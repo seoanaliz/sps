@@ -62,15 +62,15 @@
                             <param name="password">q2L3DWlLse0Wtah6nMTR</param>
                         </vkapi>
                     </modules>
+                    <databases>
+                        <database driver="PgSql">
+                            <name>sps_devel</name>
+                            <user>postgres</user>
+                            <password></password>
+                            <encoding>UTF8</encoding>
+                        </database>
+                    </databases>
                 </settings>
-                <databases>
-                    <database driver="PgSql">
-                        <name>sps_devel</name>
-                        <user>postgres</user>
-                        <password></password>
-                        <encoding>UTF8</encoding>
-                    </database>
-                </databases>
             </host>
 		</hosts>
 	</site>
