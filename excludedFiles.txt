@@ -1,0 +1,3 @@
+web/cache
+web/shared/files
+/devel

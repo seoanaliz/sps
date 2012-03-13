@@ -53,6 +53,17 @@
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
 			</host>
+            <host name="devel">
+                <hostname>mystery.vmkteam.ru</hostname>
+                <settings>
+                    <modules>
+                        <vkapi class="AuthVkontakte">
+                            <param name="appId">1868779</param>
+                            <param name="password">q2L3DWlLse0Wtah6nMTR</param>
+                        </vkapi>
+                    </modules>
+                </settings>
+            </host>
 		</hosts>
 	</site>
 </sites>
