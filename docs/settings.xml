@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<settings>
+  <files>
+    <string>..\web\eaze.php</string>
+    <string>..\web\eaze.production.php</string>
+    <string>..\web\etc\conf\pages.xml</string>
+    <string>..\web\etc\conf\sites.xml</string>
+    <string>..\web\shared\minify.php</string>
+    <string>Model\Project.mfd</string>
+    <string>Model\Project.Common.xml</string>
+    <string>rebuild-database.bat</string>
+    <string>create-hosts.bat</string>
+  </files>
+  <replace>
+	<!-- Common -->
+    <cmd find="%sitename%" replace="sps" />
+    <cmd find="%project%" replace="SPS" />
+	<cmd find="%host_name%" replace="sps" />
+	<cmd find="%web_root%" replace="d:\www\SPS\" />
+	<cmd find="%sys_hosts%" replace="C:\Windows\System32\drivers\etc\hosts" />
+	<cmd find="%apache_hosts%" replace="D:\usr\Apache\conf\extra\httpd-vhosts.conf" />
+	
+	<!-- Database -->
+    <cmd find="%db_driver%" replace="PgSql" /> <!-- MySql,PgSql -->
+    <cmd find="%db_name%" replace="sps" />
+    <cmd find="%db_user%" replace="postgres" /> <!-- postgres, root -->
+    <cmd find="%db_pass%" replace="" />
+    <cmd find="%db_encode%" replace="UTF8" /> <!-- UTF8, cp1251 -->
+	<cmd find="%db_root%" replace="D:\usr\postgres\bin" /> <!-- D:\usr\postgres\bin, D:\usr\mysql\bin -->
+	
+	<!-- Locale -->
+    <cmd find="%lang%" replace="ru" /> <!-- ru, en -->
+    <cmd find="%html_encoding%" replace="utf-8" /> <!-- utf-8 -->
+    <cmd find="%locale%" replace="en_EN.UTF-8" /> <!-- en_EN.UTF-8, ru_RU.CP1251, ru_RU.UTF-8 -->
+	
+	<!-- Mail -->
+    <cmd find="%sender_name%" replace="Administrator" />
+    <cmd find="%sender_email%" replace="admin@1adw.com" />
+    <cmd find="%mail_charset%" replace="utf-8" /> <!-- utf-8, cp1251 -->
+	
+	<!-- Minify -->
+    <cmd find="%minify_encode%" replace="utf-8" /> <!-- utf-8, cp1251 -->
+  </replace>
+  <rename>
+	<!-- Model -->
+	<move src="Model\Project.mfd" dest="%project%.mfd" />
+	<move src="Model\Project.Common.xml" dest="%project%.Common.xml" />
+	<move src="Model\Project.Common.EazeEntity.xml" dest="%project%.Common.EazeEntity.xml" />
+	<move src="Project.dm2" dest="%project%.dm2" />
+	<move src="Project.sql" dest="%project%.sql" />
+	<move src="Views\Project.Common.sql" dest="%project%.Common.sql" />
+	
+	<!-- Lib -->
+	<move src="..\web\lib\Project.Common\Project.Common.xml" dest="%project%.Common.xml" />
+	<move src="..\web\lib\Project.Common" dest="%project%.Common" />
+	<move src="..\web\lib\Project.Site\Project.Site.xml" dest="%project%.Site.xml" />
+	<move src="..\web\lib\Project.Site" dest="%project%.Site" />
+  </rename>
+</settings>

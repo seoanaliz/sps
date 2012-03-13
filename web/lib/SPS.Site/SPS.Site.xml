@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <group name="Pages">
+        <action name="GetMetaDetails" />
+        <action name="GetNavigations" />
+        <action name="GetStaticPage">
+            <path>GetStaticPage</path>
+            <parameters>
+                <request>
+                    <param name="gsp_With404">false</param>
+                </request>
+            </parameters>
+        </action>
+        <action name="GetForceStaticPage">
+            <path>GetStaticPage</path>
+            <parameters>
+                <request>
+                    <param name="gsp_With404">true</param>
+                </request>
+            </parameters>
+        </action>
+        <action name="GetSiteParams">
+            <path>controls/GetSiteParams</path>
+            <parameters>
+                <request>
+                    <param name="gsp_Container">"__params"</param>
+                </request>
+            </parameters>
+        </action>
+    </group>
+
+
+    <group name="Controls">
+    </group>
+
+	<!-- Put your's frontend actions here -->
+    <group name="Site">
+
+    </group>
+</actions>

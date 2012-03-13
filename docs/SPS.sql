@@ -1,0 +1,228 @@
+/*
+Created		16.08.2008
+Modified		04.11.2009
+Project		
+Model			
+Company		
+Author		
+Version		
+Database		PostgreSQL 8.1 
+*/
+
+
+/* Create Domains */
+
+
+/* Create Sequences */
+
+
+/* Create Tables */
+
+
+Create table "users"
+(
+	"userId" Serial NOT NULL,
+	"login" Varchar(64) NOT NULL,
+	"password" Varchar(64) NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("userId")
+) Without Oids;
+
+
+Create table "statuses"
+(
+	"statusId" Serial NOT NULL,
+	"title" Varchar(255) NOT NULL,
+	"alias" Varchar(64) NOT NULL UNIQUE,
+ primary key ("statusId")
+) Without Oids;
+
+
+Create table "daemonLocks"
+(
+	"daemonLockId" Serial NOT NULL,
+	"title" Varchar(255) NOT NULL,
+	"packageName" Varchar(255) NOT NULL,
+	"methodName" Varchar(255) NOT NULL,
+	"runAt" Timestamp NOT NULL Default now(),
+	"maxExecutionTime" Interval NOT NULL Default '00:03:00',
+ primary key ("daemonLockId")
+) Without Oids;
+
+
+Create table "vfsFiles"
+(
+	"fileId" Serial NOT NULL,
+	"folderId" Integer NOT NULL,
+	"title" Varchar(255) NOT NULL,
+	"path" Varchar(255) NOT NULL,
+	"params" Text,
+	"isFavorite" Boolean Default false,
+	"mimeType" Varchar(255) NOT NULL,
+	"fileSize" Integer Default 0,
+	"fileExists" Boolean NOT NULL Default true,
+	"statusId" Integer NOT NULL,
+	"createdAt" Timestamp NOT NULL Default now(),
+ primary key ("fileId")
+) Without Oids;
+
+
+Create table "vfsFoldersTree"
+(
+	"objectId" Integer NOT NULL,
+	"parentId" Integer,
+	"path"  "ltree",
+	"rKey" Integer,
+	"lKey" Integer,
+ primary key ("objectId")
+) Without Oids;
+
+
+Create table "vfsFolders"
+(
+	"folderId" Serial NOT NULL,
+	"parentFolderId" Integer,
+	"title" Varchar(255) NOT NULL,
+	"isFavorite" Boolean Default false,
+	"createdAt" Timestamp NOT NULL Default now(),
+	"statusId" Integer NOT NULL,
+ primary key ("folderId")
+) Without Oids;
+
+
+Create table "metaDetails"
+(
+	"metaDetailId" Serial NOT NULL,
+	"url" Varchar(255) NOT NULL,
+	"pageTitle" Varchar(255),
+	"metaKeywords" Varchar(1024),
+	"metaDescription" Varchar(1024),
+	"alt" Varchar(255),
+	"isInheritable" Boolean NOT NULL Default false,
+	"statusId" Integer NOT NULL,
+ primary key ("metaDetailId")
+) Without Oids;
+
+
+Create table "siteParams"
+(
+	"siteParamId" Serial NOT NULL,
+	"alias" Varchar(32) NOT NULL,
+	"value" Varchar(255) NOT NULL,
+	"description" Varchar(255),
+	"statusId" Integer NOT NULL,
+ primary key ("siteParamId")
+) Without Oids;
+
+
+Create table "staticPages"
+(
+	"staticPageId" Serial NOT NULL,
+	"title" Varchar(255) NOT NULL,
+	"url" Varchar(255) NOT NULL,
+	"content" Text,
+	"pageTitle" Varchar(255),
+	"metaKeywords" Varchar(2048),
+	"metaDescription" Varchar(2048),
+	"orderNumber" Integer,
+	"parentStaticPageId" Integer,
+	"statusId" Integer NOT NULL,
+ primary key ("staticPageId")
+) Without Oids;
+
+
+Create table "navigations"
+(
+	"navigationId" Serial NOT NULL,
+	"navigationTypeId" Integer NOT NULL,
+	"title" Varchar(255),
+	"orderNumber" Integer NOT NULL Default 1,
+	"staticPageId" Integer,
+	"url" Varchar(255),
+	"statusId" Integer NOT NULL,
+ primary key ("navigationId")
+) Without Oids;
+
+
+Create table "navigationTypes"
+(
+	"navigationTypeId" Serial NOT NULL,
+	"title" Varchar(255) NOT NULL,
+	"alias" Varchar(32) NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("navigationTypeId")
+) Without Oids;
+
+
+/* Create Tab 'Others' for Selected Tables */
+
+
+/* Create Alternate Keys */
+
+
+/* Create Indexes */
+Create unique index "IX_daemonLock" on "daemonLocks" using btree ("title","packageName","methodName");
+Create index "IX_vfsFoldersTreeTreePath" on "vfsFoldersTree" using gist ("path");
+Create index "IX_vfsFoldersTreeTreeRKey" on "vfsFoldersTree" using btree ("rKey");
+Create index "IX_vfsFoldersTreeTreeLKey" on "vfsFoldersTree" using btree ("lKey");
+
+
+/* Create Foreign Keys */
+Create index "IX_FK_usersStatusId_users" on "users" ("statusId");
+Alter table "users" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_metaDetailsStatusId_metaDetails" on "metaDetails" ("statusId");
+Alter table "metaDetails" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_siteParamsStatusId_siteParams" on "siteParams" ("statusId");
+Alter table "siteParams" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_staticPagesStatusId_staticPages" on "staticPages" ("statusId");
+Alter table "staticPages" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_navigationTypesStatusId_navigationTypes" on "navigationTypes" ("statusId");
+Alter table "navigationTypes" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_navigationsStatusId_navigations" on "navigations" ("statusId");
+Alter table "navigations" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFoldersStatusId_vfsFolders" on "vfsFolders" ("statusId");
+Alter table "vfsFolders" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFilesStatusId_vfsFiles" on "vfsFiles" ("statusId");
+Alter table "vfsFiles" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
+Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");
+Alter table "vfsFiles" add  foreign key ("folderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFoldersTreeFolderId_vfsFoldersTree" on "vfsFoldersTree" ("objectId");
+Alter table "vfsFoldersTree" add  foreign key ("objectId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
+Create index "IX_FK_vfsFoldersTreeParentId_vfsFoldersTree" on "vfsFoldersTree" ("parentId");
+Alter table "vfsFoldersTree" add  foreign key ("parentId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
+Create index "IX_FK_navigationsStaticPageId_navigations" on "navigations" ("staticPageId");
+Alter table "navigations" add  foreign key ("staticPageId") references "staticPages" ("staticPageId") on update restrict on delete restrict;
+Create index "IX_FK_staticPagesParentStaticPageId_staticPages" on "staticPages" ("parentStaticPageId");
+Alter table "staticPages" add  foreign key ("parentStaticPageId") references "staticPages" ("staticPageId") on update restrict on delete restrict;
+Create index "IX_FK_navigationsNavigationTypeId_navigations" on "navigations" ("navigationTypeId");
+Alter table "navigations" add  foreign key ("navigationTypeId") references "navigationTypes" ("navigationTypeId") on update restrict on delete restrict;
+
+
+/* Create Procedures */
+
+
+/* Create Views */
+
+
+/* Create Referential Integrity Triggers */
+
+
+/* Create User-Defined Triggers */
+
+
+/* Create Roles */
+
+
+/* Add Roles To Roles */
+
+
+/* Create Role Permissions */
+/* Role permissions on tables */
+
+/* Role permissions on views */
+
+/* Role permissions on procedures */
+
+
