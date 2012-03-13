@@ -22,6 +22,7 @@
     Package::Load( 'Base.VFS' );
 
     Package::Load( 'SPS.Common' );
+    Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.Site' );
 
     // Initialize Logger

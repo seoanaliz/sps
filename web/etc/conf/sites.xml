@@ -62,6 +62,7 @@
                             <param name="password">q2L3DWlLse0Wtah6nMTR</param>
                         </vkapi>
                     </modules>
+                    <databases />
                 </settings>
             </host>
 		</hosts>
