@@ -4,5 +4,6 @@
   <TemplateVersion>trunk</TemplateVersion>
   <PackageNames>
     <string>SPS.Common</string>
+    <string>SPS.Articles</string>
   </PackageNames>
 </Project>

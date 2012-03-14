@@ -1,0 +1,451 @@
+<?xml version="1.0"?>
+<ArrayOfEazeEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <EazeEntity Name="SourceFeed">
+    <TerminalPath>source-feeds</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies />
+    <Search>
+      <TemplateAttribute Name="sourceFeedId" TitleKey="vt.sourceFeed.sourceFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sourceFeedId" />
+          <AttributeParameter Key="value" Value="sourceFeedId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="sourceFeedId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.sourceFeed.title" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.sourceFeed.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="sourceFeedId" TitleKey="vt.sourceFeed.sourceFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sourceFeedId" />
+          <AttributeParameter Key="value" Value="sourceFeedId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="sourceFeedId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.sourceFeed.title" TitleValue="Заголовок" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.sourceFeed.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="TargetFeed">
+    <TerminalPath>target-feeds</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies />
+    <Search>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.targetFeed.title" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.targetFeed.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.targetFeed.title" TitleValue="Заголовок" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.targetFeed.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="Article">
+    <TerminalPath>articles</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>sourceFeeds</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="importedAt" TitleKey="vt.article.importedAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="importedAt" />
+          <AttributeParameter Key="value" Value="importedAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sourceFeedId" TitleKey="vt.article.sourceFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sourceFeedId" />
+          <AttributeParameter Key="values" Value="$sourceFees" />
+          <AttributeParameter Key="dataKey" Value="sourceFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="sourceFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.article.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="importedAt" TitleKey="vt.article.importedAt" TitleValue="Дата импорта" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="importedAt" />
+          <AttributeParameter Key="value" Value="importedAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sourceFeedId" TitleKey="vt.article.sourceFeedId" TitleValue="Источник" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sourceFeedId" />
+          <AttributeParameter Key="values" Value="$sourceFees" />
+          <AttributeParameter Key="dataKey" Value="sourceFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="sourceFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sourceFee.title" TitleKey="vt.article.sourceFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sourceFeedId" />
+          <AttributeParameter Key="values" Value="$sourceFees" />
+          <AttributeParameter Key="dataKey" Value="sourceFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="sourceFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.article.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="ArticleQueue">
+    <TerminalPath>article-queues</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>articles targetFeeds</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="articleQueueId" TitleKey="vt.articleQueue.articleQueueId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleQueueId" />
+          <AttributeParameter Key="value" Value="articleQueueId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleQueueId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.articleQueue.startDate" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="endDate" TitleKey="vt.articleQueue.endDate" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="endDate" />
+          <AttributeParameter Key="value" Value="endDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.articleQueue.createdAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sentAt" TitleKey="vt.articleQueue.sentAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sentAt" />
+          <AttributeParameter Key="value" Value="sentAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.articleQueue.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.articleQueue.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.articleQueue.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="articleQueueId" TitleKey="vt.articleQueue.articleQueueId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleQueueId" />
+          <AttributeParameter Key="value" Value="articleQueueId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleQueueId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.articleQueue.startDate" TitleValue="Дата начала" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="endDate" TitleKey="vt.articleQueue.endDate" TitleValue="Дата окончания" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="endDate" />
+          <AttributeParameter Key="value" Value="endDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.articleQueue.createdAt" TitleValue="Дата создания" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sentAt" TitleKey="vt.articleQueue.sentAt" TitleValue="Дата отправки" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sentAt" />
+          <AttributeParameter Key="value" Value="sentAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.articleQueue.articleId" TitleValue="Статья" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.articleQueue.targetFeedId" TitleValue="Лента отправки" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFee.title" TitleKey="vt.articleQueue.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.articleQueue.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="ArticleRecord">
+    <TerminalPath>article-records</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>articles articleQueues</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="articleRecordId" TitleKey="vt.articleRecord.articleRecordId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleRecordId" />
+          <AttributeParameter Key="value" Value="articleRecordId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleRecordId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="content" TitleKey="vt.articleRecord.content" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="content" />
+          <AttributeParameter Key="value" Value="content" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="content" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="likes" TitleKey="vt.articleRecord.likes" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="likes" />
+          <AttributeParameter Key="value" Value="likes" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="likes" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.articleRecord.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleQueueId" TitleKey="vt.articleRecord.articleQueueId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleQueueId" />
+          <AttributeParameter Key="value" Value="articleQueueId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleQueueId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="articleRecordId" TitleKey="vt.articleRecord.articleRecordId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleRecordId" />
+          <AttributeParameter Key="value" Value="articleRecordId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleRecordId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="content" TitleKey="vt.articleRecord.content" TitleValue="Содержание" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="content" />
+          <AttributeParameter Key="value" Value="content" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="content" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="likes" TitleKey="vt.articleRecord.likes" TitleValue="Лайки" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="likes" />
+          <AttributeParameter Key="value" Value="likes" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="likes" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.articleRecord.articleId" TitleValue="articleId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleQueueId" TitleKey="vt.articleRecord.articleQueueId" TitleValue="articleQueueId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleQueueId" />
+          <AttributeParameter Key="value" Value="articleQueueId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleQueueId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+</ArrayOfEazeEntity>

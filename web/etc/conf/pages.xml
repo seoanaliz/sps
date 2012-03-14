@@ -130,6 +130,77 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
+
+                <pageGroup name="SPS.Articles">
+                    <pageGroup name="sourceFeed">
+                        <page uri="vt://source-feeds/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetSourceFeedList</actions>
+                            <template>tmpl://vt/source-feeds/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://source-feeds/add">
+                            <actions>SPS.Articles.SaveSourceFeed</actions>
+                            <template>tmpl://vt/source-feeds/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://source-feeds/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteSourceFeed</actions>
+                        </page>
+                        <page uri="vt://source-feeds/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveSourceFeed</actions>
+                            <template>tmpl://vt/source-feeds/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="targetFeed">
+                        <page uri="vt://target-feeds/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetTargetFeedList</actions>
+                            <template>tmpl://vt/target-feeds/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://target-feeds/add">
+                            <actions>SPS.Articles.SaveTargetFeed</actions>
+                            <template>tmpl://vt/target-feeds/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://target-feeds/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteTargetFeed</actions>
+                        </page>
+                        <page uri="vt://target-feeds/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveTargetFeed</actions>
+                            <template>tmpl://vt/target-feeds/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="article">
+                        <page uri="vt://articles/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleList</actions>
+                            <template>tmpl://vt/articles/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://articles/add">
+                            <actions>SPS.Articles.SaveArticle</actions>
+                            <template>tmpl://vt/articles/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://articles/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteArticle</actions>
+                        </page>
+                        <page uri="vt://articles/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveArticle</actions>
+                            <template>tmpl://vt/articles/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="articleQueue">
+                        <page uri="vt://article-queues/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleQueueList</actions>
+                            <template>tmpl://vt/article-queues/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://article-queues/add">
+                            <actions>SPS.Articles.SaveArticleQueue</actions>
+                            <template>tmpl://vt/article-queues/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://article-queues/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteArticleQueue</actions>
+                        </page>
+                        <page uri="vt://article-queues/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveArticleQueue</actions>
+                            <template>tmpl://vt/article-queues/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                </pageGroup>
 				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">

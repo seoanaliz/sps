@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>SPS.Articles</Name>
+  <Entities>
+    <Entity Name="SourceFeed" PackageName="SPS.Articles" Table="sourceFeeds" View="getSourceFeeds" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="sourceFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="TargetFeed" PackageName="SPS.Articles" Table="targetFeeds" View="getTargetFeeds" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="targetFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="Article" PackageName="SPS.Articles" Table="articles" View="getArticles" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="articleId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="importedAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="importedAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="sourceFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFee" ForeignKey="SourceFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Search>
+      <Flags>
+        <EFlag>CanPages</EFlag>
+        <EFlag>CanCache</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="ArticleQueue" PackageName="SPS.Articles" Table="articleQueues" View="getArticleQueues" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="articleQueueId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleQueueId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="startDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="endDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="endDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="createdAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="createdAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="sentAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sentAt" FieldType="TYPE_DATETIME" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFee" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Search>
+      <Flags>
+        <EFlag>CanPages</EFlag>
+        <EFlag>CanCache</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="ArticleRecord" PackageName="SPS.Articles" Table="articleRecords" View="getArticleRecords" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="articleRecordId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleRecordId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="content" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="content" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="likes" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="likes" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="articleQueueId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleQueue" ForeignKey="ArticleQueue" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+  </Entities>
+</Package>

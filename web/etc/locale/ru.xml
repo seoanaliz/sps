@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language name="ru">
   <errors>
     <desc>
@@ -14,6 +14,12 @@
   </errors>
   <vt>
     <grid>
+      <resultsCount>
+        <onePage1><![CDATA[Показан %s результат]]></onePage1>
+        <onePage2><![CDATA[Показано %s результата]]></onePage2>
+        <onePage5><![CDATA[Показано %s результатов]]></onePage5>
+        <pages><![CDATA[Показано %s-%s результатов из %s]]></pages>
+      </resultsCount>
       <pEnd><![CDATA[&gt;&gt;]]></pEnd>
       <pStart><![CDATA[&lt;&lt;]]></pStart>
       <pFrom><![CDATA[из]]></pFrom>
@@ -22,12 +28,6 @@
       <pageSize><![CDATA[Количество на странице]]></pageSize>
       <search><![CDATA[Найти]]></search>
       <searchparams><![CDATA[Поиск]]></searchparams>
-      <resultsCount>
-          <onePage1><![CDATA[Показан %s результат]]></onePage1>
-          <onePage2><![CDATA[Показано %s результата]]></onePage2>
-          <onePage5><![CDATA[Показано %s результатов]]></onePage5>
-          <pages><![CDATA[Показано %s-%s результатов из %s]]></pages>
-      </resultsCount>
     </grid>
     <common>
       <add><![CDATA[Добавить]]></add>
@@ -129,6 +129,26 @@
         <addTitle><![CDATA[Добавление элемента навигации]]></addTitle>
         <editTitle><![CDATA[Редактирование элемента навигации]]></editTitle>
       </navigation>
+      <sourceFeed>
+        <list><![CDATA[Список источников]]></list>
+        <addTitle><![CDATA[Добавление источника]]></addTitle>
+        <editTitle><![CDATA[Редактирование источника]]></editTitle>
+      </sourceFeed>
+      <targetFeed>
+        <list><![CDATA[Список лент отправки]]></list>
+        <addTitle><![CDATA[Добавление ленты отправки]]></addTitle>
+        <editTitle><![CDATA[Редактирование ленты отправки]]></editTitle>
+      </targetFeed>
+      <article>
+        <list><![CDATA[Список статей]]></list>
+        <addTitle><![CDATA[Добавление статьи]]></addTitle>
+        <editTitle><![CDATA[Редактирование статьи]]></editTitle>
+      </article>
+      <articleQueue>
+        <list><![CDATA[Список очередей]]></list>
+        <addTitle><![CDATA[Добавление очереди]]></addTitle>
+        <editTitle><![CDATA[Редактирование очереди]]></editTitle>
+      </articleQueue>
     </screens>
     <vfs>
       <queue>
@@ -196,6 +216,7 @@
       <statusId><![CDATA[Статус]]></statusId>
       <commonInfo><![CDATA[Общая информация]]></commonInfo>
       <metaDetails><![CDATA[Параметры страницы]]></metaDetails>
+      <nodes><![CDATA[nodes]]></nodes>
     </staticPage>
     <navigationType>
       <deleteString><![CDATA[Вы действительно хотите удалить типа навигации?]]></deleteString>
@@ -213,7 +234,38 @@
       <url><![CDATA[Ссылка]]></url>
       <staticPageId><![CDATA[Страница]]></staticPageId>
       <statusId><![CDATA[Статус]]></statusId>
+      <nodes><![CDATA[nodes]]></nodes>
     </navigation>
+    <sourceFeed>
+      <deleteString><![CDATA[Вы действительно хотите удалить источник?]]></deleteString>
+      <header><![CDATA[источники]]></header>
+      <title><![CDATA[Заголовок]]></title>
+      <statusId><![CDATA[Статус]]></statusId>
+    </sourceFeed>
+    <targetFeed>
+      <deleteString><![CDATA[Вы действительно хотите удалить ленту отправки?]]></deleteString>
+      <header><![CDATA[ленты отправки]]></header>
+      <title><![CDATA[Заголовок]]></title>
+      <statusId><![CDATA[Статус]]></statusId>
+    </targetFeed>
+    <article>
+      <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
+      <header><![CDATA[статьи]]></header>
+      <importedAt><![CDATA[Дата импорта]]></importedAt>
+      <sourceFeedId><![CDATA[Источник]]></sourceFeedId>
+      <statusId><![CDATA[Статус]]></statusId>
+    </article>
+    <articleQueue>
+      <deleteString><![CDATA[Вы действительно хотите удалить очередь?]]></deleteString>
+      <header><![CDATA[очереди]]></header>
+      <startDate><![CDATA[Дата начала]]></startDate>
+      <endDate><![CDATA[Дата окончания]]></endDate>
+      <createdAt><![CDATA[Дата создания]]></createdAt>
+      <sentAt><![CDATA[Дата отправки]]></sentAt>
+      <articleId><![CDATA[Статья]]></articleId>
+      <targetFeedId><![CDATA[Лента отправки]]></targetFeedId>
+      <statusId><![CDATA[Статус]]></statusId>
+    </articleQueue>
   </vt>
   <objects>
     <siteParam>
@@ -258,5 +310,33 @@
       <singleGenitive><![CDATA[элемента навигации]]></singleGenitive>
       <singleAccusative><![CDATA[элемент навигации]]></singleAccusative>
     </navigation>
+    <sourceFeed>
+      <single><![CDATA[источник]]></single>
+      <plural><![CDATA[источники]]></plural>
+      <pluralGenitive><![CDATA[источников]]></pluralGenitive>
+      <singleGenitive><![CDATA[источника]]></singleGenitive>
+      <singleAccusative><![CDATA[источник]]></singleAccusative>
+    </sourceFeed>
+    <targetFeed>
+      <single><![CDATA[лента отправки]]></single>
+      <plural><![CDATA[ленты отправки]]></plural>
+      <pluralGenitive><![CDATA[лент отправки]]></pluralGenitive>
+      <singleGenitive><![CDATA[ленты отправки]]></singleGenitive>
+      <singleAccusative><![CDATA[ленту отправки]]></singleAccusative>
+    </targetFeed>
+    <article>
+      <single><![CDATA[статья]]></single>
+      <plural><![CDATA[статьи]]></plural>
+      <pluralGenitive><![CDATA[статей]]></pluralGenitive>
+      <singleGenitive><![CDATA[статьи]]></singleGenitive>
+      <singleAccusative><![CDATA[статью]]></singleAccusative>
+    </article>
+    <articleQueue>
+      <single><![CDATA[очередь]]></single>
+      <plural><![CDATA[очереди]]></plural>
+      <pluralGenitive><![CDATA[очередей]]></pluralGenitive>
+      <singleGenitive><![CDATA[очереди]]></singleGenitive>
+      <singleAccusative><![CDATA[очередь]]></singleAccusative>
+    </articleQueue>
   </objects>
 </language>

@@ -13,6 +13,7 @@ net stop Apache2.2
 %PGSQL_ROOT%\psql.exe  -U %DATABASE_USER% -f Views\Base.VFS.sql  %DATABASE_NAME%
 %PGSQL_ROOT%\psql.exe  -U %DATABASE_USER% -f Views\Base.Common.sql  %DATABASE_NAME%
 %PGSQL_ROOT%\psql.exe  -U %DATABASE_USER% -f Views\SPS.Common.sql  %DATABASE_NAME%
+%PGSQL_ROOT%\psql.exe  -U %DATABASE_USER% -f Views\SPS.Articles.sql  %DATABASE_NAME%
 %PGSQL_ROOT%\psql.exe  -U %DATABASE_USER% -f init.sql  %DATABASE_NAME%
 
 net START Apache2.2

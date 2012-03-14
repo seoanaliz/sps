@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		04.11.2009
+Modified		14.03.2012
 Project		
 Model			
 Company		
@@ -154,6 +154,59 @@ Create table "navigationTypes"
 ) Without Oids;
 
 
+Create table "articles"
+(
+	"articleId" Integer NOT NULL,
+	"importedAt" Timestamp NOT NULL,
+	"sourceFeedId" Integer NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("articleId")
+) Without Oids;
+
+
+Create table "articleQueues"
+(
+	"articleQueueId" Serial NOT NULL,
+	"startDate" Timestamp NOT NULL,
+	"endDate" Timestamp NOT NULL,
+	"createdAt" Timestamp NOT NULL,
+	"sentAt" Timestamp,
+	"articleId" Integer NOT NULL,
+	"targetFeedId" Integer NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("articleQueueId")
+) Without Oids;
+
+
+Create table "articleRecords"
+(
+	"articleRecordId" Serial NOT NULL,
+	"content" Text NOT NULL,
+	"likes" Integer,
+	"articleId" Integer,
+	"articleQueueId" Integer,
+ primary key ("articleRecordId")
+) Without Oids;
+
+
+Create table "sourceFeeds"
+(
+	"sourceFeedId" Serial NOT NULL,
+	"title" Varchar(500) NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("sourceFeedId")
+) Without Oids;
+
+
+Create table "targetFeeds"
+(
+	"targetFeedId" Serial NOT NULL,
+	"title" Varchar(500) NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("targetFeedId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -184,6 +237,14 @@ Create index "IX_FK_vfsFoldersStatusId_vfsFolders" on "vfsFolders" ("statusId");
 Alter table "vfsFolders" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesStatusId_vfsFiles" on "vfsFiles" ("statusId");
 Alter table "vfsFiles" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_articlesStatusId_articles" on "articles" ("statusId");
+Alter table "articles" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_articleQueuesStatusId_articleQueues" on "articleQueues" ("statusId");
+Alter table "articleQueues" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_sourceFeedsStatusId_sourceFeeds" on "sourceFeeds" ("statusId");
+Alter table "sourceFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_targetFeedsStatusId_targetFeeds" on "targetFeeds" ("statusId");
+Alter table "targetFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
 Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");
@@ -198,6 +259,16 @@ Create index "IX_FK_staticPagesParentStaticPageId_staticPages" on "staticPages" 
 Alter table "staticPages" add  foreign key ("parentStaticPageId") references "staticPages" ("staticPageId") on update restrict on delete restrict;
 Create index "IX_FK_navigationsNavigationTypeId_navigations" on "navigations" ("navigationTypeId");
 Alter table "navigations" add  foreign key ("navigationTypeId") references "navigationTypes" ("navigationTypeId") on update restrict on delete restrict;
+Create index "IX_FK_articleQueuesArticleId_articleQueues" on "articleQueues" ("articleId");
+Alter table "articleQueues" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
+Create index "IX_FK_articleRecordsArticleId_articleRecords" on "articleRecords" ("articleId");
+Alter table "articleRecords" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
+Create index "IX_FK_articleRecordsArticleQueueId_articleRecords" on "articleRecords" ("articleQueueId");
+Alter table "articleRecords" add  foreign key ("articleQueueId") references "articleQueues" ("articleQueueId") on update restrict on delete restrict;
+Create index "IX_FK_articlesSourceFeedId_articles" on "articles" ("sourceFeedId");
+Alter table "articles" add  foreign key ("sourceFeedId") references "sourceFeeds" ("sourceFeedId") on update restrict on delete restrict;
+Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
+Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 
 
 /* Create Procedures */
