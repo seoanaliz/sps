@@ -3,14 +3,16 @@ SELECT "public"."sourceFeeds"."sourceFeedId"
 	, "public"."sourceFeeds"."title"
 	, "public"."sourceFeeds"."statusId"
  FROM "public"."sourceFeeds"
-	WHERE "public"."sourceFeeds"."statusId" != 3;
+	WHERE "public"."sourceFeeds"."statusId" != 3
+ORDER BY "title";
 	
 CREATE OR REPLACE VIEW "getTargetFeeds" AS
 SELECT "public"."targetFeeds"."targetFeedId"
 	, "public"."targetFeeds"."title"
 	, "public"."targetFeeds"."statusId"
  FROM "public"."targetFeeds"
-	WHERE "public"."targetFeeds"."statusId" != 3;
+	WHERE "public"."targetFeeds"."statusId" != 3
+ORDER BY "title";
 	
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"

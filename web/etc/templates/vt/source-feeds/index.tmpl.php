@@ -66,7 +66,7 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td>{$object.title}</td>
+                <td class="header">{$object.title}</td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
