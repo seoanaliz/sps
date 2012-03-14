@@ -26,6 +26,21 @@
             parent::$factory = new ArticleFactory();
         }
 
+        protected function beforeSave() {
+            $this->photosToResponse();
+        }
+
+        protected function photosToResponse() {
+            $photos = array();
+            if (!empty($this->articleRecord->photos)) {
+                foreach($this->articleRecord->photos as $photoItem) {
+                    $photo = $photoItem;
+                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], !empty($photoItem['isTemp']) ? MediaServerManager::$TempLocation : null );
+                    $photos[] = $photo;
+                }
+            }
+            Response::setString( 'filesJSON', ObjectHelper::ToJSON($photos) );
+        }
                
         /**
          * Form Object From Request
@@ -58,10 +73,13 @@
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
                 }
             }
-
             Response::setParameter( "articleRecord", $this->articleRecord );
 
-            Response::setString( 'filesJSON', '[]' );
+            //get photos from request
+            $photos = Request::getArray( 'files' );
+            $photos = !empty($photos) ? $photos : array();
+            $this->articleRecord->photos = $photos;
+            $this->photosToResponse();
             
             return $object;
         }
@@ -86,7 +104,22 @@
             
             return $errors;
         }
-        
+
+        private function preparePhotosForSave() {
+            $photosForSave = array();
+
+            if (!empty($this->articleRecord->photos)) {
+                foreach ($this->articleRecord->photos as &$photo) {
+                    if (!empty($photo['isTemp'])) {
+                        $photo['isTemp']    = false;
+                        $photosForSave[]    = $photo['filename'];
+                    }
+                }
+            }
+
+            MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', $photosForSave );
+            $this->photosToResponse();
+        }
         
         /**
          * Add Object
@@ -95,6 +128,8 @@
          * @return bool
          */
         protected function add( $object ) {
+            $this->preparePhotosForSave();
+
             $conn = ConnectionFactory::Get();
             $conn->begin();
 
@@ -127,6 +162,8 @@
          * @return bool
          */
         protected function update( $object ) {
+            $this->preparePhotosForSave();
+
             $conn = ConnectionFactory::Get();
             $conn->begin();
 
@@ -150,7 +187,6 @@
 
             return $result;
         }
-        
         
         /**
          * Set Foreign Lists

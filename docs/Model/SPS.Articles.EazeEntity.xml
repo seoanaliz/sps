@@ -403,6 +403,14 @@
           <AttributeParameter Key="controlId" Value="articleQueueId" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="photos" TitleKey="vt.articleRecord.photos" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="photos" />
+          <AttributeParameter Key="value" Value="photos" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="photos" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleRecordId" TitleKey="vt.articleRecord.articleRecordId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -444,6 +452,14 @@
           <AttributeParameter Key="value" Value="articleQueueId" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="articleQueueId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="photos" TitleKey="vt.articleRecord.photos" TitleValue="Фотографии" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="photos" />
+          <AttributeParameter Key="value" Value="photos" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="photos" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

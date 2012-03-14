@@ -39,6 +39,11 @@
                     'name'          => 'likes'
                     , 'type'        => TYPE_INTEGER
                 )
+                ,'photos' => array(
+                    'name'          => 'photos'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER

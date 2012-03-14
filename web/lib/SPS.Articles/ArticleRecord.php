@@ -21,6 +21,9 @@
         /** @var int */
         public $likes;
 
+        /** @var array */
+        public $photos;
+
         /** @var int */
         public $articleId;
 

@@ -34,7 +34,7 @@
         <input type="hidden" name="files[${ $item.counter.index }][isTemp]" value="${isTemp}">
         <img src="{web:images://vt/common/objects/sort-link.gif}" style="cursor: move;" class="handle">
         <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
-        <span class="fileName">${name}</span>
+        <span class="fileName">${filename}</span>
         <br /><br /><img src="${path}" alt="" />
     </div>
 </script><script>''</script>

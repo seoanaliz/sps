@@ -183,6 +183,7 @@ Create table "articleRecords"
 	"articleRecordId" Serial NOT NULL,
 	"content" Text NOT NULL,
 	"likes" Integer,
+	"photos" Text,
 	"articleId" Integer,
 	"articleQueueId" Integer,
  primary key ("articleRecordId")
