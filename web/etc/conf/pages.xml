@@ -233,6 +233,13 @@
                     </page>
                 </pageGroup>
             </pageGroup>
+
+            <pageGroup name="daemons" boot="">
+                <page uri="daemons://process-queue/">
+                    <actions>SPS.Site.ProcessQueue</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

@@ -29,6 +29,11 @@
         </action>
     </group>
 
+    <group name="Queue">
+        <action name="ProcessQueue">
+            <path>queue/ProcessQueue</path>
+        </action>
+    </group>
 
     <group name="Controls">
     </group>
