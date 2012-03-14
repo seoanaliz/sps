@@ -52,6 +52,18 @@
 			<host name="local">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
+                <settings>
+                    <modules>
+                        <mediaServer class="MediaServerManager">
+                            <param name="host">media.sps</param>
+                            <param name="mainLocation">/</param>
+                            <param name="tempLocation">/temp/</param>
+                            <param name="uploadPort">8000</param>
+                            <param name="resizeExec">"c:\\Program Files (x86)\\ImageMagick\\convert.exe"</param>
+                            <param name="resizeCommands">array( 'resize' => '^>', 'crop' => '^^' )</param>
+                        </mediaServer>
+                    </modules>
+                </settings>
 			</host>
             <host name="devel">
                 <hostname>mystery.vmkteam.ru</hostname>
