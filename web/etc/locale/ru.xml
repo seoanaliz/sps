@@ -145,9 +145,9 @@
                 <editTitle><![CDATA[Редактирование статьи]]></editTitle>
             </article>
             <articleQueue>
-                <list><![CDATA[Список очередей]]></list>
-                <addTitle><![CDATA[Добавление очереди]]></addTitle>
-                <editTitle><![CDATA[Редактирование очереди]]></editTitle>
+                <list><![CDATA[Очередь отправки статей]]></list>
+                <addTitle><![CDATA[Добавление в очередь]]></addTitle>
+                <editTitle><![CDATA[Редактирование эелемента очереди]]></editTitle>
             </articleQueue>
         </screens>
         <vfs>
@@ -185,6 +185,7 @@
             <articles><![CDATA[Статьи]]></articles>
             <sourceFeeds><![CDATA[Источники]]></sourceFeeds>
             <targetFeeds><![CDATA[Ленты отправки]]></targetFeeds>
+            <articlesQueue><![CDATA[Очередь]]></articlesQueue>
         </menu>
         <metaDetail>
             <deleteString><![CDATA[Вы действительно хотите удалить параметр страницы?]]></deleteString>
@@ -266,7 +267,7 @@
             <endDate><![CDATA[Дата окончания]]></endDate>
             <createdAt><![CDATA[Дата создания]]></createdAt>
             <sentAt><![CDATA[Дата отправки]]></sentAt>
-            <articleId><![CDATA[Статья]]></articleId>
+            <articleId><![CDATA[ID Статьи]]></articleId>
             <targetFeedId><![CDATA[Лента отправки]]></targetFeedId>
             <statusId><![CDATA[Статус]]></statusId>
         </articleQueue>

@@ -36,6 +36,9 @@
             
             if ( $originalObject != null ) {
                 $object->articleQueueId = $originalObject->articleQueueId;
+                $object->createdAt      = $originalObject->createdAt;
+            } else {
+                $object->createdAt      = DateTimeWrapper::Now();
             }
             
             return $object;

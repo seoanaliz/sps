@@ -185,7 +185,7 @@
                     </pageGroup>
                     <pageGroup name="articleQueue">
                         <page uri="vt://article-queues/">
-                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleQueueList</actions>
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleQueueList, SPS.Common.SetArticleQueueMenu</actions>
                             <template>tmpl://vt/article-queues/index.tmpl.php</template>
                         </page>
                         <page uri="vt://article-queues/add">

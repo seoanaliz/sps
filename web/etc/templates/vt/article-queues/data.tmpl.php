@@ -25,10 +25,6 @@
             <label>{lang:vt.articleQueue.endDate}</label>
             <?= FormHelper::FormDateTime( $prefix . '[endDate]', $object->endDate, 'd.m.Y G:i' ); ?>
         </div>
-        <div data-row="createdAt" class="row required">
-            <label>{lang:vt.articleQueue.createdAt}</label>
-            <?= FormHelper::FormDateTime( $prefix . '[createdAt]', $object->createdAt, 'd.m.Y G:i' ); ?>
-        </div>
         <div data-row="sentAt" class="row">
             <label>{lang:vt.articleQueue.sentAt}</label>
             <?= FormHelper::FormDateTime( $prefix . '[sentAt]', $object->sentAt, 'd.m.Y G:i' ); ?>
@@ -39,7 +35,7 @@
         </div>
         <div data-row="targetFeedId" class="row required">
             <label>{lang:vt.articleQueue.targetFeedId}</label>
-            <?= FormHelper::FormSelect( $prefix . '[targetFeedId]', $targetFees, "targetFeedId", "title", $object->targetFeedId, null, null, false ); ?>
+            <?= FormHelper::FormSelect( $prefix . '[targetFeedId]', $targetFeeds, "targetFeedId", "title", $object->targetFeedId, null, null, false ); ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.articleQueue.statusId}</label>

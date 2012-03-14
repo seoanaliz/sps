@@ -237,5 +237,13 @@
                 </response>
             </parameters>
         </action>
+        <action name="SetArticleQueueMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"articles-queue"</param>
+                </response>
+            </parameters>
+        </action>
     </group>
 </actions>

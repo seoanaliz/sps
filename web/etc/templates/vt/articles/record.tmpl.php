@@ -11,5 +11,5 @@
 </div>
 <div data-row="likes" class="row">
     <label>{lang:vt.articleRecord.likes}</label>
-    <?= FormHelper::FormInput( $prefixRecord . '[likes]', $articleRecord->likes, 'likes', null, array( 'size' => 80 ) ); ?>
+    <?= FormHelper::FormInput( $prefixRecord . '[likes]', $articleRecord->likes, 'likes', null, array( 'size' => 80, 'style' => 'width: 100px;' ) ); ?>
 </div>

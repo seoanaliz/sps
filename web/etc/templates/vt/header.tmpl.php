@@ -17,6 +17,10 @@
             "title"  => "vt.menu.articles"
             , "link" => "vt://articles/"
         )
+        , "articles-queue" => array(
+            "title"  => "vt.menu.articlesQueue"
+            , "link" => "vt://article-queues/"
+        )
         , "source-feeds" => array(
             "title"  => "vt.menu.sourceFeeds"
             , "link" => "vt://source-feeds/"

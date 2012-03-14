@@ -50,7 +50,7 @@
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
                     <label>{lang:vt.articleQueue.targetFeedId}</label>
-                    <?= FormHelper::FormSelect( "search[targetFeedId]", $targetFees, "targetFeedId", "title", $search['targetFeedId'], null, null, true ); ?>
+                    <?= FormHelper::FormSelect( "search[targetFeedId]", $targetFeeds, "targetFeedId", "title", $search['targetFeedId'], null, null, true ); ?>
                 </div>
                 <div class="row">
                     <label>{lang:vt.articleQueue.statusId}</label>
@@ -76,7 +76,7 @@
                 <td><?= ( !empty( $object->createdAt ) ? $object->createdAt->DefaultFormat() : '' ) ?></td>
                 <td><?= ( !empty( $object->sentAt ) ? $object->sentAt->DefaultFormat() : '' ) ?></td>
                 <td>{$object.articleId}</td>
-                <td>{$object.targetFee.title}</td>
+                <td><?= !empty($targetFeeds[$object->targetFeedId]) ? $targetFeeds[$object->targetFeedId]->title : '' ?></td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
