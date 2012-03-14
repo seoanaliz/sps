@@ -282,6 +282,7 @@
         <articleRecord>
             <content><![CDATA[Содержание]]></content>
             <likes><![CDATA[Лайки]]></likes>
+            <photos><![CDATA[Фото]]></photos>
         </articleRecord>
     </vt>
     <objects>

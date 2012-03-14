@@ -14,7 +14,7 @@
     <?= FormHelper::FormInput( $prefixRecord . '[likes]', $articleRecord->likes, 'likes', null, array( 'size' => 80, 'style' => 'width: 100px;' ) ); ?>
 </div>
 <div data-row="files" class="row">
-    <label>{lang:vt.articleRecord.files}</label>
+    <label>{lang:vt.articleRecord.photos}</label>
     <div style="display: inline-block; //display: inline;">
         <input id="file_upload" name="file_upload" type="file" />
     </div>
@@ -24,7 +24,7 @@
 </script>
 <script type="text/javascript">
     function uploadCallback( file,data ) {
-        t = $("#fileTemplate").tmpl( {filename: data.filename, isTemp: data.isTemp, path: data.path, name : file.name}, { counter: filesCounter } );
+        t = $("#fileTemplate").tmpl( {title: '', filename: data.filename, isTemp: data.isTemp, path: data.path, name : file.name}, { counter: filesCounter } );
         $('#' + file.id).replaceWith( t );
     }
 </script>
@@ -35,5 +35,6 @@
         <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
         <span class="fileName">${filename}</span>
         <br /><br /><img src="${path}" alt="" />
+        <br /><br /><input type="text" name="files[${ $item.counter.index }][title]" value="${title}" style="width: 98%"/>
     </div>
 </script><script>''</script>
