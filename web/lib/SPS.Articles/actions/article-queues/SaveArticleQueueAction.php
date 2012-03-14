@@ -98,12 +98,12 @@
 
             $articleRecordErrors = ArticleRecordFactory::Validate( $this->articleRecord );
 
-            if( !empty( $articleRecordErrors['fields'] ) ) {
+            if( !empty( $articleRecordErrors['fields'] ) && $this->action != BaseSaveAction::DeleteAction ) {
                 foreach( $articleRecordErrors['fields'] as $key => $value ) {
                     $errors['fields'][$key] = $value;
                 }
             }
-            
+
             return $errors;
         }
         
