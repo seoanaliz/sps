@@ -67,6 +67,16 @@
                 $article = ArticleFactory::GetById($articleId);
                 if ($article) {
                     $object->articleId = $articleId;
+
+                    //force article records fields
+                    $forceArticleRecord = ArticleRecordFactory::GetOne(
+                        array('articleId' => $articleId)
+                    );
+
+                    if (!empty($forceArticleRecord)) {
+                        $this->articleRecord->content   = $forceArticleRecord->content;
+                        $this->articleRecord->likes     = $forceArticleRecord->likes;
+                    }
                 }
             }
 
