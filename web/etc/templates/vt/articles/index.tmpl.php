@@ -7,11 +7,10 @@
         "columns" => array(
            LocaleLoader::Translate( "vt.article.importedAt" )
             , LocaleLoader::Translate( "vt.article.sourceFeedId" )
-            , LocaleLoader::Translate( "vt.article.sourceFeedId" )
             , LocaleLoader::Translate( "vt.article.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "importedAt", 1 => "sourceFeedId", 2 => "sourceFee.title", 3 => "statusId")
+        , "sorts"		=> array(0 => "importedAt", 1 => "sourceFeedId", 2 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> ArticleFactory::CanPages()
@@ -69,8 +68,7 @@
 ?>
 			<tr data-object-id="{$id}">
                 <td><?= ( !empty( $object->importedAt ) ? $object->importedAt->DefaultFormat() : '' ) ?></td>
-                <td>{$object.sourceFeedId}</td>
-                <td>{$object.sourceFee.title}</td>
+                <td><?= !empty($sourceFeeds[$object->sourceFeedId]) ? $sourceFeeds[$object->sourceFeedId]->title : '' ?></td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

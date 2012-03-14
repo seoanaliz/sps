@@ -156,7 +156,7 @@ Create table "navigationTypes"
 
 Create table "articles"
 (
-	"articleId" Integer NOT NULL,
+	"articleId" Serial NOT NULL,
 	"importedAt" Timestamp NOT NULL,
 	"sourceFeedId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
