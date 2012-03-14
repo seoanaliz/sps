@@ -213,5 +213,29 @@
                 </response>
             </parameters>
         </action>
+        <action name="SetSourceFeedsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"source-feeds"</param>
+                </response>
+            </parameters>
+        </action>
+        <action name="SetTargetFeedsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"target-feeds"</param>
+                </response>
+            </parameters>
+        </action>
+        <action name="SetArticlesMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"articles"</param>
+                </response>
+            </parameters>
+        </action>
     </group>
 </actions>

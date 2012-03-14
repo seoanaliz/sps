@@ -13,7 +13,19 @@
 
     /** Menu Structure */
     $__menu = array(
-        "static-pages" => array(
+        "articles" => array(
+            "title"  => "vt.menu.articles"
+            , "link" => "vt://articles/"
+        )
+        , "source-feeds" => array(
+            "title"  => "vt.menu.sourceFeeds"
+            , "link" => "vt://source-feeds/"
+        )
+        , "target-feeds" => array(
+            "title"  => "vt.menu.targetFeeds"
+            , "link" => "vt://target-feeds/"
+        )
+        , "static-pages" => array(
             "title"  => "vt.menu.staticPages"
             , "link" => "vt://static-pages/"
             , "menu" => array(

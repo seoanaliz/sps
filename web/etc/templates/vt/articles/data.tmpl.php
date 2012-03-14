@@ -23,7 +23,7 @@
         </div>
         <div data-row="sourceFeedId" class="row required">
             <label>{lang:vt.article.sourceFeedId}</label>
-            <?= FormHelper::FormSelect( $prefix . '[sourceFeedId]', $sourceFees, "sourceFeedId", "title", $object->sourceFeedId, null, null, false ); ?>
+            <?= FormHelper::FormSelect( $prefix . '[sourceFeedId]', $sourceFeeds, "sourceFeedId", "title", $object->sourceFeedId, null, null, false ); ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.article.statusId}</label>

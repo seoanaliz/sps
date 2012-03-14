@@ -134,7 +134,7 @@
                 <pageGroup name="SPS.Articles">
                     <pageGroup name="sourceFeed">
                         <page uri="vt://source-feeds/">
-                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetSourceFeedList</actions>
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetSourceFeedList, SPS.Common.SetSourceFeedsMenu</actions>
                             <template>tmpl://vt/source-feeds/index.tmpl.php</template>
                         </page>
                         <page uri="vt://source-feeds/add">
@@ -151,7 +151,7 @@
                     </pageGroup>
                     <pageGroup name="targetFeed">
                         <page uri="vt://target-feeds/">
-                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetTargetFeedList</actions>
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetTargetFeedList, SPS.Common.SetTargetFeedsMenu</actions>
                             <template>tmpl://vt/target-feeds/index.tmpl.php</template>
                         </page>
                         <page uri="vt://target-feeds/add">
@@ -168,7 +168,7 @@
                     </pageGroup>
                     <pageGroup name="article">
                         <page uri="vt://articles/">
-                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleList</actions>
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetArticleList, SPS.Common.SetArticlesMenu</actions>
                             <template>tmpl://vt/articles/index.tmpl.php</template>
                         </page>
                         <page uri="vt://articles/add">

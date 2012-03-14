@@ -47,7 +47,7 @@
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
                     <label>{lang:vt.article.sourceFeedId}</label>
-                    <?= FormHelper::FormSelect( "search[sourceFeedId]", $sourceFees, "sourceFeedId", "title", $search['sourceFeedId'], null, null, true ); ?>
+                    <?= FormHelper::FormSelect( "search[sourceFeedId]", $sourceFeeds, "sourceFeedId", "title", $search['sourceFeedId'], null, null, true ); ?>
                 </div>
                 <div class="row">
                     <label>{lang:vt.article.statusId}</label>
