@@ -20,6 +20,24 @@
                 , 2 => "Не опубликован"
 			)
         );
+
+        /**
+         * Common Statuses
+         *
+         * @var array
+         */
+        public static $Queue = array(
+            "en" => array(
+                1   => "Waiting"
+                , 4 => "Queued"
+                , 5 => "Finished"
+            )
+            , "ru" => array(
+                1   => "В ожидании"
+                , 4 => "Обрабатывается"
+                , 5 => "Отправлен"
+            )
+        );
         
         /**
          * Get Status Template
@@ -40,6 +58,26 @@
             }
         }
 
+        /**
+         * Get Queue Status Template
+         *
+         * @param int $statusId
+         * @return string
+         */
+        public static function GetQueueStatusTemplate( $statusId ) {
+            $status = self::$Queue[LocaleLoader::$CurrentLanguage][$statusId];
+
+            switch ($statusId) {
+                case 1:
+                    return sprintf( '<span class="status" title="%s">%s</span>', $status, $status);
+                case 4:
+                    return sprintf( '<span class="status red" title="%s">%s</span>', $status, $status);
+                case 5:
+                    return sprintf( '<span class="status green" title="%s">%s</span>', $status, $status);
+                default:
+                    return sprintf( '<span class="status" title="%s">%s</span>', $status, $status);
+            }
+        }
 
         /**
          * Get Bool Template

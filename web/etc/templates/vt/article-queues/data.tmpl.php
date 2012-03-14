@@ -39,7 +39,7 @@
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.articleQueue.statusId}</label>
-            <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
+            <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Queue[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
 	</div>
 </div>

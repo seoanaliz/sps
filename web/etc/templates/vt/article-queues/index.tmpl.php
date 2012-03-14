@@ -54,7 +54,7 @@
                 </div>
                 <div class="row">
                     <label>{lang:vt.articleQueue.statusId}</label>
-                    <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Common[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
+                    <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Queue[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
@@ -77,7 +77,7 @@
                 <td><?= ( !empty( $object->sentAt ) ? $object->sentAt->DefaultFormat() : '' ) ?></td>
                 <td>{$object.articleId}</td>
                 <td><?= !empty($targetFeeds[$object->targetFeedId]) ? $targetFeeds[$object->targetFeedId]->title : '' ?></td>
-                <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
+                <td><?= StatusUtility::GetQueueStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>
