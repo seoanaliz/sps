@@ -14,6 +14,7 @@
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
     <ul class="tabs-list">
         <li><a href="#page-0">{lang:vt.common.commonInfo}</a></li>
+        <li><a href="#page-1">{lang:vt.article.recordInfo}</a></li>
     </ul>
 
     <div id="page-0" class="tab-page rows">
@@ -42,6 +43,9 @@
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Queue[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
 	</div>
+    <div id="page-1" class="tab-page rows">
+        {increal:tmpl://vt/articles/record.tmpl.php}
+    </div>
 </div>
 <script type="text/javascript">
 	var jsonErrors = {$jsonErrors};

@@ -49,7 +49,11 @@
 
             //set original articleRecordId if exists
             if ( $originalObject != null ) {
-                $originalArticleRecord = ArticleRecordFactory::GetOne( array('articleId' => $this->originalObject->articleId), array(BaseFactory::WithColumns => '"articleRecordId"') );
+                $originalArticleRecord = ArticleRecordFactory::GetOne(
+                    array('articleId' => $this->originalObject->articleId)
+                    , array(BaseFactory::WithColumns => '"articleRecordId"')
+                );
+
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
                 }
@@ -154,7 +158,7 @@
             Response::setArray( "sourceFeeds", $sourceFeeds );
 
             /*
-            * Creating new UserInfo object or select existing
+            * Creating new ArticleRecord object or select existing
             */
             if( !empty( $this->originalObject ) ) {
                 $this->articleRecord = ArticleRecordFactory::GetOne( array('articleId' => $this->originalObject->articleId) );
