@@ -6,11 +6,12 @@
     $grid = array(
         "columns" => array(
            LocaleLoader::Translate( "vt.article.importedAt" )
+            , LocaleLoader::Translate( "vt.articleQueue.articleId" )
             , LocaleLoader::Translate( "vt.article.sourceFeedId" )
             , LocaleLoader::Translate( "vt.article.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "importedAt", 1 => "sourceFeedId", 2 => "statusId")
+        , "sorts"		=> array(0 => "importedAt", 1 => "articleId", 2 => "sourceFeedId", 3 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> ArticleFactory::CanPages()
@@ -45,6 +46,10 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
+                    <label>{lang:vt.articleQueue.articleId}</label>
+                    <?= FormHelper::FormInput( 'search[articleId]', $search['articleId'], 'articleId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.article.sourceFeedId}</label>
                     <?= FormHelper::FormSelect( "search[sourceFeedId]", $sourceFeeds, "sourceFeedId", "title", $search['sourceFeedId'], null, null, true ); ?>
                 </div>
@@ -67,13 +72,17 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td><?= ( !empty( $object->importedAt ) ? $object->importedAt->DefaultFormat() : '' ) ?></td>
+                <td class="header"><?= ( !empty( $object->importedAt ) ? $object->importedAt->DefaultFormat() : '' ) ?></td>
+                <td>{$object.articleId}</td>
                 <td><?= !empty($sourceFeeds[$object->sourceFeedId]) ? $sourceFeeds[$object->sourceFeedId]->title : '' ?></td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>
 					</ul>
+
+                    <a href="{web:vt://article-queues/}?search[articleId]={$id}" style="color: #291;" title="Найти в очереди">Найти в очереди</a>
+                    <a href="{web:vt://article-queues/add}?articleId={$id}" style="color: #C00;" title="Добавить в очередь">Добавить в очередь</a>
 				</td>
 	        </tr>
 <?php

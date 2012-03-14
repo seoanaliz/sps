@@ -11,7 +11,7 @@
 {increal:tmpl://vt/header.tmpl.php}
 <div class="main">
 	<div class="inner">
-		<form method="post" action="" enctype="multipart/form-data" id="data-form">
+		<form method="post" action="{web:vt://article-queues/add}" enctype="multipart/form-data" id="data-form">
 			{increal:tmpl://vt/elements/menu/breadcrumbs.tmpl.php}
 			<div class="pagetitle">
 				<h1>{$__pageTitle}</h1>

@@ -49,6 +49,10 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
+                    <label>{lang:vt.articleQueue.articleId}</label>
+                    <?= FormHelper::FormInput( 'search[articleId]', $search['articleId'], 'articleId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.articleQueue.targetFeedId}</label>
                     <?= FormHelper::FormSelect( "search[targetFeedId]", $targetFeeds, "targetFeedId", "title", $search['targetFeedId'], null, null, true ); ?>
                 </div>

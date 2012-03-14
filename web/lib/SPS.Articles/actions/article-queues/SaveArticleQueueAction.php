@@ -25,7 +25,6 @@
 
             parent::$factory = new ArticleQueueFactory();
         }
-
                
         /**
          * Form Object From Request
@@ -59,6 +58,15 @@
 
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
+                }
+            }
+
+            //force articleId
+            $articleId = Request::getInteger( 'articleId' );
+            if ($articleId) {
+                $article = ArticleFactory::GetById($articleId);
+                if ($article) {
+                    $object->articleId = $articleId;
                 }
             }
 

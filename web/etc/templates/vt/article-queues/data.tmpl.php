@@ -18,6 +18,10 @@
     </ul>
 
     <div id="page-0" class="tab-page rows">
+        <div data-row="articleId" class="row required">
+            <label>{lang:vt.articleQueue.articleId}</label>
+            <?= FormHelper::FormInput( $prefix . '[articleId]', $object->articleId, 'articleId', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="startDate" class="row required">
             <label>{lang:vt.articleQueue.startDate}</label>
             <?= FormHelper::FormDateTime( $prefix . '[startDate]', $object->startDate, 'd.m.Y G:i' ); ?>
@@ -29,10 +33,6 @@
         <div data-row="sentAt" class="row">
             <label>{lang:vt.articleQueue.sentAt}</label>
             <?= FormHelper::FormDateTime( $prefix . '[sentAt]', $object->sentAt, 'd.m.Y G:i' ); ?>
-        </div>
-        <div data-row="articleId" class="row required">
-            <label>{lang:vt.articleQueue.articleId}</label>
-            <?= FormHelper::FormInput( $prefix . '[articleId]', $object->articleId, 'articleId', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="targetFeedId" class="row required">
             <label>{lang:vt.articleQueue.targetFeedId}</label>
