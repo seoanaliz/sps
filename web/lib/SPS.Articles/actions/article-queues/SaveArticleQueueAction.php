@@ -25,6 +25,22 @@
 
             parent::$factory = new ArticleQueueFactory();
         }
+
+        protected function beforeSave() {
+            $this->photosToResponse();
+        }
+
+        protected function photosToResponse() {
+            $photos = array();
+            if (!empty($this->articleRecord->photos)) {
+                foreach($this->articleRecord->photos as $photoItem) {
+                    $photo = $photoItem;
+                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $photos[] = $photo;
+                }
+            }
+            Response::setString( 'filesJSON', ObjectHelper::ToJSON($photos) );
+        }
                
         /**
          * Form Object From Request
@@ -82,6 +98,11 @@
 
             Response::setParameter( "articleRecord", $this->articleRecord );
 
+            //get photos from request
+            $photos = Request::getArray( 'files' );
+            $photos = !empty($photos) ? $photos : array();
+            $this->articleRecord->photos = $photos;
+            $this->photosToResponse();
             
             return $object;
         }
