@@ -36,6 +36,9 @@
     </group>
 
     <group name="Controls">
+        <action name="ImageUploadControl">
+            <path>controls/ImageUploadControl</path>
+        </action>
     </group>
 
 	<!-- Put your's frontend actions here -->

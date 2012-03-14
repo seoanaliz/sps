@@ -13,3 +13,28 @@
     <label>{lang:vt.articleRecord.likes}</label>
     <?= FormHelper::FormInput( $prefixRecord . '[likes]', $articleRecord->likes, 'likes', null, array( 'size' => 80, 'style' => 'width: 100px;' ) ); ?>
 </div>
+<div data-row="files" class="row">
+    <label>{lang:vt.articleRecord.files}</label>
+    <div style="display: inline-block; //display: inline;">
+        <input id="file_upload" name="file_upload" type="file" />
+    </div>
+</div>
+<script type="text/javascript">
+    var filesJSON   = {$filesJSON};
+</script>
+<script type="text/javascript">
+    function uploadCallback( file,data ) {
+        t = $("#fileTemplate").tmpl( {filename: data.filename, isTemp: data.isTemp, path: data.path, name : file.name}, { counter: filesCounter } );
+        $('#' + file.id).replaceWith( t );
+    }
+</script>
+<script id="fileTemplate" type="text/x-jquery-tmpl">
+    <div class="uploadifyQueueItem sort" id="file-${ $item.counter.nextIndex() }">
+        <input type="hidden" name="files[${ $item.counter.index }][filename]" value="${filename}">
+        <input type="hidden" name="files[${ $item.counter.index }][isTemp]" value="${isTemp}">
+        <img src="{web:images://vt/common/objects/sort-link.gif}" style="cursor: move;" class="handle">
+        <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
+        <span class="fileName">${name}</span>
+        <br /><br /><img src="${path}" alt="" />
+    </div>
+</script><script>''</script>

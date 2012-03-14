@@ -9,6 +9,13 @@
     if ( !empty($errors["fatal"] ) ) {
 		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
 	}
+
+    CssHelper::PushFile( 'js://ext/uploadify/uploadify.css' );
+    JsHelper::PushFiles( array(
+        'js://ext/swfobject/swfobject.js'
+        , 'js://ext/uploadify/jquery.uploadify.js'
+        , 'js://vt/files.js'
+    ));
 ?>
 <div class="tabs">
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
@@ -36,5 +43,5 @@
     </div>
 </div>
 <script type="text/javascript">
-	var jsonErrors = {$jsonErrors};
+    var jsonErrors  = {$jsonErrors};
 </script>

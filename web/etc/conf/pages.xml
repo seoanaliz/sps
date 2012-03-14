@@ -234,6 +234,12 @@
                 </pageGroup>
             </pageGroup>
 
+            <pageGroup name="controls" boot="">
+                <page uri="controls://image-upload/">
+                    <actions>SPS.Site.ImageUploadControl</actions>
+                </page>
+            </pageGroup>
+
             <pageGroup name="daemons" boot="">
                 <page uri="daemons://process-queue/">
                     <actions>SPS.Site.ProcessQueue</actions>

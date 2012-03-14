@@ -110,6 +110,7 @@
         , 'js://ext/jquery.plugins/jquery.confirmdialog.js'
         , 'js://ext/jquery.plugins/jquery.blockui.js'
         , 'js://ext/jquery.plugins/jquery.cookie.js'
+        , 'js://ext/jquery.plugins/jquery.tmpl.min.js'
         , 'js://ext/jquery.ui/jquery-ui.js'
 
         , 'js://ext/fancybox/jquery.easing-1.3.pack.js'

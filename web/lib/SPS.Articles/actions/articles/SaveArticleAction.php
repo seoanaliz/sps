@@ -60,6 +60,8 @@
             }
 
             Response::setParameter( "articleRecord", $this->articleRecord );
+
+            Response::setString( 'filesJSON', '[]' );
             
             return $object;
         }

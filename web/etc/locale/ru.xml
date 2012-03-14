@@ -11,6 +11,14 @@
         <max><![CDATA[Превышено максимальное значение]]></max>
         <min><![CDATA[Минимальное значение меньше допустимого]]></min>
         <null><![CDATA[Значение не может быть пустым]]></null>
+        <files>
+            <extension><![CDATA[Неверное разрешение файла]]></extension>
+            <notImage><![CDATA[Файл не является изображением]]></notImage>
+            <filesize><![CDATA[Превышен максимальный размер файла]]></filesize>
+            <rulesError><![CDATA[Не заданы правила для файла]]></rulesError>
+            <imageDimensionsMin><![CDATA[Загружено слишком маленькое изображение]]></imageDimensionsMin>
+            <imageDimensionsWrong><![CDATA[Неверные размеры изображения]]></imageDimensionsWrong>
+        </files>
     </errors>
     <vt>
         <grid>
