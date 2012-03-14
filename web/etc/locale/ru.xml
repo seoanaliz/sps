@@ -256,6 +256,7 @@
             <header><![CDATA[статьи]]></header>
             <importedAt><![CDATA[Дата импорта]]></importedAt>
             <sourceFeedId><![CDATA[Источник]]></sourceFeedId>
+            <recordInfo><![CDATA[Данные статьи]]></recordInfo>
             <statusId><![CDATA[Статус]]></statusId>
         </article>
         <articleQueue>
@@ -269,6 +270,10 @@
             <targetFeedId><![CDATA[Лента отправки]]></targetFeedId>
             <statusId><![CDATA[Статус]]></statusId>
         </articleQueue>
+        <articleRecord>
+            <content><![CDATA[Содержание]]></content>
+            <likes><![CDATA[Лайки]]></likes>
+        </articleRecord>
     </vt>
     <objects>
         <siteParam>

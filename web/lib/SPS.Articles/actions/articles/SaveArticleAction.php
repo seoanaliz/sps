@@ -8,6 +8,11 @@
      * @property Article currentObject
      */
     class SaveArticleAction extends BaseSaveAction  {
+
+        /**
+         * @var ArticleRecord
+         */
+        private $articleRecord;
         
         /**
          * Constructor
@@ -37,6 +42,20 @@
             if ( $originalObject != null ) {
                 $object->articleId = $originalObject->articleId;
             }
+
+            $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
+            $this->articleRecord->articleQueueId    = null; //NB
+            $this->articleRecord->articleRecordId   = null; //NB
+
+            //set original articleRecordId if exists
+            if ( $originalObject != null ) {
+                $originalArticleRecord = ArticleRecordFactory::GetOne( array('articleId' => $this->originalObject->articleId), array(BaseFactory::WithColumns => '"articleRecordId"') );
+                if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
+                    $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
+                }
+            }
+
+            Response::setParameter( "articleRecord", $this->articleRecord );
             
             return $object;
         }
@@ -50,6 +69,14 @@
          */
         protected function validate( $object ) {
             $errors = parent::$factory->Validate( $object );
+
+            $articleRecordErrors = ArticleRecordFactory::Validate( $this->articleRecord );
+
+            if( !empty( $articleRecordErrors['fields'] ) ) {
+                foreach( $articleRecordErrors['fields'] as $key => $value ) {
+                    $errors['fields'][$key] = $value;
+                }
+            }
             
             return $errors;
         }
@@ -62,8 +89,27 @@
          * @return bool
          */
         protected function add( $object ) {
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+
             $result = parent::$factory->Add( $object );
-            
+
+            $this->articleRecord->articleId = parent::$factory->GetCurrentId();
+
+            if ( $result ) {
+                if( empty( $this->articleRecord->articleRecordId ) ) {
+                    $result = ArticleRecordFactory::Add( $this->articleRecord );
+                } else {
+                    $result = ArticleRecordFactory::Update( $this->articleRecord );
+                }
+            }
+
+            if ( $result ) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+
             return $result;
         }
         
@@ -75,8 +121,27 @@
          * @return bool
          */
         protected function update( $object ) {
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+
             $result = parent::$factory->Update( $object );
-            
+
+            $this->articleRecord->articleId = $object->articleId;
+
+            if ( $result ) {
+                if( empty( $this->articleRecord->articleRecordId ) ) {
+                    $result = ArticleRecordFactory::Add( $this->articleRecord );
+                } else {
+                    $result = ArticleRecordFactory::Update( $this->articleRecord );
+                }
+            }
+
+            if ( $result ) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+
             return $result;
         }
         
@@ -87,6 +152,19 @@
         protected function setForeignLists() {
             $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
             Response::setArray( "sourceFeeds", $sourceFeeds );
+
+            /*
+            * Creating new UserInfo object or select existing
+            */
+            if( !empty( $this->originalObject ) ) {
+                $this->articleRecord = ArticleRecordFactory::GetOne( array('articleId' => $this->originalObject->articleId) );
+            }
+
+            if( empty( $this->articleRecord ) ) {
+                $this->articleRecord = new ArticleRecord();
+            }
+
+            Response::setParameter( "articleRecord", $this->articleRecord );
         }
     }
 ?>
