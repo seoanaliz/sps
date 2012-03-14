@@ -31,7 +31,6 @@
 <script id="fileTemplate" type="text/x-jquery-tmpl">
     <div class="uploadifyQueueItem sort" id="file-${ $item.counter.nextIndex() }">
         <input type="hidden" name="files[${ $item.counter.index }][filename]" value="${filename}">
-        <input type="hidden" name="files[${ $item.counter.index }][isTemp]" value="${isTemp}">
         <img src="{web:images://vt/common/objects/sort-link.gif}" style="cursor: move;" class="handle">
         <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
         <span class="fileName">${filename}</span>

@@ -35,7 +35,7 @@
             if (!empty($this->articleRecord->photos)) {
                 foreach($this->articleRecord->photos as $photoItem) {
                     $photo = $photoItem;
-                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], !empty($photoItem['isTemp']) ? MediaServerManager::$TempLocation : null );
+                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation);
                     $photos[] = $photo;
                 }
             }
@@ -104,22 +104,6 @@
             
             return $errors;
         }
-
-        private function preparePhotosForSave() {
-            $photosForSave = array();
-
-            if (!empty($this->articleRecord->photos)) {
-                foreach ($this->articleRecord->photos as &$photo) {
-                    if (!empty($photo['isTemp'])) {
-                        $photo['isTemp']    = false;
-                        $photosForSave[]    = $photo['filename'];
-                    }
-                }
-            }
-
-            MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', $photosForSave );
-            $this->photosToResponse();
-        }
         
         /**
          * Add Object
@@ -128,8 +112,6 @@
          * @return bool
          */
         protected function add( $object ) {
-            $this->preparePhotosForSave();
-
             $conn = ConnectionFactory::Get();
             $conn->begin();
 
@@ -162,8 +144,6 @@
          * @return bool
          */
         protected function update( $object ) {
-            $this->preparePhotosForSave();
-
             $conn = ConnectionFactory::Get();
             $conn->begin();
 
