@@ -11,10 +11,19 @@ CREATE OR REPLACE VIEW "getTargetFeeds" AS
 SELECT "public"."targetFeeds"."targetFeedId"
 	, "public"."targetFeeds"."title"
 	, "public"."targetFeeds"."externalId"
+	, "public"."targetFeeds"."publisherId"
 	, "public"."targetFeeds"."statusId"
+	, "publisher"."publisherId" AS "publisher.publisherId"
+	, "publisher"."name" AS "publisher.name"
+	, "publisher"."vk_id" AS "publisher.vk_id"
+	, "publisher"."vk_app" AS "publisher.vk_app"
+	, "publisher"."vk_token" AS "publisher.vk_token"
+	, "publisher"."vk_seckey" AS "publisher.vk_seckey"
+	, "publisher"."statusId" AS "publisher.statusId"
  FROM "public"."targetFeeds"
-	WHERE "public"."targetFeeds"."statusId" != 3
-ORDER BY "title";
+	INNER JOIN "public"."publishers" "publisher" ON
+		"publisher"."publisherId" = "public"."targetFeeds"."publisherId"
+	WHERE "public"."targetFeeds"."statusId" != 3;
 	
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
@@ -48,3 +57,15 @@ SELECT "public"."articleRecords"."articleRecordId"
 	, "public"."articleRecords"."articleId"
 	, "public"."articleRecords"."articleQueueId"
  FROM "public"."articleRecords";
+ 
+CREATE OR REPLACE VIEW "getPublishers" AS
+SELECT "public"."publishers"."publisherId"
+	, "public"."publishers"."name"
+	, "public"."publishers"."vk_id"
+	, "public"."publishers"."vk_app"
+	, "public"."publishers"."vk_token"
+	, "public"."publishers"."vk_seckey"
+	, "public"."publishers"."statusId"
+ FROM "public"."publishers"
+	WHERE "public"."publishers"."statusId" != 3
+ORDER BY "publisherId";

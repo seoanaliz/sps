@@ -1,12 +1,12 @@
 <?php
     /**
-     * Get TargetFeed List Action
+     * Get Publisher List Action
      * 
      * @package SPS
      * @subpackage Articles
-     * @property TargetFeed[] list
+     * @property Publisher[] list
      */
-    class GetTargetFeedListAction extends BaseGetAction {
+    class GetPublisherListAction extends BaseGetAction {
 
         /**
          * Constructor
@@ -17,16 +17,13 @@
                 , BaseFactory::WithLists     => false
             );
 
-            parent::$factory = new TargetFeedFactory();
+            parent::$factory = new PublisherFactory();
         }
         
         
         /**
          * Set Foreign Lists
          */
-        protected function setForeignLists() {
-            $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            Response::setArray( "publishers", $publishers );
-        }
+        protected function setForeignLists() {}
     }
 ?>

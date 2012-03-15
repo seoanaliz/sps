@@ -5,27 +5,30 @@
      */
 
     /**
-     * TargetFeed
+     * Publisher
      *
      * @package SPS
      * @subpackage Articles
      */
-    class TargetFeed {
-
-        /** @var int */
-        public $targetFeedId;
-
-        /** @var string */
-        public $title;
-
-        /** @var string */
-        public $externalId;
+    class Publisher {
 
         /** @var int */
         public $publisherId;
 
-        /** @var Publisher */
-        public $publisher;
+        /** @var string */
+        public $name;
+
+        /** @var int */
+        public $vk_id;
+
+        /** @var int */
+        public $vk_app;
+
+        /** @var string */
+        public $vk_token;
+
+        /** @var string */
+        public $vk_seckey;
 
         /** @var int */
         public $statusId;

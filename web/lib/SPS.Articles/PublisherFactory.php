@@ -7,46 +7,56 @@
     Package::Load( 'SPS.Articles' );
 
     /**
-     * TargetFeed Factory
+     * Publisher Factory
      *
      * @package SPS
      * @subpackage Articles
      */
-    class TargetFeedFactory implements IFactory {
+    class PublisherFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** TargetFeed instance mapping  */
+        /** Publisher instance mapping  */
         public static $mapping = array (
-            'class'       => 'TargetFeed'
-            , 'table'     => 'targetFeeds'
-            , 'view'      => 'getTargetFeeds'
+            'class'       => 'Publisher'
+            , 'table'     => 'publishers'
+            , 'view'      => 'getPublishers'
             , 'flags'     => array( 'CanCache' => 'CanCache' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'targetFeedId' => array(
-                    'name'          => 'targetFeedId'
+                'publisherId' => array(
+                    'name'          => 'publisherId'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 )
-                ,'title' => array(
-                    'name'          => 'title'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 500
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'externalId' => array(
-                    'name'          => 'externalId'
+                ,'name' => array(
+                    'name'          => 'name'
                     , 'type'        => TYPE_STRING
                     , 'max'         => 100
                     , 'nullable'    => 'CheckEmpty'
                 )
-                ,'publisherId' => array(
-                    'name'          => 'publisherId'
+                ,'vk_id' => array(
+                    'name'          => 'vk_id'
                     , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'No'
+                )
+                ,'vk_app' => array(
+                    'name'          => 'vk_app'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'No'
+                )
+                ,'vk_token' => array(
+                    'name'          => 'vk_token'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 128
                     , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Publisher'
+                )
+                ,'vk_seckey' => array(
+                    'name'          => 'vk_seckey'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 64
+                    , 'nullable'    => 'CheckEmpty'
                 )
                 ,'statusId' => array(
                     'name'          => 'statusId'
@@ -105,17 +115,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed[] */
+        /** @return Publisher[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return Publisher */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return TargetFeed */
+        /** @return Publisher */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -140,7 +150,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return Publisher */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

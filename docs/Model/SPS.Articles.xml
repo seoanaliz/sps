@@ -20,6 +20,7 @@
         <Attribute Name="targetFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search />
@@ -81,6 +82,22 @@
       <Flags>
         <EFlag>CanCache</EFlag>
         <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="Publisher" PackageName="SPS.Articles" Table="publishers" View="getPublishers" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="publisherId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisherId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="name" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="name" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="vk_id" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="vk_id" FieldType="TYPE_INTEGER" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="vk_app" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="vk_app" FieldType="TYPE_INTEGER" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="vk_token" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="128" DbName="vk_token" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="vk_seckey" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="64" DbName="vk_seckey" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
       </Flags>
       <Lists />
     </Entity>

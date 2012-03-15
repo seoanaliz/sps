@@ -7,10 +7,6 @@
         <fatal>
             <database><![CDATA[Ошибка базы данных. Обратитесь к разработчикам]]></database>
         </fatal>
-        <format><![CDATA[Неверный формат]]></format>
-        <max><![CDATA[Превышено максимальное значение]]></max>
-        <min><![CDATA[Минимальное значение меньше допустимого]]></min>
-        <null><![CDATA[Значение не может быть пустым]]></null>
         <files>
             <extension><![CDATA[Неверное разрешение файла]]></extension>
             <notImage><![CDATA[Файл не является изображением]]></notImage>
@@ -19,6 +15,10 @@
             <imageDimensionsMin><![CDATA[Загружено слишком маленькое изображение]]></imageDimensionsMin>
             <imageDimensionsWrong><![CDATA[Неверные размеры изображения]]></imageDimensionsWrong>
         </files>
+        <format><![CDATA[Неверный формат]]></format>
+        <max><![CDATA[Превышено максимальное значение]]></max>
+        <min><![CDATA[Минимальное значение меньше допустимого]]></min>
+        <null><![CDATA[Значение не может быть пустым]]></null>
     </errors>
     <vt>
         <grid>
@@ -158,6 +158,11 @@
                 <addTitle><![CDATA[Добавление в очередь]]></addTitle>
                 <editTitle><![CDATA[Редактирование эелемента очереди]]></editTitle>
             </articleQueue>
+            <publisher>
+                <list><![CDATA[Список издателей]]></list>
+                <addTitle><![CDATA[Добавление издателя]]></addTitle>
+                <editTitle><![CDATA[Редактирование издателя]]></editTitle>
+            </publisher>
         </screens>
         <vfs>
             <queue>
@@ -195,6 +200,7 @@
             <sourceFeeds><![CDATA[Источники]]></sourceFeeds>
             <targetFeeds><![CDATA[Ленты отправки]]></targetFeeds>
             <articlesQueue><![CDATA[Очередь]]></articlesQueue>
+            <publishers><![CDATA[Издатели]]></publishers>
         </menu>
         <metaDetail>
             <deleteString><![CDATA[Вы действительно хотите удалить параметр страницы?]]></deleteString>
@@ -254,12 +260,15 @@
             <header><![CDATA[источники]]></header>
             <title><![CDATA[Заголовок]]></title>
             <statusId><![CDATA[Статус]]></statusId>
+            <externalId><![CDATA[externalId]]></externalId>
         </sourceFeed>
         <targetFeed>
             <deleteString><![CDATA[Вы действительно хотите удалить ленту отправки?]]></deleteString>
             <header><![CDATA[ленты отправки]]></header>
             <title><![CDATA[Заголовок]]></title>
             <statusId><![CDATA[Статус]]></statusId>
+            <externalId><![CDATA[externalId]]></externalId>
+            <publisherId><![CDATA[Издатель]]></publisherId>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
@@ -269,6 +278,7 @@
             <sourceFeedId><![CDATA[Источник]]></sourceFeedId>
             <recordInfo><![CDATA[Данные статьи]]></recordInfo>
             <statusId><![CDATA[Статус]]></statusId>
+            <externalId><![CDATA[externalId]]></externalId>
         </article>
         <articleQueue>
             <deleteString><![CDATA[Вы действительно хотите удалить очередь?]]></deleteString>
@@ -286,6 +296,16 @@
             <likes><![CDATA[Лайки]]></likes>
             <photos><![CDATA[Фото]]></photos>
         </articleRecord>
+        <publisher>
+            <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>
+            <header><![CDATA[издатели]]></header>
+            <name><![CDATA[Имя]]></name>
+            <vk_id><![CDATA[vk_id]]></vk_id>
+            <vk_app><![CDATA[vk_app]]></vk_app>
+            <vk_token><![CDATA[vk_token]]></vk_token>
+            <vk_seckey><![CDATA[vk_seckey]]></vk_seckey>
+            <statusId><![CDATA[Статус]]></statusId>
+        </publisher>
     </vt>
     <objects>
         <siteParam>
@@ -358,5 +378,12 @@
             <singleGenitive><![CDATA[очереди]]></singleGenitive>
             <singleAccusative><![CDATA[очередь]]></singleAccusative>
         </articleQueue>
+        <publisher>
+            <single><![CDATA[издатель]]></single>
+            <plural><![CDATA[издатели]]></plural>
+            <pluralGenitive><![CDATA[издателей]]></pluralGenitive>
+            <singleGenitive><![CDATA[издателя]]></singleGenitive>
+            <singleAccusative><![CDATA[издателя]]></singleAccusative>
+        </publisher>
     </objects>
 </language>

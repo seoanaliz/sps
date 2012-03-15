@@ -1,13 +1,13 @@
 <?php
     /**
-     * Save TargetFeed Action
+     * Save Publisher Action
      * 
      * @package SPS
      * @subpackage Articles
-     * @property TargetFeed originalObject
-     * @property TargetFeed currentObject
+     * @property Publisher originalObject
+     * @property Publisher currentObject
      */
-    class SaveTargetFeedAction extends BaseSaveAction  {
+    class SavePublisherAction extends BaseSaveAction  {
         
         /**
          * Constructor
@@ -18,24 +18,24 @@
                 , BaseFactory::WithLists     => true
             );
 
-            parent::$factory = new TargetFeedFactory();
+            parent::$factory = new PublisherFactory();
         }
 
                
         /**
          * Form Object From Request
          *
-         * @param TargetFeed $originalObject 
-         * @return TargetFeed
+         * @param Publisher $originalObject 
+         * @return Publisher
          */
         protected function getFromRequest( $originalObject = null ) {
             /**
-             * @var TargetFeed $object
+             * @var Publisher $object
              */
             $object = parent::$factory->GetFromRequest();
             
             if ( $originalObject != null ) {
-                $object->targetFeedId = $originalObject->targetFeedId;
+                $object->publisherId = $originalObject->publisherId;
             }
             
             return $object;
@@ -45,7 +45,7 @@
         /**
          * Validate Object
          *
-         * @param TargetFeed $object
+         * @param Publisher $object
          * @return array
          */
         protected function validate( $object ) {
@@ -58,7 +58,7 @@
         /**
          * Add Object
          *
-         * @param TargetFeed $object
+         * @param Publisher $object
          * @return bool
          */
         protected function add( $object ) {
@@ -71,7 +71,7 @@
         /**
          * Update Object
          *
-         * @param TargetFeed $object
+         * @param Publisher $object
          * @return bool
          */
         protected function update( $object ) {
@@ -84,9 +84,6 @@
         /**
          * Set Foreign Lists
          */
-        protected function setForeignLists() {
-            $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            Response::setArray( "publishers", $publishers );
-        }
+        protected function setForeignLists() {}
     }
 ?>

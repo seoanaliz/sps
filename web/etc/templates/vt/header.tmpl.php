@@ -16,10 +16,12 @@
         "articles" => array(
             "title"  => "vt.menu.articles"
             , "link" => "vt://articles/"
-        )
-        , "articles-queue" => array(
-            "title"  => "vt.menu.articlesQueue"
-            , "link" => "vt://article-queues/"
+            , "menu" => array(
+                array(
+                    "title"  => "vt.menu.articlesQueue"
+                    , "link" => "vt://article-queues/"
+                )
+            )
         )
         , "source-feeds" => array(
             "title"  => "vt.menu.sourceFeeds"
@@ -28,6 +30,12 @@
         , "target-feeds" => array(
             "title"  => "vt.menu.targetFeeds"
             , "link" => "vt://target-feeds/"
+            , "menu" => array(
+                array(
+                    "title"  => "vt.menu.publishers"
+                    , "link" => "vt://publishers/"
+                )
+            )
         )
         , "static-pages" => array(
             "title"  => "vt.menu.staticPages"

@@ -200,6 +200,23 @@
                             <template>tmpl://vt/article-queues/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+                    <pageGroup name="publisher">
+                        <page uri="vt://publishers/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetPublisherList</actions>
+                            <template>tmpl://vt/publishers/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://publishers/add">
+                            <actions>SPS.Articles.SavePublisher</actions>
+                            <template>tmpl://vt/publishers/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://publishers/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeletePublisher</actions>
+                        </page>
+                        <page uri="vt://publishers/edit/([0-9]+)">
+                            <actions>SPS.Articles.SavePublisher</actions>
+                            <template>tmpl://vt/publishers/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
                 </pageGroup>
 				
                 <pageGroup name="daemonLocks">

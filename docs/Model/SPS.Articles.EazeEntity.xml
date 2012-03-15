@@ -116,6 +116,14 @@
           <AttributeParameter Key="nullValue" Value="true" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.targetFeed.publisherId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -140,6 +148,14 @@
           <AttributeParameter Key="value" Value="externalId" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.targetFeed.publisherId" TitleValue="Издатель" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
         </Parameters>
       </TemplateAttribute>
       <TemplateAttribute Name="statusId" TitleKey="vt.targetFeed.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
@@ -522,6 +538,131 @@
           <AttributeParameter Key="value" Value="photos" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="photos" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="Publisher">
+    <TerminalPath>publishers</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies />
+    <Search>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.publisher.publisherId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="name" TitleKey="vt.publisher.name" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="name" />
+          <AttributeParameter Key="value" Value="name" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="name" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_id" TitleKey="vt.publisher.vk_id" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_id" />
+          <AttributeParameter Key="value" Value="vk_id" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_id" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_app" TitleKey="vt.publisher.vk_app" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_app" />
+          <AttributeParameter Key="value" Value="vk_app" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_app" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_token" TitleKey="vt.publisher.vk_token" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_token" />
+          <AttributeParameter Key="value" Value="vk_token" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_token" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_seckey" TitleKey="vt.publisher.vk_seckey" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_seckey" />
+          <AttributeParameter Key="value" Value="vk_seckey" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_seckey" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.publisher.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.publisher.publisherId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="name" TitleKey="vt.publisher.name" TitleValue="Имя" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="name" />
+          <AttributeParameter Key="value" Value="name" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="name" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_id" TitleKey="vt.publisher.vk_id" TitleValue="vk_id" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_id" />
+          <AttributeParameter Key="value" Value="vk_id" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_id" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_app" TitleKey="vt.publisher.vk_app" TitleValue="vk_app" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_app" />
+          <AttributeParameter Key="value" Value="vk_app" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_app" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_token" TitleKey="vt.publisher.vk_token" TitleValue="vk_token" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_token" />
+          <AttributeParameter Key="value" Value="vk_token" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_token" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vk_seckey" TitleKey="vt.publisher.vk_seckey" TitleValue="vk_seckey" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vk_seckey" />
+          <AttributeParameter Key="value" Value="vk_seckey" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vk_seckey" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.publisher.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

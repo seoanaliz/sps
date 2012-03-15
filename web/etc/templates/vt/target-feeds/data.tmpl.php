@@ -25,6 +25,10 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="publisherId" class="row required">
+            <label>{lang:vt.targetFeed.publisherId}</label>
+            <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, false ); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.targetFeed.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>

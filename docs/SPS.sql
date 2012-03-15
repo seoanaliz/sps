@@ -207,8 +207,22 @@ Create table "targetFeeds"
 	"targetFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
 	"externalId" Varchar(100) NOT NULL,
+	"publisherId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("targetFeedId")
+) Without Oids;
+
+
+Create table "publishers"
+(
+	"publisherId" Serial NOT NULL,
+	"name" Varchar(100) NOT NULL,
+	"vk_id" Integer NOT NULL,
+	"vk_app" Integer NOT NULL,
+	"vk_token" Varchar(128) NOT NULL,
+	"vk_seckey" Varchar(64) NOT NULL,
+	"statusId" Integer NOT NULL,
+ primary key ("publisherId")
 ) Without Oids;
 
 
@@ -250,6 +264,8 @@ Create index "IX_FK_sourceFeedsStatusId_sourceFeeds" on "sourceFeeds" ("statusId
 Alter table "sourceFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedsStatusId_targetFeeds" on "targetFeeds" ("statusId");
 Alter table "targetFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_publishersStatusId_publishers" on "publishers" ("statusId");
+Alter table "publishers" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
 Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");
@@ -274,6 +290,8 @@ Create index "IX_FK_articlesSourceFeedId_articles" on "articles" ("sourceFeedId"
 Alter table "articles" add  foreign key ("sourceFeedId") references "sourceFeeds" ("sourceFeedId") on update restrict on delete restrict;
 Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
 Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
+Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
+Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
 
 
 /* Create Procedures */
