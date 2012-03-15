@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW "getSourceFeeds" AS
 SELECT "public"."sourceFeeds"."sourceFeedId"
 	, "public"."sourceFeeds"."title"
+	, "public"."sourceFeeds"."externalId"
 	, "public"."sourceFeeds"."statusId"
  FROM "public"."sourceFeeds"
 	WHERE "public"."sourceFeeds"."statusId" != 3
@@ -9,6 +10,7 @@ ORDER BY "title";
 CREATE OR REPLACE VIEW "getTargetFeeds" AS
 SELECT "public"."targetFeeds"."targetFeedId"
 	, "public"."targetFeeds"."title"
+	, "public"."targetFeeds"."externalId"
 	, "public"."targetFeeds"."statusId"
  FROM "public"."targetFeeds"
 	WHERE "public"."targetFeeds"."statusId" != 3
@@ -17,6 +19,8 @@ ORDER BY "title";
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
 	, "public"."articles"."importedAt"
+	, "public"."articles"."createdAt"
+	, "public"."articles"."externalId"
 	, "public"."articles"."sourceFeedId"
 	, "public"."articles"."statusId"
  FROM "public"."articles"

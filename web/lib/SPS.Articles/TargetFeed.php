@@ -18,6 +18,9 @@
         /** @var string */
         public $title;
 
+        /** @var string */
+        public $externalId;
+
         /** @var int */
         public $statusId;
 

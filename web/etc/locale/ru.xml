@@ -78,6 +78,7 @@
             <mainPage><![CDATA[Главная]]></mainPage>
             <crumbAdd><![CDATA[Добавление]]></crumbAdd>
             <crumbEdit><![CDATA[Редактирование]]></crumbEdit>
+            <externalId><![CDATA[Внешний ID]]></externalId>
         </common>
         <daemonLock>
             <deleteString><![CDATA[Удалить блокировку?]]></deleteString>

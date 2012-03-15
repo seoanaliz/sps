@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		14.03.2012
+Modified		15.03.2012
 Project		
 Model			
 Company		
@@ -158,6 +158,8 @@ Create table "articles"
 (
 	"articleId" Serial NOT NULL,
 	"importedAt" Timestamp NOT NULL,
+	"createdAt" Timestamp,
+	"externalId" Varchar(100) NOT NULL,
 	"sourceFeedId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("articleId")
@@ -194,6 +196,7 @@ Create table "sourceFeeds"
 (
 	"sourceFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
+	"externalId" Varchar(100) NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("sourceFeedId")
 ) Without Oids;
@@ -203,6 +206,7 @@ Create table "targetFeeds"
 (
 	"targetFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
+	"externalId" Varchar(100) NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("targetFeedId")
 ) Without Oids;

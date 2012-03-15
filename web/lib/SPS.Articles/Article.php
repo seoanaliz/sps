@@ -18,6 +18,12 @@
         /** @var DateTimeWrapper */
         public $importedAt;
 
+        /** @var DateTimeWrapper */
+        public $createdAt;
+
+        /** @var string */
+        public $externalId;
+
         /** @var int */
         public $sourceFeedId;
 

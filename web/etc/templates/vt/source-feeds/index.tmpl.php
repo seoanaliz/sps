@@ -6,10 +6,11 @@
     $grid = array(
         "columns" => array(
            LocaleLoader::Translate( "vt.sourceFeed.title" )
+            , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.sourceFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> SourceFeedFactory::CanPages()
@@ -48,6 +49,10 @@
                     <?= FormHelper::FormInput( "search[title]", $search['title'], 'title', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
+                    <label>{lang:vt.common.externalId}</label>
+                    <?= FormHelper::FormInput( "search[externalId]", $search['externalId'], 'externalId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.sourceFeed.statusId}</label>
                     <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Common[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
                 </div>
@@ -67,6 +72,7 @@
 ?>
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.title}</td>
+                <td>{form:$object.externalId}</td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

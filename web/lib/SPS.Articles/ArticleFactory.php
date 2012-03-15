@@ -35,6 +35,16 @@
                     , 'type'        => TYPE_DATETIME
                     , 'nullable'    => 'No'
                 )
+                ,'createdAt' => array(
+                    'name'          => 'createdAt'
+                    , 'type'        => TYPE_DATETIME
+                )
+                ,'externalId' => array(
+                    'name'          => 'externalId'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                    , 'nullable'    => 'CheckEmpty'
+                )
                 ,'sourceFeedId' => array(
                     'name'          => 'sourceFeedId'
                     , 'type'        => TYPE_INTEGER

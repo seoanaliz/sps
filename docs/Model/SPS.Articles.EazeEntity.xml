@@ -21,6 +21,14 @@
           <AttributeParameter Key="controlId" Value="title" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.sourceFeed.externalId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
       <TemplateAttribute Name="statusId" TitleKey="vt.sourceFeed.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
         <Parameters>
           <AttributeParameter Key="name" Value="statusId" />
@@ -47,6 +55,14 @@
           <AttributeParameter Key="value" Value="title" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.sourceFeed.externalId" TitleValue="externalId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
         </Parameters>
       </TemplateAttribute>
       <TemplateAttribute Name="statusId" TitleKey="vt.sourceFeed.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
@@ -82,6 +98,14 @@
           <AttributeParameter Key="controlId" Value="title" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.targetFeed.externalId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
       <TemplateAttribute Name="statusId" TitleKey="vt.targetFeed.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
         <Parameters>
           <AttributeParameter Key="name" Value="statusId" />
@@ -108,6 +132,14 @@
           <AttributeParameter Key="value" Value="title" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.targetFeed.externalId" TitleValue="externalId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
         </Parameters>
       </TemplateAttribute>
       <TemplateAttribute Name="statusId" TitleKey="vt.targetFeed.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
@@ -162,6 +194,21 @@
           <AttributeParameter Key="nullValue" Value="true" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.article.externalId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.article.createdAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -207,6 +254,21 @@
           <AttributeParameter Key="dataValue" Value="" />
           <AttributeParameter Key="value" Value="statusId" />
           <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.article.externalId" TitleValue="externalId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.article.createdAt" TitleValue="Дата создания" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

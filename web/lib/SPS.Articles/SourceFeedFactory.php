@@ -36,6 +36,12 @@
                     , 'max'         => 500
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'externalId' => array(
+                    'name'          => 'externalId'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                    , 'nullable'    => 'CheckEmpty'
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER

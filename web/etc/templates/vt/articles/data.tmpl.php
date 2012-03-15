@@ -29,6 +29,14 @@
             <label>{lang:vt.article.importedAt}</label>
             <?= FormHelper::FormDateTime( $prefix . '[importedAt]', $object->importedAt, 'd.m.Y G:i' ); ?>
         </div>
+        <div data-row="createdAt" class="row required">
+            <label>{lang:vt.article.createdAt}</label>
+            <?= FormHelper::FormDateTime( $prefix . '[createdAt]', $object->createdAt, 'd.m.Y G:i' ); ?>
+        </div>
+        <div data-row="externalId" class="row required">
+            <label>{lang:vt.common.externalId}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="sourceFeedId" class="row required">
             <label>{lang:vt.article.sourceFeedId}</label>
             <?= FormHelper::FormSelect( $prefix . '[sourceFeedId]', $sourceFeeds, "sourceFeedId", "title", $object->sourceFeedId, null, null, false ); ?>

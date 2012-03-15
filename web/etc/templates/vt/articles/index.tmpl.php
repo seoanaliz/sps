@@ -7,11 +7,12 @@
         "columns" => array(
            LocaleLoader::Translate( "vt.article.importedAt" )
             , LocaleLoader::Translate( "vt.articleQueue.articleId" )
+            , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.article.sourceFeedId" )
             , LocaleLoader::Translate( "vt.article.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "importedAt", 1 => "articleId", 2 => "sourceFeedId", 3 => "statusId")
+        , "sorts"		=> array(0 => "importedAt", 1 => "articleId", 2 => "externalId", 3 => "sourceFeedId", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> ArticleFactory::CanPages()
@@ -50,6 +51,10 @@
                     <?= FormHelper::FormInput( 'search[articleId]', $search['articleId'], 'articleId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
+                    <label>{lang:vt.common.externalId}</label>
+                    <?= FormHelper::FormInput( "search[externalId]", $search['externalId'], 'externalId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.article.sourceFeedId}</label>
                     <?= FormHelper::FormSelect( "search[sourceFeedId]", $sourceFeeds, "sourceFeedId", "title", $search['sourceFeedId'], null, null, true ); ?>
                 </div>
@@ -74,6 +79,7 @@
 			<tr data-object-id="{$id}">
                 <td class="header"><?= ( !empty( $object->importedAt ) ? $object->importedAt->DefaultFormat() : '' ) ?></td>
                 <td>{$object.articleId}</td>
+                <td>{form:$object.externalId}</td>
                 <td><?= !empty($sourceFeeds[$object->sourceFeedId]) ? $sourceFeeds[$object->sourceFeedId]->title : '' ?></td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
