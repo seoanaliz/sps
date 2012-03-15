@@ -265,6 +265,7 @@
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
             <header><![CDATA[статьи]]></header>
             <importedAt><![CDATA[Дата импорта]]></importedAt>
+            <createdAt><![CDATA[Дата публикации]]></createdAt>
             <sourceFeedId><![CDATA[Источник]]></sourceFeedId>
             <recordInfo><![CDATA[Данные статьи]]></recordInfo>
             <statusId><![CDATA[Статус]]></statusId>
