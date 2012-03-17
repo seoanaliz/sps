@@ -53,3 +53,4 @@
             setcookie('vk_app_' . self::$AppId, '', 0, "/", '.'.$_SERVER['HTTP_HOST']);
         }
     }
+?>

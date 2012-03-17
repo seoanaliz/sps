@@ -23,6 +23,7 @@
 
     Package::Load( 'SPS.Common' );
     Package::Load( 'SPS.System' );
+    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.Site' );
 

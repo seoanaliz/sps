@@ -5700,3 +5700,4 @@ phpQuery::$plugins = new phpQueryPlugins();
 // include bootstrap file (personal library config)
 if (file_exists(dirname(__FILE__).'/phpQuery/bootstrap.php'))
 	require_once dirname(__FILE__).'/phpQuery/bootstrap.php';
+?>
