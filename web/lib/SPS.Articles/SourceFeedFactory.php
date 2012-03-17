@@ -42,6 +42,11 @@
                     , 'max'         => 100
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'processed' => array(
+                    'name'          => 'processed'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER

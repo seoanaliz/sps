@@ -12,11 +12,21 @@
     class SyncSources {
 
         /**
-         * Entry Point
+         * @var Daemon
+         */
+        private $daemon;
+
+        /**
+         * Один вызов этого метода просинхронизирует только одн страницу одного sourceFeed из-за длительности работы
          */
         public function Execute() {
             set_time_limit(0);
             Logger::LogLevel(ELOG_DEBUG);
+
+            $this->daemon                   = new Daemon();
+            $this->daemon->package          = 'SPS.Site';
+            $this->daemon->method           = 'SyncSources';
+            $this->daemon->maxExecutionTime = '03:00:00';
 
             //get sources
             $sources = SourceFeedFactory::Get();
@@ -32,24 +42,35 @@
 
                 $pagesCountTotal = ceil($count / ParserVkontakte::PAGE_SIZE);
 
-                $pagesCountProcessed = 0;
+                $pagesCountProcessed = Convert::ToInt($source->processed);
                 //если кол-во обработанных страниц в source меньше $pagesCount - работаем
                 if ($pagesCountTotal > $pagesCountProcessed) {
                     //парсим одну нужную страницу
                     $targetPage = $pagesCountTotal - 1 - $pagesCountProcessed;
 
+                    //пытаемся залочиться
+                    $this->daemon->name = $source->sourceFeedId . ':' . $targetPage;
+                    if ( !$this->daemon->Lock() ) {
+                        Logger::Warning( "Failed to lock {$this->daemon->name}");
+                        continue; //переходим к следующему sorce
+                    }
+
                     try {
                         $posts = $parser->get_posts($targetPage);
                     } catch (Exception $Ex) {
-                        break;
+                        continue; //переходим к следующему sorce
                     }
 
                     $result = $this->saveFeedPosts($source, $posts);
 
                     if ($result) {
                         //обновляем pagesCountProcessed в базе
-                        break; //сохраняем только одну страницу одной группы за проход
+                        $source->processed = $pagesCountProcessed + 1;
+                        SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
                     }
+
+                    //снимаем лок
+                    $this->daemon->Unlock();
                 }
             }
         }
@@ -121,6 +142,7 @@
                 }
             }
 
+            //TODO возвращать true только если полностью обработали страницу и к ней не вернемся
             return true;
         }
     }

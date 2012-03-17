@@ -39,6 +39,14 @@
           <AttributeParameter Key="nullValue" Value="true" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="processed" TitleKey="vt.sourceFeed.processed" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="processed" />
+          <AttributeParameter Key="value" Value="processed" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="processed" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="sourceFeedId" TitleKey="vt.sourceFeed.sourceFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -73,6 +81,14 @@
           <AttributeParameter Key="dataValue" Value="" />
           <AttributeParameter Key="value" Value="statusId" />
           <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="processed" TitleKey="vt.sourceFeed.processed" TitleValue="processed" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="processed" />
+          <AttributeParameter Key="value" Value="processed" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="processed" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

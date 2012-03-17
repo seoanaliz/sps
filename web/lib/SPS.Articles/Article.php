@@ -28,7 +28,7 @@
         public $sourceFeedId;
 
         /** @var SourceFeed */
-        public $sourceFee;
+        public $sourceFeed;
 
         /** @var int */
         public $statusId;

@@ -36,6 +36,9 @@
             
             if ( $originalObject != null ) {
                 $object->sourceFeedId = $originalObject->sourceFeedId;
+                $object->processed = $originalObject->processed;
+            } else {
+                $object->processed = null;
             }
             
             return $object;

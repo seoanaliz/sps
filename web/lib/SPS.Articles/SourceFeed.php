@@ -21,6 +21,9 @@
         /** @var string */
         public $externalId;
 
+        /** @var string */
+        public $processed;
+
         /** @var int */
         public $statusId;
 

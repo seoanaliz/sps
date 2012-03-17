@@ -37,7 +37,7 @@
         public $targetFeedId;
 
         /** @var TargetFeed */
-        public $targetFee;
+        public $targetFeed;
 
         /** @var int */
         public $statusId;

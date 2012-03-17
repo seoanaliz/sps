@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		15.03.2012
+Modified		17.03.2012
 Project		
 Model			
 Company		
@@ -197,6 +197,7 @@ Create table "sourceFeeds"
 	"sourceFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
 	"externalId" Varchar(100) NOT NULL,
+	"processed" Varchar(100),
 	"statusId" Integer NOT NULL,
  primary key ("sourceFeedId")
 ) Without Oids;

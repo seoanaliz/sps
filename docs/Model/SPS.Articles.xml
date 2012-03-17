@@ -7,6 +7,7 @@
         <Attribute Name="sourceFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="processed" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="processed" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search />
@@ -35,7 +36,7 @@
         <Attribute Name="importedAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="importedAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="createdAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="createdAt" FieldType="TYPE_DATETIME" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
-        <Attribute Name="sourceFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFee" ForeignKey="SourceFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="sourceFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFeed" ForeignKey="SourceFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>
@@ -56,7 +57,7 @@
         <Attribute Name="createdAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="createdAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="sentAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sentAt" FieldType="TYPE_DATETIME" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
-        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFee" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeed" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>

@@ -119,16 +119,16 @@
             if ( !empty( $lock ) ) {
                 // check lock for active
                 if ( $lock->isActive ) {
-                    Logger::Info( __METHOD__, "Lock {$lock->title} is active");
+                    Logger::Info( "Lock {$lock->title} is active");
                     return false;
                 } else {
-                    Logger::Warning( __METHOD__, "Flusing inactive lock {$lock->title}" );
+                    Logger::Warning( "Flusing inactive lock {$lock->title}" );
                     DaemonLockFactory::Delete( $lock );
                 }
             }
 
             $result = DaemonLockFactory::Add( $this->GetDaemonLock() );
-            Logger::Info( __METHOD__, "Locked {$this->name}");
+            Logger::Info( "Locked {$this->name}");
             
             return true;
         }
@@ -175,14 +175,14 @@
          */
         public function Run() {
             if ( !$this->CanRun() ) {
-                Logger::Info( __METHOD__, "{$this->name} couldn't be run.");
+                Logger::Info( "{$this->name} couldn't be run.");
                 return false;
             }
             
             set_time_limit( 0 );
             
             if ( !$this->Lock() ) {
-                Logger::Warning( __METHOD__, "Failed to lock {$this->name}");
+                Logger::Warning( "Failed to lock {$this->name}");
                 return false;
             }
             
@@ -190,7 +190,7 @@
                 Package::Load( $this->package );
                 call_user_func_array( $this->method, array( $this->params ) );
             } catch ( Exception $e ) {
-                Logger::Error( __METHOD__, "{$this->name}: exeption in {$e->getMessage()}" );
+                Logger::Error( "{$this->name}: exeption in {$e->getMessage()}" );
             }
             
             $this->Unlock();
