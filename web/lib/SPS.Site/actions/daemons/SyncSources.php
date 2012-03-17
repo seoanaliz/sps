@@ -26,7 +26,7 @@
             $this->daemon                   = new Daemon();
             $this->daemon->package          = 'SPS.Site';
             $this->daemon->method           = 'SyncSources';
-            $this->daemon->maxExecutionTime = '00:10:00';
+            $this->daemon->maxExecutionTime = '01:00:00';
 
             //get sources
             $sources = SourceFeedFactory::Get();
@@ -174,7 +174,7 @@
 
                     $result[] = array(
                         'filename' => $fileUploadResult['filename'],
-                        'title' => !empty($photo['descr']) ? TextHelper::ToUTF8($photo['descr']) : ''
+                        'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : ''
                     );
                 }
             }

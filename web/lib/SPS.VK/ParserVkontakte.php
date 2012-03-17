@@ -150,8 +150,7 @@
                     }
                 }
 
-                //$this->get_photo_desc($img_arr);
-
+                $this->get_photo_desc($img_arr);//спорно
                 $posts[$t]['photo'] = $img_arr;
                 $posts[$t]['video'] = $vid_arr;
                 $posts[$t]['music'] = $mus_arr;
@@ -162,59 +161,47 @@
                 $t++;         
             }
 
-            $photos_descr = $this->get_photos_descr($posts);
-
-            unset($post);
-            unset($pic);
-
-            foreach ($posts as &$post) {
-                if (empty($post['photo'])) continue;
-
-                foreach($post['photo'] as &$pic){
-                    if (!empty($photos_descr[$pic['id']])) {
-                        $pic['descr'] = $photos_descr[$pic['id']];
-                    }
-                }
-            }
-
             return $posts;
         }
 
-        private function get_photos_descr($posts) {
-            $result = array();
-            //получаем описание всех фоток
-            $curlData = array();
+        private function get_photo_desc(&$picsArr)
+        {
+            if(count($picsArr)<=0) return false;
 
-            foreach ($posts as $post) {
-                if (empty($post['photo'])) continue;
-                foreach($post['photo'] as $pic){
-                    $curlData[] = 'http://vk.com/photo' . $pic['id'];
-                }
+            $hArr = array();//handle array
+
+            foreach($picsArr as &$pic){
+                $h = curl_init();
+                curl_setopt($h,CURLOPT_URL,'http://vk.com/photo' . $pic['id']);
+                curl_setopt($h,CURLOPT_HEADER,0);
+                curl_setopt($h,CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($h, CURLOPT_FOLLOWLOCATION, true);
+                array_push($hArr,$h);
             }
 
-            while (!empty($curlData)) {
-                $curlResult = $this->multiRequest($curlData);
+            $mh = curl_multi_init();
+            foreach($hArr as $k => $h)
+                curl_multi_add_handle($mh,$h);
 
-                foreach ($curlResult as $i => $curlResultItem) {
-                    if( mb_strpos($curlResultItem, '<button id="msg_back_button">') !== false ) {
-                        continue;
-                    }
+            $running = null;
+            do{
+                curl_multi_exec($mh, $running);
+            }while($running > 0);
 
-                    $picId = str_replace('http://vk.com/photo', '', $curlData[$i]);
-
-                    preg_match("/\"id\":\"{$picId}\".*?\"desc\":\"(.*?)\",\"hash\"/", $curlResultItem, $matches);
-                    if (isset($matches[1]) && substr_count($matches[1], 'href') == 0){
-                        $descr = $this->remove_tags($matches[1]);
-                        $result[$picId] = $descr;
-                    }
-
-                    unset($curlData[$i]);
+            // get the result and save it in the result ARRAY
+            foreach($hArr as $k => $h){
+                $desc = curl_multi_getcontent($h);
+                preg_match("/\"id\":\"{$pic['id']}\".*?\"desc\":\"(.*?)\",\"hash\"/", $desc, $matches);
+                //                $document = phpQuery::newDocument($desc);
+                if (isset($matches[1]) && substr_count($matches[1], 'href') == 0){
+                    $pic['desc'] =  $this->remove_tags($matches[1]);
                 }
 
-                sleep(1);
             }
 
-            return $result;
+            curl_multi_close($mh);
+
+            return true;
         }
         
         //возвращает количество постов паблика()
@@ -251,66 +238,6 @@
             $text = htmlspecialchars_decode($text);
             $text = strip_tags( $text );
             return $text;
-        }
-
-        /**
-         * Функция мульти запроса на CURL
-         * @param array $data Данные для запроса
-         * @param array $options Опции для всех запросов
-         * @param array $oneoptions Опции для отдельных запросов
-         * @return array
-         */
-        function multiRequest($data, $options = array(), $oneoptions = array()) {
-            // Массив для ресурсов соединения
-            $curls = array();
-            // Массив для результатов
-            $result = array();
-            // Инициализация мульти запроса
-            $mh = curl_multi_init();
-            // Задание параметров запроса
-            foreach ($data as $id => $d)
-            {
-                $curls[$id] = curl_init();
-                $url = (is_array($d) && !empty($d['url'])) ? $d['url'] : $d;
-                curl_setopt($curls[$id], CURLOPT_URL,            $url);
-                curl_setopt($curls[$id], CURLOPT_HEADER,         false);
-                curl_setopt($curls[$id], CURLOPT_RETURNTRANSFER, true);
-                // Дополнительные опции общие запросов
-                if (!empty($options))
-                {
-                    curl_setopt_array($curls[$id], $options);
-                }
-                // Дополнительные опции для определенного запроса
-                if (!empty($oneoptions[$id]))
-                {
-                    curl_setopt_array($curls[$id], $oneoptions[$id]);
-                }
-                // Если post запрос
-                if (is_array($d))
-                {
-                    if (!empty($d['post']))
-                    {
-                        curl_setopt($curls[$id], CURLOPT_POST,       1);
-                        curl_setopt($curls[$id], CURLOPT_POSTFIELDS, $d['post']);
-                    }
-                }
-                curl_multi_add_handle($mh, $curls[$id]);
-            }
-            // Выполняем запрос пока есть соединения
-            $running = null;
-            do
-            {
-                curl_multi_exec($mh, $running);
-            }
-            while($running > 0);
-            // Получаем данные и закрываем соединения
-            foreach($curls as $id => $content)
-            {
-                $result[$id] = curl_multi_getcontent($content);
-                curl_multi_remove_handle($mh, $content);
-            }
-            curl_multi_close($mh);
-            return $result;
         }
     }
 ?>
