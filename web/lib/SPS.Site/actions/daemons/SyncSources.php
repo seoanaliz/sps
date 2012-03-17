@@ -56,9 +56,21 @@
 
         private function saveFeedPosts($source, $posts) {
             foreach ($posts as $post) {
+                $externalId = TextHelper::ToUTF8($post['id']);
+
+                //TODO написать одним запросом
+                $originalObject = ArticleFactory::Get(
+                    array('externalId' => $externalId, 'sourceFeedId' => $source->sourceFeedId)
+                    , array(BaseFactory::WithColumns => '"articleId"')
+                );
+
+                if (!empty($originalObject)) {
+                    continue; //не сохраняем то что уже сохранили
+                }
+
                 $article = new Article();
                 $article->sourceFeedId = $source->sourceFeedId;
-                $article->externalId = TextHelper::ToUTF8($post['id']);
+                $article->externalId = $externalId;
                 $article->createdAt = DateTimeWrapper::Now(); //todo взять дату из поста когда будет
                 $article->importedAt = DateTimeWrapper::Now();
                 $article->statusId = 1;
