@@ -22,10 +22,7 @@
 //                    , 'minDimensions'   => array( 'width' => 560, 'height' => 170 )
 //                    , 'initDimensions'  => array( 'width' => 1920, 'height' => 1080 )
                     , 'resizes'     => array(
-                        'original' => array(
-                            'name'      => 'original'
-                        )
-                        , 'small' => array(
+                        'small' => array(
                             'name'      => 'small'
                             , 'width'   => 60
                             , 'height'  => 60
@@ -46,13 +43,13 @@
                             , 'quality' => 100
                             , 'scale'   => false
                         )
-                        , 'big' => array(
-                            'name'          => 'big'
-                            , 'width'       => 560
-                            , 'height'      => 999999 //inf
-                            , 'quality'     => 100
-                            , 'scale'       => true
-                        )
+//                        , 'big' => array(
+//                            'name'          => 'big'
+//                            , 'width'       => 560
+//                            , 'height'      => 999999 //inf
+//                            , 'quality'     => 100
+//                            , 'scale'       => true
+//                        )
                     )
                 )
             )
