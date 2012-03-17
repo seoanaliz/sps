@@ -77,6 +77,11 @@
                 }
             }
 
+            //get photos from request
+            $photos = Request::getArray( 'files' );
+            $photos = !empty($photos) ? $photos : array();
+            $this->articleRecord->photos = $photos;
+
             //force articleId
             $articleId = Request::getInteger( 'articleId' );
             if ($articleId) {
@@ -99,10 +104,6 @@
 
             Response::setParameter( "articleRecord", $this->articleRecord );
 
-            //get photos from request
-            $photos = Request::getArray( 'files' );
-            $photos = !empty($photos) ? $photos : array();
-            $this->articleRecord->photos = $photos;
             $this->photosToResponse();
             
             return $object;
