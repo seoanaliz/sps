@@ -26,7 +26,7 @@
             $this->daemon                   = new Daemon();
             $this->daemon->package          = 'SPS.Site';
             $this->daemon->method           = 'SyncSources';
-            $this->daemon->maxExecutionTime = '03:00:00';
+            $this->daemon->maxExecutionTime = '00:10:00';
 
             //get sources
             $sources = SourceFeedFactory::Get();
@@ -49,7 +49,7 @@
                     $targetPage = $pagesCountTotal - 1 - $pagesCountProcessed;
 
                     //пытаемся залочиться
-                    $this->daemon->name = $source->sourceFeedId . ':' . $targetPage;
+                    $this->daemon->name = "source$source->sourceFeedId::page$targetPage";
                     if ( !$this->daemon->Lock() ) {
                         Logger::Warning( "Failed to lock {$this->daemon->name}");
                         continue; //переходим к следующему sorce
