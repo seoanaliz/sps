@@ -73,6 +73,14 @@
                             <param name="appId">2853330</param>
                             <param name="password">1h2pQNcNMw54IwO6kuVi</param>
                         </vkapi>
+                        <mediaServer class="MediaServerManager">
+                            <param name="host">media.mystery.vmkteam.ru</param>
+                            <param name="mainLocation">/</param>
+                            <param name="tempLocation">/temp/</param>
+                            <param name="uploadPort">80</param>
+                            <param name="resizeExec">/usr/local/bin/convert</param>
+                            <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
+                        </mediaServer>
                     </modules>
                     <databases>
                         <database driver="PgSql">
