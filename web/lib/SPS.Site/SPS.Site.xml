@@ -29,9 +29,12 @@
         </action>
     </group>
 
-    <group name="Queue">
+    <group name="Daemons">
         <action name="ProcessQueue">
             <path>queue/ProcessQueue</path>
+        </action>
+        <action name="SyncSources">
+            <path>daemons/SyncSources</path>
         </action>
     </group>
 
