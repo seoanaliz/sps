@@ -40,6 +40,7 @@
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>
+        <Attribute Name="_externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="externalId" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
         <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Search>

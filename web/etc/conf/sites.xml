@@ -49,7 +49,7 @@
 			</databases>
 		</settings>
 		<hosts>
-			<host name="local">
+			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
                 <settings>

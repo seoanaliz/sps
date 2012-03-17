@@ -49,7 +49,7 @@
                     $targetPage = $pagesCountTotal - 1 - $pagesCountProcessed;
 
                     //пытаемся залочиться
-                    $this->daemon->name = "source$source->sourceFeedId::page$targetPage";
+                    $this->daemon->name = "source$source->externalId";
                     if ( !$this->daemon->Lock() ) {
                         Logger::Warning( "Failed to lock {$this->daemon->name}");
                         continue; //переходим к следующему sorce
@@ -61,31 +61,56 @@
                         continue; //переходим к следующему sorce
                     }
 
-                    $result = $this->saveFeedPosts($source, $posts);
+                    $posts = !empty($posts) ? $posts : array();
 
-                    if ($result) {
-                        //обновляем pagesCountProcessed в базе
-                        $source->processed = $pagesCountProcessed + 1;
-                        SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
-                    }
-
-                    //снимаем лок
-                    $this->daemon->Unlock();
+                    $this->saveFeedPosts($source, $posts);
                 }
             }
         }
 
+        /**
+         * Метод синхронизации постов
+         * @param SourceFeed    $source лента откуда получили посты
+         * @param array         $posts массив постов
+         * @return bool нужно ли обновить processed у $source
+         */
         private function saveFeedPosts($source, $posts) {
+            /**
+             * Ищем в базе уже возможно сохраненные
+             */
+            $externalIds = array();
+            foreach ($posts as $post) {
+                $externalIds[] = TextHelper::ToUTF8($post['id']);
+            }
+
+            $originalObjects = ArticleFactory::Get(
+                array('_externalId' => $externalIds, 'sourceFeedId' => $source->sourceFeedId)
+                , array(BaseFactory::WithColumns => '"articleId", "externalId"', BaseFactory::WithoutPages => true)
+            );
+            if (!empty($originalObjects)) {
+                $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId');
+            }
+
+            /**
+             * TODO ставить $hasSkippedPosts = true если по каким-то условиям не сохраняем все посты
+             */
+            $hasSkippedPosts = false;
+            if (!$hasSkippedPosts) {
+                //обновляем pagesCountProcessed в базе
+                $source->processed = Convert::ToInt($source->processed) + 1;
+                SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
+            }
+
+            //снимаем лок
+            $this->daemon->Unlock();
+
+            /**
+             * Обходим посты и созраняем их в бд, попутно сливая фотки
+             */
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8($post['id']);
 
-                //TODO написать одним запросом
-                $originalObject = ArticleFactory::Get(
-                    array('externalId' => $externalId, 'sourceFeedId' => $source->sourceFeedId)
-                    , array(BaseFactory::WithColumns => '"articleId"')
-                );
-
-                if (!empty($originalObject)) {
+                if (!empty($originalObjects[$externalId])) {
                     continue; //не сохраняем то что уже сохранили
                 }
 
@@ -102,26 +127,8 @@
                 $articleRecord->photos  = array();
 
                 //сохраняем фотки на медиа сервер
-                if (!empty($post['photo'])) {
-                    foreach ($post['photo'] as $photo) {
-                        //moving photo to local temp
-                        $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-                        file_put_contents($tmpName, file_get_contents($photo['url']));
-                        $file = array(
-                            'tmp_name'  => $tmpName,
-                            'name'      => $tmpName,
-                        );
-                        $fileUploadResult = MediaUtility::SaveTempFile( $file, 'Article', 'photos' );
-
-                        if( !empty( $fileUploadResult['filename'] ) ) {
-                            MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($fileUploadResult['filename']) );
-                            unlink($tmpName);
-                            $articleRecord->photos[] = array(
-                                'filename' => $fileUploadResult['filename'],
-                                'title' => !empty($photo['descr']) ? TextHelper::ToUTF8($photo['descr']) : ''
-                            );
-                        }
-                    }
+                if (!empty($post['photo']) && !Site::IsDevel()) {
+                    $articleRecord->photos = $this->savePostPhotos($post['photo']);
                 }
 
                 //сохраняем в транзакции
@@ -141,9 +148,38 @@
                     $conn->rollback();
                 }
             }
+        }
 
-            //TODO возвращать true только если полностью обработали страницу и к ней не вернемся
-            return true;
+        /**
+         * Метод сохраняет фотки извне на медиасервер и готовит инфу о них для записи в базу
+         * @param $data
+         * @return array
+         */
+        private function savePostPhotos($data) {
+            $result = array();
+
+            foreach ($data as $photo) {
+                //moving photo to local temp
+                $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
+                file_put_contents($tmpName, file_get_contents($photo['url']));
+                $file = array(
+                    'tmp_name'  => $tmpName,
+                    'name'      => $tmpName,
+                );
+                $fileUploadResult = MediaUtility::SaveTempFile( $file, 'Article', 'photos' );
+
+                if( !empty( $fileUploadResult['filename'] ) ) {
+                    MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($fileUploadResult['filename']) );
+                    unlink($tmpName);
+
+                    $result[] = array(
+                        'filename' => $fileUploadResult['filename'],
+                        'title' => !empty($photo['descr']) ? TextHelper::ToUTF8($photo['descr']) : ''
+                    );
+                }
+            }
+
+            return $result;
         }
     }
 ?>

@@ -59,7 +59,12 @@
                 ))
             , 'lists'     => array()
             , 'search'    => array(
-                'page' => array(
+                '_externalId' => array(
+                    'name'         => 'externalId'
+                    , 'type'       => TYPE_STRING
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 0
