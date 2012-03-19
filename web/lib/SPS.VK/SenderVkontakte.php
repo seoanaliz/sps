@@ -99,10 +99,10 @@
                 }
 
                 //заливка фото
-                $content = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
-                $content = json_decode($content);
+                $rawContent = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
+                $content = json_decode($rawContent);
                 if (empty($content->photo)) {
-                    throw new exception(" Error uploading photo. Response : $content");
+                    throw new exception(" Error uploading photo. Response : $rawContent");
                 }
 
                 sleep(1);
