@@ -31,7 +31,7 @@
 
     <group name="Daemons">
         <action name="ProcessQueue">
-            <path>queue/ProcessQueue</path>
+            <path>daemons/ProcessQueue</path>
         </action>
         <action name="SyncSources">
             <path>daemons/SyncSources</path>

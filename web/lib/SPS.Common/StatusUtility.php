@@ -5,6 +5,9 @@
      */
     class StatusUtility {
 
+        const Queued = 4;
+        const Finished = 5;
+
         /**
          * Common Statuses
          *
