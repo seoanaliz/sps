@@ -44,11 +44,9 @@ sql;
                 ArticleQueueFactory::UpdateByMask($object, array('statusId'), array('articleQueueId' => $object->articleQueueId) );
                 ConnectionFactory::CommitTransaction(true);
             } else {
-                ConnectionFactory::CommitTransaction(false);
+                ConnectionFactory::CommitTransaction(true);
                 return;
             }
-
-            ConnectionFactory::CommitTransaction(true);
 
             $this->sendArticleQueue($object);
         }
@@ -83,22 +81,36 @@ sql;
 
             if (!empty($articleRecord->photos)) {
                 foreach ($articleRecord->photos as $photoItem) {
-                    $post_data['photo_array'][] = MediaUtility::GetFilePath( 'Article', 'photos', 'normal', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'normal', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
+
+                    file_put_contents($localPath, file_get_contents($remotePath));
+
+                    $post_data['photo_array'][] = $localPath;
                 }
             }
-
-            Logger::VarDump( $post_data );
 
             $sender = new SenderVkontakte($post_data);
 
             try {
                 $sender->send_post();
+
+                //закрываем
+                $this->finishArticleQueue($articleQueue);
             } catch (Exception $e){
                 $err = $e->getMessage();
                 Logger::Warning($err);
+
+                //ставим обратно в очередь
+                $this->restartArticleQueue($articleQueue);
             }
 
-            $this->restartArticleQueue($articleQueue);
+            //unlink temp files
+            if (!empty($post_data['photo_array'])) {
+                foreach ($post_data['photo_array'] as $localPath) {
+                    @unlink($localPath);
+                }
+            }
 
             return $result;
         }
