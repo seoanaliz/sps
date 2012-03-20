@@ -37,6 +37,7 @@
                 try {
                     $count = $parser->get_posts_count();
                 } catch (Exception $Ex) {
+                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
                     break;
                 }
 
@@ -58,6 +59,7 @@
                     try {
                         $posts = $parser->get_posts($targetPage);
                     } catch (Exception $Ex) {
+                        AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
                         continue; //переходим к следующему sorce
                     }
 

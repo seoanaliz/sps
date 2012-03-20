@@ -97,9 +97,11 @@ sql;
 
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
-            } catch (Exception $e){
-                $err = $e->getMessage();
+            } catch (Exception $Ex){
+                $err = $Ex->getMessage();
                 Logger::Warning($err);
+
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
 
                 //ставим обратно в очередь
                 $this->restartArticleQueue($articleQueue);
