@@ -87,6 +87,8 @@ sql;
                 }
             }
 
+            Logger::VarDump( $post_data );
+
             $sender = new SenderVkontakte($post_data);
 
             try {
