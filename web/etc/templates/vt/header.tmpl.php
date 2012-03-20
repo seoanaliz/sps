@@ -37,24 +37,6 @@
                 )
             )
         )
-        , "static-pages" => array(
-            "title"  => "vt.menu.staticPages"
-            , "link" => "vt://static-pages/"
-            , "menu" => array(
-                array(
-                    "title"  => "vt.menu.navigations"
-                    , "link" => "vt://navigations/"
-                )
-                , array(
-                    "title"  => "vt.menu.navigationTypes"
-                    , "link" => "vt://navigations/types/"
-                )
-                , array(
-                    "title"  => "vt.menu.metaDetails"
-                    , "link" => "vt://meta-details/"
-                )
-            )
-        )
         , "site-params" => array(
             "title"  => "vt.menu.siteParams"
             , "link" => "vt://site-params/"
@@ -62,11 +44,15 @@
                 array(
                     "title"  => "vt.menu.users"
                     , "link" => "vt://users/"
-                )
-                , array(
-                    "title"  => "vt.menu.vfs"
-                    , "link" => "vt://vfs/"
-                )
+                ),
+                array(
+                    "title"  => "vt.daemons.header"
+                    , "link" => "vt://daemons/list/"
+                ),
+                array(
+                    "title"  => "vt.screens.daemonLock.list"
+                    , "link" => "vt://daemons/"
+                ),
             )            
         )
         , "exit" => array (

@@ -1,6 +1,6 @@
 <?
     $__pageTitle = LocaleLoader::Translate( "vt.daemons.header");
-    $daemons = array( 'process-events', 'process-messages', 'delete-messages', 'build-search-data' );
+    $daemons = array( 'sync-sources', 'process-queue' );
 
     $__breadcrumbs = array( array( 'link' => Site::GetWebPath( "vt://daemons/list/" ), 'title' => $__pageTitle ) );
 ?>
@@ -23,7 +23,7 @@
     </thead>
 <?php
     foreach ( $daemons as $name )  {
-        $link  = 'daemons://' . $name;
+        $link  = 'daemons://' . $name . '/';
 ?>
         <tr>
             <td><strong>{$name}</strong></td>

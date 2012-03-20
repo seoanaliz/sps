@@ -224,6 +224,9 @@
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
                         <template>tmpl://vt/daemons/index.tmpl.php</template>
                     </page>
+                    <page uri="vt://daemons/list/">
+                        <template>tmpl://vt/daemons/list.tmpl.php</template>
+                    </page>
                     <page uri="vt://daemons/delete/([0-9]+)">
                         <actions>SPS.Common.DeleteDaemonLock</actions>
                     </page>

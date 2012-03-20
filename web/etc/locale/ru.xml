@@ -89,6 +89,23 @@
             <runAt><![CDATA[Время запуска]]></runAt>
             <title><![CDATA[Название]]></title>
         </daemonLock>
+        <daemons>
+            <header><![CDATA[Доступные демоны]]></header>
+            <title><![CDATA[Название]]></title>
+            <description><![CDATA[Описание]]></description>
+            <time><![CDATA[Время запуска]]></time>
+            <link><![CDATA[Ссылка]]></link>
+            <list>
+                <processqueue>
+                    <title><![CDATA[Разбор очереди отправки]]></title>
+                    <time><![CDATA[Раз в 1 минуту 5 копий]]></time>
+                </processqueue>
+                <syncsources>
+                    <title><![CDATA[Синхронизация по одной старнице каждого источника]]></title>
+                    <time><![CDATA[Раз в 5 минут]]></time>
+                </syncsources>
+            </list>
+        </daemons>
         <login>
             <enter><![CDATA[Войти]]></enter>
             <error><![CDATA[Имя пользователя или пароль не опознаны]]></error>
