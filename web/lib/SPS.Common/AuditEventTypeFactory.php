@@ -4,59 +4,43 @@
      * Copyright (c) The 1ADW. All rights reserved.
      */
           
-    Package::Load( 'SPS.Articles' );
+    Package::Load( 'SPS.Common' );
 
     /**
-     * SourceFeed Factory
+     * AuditEventType Factory
      *
      * @package SPS
-     * @subpackage Articles
+     * @subpackage Common
      */
-    class SourceFeedFactory implements IFactory {
+    class AuditEventTypeFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** SourceFeed instance mapping  */
+        /** AuditEventType instance mapping  */
         public static $mapping = array (
-            'class'       => 'SourceFeed'
-            , 'table'     => 'sourceFeeds'
-            , 'view'      => 'getSourceFeeds'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
+            'class'       => 'AuditEventType'
+            , 'table'     => 'auditEventTypes'
+            , 'view'      => 'getAuditEventTypes'
+            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'sourceFeedId' => array(
-                    'name'          => 'sourceFeedId'
+                'auditEventTypeId' => array(
+                    'name'          => 'auditEventTypeId'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 )
                 ,'title' => array(
                     'name'          => 'title'
                     , 'type'        => TYPE_STRING
-                    , 'max'         => 500
+                    , 'max'         => 1000
                     , 'nullable'    => 'CheckEmpty'
                 )
-                ,'externalId' => array(
-                    'name'          => 'externalId'
+                ,'alias' => array(
+                    'name'          => 'alias'
                     , 'type'        => TYPE_STRING
-                    , 'max'         => 100
+                    , 'max'         => 1000
                     , 'nullable'    => 'CheckEmpty'
-                )
-                ,'useFullExport' => array(
-                    'name'          => 'useFullExport'
-                    , 'type'        => TYPE_BOOLEAN
-                    , 'nullable'    => 'No'
-                )
-                ,'processed' => array(
-                    'name'          => 'processed'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 100
-                )
-                ,'statusId' => array(
-                    'name'          => 'statusId'
-                    , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Status'
                 ))
             , 'lists'     => array()
             , 'search'    => array()
@@ -109,17 +93,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return SourceFeed[] */
+        /** @return AuditEventType[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return SourceFeed */
+        /** @return AuditEventType */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return SourceFeed */
+        /** @return AuditEventType */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -144,7 +128,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return SourceFeed */
+        /** @return AuditEventType */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

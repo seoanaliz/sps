@@ -1,29 +1,30 @@
 <?php
-    /** @var SourceFeed[] $list */
+    /** @var AuditEvent[] $list */
 
-    $__pageTitle = LocaleLoader::Translate( "vt.screens.sourceFeed.list");
+    $__pageTitle = LocaleLoader::Translate( "vt.screens.auditEvent.list");
 
     $grid = array(
         "columns" => array(
-           LocaleLoader::Translate( "vt.sourceFeed.title" )
-            , LocaleLoader::Translate( "vt.common.externalId" )
-            , LocaleLoader::Translate( "vt.sourceFeed.useFullExport" )
-            , LocaleLoader::Translate( "vt.sourceFeed.statusId" )
+           LocaleLoader::Translate( "vt.auditEvent.auditEventTypeId" )
+            , LocaleLoader::Translate( "vt.auditEvent.object" )
+            , LocaleLoader::Translate( "vt.auditEvent.objectId" )
+            , LocaleLoader::Translate( "vt.auditEvent.message" )
+            , LocaleLoader::Translate( "vt.auditEvent.createdAt" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "useFullExport", 3 => "statusId")
-        , "operations"	=> true
-        , "allowAdd"	=> true
-        , "canPages"	=> SourceFeedFactory::CanPages()
-        , "basepath"	=> Site::GetWebPath( "vt://source-feeds/" )
-        , "addpath"		=> Site::GetWebPath( "vt://source-feeds/add" )
+        , "sorts"		=> array(0 => "auditEventType.title", 1 => "object", 2 => "objectId", 3 => "message", 4 => "createdAt")
+        , "operations"	=> false
+        , "allowAdd"	=> false
+        , "canPages"	=> AuditEventFactory::CanPages()
+        , "basepath"	=> Site::GetWebPath( "vt://" )
+        , "addpath"		=> Site::GetWebPath( "vt://audit/add" )
         , "title"		=> $__pageTitle
 		, "description"	=> ''
         , "pageSize"	=> HtmlHelper::RenderToForm( $search["pageSize"] )
-        , "deleteStr"	=> LocaleLoader::Translate( "vt.sourceFeed.deleteString")
+        , "deleteStr"	=> LocaleLoader::Translate( "vt.auditEvent.deleteString")
     );
 	
-	$__breadcrumbs = array( array( 'link' => $grid['basepath'], 'title' => $__pageTitle ) );
+	//$__breadcrumbs = array( array( 'link' => $grid['basepath'], 'title' => $__pageTitle ) );
 ?>
 {increal:tmpl://vt/header.tmpl.php}
 <div class="main">
@@ -46,16 +47,16 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.sourceFeed.title}</label>
-                    <?= FormHelper::FormInput( "search[title]", $search['title'], 'title', null, array( 'size' => 80 ) ); ?>
+                    <label>{lang:vt.auditEvent.object}</label>
+                    <?= FormHelper::FormInput( "search[object]", $search['object'], 'object', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.common.externalId}</label>
-                    <?= FormHelper::FormInput( "search[externalId]", $search['externalId'], 'externalId', null, array( 'size' => 80 ) ); ?>
+                    <label>{lang:vt.auditEvent.objectId}</label>
+                    <?= FormHelper::FormInput( "search[objectId]", $search['objectId'], 'objectId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.sourceFeed.statusId}</label>
-                    <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Common[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
+                    <label>{lang:vt.auditEvent.auditEventTypeId}</label>
+                    <?= FormHelper::FormSelect( "search[auditEventTypeId]", $auditEventTypes, "auditEventTypeId", "title", $search['auditEventTypeId'], null, null, true ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
@@ -68,19 +69,15 @@
     $langDelete = LocaleLoader::Translate( "vt.common.delete" );
 
     foreach ( $list as $object )  {
-        $id         = $object->sourceFeedId;
+        $id         = $object->auditEventId;
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td class="header">{$object.title}</td>
-                <td>{form:$object.externalId}</td>
-                <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>
-                <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
-				<td width="10%">
-					<ul class="actions">
-						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>
-					</ul>
-				</td>
+                <td class="header">{$object.auditEventType.title}</td>
+                <td>{$object.object}</td>
+                <td>{$object.objectId}</td>
+                <td>{form:$object.message}</td>
+                <td><?= ( !empty( $object->createdAt ) ? $object->createdAt->DefaultFormat() : '' ) ?></td>
 	        </tr>
 <?php
     }

@@ -119,6 +119,11 @@
             <path>navigations/GetNavigationListAction</path>
         </action>
     </group>
+    <group name="auditevent">
+        <action name="GetAuditEventList">
+            <path>audit/GetAuditEventListAction</path>
+        </action>
+    </group>
   
     <group name="simple auth">
         <action name="CheckAuth">
@@ -242,6 +247,14 @@
             <parameters>
                 <response>
                     <param name="__activeElement">"articles-queue"</param>
+                </response>
+            </parameters>
+        </action>
+        <action name="SetAuditMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"audit"</param>
                 </response>
             </parameters>
         </action>

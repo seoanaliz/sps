@@ -23,7 +23,8 @@
                     <actions>SPS.Common.Login</actions>
                 </page>
                 <page uri="vt://">
-                    <template>tmpl://vt/index.tmpl.php</template>
+                    <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
+                    <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
 				
                 <pageGroup name="SPS.Common">

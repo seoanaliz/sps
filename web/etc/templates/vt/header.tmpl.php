@@ -13,15 +13,17 @@
 
     /** Menu Structure */
     $__menu = array(
-        "articles" => array(
+        "audit" => array(
+            "title"  => "vt.screens.auditEvent.list"
+            , "link" => "vt://"
+        )
+        , "articles" => array(
             "title"  => "vt.menu.articles"
             , "link" => "vt://articles/"
-            , "menu" => array(
-                array(
-                    "title"  => "vt.menu.articlesQueue"
-                    , "link" => "vt://article-queues/"
-                )
-            )
+        )
+        , "articles-queue" => array(
+            "title"  => "vt.menu.articlesQueue"
+            , "link" => "vt://article-queues/"
         )
         , "source-feeds" => array(
             "title"  => "vt.menu.sourceFeeds"

@@ -8,3 +8,8 @@ INSERT INTO "users" ( "login", "password", "statusId" ) VALUES ( 'admin', md5( '
 
 INSERT INTO "vfsFolders" ("title", "statusId") 			VALUES ( 'root', 1 ); 
 INSERT INTO "vfsFoldersTree" 							VALUES ( 1, NULL, '1', NULL, NULL );
+
+INSERT INTO "public"."auditEventTypes" ("title", "alias")
+VALUES ('Ошибки импорта', 'importErrors');
+INSERT INTO "public"."auditEventTypes" ("title", "alias")
+VALUES ('Ошибки экспорта', 'exportErrors');

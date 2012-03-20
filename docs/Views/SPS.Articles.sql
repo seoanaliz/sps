@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW "getSourceFeeds" AS
 SELECT "public"."sourceFeeds"."sourceFeedId"
 	, "public"."sourceFeeds"."title"
 	, "public"."sourceFeeds"."externalId"
+	, "public"."sourceFeeds"."useFullExport"
 	, "public"."sourceFeeds"."processed"
 	, "public"."sourceFeeds"."statusId"
  FROM "public"."sourceFeeds"

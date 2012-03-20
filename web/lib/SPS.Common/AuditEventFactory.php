@@ -4,62 +4,69 @@
      * Copyright (c) The 1ADW. All rights reserved.
      */
           
-    Package::Load( 'SPS.Articles' );
+    Package::Load( 'SPS.Common' );
 
     /**
-     * SourceFeed Factory
+     * AuditEvent Factory
      *
      * @package SPS
-     * @subpackage Articles
+     * @subpackage Common
      */
-    class SourceFeedFactory implements IFactory {
+    class AuditEventFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** SourceFeed instance mapping  */
+        /** AuditEvent instance mapping  */
         public static $mapping = array (
-            'class'       => 'SourceFeed'
-            , 'table'     => 'sourceFeeds'
-            , 'view'      => 'getSourceFeeds'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
-            , 'cacheDeps' => array()
+            'class'       => 'AuditEvent'
+            , 'table'     => 'auditEvents'
+            , 'view'      => 'getAuditEvents'
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'ReadOnlyTemplates' => 'ReadOnlyTemplates' )
+            , 'cacheDeps' => array( 'auditEventTypes' )
             , 'fields'    => array(
-                'sourceFeedId' => array(
-                    'name'          => 'sourceFeedId'
+                'auditEventId' => array(
+                    'name'          => 'auditEventId'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 )
-                ,'title' => array(
-                    'name'          => 'title'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 500
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'externalId' => array(
-                    'name'          => 'externalId'
+                ,'object' => array(
+                    'name'          => 'object'
                     , 'type'        => TYPE_STRING
                     , 'max'         => 100
-                    , 'nullable'    => 'CheckEmpty'
                 )
-                ,'useFullExport' => array(
-                    'name'          => 'useFullExport'
-                    , 'type'        => TYPE_BOOLEAN
+                ,'objectId' => array(
+                    'name'          => 'objectId'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 200
+                )
+                ,'message' => array(
+                    'name'          => 'message'
+                    , 'type'        => TYPE_STRING
+                )
+                ,'createdAt' => array(
+                    'name'          => 'createdAt'
+                    , 'type'        => TYPE_DATETIME
                     , 'nullable'    => 'No'
                 )
-                ,'processed' => array(
-                    'name'          => 'processed'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 100
-                )
-                ,'statusId' => array(
-                    'name'          => 'statusId'
+                ,'auditEventTypeId' => array(
+                    'name'          => 'auditEventTypeId'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Status'
+                    , 'foreignKey'  => 'AuditEventType'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'page' => array(
+                    'name'         => 'page'
+                    , 'type'       => TYPE_INTEGER
+                    , 'default'    => 0
+                )
+                ,'pageSize' => array(
+                    'name'         => 'pageSize'
+                    , 'type'       => TYPE_INTEGER
+                    , 'default'    => 25
+                ))
         );
         
         /** @return array */
@@ -109,17 +116,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return SourceFeed[] */
+        /** @return AuditEvent[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return SourceFeed */
+        /** @return AuditEvent */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return SourceFeed */
+        /** @return AuditEvent */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -144,7 +151,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return SourceFeed */
+        /** @return AuditEvent */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

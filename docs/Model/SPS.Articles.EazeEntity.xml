@@ -47,6 +47,13 @@
           <AttributeParameter Key="controlId" Value="processed" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="useFullExport" TitleKey="vt.sourceFeed.useFullExport" Type="HTML_CHECKBOX" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="useFullExport" />
+          <AttributeParameter Key="value" Value="useFullExport" />
+          <AttributeParameter Key="controlId" Value="useFullExport" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="sourceFeedId" TitleKey="vt.sourceFeed.sourceFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -89,6 +96,13 @@
           <AttributeParameter Key="value" Value="processed" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="processed" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="useFullExport" TitleKey="vt.sourceFeed.useFullExport" TitleValue="useFullExport" Type="HTML_CHECKBOX" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="useFullExport" />
+          <AttributeParameter Key="value" Value="useFullExport" />
+          <AttributeParameter Key="controlId" Value="useFullExport" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

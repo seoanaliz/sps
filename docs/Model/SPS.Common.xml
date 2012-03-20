@@ -33,7 +33,7 @@
       </Flags>
       <Lists />
     </Entity>
-    <Entity Name="MetaDetail" PackageName="SPS.Common" Table="metaDetails" View="getMetaDetails">
+    <Entity Name="MetaDetail" PackageName="SPS.Common" Table="metaDetails" View="getMetaDetails" DefaultConnection="">
       <Attributes>
         <Attribute Name="metaDetailId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="metaDetailId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="url" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="255" DbName="url" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
@@ -144,6 +144,38 @@
       <Search />
       <Flags>
         <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="AuditEventType" PackageName="SPS.Common" Table="auditEventTypes" View="getAuditEventTypes" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="auditEventTypeId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="auditEventTypeId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="alias" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="alias" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="AuditEvent" PackageName="SPS.Common" Table="auditEvents" View="getAuditEvents" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="auditEventId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="auditEventId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="object" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="object" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="objectId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="200" DbName="objectId" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="message" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="message" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="createdAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="createdAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="auditEventTypeId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="auditEventType" ForeignKey="AuditEventType" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Search>
+      <Flags>
+        <EFlag>CanPages</EFlag>
+        <EFlag>ReadOnlyTemplates</EFlag>
       </Flags>
       <Lists />
     </Entity>

@@ -21,6 +21,9 @@
         /** @var string */
         public $externalId;
 
+        /** @var bool */
+        public $useFullExport;
+
         /** @var string */
         public $processed;
 

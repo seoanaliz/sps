@@ -25,6 +25,10 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="useFullExport" class="row required">
+            <label>{lang:vt.sourceFeed.useFullExport}</label>
+            <?= FormHelper::FormCheckBox( $prefix . '[useFullExport]', null, 'useFullExport', null, $object->useFullExport ); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.sourceFeed.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>

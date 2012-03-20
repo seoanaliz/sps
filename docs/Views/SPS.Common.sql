@@ -72,3 +72,25 @@ SELECT "public"."navigations"."navigationId"
 		"staticPage"."staticPageId" = "public"."navigations"."staticPageId"
 	WHERE "public"."navigations"."statusId" IN (1,2)
 ORDER BY "navigationType"."alias", "orderNumber";
+
+CREATE OR REPLACE VIEW "getAuditEventTypes" AS
+SELECT "public"."auditEventTypes"."auditEventTypeId"
+	, "public"."auditEventTypes"."title"
+	, "public"."auditEventTypes"."alias"
+ FROM "public"."auditEventTypes"
+ORDER BY "auditEventTypeId";
+
+CREATE OR REPLACE VIEW "getAuditEvents" AS
+SELECT "public"."auditEvents"."auditEventId"
+	, "public"."auditEvents"."object"
+	, "public"."auditEvents"."objectId"
+	, "public"."auditEvents"."message"
+	, "public"."auditEvents"."createdAt"
+	, "public"."auditEvents"."auditEventTypeId"
+	, "auditEventType"."auditEventTypeId" AS "auditEventType.auditEventTypeId"
+	, "auditEventType"."title" AS "auditEventType.title"
+	, "auditEventType"."alias" AS "auditEventType.alias"
+ FROM "public"."auditEvents"
+	INNER JOIN "public"."auditEventTypes" "auditEventType" ON
+		"auditEventType"."auditEventTypeId" = "public"."auditEvents"."auditEventTypeId"
+ORDER BY "createdAt" DESC;

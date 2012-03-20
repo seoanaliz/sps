@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		17.03.2012
+Modified		20.03.2012
 Project		
 Model			
 Company		
@@ -197,6 +197,7 @@ Create table "sourceFeeds"
 	"sourceFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
 	"externalId" Varchar(100) NOT NULL,
+	"useFullExport" Boolean NOT NULL Default false,
 	"processed" Varchar(100),
 	"statusId" Integer NOT NULL,
  primary key ("sourceFeedId")
@@ -224,6 +225,27 @@ Create table "publishers"
 	"vk_seckey" Varchar(64) NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("publisherId")
+) Without Oids;
+
+
+Create table "auditEvents"
+(
+	"auditEventId" Serial NOT NULL,
+	"object" Varchar(100),
+	"objectId" Varchar(200),
+	"message" Text,
+	"createdAt" Timestamp NOT NULL Default now(),
+	"auditEventTypeId" Integer NOT NULL,
+ primary key ("auditEventId")
+) Without Oids;
+
+
+Create table "auditEventTypes"
+(
+	"auditEventTypeId" Serial NOT NULL,
+	"title" Varchar(1000) NOT NULL,
+	"alias" Varchar(1000) NOT NULL,
+ primary key ("auditEventTypeId")
 ) Without Oids;
 
 
@@ -293,6 +315,8 @@ Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" 
 Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
 Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
+Create index "IX_FK_auditEventsAuditEventTypeId_auditEvents" on "auditEvents" ("auditEventTypeId");
+Alter table "auditEvents" add  foreign key ("auditEventTypeId") references "auditEventTypes" ("auditEventTypeId") on update restrict on delete restrict;
 
 
 /* Create Procedures */

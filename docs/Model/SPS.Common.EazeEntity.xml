@@ -931,4 +931,179 @@
       </TemplateAttribute>
     </Attributes>
   </EazeEntity>
+  <EazeEntity Name="AuditEventType">
+    <TerminalPath>auditEventTypes</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies />
+    <Search>
+      <TemplateAttribute Name="auditEventTypeId" TitleKey="vt.auditEventType.auditEventTypeId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventTypeId" />
+          <AttributeParameter Key="value" Value="auditEventTypeId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="auditEventTypeId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.auditEventType.title" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="alias" TitleKey="vt.auditEventType.alias" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="alias" />
+          <AttributeParameter Key="value" Value="alias" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="alias" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="auditEventTypeId" TitleKey="vt.auditEventType.auditEventTypeId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventTypeId" />
+          <AttributeParameter Key="value" Value="auditEventTypeId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="auditEventTypeId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="title" TitleKey="vt.auditEventType.title" TitleValue="Заголовок" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="title" />
+          <AttributeParameter Key="value" Value="title" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="title" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="alias" TitleKey="vt.auditEventType.alias" TitleValue="Системное имя" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="alias" />
+          <AttributeParameter Key="value" Value="alias" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="alias" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="AuditEvent">
+    <TerminalPath>audit</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>auditEventTypes</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="auditEventId" TitleKey="vt.auditEvent.auditEventId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventId" />
+          <AttributeParameter Key="value" Value="auditEventId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="auditEventId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="object" TitleKey="vt.auditEvent.object" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="object" />
+          <AttributeParameter Key="value" Value="object" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="object" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="objectId" TitleKey="vt.auditEvent.objectId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="objectId" />
+          <AttributeParameter Key="value" Value="objectId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="objectId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="message" TitleKey="vt.auditEvent.message" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="message" />
+          <AttributeParameter Key="value" Value="message" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="message" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.auditEvent.createdAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="auditEventTypeId" TitleKey="vt.auditEvent.auditEventTypeId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventTypeId" />
+          <AttributeParameter Key="values" Value="$auditEventTypes" />
+          <AttributeParameter Key="dataKey" Value="auditEventTypeId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="auditEventTypeId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="auditEventId" TitleKey="vt.auditEvent.auditEventId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventId" />
+          <AttributeParameter Key="value" Value="auditEventId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="auditEventId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="auditEventTypeId" TitleKey="vt.auditEvent.auditEventTypeId" TitleValue="Событие" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventTypeId" />
+          <AttributeParameter Key="values" Value="$auditEventTypes" />
+          <AttributeParameter Key="dataKey" Value="auditEventTypeId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="auditEventTypeId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="auditEventType.title" TitleKey="vt.auditEvent.auditEventTypeId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="auditEventTypeId" />
+          <AttributeParameter Key="values" Value="$auditEventTypes" />
+          <AttributeParameter Key="dataKey" Value="auditEventTypeId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="auditEventTypeId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="object" TitleKey="vt.auditEvent.object" TitleValue="Объект" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="object" />
+          <AttributeParameter Key="value" Value="object" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="object" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="objectId" TitleKey="vt.auditEvent.objectId" TitleValue="ID" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="objectId" />
+          <AttributeParameter Key="value" Value="objectId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="objectId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="message" TitleKey="vt.auditEvent.message" TitleValue="Сообщение" Type="HTML_EDITOR" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="message" />
+          <AttributeParameter Key="value" Value="message" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="message" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.auditEvent.createdAt" TitleValue="Дата создания" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
 </ArrayOfEazeEntity>
