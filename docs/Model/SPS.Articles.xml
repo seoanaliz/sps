@@ -81,7 +81,10 @@
         <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="articleQueueId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleQueue" ForeignKey="ArticleQueue" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
-      <Search />
+      <Search>
+        <Attribute Name="_articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+        <Attribute Name="_articleQueueId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleQueueId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
       <Flags>
         <EFlag>CanCache</EFlag>
         <EFlag>WithoutTemplates</EFlag>

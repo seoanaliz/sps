@@ -81,7 +81,7 @@ sql;
 
             if (!empty($articleRecord->photos)) {
                 foreach ($articleRecord->photos as $photoItem) {
-                    $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'normal', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                     $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
 
                     file_put_contents($localPath, file_get_contents($remotePath));

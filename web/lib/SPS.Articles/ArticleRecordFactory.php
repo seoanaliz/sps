@@ -55,7 +55,17 @@
                     , 'foreignKey'  => 'ArticleQueue'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                '_articleId' => array(
+                    'name'         => 'articleId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'_articleQueueId' => array(
+                    'name'         => 'articleQueueId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                ))
         );
         
         /** @return array */

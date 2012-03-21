@@ -4,7 +4,7 @@
         <pages>
             <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
                 <page uri="/">
-                    <actions>SPS.Site.GetStaticPage</actions>
+                    <actions>SPS.Site.GetIndexPage</actions>
                     <template>tmpl://fe/index.tmpl.php</template>
                 </page>
                 <page uri="/login/" boot="SPS.Site.GetSiteParams">
@@ -14,6 +14,13 @@
                 <page uri="/logout/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
+                <page uri="controls://arcticles-list/">
+                    <actions>SPS.Site.GetAriclesListControl</actions>
+                    <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
                 </page>
             </pageGroup>
 			

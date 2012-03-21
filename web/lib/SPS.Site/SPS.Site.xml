@@ -42,10 +42,14 @@
         <action name="ImageUploadControl">
             <path>controls/ImageUploadControl</path>
         </action>
+
+        <action name="GetAriclesListControl">
+            <path>controls/GetAriclesListControl</path>
+        </action>
     </group>
 
 	<!-- Put your's frontend actions here -->
     <group name="Site">
-
+        <action name="GetIndexPage" />
     </group>
 </actions>

@@ -19,8 +19,6 @@
                     , 'maxSize'         => 2097152 //2MB (1024*1024*2)
                     , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
                     , 'isImage'         => true
-//                    , 'minDimensions'   => array( 'width' => 560, 'height' => 170 )
-//                    , 'initDimensions'  => array( 'width' => 1920, 'height' => 1080 )
                     , 'resizes'     => array(
                         'small' => array(
                             'name'      => 'small'
@@ -29,27 +27,9 @@
                             , 'quality' => 100
                             , 'scale'   => false
                         )
-                        , 'medium' => array(
-                            'name'      => 'medium'
-                            , 'width'   => 100
-                            , 'height'  => 100
-                            , 'quality' => 100
-                            , 'scale'   => false
+                        , 'original' => array(
+                            'name'      => 'original'
                         )
-                        , 'normal' => array(
-                            'name'      => 'normal'
-                            , 'width'   => 170
-                            , 'height'  => 170
-                            , 'quality' => 100
-                            , 'scale'   => false
-                        )
-//                        , 'big' => array(
-//                            'name'          => 'big'
-//                            , 'width'       => 560
-//                            , 'height'      => 999999 //inf
-//                            , 'quality'     => 100
-//                            , 'scale'       => true
-//                        )
                     )
                 )
             )
