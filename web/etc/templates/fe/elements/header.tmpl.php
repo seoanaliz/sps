@@ -31,14 +31,20 @@
     $__pageTitle = !empty( $__pageTitle ) ? $__pageTitle : $__sitePageTitle;
 	
     $cssFiles = array(
-        AssetHelper::AnyBrowser => array()
+        AssetHelper::AnyBrowser => array(
+            'css://fe/reset.css',
+            'css://fe/main.css',
+        )
         , AssetHelper::IE7 => array()
     );
 
     $jsFiles = array(
         'js://fe/locale/'. LocaleLoader::$CurrentLanguage . '.js',
-        'js://ext/jquery/jquery.js',
+        'js://fe/jquery-1.7.1.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',
+        'js://fe/jquery.ui.datepicker.js',
+        'js://fe/eventlist.js',
+        'js://fe/main.js',
     );
 
     CssHelper::Init( false );
