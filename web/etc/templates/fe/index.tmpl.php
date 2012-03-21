@@ -26,7 +26,7 @@
             <div class="newpost collapsed bb" style="display: none;">
                 <div class="input default" contenteditable="true">Есть чем поделиться?</div>
             </div>
-            <div class="wall">
+            <div class="wall" id="wall">
 
             </div>
         </div>
@@ -60,6 +60,9 @@
                     <div class="ctl spr del"></div>
                 </div -->
 
+            </div>
+
+            <div class="items block drop" id="queue" style="display: none;">
             </div>
         </div>
     </div>

@@ -1,3 +1,28 @@
+function loadQueue() {
+    try {
+        timestamp = $("#calendar").datepicker("getDate").getTime() / 1000;
+    } catch (ex) {
+        timestamp = null;
+    }
+
+    targetFeedId = $(".right-panel .drop-down").data("selected");
+
+    if (targetFeedId) {
+        //clean and load right column
+        $.ajax({
+            url: controlsRoot + 'arcticles-queue-list/',
+            dataType : "html",
+            data: {
+                targetFeedId: targetFeedId,
+                timestamp: timestamp
+            },
+            success: function (data) {
+                $('div#queue').show().html(data);
+            }
+        });
+    }
+}
+
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
         $.ajax({
@@ -22,12 +47,16 @@ var Eventlist = {
                 sourceFeedId: sel
             },
             success: function (data) {
-                $('div.wall').html(data);
+                $('div#wall').html(data);
             }
         });
     },
-    rightcolumn_dropdown_change: function(sel){},
-    calendar_change: function(timestamp){},
+    rightcolumn_dropdown_change: function(sel){
+        loadQueue();
+    },
+    calendar_change: function(timestamp){
+        loadQueue();
+    },
     wall_load_more: function(){
         alert('moreeee');
     },
