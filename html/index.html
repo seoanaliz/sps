@@ -24,7 +24,7 @@
             <div class="header bb">
 
                 <div class="drop-down">
-                    <div class="caption default">Choose</div>
+                    <div class="caption default">Источник</div>
                     <div class="tip"><s></s></div>
                     <ul>
                         <li>Item1</li>
@@ -48,7 +48,13 @@
                 <div class="input default" contenteditable="true">Есть чем поделиться?</div>
             </div>
             <div class="wall">
-                <div class="post" data-id="631">
+
+                <div id="emptylabel">
+                    <div>Новых постов нет.</div>
+                    <div>Проверить</div>
+                </div>
+
+                <div class="post bb" data-id="631">
                     <div class="l d-hide">
                         <div class="userpic"><img/></div>
                     </div>
@@ -62,9 +68,64 @@
                     <div class="clear"></div>
                 </div>
 
-                <div class="spacer"></div>
+                <div class="post bb" data-id="631">
+                    <div class="l d-hide">
+                        <div class="userpic"><img/></div>
+                    </div>
+                    <div class="name d-hide">Username</div>
+                    <div class="content">sdfdsfs<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/></div>
+                    <div class="bottom d-hide">
+                        <div class="l"><span class="timestamp">10 фев 2012</span> | <a href="javascript:;">Редактировать</a></div>
+                        <div class="r"><span class="original">Оригинал</span> | <span class="likes spr"></span><span class="likes-count">1000</span></div>
+                    </div>
+                    <div class="delete spr"></div>
+                    <div class="clear"></div>
+                </div>
 
-                <div class="post" data-id="123">asdas</div>
+                <div class="post bb" data-id="631">
+                    <div class="l d-hide">
+                        <div class="userpic"><img/></div>
+                    </div>
+                    <div class="name d-hide">Username</div>
+                    <div class="content">sdfdsfs<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/></div>
+                    <div class="bottom d-hide">
+                        <div class="l"><span class="timestamp">10 фев 2012</span> | <a href="javascript:;">Редактировать</a></div>
+                        <div class="r"><span class="original">Оригинал</span> | <span class="likes spr"></span><span class="likes-count">1000</span></div>
+                    </div>
+                    <div class="delete spr"></div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="post bb" data-id="631">
+                    <div class="l d-hide">
+                        <div class="userpic"><img/></div>
+                    </div>
+                    <div class="name d-hide">Username</div>
+                    <div class="content">sdfdsfs<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/></div>
+                    <div class="bottom d-hide">
+                        <div class="l"><span class="timestamp">10 фев 2012</span> | <a href="javascript:;">Редактировать</a></div>
+                        <div class="r"><span class="original">Оригинал</span> | <span class="likes spr"></span><span class="likes-count">1000</span></div>
+                    </div>
+                    <div class="delete spr"></div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="post bb" data-id="631">
+                    <div class="l d-hide">
+                        <div class="userpic"><img/></div>
+                    </div>
+                    <div class="name d-hide">Username</div>
+                    <div class="content">sdfdsfs<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/>sdfsdf<br/></div>
+                    <div class="bottom d-hide">
+                        <div class="l"><span class="timestamp">10 фев 2012</span> | <a href="javascript:;">Редактировать</a></div>
+                        <div class="r"><span class="original">Оригинал</span> | <span class="likes spr"></span><span class="likes-count">1000</span></div>
+                    </div>
+                    <div class="delete spr"></div>
+                    <div class="clear"></div>
+                </div>
+
+                <div id="wallloadmore">Больше</div>
+
             </div>
         </div>
     </div>
@@ -75,12 +136,12 @@
 
                 <div class="calendar">
                     <input type="text" id="calendar"/>
-                    <div class="caption default">date</div>
+                    <div class="caption default">Дата</div>
                     <div class="tip"><b>cal</b></div>
                 </div>
 
                 <div class="drop-down">
-                    <div class="caption default">Choose</div>
+                    <div class="caption default">Источник</div>
                     <div class="tip"><s></s></div>
                     <ul>
                         <li data-id="1">Item1</li>
@@ -102,22 +163,22 @@
             </div>
 
             <div class="items block drop">
-                <div class="slot empty">
+                <div class="slot empty" data-id="0">
                     <div class="time">0:00</div>
                     <div class="content"></div>
                 </div>
-                <div class="slot">
+                <div class="slot" data-id="1">
                     <div class="time">1:00</div>
                     <div class="post" data-id="164">
                         <div class="content">ПСТО намбер ван</div>
                         <div class="spr delete"></div>
                     </div>
                 </div>
-                <div class="slot empty">
+                <div class="slot empty" data-id="2">
                     <div class="time">2:00</div>
                     <div class="content"></div>
                 </div>
-                <div class="slot empty">
+                <div class="slot empty" data-id="3">
                     <div class="time">3:00</div>
                     <div class="content"></div>
                 </div>
