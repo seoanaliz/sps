@@ -1,5 +1,16 @@
 var Eventlist = {
-    leftcolumn_deletepost: function(post_id, callback){callback(1)},
+    leftcolumn_deletepost: function(post_id, callback){
+        $.ajax({
+            url: controlsRoot + 'arcticle-delete/',
+            dataType : "html",
+            data: {
+                id: post_id
+            },
+            success: function (data) {
+                callback(1);
+            }
+        });
+    },
     rightcolumn_deletepost: function(post_id, callback){callback(1)},
     leftcolumn_dropdown_change: function(sel){
         $('.newpost').show();

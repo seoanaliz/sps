@@ -46,6 +46,9 @@
         <action name="GetAriclesListControl">
             <path>controls/GetAriclesListControl</path>
         </action>
+        <action name="DeleteAricleControl">
+            <path>controls/DeleteAricleControl</path>
+        </action>
     </group>
 
 	<!-- Put your's frontend actions here -->

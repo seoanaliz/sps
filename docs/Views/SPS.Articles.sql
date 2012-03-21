@@ -36,7 +36,7 @@ SELECT "public"."articles"."articleId"
 	, "public"."articles"."statusId"
  FROM "public"."articles"
 	WHERE "public"."articles"."statusId" != 3
-ORDER BY "createdAt" DESC;
+ORDER BY "createdAt" DESC, "articleId" DESC;
 
 CREATE OR REPLACE VIEW "getArticleQueues" AS
 SELECT "public"."articleQueues"."articleQueueId"

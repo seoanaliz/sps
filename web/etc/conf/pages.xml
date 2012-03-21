@@ -22,6 +22,9 @@
                     <actions>SPS.Site.GetAriclesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
                 </page>
+                <page uri="controls://arcticle-delete/">
+                    <actions>SPS.Site.DeleteAricleControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

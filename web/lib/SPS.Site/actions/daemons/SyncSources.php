@@ -129,7 +129,7 @@
                 $articleRecord->photos  = array();
 
                 //сохраняем фотки на медиа сервер
-                if (!empty($post['photo']) && !Site::IsDevel()) {
+                if (!empty($post['photo'])) {
                     $articleRecord->photos = $this->savePostPhotos($post['photo']);
                 }
 
