@@ -5,14 +5,14 @@
 
     $grid = array(
         "columns" => array(
-           LocaleLoader::Translate( "vt.article.importedAt" )
+           LocaleLoader::Translate( "vt.article.createdAt" )
             , LocaleLoader::Translate( "vt.articleQueue.articleId" )
             , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.article.sourceFeedId" )
             , LocaleLoader::Translate( "vt.article.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "importedAt", 1 => "articleId", 2 => "externalId", 3 => "sourceFeedId", 4 => "statusId")
+        , "sorts"		=> array(0 => "createdAt", 1 => "articleId", 2 => "externalId", 3 => "sourceFeedId", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> ArticleFactory::CanPages()
@@ -77,7 +77,7 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td class="header"><?= ( !empty( $object->importedAt ) ? $object->importedAt->DefaultFormat() : '' ) ?></td>
+                <td class="header"><?= ( !empty( $object->createdAt ) ? $object->createdAt->DefaultFormat() : '' ) ?></td>
                 <td>{$object.articleId}</td>
                 <td>{form:$object.externalId}</td>
                 <td><?= !empty($sourceFeeds[$object->sourceFeedId]) ? $sourceFeeds[$object->sourceFeedId]->title : '' ?></td>

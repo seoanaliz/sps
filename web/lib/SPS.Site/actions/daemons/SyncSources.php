@@ -57,7 +57,7 @@
                     }
 
                     try {
-                        $posts = $parser->get_posts($targetPage);
+                        $posts = $parser->get_posts($targetPage, !empty($source->useFullExport));
                     } catch (Exception $Ex) {
                         AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
                         continue; //переходим к следующему sorce
@@ -117,11 +117,11 @@
                 }
 
                 $article = new Article();
-                $article->sourceFeedId = $source->sourceFeedId;
-                $article->externalId = $externalId;
-                $article->createdAt = DateTimeWrapper::Now(); //todo взять дату из поста когда будет
-                $article->importedAt = DateTimeWrapper::Now();
-                $article->statusId = 1;
+                $article->sourceFeedId  = $source->sourceFeedId;
+                $article->externalId    = $externalId;
+                $article->createdAt     = new DateTimeWrapper('@'.$post['time']);
+                $article->importedAt    = DateTimeWrapper::Now();
+                $article->statusId      = 1;
 
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = TextHelper::ToUTF8($post['text']);

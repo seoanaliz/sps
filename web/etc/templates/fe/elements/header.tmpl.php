@@ -4,7 +4,7 @@
     /**
      * Manual set meta or reset of meta
      */
-    $__sitePageTitle    = 'New project';
+    $__sitePageTitle    = 'Socialboard';
     $__pageTitle        = !empty( $__pageTitle ) ? $__pageTitle : '';
     $__metaDescription  = !empty( $__metaDescription ) ? $__metaDescription : '';
     $__metaKeywords     = !empty( $__metaKeywords ) ? $__metaKeywords : '';
