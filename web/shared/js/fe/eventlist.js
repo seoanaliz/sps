@@ -36,6 +36,7 @@ function loadArticles(clean) {
         },
         success: function (data) {
             $('div#wall').append(data);
+            Elements.addEvents();
         }
     });
 }
@@ -64,7 +65,6 @@ var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-delete/',
-            dataType : "html",
             data: {
                 id: post_id
             },
@@ -76,7 +76,6 @@ var Eventlist = {
     rightcolumn_deletepost: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-queue-delete/',
-            dataType : "html",
             data: {
                 id: post_id
             },
@@ -101,7 +100,22 @@ var Eventlist = {
         callback(true);
     },
     post_moved: function(post_id, slot_id, callback){
-        window.setTimeout(function(){callback(1)},500);
+        $.ajax({
+            url: controlsRoot + 'arcticle-add-to-queue/',
+            dataType : "json",
+            data: {
+                articleId: post_id,
+                timestamp: slot_id,
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(1);
+                } else {
+                    callback(0);
+                }
+            }
+        });
     },
 
     /* после выполнения запроса к сервису. Вызвать callback(state) state = {}|false */

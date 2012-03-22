@@ -56,6 +56,9 @@
             <action name="DeleteAricleQueueControl">
                 <path>controls/DeleteAricleQueueControl</path>
             </action>
+            <action name="AddAricleToQueueControl">
+                <path>controls/AddAricleToQueueControl</path>
+            </action>
         </group>
     </group>
 

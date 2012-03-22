@@ -32,6 +32,9 @@
                 <page uri="controls://arcticle-queue-delete/">
                     <actions>SPS.Site.DeleteAricleQueueControl</actions>
                 </page>
+                <page uri="controls://arcticle-add-to-queue/">
+                    <actions>SPS.Site.AddAricleToQueueControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

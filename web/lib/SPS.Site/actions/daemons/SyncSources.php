@@ -119,7 +119,7 @@
                 $article = new Article();
                 $article->sourceFeedId  = $source->sourceFeedId;
                 $article->externalId    = $externalId;
-                $article->createdAt     = new DateTimeWrapper('@'.$post['time']);
+                $article->createdAt     = new DateTimeWrapper(date('r', $post['time']));
                 $article->importedAt    = DateTimeWrapper::Now();
                 $article->statusId      = 1;
 
