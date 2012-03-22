@@ -41,7 +41,7 @@
             );
 
             if ($existsCount) {
-                $result['message'] = 'exists';
+                $result['message'] = 'articleQueueExists';
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
