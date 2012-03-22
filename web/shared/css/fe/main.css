@@ -190,3 +190,5 @@ i {font-style: italic;}
 .button {background-position:0 -15px;width: 139px;line-height: 30px; overflow:hidden;text-align: center;color:#fff;text-shadow: 0px -1px 1px rgba(0,0,0,0.6);cursor:pointer;}
 .newpost .button {margin-top: 20px;}
 .newpost.collapsed .button {display: none;}
+.newpost.collapsed .uploadify {display: none;}
+.newpost.collapsed .uploadifyQueue {display: none;}

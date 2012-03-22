@@ -23,13 +23,7 @@
                 </div -->
 
             </div>
-            <div class="newpost collapsed bb hidden">
-                <div class="input" contenteditable="true"></div>
-                <div class="tip">Есть чем поделиться?</div>
-                <div class="save button spr l">Сохранить</div>
-                <div class="attach button spr r">Прикрепить</div>
-                <div class="clear"></div>
-            </div>
+            {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 
             <div class="wall" id="wall">
 

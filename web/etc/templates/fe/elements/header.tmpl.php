@@ -34,6 +34,7 @@
         AssetHelper::AnyBrowser => array(
             'css://fe/reset.css',
             'css://fe/main.css',
+            'js://ext/uploadify/uploadify.css',
         )
         , AssetHelper::IE7 => array()
     );
@@ -44,9 +45,14 @@
         'js://fe/jquery-ui-1.8.18.custom.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',
         'js://ext/jquery.plugins/jquery.blockui.js',
+        'js://ext/jquery.plugins/jquery.tmpl.min.js',
         'js://fe/jquery.ui.datepicker.js',
         'js://fe/eventlist.js',
         'js://fe/main.js',
+
+        'js://ext/swfobject/swfobject.js',
+        'js://ext/uploadify/jquery.uploadify.js',
+        'js://fe/files.js',
     );
 
     CssHelper::Init( false );
