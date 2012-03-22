@@ -21,7 +21,9 @@
                             <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
                             <? } ?>
                         </div>
-                        <div class="spr delete"></div>
+                        <? if(!empty($gridItem['canDelete'])) {?>
+                            <div class="spr delete"></div>
+                        <? } ?>
                     </div>
                 </div>
             <?

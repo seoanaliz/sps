@@ -71,7 +71,16 @@ var Eventlist = {
         });
     },
     rightcolumn_deletepost: function(post_id, callback){
-        callback(1);
+        $.ajax({
+            url: controlsRoot + 'arcticle-queue-delete/',
+            dataType : "html",
+            data: {
+                id: post_id
+            },
+            success: function (data) {
+                callback(1);
+            }
+        });
     },
     leftcolumn_dropdown_change: function(sel){
         loadArticles();

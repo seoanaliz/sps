@@ -29,6 +29,9 @@
                     <actions>SPS.Site.GetAriclesQueueListControl</actions>
                     <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
                 </page>
+                <page uri="controls://arcticle-queue-delete/">
+                    <actions>SPS.Site.DeleteAricleQueueControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

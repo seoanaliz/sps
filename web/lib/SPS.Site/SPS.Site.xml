@@ -43,16 +43,20 @@
             <path>controls/ImageUploadControl</path>
         </action>
 
-        <action name="GetAriclesListControl">
-            <path>controls/GetAriclesListControl</path>
-        </action>
-        <action name="DeleteAricleControl">
-            <path>controls/DeleteAricleControl</path>
-        </action>
-
-        <action name="GetAriclesQueueListControl">
-            <path>controls/GetAriclesQueueListControl</path>
-        </action>
+        <group name="Articles">
+            <action name="GetAriclesListControl">
+                <path>controls/GetAriclesListControl</path>
+            </action>
+            <action name="DeleteAricleControl">
+                <path>controls/DeleteAricleControl</path>
+            </action>
+            <action name="GetAriclesQueueListControl">
+                <path>controls/GetAriclesQueueListControl</path>
+            </action>
+            <action name="DeleteAricleQueueControl">
+                <path>controls/DeleteAricleQueueControl</path>
+            </action>
+        </group>
     </group>
 
 	<!-- Put your's frontend actions here -->
