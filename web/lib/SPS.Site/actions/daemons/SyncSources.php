@@ -79,10 +79,21 @@
         private function saveFeedPosts($source, $posts) {
             /**
              * Ищем в базе уже возможно сохраненные
+             * Попутно собираем id тех, которые надо пропустить
              */
-            $externalIds = array();
+            $externalIds    = array();
+            $skipIds        = array();
+            $targetDate = new DateTimeWrapper('-1 day'); //проспускаем посты, которым еще нет 1 суток
             foreach ($posts as $post) {
-                $externalIds[] = TextHelper::ToUTF8($post['id']);
+                $externalId = TextHelper::ToUTF8($post['id']);
+                $externalIds[] = $externalId;
+
+                //если пост новее чем $targetDate - пропускаем
+                $postDate = new DateTimeWrapper(date('r', $post['time']));
+                if ($postDate >= $targetDate) {
+                    $skipIds[] = $externalId;
+
+                }
             }
 
             $originalObjects = ArticleFactory::Get(
@@ -94,23 +105,26 @@
             }
 
             /**
-             * TODO ставить $hasSkippedPosts = true если по каким-то условиям не сохраняем все посты
+             * если массив $skipIds непуст, то значит по каким-то условиям не сохраняем все посты
              */
-            $hasSkippedPosts = false;
-            if (!$hasSkippedPosts) {
-                //обновляем pagesCountProcessed в базе
+            if (empty($skipIds)) {
+                //обновляем pagesCountProcessed в базе, снимаем лок параллельному потоку
                 $source->processed = Convert::ToInt($source->processed) + 1;
                 SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
-            }
 
-            //снимаем лок
-            $this->daemon->Unlock();
+                //снимаем лок
+                $this->daemon->Unlock();
+            }
 
             /**
              * Обходим посты и созраняем их в бд, попутно сливая фотки
              */
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8($post['id']);
+
+                if (in_array($externalId, $skipIds)) {
+                    continue; //пропускаем определенные
+                }
 
                 if (!empty($originalObjects[$externalId])) {
                     continue; //не сохраняем то что уже сохранили
@@ -149,6 +163,11 @@
                 } else {
                     $conn->rollback();
                 }
+            }
+
+            if (!empty($skipIds)) {
+                //снимаем лок
+                $this->daemon->Unlock();
             }
         }
 

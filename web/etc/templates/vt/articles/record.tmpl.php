@@ -3,7 +3,7 @@
 
     $prefixRecord = "articleRecord";
 ?>
-<div data-row="content" class="row required">
+<div data-row="content" class="row">
     <label>{lang:vt.articleRecord.content}</label>
     <?= FormHelper::FormTextArea( $prefixRecord . '[content]', $articleRecord->content, 'content', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
 </div>

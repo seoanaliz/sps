@@ -33,7 +33,6 @@
                 ,'content' => array(
                     'name'          => 'content'
                     , 'type'        => TYPE_STRING
-                    , 'nullable'    => 'CheckEmpty'
                 )
                 ,'likes' => array(
                     'name'          => 'likes'
