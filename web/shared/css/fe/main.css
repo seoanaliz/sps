@@ -54,7 +54,7 @@ i {font-style: italic;}
 .calendar {position:relative;width:123px;}
 #calendar {position:absolute;border:none;background: none;top:0;bottom:0;left:5px;right: 25px;padding:0;margin:0;line-height: 27px;font-size: 12px;}
 .calendar b {line-height: 23px;position:relative;top:2px;color:#888;left:-2px;}
-.calendar .caption {text-indent: -1000px;}
+.calendar .caption {text-indent: -10000px;}
 .calendar .caption.default {text-indent: 0;}
 
 .block {
@@ -141,8 +141,8 @@ i {font-style: italic;}
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current { float:left; }
 
 .ui-datepicker {background: #828282;}
-.ui-icon-circle-triangle-w {text-indent: -1000px;}
-.ui-icon-circle-triangle-e {text-indent: -1000px;}
+.ui-icon-circle-triangle-w {text-indent: -10000px;}
+.ui-icon-circle-triangle-e {text-indent: -10000px;}
 .ui-datepicker .ui-datepicker-title { width:195px;}
 .ui-datepicker .ui-datepicker-title select { font-size:1em; margin:1px 0; }
 
