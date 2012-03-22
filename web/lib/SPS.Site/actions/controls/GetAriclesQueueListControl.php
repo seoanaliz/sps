@@ -60,7 +60,7 @@
                             if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
                                 if (empty($gridItem['queue'])) {
                                     $gridItem['queue'] = $articlesQueueItem;
-                                    $gridItem['canDelete'] = ($articlesQueueItem->statusId == 1);
+                                    $gridItem['blocked'] = ($articlesQueueItem->statusId != 1);
                                 }
                             }
                         }

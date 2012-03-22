@@ -225,8 +225,8 @@ var Elements = {
         (function(){
             $(".slot .post").addClass("dragged");
             var target = false;
-            var dragdrop = function(post, slot, callback, failback){
-                Events.fire('post_moved', [post, slot, function(state, newId){
+            var dragdrop = function(post, slot, queueId, callback, failback){
+                Events.fire('post_moved', [post, slot, queueId, function(state, newId){
                     if (state) {
                         callback(newId);
                     } else {
@@ -249,8 +249,9 @@ var Elements = {
                     var elem = $(this);
                     if(target.hasClass("empty")) {
                         if(!$(this).hasClass("dragged")) {
-                            dragdrop($(this).data("id"), target.data("id"), function(newId){
+                            dragdrop($(this).data("id"), target.data("id"), $(this).data("queue-id"), function(newId){
                                 elem.data("id", newId);
+                                elem.data("queue-id", newId);
                                 target.append(elem.addClass("dragged"));
                                 target.removeClass("empty");
                                 target.append(elem.addClass("dragged"));
@@ -259,7 +260,7 @@ var Elements = {
                                 elem.removeClass("spinner");
                             });
                         } else {
-                            dragdrop($(this).data("id"), target.data("id"), function(){
+                            dragdrop($(this).data("id"), target.data("id"), $(this).data("queue-id"), function(){
                                 elem.closest(".slot").addClass("empty");
                                 target.removeClass("empty");
                                 target.append(elem.addClass("dragged"));

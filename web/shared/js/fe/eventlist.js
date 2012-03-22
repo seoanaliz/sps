@@ -57,6 +57,8 @@ function loadQueue() {
         success: function (data) {
             $('div#queue').show().html(data);
             Elements.addEvents();
+
+            $('.post.blocked').draggable('disable');
         }
     });
 }
@@ -99,14 +101,15 @@ var Eventlist = {
         }
         callback(true);
     },
-    post_moved: function(post_id, slot_id, callback){
+    post_moved: function(post_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-add-to-queue/',
             dataType : "json",
             data: {
                 articleId: post_id,
                 timestamp: slot_id,
-                targetFeedId: Elements.rightdd()
+                targetFeedId: Elements.rightdd(),
+                queueId: queueId
             },
             success: function (data) {
                 if(data.success) {

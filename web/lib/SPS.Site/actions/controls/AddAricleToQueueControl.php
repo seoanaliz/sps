@@ -9,6 +9,14 @@
      */
     class AddAricleToQueueControl {
 
+        private function buildDates($object, $timestamp) {
+            $object->startDate = new DateTimeWrapper(date('r', $timestamp));
+            $object->endDate = new DateTimeWrapper(date('r', $timestamp));
+
+            $object->startDate->modify('-10 minutes');
+            $object->endDate->modify('+10 minutes');
+        }
+
         /**
          * Entry Point
          */
@@ -20,10 +28,25 @@
             $articleId = Request::getInteger( 'articleId' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $timestamp = Request::getInteger( 'timestamp' );
+            $queueId = Request::getInteger( 'queueId' );
 
             if (empty($articleId) || empty($targetFeedId) || empty($timestamp)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
+            }
+
+            if (!empty($queueId)) {
+                //просто перемещаем элемент очереди
+                $object = new ArticleQueue();
+                $this->buildDates($object, $timestamp);
+                ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate'), array('articleQueueId' => $queueId, 'statusId' => 1));
+
+                $result = array(
+                    'success' => true,
+                    'id' => $queueId
+                );
+                echo ObjectHelper::ToJSON($result);
+                return true;
             }
 
             $article = ArticleFactory::GetById($articleId);
@@ -50,11 +73,7 @@
             $object->createdAt = DateTimeWrapper::Now();
             $object->articleId = $article->articleId;
             $object->targetFeedId = $targetFeed->targetFeedId;
-            $object->startDate = new DateTimeWrapper(date('r', $timestamp));
-            $object->endDate = new DateTimeWrapper(date('r', $timestamp));
-
-            $object->startDate->modify('-10 minutes');
-            $object->endDate->modify('+10 minutes');
+            $this->buildDates($object, $timestamp);
 
             $object->statusId = 1;
 

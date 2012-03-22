@@ -14,14 +14,14 @@
             ?>
                 <div class="slot" data-id="{$id}">
                     <div class="time"><?= $gridItem['dateTime']->defaultFormat() ?></div>
-                    <div class="post" data-id="{$articleQueueId}">
+                    <div class="post <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
                         <div class="content">
                             <?= nl2br($articleRecord->content) ?>
                             <? foreach($articleRecord->photos as $photoItem) { ?>
                             <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
                             <? } ?>
                         </div>
-                        <? if(!empty($gridItem['canDelete'])) {?>
+                        <? if(empty($gridItem['blocked'])) {?>
                             <div class="spr delete"></div>
                         <? } ?>
                     </div>
