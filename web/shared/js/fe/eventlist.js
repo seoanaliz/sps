@@ -97,6 +97,7 @@ var Eventlist = {
     },
     wall_load_more: function(callback){
         if (!$("#wallloadmore").hasClass('hidden')) {
+            $("#wallloadmore").addClass('hidden');
             loadArticles(false);
         }
         callback(true);
