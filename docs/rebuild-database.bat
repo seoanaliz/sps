@@ -19,3 +19,6 @@ net stop Apache2.2
 
 net START Apache2.2
 pause
+
+REM dropdb -U postgres sps_devel; createdb -U postgres sps_devel -E UTF8;
+REM psql -U icms -f init-dump.sql sps_devel;
