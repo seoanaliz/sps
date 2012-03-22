@@ -2,12 +2,12 @@
     Package::Load( 'SPS.Site' );
 
     /**
-     * GetAriclesListControl Action
+     * GetArticlesListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAriclesListControl {
+    class GetArticlesListControl {
 
         /**
          * Entry Point

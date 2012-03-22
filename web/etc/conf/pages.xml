@@ -19,21 +19,21 @@
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
                 <page uri="controls://arcticles-list/">
-                    <actions>SPS.Site.GetAriclesListControl</actions>
+                    <actions>SPS.Site.GetArticlesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
                 </page>
                 <page uri="controls://arcticle-delete/">
-                    <actions>SPS.Site.DeleteAricleControl</actions>
+                    <actions>SPS.Site.DeleteArticleControl</actions>
                 </page>
                 <page uri="controls://arcticles-queue-list/">
-                    <actions>SPS.Site.GetAriclesQueueListControl</actions>
+                    <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
                 </page>
                 <page uri="controls://arcticle-queue-delete/">
-                    <actions>SPS.Site.DeleteAricleQueueControl</actions>
+                    <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
                 <page uri="controls://arcticle-add-to-queue/">
-                    <actions>SPS.Site.AddAricleToQueueControl</actions>
+                    <actions>SPS.Site.AddArticleToQueueControl</actions>
                 </page>
             </pageGroup>
 			

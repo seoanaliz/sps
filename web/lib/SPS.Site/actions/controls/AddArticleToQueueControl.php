@@ -2,12 +2,12 @@
     Package::Load( 'SPS.Site' );
 
     /**
-     * AddAricleToQueueControl Action
+     * AddArticleToQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class AddAricleToQueueControl {
+    class AddArticleToQueueControl {
 
         private function buildDates($object, $timestamp) {
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));

@@ -2,12 +2,12 @@
     Package::Load( 'SPS.Site' );
 
     /**
-     * GetAriclesQueueListControl Action
+     * GetArticlesQueueListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAriclesQueueListControl {
+    class GetArticlesQueueListControl {
 
         private function getGrid($date) {
             //generate table

@@ -2,12 +2,12 @@
     Package::Load( 'SPS.Site' );
 
     /**
-     * DeleteAricleControl Action
+     * DeleteArticleQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteAricleControl {
+    class DeleteArticleQueueControl {
 
         /**
          * Entry Point
@@ -15,9 +15,9 @@
         public function Execute() {
             $id = Request::getInteger( 'id' );
             if ($id) {
-                $o = new Article();
+                $o = new ArticleQueue();
                 $o->statusId = 3;
-                ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $id));
+                ArticleQueueFactory::UpdateByMask($o, array('statusId'), array('articleQueueId' => $id));
             }
         }
     }

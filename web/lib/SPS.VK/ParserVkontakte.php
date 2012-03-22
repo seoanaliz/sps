@@ -6,23 +6,67 @@
         private $count;
         const PAGE_SIZE = 20;
         const WALL_URL = 'http://vk.com/wall-';
+        const VK_URL = 'http://vk.com';
 
         //
         public function __construct($public_id = '') {
             if ($public_id) $this->page_adr = self::WALL_URL. $public_id;
         }
 
-        //затычка, должен возвращать id, ссылку на аву по короткому названию
-        //(http://vk.com/blabla)
-        //из-за нее при создании класса не обязательно задавать page_adr
-        public function get_public_info($url)
+
+
+        //сюда приходит нечто вида vk.com/idXXXX, vk.com/publicXXXX либо vk.com/blabla
+        //возвращает массив
+        //      type    :   id(человек), public(Группа)
+        //      id      :   контактовский номер чела/группы.
+        //      avatarа :   адрес фотки юзера/группы (может принимать значение standard - одна из картинок контакта типа "недоступен", "ненадежен" и тп)
+        //      name    :   имя/название паблика (паблик может не иметь названия)
+        //      если страница удалена, вернет false. при проблемах с закачкой - exception
+        public function get_info($url)
         {
             $a = $this->get_page($url);
-            preg_match('/(?s)"public_avatar">.{0,6}<img src="(.*?jpg).*?>/', $a, $match);
-            $avatara = $match[1];
+            if (!$a) {
 
+                throw new Exception('Не удалось скачать страницу '.$url);
+            }
 
+            if (substr_count($a, 'profile_avatar')> 0){
+                if (!preg_match('/user_id":(.*?),/', $a, $oid));
+                preg_match('/"loc":"\?id=(.*?)"/', $a, $oid);
+                preg_match('/profile_avatar".*? src="(.*?)"/', $a, $ava);
+                if (substr_count($ava[1], 'png') > 0 || substr_count($ava[1], 'gif') > 0) $ava = 'standard';
+                else $ava = $ava[1];
+                $err_counter = 0;
+                if(!preg_match('/(?s)id="header.*?b>([^<].*?)<\/h1/', $a, $name)){
+                    preg_match('/(?s)id="header.*?title">([^<].*?)<\/h1/', $a, $name);
+                }
+                $name = $name[1];
+                return array(
+                    'type'      =>  'id',
+                    'id'        =>  $oid[1],
+                    'avatarа'    =>  $ava,
+                    'name'      =>  $name
+                );
+
+            } elseif(substr_count($a, 'public_avatar')> 0 || substr_count($a, 'group_avatar')> 0){
+                preg_match('/(?s)top_header">(.*?)<\/div>/', $a, $name);
+                if (!preg_match('/group_id":(.*?),/',$a, $gid))
+                    if(!preg_match('/loc":"\?gid=(.*?)[&"]/',$a, $gid))
+                        preg_match('/public.init\(.*?id":(.*?),/', $a, $gid);
+                preg_match('/(?s)id=".*?avatar.*?src="(.*?)"/', $a, $ava);
+                if (substr_count($ava[1], 'png')>0 || substr_count($ava[1], 'gif')>0) $ava = 'standard';
+                else $ava = $ava[1];
+                return array(
+                    'type'      =>  'public',
+                    'id'        =>  $gid[1],
+                    'avatarа'    =>  $ava,
+                    'name'      =>  $name[1]
+                );
+            }
+
+            return false;
         }
+
         //возвращает Json с постами. поля:
         //likes - лайки
         //id - внутренний id поста в контакте
@@ -83,9 +127,13 @@
                 if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
                     ' не удалось получить id поста со стены ' . $this->page_adr);
                 $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
-                //                die();
+
                 //ретвит
-                $posts[$t]['retweet'] = '';
+                $retwitt = $pq->find('a.published_by')->attr('href');
+                if ($retwitt){
+
+                    $posts[$t]['retwitt'] = $this->get_info(self::VK_URL.$retwitt);
+                } else $posts[$t]['retwitt'] = '';
 
                 //ссылка
                 $posts[$t]['link'] = '';
@@ -97,7 +145,6 @@
                     $text = end($text);
                 }
                 $text = $this->remove_tags($text);
-
                 $posts[$t]['text'] = $text;
 
                 //изображения

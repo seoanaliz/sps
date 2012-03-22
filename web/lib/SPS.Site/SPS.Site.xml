@@ -44,20 +44,20 @@
         </action>
 
         <group name="Articles">
-            <action name="GetAriclesListControl">
-                <path>controls/GetAriclesListControl</path>
+            <action name="GetArticlesListControl">
+                <path>controls/GetArticlesListControl</path>
             </action>
-            <action name="DeleteAricleControl">
-                <path>controls/DeleteAricleControl</path>
+            <action name="DeleteArticleControl">
+                <path>controls/DeleteArticleControl</path>
             </action>
-            <action name="GetAriclesQueueListControl">
-                <path>controls/GetAriclesQueueListControl</path>
+            <action name="GetArticlesQueueListControl">
+                <path>controls/GetArticlesQueueListControl</path>
             </action>
-            <action name="DeleteAricleQueueControl">
-                <path>controls/DeleteAricleQueueControl</path>
+            <action name="DeleteArticleQueueControl">
+                <path>controls/DeleteArticleQueueControl</path>
             </action>
-            <action name="AddAricleToQueueControl">
-                <path>controls/AddAricleToQueueControl</path>
+            <action name="AddArticleToQueueControl">
+                <path>controls/AddArticleToQueueControl</path>
             </action>
         </group>
     </group>
