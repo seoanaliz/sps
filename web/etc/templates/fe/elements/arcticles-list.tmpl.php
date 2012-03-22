@@ -8,9 +8,9 @@
             ?>
         <div class="post bb" data-id="{$article->articleId}">
             <div class="l d-hide">
-                <div class="userpic"><img/></div>
+                <div class="userpic"><img src="{$sourceInfo[img]}" /></div>
             </div>
-            <div class="name d-hide">{$sourceFeed->title}</div>
+            <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
                 <?= nl2br($articleRecord->content) ?>
                 <? foreach($articleRecord->photos as $photoItem) { ?>

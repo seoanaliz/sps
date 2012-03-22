@@ -50,10 +50,33 @@
                 Session::setInteger('page', $page+1);
             }
 
+            //group info
+            $sourceInfo = array(
+                'name' => $sourceFeed->title,
+                'img' => '',
+            );
+
+            //group image
+            $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
+            $filePath = Site::GetRealPath($path);
+            if (file_exists($filePath)) {
+
+            } else {
+                try {
+                    $parser = new ParserVkontakte();
+                    $info = $parser->get_info(ParserVkontakte::VK_URL . '/public' . $sourceFeed->externalId);
+                    file_put_contents($filePath, file_get_contents($info['avatarа']));
+                } catch (Exception $Ex) {}
+            }
+
+            $sourceInfo['img'] = Site::GetWebPath($path);
+
+
             Response::setArray( 'articles', $articles );
             Response::setArray( 'articleRecords', $articleRecords );
             Response::setBoolean( 'hasMore', $hasMore );
             Response::setParameter( 'sourceFeed', $sourceFeed );
+            Response::setArray( 'sourceInfo', $sourceInfo );
         }
     }
 
