@@ -39,10 +39,43 @@
                 $date = date('d.m.Y');
             }
 
-            $targetFeedId = Request::getInteger( 'targetFeedId' );
-
             $grid = $this->getGrid($date);
 
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
+
+            $articleRecords = array();
+
+            if(!empty($targetFeedId) && !empty($targetFeed)) {
+                //вытаскиваем всю очередь на этот день на этот паблик
+                $articlesQueue = ArticleQueueFactory::Get(
+                    array('targetFeedId' => $targetFeedId, 'startDateAsDate' => $date)
+                    , array(BaseFactory::WithoutPages => true)
+                );
+
+                if(!empty($articlesQueue)) {
+                    foreach($articlesQueue as $articlesQueueItem) {
+                        //ищем место в grid для текущей $articlesQueueItem
+                        foreach ($grid as &$gridItem) {
+                            if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
+                                if (empty($gridItem['queue'])) {
+                                    $gridItem['queue'] = $articlesQueueItem;
+                                }
+                            }
+                        }
+                    }
+
+                    //load arciles data
+                    $articleRecords = ArticleRecordFactory::Get(
+                        array('_articleQueueId' => array_keys($articlesQueue))
+                    );
+                    if (!empty($articleRecords)) {
+                        $articleRecords = BaseFactoryPrepare::Collapse($articleRecords, 'articleQueueId', false);
+                    }
+                }
+            }
+
+            Response::setArray( 'articleRecords', $articleRecords );
             Response::setArray( 'grid', $grid );
         }
     }

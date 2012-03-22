@@ -69,7 +69,11 @@
                 ))
             , 'lists'     => array()
             , 'search'    => array(
-                'page' => array(
+                'startDateAsDate' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATE
+                )
+                ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 0

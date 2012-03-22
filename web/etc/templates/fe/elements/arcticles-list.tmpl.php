@@ -1,6 +1,7 @@
 <?
     /** @var $articles Article[] */
     /** @var $articleRecords articleRecord[] */
+    /** @var $sourceFeed SourceFeed */
     foreach($articles as $article) {
         $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
         ?>
@@ -8,7 +9,7 @@
                 <div class="l d-hide">
                     <div class="userpic"><img/></div>
                 </div>
-                <div class="name d-hide">Username</div>
+                <div class="name d-hide">{$sourceFeed->title}</div>
                 <div class="content">
                     <?= nl2br($articleRecord->content) ?>
                     <? foreach($articleRecord->photos as $photoItem) { ?>

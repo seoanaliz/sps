@@ -15,8 +15,8 @@
         public function Execute() {
             $pageSize       = 10;
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
-
-            if(empty($sourceFeedId)) {
+            $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
+            if(empty($sourceFeedId) || empty($sourceFeed)) {
                 return;
             }
 
@@ -42,6 +42,7 @@
             Response::setArray( 'articles', $articles );
             Response::setArray( 'articleRecords', $articleRecords );
             Response::setBoolean( 'hasMore', $hasMore );
+            Response::setParameter( 'sourceFeed', $sourceFeed );
         }
     }
 
