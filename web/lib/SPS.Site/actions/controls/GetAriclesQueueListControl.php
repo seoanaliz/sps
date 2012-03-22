@@ -12,7 +12,7 @@
         private function getGrid($date) {
             //generate table
             $result = array();
-
+            $now = DateTimeWrapper::Now();
             for ($i = 24; $i >= 9; $i--) {
                 $queueDate = new DateTimeWrapper($date);
                 $queueDate->modify('+ ' . $i . 'hours');
@@ -21,7 +21,8 @@
                 }
 
                 $result[] = array(
-                    'dateTime' => $queueDate
+                    'dateTime' => $queueDate,
+                    'blocked' => ($queueDate <= $now)
                 );
             }
 

@@ -3,7 +3,7 @@
         $id = $gridItem['dateTime']->format('U');
         if (empty($gridItem['queue'])) {
             ?>
-                <div class="slot empty" data-id="{$id}">
+                <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>" data-id="{$id}">
                     <div class="time"><?= $gridItem['dateTime']->defaultFormat() ?></div>
                     <div class="content"></div>
                 </div>
