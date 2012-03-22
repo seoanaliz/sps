@@ -1,26 +1,60 @@
-function loadQueue() {
+var timestampValue;
+var sourceFeedIdValue;
+var targetFeedIdValue;
+
+function getCurrentValues() {
     try {
-        timestamp = $("#calendar").datepicker("getDate").getTime() / 1000;
+        timestampValue = $("#calendar").datepicker("getDate").getTime() / 1000;
     } catch (ex) {
-        timestamp = null;
+        timestampValue = null;
     }
 
-    targetFeedId = $(".right-panel .drop-down").data("selected");
+    sourceFeedIdValue = $(".left-panel .drop-down").data("selected");
+    targetFeedIdValue = $(".right-panel .drop-down").data("selected");
+}
 
-    if (targetFeedId) {
-        //clean and load right column
-        $.ajax({
-            url: controlsRoot + 'arcticles-queue-list/',
-            dataType : "html",
-            data: {
-                targetFeedId: targetFeedId,
-                timestamp: timestamp
-            },
-            success: function (data) {
-                $('div#queue').show().html(data);
-            }
-        });
+function loadArticles() {
+    getCurrentValues();
+
+    if (!sourceFeedIdValue) {
+        $('.newpost').hide();
+        return;
     }
+
+    $('.newpost').show();
+
+    //clean and load left column
+    $.ajax({
+        url: controlsRoot + 'arcticles-list/',
+        dataType : "html",
+        data: {
+            sourceFeedId: sourceFeedIdValue
+        },
+        success: function (data) {
+            $('div#wall').html(data);
+        }
+    });
+}
+
+function loadQueue() {
+    getCurrentValues();
+
+    if (!targetFeedIdValue) {
+        return;
+    }
+
+    //clean and load right column
+    $.ajax({
+        url: controlsRoot + 'arcticles-queue-list/',
+        dataType : "html",
+        data: {
+            targetFeedId: targetFeedIdValue,
+            timestamp: timestampValue
+        },
+        success: function (data) {
+            $('div#queue').show().html(data);
+        }
+    });
 }
 
 var Eventlist = {
@@ -38,18 +72,7 @@ var Eventlist = {
     },
     rightcolumn_deletepost: function(post_id, callback){callback(1)},
     leftcolumn_dropdown_change: function(sel){
-        $('.newpost').show();
-        //clean and load left column
-        $.ajax({
-            url: controlsRoot + 'arcticles-list/',
-            dataType : "html",
-            data: {
-                sourceFeedId: sel
-            },
-            success: function (data) {
-                $('div#wall').html(data);
-            }
-        });
+        loadArticles();
     },
     rightcolumn_dropdown_change: function(sel){
         loadQueue();

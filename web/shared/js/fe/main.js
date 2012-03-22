@@ -225,6 +225,14 @@ $(document).ready(function(){
             addInput(getDD(this));
         });
     })();
+
+    //init first source and target
+    firstSource = $(".left-panel .drop-down ul :first-child");
+    firstTarget = $(".right-panel .drop-down ul :first-child");
+    if (firstSource && firstTarget) {
+        $(".left-panel .drop-down").data('selected', firstSource.data("id")).change();
+        $(".right-panel .drop-down").data('selected', firstTarget.data("id")).change();
+    }
 });
 
 Events.fire = function(name, args){
