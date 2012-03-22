@@ -1,31 +1,30 @@
-var Events = {};
-
 $(document).ready(function(){
     var DD_DEFAULT_TEXT = 'Источник';
 
     $("#calendar")
         .datepicker(
-            {
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: "d MM"
-            }
-        )
+        {
+            dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+            monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            firstDay: 1,
+            showAnim: '',
+            dateFormat: "d MM"
+        }
+    )
         .keydown(function(e){
             if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change', $(this).datepicker("getDate").getTime() / 1000);
+            Events.fire('calendar_change', [])
         });
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });
+
 
     $(".drop-down").click(function(e){
         e.stopPropagation();
@@ -45,96 +44,17 @@ $(document).ready(function(){
         elem.find("li").click(click_li);
         elem.addClass("expanded");
     });
-    $.fn.dd_sel = function(id){
-        var elem = $(this);
-        if(!elem.hasClass("drop-down")) return;
-        if(id) {
-            elem = elem.find("li[data-id=" + id + "]");
-        } else {
-            elem = elem.find("li:first");
-        }
-        if(elem.length) {
-            $(this)
-                .data("selected",elem.data("id"))
-                .find(".caption")
-                    .text(elem.text())
-                    .removeClass("default");
-        } else {
-            $(this)
-                .data("selected",0)
-                .find(".caption").text(DD_DEFAULT_TEXT).addClass("default");
-        }
-        $(this).trigger("change");
-    };
-
-    $(".slot .post").addClass("dragged");
-
-    (function(){
-        var target = false;
-        var dragdrop = function(post, slot, callback, failback){
-            Events.fire('post_moved', [post, slot, function(state){
-                (state ? callback : failback)();
-            }]);
-        }
-        $(".post").draggable({
-            revert: 'invalid',
-            cursorAt: {top: 60, left: 150},
-            helper: function(){
-                return $(this).clone().addClass("dragged moving");
-            },
-            start: function(){
-                $(this).addClass("removed");
-            },
-            stop: function(){
-                $(this).removeClass("removed");
-                target = $(target);
-                var elem = $(this);
-                if(target.hasClass("empty")) {
-                    if(!$(this).hasClass("dragged")) {
-                        dragdrop($(this).data("id"), target.data("id"), function(){
-                            target.append(elem.addClass("dragged"));
-                            target.removeClass("empty");
-                            leftcolcheck();
-                            target.append(elem.addClass("dragged"));
-                            elem.removeClass("spinner");
-                        },function(){
-                            elem.removeClass("spinner");
-                        });
-                    } else {
-                        dragdrop($(this).data("id"), target.data("id"), function(){
-                            elem.closest(".slot").addClass("empty");
-                            target.removeClass("empty");
-                            target.append(elem.addClass("dragged"));
-                            elem.removeClass("spinner");
-                        },function(){
-                            elem.removeClass("spinner");
-                        });
-                    }
-                    elem.addClass("spinner");
-                }
-            }
-        });
-
-        $('.items .slot').droppable({
-            activeClass: "ui-state-hover",
-            hoverClass: "ui-state-active",
-            drop: function(){
-                target = this;
-            }
-        });
-    })();
 
     $(".left-panel .drop-down").change(function(){
-        Events.fire('leftcolumn_dropdown_change',$(this).data("selected"));
+        Events.fire('leftcolumn_dropdown_change', []);
     });
     $(".right-panel .drop-down").change(function(){
-        Events.fire('rightcolumn_dropdown_change',$(this).data("selected"));
+        Events.fire('rightcolumn_dropdown_change', []);
     });
 
     $(".wall").delegate(".post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
-        leftcolcheck();
         Events.fire('leftcolumn_deletepost', [pid, function(state){
             if(state) {
                 elem.remove();
@@ -151,15 +71,17 @@ $(document).ready(function(){
             }
         }]);
     });
-    var leftcolcheck = function(def){
-        if(!def) {window.setTimeout(function(){leftcolcheck(true);},0);}
-        if(!$(".wall .post").length) {
-            $("#emptylabel").show();
-        }
-    }
 
     $("#wallloadmore").click(function(){
-        Events.fire('wall_load_more');
+        var b = $(this);
+        if(b.hasClass("disabled")) { return; }
+        b.addClass("disabled");
+        Events.fire('wall_load_more', function(state){
+            b.removeClass("disabled");
+            if(!state) {
+                b.addClass("disabled");
+            }
+        });
     });
 
     (function(){
@@ -226,30 +148,177 @@ $(document).ready(function(){
         });
     })();
 
-    //init first source and target
-    firstSource = $(".left-panel .drop-down ul :first-child");
-    firstTarget = $(".right-panel .drop-down ul :first-child");
-    if (firstSource && firstTarget) {
-        $(".left-panel .drop-down").data('selected', firstSource.data("id")).change();
-        $(".right-panel .drop-down").data('selected', firstTarget.data("id")).change();
-    }
+    (function(){
+        var w = $(window),
+            b = $("#wallloadmore");
+        w.scroll(function(){
+            if(w.scrollTop() > (b.offset().top - w.outerHeight(true))) {
+                b.click();
+            }
+        });
+    })();
+
+    (function(){
+        var form = $(".newpost"),
+            input = $(".input", form),
+            tip = $(".tip", form);
+        tip.click(function(){input.focus();});
+        form.click(function(e){ e.stopPropagation(); });
+        input.focus(function(){
+            form.removeClass("collapsed");
+            $(window).bind("click", stop);
+        });
+        var stop = function(){
+            $(window).unbind("click", stop);
+            if(!input.text().length) form.addClass("collapsed");
+        }
+        form.find(".save").click(function(){
+            form.addClass("spinner");
+            Events.fire("post", [
+                input.html(),
+                input.data("id"),
+                function(state){
+                    if(state) {
+                        input.data("id", 0);
+                        input.html('');
+                        stop();
+                    }
+                    form.removeClass("spinner");
+                }
+            ])
+        });
+        form.find(".attach").click(
+            /*TODO: attach*/
+        );
+
+        $(".left-panel").delegate(".post .edit", "click" ,function(){
+            /*TODO: edit*/
+            input.data("id", $(this).closest("post").data("id"));
+        });
+    })();
+
 });
 
-Events.fire = function(name, args){
-    if(typeof args != "undefined") {
-        if(!$.isArray(args)) args = [args];
-    } else {
-        args = [];
-    }
-    if($.isFunction(this[name])) {
-        try {
-            this[name].apply(window, args)
-        } catch(e) {
-            if(console && $.isFunction(console.log)) {
-                console.log(e);
+var Events = {
+    fire : function(name, args){
+        if(typeof args != "undefined") {
+            if(!$.isArray(args)) args = [args];
+        } else {
+            args = [];
+        }
+        if($.isFunction(this[name])) {
+            try {
+                this[name].apply(window, args)
+            } catch(e) {
+                if(console && $.isFunction(console.log)) {
+                    console.log(e);
+                }
             }
         }
     }
 }
 $.extend(Events, Eventlist);
 delete(Eventlist);
+
+var Elements = {
+    addEvents: function(){
+        (function(){
+            $(".slot .post").addClass("dragged");
+            var target = false;
+            var dragdrop = function(post, slot, callback, failback){
+                Events.fire('post_moved', [post, slot, function(state){
+                    (state ? callback : failback)();
+                }]);
+            }
+            $(".post").draggable({
+                revert: 'invalid',
+                cursorAt: {top: 60, left: 150},
+                helper: function(){
+                    return $(this).clone().addClass("dragged moving");
+                },
+                start: function(){
+                    $(this).addClass("removed");
+                },
+                stop: function(){
+                    $(this).removeClass("removed");
+                    target = $(target);
+                    var elem = $(this);
+                    if(target.hasClass("empty")) {
+                        if(!$(this).hasClass("dragged")) {
+                            dragdrop($(this).data("id"), target.data("id"), function(){
+                                target.append(elem.addClass("dragged"));
+                                target.removeClass("empty");
+                                target.append(elem.addClass("dragged"));
+                                elem.removeClass("spinner");
+                            },function(){
+                                elem.removeClass("spinner");
+                            });
+                        } else {
+                            dragdrop($(this).data("id"), target.data("id"), function(){
+                                elem.closest(".slot").addClass("empty");
+                                target.removeClass("empty");
+                                target.append(elem.addClass("dragged"));
+                                elem.removeClass("spinner");
+                            },function(){
+                                elem.removeClass("spinner");
+                            });
+                        }
+                        elem.addClass("spinner");
+                    }
+                }
+            });
+
+            $('.items .slot').droppable({
+                activeClass: "ui-state-active",
+                hoverClass: "ui-state-hover",
+                drop: function(){
+                    target = this;
+                }
+            });
+        })();
+    },
+    leftdd: function(value){
+        if(typeof value == 'undefined') {
+            return $(".left-panel .drop-down").data("selected");
+        } else {
+            $(".left-panel .drop-down").dd_sel(value);
+        }
+    },
+    rightdd:function(value){
+        if(typeof value == 'undefined') {
+            return $(".right-panel .drop-down").data("selected");
+        } else {
+            $(".right-panel .drop-down").dd_sel(value);
+        }
+    },
+    calendar: function(value){
+        if(typeof value == 'undefined') {
+            var timestamp = $("#calendar").datepicker("getDate");
+            return timestamp ? timestamp.getTime() / 1000 : null;
+        } else {
+            $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
+        }
+    }
+}
+
+$.fn.dd_sel = function(id){
+    var elem = $(this);
+    if(!elem.hasClass("drop-down")) return;
+    if(id) {
+        elem = elem.find("li[data-id=" + id + "]");
+    } else {
+        elem = elem.find("li:first");
+    }
+    if(elem.length) {
+        $(this)
+            .data("selected",elem.data("id"))
+            .find(".caption")
+            .text(elem.text())
+            .removeClass("default");
+    } else {
+        $(this)
+            .data("selected",0)
+            .find(".caption").text(DD_DEFAULT_TEXT).addClass("default");
+    }
+    $(this).trigger("change");
+};

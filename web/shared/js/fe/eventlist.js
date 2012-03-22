@@ -1,22 +1,25 @@
 var timestampValue;
-var sourceFeedIdValue;
-var targetFeedIdValue;
 
-function getCurrentValues() {
-    try {
-        timestampValue = $("#calendar").datepicker("getDate").getTime() / 1000;
-    } catch (ex) {
-        timestampValue = null;
+//init first source and target
+$(document).ready(function(){
+    firstSource = $(".left-panel .drop-down ul :first-child");
+    firstTarget = $(".right-panel .drop-down ul :first-child");
+    if (firstSource.length > 0) {
+        Elements.leftdd(firstSource.data("id"));
+        Events.fire('leftcolumn_dropdown_change', []);
+    }
+    if (firstTarget.length > 0) {
+        Elements.rightdd(firstSource.data("id"));
+        Events.fire('rightcolumn_dropdown_change', []);
+    }
+});
+
+function loadArticles(clean) {
+    if (clean) {
+        $('div#wall').html('');
     }
 
-    sourceFeedIdValue = $(".left-panel .drop-down").data("selected");
-    targetFeedIdValue = $(".right-panel .drop-down").data("selected");
-}
-
-function loadArticles() {
-    getCurrentValues();
-
-    if (!sourceFeedIdValue) {
+    if (!Elements.leftdd()) {
         $('.newpost').hide();
         return;
     }
@@ -28,18 +31,17 @@ function loadArticles() {
         url: controlsRoot + 'arcticles-list/',
         dataType : "html",
         data: {
-            sourceFeedId: sourceFeedIdValue
+            sourceFeedId: Elements.leftdd(),
+            clean: clean
         },
         success: function (data) {
-            $('div#wall').html(data);
+            $('div#wall').append(data);
         }
     });
 }
 
 function loadQueue() {
-    getCurrentValues();
-
-    if (!targetFeedIdValue) {
+    if (!Elements.rightdd()) {
         return;
     }
 
@@ -48,11 +50,12 @@ function loadQueue() {
         url: controlsRoot + 'arcticles-queue-list/',
         dataType : "html",
         data: {
-            targetFeedId: targetFeedIdValue,
-            timestamp: timestampValue
+            targetFeedId: Elements.rightdd(),
+            timestamp: Elements.calendar()
         },
         success: function (data) {
             $('div#queue').show().html(data);
+            Elements.addEvents();
         }
     });
 }
@@ -82,20 +85,23 @@ var Eventlist = {
             }
         });
     },
-    leftcolumn_dropdown_change: function(sel){
-        loadArticles();
+    leftcolumn_dropdown_change: function(){
+        loadArticles(true);
     },
-    rightcolumn_dropdown_change: function(sel){
+    rightcolumn_dropdown_change: function(){
         loadQueue();
     },
-    calendar_change: function(timestamp){
+    calendar_change: function(){
         loadQueue();
     },
-    wall_load_more: function(){
-        alert('moreeee');
+    wall_load_more: function(callback){
+        if (!$("#wallloadmore").hasClass('hidden')) {
+            loadArticles(false);
+        }
+        callback(true);
     },
     post_moved: function(post_id, slot_id, callback){
-        window.setTimeout(function(){callback(1)},5000);
+        window.setTimeout(function(){callback(1)},500);
     },
 
     /* после выполнения запроса к сервису. Вызвать callback(state) state = {}|false */
@@ -106,5 +112,11 @@ var Eventlist = {
     rightcolumn_source_edited: function(val,id, callback){callback({value: val});},
     rightcolumn_source_deleted: function(id, callback){callback(true)},
     rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
+
+    post: function(html, id, callback){
+        // id = 0 - new post, else - edit old
+        callback(false);
+    },
+
     eof: null
 }

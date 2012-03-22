@@ -23,12 +23,19 @@
                 </div -->
 
             </div>
-            <div class="newpost collapsed bb" style="display: none;">
-                <div class="input default" contenteditable="true">Есть чем поделиться?</div>
+            <div class="newpost collapsed bb hidden">
+                <div class="input" contenteditable="true"></div>
+                <div class="tip">Есть чем поделиться?</div>
+                <div class="save button spr l">Сохранить</div>
+                <div class="attach button spr r">Прикрепить</div>
+                <div class="clear"></div>
             </div>
+
             <div class="wall" id="wall">
 
             </div>
+
+            <div id="wallloadmore" class="hidden">Больше</div>
         </div>
     </div>
 

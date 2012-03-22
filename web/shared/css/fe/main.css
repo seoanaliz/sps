@@ -1,6 +1,3 @@
-.left-panel {height: 2000px;}
-.left-panel .wall .post .userpic {background:#ff0;}
-
 body {
     background: url(../../images/fe/bg.png);
     font-size: 12px;
@@ -16,6 +13,8 @@ a:hover {color: #205f82;text-decoration: underline;}
 .hidden {display: none;}
 .l {float:left;}
 .r {float:right;}
+b {font-weight: bold;}
+i {font-style: italic;}
 
 .input,
 .calendar,
@@ -113,8 +112,8 @@ a:hover {color: #205f82;text-decoration: underline;}
 
 .right-panel .items .slot {background: #fff;position:relative;border-bottom: 1px solid #ddd;min-height: 105px;}
 .right-panel .items .slot.empty {background: #ffe;}
-.right-panel .items .slot.ui-state-hover {background: #edf4f8;}
-.right-panel .items .slot.ui-state-active {background: #e9eff2;
+.right-panel .items .slot.ui-state-active {background: #edf4f8;}
+.right-panel .items .slot.ui-state-hover {background: #e9eff2;
     -webkit-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
     -moz-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
     box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
@@ -176,10 +175,18 @@ a:hover {color: #205f82;text-decoration: underline;}
 .ui-datepicker-calendar td.ui-datepicker-current-day {background-position: 0 -108px;}
 .layer {margin: 0 auto;width:1010px;}
 
-#emptylabel {display: none;text-align: center;background: #fff;padding: 50px 0;}
 #wallloadmore {cursor:pointer;text-align: center;background: #fff;padding: 10px 0;}
 #wallloadmore:hover {background: #eff;}
 
 .drop-down input {line-height: 23px;padding: 0 25px 0 9px;position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border: none;}
 
 .spinner {opacity: 0.3;}
+
+.newpost {position: relative;}
+.newpost .input {max-height: 200px;}
+.newpost .tip {display: none;position: absolute;top: 24px;left: 25px;color:#888;}
+.newpost.collapsed .tip {display: block;}
+
+.button {background-position:0 -15px;width: 139px;line-height: 30px; overflow:hidden;text-align: center;color:#fff;text-shadow: 0px -1px 1px rgba(0,0,0,0.6);cursor:pointer;}
+.newpost .button {margin-top: 20px;}
+.newpost.collapsed .button {display: none;}

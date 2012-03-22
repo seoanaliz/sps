@@ -25,8 +25,13 @@
             </div>
         <?
     }
-
-    if (!empty($hasMore)) {
-        ?><div id="wallloadmore">Больше</div><?
-    }
 ?>
+<script type="text/javascript">
+    <?
+        if (!empty($hasMore)) {
+            ?>$("#wallloadmore").removeClass('hidden');<?
+        } else {
+            ?>$("#wallloadmore").addClass('hidden');<?
+        }
+    ?>
+</script>
