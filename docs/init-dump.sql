@@ -600,7 +600,7 @@ INSERT INTO "public"."auditEventTypes" ("title", "alias")
 VALUES ('РћС€РёР±РєРё СЌРєСЃРїРѕСЂС‚Р°', 'exportErrors');INSERT INTO "public"."sourceFeeds" ("title", "externalId", "statusId")
 VALUES ('animal.world', '27052479', 1);
 INSERT INTO "public"."sourceFeeds" ("title", "externalId", "statusId")
-VALUES ('Лучшие автомобили | ВКурсе', '35807044', 1);
+VALUES ('Р›СѓС‡С€РёРµ Р°РІС‚РѕРјРѕР±РёР»Рё | Р’РљСѓСЂСЃРµ', '35807044', 1);
 
 INSERT INTO "public"."publishers" ("name", "vk_id", "vk_app", "vk_token", "vk_seckey", "statusId")
 VALUES ('test publisher', 0, 0, 'c7ac1842c3ddb889c3ddb88974c3f6e60dcc3ddc3d8801f85c16a3c7336abd4', 'V1us1w3lbkoaapuYiddg', 1);
