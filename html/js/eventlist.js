@@ -1,12 +1,14 @@
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){callback(1)},
     rightcolumn_deletepost: function(post_id, callback){callback(1)},
-    leftcolumn_dropdown_change: function(sel){},
-    rightcolumn_dropdown_change: function(sel){},
-    calendar_change: function(timestamp){},
-    wall_load_more: function(){},
+
+    leftcolumn_dropdown_change: function(){},
+    rightcolumn_dropdown_change: function(){},
+    calendar_change: function(){},
+
+    wall_load_more: function(callback){callback(false/*false - nothing more to load*/);},
     post_moved: function(post_id, slot_id, callback){
-        window.setTimeout(function(){callback(1)},5000);
+        window.setTimeout(function(){callback(1)},1000);
     },
 
     /* после выполнения запроса к сервису. Вызвать callback(state) state = {}|false */
@@ -17,5 +19,24 @@ var Eventlist = {
     rightcolumn_source_edited: function(val,id, callback){callback({value: val});},
     rightcolumn_source_deleted: function(id, callback){callback(true)},
     rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
+
+    post: function(html, id, callback){
+        // id = 0 - new post, else - edit old
+        callback(false);
+    },
+
     eof: null
 }
+
+/*
+Elements.calendar()
+Elements.calendar(value)
+
+Elements.leftdd()
+Elements.leftdd(value)
+
+Elements.rightdd()
+Elements.rightdd(value)
+
+Elements.addEvents()
+*/
