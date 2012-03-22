@@ -35,9 +35,16 @@
                 return false;
             }
 
-            //TODO проверяем, если ли такая $articleId в этой $targetFeedId
+            //проверяем, если ли такая $articleId в этой $targetFeedId
+            $existsCount = ArticleQueueFactory::Count(
+                array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
+            );
 
-            $dateTime = new DateTimeWrapper(date('r', $timestamp));
+            if ($existsCount) {
+                $result['message'] = 'exists';
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
 
             $object = new ArticleQueue();
             $object->createdAt = DateTimeWrapper::Now();

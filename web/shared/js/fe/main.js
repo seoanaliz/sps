@@ -226,8 +226,12 @@ var Elements = {
             $(".slot .post").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, callback, failback){
-                Events.fire('post_moved', [post, slot, function(state){
-                    (state ? callback : failback)();
+                Events.fire('post_moved', [post, slot, function(state, newId){
+                    if (state) {
+                        callback(newId);
+                    } else {
+                        failback();
+                    }
                 }]);
             }
             $(".post").draggable({
@@ -245,7 +249,8 @@ var Elements = {
                     var elem = $(this);
                     if(target.hasClass("empty")) {
                         if(!$(this).hasClass("dragged")) {
-                            dragdrop($(this).data("id"), target.data("id"), function(){
+                            dragdrop($(this).data("id"), target.data("id"), function(newId){
+                                elem.data("id", newId);
                                 target.append(elem.addClass("dragged"));
                                 target.removeClass("empty");
                                 target.append(elem.addClass("dragged"));

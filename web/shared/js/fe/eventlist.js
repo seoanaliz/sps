@@ -110,8 +110,11 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    callback(1);
+                    callback(1, data.id);
                 } else {
+                    if (data.message) {
+                        alert(data.message);
+                    }
                     callback(0);
                 }
             }
