@@ -23,7 +23,9 @@
                             $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                             $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
                             $photoTitle = nl2br($photoTitle);
-                            ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}"><img src="{$path}" alt="" /></a><?
+                            ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
+                                <img src="{$path}" alt="" style="height: 0px;" /></a>
+                            <?
                         }
                         ?></div><?
                     }
