@@ -277,6 +277,7 @@ var Elements = {
             prevEffect		: 'none',
             nextEffect		: 'none',
             closeBtn		: false,
+            fitToView       : false,
             helpers		: {
                 title	: { type : 'inside' },
                 buttons	: {}
