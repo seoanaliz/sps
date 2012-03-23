@@ -37,7 +37,7 @@ function loadArticles(clean) {
         success: function (data) {
             $('div#wall').append(data);
             Elements.addEvents();
-            Elements.initImages('.post');
+            Elements.initImages('.post .images');
         }
     });
 }

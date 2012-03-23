@@ -12,10 +12,11 @@
             </div>
             <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
-                <?= nl2br($articleRecord->content) ?>
+                <div class="text-wrap">
+                    <?= nl2br($articleRecord->content) ?>
+                </div>
 
-
-                <div>
+                <div class="images">
                     <? foreach($articleRecord->photos as $photoItem) { ?>
                         <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
                     <? } ?>

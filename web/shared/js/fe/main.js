@@ -223,24 +223,27 @@ delete(Eventlist);
 var Elements = {
     initImages: function(selector){
         var root = $(selector);
-        if(root.hasClass("ready")) { return }
-        var imgs = root.find("img"),
-            imgs_length = imgs.length;
-        var wait = function(){
-            if(imgs_length) { return; }
-            imgs.each(function(){
-                var img = $(this).clone(),
-                    div = $("<div/>");
-                $(this).replaceWith(div.append(img));
-                img.height(100);
-                div.css({width:img.width(), height:"100px", overflow:"hidden", display: "inline-block", padding:"10px"});
-                root.addClass("ready");
+        root.each(function(){
+            var root = $(this);
+            if(root.hasClass("ready")) { return }
+            var imgs = root.find("img"),
+                imgs_length = imgs.length;
+            var wait = function(){
+                if(imgs_length) { return; }
+                imgs.each(function(){
+                    var img = $(this).clone(),
+                        div = $("<div/>");
+                    $(this).replaceWith(div.append(img));
+                    img.height(100);
+                    div.css({width:img.width(), height:"100px", overflow:"hidden", display: "inline-block", padding:"10px"});
+                    root.addClass("ready");
+                });
+            }
+            root.find("img").load(function(){
+                imgs_length--;
+                wait();
             });
-        }
-        root.find("img").load(function(){
-            imgs_length--;
-            wait();
-        })
+        });
     },
     addEvents: function(){
         (function(){
