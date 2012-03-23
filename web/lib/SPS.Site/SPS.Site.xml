@@ -59,6 +59,9 @@
             <action name="AddArticleToQueueControl">
                 <path>controls/AddArticleToQueueControl</path>
             </action>
+            <action name="SaveArticleControl">
+                <path>controls/SaveArticleControl</path>
+            </action>
         </group>
     </group>
 

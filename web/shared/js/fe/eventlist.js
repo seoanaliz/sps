@@ -135,9 +135,34 @@ var Eventlist = {
     rightcolumn_source_deleted: function(id, callback){callback(true)},
     rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
 
-    post: function(html, id, callback){
-        // id = 0 - new post, else - edit old
-        callback(false);
+    post: function(text, photos, id, callback){
+        $.ajax({
+            url: controlsRoot + 'arcticle-save/',
+            type: 'POST',
+            dataType : "json",
+            data: {
+                articleId: id,
+                text: text,
+                photos: photos,
+                sourceFeedId: Elements.leftdd()
+            },
+            success: function (data) {
+                if(data.success) {
+                    if (id) {
+                        //scroll to edit element
+                    } else {
+                        //reload left wall
+                        loadArticles(true);
+                    }
+                    callback(true);
+                } else {
+                    if (data.message) {
+                        popupError(Lang[data.message]);
+                    }
+                    callback(false);
+                }
+            }
+        });
     },
 
     eof: null

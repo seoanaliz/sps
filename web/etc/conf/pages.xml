@@ -35,6 +35,9 @@
                 <page uri="controls://arcticle-add-to-queue/">
                     <actions>SPS.Site.AddArticleToQueueControl</actions>
                 </page>
+                <page uri="controls://arcticle-save/">
+                    <actions>SPS.Site.SaveArticleControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

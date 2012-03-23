@@ -173,14 +173,23 @@ $(document).ready(function(){
             if(!input.text().length) form.addClass("collapsed");
         }
         form.find(".save").click(function(){
+            var photos = new Array();
+            $('.uploadifyQueueItem').each(function(){
+                var photo = new Object();
+                photo.filename = $(this).find('input:hidden').val();
+                photo.title = $(this).find('input:text').val();
+                photos.push(photo);
+            });
             form.addClass("spinner");
             Events.fire("post", [
                 input.html(),
+                photos,
                 input.data("id"),
                 function(state){
                     if(state) {
                         input.data("id", 0);
                         input.html('');
+                        $('#file_upload_queue').html('')
                         stop();
                     }
                     form.removeClass("spinner");
