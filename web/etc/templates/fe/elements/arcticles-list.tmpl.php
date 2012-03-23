@@ -13,7 +13,7 @@
             <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
                 <div class="text-wrap">
-                    <?= nl2br($articleRecord->content) ?>
+                    <?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?>
                 </div>
 
                 <?
@@ -23,7 +23,7 @@
                             $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                             $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
                             $photoTitle = nl2br($photoTitle);
-                            ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{$photoTitle}"><img src="{$path}" alt="" /></a><?
+                            ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}"><img src="{$path}" alt="" /></a><?
                         }
                         ?></div><?
                     }

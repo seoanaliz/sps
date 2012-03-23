@@ -16,7 +16,7 @@
                     <div class="time"><?= $gridItem['dateTime']->defaultFormat() ?></div>
                     <div class="post <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
                         <div class="content">
-                            <?= nl2br($articleRecord->content) ?>
+                            <?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?>
 
                             <? if (!empty($articleRecord->photos)) { ?>
                                 <? foreach($articleRecord->photos as $photoItem) { ?>
