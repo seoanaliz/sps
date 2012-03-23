@@ -135,6 +135,22 @@ var Eventlist = {
     rightcolumn_source_deleted: function(id, callback){callback(true)},
     rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
 
+    load_post_edit: function(id, callback){
+        $.ajax({
+            url: controlsRoot + 'arcticle-get/',
+            dataType : "json",
+            data: {
+                articleId: id
+            },
+            success: function (data) {
+                if(data && data.id) {
+                    callback(true, data);
+                } else {
+                    callback(false, null);
+                }
+            }
+        });
+    },
     post: function(text, photos, id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-save/',
@@ -148,12 +164,7 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    if (id) {
-                        //scroll to edit element
-                    } else {
-                        //reload left wall
-                        loadArticles(true);
-                    }
+                    loadArticles(true);
                     callback(true);
                 } else {
                     if (data.message) {

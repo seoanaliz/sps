@@ -62,6 +62,9 @@
             <action name="SaveArticleControl">
                 <path>controls/SaveArticleControl</path>
             </action>
+            <action name="GetArticleControl">
+                <path>controls/GetArticleControl</path>
+            </action>
         </group>
     </group>
 

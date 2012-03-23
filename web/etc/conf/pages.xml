@@ -38,6 +38,9 @@
                 <page uri="controls://arcticle-save/">
                     <actions>SPS.Site.SaveArticleControl</actions>
                 </page>
+                <page uri="controls://arcticle-get/">
+                    <actions>SPS.Site.GetArticleControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

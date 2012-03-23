@@ -25,7 +25,7 @@
                 <? } ?>
             </div>
             <div class="bottom d-hide">
-                <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a href="javascript:;">Редактировать</a></div>
+                <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a></div>
                 <div class="r">
                     <span class="original">
                         <? if($article->externalId != -1){ ?>

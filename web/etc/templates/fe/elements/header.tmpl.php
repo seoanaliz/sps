@@ -46,6 +46,7 @@
         'js://ext/jquery.plugins/jquery.cookie.js',
         'js://ext/jquery.plugins/jquery.blockui.js',
         'js://ext/jquery.plugins/jquery.tmpl.min.js',
+        'js://ext/jquery.plugins/jquery.scrollTo-min.js',
         'js://fe/jquery.ui.datepicker.js',
         'js://fe/eventlist.js',
         'js://fe/main.js',

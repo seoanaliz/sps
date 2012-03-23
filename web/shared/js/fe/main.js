@@ -189,20 +189,32 @@ $(document).ready(function(){
                     if(state) {
                         input.data("id", 0);
                         input.html('');
-                        $('#file_upload_queue').html('')
+                        $('#file_upload_queue').html('');
                         stop();
                     }
                     form.removeClass("spinner");
                 }
             ])
         });
-        form.find(".attach").click(
-            /*TODO: attach*/
-        );
 
         $(".left-panel").delegate(".post .edit", "click" ,function(){
-            /*TODO: edit*/
-            input.data("id", $(this).closest("post").data("id"));
+            input.data("id", 0);
+            input.html('');
+            $('#file_upload_queue').html('');
+
+            id = $(this).closest(".post").data("id");
+
+            Events.fire('load_post_edit', [id, function(state, data){
+                if(state && data) {
+                    tip.click();
+                    input.data("id", id);
+                    input.html(data.text);
+                    $('html, body').animate({scrollTop:0}, 'slow');
+                    if(data.photos) {
+                        $("#fileTemplate").tmpl( eval(data.photos), { counter: filesCounter } ).appendTo(".uploadifyQueue");
+                    }
+                }
+            }]);
         });
     })();
 

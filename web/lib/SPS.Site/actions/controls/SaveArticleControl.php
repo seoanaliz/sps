@@ -17,6 +17,7 @@
                 'success' => false
             );
 
+            $id             = Request::getInteger('articleId');
             $text           = Request::getString( 'text' );
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
@@ -47,13 +48,19 @@
             $articleRecord->likes = 0;
             $articleRecord->photos = $photos;
 
-            $queryResult = $this->add($article, $articleRecord);
+            if (!empty($id)) {
+                $queryResult = $this->update($id, $articleRecord);
+            } else {
+                $queryResult = $this->add($article, $articleRecord);
+            }
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
-                $result['id'] = $article->articleId;
+                if ($id) {
+                    $result['id'] = $id;
+                }
             }
 
             echo ObjectHelper::ToJSON($result);
@@ -70,6 +77,15 @@
 
                 $result = ArticleRecordFactory::Add($articleRecord);
             }
+
+            ConnectionFactory::CommitTransaction($result);
+            return $result;
+        }
+
+        private function update($id, $articleRecord) {
+            ConnectionFactory::BeginTransaction();
+
+            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photots'), array('articleId' => $id));
 
             ConnectionFactory::CommitTransaction($result);
             return $result;
