@@ -1,35 +1,34 @@
-#
-# $Header: /data/cvs/1adw/eaze/Makefile,v 1.7 2008/03/17 08:05:10 sergeyfast Exp $
-# $Revision: 1.7 $
-# $Date: 2008/03/17 08:05:10 $
-#
-
 # Default Parameters
 layout=local
 
 include build.properties
 
-.PHONY: sync deploy
-verify:
-	@# Verify layout
-	@if [ "x" = "x$(deploy.$(layout).host)" ] && [ "xlocal" != "x$(layout)" ]; then \
-		echo "Can not find layout \"$(layout)\"."; \
-		exit 1; \
-	fi;
-	
+all: sync
+
 sync:
 	@echo "[SVN] Synchronizing with SVN server..."
 	@svn update
-	
+
 sync-only:
-	@echo "[SVN] Synchronizing with SVN server... w/o"
+	@echo "[SVN] Synchronizing with SVN server... (omit externals)"
 	@svn update --ignore-externals
+
 
 deploy:
 	@echo "[SSH] Deploying to server..."
+	
+	@svn info > web/shared/last-version.txt
+	@svn status >> web/shared/last-version.txt
+	@svn info | grep Revision | cut -d: -f2 > web/shared/.revision
 
-	@# Synchronize
-	@if [ "xlocal" != "x$(layout)" ]; then \
-		rsync -Cavuz -e "ssh " $(deploy.$(layout).ignore) $(dir.deploy)/ "$(deploy.$(layout).user)"@$(deploy.$(layout).host):"$(deploy.$(layout).root)"; \
-		ssh $(deploy.$(layout).user)@$(deploy.$(layout).host) "chmod +x $(deploy.$(layout).root)/post_deploy.sh && $(deploy.$(layout).root)/post_deploy.sh $(deploy.$(layout).root)";  \
+	@if [ -n "$(deploy.$(layout).hosts)" ]; then \
+		for i in $(deploy.$(layout).hosts); do \
+			rsync -Cavuz --chmod=ugo=rwX -e "ssh -p$(deploy.$(layout).port)" $(deploy.$(layout).ignore) $(dir.deploy)/ "$(deploy.$(layout).user)"@$$i:"$(deploy.$(layout).root)"; \
+			ssh -p$(deploy.$(layout).port) $(deploy.$(layout).user)@$$i "chmod +x $(deploy.$(layout).root)/post_deploy.sh && $(deploy.$(layout).root)/post_deploy.sh $(deploy.$(layout).root)";  \
+		done; \
+	else  \
+		rsync -Cavuz --chmod=ugo=rwX -e "ssh -p$(deploy.$(layout).port)" $(deploy.$(layout).ignore) $(dir.deploy)/ "$(deploy.$(layout).user)"@$(deploy.$(layout).host):"$(deploy.$(layout).root)"; \
+		ssh -p$(deploy.$(layout).port) $(deploy.$(layout).user)@$(deploy.$(layout).host) "chmod +x $(deploy.$(layout).root)/post_deploy.sh && $(deploy.$(layout).root)/post_deploy.sh $(deploy.$(layout).root)";  \
 	fi;
+	
+	@rm web/shared/last-version.txt
