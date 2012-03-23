@@ -35,6 +35,8 @@
             'css://fe/reset.css',
             'css://fe/main.css',
             'js://ext/uploadify/uploadify.css',
+            'js://ext/fancybox2/jquery.fancybox.css',
+            'js://ext/fancybox2/helpers/jquery.fancybox-buttons.css',
         )
         , AssetHelper::IE7 => array()
     );
@@ -47,6 +49,8 @@
         'js://ext/jquery.plugins/jquery.blockui.js',
         'js://ext/jquery.plugins/jquery.tmpl.min.js',
         'js://ext/jquery.plugins/jquery.scrollTo-min.js',
+        'js://ext/fancybox2/jquery.fancybox.js',
+        'js://ext/fancybox2/helpers/jquery.fancybox-buttons.js',
         'js://fe/jquery.ui.datepicker.js',
         'js://fe/eventlist.js',
         'js://fe/main.js',

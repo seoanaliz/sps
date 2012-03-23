@@ -25,6 +25,6 @@
         <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
         <span class="fileName">${filename}</span>
         <br /><br /><img src="${path}" alt="" />
-        <br /><br /><input type="text" name="files[${ $item.counter.index }][title]" value="${title}" style="width: 98%"/>
+        <br /><br /><textarea rows="2" cols="40" name="files[${ $item.counter.index }][title]">${title}</textarea>
     </div>
 </script><script>''</script>

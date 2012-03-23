@@ -102,7 +102,7 @@
         private function update($id, $articleRecord) {
             ConnectionFactory::BeginTransaction();
 
-            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photots'), array('articleId' => $id));
+            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos'), array('articleId' => $id));
 
             ConnectionFactory::CommitTransaction($result);
             return $result;

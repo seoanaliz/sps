@@ -180,7 +180,7 @@ $(document).ready(function(){
             $('.uploadifyQueueItem').each(function(){
                 var photo = new Object();
                 photo.filename = $(this).find('input:hidden').val();
-                photo.title = $(this).find('input:text').val();
+                photo.title = $(this).find('textarea').val();
                 photos.push(photo);
             });
             form.addClass("spinner");
@@ -271,6 +271,16 @@ var Elements = {
                 imgs_length--;
                 wait();
             });
+        });
+
+        $(".fancybox-thumb").fancybox({
+            prevEffect		: 'none',
+            nextEffect		: 'none',
+            closeBtn		: false,
+            helpers		: {
+                title	: { type : 'inside' },
+                buttons	: {}
+            }
         });
     },
     addEvents: function(){

@@ -16,13 +16,18 @@
                     <?= nl2br($articleRecord->content) ?>
                 </div>
 
-                <? if (!empty($articleRecord->photos)) { ?>
-                <div class="images">
-                    <? foreach($articleRecord->photos as $photoItem) { ?>
-                        <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
-                    <? } ?>
-                </div>
-                <? } ?>
+                <?
+                    if (!empty($articleRecord->photos)) {
+                        ?><div class="images"><?
+                        foreach($articleRecord->photos as $photoItem) {
+                            $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                            $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
+                            $photoTitle = nl2br($photoTitle);
+                            ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{$photoTitle}"><img src="{$path}" alt="" /></a><?
+                        }
+                        ?></div><?
+                    }
+                ?>
             </div>
             <div class="bottom d-hide">
                 <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a></div>
