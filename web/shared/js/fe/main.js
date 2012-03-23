@@ -1,6 +1,4 @@
 $(document).ready(function(){
-    var DD_DEFAULT_TEXT = 'Источник';
-
     $("#calendar")
         .datepicker(
         {
@@ -387,7 +385,7 @@ $.fn.dd_sel = function(id){
     } else {
         $(this)
             .data("selected",0)
-            .find(".caption").text(DD_DEFAULT_TEXT).addClass("default");
+            .find(".caption").text('Источник').addClass("default");
     }
     $(this).trigger("change");
 };
