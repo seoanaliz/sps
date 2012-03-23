@@ -9,6 +9,20 @@
      */
     class SaveArticleControl {
 
+        private function convert_line_breaks($string, $line_break=PHP_EOL) {
+            $patterns = array(
+                "/(<br>|<br \/>|<br\/>)\s*/i",
+                "/(\r\n|\r|\n)/"
+            );
+            $replacements = array(
+                PHP_EOL,
+                $line_break
+            );
+            $string = preg_replace($patterns, $replacements, $string);
+            return $string;
+        }
+
+
         /**
          * Entry Point
          */
@@ -21,6 +35,9 @@
             $text           = Request::getString( 'text' );
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
+
+            $text = $this->convert_line_breaks($text);
+            $text = strip_tags($text);
 
             $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
             if (empty($sourceFeedId) || empty($sourceFeed)) {
