@@ -13,9 +13,13 @@
             <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
                 <?= nl2br($articleRecord->content) ?>
-                <? foreach($articleRecord->photos as $photoItem) { ?>
-                <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
-                <? } ?>
+
+
+                <div>
+                    <? foreach($articleRecord->photos as $photoItem) { ?>
+                        <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
+                    <? } ?>
+                </div>
             </div>
             <div class="bottom d-hide">
                 <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a href="javascript:;">Редактировать</a></div>
