@@ -12,11 +12,6 @@ Counter.prototype.nextIndex = function() {
 
 var filesCounter = new Counter();
 
-$(".delete-file").live('click', function(e) {
-    $(this).parents('div.uploadifyQueueItem').remove();
-    e.preventDefault();
-});
-
 $(document).ready(function() {
     $('#file_upload').uploadify({
         'uploader'        : root + 'int/controls/image-upload/',
@@ -51,8 +46,6 @@ $(document).ready(function() {
             }
         }
     });
-
-    //$("#fileTemplate").tmpl( filesJSON, { counter: filesCounter } ).appendTo(".uploadifyQueue");
 
     $('.uploadifyQueue').sortable({
         'items': '.uploadifyQueueItem'

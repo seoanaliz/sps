@@ -170,7 +170,10 @@ $(document).ready(function(){
         });
         var stop = function(){
             $(window).unbind("click", stop);
-            if(!input.text().length) form.addClass("collapsed");
+            if(!input.text().length && !$(".uploadifyQueueItem").length) {
+                input.data("id", 0);
+                form.addClass("collapsed");
+            }
         }
         form.find(".save").click(function(){
             var photos = new Array();
@@ -212,6 +215,10 @@ $(document).ready(function(){
                     $('html, body').animate({scrollTop:0}, 'slow');
                     if(data.photos) {
                         $("#fileTemplate").tmpl( eval(data.photos), { counter: filesCounter } ).appendTo(".uploadifyQueue");
+                        $("a.delete-file").bind('click', function(e) {
+                            $(this).parents('div.uploadifyQueueItem').remove();
+                            e.preventDefault();
+                        });
                     }
                 }
             }]);

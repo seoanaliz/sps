@@ -9,10 +9,13 @@
     <div class="clear"></div>
 </div>
 <script type="text/javascript">
-    var filesJSON = '';
     function uploadCallback( file,data ) {
         t = $("#fileTemplate").tmpl( {title: '', filename: data.filename, isTemp: data.isTemp, path: data.path, name : file.name}, { counter: filesCounter } );
         $('#' + file.id).replaceWith( t );
+        $("a.delete-file").bind('click', function(e) {
+            $(this).parents('div.uploadifyQueueItem').remove();
+            e.preventDefault();
+        });
     }
 </script>
 <script id="fileTemplate" type="text/x-jquery-tmpl">
