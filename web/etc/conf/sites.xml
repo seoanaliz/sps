@@ -97,8 +97,8 @@
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
-                            <param name="appId">2853330</param>
-                            <param name="password">1h2pQNcNMw54IwO6kuVi</param>
+                            <param name="appId">2879919</param>
+                            <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.mystery.vmkteam.ru</param>

@@ -71,7 +71,7 @@ Create table "vfsFoldersTree"
 (
 	"objectId" Integer NOT NULL,
 	"parentId" Integer,
-	"path"  "ltree",
+	"path"  Varchar(255),
 	"rKey" Integer,
 	"lKey" Integer,
  primary key ("objectId")
