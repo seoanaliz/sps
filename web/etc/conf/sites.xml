@@ -111,8 +111,8 @@
                     </modules>
                     <databases>
                         <database driver="PgSql">
-                            <name>sps_devel</name>
-                            <user>postgres</user>
+                            <name>sps</name>
+                            <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
                         </database>
