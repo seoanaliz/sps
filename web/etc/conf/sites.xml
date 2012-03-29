@@ -92,6 +92,33 @@
                     </databases>
                 </settings>
             </host>
+            <host name="production">
+                <hostname>sps.verumnets.ru</hostname>
+                <settings>
+                    <modules>
+                        <vkapi class="AuthVkontakte">
+                            <param name="appId">2853330</param>
+                            <param name="password">1h2pQNcNMw54IwO6kuVi</param>
+                        </vkapi>
+                        <mediaServer class="MediaServerManager">
+                            <param name="host">media.mystery.vmkteam.ru</param>
+                            <param name="mainLocation">/</param>
+                            <param name="tempLocation">/temp/</param>
+                            <param name="uploadPort">80</param>
+                            <param name="resizeExec">/usr/local/bin/convert</param>
+                            <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
+                        </mediaServer>
+                    </modules>
+                    <databases>
+                        <database driver="PgSql">
+                            <name>sps_devel</name>
+                            <user>postgres</user>
+                            <password></password>
+                            <encoding>UTF8</encoding>
+                        </database>
+                    </databases>
+                </settings>
+            </host>
 		</hosts>
 	</site>
 </sites>
