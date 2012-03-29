@@ -13,6 +13,7 @@
         public static $MainLocation     = '';
         public static $TempLocation     = '';
         public static $UploadPort       = '';
+        public static $UploadHost       = '';
         public static $ResizeExec       = '';
         public static $resizeCommands   = '';
 
@@ -32,6 +33,7 @@
             self::$MainLocation     = self::$params['mainLocation'];
             self::$TempLocation     = self::$params['tempLocation'];
             self::$UploadPort       = self::$params['uploadPort'];
+            self::$UploadHost       = self::$params['uploadHost'];
             self::$ResizeExec       = self::$params['resizeExec'];
             self::$resizeCommands   = eval( 'return ' . self::$params['resizeCommands']  . ';' );
         }
@@ -186,11 +188,13 @@
 		 * @param $path (path on remote server, ex. '/user-avatars/original/4/40/409ab75f.jpg')
 		 * @param string $location (use '' or self::$TempLocation)
 		 * @param boolean $withoutHost
+		 * @param string $host
 		 * @return string
 		 */
-		private static function formatPath( $path, $location = null, $withoutHost = false ) {
-            $location = !empty( $location ) ? $location : self::$MainLocation;
-			return sprintf( '%s%s/%s', ( $withoutHost ) ? '' : self::$Host, rtrim( $location, '/' ), trim( $path, '/' ) );
+		private static function formatPath( $path, $location = null, $withoutHost = false, $host = null ) {
+            $location   = !empty( $location ) ? $location : self::$MainLocation;
+            $host       = !empty($host) ? $host : self::$UploadHost;
+			return sprintf( '%s%s/%s', ( $withoutHost ) ? '' : $host, rtrim( $location, '/' ), trim( $path, '/' ) );
 		}
 
 		/**

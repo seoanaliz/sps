@@ -59,6 +59,7 @@
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
+                            <param name="uploadHost">media.sps</param>
                             <param name="resizeExec">"c:\\Program Files (x86)\\ImageMagick\\convert.exe"</param>
                             <param name="resizeCommands">array( 'resize' => '^>', 'crop' => '^^' )</param>
                         </mediaServer>
@@ -78,6 +79,7 @@
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">80</param>
+                            <param name="uploadHost">media.mystery.vmkteam.ru</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
@@ -105,6 +107,7 @@
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
+                            <param name="uploadHost">127.0.0.1</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
