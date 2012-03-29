@@ -101,10 +101,10 @@
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.mystery.vmkteam.ru</param>
+                            <param name="host">media.sps.verumnets.ru</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
-                            <param name="uploadPort">80</param>
+                            <param name="uploadPort">8001</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>

@@ -1,0 +1,6 @@
+*/5     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/sync-sources/ > /dev/null
+0-59     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/process-queue/ > /dev/null
+0-59     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/process-queue/ > /dev/null
+0-59     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/process-queue/ > /dev/null
+0-59     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/process-queue/ > /dev/null
+0-59     *       *       *       *       root    /usr/local/bin/curl -s http://sps.verumnets.ru/int/daemons/process-queue/ > /dev/null
