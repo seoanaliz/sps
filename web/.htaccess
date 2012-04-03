@@ -3,6 +3,13 @@ RewriteRule ^favicon.ico - [L]
 RewriteRule ^crossdomain.xml - [L]
 RewriteRule ^robots.txt - [L]
 RewriteRule ^xd_receiver.htm - [L]
+RewriteRule ^updating.html - [L]
+
+#Updating
+RewriteCond %{REQUEST_FILENAME}  !^/shared/.*
+RewriteRule ^(.*)$ /updating.html [R=503,L]
+Header set Retry-After "3600"
+ErrorDocument 503 /updating.html
 
 RewriteRule ^(vt)$ /$1/? [R=301,L]
 RewriteRule .* eaze.php
