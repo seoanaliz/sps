@@ -268,7 +268,6 @@ delete(Eventlist);
 var Elements = {
     addEvents: function(){
         (function(){
-            console.log('addEvents');
             $(".slot .post").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, callback, failback){
