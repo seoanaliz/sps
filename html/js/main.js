@@ -181,12 +181,75 @@ $(document).ready(function(){
         var form = $(".newpost"),
             input = $(".input", form),
             tip = $(".tip", form);
+            
+        var $linkInfo = $('.link-info', form),
+            $linkDescription = $('.link-description', $linkInfo),
+            $linkStatus = $('.link-status', $linkInfo),
+            foundLink, foundDomain;
+        
         tip.click(function(){input.focus();});
         form.click(function(e){ e.stopPropagation(); });
-        input.focus(function(){
-            form.removeClass("collapsed");
-            $(window).bind("click", stop);
-        });
+        input
+            .focus(function(){
+                form.removeClass("collapsed");
+                $(window).bind("click", stop);
+            })
+            .bind('paste', function() {
+                var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
+                    txt, matches;
+                setTimeout(function() {
+                    txt = input.text();
+                    matches = txt.match(pattern);
+                    // если приаттачили ссылку
+                    if (matches && matches[0] && matches[1] && !foundLink) {
+                        foundLink   = matches[0];
+                        foundDomain = matches[1];
+
+                        Events.fire("post_describe_link", [
+                            foundLink,
+                            function(result) {
+                                if (result) {
+                                    $linkDescription.empty()
+                                    $linkStatus.empty()
+
+                                    // отрисовываем ссылку
+                                    if (result.img) {
+                                        var $img = $('<img />', { src: result.img, alt: '', width: 75, height: 75 });
+                                        $linkDescription.append($img);
+                                    }
+                                    if (result.title) {
+                                        var $a = $('<a />', { href: foundLink, target: '_blank', text: result.title });
+                                        $linkDescription.append($a);
+                                    }
+                                    if (result.description) {
+                                        var $p = $('<p />', { text: result.description });
+                                        $linkDescription.append($p);
+                                    }
+
+                                    var $span = $('<span />', { text: 'Ссылка: ' });
+                                    $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
+
+                                    var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
+                                        // убираем аттач ссылки
+                                        $linkDescription.empty()
+                                        $linkStatus.empty()
+                                        $linkInfo.hide();
+                                        foundLink = false;
+                                        foundDomain = false;
+                                    });
+                                    $span.append($deleteLink);
+
+                                    $linkStatus.html($span);
+
+                                    $linkInfo.show();
+                                }
+                            }
+                        ]);
+                    }
+                }, 10);
+            })
+        ;
+        
         var stop = function(){
             $(window).unbind("click", stop);
             if(!input.text().length) form.addClass("collapsed");
@@ -204,7 +267,7 @@ $(document).ready(function(){
                     }
                     form.removeClass("spinner");
                 }
-            ])
+            ]);
         });
         form.find('.cancel').click(function(e) {
             input.text('').blur();
@@ -253,7 +316,7 @@ var Events = {
         }
         if($.isFunction(this[name])) {
             try {
-                this[name].apply(window, args)
+                this[name].apply(window, args);
             } catch(e) {
                 if(console && $.isFunction(console.log)) {
                     console.log(e);
