@@ -52,15 +52,34 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
-    $(".wall").delegate(".post .delete", "click", function(){
-        var elem = $(this).closest(".post"),
-            pid = elem.data("id");
-        Events.fire('leftcolumn_deletepost', [pid, function(state){
-            if(state) {
-                elem.remove();
-            }
-        }]);
-    });
+    $(".wall")
+        .delegate(".post .delete", "click", function(){
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('leftcolumn_deletepost', [pid, function(state){
+                if (state) {
+                    var deleteMessageId = 'deleted-post-' + pid;
+                    if ($('#' + deleteMessageId).length) {
+                        // если уже удаляли пост, то сообщение об удалении уже в DOMе
+                        $('#' + deleteMessageId).show();
+                    } else {
+                        // иначе добавляем
+                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Сообщение удалено. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
+                    }
+
+                    elem.hide();
+                }
+            }]);
+        })
+        .delegate('.post .recover', 'click', function() {
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('leftcolumn_recoverpost', [pid, function(state){
+                if(state) {
+                    elem.hide().next().show();
+                }
+            }]);
+        });
     $(".items").delegate(".slot .post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
@@ -187,6 +206,11 @@ $(document).ready(function(){
                 }
             ])
         });
+        form.find('.cancel').click(function(e) {
+            input.text('').blur();
+            form.addClass('collapsed');
+            e.preventDefault();
+        });
         form.find(".attach").click(
             /*TODO: attach*/
         );
@@ -197,6 +221,27 @@ $(document).ready(function(){
         });
     })();
 
+    $('.left-panel .show-cut').click(function(e) {
+        var $content = $(this).closest('.content'),
+            shortcut = $content.find('.shortcut').html(),
+            cut      = $content.find('.cut').html();
+
+        $content.html(shortcut + ' ' + cut);
+        $(this).remove();
+
+        e.preventDefault();
+    });
+
+    $('.right-panel .show-cut').click(function(e) {
+        var $content = $(this).closest('.content'),
+            txt      = $(this).text();
+
+        $content.find('.cut').toggle();
+
+        $(this).text(txt == '«' ? '»' : '«');
+
+        e.preventDefault();
+    });
 });
 
 var Events = {
@@ -223,6 +268,7 @@ delete(Eventlist);
 var Elements = {
     addEvents: function(){
         (function(){
+            console.log('addEvents');
             $(".slot .post").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, callback, failback){

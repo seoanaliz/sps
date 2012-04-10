@@ -1,5 +1,7 @@
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){callback(1)},
+    leftcolumn_recoverpost: function(post_id, callback){callback(1)},
+
     rightcolumn_deletepost: function(post_id, callback){callback(1)},
 
     leftcolumn_dropdown_change: function(){},
