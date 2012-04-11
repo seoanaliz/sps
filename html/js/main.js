@@ -1,6 +1,20 @@
 $(document).ready(function(){
     var DD_DEFAULT_TEXT = 'Источник';
 
+    console.log($('#attach-file'));
+
+    // приложить файл
+    var uploader = new qq.FileUploader({
+        debug: true,
+        element: $('#attach-file')[0],
+        action: '127.0.0.1',
+        template: '<div class="qq-uploader">' + 
+            '<div class="qq-upload-drop-area"><span>Можете перетащить файлы сюда для загрузки</span></div>' +
+            '<div class="qq-upload-button">Прикрепить</div>' +
+            '<ul class="qq-upload-list"></ul>' + 
+         '</div>'
+    });
+
     $("#calendar")
         .datepicker(
             {
