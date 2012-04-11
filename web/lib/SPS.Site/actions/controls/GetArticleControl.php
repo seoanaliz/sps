@@ -35,7 +35,7 @@
 
             $result = array(
                 'id' => $articleId,
-                'text' => $articleRecord->content,
+                'text' => nl2br($articleRecord->content),
                 'photos' => ObjectHelper::ToJSON($photos),
             );
 
