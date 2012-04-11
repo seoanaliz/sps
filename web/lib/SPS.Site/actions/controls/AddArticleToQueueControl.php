@@ -94,6 +94,11 @@
             ConnectionFactory::CommitTransaction($sqlResult);
 
             if ($sqlResult) {
+                //блокируем статью, чтобы ее больше никто не пытался отправить
+                $o = new Article();
+                $o->statusId = 2;
+                ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $article->articleId));
+
                 $result = array(
                     'success' => true,
                     'id' => $articleQueueRecord->articleQueueId
