@@ -4,7 +4,7 @@
         <div class="block">
             <div class="header bb">
 
-                <div class="drop-down">
+                <div class="drop-down left-drop-down">
                     <div class="caption default">Источник</div>
                     <div class="tip"><s></s></div>
                     <ul>
@@ -43,7 +43,7 @@
                     <div class="tip"><b>cal</b></div>
                 </div>
 
-                <div class="drop-down">
+                <div class="drop-down right-drop-down">
                     <div class="caption default">Паблик</div>
                     <div class="tip"><s></s></div>
                     <ul>

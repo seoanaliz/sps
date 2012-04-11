@@ -76,6 +76,7 @@ var Eventlist = {
             }
         });
     },
+    leftcolumn_recoverpost: function(post_id, callback){callback(1)},
     rightcolumn_deletepost: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-queue-delete/',
@@ -151,6 +152,27 @@ var Eventlist = {
             }
         });
     },
+
+    post_describe_link: function(link, callback) {
+        if (link == 'link.ru') {
+            callback({
+                title: 'Секреты личной жизни Влада Цыплухин - ЭКСКЛЮЗИВ',
+                description: 'Эксклюзивный материал для программы Дарьи Герман и Николая Воробьёва Школа Соблазна'
+            });
+        } else if (link == 'link.img.ru') {
+            callback({
+                img: 'img/bg.png',
+                title: 'Секреты личной жизни Влада Цыплухин - ЭКСКЛЮЗИВ',
+                description: 'Эксклюзивный материал для программы Дарьи Герман и Николая Воробьёва Школа Соблазна'
+            });
+        } else {
+            callback({
+                description: 'Эксклюзивный материал для программы Дарьи Герман и Николая Воробьёва Школа Соблазна'
+            });
+        }
+
+    },
+
     post: function(text, photos, id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-save/',

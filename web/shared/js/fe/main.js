@@ -50,15 +50,35 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
-    $(".wall").delegate(".post .delete", "click", function(){
-        var elem = $(this).closest(".post"),
-            pid = elem.data("id");
-        Events.fire('leftcolumn_deletepost', [pid, function(state){
-            if(state) {
-                elem.remove();
-            }
-        }]);
-    });
+    $(".wall")
+        .delegate(".post .delete", "click", function(){
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('leftcolumn_deletepost', [pid, function(state){
+                if (state) {
+                    var deleteMessageId = 'deleted-post-' + pid;
+                    if ($('#' + deleteMessageId).length) {
+                        // если уже удаляли пост, то сообщение об удалении уже в DOMе
+                        $('#' + deleteMessageId).show();
+                    } else {
+                        // иначе добавляем
+                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Сообщение удалено. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
+                    }
+
+                    elem.hide();
+                }
+            }]);
+        })
+        .delegate('.post .recover', 'click', function() {
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('leftcolumn_recoverpost', [pid, function(state){
+                if(state) {
+                    elem.hide().next().show();
+                }
+            }]);
+        });
+
     $(".items").delegate(".slot .post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
@@ -160,12 +180,75 @@ $(document).ready(function(){
         var form = $(".newpost"),
             input = $(".input", form),
             tip = $(".tip", form);
+
+        var $linkInfo = $('.link-info', form),
+            $linkDescription = $('.link-description', $linkInfo),
+            $linkStatus = $('.link-status', $linkInfo),
+            foundLink, foundDomain;
+
         tip.click(function(){input.focus();});
         form.click(function(e){ e.stopPropagation(); });
-        input.focus(function(){
+        input
+            .focus(function(){
             form.removeClass("collapsed");
             $(window).bind("click", stop);
-        });
+        })
+            .bind('paste', function() {
+                var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
+                    txt, matches;
+                setTimeout(function() {
+                    txt = input.text();
+                    matches = txt.match(pattern);
+                    // если приаттачили ссылку
+                    if (matches && matches[0] && matches[1] && !foundLink) {
+                        foundLink   = matches[0];
+                        foundDomain = matches[1];
+
+                        Events.fire("post_describe_link", [
+                            foundLink,
+                            function(result) {
+                                if (result) {
+                                    $linkDescription.empty()
+                                    $linkStatus.empty()
+
+                                    // отрисовываем ссылку
+                                    if (result.img) {
+                                        var $img = $('<img />', { src: result.img, alt: '', width: 75, height: 75 });
+                                        $linkDescription.append($img);
+                                    }
+                                    if (result.title) {
+                                        var $a = $('<a />', { href: foundLink, target: '_blank', text: result.title });
+                                        $linkDescription.append($a);
+                                    }
+                                    if (result.description) {
+                                        var $p = $('<p />', { text: result.description });
+                                        $linkDescription.append($p);
+                                    }
+
+                                    var $span = $('<span />', { text: 'Ссылка: ' });
+                                    $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
+
+                                    var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
+                                        // убираем аттач ссылки
+                                        $linkDescription.empty()
+                                        $linkStatus.empty()
+                                        $linkInfo.hide();
+                                        foundLink = false;
+                                        foundDomain = false;
+                                    });
+                                    $span.append($deleteLink);
+
+                                    $linkStatus.html($span);
+
+                                    $linkInfo.show();
+                                }
+                            }
+                        ]);
+                    }
+                }, 10);
+            })
+        ;
+
         var stop = function(){
             $(window).unbind("click", stop);
             if(!input.text().length && !$(".uploadifyQueueItem").length) {
@@ -195,9 +278,13 @@ $(document).ready(function(){
                     }
                     form.removeClass("spinner");
                 }
-            ])
+            ]);
         });
-
+        form.find('.cancel').click(function(e) {
+            input.text('').blur();
+            form.addClass('collapsed');
+            e.preventDefault();
+        });
         $(".left-panel").delegate(".post .edit", "click" ,function(){
             input.data("id", 0);
             input.html('');
@@ -223,6 +310,27 @@ $(document).ready(function(){
         });
     })();
 
+    $('.left-panel .show-cut').click(function(e) {
+        var $content = $(this).closest('.content'),
+            shortcut = $content.find('.shortcut').html(),
+            cut      = $content.find('.cut').html();
+
+        $content.html(shortcut + ' ' + cut);
+        $(this).remove();
+
+        e.preventDefault();
+    });
+
+    $('.right-panel .show-cut').click(function(e) {
+        var $content = $(this).closest('.content'),
+            txt      = $(this).text();
+
+        $content.find('.cut').toggle();
+
+        $(this).text(txt == '«' ? '»' : '«');
+
+        e.preventDefault();
+    });
 });
 
 var Events = {
@@ -234,7 +342,7 @@ var Events = {
         }
         if($.isFunction(this[name])) {
             try {
-                this[name].apply(window, args)
+                this[name].apply(window, args);
             } catch(e) {
                 if(console && $.isFunction(console.log)) {
                     console.log(e);
