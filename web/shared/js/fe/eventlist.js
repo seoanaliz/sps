@@ -76,7 +76,17 @@ var Eventlist = {
             }
         });
     },
-    leftcolumn_recoverpost: function(post_id, callback){callback(1)},
+    leftcolumn_recoverpost: function(post_id, callback){
+        $.ajax({
+            url: controlsRoot + 'arcticle-restore/',
+            data: {
+                id: post_id
+            },
+            success: function (data) {
+                callback(1);
+            }
+        });
+    },
     rightcolumn_deletepost: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-queue-delete/',

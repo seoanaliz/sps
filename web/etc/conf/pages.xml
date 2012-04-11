@@ -41,6 +41,9 @@
                 <page uri="controls://arcticle-get/">
                     <actions>SPS.Site.GetArticleControl</actions>
                 </page>
+                <page uri="controls://arcticle-restore/">
+                    <actions>SPS.Site.RestoreArticleControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

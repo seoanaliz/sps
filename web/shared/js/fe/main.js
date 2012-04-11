@@ -62,7 +62,7 @@ $(document).ready(function(){
                         $('#' + deleteMessageId).show();
                     } else {
                         // иначе добавляем
-                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Сообщение удалено. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
+                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Пост удален. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
                     }
 
                     elem.hide();

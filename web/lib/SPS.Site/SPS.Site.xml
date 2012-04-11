@@ -65,6 +65,9 @@
             <action name="GetArticleControl">
                 <path>controls/GetArticleControl</path>
             </action>
+            <action name="RestoreArticleControl">
+                <path>controls/RestoreArticleControl</path>
+            </action>
         </group>
     </group>
 
