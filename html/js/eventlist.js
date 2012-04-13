@@ -42,7 +42,7 @@ var Eventlist = {
         
     },
 
-    post: function(html, id, callback){
+    post: function(html, id, callback) {
         // id = 0 - new post, else - edit old
         callback(false);
     },
