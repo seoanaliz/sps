@@ -501,7 +501,7 @@ var Elements = {
         }
     },
     initLinks: function(){
-        var tpl = '\
+        var tpl = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
             <div class="link-description-content">\
             <img src="" alt="" class="l" style="width: 75px; height: 75px;">\
                 <div class="link-description-text l">\
@@ -509,8 +509,7 @@ var Elements = {
                     <p></p>\
                 </div>\
                 <div class="clear"></div>\
-            </div>\
-            <div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>';
+            </div>';
 
         $('img.ajax-loader').each(function(){
             var container   = $(this).parents('div.link-info-content');
@@ -537,7 +536,16 @@ var Elements = {
                     }
 
                     container.find('a').attr('href', link);
-                    container.find('div.link-status-content span a').text(link);
+
+                    var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
+                        matches;
+                    matches = link.match(pattern);
+
+                    shortLink = link;
+                    if (matches[1]) {
+                        shortLink = matches[1];
+                    }
+                    container.find('div.link-status-content span a').text(shortLink);
                 }
             });
 

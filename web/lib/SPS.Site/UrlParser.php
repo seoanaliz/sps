@@ -31,7 +31,7 @@
         }
 
         public static function IsContentWithLink($content) {
-            if (preg_match('/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/uim', $content)) {
+            if (preg_match('%([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?/#,&;]+)?%uim', $content)) {
                 return true;
             } else {
                 return false;
