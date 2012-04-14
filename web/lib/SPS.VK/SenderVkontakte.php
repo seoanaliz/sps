@@ -138,8 +138,8 @@
 
             //todo
             if (!empty($this->link)){
-                $this->post_text .= "\r\n". $this->link;
-                //                 $attachment .= ','.$this->link;
+                //$this->post_text .= "\r\n". $this->link;
+                $attachment .= ','.$this->link;
             }
 
             $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
@@ -159,10 +159,10 @@
             $fwd3 = $fwd3->response;
             if (!empty($fwd3->post_id)) {
                 return $fwd3->post_id;# вернет id поста
-            } elseif(!empty($fwd->processing)){
+            } elseif(!empty($fwd3->processing)){
                 return true;
             }else{
-                throw new exception("Error in response : $tmp");
+                //throw new exception("Error in response : $tmp");
             }
         }
 

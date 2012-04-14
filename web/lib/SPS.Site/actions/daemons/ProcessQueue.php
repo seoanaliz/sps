@@ -76,7 +76,7 @@ sql;
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
-                'link' => '',
+                'link' => $articleRecord->link,
             );
 
             if (!empty($articleRecord->photos)) {
