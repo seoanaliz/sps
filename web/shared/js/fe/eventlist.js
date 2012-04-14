@@ -38,6 +38,7 @@ function loadArticles(clean) {
             $('div#wall').append(data);
             Elements.addEvents();
             Elements.initImages('.post .images');
+            Elements.initLinks();
         }
     });
 }

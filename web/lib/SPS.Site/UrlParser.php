@@ -20,6 +20,9 @@
             $description = $document->find("meta[name='description']")->attr('content');
             $img = $document->find("link[rel='image_src']")->attr('href');
 
+            $title = trim($title);
+            $description = trim($description);
+
             $result['title'] = !empty($title) ? $title : $url;
             if (!empty($description)) $result['description'] = $description;
             if (!empty($img)) $result['img'] = $img;

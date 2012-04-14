@@ -34,6 +34,7 @@
         AssetHelper::AnyBrowser => array(
             'css://fe/reset.css',
             'css://fe/main.css',
+            'css://fe/custom.css',
             'js://ext/uploadify/uploadify.css',
             'js://ext/fancybox2/jquery.fancybox.css',
             'js://ext/fancybox2/helpers/jquery.fancybox-buttons.css',

@@ -499,6 +499,49 @@ var Elements = {
         } else {
             $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
         }
+    },
+    initLinks: function(){
+        var tpl = '\
+            <div class="link-description-content">\
+            <img src="" alt="" class="l" style="width: 75px; height: 75px;">\
+                <div class="link-description-text l">\
+                    <a href="" target="_blank"></a>\
+                    <p></p>\
+                </div>\
+                <div class="clear"></div>\
+            </div>\
+            <div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>';
+
+        $('img.ajax-loader').each(function(){
+            var container   = $(this).parents('div.link-info-content');
+            var link        = $(this).attr('rel');
+            $.ajax({
+                url: controlsRoot + 'parse-url/',
+                type: 'GET',
+                dataType : "json",
+                data: {
+                    url: link
+                },
+                success: function (data) {
+                    container.html(tpl);
+                    if (data.img) {
+                        container.find('img').attr('src', data.img);
+                    } else {
+                        container.find('img').remove();
+                    }
+                    if (data.title) {
+                        container.find('div.link-description-text a').text(data.title);
+                    }
+                    if (data.description) {
+                        container.find('div.link-description-text p').text(data.description);
+                    }
+
+                    container.find('a').attr('href', link);
+                    container.find('div.link-status-content span a').text(link);
+                }
+            });
+
+        });
     }
 }
 

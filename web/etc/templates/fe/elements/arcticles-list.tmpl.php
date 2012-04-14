@@ -25,6 +25,18 @@
                 <? } ?>
 
                 <?
+                    if (!empty($articleRecord->link)) {
+                        ?>
+                        <div class="link-info-content">
+                            <div class="link-description-content">
+                                <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
+                            </div>
+                        </div>
+                        <?
+                    }
+                ?>
+
+                <?
                     if (!empty($articleRecord->photos)) {
                         ?><div class="images"><?
                         foreach($articleRecord->photos as $photoItem) {
