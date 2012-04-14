@@ -4,6 +4,7 @@ RewriteRule ^crossdomain.xml - [L]
 RewriteRule ^robots.txt - [L]
 RewriteRule ^xd_receiver.htm - [L]
 RewriteRule ^updating.html - [L]
+RewriteRule ^html - [L]
 
 #Updating
 #RewriteCond %{REQUEST_FILENAME}  !^/shared/.*
