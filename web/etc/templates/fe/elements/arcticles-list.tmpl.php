@@ -45,6 +45,12 @@
                     <? if (!empty($articleRecord->link)) { ?>
                         <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
                     <? } ?>
+                    <? if (UrlParser::IsContentWithLink($articleRecord->content)) { ?>
+                        <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>
+                    <? } ?>
+                    <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
+                        <span class="hash-span" title="Пост с хештэгом">#hash</span>
+                    <? } ?>
                     <span class="original">
                         <? if($article->externalId != -1){ ?>
                             <a href="http://vk.com/wall-{$article->externalId}" target="_blank">Оригинал</a>

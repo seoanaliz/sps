@@ -86,6 +86,7 @@ $(document).ready(function(){
             if(state) {
                 elem.closest(".slot").addClass('empty');
                 elem.closest(".slot").find('span.attach-icon').remove();
+                elem.closest(".slot").find('span.hash-span').remove();
                 elem.remove();
             }
         }]);
@@ -443,6 +444,12 @@ var Elements = {
 
                                 if (elem.find('.attach-icon-link').length > 0) {
                                     target.find('.time').append(' <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>');
+                                }
+                                if (elem.find('.attach-icon-link-red').length > 0) {
+                                    target.find('.time').append(' <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>');
+                                }
+                                if (elem.find('.hash-span').length > 0) {
+                                    target.find('.time').append(' <span class="hash-span" title="Пост с хештэгом">#hash</span>');
                                 }
                             },function(){
                                 elem.removeClass("spinner");

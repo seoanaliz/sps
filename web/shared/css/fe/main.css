@@ -101,10 +101,11 @@ i {font-style: italic;}
 .right-panel .show-cut { font-size: 14px; }
 .cut { display: none; }
 
-.attach-icon { display: inline-block; height: 11px; margin: 0 3px -2px 0; background: url('../../images/fe/attachments-icons.png') no-repeat; }
+.attach-icon { display: inline-block; height: 11px; margin: 0 3px -2px 0; background: url('../../images/fe/attachments-icons.png?1') no-repeat; }
 .attach-icon-link  { width: 15px; }
 .attach-icon-video { width: 9px; background-position: -21px 0; }
 .attach-icon-audio { width: 4px; background-position: -37px 0; }
+.attach-icon-link-red { width: 15px; background-position: -45px 0; }
 
 .locked { opacity: .3; }
 

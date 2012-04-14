@@ -27,6 +27,22 @@
             return $result;
         }
 
+        public static function IsContentWithLink($content) {
+            if (preg_match('/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/uim', $content)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public static function IsContentWithHash($content) {
+            if (preg_match('/(^|\s)#(\w+)/uim', $content)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         private static function getUrlContent($url) {
             $hnd = curl_init($url);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
