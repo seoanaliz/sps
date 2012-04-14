@@ -21,6 +21,9 @@
         /** @var int */
         public $likes;
 
+        /** @var string */
+        public $link;
+
         /** @var array */
         public $photos;
 

@@ -38,6 +38,11 @@
                     'name'          => 'likes'
                     , 'type'        => TYPE_INTEGER
                 )
+                ,'link' => array(
+                    'name'          => 'link'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 500
+                )
                 ,'photos' => array(
                     'name'          => 'photos'
                     , 'type'        => TYPE_ARRAY

@@ -194,68 +194,77 @@ $(document).ready(function(){
             $(window).bind("click", stop);
         })
             .bind('paste', function() {
-                var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
-                    txt, matches;
                 setTimeout(function() {
-                    txt = input.text();
-                    matches = txt.match(pattern);
-                    // если приаттачили ссылку
-                    if (matches && matches[0] && matches[1] && !foundLink) {
-                        foundLink   = matches[0];
-                        foundDomain = matches[1];
-
-                        Events.fire("post_describe_link", [
-                            foundLink,
-                            function(result) {
-                                if (result) {
-                                    $linkDescription.empty()
-                                    $linkStatus.empty()
-
-                                    // отрисовываем ссылку
-                                    if (result.img) {
-                                        var $img = $('<img />', { src: result.img, alt: '', width: 75, height: 75 });
-                                        $linkDescription.append($img);
-                                    }
-                                    if (result.title) {
-                                        var $a = $('<a />', { href: 'http://' + foundLink, target: '_blank', text: result.title });
-                                        $linkDescription.append($a);
-                                    }
-                                    if (result.description) {
-                                        var $p = $('<p />', { text: result.description });
-                                        $linkDescription.append($p);
-                                    }
-
-                                    var $span = $('<span />', { text: 'Ссылка: ' });
-                                    $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
-
-                                    var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
-                                        // убираем аттач ссылки
-                                        $linkDescription.empty()
-                                        $linkStatus.empty()
-                                        $linkInfo.hide();
-                                        foundLink = false;
-                                        foundDomain = false;
-                                    });
-                                    $span.append($deleteLink);
-
-                                    $linkStatus.html($span);
-
-                                    $linkInfo.show();
-                                }
-                            }
-                        ]);
-                    }
+                    parseUrl(input.text());
                 }, 10);
             })
         ;
+
+        var parseUrl = function(txt){
+            var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
+                matches;
+            matches = txt.match(pattern);
+            // если приаттачили ссылку
+            if (matches && matches[0] && matches[1] && !foundLink) {
+                foundLink   = matches[0];
+                foundDomain = matches[1];
+
+                Events.fire("post_describe_link", [
+                    foundLink,
+                    function(result) {
+                        if (result) {
+                            $linkDescription.empty()
+                            $linkStatus.empty()
+
+                            // отрисовываем ссылку
+                            if (result.img) {
+                                var $img = $('<img />', { src: result.img, alt: '', width: 75, height: 75 });
+                                $linkDescription.append($img);
+                            }
+                            if (result.title) {
+                                var $a = $('<a />', { href: 'http://' + foundLink, target: '_blank', text: result.title });
+                                $linkDescription.append($a);
+                            }
+                            if (result.description) {
+                                var $p = $('<p />', { text: result.description });
+                                $linkDescription.append($p);
+                            }
+
+                            var $span = $('<span />', { text: 'Ссылка: ' });
+                            $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
+
+                            var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
+                                // убираем аттач ссылки
+                                deleteLink();
+                            });
+                            $span.append($deleteLink);
+
+                            $linkStatus.html($span);
+
+                            $linkInfo.show();
+                        }
+                    }
+                ]);
+            }
+        }
 
         var stop = function(){
             $(window).unbind("click", stop);
             if(!input.text().length && !$(".uploadifyQueueItem").length) {
                 input.data("id", 0);
                 form.addClass("collapsed");
+                deleteLink();
             }
         }
+
+        var deleteLink = function(){
+            $linkDescription.empty();
+            $linkStatus.empty();
+            $linkInfo.hide();
+            foundLink = false;
+            foundDomain = false;
+        }
+
         form.find(".save").click(function(){
             var photos = new Array();
             $('.uploadifyQueueItem').each(function(){
@@ -268,6 +277,7 @@ $(document).ready(function(){
             Events.fire("post", [
                 input.html(),
                 photos,
+                $linkDescription.find('a').attr('href'),
                 input.data("id"),
                 function(state){
                     if(state) {
@@ -289,6 +299,7 @@ $(document).ready(function(){
             input.data("id", 0);
             input.html('');
             $('#file_upload_queue').html('');
+            deleteLink();
 
             id = $(this).closest(".post").data("id");
 
@@ -304,6 +315,9 @@ $(document).ready(function(){
                             $(this).parents('div.uploadifyQueueItem').remove();
                             e.preventDefault();
                         });
+                    }
+                    if (data.link) {
+                        parseUrl(data.link);
                     }
                 }
             }]);

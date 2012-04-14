@@ -11,6 +11,10 @@
     <label>{lang:vt.articleRecord.likes}</label>
     <?= FormHelper::FormInput( $prefixRecord . '[likes]', $articleRecord->likes, 'likes', null, array( 'size' => 80, 'style' => 'width: 100px;' ) ); ?>
 </div>
+<div data-row="link" class="row">
+    <label>{lang:vt.articleRecord.link}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[link]', $articleRecord->link, 'link', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+</div>
 <div data-row="files" class="row">
     <label>{lang:vt.articleRecord.photos}</label>
     <div style="display: inline-block; //display: inline;">

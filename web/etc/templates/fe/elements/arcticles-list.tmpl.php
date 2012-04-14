@@ -13,7 +13,10 @@
             <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
                 <div class="text-wrap">
-                    <?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?>
+                    <?
+                        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
+                        echo !empty($content) ? $content : '&nbsp';
+                    ?>
                 </div>
 
                 <?

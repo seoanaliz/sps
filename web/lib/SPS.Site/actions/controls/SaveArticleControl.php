@@ -32,7 +32,8 @@
             );
 
             $id             = Request::getInteger('articleId');
-            $text           = Request::getString( 'text' );
+            $text           = trim(Request::getString( 'text' ));
+            $link           = trim(Request::getString( 'link' ));
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
 
@@ -52,6 +53,12 @@
                 return false;
             }
 
+            //parsing link
+            $linkInfo = UrlParser::Parse($link);
+            if (empty($linkInfo)) {
+                $link = null;
+            }
+
             //building data
             $article = new Article();
             $article->createdAt = DateTimeWrapper::Now();
@@ -64,6 +71,7 @@
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
             $articleRecord->photos = $photos;
+            $articleRecord->link = $link;
 
             if (!empty($id)) {
                 $queryResult = $this->update($id, $articleRecord);
@@ -102,7 +110,7 @@
         private function update($id, $articleRecord) {
             ConnectionFactory::BeginTransaction();
 
-            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos'), array('articleId' => $id));
+            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link'), array('articleId' => $id));
 
             ConnectionFactory::CommitTransaction($result);
             return $result;

@@ -37,6 +37,7 @@
                 'id' => $articleId,
                 'text' => nl2br($articleRecord->content),
                 'photos' => ObjectHelper::ToJSON($photos),
+                'link' => $articleRecord->link
             );
 
             echo ObjectHelper::ToJSON($result);

@@ -319,6 +319,7 @@
       <content><![CDATA[Содержание]]></content>
       <likes><![CDATA[Лайки]]></likes>
       <photos><![CDATA[Фото]]></photos>
+      <link><![CDATA[Ссылка]]></link>
     </articleRecord>
     <publisher>
       <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>

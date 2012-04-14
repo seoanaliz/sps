@@ -177,7 +177,7 @@ var Eventlist = {
         });
     },
 
-    post: function(text, photos, id, callback){
+    post: function(text, photos, link, id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-save/',
             type: 'POST',
@@ -186,6 +186,7 @@ var Eventlist = {
                 articleId: id,
                 text: text,
                 photos: photos,
+                link: link,
                 sourceFeedId: Elements.leftdd()
             },
             success: function (data) {

@@ -98,6 +98,7 @@
                         $this->articleRecord->content   = $forceArticleRecord->content;
                         $this->articleRecord->likes     = $forceArticleRecord->likes;
                         $this->articleRecord->photos    = $forceArticleRecord->photos;
+                        $this->articleRecord->link      = $forceArticleRecord->link;
                     }
                 }
             }

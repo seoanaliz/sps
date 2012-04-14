@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		20.03.2012
+Modified		14.04.2012
 Project		
 Model			
 Company		
@@ -71,7 +71,7 @@ Create table "vfsFoldersTree"
 (
 	"objectId" Integer NOT NULL,
 	"parentId" Integer,
-	"path"  Varchar(255),
+	"path" Varchar(255),
 	"rKey" Integer,
 	"lKey" Integer,
  primary key ("objectId")
@@ -186,6 +186,7 @@ Create table "articleRecords"
 	"content" Text NOT NULL,
 	"likes" Integer,
 	"photos" Text,
+	"link" Varchar(500),
 	"articleId" Integer,
 	"articleQueueId" Integer,
  primary key ("articleRecordId")
