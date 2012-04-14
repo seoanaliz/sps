@@ -4,28 +4,30 @@ $(document).ready(function(){
     $(".newpost").removeClass('collapsed');
 
     // приложить файл
-    var uploader = new qq.FileUploader({
-        debug: true,
-        element: $('#attach-file')[0],
-        action: 'upload.php',
-        template: ' <div class="qq-uploader">' + 
-            '<ul class="qq-upload-list"></ul>' +
-            '<div class="save button spr l">Отправить</div>' +
-            '<a href="#" class="cancel spr l">Отменить</a>' +
-            '<a href="#" class="qq-upload-button">Прикрепить</a>' + 
-            '</div>',
-        onComplete: function(id, fileName, responseJSON) {
-            var $deleteAttachLink = $('<a />', { 'href': 'javascript:;', 'text': 'удалить' });
-            $deleteAttachLink.click(function(e) {
-                e.preventDefault();
-                console.log('delete attach');
-                $(this).closest('li').remove();
-            });
-            $('.qq-upload-list li:last-child')
-                .append($('<img />', { src: responseJSON.image }))
-                .append($deleteAttachLink);
-       }
-    });
+    try {
+        var uploader = new qq.FileUploader({
+            debug: true,
+            element: $('#attach-file')[0],
+            action: 'upload.php',
+            template: ' <div class="qq-uploader">' +
+                '<ul class="qq-upload-list"></ul>' +
+                '<div class="save button spr l">Отправить</div>' +
+                '<a href="#" class="cancel spr l">Отменить</a>' +
+                '<a href="#" class="qq-upload-button">Прикрепить</a>' +
+                '</div>',
+            onComplete: function(id, fileName, responseJSON) {
+                var $deleteAttachLink = $('<a />', { 'href': 'javascript:;', 'text': 'удалить' });
+                $deleteAttachLink.click(function(e) {
+                    e.preventDefault();
+                    console.log('delete attach');
+                    $(this).closest('li').remove();
+                });
+                $('.qq-upload-list li:last-child')
+                    .append($('<img />', { src: responseJSON.image }))
+                    .append($deleteAttachLink);
+           }
+        });
+    } catch (e){}
 
     $("#calendar")
         .datepicker(
