@@ -278,7 +278,7 @@ $(document).ready(function(){
             Events.fire("post", [
                 input.html(),
                 photos,
-                $linkDescription.find('a').attr('href'),
+                $linkStatus.find('a').attr('href'),
                 input.data("id"),
                 function(state){
                     if(state) {
