@@ -12,7 +12,7 @@
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             ?>
-                <div class="slot" data-id="{$id}">
+                <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>" data-id="{$id}">
                     <div class="time">
                         <?= $gridItem['dateTime']->defaultFormat() ?>
                         <? if (!empty($articleRecord->link)) { ?>
