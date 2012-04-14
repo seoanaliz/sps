@@ -13,10 +13,18 @@
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             ?>
                 <div class="slot" data-id="{$id}">
-                    <div class="time"><?= $gridItem['dateTime']->defaultFormat() ?></div>
+                    <div class="time">
+                        <?= $gridItem['dateTime']->defaultFormat() ?>
+                        <? if (!empty($articleRecord->link)) { ?>
+                            <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
+                        <? } ?>
+                    </div>
                     <div class="post <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
                         <div class="content">
-                            <?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?>
+                            <?
+                                $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
+                            ?>
+                            {$content}
 
                             <? if (!empty($articleRecord->photos)) { ?>
                                 <? foreach($articleRecord->photos as $photoItem) { ?>

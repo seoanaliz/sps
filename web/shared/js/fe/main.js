@@ -324,7 +324,7 @@ $(document).ready(function(){
         });
     })();
 
-    $('.left-panel .show-cut').click(function(e) {
+    $(".left-panel").delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
             shortcut = $content.find('.shortcut').html(),
             cut      = $content.find('.cut').html();
@@ -335,7 +335,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
-    $('.right-panel .show-cut').click(function(e) {
+    $(".right-panel").delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
             txt      = $(this).text();
 

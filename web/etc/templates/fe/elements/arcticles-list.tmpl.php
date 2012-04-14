@@ -12,12 +12,17 @@
             </div>
             <div class="name d-hide">{$sourceInfo[name]}</div>
             <div class="content">
-                <div class="text-wrap">
-                    <?
-                        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
-                        echo !empty($content) ? $content : '&nbsp';
-                    ?>
-                </div>
+                <?
+                    $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
+                    $contentPart1 = mb_substr($content, 0, 300);
+                    $contentPart2 = mb_substr($content, 300);
+                    $contentPart1 = !empty($contentPart1) ? $contentPart1 : '&nbsp;'
+                ?>
+                <div class="shortcut">{$contentPart1}</div>
+                <? if($contentPart2) { ?>
+                    <a href="javascript:;" class="show-cut">Показать полностью...</a>
+                    <div class="cut">{$contentPart2}</div>
+                <? } ?>
 
                 <?
                     if (!empty($articleRecord->photos)) {
@@ -37,6 +42,9 @@
             <div class="bottom d-hide">
                 <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a></div>
                 <div class="r">
+                    <? if (!empty($articleRecord->link)) { ?>
+                        <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
+                    <? } ?>
                     <span class="original">
                         <? if($article->externalId != -1){ ?>
                             <a href="http://vk.com/wall-{$article->externalId}" target="_blank">Оригинал</a>
