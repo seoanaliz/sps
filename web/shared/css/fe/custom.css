@@ -16,9 +16,15 @@
 .link-info-content .link-description-content img ~ p { width: 450px; }
 .link-info-content .link-status-content { margin: 10px 0 0 10px; }
 .link-info-content .link-status-content span { position: relative; }
-.link-info-content .link-description-text { position: relative; width: 420px; }
+.link-info-content .link-description-text { position: relative; width: 375px; }
 .link-info-content img.ajax-loader {
     margin: 0 auto;
     display: block;
     float: none;
+}
+.link-info-content .link-img {
+    width: 130px;
+    height: 63px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
 }
