@@ -85,6 +85,7 @@ $(document).ready(function(){
         Events.fire('rightcolumn_deletepost', [pid, function(state){
             if(state) {
                 elem.closest(".slot").addClass('empty');
+                elem.closest(".slot").find('span.attach-icon').remove();
                 elem.remove();
             }
         }]);
@@ -439,6 +440,10 @@ var Elements = {
                                 target.removeClass("empty");
                                 target.append(elem.addClass("dragged"));
                                 elem.removeClass("spinner");
+
+                                if (elem.find('.attach-icon-link').length > 0) {
+                                    target.find('.time').append(' <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>');
+                                }
                             },function(){
                                 elem.removeClass("spinner");
                             });
