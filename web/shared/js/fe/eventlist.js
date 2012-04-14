@@ -164,6 +164,8 @@ var Eventlist = {
     },
 
     post_describe_link: function(link, callback) {
+        $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
+        $('div.link-info').show();
         $.ajax({
             url: controlsRoot + 'parse-url/',
             type: 'GET',
@@ -172,6 +174,8 @@ var Eventlist = {
                 url: link
             },
             success: function (data) {
+                $('div.link-description').html('');
+                $('div.link-info').hide();
                 callback(data);
             }
         });
