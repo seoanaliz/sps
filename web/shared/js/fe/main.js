@@ -217,7 +217,7 @@ $(document).ready(function(){
                                         $linkDescription.append($img);
                                     }
                                     if (result.title) {
-                                        var $a = $('<a />', { href: foundLink, target: '_blank', text: result.title });
+                                        var $a = $('<a />', { href: 'http://' + foundLink, target: '_blank', text: result.title });
                                         $linkDescription.append($a);
                                     }
                                     if (result.description) {

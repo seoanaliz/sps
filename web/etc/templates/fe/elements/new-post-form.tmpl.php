@@ -1,6 +1,10 @@
 <div class="newpost collapsed bb">
     <div class="input" contenteditable="true"></div>
     <div class="tip">Есть чем поделиться?</div>
+    <div class="link-info" style="display: none;">
+        <div class="link-description"><!-- --></div>
+        <div class="link-status"><!-- --></div>
+    </div>
     <div class="l" style="margin-top: 20px;">
         <input type="hidden" id="file_upload">
     </div>

@@ -42,6 +42,9 @@
         <action name="ImageUploadControl">
             <path>controls/ImageUploadControl</path>
         </action>
+        <action name="ParseUrlControl">
+            <path>controls/ParseUrlControl</path>
+        </action>
 
         <group name="Articles">
             <action name="GetArticlesListControl">
