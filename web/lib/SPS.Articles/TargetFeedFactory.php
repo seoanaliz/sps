@@ -42,6 +42,16 @@
                     , 'max'         => 100
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'startTime' => array(
+                    'name'          => 'startTime'
+                    , 'type'        => TYPE_TIME
+                    , 'nullable'    => 'CheckEmpty'
+                )
+                ,'period' => array(
+                    'name'          => 'period'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'CheckEmpty'
+                )
                 ,'publisherId' => array(
                     'name'          => 'publisherId'
                     , 'type'        => TYPE_INTEGER

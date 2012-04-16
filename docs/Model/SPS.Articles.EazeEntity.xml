@@ -154,6 +154,21 @@
           <AttributeParameter Key="controlId" Value="publisherId" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="startTime" TitleKey="vt.targetFeed.startTime" Type="HTML_TIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startTime" />
+          <AttributeParameter Key="value" Value="startTime" />
+          <AttributeParameter Key="format" Value="G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="period" TitleKey="vt.targetFeed.period" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="period" />
+          <AttributeParameter Key="value" Value="period" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="period" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -196,6 +211,21 @@
           <AttributeParameter Key="dataValue" Value="" />
           <AttributeParameter Key="value" Value="statusId" />
           <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startTime" TitleKey="vt.targetFeed.startTime" TitleValue="startTime" Type="HTML_TIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startTime" />
+          <AttributeParameter Key="value" Value="startTime" />
+          <AttributeParameter Key="format" Value="G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="period" TitleKey="vt.targetFeed.period" TitleValue="period" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="period" />
+          <AttributeParameter Key="value" Value="period" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="period" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

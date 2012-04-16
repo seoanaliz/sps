@@ -21,6 +21,12 @@
         /** @var string */
         public $externalId;
 
+        /** @var DateTimeWrapper */
+        public $startTime;
+
+        /** @var int */
+        public $period;
+
         /** @var int */
         public $publisherId;
 

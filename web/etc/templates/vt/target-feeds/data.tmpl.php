@@ -25,6 +25,15 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="startTime" class="row required">
+            <label>{lang:vt.targetFeed.startTime}</label>
+            <?= FormHelper::FormTime( $prefix . '[startTime]', $object->startTime, 'G:i' ); ?>
+        </div>
+        <div data-row="period" class="row required">
+            <label>{lang:vt.targetFeed.period}</label>
+            <?= FormHelper::FormInput( $prefix . '[period]', $object->period, 'period', null, array( 'size' => 80, 'style' => 'width: 40px;' ) ); ?>
+            {lang:vt.common.manyMinutes}
+        </div>
         <div data-row="publisherId" class="row required">
             <label>{lang:vt.targetFeed.publisherId}</label>
             <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, false ); ?>

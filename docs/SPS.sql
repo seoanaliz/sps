@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		14.04.2012
+Modified		16.04.2012
 Project		
 Model			
 Company		
@@ -210,6 +210,8 @@ Create table "targetFeeds"
 	"targetFeedId" Serial NOT NULL,
 	"title" Varchar(500) NOT NULL,
 	"externalId" Varchar(100) NOT NULL,
+	"startTime" Time NOT NULL Default '09:00:00',
+	"period" Integer NOT NULL Default 60,
 	"publisherId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("targetFeedId")

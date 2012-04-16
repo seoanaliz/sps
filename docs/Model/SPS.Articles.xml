@@ -22,6 +22,8 @@
         <Attribute Name="targetFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="title" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="title" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="startTime" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startTime" FieldType="TYPE_TIME" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="period" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="period" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>

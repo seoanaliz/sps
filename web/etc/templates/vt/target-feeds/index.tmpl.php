@@ -7,11 +7,12 @@
         "columns" => array(
            LocaleLoader::Translate( "vt.targetFeed.title" )
             , LocaleLoader::Translate( "vt.common.externalId" )
+            , LocaleLoader::Translate( "vt.targetFeed.grid" )
             , LocaleLoader::Translate( "vt.targetFeed.publisherId" )
             , LocaleLoader::Translate( "vt.targetFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "publisherId", 3 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 3 => "publisherId", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> TargetFeedFactory::CanPages()
@@ -78,6 +79,7 @@
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.title}</td>
                 <td>{form:$object.externalId}</td>
+                <td>Каждые <strong>{$object->period}</strong> минут начиная с <strong>{$object->startTime->Format('G:i')}</strong></td>
                 <td>{form:$object.publisher.name}</td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">

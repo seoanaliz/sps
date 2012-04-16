@@ -37,7 +37,15 @@
             if ( $originalObject != null ) {
                 $object->targetFeedId = $originalObject->targetFeedId;
             }
-            
+
+            $data = Request::getArray('targetFeed');
+            if (empty($data['startTime'])) {
+                $object->startTime = '09:00:00';
+            }
+            if (empty($object->period)) {
+                $object->period = 60;
+            }
+
             return $object;
         }
         
@@ -50,6 +58,12 @@
          */
         protected function validate( $object ) {
             $errors = parent::$factory->Validate( $object );
+
+            if (empty($errors['fields']['period'])) {
+                if ($object->period <= 10 || $object->period >= 180) {
+                    $errors['fields']['period']['periodVal'] = 'periodVal';
+                }
+            }
             
             return $errors;
         }
