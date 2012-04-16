@@ -98,7 +98,11 @@
 
             $originalObjects = ArticleFactory::Get(
                 array('_externalId' => $externalIds, 'sourceFeedId' => $source->sourceFeedId)
-                , array(BaseFactory::WithColumns => '"articleId", "externalId"', BaseFactory::WithoutPages => true)
+                , array(
+                    BaseFactory::WithColumns => '"articleId", "externalId"'
+                    , BaseFactory::WithoutPages => true
+                    , BaseFactory::WithoutDisabled => false
+                )
             );
             if (!empty($originalObjects)) {
                 $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId');
