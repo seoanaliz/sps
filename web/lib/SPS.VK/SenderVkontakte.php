@@ -14,20 +14,21 @@
         protected $vk_group_id;         //id паблика, куда постим
         protected $vk_aplication_id;    //id аппа, с которого постим
         protected $vk_app_seckey;       //
-        protected $link;                //ссылка на источник
+        protected $link;                //ссылка на источник, не в тексте
         protected $sign;                //ссыль на пользователя, пока неактивно
 
-        public function __construct($post_data)
+        public function __construct($post_date)
         {
-            $this->post_photo_array = $post_data['photo_array']; //массив вида array('photoXXXX_YYYYYYY','...')
-            $this->post_text = $post_data['text'];
-            $this->vk_group_id = $post_data['group_id'];
-            $this->vk_app_seckey = $post_data['vk_app_seckey'];
-            $this->vk_access_token = $post_data['vk_access_token'];
-            $this->audio_id = $post_data['audio_id'];//массив вида array('videoXXXX_YYYYYYY','...')
-            $this->video_id = $post_data['video_id'];//массив вида array('audioXXXX_YYYYYYY','...')
+            $post_date = json_decode($post_date);
+            $this->post_photo_array = $post_date -> photo_array; //массив путей к фоткам
+            $this->post_text = $post_date -> text;
+            $this->vk_group_id = $post_date -> group_id;
+            $this->vk_app_seckey = $post_date -> vk_app_seckey;
+            $this->vk_access_token = $post_date -> vk_access_token;
+            $this->audio_id = $post_date -> audio_id;//массив вида array('videoXXXX_YYYYYYY','...')
+            $this->video_id = $post_date -> video_id;//массив вида array('audioXXXX_YYYYYYY','...')
             //todo пока линк можно вставить только в тело сообщения(иначе фото(только фото!) не отобразится)
-            $this->link = $post_data['link'];
+            $this->link = $post_date -> link;
         }
 
         private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
@@ -138,28 +139,70 @@
 
             //todo
             if (!empty($this->link)){
-                //$this->post_text .= "\r\n". $this->link;
-                $attachment .= ','.$this->link;
+                $this->post_text .= "\r\n". $this->link;
+                //                 $attachment .= ','.$this->link;
             }
 
             $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
                                 'message'       =>  $this->post_text,
                                 'access_token'  =>  $this->vk_access_token,
                                 'attachment'    =>  $attachment);
+
             $url3 = "https://api.vkontakte.ru/method/wall.post";
             $try_cntr = 0;
             $fwd3 = $this->qurl_request($url3, $arr_fields);
             $fwd3 = json_decode($fwd3);
             if (!empty ($fwd3->error)){
-                $fwd3 = $fwd3->error;
                 throw new exception("Error in wall.post : $fwd3->error_msg");
             }
 
             $tmp = $fwd3;
             $fwd3 = $fwd3->response;
+
             if (!empty($fwd3->post_id)) {
+                //прикрепление ссылки. Из-за косяков, следующим образом: на стену
+                //идет пост без ссылки, удаляется, снова помещается, но со ссылками
+                // на фотки с пред поста + необходимая нам ссыль
+
+                if (!empty($this->link)){
+                    sleep(0.3);
+                    $attachment .= ',' . $this->link;
+                    $url = self::METH . 'wall.delete';
+
+                    $arr_fields = array(
+                        'owner_id'      =>  '-' . $this->vk_group_id,
+                        'post_id'       =>  $fwd3->post_id,
+                        'access_token'  =>  $this->vk_access_token
+                    );
+
+                    $fwd = $this->qurl_request($url, $arr_fields);
+                    $fwd = json_decode($fwd);
+
+                    if (!empty ($fwd3->error)){
+                        throw new exception("Error in wall.delete : $fwd->error_msg");
+                    }
+
+                    sleep(0.3);
+                    $arr_fields = array(
+                        'owner_id'      =>  '-' . $this->vk_group_id,
+                        'message'       =>  $this->post_text,
+                        'access_token'  =>  $this->vk_access_token,
+                        'attachment'    =>  $attachment
+                    );
+                    $url3 = self::METH . "/wall.post";
+
+                    $try_cntr = 0;
+                    $fwd3 = $this->qurl_request($url3, $arr_fields);
+                    $fwd3 = json_decode($fwd3);
+                    if (!empty ($fwd3->error)){
+                        throw new exception("Error in wall.post : $fwd3->error_msg");
+                    }
+                    return true;
+
+                }
                 return $fwd3->post_id;# вернет id поста
-            } elseif(!empty($fwd3->processing)){
+
+            } elseif(!empty($fwd->processing)){
                 return true;
             }else{
                 //throw new exception("Error in response : $tmp");
@@ -170,6 +213,7 @@
         {
             $this->post_text = str_replace( '<br>', "\r\n", $this->post_text );
             $this->post_text = htmlspecialchars_decode($this->post_text);
+            $this->post_text = html_entity_decode($this->post_text);
             $this->post_text = strip_tags( $this->post_text );
         }
     }
