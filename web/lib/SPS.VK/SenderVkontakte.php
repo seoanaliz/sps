@@ -18,18 +18,17 @@
         protected $sign;                //ссыль на пользователя, пока неактивно
         const METH = 'https://api.vk.com/method/';
 
-        public function __construct($post_date)
+        public function __construct($post_data)
         {
-            $post_date = json_decode($post_date);
-            $this->post_photo_array = $post_date -> photo_array; //массив путей к фоткам
-            $this->post_text = $post_date -> text;
-            $this->vk_group_id = $post_date -> group_id;
-            $this->vk_app_seckey = $post_date -> vk_app_seckey;
-            $this->vk_access_token = $post_date -> vk_access_token;
-            $this->audio_id = $post_date -> audio_id;//массив вида array('videoXXXX_YYYYYYY','...')
-            $this->video_id = $post_date -> video_id;//массив вида array('audioXXXX_YYYYYYY','...')
+            $this->post_photo_array = $post_data['photo_array']; //массив вида array('photoXXXX_YYYYYYY','...')
+            $this->post_text = $post_data['text'];
+            $this->vk_group_id = $post_data['group_id'];
+            $this->vk_app_seckey = $post_data['vk_app_seckey'];
+            $this->vk_access_token = $post_data['vk_access_token'];
+            $this->audio_id = $post_data['audio_id'];//массив вида array('videoXXXX_YYYYYYY','...')
+            $this->video_id = $post_data['video_id'];//массив вида array('audioXXXX_YYYYYYY','...')
             //todo пока линк можно вставить только в тело сообщения(иначе фото(только фото!) не отобразится)
-            $this->link = $post_date -> link;
+            $this->link = $post_data['link'];
         }
 
         private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
@@ -136,12 +135,6 @@
 
             if (!empty($this->video_id)){
                 $attachment .= ','.implode(',', $this->video_id);
-            }
-
-            //todo
-            if (!empty($this->link)){
-                $this->post_text .= "\r\n". $this->link;
-                //                 $attachment .= ','.$this->link;
             }
 
             $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
