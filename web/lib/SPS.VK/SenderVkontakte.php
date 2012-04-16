@@ -16,6 +16,7 @@
         protected $vk_app_seckey;       //
         protected $link;                //ссылка на источник, не в тексте
         protected $sign;                //ссыль на пользователя, пока неактивно
+        const METH = 'https://api.vk.com/method/';
 
         public function __construct($post_date)
         {
@@ -79,7 +80,7 @@
             foreach($this->post_photo_array as $photo_adr)
             {
                 //первый запрос, получение адреса для заливки фото
-                $url = "https://api.vkontakte.ru/method/photos.getWallUploadServer";
+                $url = self::METH . "photos.getWallUploadServer";
                 $fwd = $this->qurl_request($url, $fields1);
                 $tmp = $fwd;
                 //декодируем результат
@@ -108,7 +109,7 @@
 
                 sleep(1);
                 //"закрепляем" фотку
-                $url2 = "https://api.vkontakte.ru/method/photos.saveWallPhoto";
+                $url2 = self::METH . "photos.saveWallPhoto";
                 $fields = array(    'gid'           =>  $this->vk_group_id,
                                     'server'        =>  $content->server,
                                     'hash'          =>  $content->hash,
@@ -148,7 +149,7 @@
                                 'access_token'  =>  $this->vk_access_token,
                                 'attachment'    =>  $attachment);
 
-            $url3 = "https://api.vkontakte.ru/method/wall.post";
+            $url3 = self::METH . "wall.post";
             $try_cntr = 0;
             $fwd3 = $this->qurl_request($url3, $arr_fields);
             $fwd3 = json_decode($fwd3);
