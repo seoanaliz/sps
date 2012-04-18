@@ -239,24 +239,25 @@ i {font-style: italic;}
 .newpost .cancel { margin-left: 10px; }
 .newpost.collapsed a {display: none;}
 
-/*.images ready {*/
-    /*margin-top: 10px;*/
-    /*width: 520px;*/
-/*}*/
+.images-ready {
+    margin-top: 10px;
+    width: 520px;
+    overflow: hidden;
+}
 
-/*.post-image {*/
-    /*overflow-x: hidden;*/
-    /*overflow-y: hidden;*/
-    /*display: inline-block;*/
-    /*padding-right: 5px;*/
-    /*padding-bottom: 5px;*/
-    /*float: left;*/
-/*}*/
+.post-image {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    display: inline-block;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    float: left;
+}
 
-/*.post-image .first img {*/
-    /*max-height: 320px;*/
-/*}*/
+.post-image .first {
+    max-height: 320px;
+}
 
-/*.post-image .else img {*/
-    /*max-width: 150px;*/
-/*}*/
+.post-image .else {
+    max-width: 150px;
+}

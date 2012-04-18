@@ -38,13 +38,26 @@
 
                 <?
                     if (!empty($articleRecord->photos)) {
-                        ?><div class="images"><?
+                        $i = 0;
+
+                        ?><div class="images-ready"><?
                         foreach($articleRecord->photos as $photoItem) {
+                            $i++;
                             $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                             $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
                             $photoTitle = nl2br($photoTitle);
+
+                            if ($i == 1) {
+                                $imgClass = 'first';
+                            } else {
+                                $imgClass = 'else';
+                            }
+
                             ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
-                                <img src="{$path}" alt="" style="height: 0px;" /></a>
+                                <div class="post-image">
+                                    <img src="{$path}" class="{$imgClass}" alt="" />
+                                </div>
+                            </a>
                             <?
                         }
                         ?></div><?
