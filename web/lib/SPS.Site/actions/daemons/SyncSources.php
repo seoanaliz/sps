@@ -96,14 +96,19 @@
                 }
             }
 
+            //ищем тупо во всей базе такие ArticleFactory::$mapping
+            $__mapping = ArticleFactory::$mapping;
+            ArticleFactory::$mapping['view'] = 'articles';
             $originalObjects = ArticleFactory::Get(
-                array('_externalId' => $externalIds, 'sourceFeedId' => $source->sourceFeedId)
+                array('_externalId' => $externalIds)
                 , array(
                     BaseFactory::WithColumns => '"articleId", "externalId"'
                     , BaseFactory::WithoutPages => true
                     , BaseFactory::WithoutDisabled => false
                 )
             );
+            ArticleFactory::$mapping = $__mapping;
+
             if (!empty($originalObjects)) {
                 $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId');
             }
