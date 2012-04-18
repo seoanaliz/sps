@@ -33,9 +33,10 @@
     $cssFiles = array(
         AssetHelper::AnyBrowser => array(
             'css://fe/reset.css',
+            'js://fe/file-uploader/fileuploader.css',
             'css://fe/main.css',
             'css://fe/custom.css',
-            'js://ext/uploadify/uploadify.css',
+            //'js://ext/uploadify/uploadify.css',
             'js://ext/fancybox2/jquery.fancybox.css',
             'js://ext/fancybox2/helpers/jquery.fancybox-buttons.css',
         )
@@ -54,10 +55,11 @@
         'js://ext/fancybox2/helpers/jquery.fancybox-buttons.js',
         'js://fe/jquery.ui.datepicker.js',
         'js://fe/eventlist.js',
+        'js://fe/file-uploader/fileuploader.js',
         'js://fe/main.js',
 
-        'js://ext/swfobject/swfobject.js',
-        'js://ext/uploadify/jquery.uploadify.js',
+//        'js://ext/swfobject/swfobject.js',
+//        'js://ext/uploadify/jquery.uploadify.js',
         'js://fe/files.js',
     );
 

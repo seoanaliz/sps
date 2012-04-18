@@ -13,44 +13,26 @@ Counter.prototype.nextIndex = function() {
 var filesCounter = new Counter();
 
 $(document).ready(function() {
-    $('#file_upload').uploadify({
-        'uploader'        : root + 'int/controls/image-upload/',
-        'swf'             : root + 'shared/js/ext/uploadify/uploadify.swf',
-        'langFile'        : root + 'shared/js/ext/uploadify/uploadifyLang_en.js',
-        'cancelImage'     : root + 'shared/js/ext/uploadify/uploadify-cancel.png',
-        'method'          : 'post',
-        'auto'            : true,
-        'multi'           : true,
-        'buttonText'      : 'Прикрепить',
-        'rollover'    : true,
-        'width'           : 139,
-        'height'    : 30,
-        'checkExisting'   : false,
-        'onUploadSuccess' : function(file,data,response) {
-            result = JSON.parse( data );
-            if( result ) {
-                if( result.error ) {
-                    popupError( result.error );
-                } else {
-                    result.isTemp = true;
-
-                    uploadCallback( file, result );
-
-                    $('.uploadifyQueue').sortable({
-                        'items': '.uploadifyQueueItem'
-                        , 'forceHelperSize': true
-                        , 'forcePlaceholderSize': true
-                        , 'handle': '.handle'
-                    });
+    try {
+        var uploader = new qq.FileUploader({
+            debug: false,
+            element: $('#attach-file')[0],
+            action: root + 'int/controls/image-upload/',
+            template: ' <div class="qq-uploader">' +
+                '<ul class="qq-upload-list"></ul>' +
+                '<div class="save button spr l">Отправить</div>' +
+                '<a href="javascript:;" class="cancel spr l">Отменить</a>' +
+                '<a href="javascript:;" class="qq-upload-button">Прикрепить</a>' +
+                '</div>',
+            onComplete: function(id, fileName, responseJSON) {
+                result = responseJSON;
+                if( result ) {
+                    if( !result.error ) {
+                        result.isTemp = true;
+                        uploadCallback( result );
+                    }
                 }
             }
-        }
-    });
-
-    $('.uploadifyQueue').sortable({
-        'items': '.uploadifyQueueItem'
-        , 'forceHelperSize': true
-        , 'forcePlaceholderSize': true
-        , 'handle': '.handle'
-    });
+        });
+    } catch (e){}
 });

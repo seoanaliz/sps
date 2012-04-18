@@ -250,9 +250,16 @@ $(document).ready(function(){
             }
         }
 
+        var clearForm = function(){
+            input.data("id", 0).html('');
+            $('.qq-upload-list').html('');
+            deleteLink();
+        }
+
         var stop = function(){
             $(window).unbind("click", stop);
-            if(!input.text().length && !$(".uploadifyQueueItem").length) {
+
+            if(!input.text().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
                 input.data("id", 0);
                 form.addClass("collapsed");
                 deleteLink();
@@ -267,9 +274,9 @@ $(document).ready(function(){
             foundDomain = false;
         }
 
-        form.find(".save").click(function(){
+        form.delegate(".save", "click" ,function(e){
             var photos = new Array();
-            $('.uploadifyQueueItem').each(function(){
+            $('.qq-upload-success').each(function(){
                 var photo = new Object();
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
@@ -283,25 +290,21 @@ $(document).ready(function(){
                 input.data("id"),
                 function(state){
                     if(state) {
-                        input.data("id", 0);
-                        input.html('');
-                        $('#file_upload_queue').html('');
+                        clearForm();
                         stop();
                     }
                     form.removeClass("spinner");
                 }
             ]);
         });
-        form.find('.cancel').click(function(e) {
+        form.delegate(".cancel", "click" ,function(e){
+            clearForm();
             input.text('').blur();
             form.addClass('collapsed');
             e.preventDefault();
         });
         $(".left-panel").delegate(".post .edit", "click" ,function(){
-            input.data("id", 0);
-            input.html('');
-            $('#file_upload_queue').html('');
-            deleteLink();
+            clearForm();
 
             id = $(this).closest(".post").data("id");
 
@@ -312,9 +315,9 @@ $(document).ready(function(){
                     input.html(data.text);
                     $('html, body').animate({scrollTop:0}, 'slow');
                     if(data.photos) {
-                        $("#fileTemplate").tmpl( eval(data.photos), { counter: filesCounter } ).appendTo(".uploadifyQueue");
-                        $("a.delete-file").bind('click', function(e) {
-                            $(this).parents('div.uploadifyQueueItem').remove();
+                        $("#fileTemplate").tmpl( eval(data.photos), { counter: filesCounter } ).appendTo(".qq-upload-list");
+                        $(".qq-upload-success a.delete-attach").click(function(e){
+                            $(this).closest('li').remove();
                             e.preventDefault();
                         });
                     }

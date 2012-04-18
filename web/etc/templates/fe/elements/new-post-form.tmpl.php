@@ -5,30 +5,31 @@
         <div class="link-description"><!-- --></div>
         <div class="link-status"><!-- --></div>
     </div>
-    <div class="l" style="margin-top: 20px;">
-        <input type="hidden" id="file_upload">
+    <div id="attach-file" class="buttons attach-file">
+        <div class="save button spr l">Отправить</div>
+        <a href="#" class="cancel spr l">Отменить</a>
+        <!-- Штука для загрузки файла -->
     </div>
-    <div class="save button spr r">Сохранить</div>
-
     <div class="clear"></div>
 </div>
 <script type="text/javascript">
-    function uploadCallback( file,data ) {
-        t = $("#fileTemplate").tmpl( {title: '', filename: data.filename, isTemp: data.isTemp, path: data.path, name : file.name}, { counter: filesCounter } );
-        $('#' + file.id).replaceWith( t );
-        $("a.delete-file").bind('click', function(e) {
-            $(this).parents('div.uploadifyQueueItem').remove();
+    function uploadCallback( data ) {
+        t = $("#fileTemplate").tmpl( {title: '', filename: data.filename, isTemp: data.isTemp, path: data.image}, { counter: filesCounter } );
+        $('.qq-upload-list').append(t);
+        $(".qq-upload-success a.delete-attach").click(function(e){
+            $(this).closest('li').remove();
             e.preventDefault();
+        });
+        $(".qq-upload-list li").each(function(){
+            if (!$(this).attr('id')) {
+                $(this).hide();
+            }
         });
     }
 </script>
 <script id="fileTemplate" type="text/x-jquery-tmpl">
-    <div class="uploadifyQueueItem sort" id="file-${ $item.counter.nextIndex() }">
+    <li class="qq-upload-success" id="file-${ $item.counter.nextIndex() }">
         <input type="hidden" name="files[${ $item.counter.index }][filename]" value="${filename}">
-        <img src="{web:images://vt/common/objects/sort-link.gif}" style="cursor: move;" class="handle">
-        <div class="cancel"><a href="#" title="Удалить" class="delete-file"><img src="{web:js://ext/uploadify/uploadify-cancel.png}" border="0"></a></div>
-        <span class="fileName">${filename}</span>
-        <br /><br /><img src="${path}" alt="" />
-        <br /><br /><textarea rows="2" cols="40" name="files[${ $item.counter.index }][title]">${title}</textarea>
-    </div>
+        <a href="javascript:;" class="delete-attach">удалить</a><img src="${path}" alt="" />
+    </li>
 </script><script>''</script>
