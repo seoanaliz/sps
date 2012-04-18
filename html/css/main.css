@@ -237,3 +237,25 @@ i {font-style: italic;}
 .newpost a { margin-top: 22px; background: none; }
 .newpost .cancel { margin-left: 10px; }
 .newpost.collapsed a {display: none;}
+
+.images ready {
+    margin-top: 10px;
+    width: 520px;
+}
+
+.post-image {
+     overflow-x: hidden;
+     overflow-y: hidden;
+     display: inline-block;
+     padding-right: 5px;
+     padding-bottom: 5px;
+     float: left;
+ }
+
+.post-image .first img {
+    max-height: 320px;
+}
+
+.post-image .else img {
+    max-width: 150px;
+}
