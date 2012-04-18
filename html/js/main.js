@@ -16,15 +16,14 @@ $(document).ready(function(){
                 '<a href="#" class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
             onComplete: function(id, fileName, responseJSON) {
-                var $deleteAttachLink = $('<a />', { 'href': 'javascript:;', 'text': 'удалить' });
+                var $deleteAttachLink = $('<a />', { 'href': 'javascript:;', 'text': 'удалить', 'class': 'delete-attach' });
                 $deleteAttachLink.click(function(e) {
                     e.preventDefault();
-                    console.log('delete attach');
                     $(this).closest('li').remove();
                 });
                 $('.qq-upload-list li:last-child')
-                    .append($('<img />', { src: responseJSON.image }))
-                    .append($deleteAttachLink);
+                    .prepend($('<img />', { src: responseJSON.image }))
+                    .prepend($deleteAttachLink);
            }
         });
     } catch (e){}
