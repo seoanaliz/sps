@@ -144,11 +144,11 @@ class Vsend{
             $attachment .= ','.implode(',', $this->video_id);
         }
           
-        if($this->post_text == ''){
-            $this->post_text = $this->header;
-        }
+        //if($this->post_text == ''){
+         //   $this->post_text = $this->header;
+        //}
         
-        if ($this->post_text =='©' || $this->post_text == '') {
+        if ($this->post_text =='©' ) {
             $this->post_text = "&#01;";
         }
             
