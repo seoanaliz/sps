@@ -77,6 +77,7 @@ sql;
                 'audio_id' => array(),
                 'video_id' => array(),
                 'link' => $articleRecord->link,
+                'header' => '',
             );
 
             if (!empty($articleRecord->photos)) {
