@@ -293,7 +293,6 @@ header("Content-Type: text/html; charset=windows-1251");
                                     }
                             
                             $img_arr[$image]['url']  = $link . $postlink . '.jpg';
-//                          echo $img_arr[$image]['url']. '<br>';
                             $image++; 
                         }
              //видео
@@ -561,15 +560,9 @@ header("Content-Type: text/html; charset=windows-1251");
 
         private function remove_tags($text)
         {
-                $text = str_replace( '<br>',    "\r\n", $text );
-                $text = str_replace( '&#189;',  "½",    $text );
-                $text = str_replace( '&#188;',  "¼",    $text );
-                $text = str_replace( '&#190;',  "¾",    $text );
-                $text = str_replace( '&#9658;', "►",    $text );
-                $text = str_replace( '&#33;',   "!",    $text );
-                $text = str_replace( '&#9829;', "",    $text );
+  
                 $text = htmlspecialchars_decode($text);
-                $this->post_text = html_entity_decode($this->post_text);
+                $text = html_entity_decode($text);
                 $text = strip_tags( $text );
                 return $text;
             }
@@ -580,8 +573,6 @@ header("Content-Type: text/html; charset=windows-1251");
             $text = substr($text, 0, 255);
             if(count($picsArr)<=0) return false; 
 
-            $hArr = array();//handle array 
-
             foreach($picsArr as &$pic){ 
 //                    echo '<br>torture  '.$pic['id'] . '<br>'; 
                     $id = $pic['id'];
@@ -591,14 +582,11 @@ header("Content-Type: text/html; charset=windows-1251");
                     curl_setopt($h,CURLOPT_RETURNTRANSFER,1);
                     curl_setopt($h, CURLOPT_FOLLOWLOCATION, true);
                     $desc = curl_exec($h);
-//                    file_put_contents('1.txt', $desc);
                    
-//                    preg_match("/pv_desc\" style=\"\"><span>(.*?)<\/span>/", $desc, $matches);
                     $desc = str_replace('"id":"'.$id.'"','i#d',$desc);
                     $desc = str_replace('id','#', $desc);
                     
                     preg_match("/\{i\#d[^\#]*?desc\":\"(.*?)\"/", $desc, $matches);
-//                    print_r($matches[1]);
                    
                     $matches[1] = $this->remove_tags($matches[1]);
                     if (isset($matches[1]) && substr_count($matches[1], "href") == 0 &&
@@ -607,38 +595,15 @@ header("Content-Type: text/html; charset=windows-1251");
                             $matches[1] != 'едактировать описание' && 
                             $matches[1] != $this->u_w('Редактировать описание')) {
                         $pic['desc'] =  $matches[1];
-                        
+                      
                  
-//                        echo $matches[1];
                     }else  $pic['desc'] = '';
                     unset ($desc);
                     unset ($matches);
                     
             } 
 
-//            $mh = curl_multi_init(); 
-//            foreach($hArr as $k => $h)
-//                curl_multi_add_handle($mh,$h); 
 
-//            $running = null; 
-//            do{ 
-//                curl_multi_exec($mh, $running); 
-//            }while($running > 0); 
-
-            // get the result and save it in the result ARRAY 
-//            foreach($hArr as $k => $h){ 
-//                    $desc = curl_multi_getcontent($h); 
-//                    
-////                    preg_match("/\"id\":\"{$pic['id']}\".*?\"desc\":\"(.*?)\",\"hash\"/", $desc, $matches);
-//                    preg_match("/pv_desc\" style=\"\"><span>(.*?)<\/span>/", $desc, $matches);
-//                    if (isset($matches[1]) && substr_count($matches[1], "href") == 0){
-//                        $pic['desc'] =  $this->remove_tags($matches[1]);
-//                    }
-//                    unset ($desc);
-//                    unset ($matches);
-//            } 
-//
-//            curl_multi_close($mh); 
 
             return true; 
         }
@@ -702,7 +667,6 @@ header("Content-Type: text/html; charset=windows-1251");
                 if (!$date[1] = $this->get_month(trim($date[1]))) return false;
                 $result = mktime(12, 0, 0, $date[1], $date[0], $date[2]);
             }
-//            echo '<br>'.date('H:i d.m.Y', $result);  
             return $result;
 
         }
