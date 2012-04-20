@@ -17,7 +17,11 @@
                     template = timeTemplate;
                     break;
             }
-            //console.log( $(this).attr('rel') );
+
+            if ($(this).hasClass('dateinput-initialized')) {
+                return;
+            }
+
             function refresh() {
                 if( typeof( dateText ) === 'undefined' ) {
                     dateText = '';

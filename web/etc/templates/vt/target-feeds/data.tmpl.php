@@ -36,9 +36,75 @@
         </div>
 	</div>
     <div id="page-1" class="tab-page rows">
+        <div data-row="grids" class="row" style="display: none;"></div>
+        <table class="objects objects-inner" style="width: 40%;" id="grids-table">
+            <tr>
+                <th>Дата начала</th>
+                <th>Шаг (мин.)</th>
+                <th></th>
+            </tr>
+        </table>
+        <div style="width: 40%; text-align: center;">
+            <a href="#" class="add-row">Добавить строку</a>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
 	var jsonErrors = {$jsonErrors};
+	var gridData = {$gridData};
+
+    var gridRows = 0;
+
+    $(document).ready( function () {
+        $("li.delete a").live('click', function(e) {
+            $(this).parents('tr').remove();
+            e.preventDefault();
+        });
+        $("a.add-row").live('click', function(e) {
+            addGridRow(null);
+            e.preventDefault();
+        });
+
+        if (gridData) {
+            for (i in gridData) {
+                addGridRow(gridData[i]);
+            }
+        }
+
+        if (jsonErrors && jsonErrors.grids) {
+            for (i in jsonErrors.grids.errors) {
+                error = jsonErrors.grids.errors[i];
+                id = error.replace('errors.', '');
+                $('[data-row-id=' + id + ']').addClass('error');
+            }
+        }
+    });
+
+    function addGridRow(item) {
+        id = gridRows++;
+
+        var tpl = '<tr data-row-id="{id}">\
+                <td><input type="hidden" name="targetFeed[grids][{id}][startDate]" value="{startDate}" class="dtpicker" rel="dateTime"></td>\
+                <td>\
+                    <input type="text" name="targetFeed[grids][{id}][period]" value="{period}">\
+                    <input type="hidden" name="targetFeed[grids][{id}][targetFeedGridId]" value="{targetFeedGridId}">\
+                </td>\
+                <td><ul class="actions"><li class="delete"><a href="#"></a></li></ul></td>\
+            </tr>';
+
+        tpl = tpl.replace(/{id}/g, id);
+        if (item) {
+            tpl = tpl.replace(/{startDate}/g, item.startDate);
+            tpl = tpl.replace(/{period}/g, item.period);
+            tpl = tpl.replace(/{targetFeedGridId}/g, item.targetFeedGridId);
+        } else {
+            tpl = tpl.replace(/{startDate}/g, '');
+            tpl = tpl.replace(/{period}/g, '60');
+            tpl = tpl.replace(/{targetFeedGridId}/g, '');
+        }
+
+        $('#grids-table').append(tpl);
+        $('.dtpicker').datetimepicker();
+    }
 </script>
  

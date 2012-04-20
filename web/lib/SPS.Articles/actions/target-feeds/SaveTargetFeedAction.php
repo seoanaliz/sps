@@ -48,6 +48,22 @@
 
             return $object;
         }
+
+        protected function beforeSave() {
+            $gridData = array();
+
+            if (!empty($this->currentObject->grids)) {
+                foreach ($this->currentObject->grids as $grid) {
+                    $gridData[] = array(
+                        'targetFeedGridId' => !empty($grid->targetFeedGridId) ? $grid->targetFeedGridId : '',
+                        'period' => !empty($grid->period) ? $grid->period : '',
+                        'startDate' => !empty($grid->startDate) ? $grid->startDate->DefaultFormat() : '',
+                    );
+                }
+            }
+
+            Response::setString('gridData', ObjectHelper::ToJSON($gridData));
+        }
         
         
         /**
@@ -64,6 +80,20 @@
                     $errors['fields']['period']['periodVal'] = 'periodVal';
                 }
             }
+
+            if (!empty($object->grids)) {
+                $gridErrors = array();
+                $i = 0;
+                foreach ($object->grids as $grid) {
+                    if (empty($grid->startDate) || empty($grid->period)) {
+                        $gridErrors[] = $i;
+                    }
+                    $i++;
+                }
+                if (!empty($gridErrors)) {
+                    $errors['fields']['grids'] = $gridErrors;
+                }
+            }
             
             return $errors;
         }
@@ -76,8 +106,19 @@
          * @return bool
          */
         protected function add( $object ) {
+            ConnectionFactory::BeginTransaction();
+
             $result = parent::$factory->Add( $object );
-            
+
+            if ($result && !empty($object->grids)) {
+                $objectId = parent::$factory->GetCurrentId();
+                foreach ($object->grids as $grid) {
+                    $grid->targetFeedId = $objectId;
+                }
+                $result = TargetFeedGridFactory::AddRange($object->grids);
+            }
+
+            ConnectionFactory::CommitTransaction($result);
             return $result;
         }
         
@@ -89,8 +130,19 @@
          * @return bool
          */
         protected function update( $object ) {
+            ConnectionFactory::BeginTransaction();
+
             $result = parent::$factory->Update( $object );
-            
+
+            if ($result && !empty($object->grids)) {
+                $objectId = $object->targetFeedId;
+                foreach ($object->grids as $grid) {
+                    $grid->targetFeedId = $objectId;
+                }
+                $result = TargetFeedGridFactory::SaveArray($object->grids, $this->originalObject->grids);
+            }
+
+            ConnectionFactory::CommitTransaction($result);
             return $result;
         }
         

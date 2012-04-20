@@ -32,3 +32,8 @@ li.confirm-ok a:focus,
 li.confirm-cancel a:focus {
     outline:none;
 }
+
+tr.error {
+    background: #FFF0F0;
+    color: #C00;
+}
