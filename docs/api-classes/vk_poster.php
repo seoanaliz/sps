@@ -141,14 +141,14 @@ class Vsend{
         }
             
         if (!empty($this->video_id)){
-            $attachment .= ','.implode(',', $this->video_id);
+            $attachment .= ',' . implode(',', $this->video_id);
         }
           
-        //if($this->post_text == ''){
-         //   $this->post_text = $this->header;
-        //}
+        if($this->post_text == ''){
+           $this->post_text = $this->header;
+        }
         
-        if ($this->post_text =='©' ) {
+        if ($this->post_text =='©' || $this->post_text == '' ) {
             $this->post_text = "&#01;";
         }
             
