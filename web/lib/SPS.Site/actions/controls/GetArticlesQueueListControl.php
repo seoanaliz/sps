@@ -19,7 +19,8 @@
             if (!empty($targetFeed)) {
                 //ищем настройки сетки
                 $queueDate = new DateTimeWrapper($date);
-                $customSql = " AND cast(\"startDate\" as DATE) <= '{$queueDate->DefaultDateFormat()}' ORDER BY \"startDate\" DESC LIMIT 1 ";
+                $sqlDate = PgSqlConvert::ToDate($queueDate);
+                $customSql = " AND cast(\"startDate\" as DATE) <= {$sqlDate} ORDER BY \"startDate\" DESC LIMIT 1 ";
                 $targetFeedGrid = TargetFeedGridFactory::GetOne(
                     array('targetFeedId' => $targetFeed->targetFeedId)
                     , array(BaseFactory::CustomSql => $customSql)
