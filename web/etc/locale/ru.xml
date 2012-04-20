@@ -296,7 +296,7 @@
             <publisherId><![CDATA[Издатель]]></publisherId>
             <startTime><![CDATA[Время начала сетки]]></startTime>
             <period><![CDATA[Шаг сетки]]></period>
-            <grid><![CDATA[Сетка]]></grid>
+            <grids><![CDATA[Изменения в сетке]]></grids>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>

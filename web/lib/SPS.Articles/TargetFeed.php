@@ -38,5 +38,8 @@
 
         /** @var Status */
         public $status;
+
+        /** @var TargetFeedGrid[] */
+        public $grids;
     }
 ?>

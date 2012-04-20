@@ -72,3 +72,11 @@ SELECT "public"."publishers"."publisherId"
  FROM "public"."publishers"
 	WHERE "public"."publishers"."statusId" != 3
 ORDER BY "publisherId";
+
+CREATE OR REPLACE VIEW "getTargetFeedGrids" AS
+SELECT "public"."targetFeedGrids"."targetFeedGridId"
+	, "public"."targetFeedGrids"."startDate"
+	, "public"."targetFeedGrids"."period"
+	, "public"."targetFeedGrids"."targetFeedId"
+ FROM "public"."targetFeedGrids"
+ORDER BY "public"."targetFeedGrids"."startDate";

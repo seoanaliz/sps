@@ -14,6 +14,7 @@
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
     <ul class="tabs-list">
         <li><a href="#page-0">{lang:vt.common.commonInfo}</a></li>
+        <li><a href="#page-1">{lang:vt.targetFeed.grids}</a></li>
     </ul>
 
     <div id="page-0" class="tab-page rows">
@@ -25,15 +26,6 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="startTime" class="row required">
-            <label>{lang:vt.targetFeed.startTime}</label>
-            <?= FormHelper::FormTime( $prefix . '[startTime]', $object->startTime, 'G:i' ); ?>
-        </div>
-        <div data-row="period" class="row required">
-            <label>{lang:vt.targetFeed.period}</label>
-            <?= FormHelper::FormInput( $prefix . '[period]', $object->period, 'period', null, array( 'size' => 80, 'style' => 'width: 40px;' ) ); ?>
-            {lang:vt.common.manyMinutes}
-        </div>
         <div data-row="publisherId" class="row required">
             <label>{lang:vt.targetFeed.publisherId}</label>
             <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, false ); ?>
@@ -43,6 +35,8 @@
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
 	</div>
+    <div id="page-1" class="tab-page rows">
+    </div>
 </div>
 <script type="text/javascript">
 	var jsonErrors = {$jsonErrors};

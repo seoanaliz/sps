@@ -743,4 +743,89 @@
       </TemplateAttribute>
     </Attributes>
   </EazeEntity>
+  <EazeEntity Name="TargetFeedGrid">
+    <TerminalPath>targetFeedGrids</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>targetFeeds</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="targetFeedGridId" TitleKey="vt.targetFeedGrid.targetFeedGridId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedGridId" />
+          <AttributeParameter Key="value" Value="targetFeedGridId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedGridId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.targetFeedGrid.startDate" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="period" TitleKey="vt.targetFeedGrid.period" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="period" />
+          <AttributeParameter Key="value" Value="period" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="period" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeedGrid.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="targetFeedGridId" TitleKey="vt.targetFeedGrid.targetFeedGridId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedGridId" />
+          <AttributeParameter Key="value" Value="targetFeedGridId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedGridId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.targetFeedGrid.startDate" TitleValue="Дата начала" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="period" TitleKey="vt.targetFeedGrid.period" TitleValue="period" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="period" />
+          <AttributeParameter Key="value" Value="period" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="period" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeedGrid.targetFeedId" TitleValue="targetFeedId" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFee.title" TitleKey="vt.targetFeedGrid.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
 </ArrayOfEazeEntity>

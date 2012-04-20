@@ -31,7 +31,9 @@
       <Flags>
         <EFlag>CanCache</EFlag>
       </Flags>
-      <Lists />
+      <Lists>
+        <Attribute Name="grids" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" ForeignKey="TargetFeedGrid" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Lists>
     </Entity>
     <Entity Name="Article" PackageName="SPS.Articles" Table="articles" View="getArticles" DefaultConnection="">
       <Attributes>
@@ -108,6 +110,22 @@
       <Search />
       <Flags>
         <EFlag>CanCache</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="TargetFeedGrid" PackageName="SPS.Articles" Table="targetFeedGrids" View="getTargetFeedGrids" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="targetFeedGridId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedGridId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="startDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="period" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="period" FieldType="TYPE_INTEGER" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeed" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
       </Flags>
       <Lists />
     </Entity>

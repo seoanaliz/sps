@@ -7,69 +7,52 @@
     Package::Load( 'SPS.Articles' );
 
     /**
-     * TargetFeed Factory
+     * TargetFeedGrid Factory
      *
      * @package SPS
      * @subpackage Articles
      */
-    class TargetFeedFactory implements IFactory {
+    class TargetFeedGridFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** TargetFeed instance mapping  */
+        /** TargetFeedGrid instance mapping  */
         public static $mapping = array (
-            'class'       => 'TargetFeed'
-            , 'table'     => 'targetFeeds'
-            , 'view'      => 'getTargetFeeds'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
-            , 'cacheDeps' => array()
+            'class'       => 'TargetFeedGrid'
+            , 'table'     => 'targetFeedGrids'
+            , 'view'      => 'getTargetFeedGrids'
+            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'cacheDeps' => array( 'targetFeeds' )
             , 'fields'    => array(
-                'targetFeedId' => array(
-                    'name'          => 'targetFeedId'
+                'targetFeedGridId' => array(
+                    'name'          => 'targetFeedGridId'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 )
-                ,'title' => array(
-                    'name'          => 'title'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 500
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'externalId' => array(
-                    'name'          => 'externalId'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 100
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'startTime' => array(
-                    'name'          => 'startTime'
-                    , 'type'        => TYPE_TIME
-                    , 'nullable'    => 'CheckEmpty'
+                ,'startDate' => array(
+                    'name'          => 'startDate'
+                    , 'type'        => TYPE_DATETIME
+                    , 'nullable'    => 'No'
                 )
                 ,'period' => array(
                     'name'          => 'period'
                     , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
+                    , 'nullable'    => 'No'
                 )
-                ,'publisherId' => array(
-                    'name'          => 'publisherId'
+                ,'targetFeedId' => array(
+                    'name'          => 'targetFeedId'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Publisher'
-                )
-                ,'statusId' => array(
-                    'name'          => 'statusId'
-                    , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Status'
+                    , 'foreignKey'  => 'TargetFeed'
                 ))
-            , 'lists'     => array(
-                'grids' => array(
+            , 'lists'     => array()
+            , 'search'    => array(
+                '_targetFeedId' => array(
                     'name'         => 'targetFeedId'
-                    , 'foreignKey' => 'TargetFeedGrid'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
                 ))
-            , 'search'    => array()
         );
         
         /** @return array */
@@ -119,17 +102,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed[] */
+        /** @return TargetFeedGrid[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return TargetFeedGrid */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return TargetFeed */
+        /** @return TargetFeedGrid */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -154,7 +137,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return TargetFeedGrid */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

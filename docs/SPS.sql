@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		16.04.2012
+Modified		20.04.2012
 Project		
 Model			
 Company		
@@ -252,6 +252,16 @@ Create table "auditEventTypes"
 ) Without Oids;
 
 
+Create table "targetFeedGrids"
+(
+	"targetFeedGridId" Serial NOT NULL,
+	"startDate" Timestamp NOT NULL,
+	"period" Integer NOT NULL,
+	"targetFeedId" Integer NOT NULL,
+ primary key ("targetFeedGridId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -316,6 +326,8 @@ Create index "IX_FK_articlesSourceFeedId_articles" on "articles" ("sourceFeedId"
 Alter table "articles" add  foreign key ("sourceFeedId") references "sourceFeeds" ("sourceFeedId") on update restrict on delete restrict;
 Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
 Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
+Create index "IX_FK_targetFeedGridsTargetFeedId_targetFeedGrids" on "targetFeedGrids" ("targetFeedId");
+Alter table "targetFeedGrids" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
 Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
 Create index "IX_FK_auditEventsAuditEventTypeId_auditEvents" on "auditEvents" ("auditEventTypeId");
