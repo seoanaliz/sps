@@ -46,6 +46,8 @@
                 $object->period = 60;
             }
 
+            $object->grids = !empty($object->grids) ? $object->grids : array();
+
             return $object;
         }
 
@@ -134,7 +136,7 @@
 
             $result = parent::$factory->Update( $object );
 
-            if ($result && !empty($object->grids)) {
+            if ($result) {
                 $objectId = $object->targetFeedId;
                 foreach ($object->grids as $grid) {
                     $grid->targetFeedId = $objectId;

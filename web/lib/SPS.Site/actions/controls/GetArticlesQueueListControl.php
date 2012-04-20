@@ -9,22 +9,48 @@
      */
     class GetArticlesQueueListControl {
 
-        private function getGrid($date) {
+        private function getGrid($date, $targetFeed) {
             //generate table
             $result = array();
-            $now = DateTimeWrapper::Now();
-            for ($i = 24; $i >= 9; $i--) {
-                $queueDate = new DateTimeWrapper($date);
-                $queueDate->modify('+ ' . $i . 'hours');
-                if ($i == 24) {
-                    $queueDate->modify('-1 minute');
-                }
 
+            $startTime  = '9:00';
+            $period     = 60;
+
+            if (!empty($targetFeed)) {
+                //ищем настройки сетки
+                $queueDate = new DateTimeWrapper($date);
+                $customSql = " AND cast(\"startDate\" as DATE) <= '{$queueDate->DefaultDateFormat()}' ORDER BY \"startDate\" DESC LIMIT 1 ";
+                $targetFeedGrid = TargetFeedGridFactory::GetOne(
+                    array('targetFeedId' => $targetFeed->targetFeedId)
+                    , array(BaseFactory::CustomSql => $customSql)
+                );
+
+                if (!empty($targetFeedGrid)) {
+                    $period = $targetFeedGrid->period;
+                    $startTime = $targetFeedGrid->startDate->format('G:i');
+                }
+            }
+
+            $period = max($period, 15);
+
+            //строим сетку
+            $now = DateTimeWrapper::Now();
+            $queueDate = new DateTimeWrapper($date . ' ' . $startTime);
+            while ($queueDate->DefaultDateFormat() == $date) {
                 $result[] = array(
-                    'dateTime' => $queueDate,
+                    'dateTime' => new DateTimeWrapper($queueDate->DefaultFormat()),
                     'blocked' => ($queueDate <= $now)
                 );
+
+                $queueDate->modify('+ ' . $period . ' minutes');
+
+                //фикс полуночи
+                if ($queueDate->format('G:i') == '0:00') {
+                    $queueDate->modify('-1 minute');
+                }
             }
+
+            $result = array_reverse($result);
 
             return $result;
         }
@@ -44,10 +70,10 @@
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
 
-            $grid = $this->getGrid($date);
-
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
+
+            $grid = $this->getGrid($date, $targetFeed);
 
             $articleRecords = array();
             $articlesQueue  = array();
