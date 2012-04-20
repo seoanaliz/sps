@@ -43,6 +43,7 @@
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            //        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 
             if (is_array($headers)) { // если заданы какие-то заголовки для браузера
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -76,105 +77,6 @@
             $attachment = array();
 
             $fields1 = array(    'gid'           =>  $this->vk_group_id,
-                                 'access_token'  =>  $this->vk_access_token );
-            foreach($this->post_photo_array as $photo_adr)
-            {
-                //первый запрос, получение адреса для заливки фото
-                $url = self::METH . "photos.getWallUploadServer";
-                $fwd = $this->qurl_request($url, $fields1);
-                $tmp = $fwd;
-                //декодируем результат
-                $fwd = json_decode($fwd);
-
-                if (!empty ($fwd->error)){
-                    $fwd = $fwd->error;
-                    throw new exception("Error in photos.getWallUploadServer : $fwd->error_msg");
-                }
-
-                $fwd = $fwd -> response;
-
-                sleep(1);
-                $upload_url = $fwd -> upload_url;
-
-                if(empty($fwd->upload_url)){
-                    throw new exception("Smthg wrong in photos.getWallUploadServer : $tmp");
-                }
-
-                //заливка фото
-                $rawContent = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
-                $content = json_decode($rawContent);
-                if (empty($content->photo)) {
-                    throw new exception(" Error uploading photo. Response : $rawContent");
-                }
-
-                sleep(1);
-                //"закрепляем" фотку
-                $url2 = self::METH . "photos.saveWallPhoto";
-                $fields = array(    'gid'           =>  $this->vk_group_id,
-                                    'server'        =>  $content->server,
-                                    'hash'          =>  $content->hash,
-                                    'photo'         =>  $content->photo,
-                                    'access_token'  =>  $this->vk_access_token );
-
-                $fwd2 = $this->qurl_request($url2, $fields);
-                $fwd2 = json_decode($fwd2);
-                if (!empty ($fwd2->error)){
-                    $fwd2 = $fwd2->error;
-                    throw new exception("Error in photos.saveWallPhoto : $fwd2->error_msg");
-                }
-
-                $fwd2 = $fwd2->response;
-                $fwd2 = $fwd2[0];
-                $attachment[] = $fwd2->id;
-            }
-
-            $attachment = implode(',', $attachment);
-            //todo  добавить другие аттачи
-            if (!empty($this->audio_id)){
-                $attachment .= ',' . implode(',', $this->audio_id);
-            }
-
-            if (!empty($this->video_id)){
-                $attachment .= ','.implode(',', $this->video_id);
-            }
-
-            //todo
-            if (!empty($this->link)){
-                //$this->post_text .= "\r\n". $this->link;
-                $attachment .= ','.$this->link;
-            }
-
-            $arr_fields = array('owner_id'      =>  '-' . $this->vk_group_id,
-                                'message'       =>  $this->post_text,
-                                'access_token'  =>  $this->vk_access_token,
-                                'attachment'    =>  $attachment);
-            $url3 = self::METH . "wall.post";
-            $try_cntr = 0;
-            $fwd3 = $this->qurl_request($url3, $arr_fields);
-            $fwd3 = json_decode($fwd3);
-            if (!empty ($fwd3->error)){
-                $fwd3 = $fwd3->error;
-                throw new exception("Error in wall.post : $fwd3->error_msg");
-            }
-
-            $tmp = $fwd3;
-            $fwd3 = $fwd3->response;
-
-            if (!empty($fwd3->post_id)) {
-                return $fwd3->post_id;# вернет id поста
-            } elseif(!empty($fwd3->processing)){
-                return true;
-            }else{
-                throw new exception("Error in response : $tmp");
-            }
-        }
-
-        public function send_post_link()
-        {
-            $try_cntr = 0; #счетчик количества попыток послать запрос
-            $attachment = array();
-
-            $fields1 = array(    'gid'           =>  $this->vk_group_id,
                                  'access_token'  =>  $this->vk_access_token);
             //        if (is_array($this->post_photo_array)){
             foreach($this->post_photo_array as $photo_adr)
@@ -183,6 +85,7 @@
                 $url = self::METH . "photos.getWallUploadServer";
                 $fwd = $this->qurl_request($url, $fields1);
                 $tmp = $fwd;
+
                 //декодируем результат
                 $fwd = json_decode($fwd);
 
@@ -238,11 +141,11 @@
                 $attachment .= ','.implode(',', $this->video_id);
             }
 
-            if($this->post_text == ''){
-                $this->post_text = $this->header;
-            }
+            //if($this->post_text == ''){
+            //   $this->post_text = $this->header;
+            //}
 
-            if ($this->post_text =='©' || $this->post_text == '') {
+            if ($this->post_text =='©' ) {
                 $this->post_text = "&#01;";
             }
 
@@ -251,6 +154,7 @@
                                 'access_token'  =>  $this->vk_access_token,
                                 'attachment'    =>  $attachment);
             $url3 = self::METH . "/wall.post";
+
 
             $try_cntr = 0;
             $fwd3 = $this->qurl_request($url3, $arr_fields);
@@ -278,6 +182,7 @@
                     $fwd = $this->qurl_request($url, $params);
                     $fwd = json_decode($fwd);
                     if (!empty ($fwd3->error)){
+                        $fwd3 = $fwd3->error;
                         throw new exception("Error in wall.delete : $fwd->error_msg");
                     }
 
@@ -289,11 +194,11 @@
                     );
                     $url3 = self::METH . "/wall.post";
 
-
                     $try_cntr = 0;
                     $fwd3 = $this->qurl_request($url3, $arr_fields);
                     $fwd3 = json_decode($fwd3);
                     if (!empty ($fwd3->error)){
+                        $fwd3 = $fwd3->error;
                         throw new exception("Error in wall.post : $fwd3->error_msg");
                     }
                     return true;
