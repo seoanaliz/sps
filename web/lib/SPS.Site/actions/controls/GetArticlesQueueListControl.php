@@ -40,18 +40,26 @@
                 $date = date('d.m.Y');
             }
 
+            $queueDate  = new DateTimeWrapper($date);
+            $today      = new DateTimeWrapper(date('d.m.Y'));
+            $isHistory  = ($queueDate < $today);
+
             $grid = $this->getGrid($date);
 
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
             $articleRecords = array();
+            $articlesQueue  = array();
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
                 //вытаскиваем всю очередь на этот день на этот паблик
                 $articlesQueue = ArticleQueueFactory::Get(
                     array('targetFeedId' => $targetFeedId, 'startDateAsDate' => $date)
-                    , array(BaseFactory::WithoutPages => true)
+                    , array(
+                        BaseFactory::WithoutPages => true
+                        , BaseFactory::OrderBy => ' "sentAt" DESC '
+                    )
                 );
 
                 if(!empty($articlesQueue)) {
@@ -77,8 +85,13 @@
                 }
             }
 
-            Response::setArray( 'articleRecords', $articleRecords );
-            Response::setArray( 'grid', $grid );
+            Response::setArray( 'articleRecords',   $articleRecords );
+            Response::setArray( 'articlesQueue',    $articlesQueue );
+            Response::setArray( 'grid',             $grid );
+
+            if ($isHistory) {
+                Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-history.tmpl.php';
+            }
         }
     }
 ?>
