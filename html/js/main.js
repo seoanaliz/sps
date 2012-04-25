@@ -392,6 +392,7 @@ $(document).ready(function(){
 						onComplete: function(id, fileName, responseJSON) {
 							t.originalImage.attr({src:responseJSON.image});
 							t.previewImage.attr({src:responseJSON.image});
+							t.crop();
 					    }
 					});
 				} catch (e) {}
