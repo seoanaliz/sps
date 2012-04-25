@@ -241,17 +241,34 @@ $(document).ready(function(){
 
                                     // отрисовываем ссылку
                                     if (result.img) {
-                                        var $img = $('<img />', { src: result.img, alt: '', width: 75, height: 75 });
-                                        $linkDescription.append($img);
+										var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css(
+											{
+												'background-image' : 'url('+result.img+')'
+											}
+										),
+										$descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
+                                        $linkDescription.append($imgBlock);
+										$linkDescription.append($descriptionLayout);
                                     }
                                     if (result.title) {
-                                        var $a = $('<a />', { href: foundLink, target: '_blank', text: result.title });
-                                        $linkDescription.append($a);
+                                        var $a = $('<a />', { 
+											href: foundLink, 
+											target: '_blank', 
+											html: '<span>'+result.title+'</span>',
+											title:'Редактировать заголовок' 
+										});
+										var $h = $('<div></div>',{'class':'post_describe_header'});
+                                        $h.append($a);
+                                        $descriptionLayout.append($h);
                                     }
                                     if (result.description) {
-                                        var $p = $('<p />', { text: result.description });
-                                        $linkDescription.append($p);
+                                        var $p = $('<p />', { 
+											html: '<span>'+result.description+'</span>',
+											title:'Редактировать описание' 
+										});
+                                        $descriptionLayout.append($p);
                                     }
+									editPostDescribeLink.load($h,$p,$imgBlock,result.img);
 
                                     var $span = $('<span />', { text: 'Ссылка: ' });
                                     $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
@@ -276,7 +293,148 @@ $(document).ready(function(){
                 }, 10);
             })
         ;
-        
+        var editPostDescribeLink = {
+			load: function ($header,$description,$image,$imageSrc) {
+				this.header = $header;
+				this.description = $description;
+				this.image = $image;
+				this.imageSrc = $imageSrc;
+				this.renderEditor();
+			},
+			renderEditor: function() {
+				var $editField = $('<input />',{type:'text',id:'post_header'});
+				var $editArea = $('<textarea />',{id: 'post_description'});
+				this.header.append($editField.val(this.header.text()));
+				this.description.append($editArea.val(this.description.text()));
+				
+				this.bindEvts();
+			},
+			bindEvts: function() {
+				var t = this;
+				this.header.bind('click',function() {
+					t.edit(t.header);
+					return false;
+				});
+				this.description.bind('click',function() {
+					t.edit(t.description);
+					return false;
+				});
+				this.image.bind('click',function() {
+					t.editImage(t.description);
+					return false;
+				});
+			},
+			editImage: function() {
+				this.renderEditImagePopup();
+			},
+			renderEditImagePopup: function() {
+				var $popup = $('<div></div>',{
+					'class': 'editImagePopup',
+					'html': '<h2>Редактировать изображение</h2>'+
+							'<table><tr><td><img src="'+this.imageSrc+'" id="originalImage" /></td>'+
+							'<td><div class="previewContainer">'+
+								'<div class="previewLayout"><img id="preview" src="'+this.imageSrc+'" /></div>'+
+								'<div class="button spr save">Сохранить</div>'+
+								'<div id="attach-image-file" class="buttons attach-file">'+
+								'</div>'+
+							'</div></td></tr></table><b class="close"></b>'
+				}),
+				t = this;
+				$('body').append($popup);
+				$('<div class="substrate"></div>').appendTo('body');
+				$('#originalImage').load(function(){
+					$popup.css({
+						left: $('body').width()/2 - $popup.width()/2,
+						top: $('.link-info').position().top
+					});
+					$('.substrate').css({
+						height: $(document).height();
+					})
+				});
+				
+				$popup.find('.save').click(function() {
+					t.post();
+				});
+				
+				
+				this.closeImagePopup($popup);
+				this.crop();
+				this.upload();
+			},
+			closeImagePopup: function($popup) {
+				$('.substrate,.editImagePopup .close').click(function() {
+					$('.substrate').remove();
+					$popup.remove();
+				});
+			},
+			crop: function() {
+				var t = this;
+				this.originalImage = $('#originalImage');
+				this.previewImage = $('#preview');
+				this.originalImage.load(function (){
+					$(this).Jcrop({
+						onChange: t.showPreview,
+						onSelect: t.showPreview,
+						aspectRatio : 2.06,
+						minSize: [130,63],
+						setSelect: [0,0,130,63]
+					});
+				});
+			},
+			upload: function() {
+			var t = this;
+				try {
+					new qq.FileUploader({
+						debug: true,
+						element: $('#attach-image-file')[0],
+						action: 'upload.php',
+						template: ' <div class="qq-uploader">' +
+									'<ul class="qq-upload-list"></ul>' +
+									'<a href="#" class="button spr qq-upload-button">Загрузить картинку</a>' +
+									'</div>',
+						onComplete: function(id, fileName, responseJSON) {
+							t.originalImage.attr({src:responseJSON.image});
+							t.previewImage.attr({src:responseJSON.image});
+							t.crop();
+					    }
+					});
+				} catch (e) {}
+			},
+			showPreview: function (coords,t) {
+				var rx = $('.previewLayout').width() / coords.w;
+				var ry = $('.previewLayout').height() / coords.h;
+				
+				$('#preview').css({
+					width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+					height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+					marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+					marginTop: '-' + Math.round(ry * coords.y) + 'px'
+				});
+				editPostDescribeLink.coords = coords;
+			},
+			edit: function($elem) {
+				var t = this;
+				$elem.find('span').hide();
+				$elem.find('input,textarea')
+					.css({display: 'block'})
+					.trigger('focus')
+					.blur(function(){
+						var $this = $(this);
+						$elem.find('span').text($this.val()).show();
+						$this.hide();
+						t.post();
+					});
+			},
+			post: function() {
+				var t = this,
+					data = {
+						header: $('#post_header').val(),
+						description: $('#post_description').val(),
+						coords: t.coords
+					};
+				console.log(data);
+			}
+		};
         var stop = function(){
             $(window).unbind("click", stop);
             if(!input.text().length) form.addClass("collapsed");
