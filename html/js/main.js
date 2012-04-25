@@ -347,6 +347,9 @@ $(document).ready(function(){
 						left: $('body').width()/2 - $popup.width()/2,
 						top: $('.link-info').position().top
 					});
+					$('.substrate').css({
+						height: $(document).height();
+					})
 				});
 				
 				$popup.find('.save').click(function() {
