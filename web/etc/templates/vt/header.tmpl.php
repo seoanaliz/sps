@@ -39,6 +39,10 @@
                 )
             )
         )
+        , "meta-details" => array(
+            "title"  => "vt.menu.metaDetails"
+            , "link" => "vt://meta-details/"
+        )
         , "site-params" => array(
             "title"  => "vt.menu.siteParams"
             , "link" => "vt://site-params/"

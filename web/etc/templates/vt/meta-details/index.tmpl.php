@@ -7,13 +7,12 @@
         "columns" => array(
            LocaleLoader::Translate( "vt.metaDetail.url" )
             , LocaleLoader::Translate( "vt.metaDetail.pageTitle" )
-            , LocaleLoader::Translate( "vt.metaDetail.metaKeywords" )
             , LocaleLoader::Translate( "vt.metaDetail.metaDescription" )
             , LocaleLoader::Translate( "vt.metaDetail.alt" )
             , LocaleLoader::Translate( "vt.metaDetail.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "url", 1 => "pageTitle", 2 => "metaKeywords", 3 => "metaDescription", 4 => "alt", 5 => "isInheritable", 6 => "statusId")
+        , "sorts"		=> array(0 => "url", 1 => "pageTitle", 2 => "metaDescription", 3 => "alt", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> MetaDetailFactory::CanPages()
@@ -51,22 +50,6 @@
                     <label>{lang:vt.metaDetail.url}</label>
                     <?= FormHelper::FormInput( "search[url]", $search['url'], 'url', null, array( 'size' => 80 ) ); ?>
                 </div>
-                <div class="row">
-                    <label>{lang:vt.metaDetail.pageTitle}</label>
-                    <?= FormHelper::FormInput( "search[pageTitle]", $search['pageTitle'], 'pageTitle', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.metaDetail.metaKeywords}</label>
-                    <?= FormHelper::FormInput( "search[metaKeywords]", $search['metaKeywords'], 'metaKeywords', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.metaDetail.metaDescription}</label>
-                    <?= FormHelper::FormInput( "search[metaDescription]", $search['metaDescription'], 'metaDescription', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.metaDetail.alt}</label>
-                    <?= FormHelper::FormInput( "search[alt]", $search['alt'], 'alt', null, array( 'size' => 80 ) ); ?>
-                </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
 		</div>
@@ -84,7 +67,6 @@
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.url}</td>
                 <td>{$object.pageTitle}</td>
-                <td>{$object.metaKeywords}</td>
                 <td>{$object.metaDescription}</td>
                 <td>{$object.alt}</td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>

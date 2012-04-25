@@ -128,9 +128,9 @@
                 <list><![CDATA[Список параметров]]></list>
             </siteParam>
             <metaDetail>
-                <list><![CDATA[Список параметров страниц]]></list>
-                <addTitle><![CDATA[Добавление параметра страницы]]></addTitle>
-                <editTitle><![CDATA[Редактирование параметра страницы]]></editTitle>
+                <list><![CDATA[Список параметров ссылок]]></list>
+                <addTitle><![CDATA[Добавление параметра ссылки]]></addTitle>
+                <editTitle><![CDATA[Редактирование параметра ссылки]]></editTitle>
             </metaDetail>
             <user>
                 <addTitle><![CDATA[Добавление пользователя]]></addTitle>
@@ -208,7 +208,7 @@
         </vfs>
         <menu>
             <users><![CDATA[Пользователи]]></users>
-            <metaDetails><![CDATA[Параметры страниц]]></metaDetails>
+            <metaDetails><![CDATA[Параметры ссылок]]></metaDetails>
             <vfs><![CDATA[Файлы]]></vfs>
             <logout><![CDATA[Выйти из системы]]></logout>
             <exitToSite><![CDATA[Перейти на сайт]]></exitToSite>
@@ -226,7 +226,7 @@
             <publishers><![CDATA[Издатели]]></publishers>
         </menu>
         <metaDetail>
-            <deleteString><![CDATA[Вы действительно хотите удалить параметр страницы?]]></deleteString>
+            <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
             <url><![CDATA[Ссылка]]></url>
             <pageTitle><![CDATA[Заголовок]]></pageTitle>
             <metaKeywords><![CDATA[Ключевые слова]]></metaKeywords>
@@ -235,7 +235,7 @@
             <statusId><![CDATA[Статус]]></statusId>
             <isInheritable><![CDATA[Наследовать параметры]]></isInheritable>
             <content><![CDATA[Содержимое]]></content>
-            <header><![CDATA[Параметры страниц]]></header>
+            <header><![CDATA[Параметры ссылок]]></header>
         </metaDetail>
         <user>
             <deleteString><![CDATA[Вы действительно хотите удалить пользователя?]]></deleteString>

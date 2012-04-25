@@ -25,10 +25,6 @@
             <label>{lang:vt.metaDetail.pageTitle}</label>
             <?= FormHelper::FormInput( $prefix . '[pageTitle]', $object->pageTitle, 'pageTitle', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="metaKeywords" class="row">
-            <label>{lang:vt.metaDetail.metaKeywords}</label>
-            <?= FormHelper::FormInput( $prefix . '[metaKeywords]', $object->metaKeywords, 'metaKeywords', null, array( 'size' => 80 ) ); ?>
-        </div>
         <div data-row="metaDescription" class="row">
             <label>{lang:vt.metaDetail.metaDescription}</label>
             <?= FormHelper::FormInput( $prefix . '[metaDescription]', $object->metaDescription, 'metaDescription', null, array( 'size' => 80 ) ); ?>
@@ -36,10 +32,6 @@
         <div data-row="alt" class="row">
             <label>{lang:vt.metaDetail.alt}</label>
             <?= FormHelper::FormInput( $prefix . '[alt]', $object->alt, 'alt', null, array( 'size' => 80 ) ); ?>
-        </div>
-        <div data-row="isInheritable" class="row required">
-            <label>{lang:vt.metaDetail.isInheritable}</label>
-            <?= FormHelper::FormCheckBox( $prefix . '[isInheritable]', null, 'isInheritable', null, $object->isInheritable ); ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.metaDetail.statusId}</label>
