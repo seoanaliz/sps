@@ -30,7 +30,7 @@
 
                 if (!empty($urlData['img'])) {
                     $tmpName = Site::GetRealPath('temp://') . md5($urlData['img']) . '.jpg';
-                    file_put_contents($tmpName, file_get_contents($urlData['img']));
+                    file_put_contents($tmpName, UrlParser::getUrlContent($urlData['img']));
                     $file = array(
                         'tmp_name'  => $tmpName,
                         'name'      => $tmpName,

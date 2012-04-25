@@ -46,7 +46,7 @@
             }
         }
 
-        private static function getUrlContent($url) {
+        public static function getUrlContent($url) {
             $hnd = curl_init($url);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
