@@ -311,15 +311,15 @@ $(document).ready(function(){
 			},
 			bindEvts: function() {
 				var t = this;
-				this.header.bind('click',function() {
+				this.header.click(function() {
 					t.edit(t.header);
 					return false;
 				});
-				this.description.bind('click',function() {
+				this.description.click(function() {
 					t.edit(t.description);
 					return false;
 				});
-				this.image.bind('click',function() {
+				this.image.click(function() {
 					t.editImage(t.description);
 					return false;
 				});
@@ -348,8 +348,8 @@ $(document).ready(function(){
 						top: $('.link-info').position().top
 					});
 					$('.substrate').css({
-						height: $(document).height();
-					})
+						height: $(document).height()
+					});
 				});
 				
 				$popup.find('.save').click(function() {
@@ -418,7 +418,8 @@ $(document).ready(function(){
 				$elem.find('input,textarea')
 					.css({display: 'block'})
 					.trigger('focus')
-					.blur(function(){
+					.unbind('blur')
+					.bind('blur',function(){
 						var $this = $(this);
 						$elem.find('span').text($this.val()).show();
 						$this.hide();
