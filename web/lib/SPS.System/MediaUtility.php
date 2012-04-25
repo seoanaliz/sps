@@ -33,6 +33,27 @@
                     )
                 )
             )
+            , 'Link' => array(
+                'photos' => array(
+                    'folder'            => 'link-photos'
+                    , 'maxSize'         => 2097152 //2MB (1024*1024*2)
+                    , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
+                    , 'isImage'         => true
+                    , 'resizes'         => array(
+                        'small' => array(
+                            'name'      => 'small'
+                            , 'width'   => 130
+                            , 'height'  => 63
+                            , 'quality' => 100
+                            , 'scale'   => false
+                            , 'watermark' => true
+                        )
+                        , 'original' => array(
+                            'name'      => 'original'
+                        )
+                    )
+                )
+            )
         );
 
         /**
@@ -223,13 +244,13 @@
                 }
 
                 //placing watermark after resize
-//                if( !empty( $resizeRule['watermark'] ) ) {
-//                    if( $localUploadFileName == $imageForResizePath ) {
-//                        copy( $localUploadFileName, $localTempFileName );
-//                        $localUploadFileName = $localTempFileName;
-//                    }
-//                    WatermarkUtility::PlaceWatermark( $localUploadFileName, $watermarkPath );
-//                }
+                if( !empty( $resizeRule['watermark'] ) ) {
+                    if( $localUploadFileName == $imageForResizePath ) {
+                        copy( $localUploadFileName, $localTempFileName );
+                        $localUploadFileName = $localTempFileName;
+                    }
+                    WatermarkUtility::PlaceWatermark( $localUploadFileName, $watermarkPath );
+                }
 
                 //upload file option
                 MediaServerManager::PutFile( $localUploadFileName, $remoteFilePath, MediaServerManager::$TempLocation );

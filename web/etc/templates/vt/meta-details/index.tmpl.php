@@ -70,7 +70,7 @@
                 <td>{$object.metaDescription}</td>
                 <td>
                     <? if(!empty($object->alt)) { ?>
-                        <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'original', $object->alt, MediaServerManager::$MainLocation ); ?>" alt="">
+                        <img src="<?= MediaUtility::GetFilePath( 'Link', 'photos', 'small', $object->alt, MediaServerManager::$MainLocation ); ?>" alt="">
                     <? } ?>
                 </td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>

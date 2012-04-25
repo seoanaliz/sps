@@ -25,7 +25,7 @@
                     $result['img'] = !empty($metaDetail->alt) ? $metaDetail->alt : '';
 
                     if (!empty($metaDetail->alt)) {
-                        $result['img'] = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $metaDetail->alt, MediaServerManager::$MainLocation );;
+                        $result['img'] = MediaUtility::GetFilePath( 'Link', 'photos', 'original', $metaDetail->alt, MediaServerManager::$MainLocation );;
                     } else {
                         $result['img'] = '';
                     }

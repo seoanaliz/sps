@@ -30,7 +30,8 @@
 
                 if (!empty($urlData['img'])) {
                     $tmpName = Site::GetRealPath('temp://') . md5($urlData['img']) . '.jpg';
-                    file_put_contents($tmpName, UrlParser::getUrlContent($urlData['img']));
+                    $fileContent = (Site::IsDevel()) ? file_get_contents($urlData['img']) : UrlParser::getUrlContent($urlData['img']);
+                    file_put_contents($tmpName, $fileContent);
                     $file = array(
                         'tmp_name'  => $tmpName,
                         'name'      => $tmpName,
@@ -38,10 +39,10 @@
 
                     ImageHelper::Crop( $tmpName, $tmpName, $dimensions['x'], $dimensions['y'], $dimensions['w'], $dimensions['h'], 100 );
 
-                    $fileUploadResult = MediaUtility::SaveTempFile( $file, 'Article', 'photos' );
+                    $fileUploadResult = MediaUtility::SaveTempFile( $file, 'Link', 'photos' );
 
                     if( !empty( $fileUploadResult['filename'] ) ) {
-                        MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($fileUploadResult['filename']) );
+                        MediaUtility::MoveObjectFilesFromTemp( 'Link', 'photos', array($fileUploadResult['filename']) );
                         unlink($tmpName);
 
                         $metaDetail->alt = $fileUploadResult['filename'];
