@@ -29,8 +29,8 @@ i {font-style: italic;}
 
 .newpost .link-info .link-description { overflow: hidden; margin-top: 15px; padding: 10px; background: #fff; border: #c0cad4 solid 1px; }
 .newpost .link-info .link-description img { float: left; margin-right: 10px; }
-.newpost .link-info .link-description a { float: left; margin: 0; }
-.newpost .link-info .link-description p { float: left; }
+.newpost .link-info .link-description a {  margin: 0; }
+.newpost .link-info .link-description p {  }
 .newpost .link-info .link-description a + p { margin-top: 5px; }
 .newpost .link-info .link-description img ~ a,
 .newpost .link-info .link-description img ~ p { width: 450px; }
