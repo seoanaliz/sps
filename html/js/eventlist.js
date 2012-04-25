@@ -30,7 +30,7 @@ var Eventlist = {
             });
         } else if (link == 'link.img.ru') {
             callback({
-                img: 'img/bg.png',
+                img: 'img/ae.png',
                 title: 'Секреты личной жизни Влада Цыплухин - ЭКСКЛЮЗИВ',
                 description: 'Эксклюзивный материал для программы Дарьи Герман и Николая Воробьёва Школа Соблазна'
             });
