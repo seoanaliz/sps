@@ -13,14 +13,43 @@
          * Entry Point
          */
         public function Execute() {
+            $data = Request::getArray('data');
+
             $metaDetail = new MetaDetail();
-            $metaDetail->url = Request::getString('url');
-            $metaDetail->pageTitle = Request::getString('title');
-            $metaDetail->metaDescription = Request::getString('description');
-            $metaDetail->alt = Request::getString('img');
+            $metaDetail->url = $data['link'];
+            $metaDetail->pageTitle = !empty($data['header']) ? $data['header'] : '';
+            $metaDetail->metaDescription = !empty($data['description']) ? $data['description'] : '';
+            $metaDetail->alt = '';
             $metaDetail->isInheritable = false;
             $metaDetail->statusId = 1;
 
+            if (!empty($data['coords'])) {
+                $dimensions = $this->getDimensions($data['coords']);
+
+                $urlData = UrlParser::Parse($metaDetail->url);
+
+                if (!empty($urlData['img'])) {
+                    $tmpName = Site::GetRealPath('temp://') . md5($urlData['img']) . '.jpg';
+                    file_put_contents($tmpName, file_get_contents($urlData['img']));
+                    $file = array(
+                        'tmp_name'  => $tmpName,
+                        'name'      => $tmpName,
+                    );
+
+                    ImageHelper::Crop( $tmpName, $tmpName, $dimensions['x'], $dimensions['y'], $dimensions['w'], $dimensions['h'], 100 );
+
+                    $fileUploadResult = MediaUtility::SaveTempFile( $file, 'Article', 'photos' );
+
+                    if( !empty( $fileUploadResult['filename'] ) ) {
+                        MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($fileUploadResult['filename']) );
+                        unlink($tmpName);
+
+                        $metaDetail->alt = $fileUploadResult['filename'];
+                    }
+                }
+            }
+
+            //original id
             if (!empty($metaDetail->url)) {
                 $originalObject = MetaDetailFactory::GetOne(array('url' => $metaDetail->url));
                 if (!empty($originalObject)) {
@@ -35,6 +64,23 @@
             }
 
             echo ObjectHelper::ToJSON($result);
+        }
+
+        private function getDimensions($coords) {
+            $result = array();
+
+            $fields = array( 'x', 'y', 'w', 'h' );
+
+            foreach( $fields as $field ) {
+                $value = $coords[$field];
+                if( ( $value < 0 ) || empty( $value ) ) {
+                    $value = 0;
+                }
+
+                $result[$field] = $value;
+            }
+
+            return $result;
         }
     }
 ?>

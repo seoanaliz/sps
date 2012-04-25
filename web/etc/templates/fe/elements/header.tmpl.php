@@ -56,6 +56,7 @@
         'js://fe/jquery.ui.datepicker.js',
         'js://fe/eventlist.js',
         'js://fe/file-uploader/fileuploader.js',
+        'js://fe/jquery.Jcrop.min.js',
         'js://fe/main.js',
 
 //        'js://ext/swfobject/swfobject.js',

@@ -261,3 +261,131 @@ i {font-style: italic;}
 .post-image .else {
     max-width: 150px;
 }
+.newpost .link-info .post_describe_image{
+    background-position: 50% 50%;
+    width:130px;
+    height:63px;
+    float: left;
+    margin: 0 10px 0 0;
+}
+.newpost .link-info .post_describe_layout{
+    overflow: hidden;
+}
+.newpost .link-info .post_describe_layout p{
+    cursor: pointer;
+}
+.newpost .link-info .post_describe_layout a span:hover,
+.newpost .link-info .post_describe_layout p span:hover{
+    background: yellow;
+}
+.newpost .link-info .post_describe_layout  input[type="text"],
+.newpost .link-info .post_describe_layout  textarea{
+    border:1px solid #C0CAD4;
+    width: 95%;
+    font: inherit;
+    display: none;
+}
+.editImagePopup {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index:100;
+    background: #fff;
+    padding:10px;
+    border:1px solid #C0CAD4;
+}
+#originalImage{
+}
+.editImagePopup h2{
+    clear: both;
+    font-size: 18px;
+    margin: 0 0 10px;
+}
+.editImagePopup .previewLayout{
+    width: 130px;
+    height: 63px;
+    border:1px solid #C0CAD4;
+    overflow: hidden;
+    margin: 0 0 10px;
+}
+.editImagePopup .qq-uploader{
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+.editImagePopup .button.qq-upload-button{
+    background: url("../../images/fe/controls.png") repeat scroll 0 -15px;
+    padding:0;
+    color: #fff;
+}
+.editImagePopup .button.qq-upload-button:hover{
+    text-decoration: none;
+}
+.editImagePopup td{
+    vertical-align: top;
+}
+.editImagePopup .jcrop-holder{
+    float: left;
+    margin: 0 10px 0 0;
+    border:1px solid #C0CAD4;
+}
+.editImagePopup .close{
+    background: url("../../images/fe/controls.png") no-repeat scroll -44px -2px;
+    position: absolute;
+    top:12px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+}
+.editImagePopup .button{
+}
+.editImagePopup .previewContainer{
+    float: left;
+}
+.substrate{
+    position: absolute;
+    left:0;
+    top:0;
+    background: #000;
+    opacity:0.5;
+    filter: alpha(opacity=50);
+    z-index:99;
+    width: 100%;
+    height: 100%;
+}
+/* Fixes issue here http://code.google.com/p/jcrop/issues/detail?id=1 */
+.jcrop-holder { text-align: left; }
+
+.jcrop-vline, .jcrop-hline
+{
+    font-size: 0px;
+    position: absolute;
+    background: white url('../../images/fe/jcrop.gif') top left repeat;
+}
+.jcrop-vline { height: 100%; width: 1px !important; }
+.jcrop-hline { width: 100%; height: 1px !important; }
+.jcrop-vline.right { right: 0px; }
+.jcrop-hline.bottom { bottom: 0px; }
+.jcrop-handle {
+    font-size: 1px;
+    width: 7px !important;
+    height: 7px !important;
+    border: 1px #eee solid;
+    background-color: #333;
+}
+
+.jcrop-tracker { width: 100%; height: 100%; }
+
+.custom .jcrop-vline,
+.custom .jcrop-hline
+{
+    background: yellow;
+}
+.custom .jcrop-handle
+{
+    border-color: black;
+    background-color: #C7BB00;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}

@@ -208,6 +208,25 @@ var Eventlist = {
         });
     },
 
+    post_link_data: function(data, callback) {
+        $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
+        $.ajax({
+            url: controlsRoot + 'link-info-upload/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                data: data
+            },
+            success: function (data) {
+                if (data) {
+                    $('.reload-link').click();
+                } else {
+                    popupError('Ошибка сохренения информации о ссылке');
+                }
+            }
+        });
+    },
+
     eof: null
 }
 

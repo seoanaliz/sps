@@ -68,7 +68,11 @@
                 <td class="header">{$object.url}</td>
                 <td>{$object.pageTitle}</td>
                 <td>{$object.metaDescription}</td>
-                <td>{$object.alt}</td>
+                <td>
+                    <? if(!empty($object->alt)) { ?>
+                        <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'original', $object->alt, MediaServerManager::$MainLocation ); ?>" alt="">
+                    <? } ?>
+                </td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

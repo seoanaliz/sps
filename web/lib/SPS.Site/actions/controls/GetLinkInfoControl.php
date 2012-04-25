@@ -23,6 +23,12 @@
                     $result['title'] = !empty($metaDetail->pageTitle) ? $metaDetail->pageTitle : '';
                     $result['description'] = !empty($metaDetail->metaDescription) ? $metaDetail->metaDescription : '';
                     $result['img'] = !empty($metaDetail->alt) ? $metaDetail->alt : '';
+
+                    if (!empty($metaDetail->alt)) {
+                        $result['img'] = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $metaDetail->alt, MediaServerManager::$MainLocation );;
+                    } else {
+                        $result['img'] = '';
+                    }
                 }
             }
 
