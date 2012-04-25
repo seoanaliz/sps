@@ -23,6 +23,8 @@
         /**
          * Set Foreign Lists
          */
-        protected function setForeignLists() {}
+        protected function setForeignLists() {
+            Response::setParameter('__activeElement', 'meta-details');
+        }
     }
 ?>

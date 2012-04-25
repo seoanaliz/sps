@@ -291,6 +291,9 @@
                 <page uri="controls://image-upload/">
                     <actions>SPS.Site.ImageUploadControl</actions>
                 </page>
+                <page uri="controls://link-info/">
+                    <actions>SPS.Site.GetLinkInfoControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="daemons" boot="">

@@ -45,6 +45,9 @@
         <action name="ParseUrlControl">
             <path>controls/ParseUrlControl</path>
         </action>
+        <action name="GetLinkInfoControl">
+            <path>controls/GetLinkInfoControl</path>
+        </action>
 
         <group name="Articles">
             <action name="GetArticlesListControl">
