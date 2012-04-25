@@ -48,6 +48,9 @@
         <action name="GetLinkInfoControl">
             <path>controls/GetLinkInfoControl</path>
         </action>
+        <action name="SaveLinkInfoControl">
+            <path>controls/SaveLinkInfoControl</path>
+        </action>
 
         <group name="Articles">
             <action name="GetArticlesListControl">

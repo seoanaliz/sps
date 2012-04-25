@@ -47,6 +47,15 @@
                 <page uri="controls://parse-url/">
                     <actions>SPS.Site.ParseUrlControl</actions>
                 </page>
+                <page uri="controls://image-upload/" boot="">
+                    <actions>SPS.Site.ImageUploadControl</actions>
+                </page>
+                <page uri="controls://link-info/" boot="">
+                    <actions>SPS.Site.GetLinkInfoControl</actions>
+                </page>
+                <page uri="controls://link-info-upload/">
+                    <actions>SPS.Site.SaveLinkInfoControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
@@ -285,15 +294,6 @@
                         <template>tmpl://vt/elements/vfs/attach.tmpl.php</template>
                     </page>
                 </pageGroup>
-            </pageGroup>
-
-            <pageGroup name="controls" boot="">
-                <page uri="controls://image-upload/">
-                    <actions>SPS.Site.ImageUploadControl</actions>
-                </page>
-                <page uri="controls://link-info/">
-                    <actions>SPS.Site.GetLinkInfoControl</actions>
-                </page>
             </pageGroup>
 
             <pageGroup name="daemons" boot="">

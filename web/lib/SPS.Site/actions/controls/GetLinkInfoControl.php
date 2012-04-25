@@ -20,9 +20,9 @@
                 $metaDetail = MetaDetailFactory::GetOne(array('url' => $url));
                 if (!empty($metaDetail)) {
                     $result['url'] = $url;
-                    $result['title'] = $metaDetail->pageTitle;
-                    $result['description'] = $metaDetail->metaDescription;
-                    $result['img'] = $metaDetail->alt;
+                    $result['title'] = !empty($metaDetail->pageTitle) ? $metaDetail->pageTitle : '';
+                    $result['description'] = !empty($metaDetail->metaDescription) ? $metaDetail->metaDescription : '';
+                    $result['img'] = !empty($metaDetail->alt) ? $metaDetail->alt : '';
                 }
             }
 
