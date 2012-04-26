@@ -79,7 +79,6 @@
             //постим обратно
             $c = curl_init();
             curl_setopt($c, CURLOPT_URL, $data['link'] . '?data=' . $result);
-            curl_setopt($c, CURLOPT_POST, true);
             curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
             curl_exec($c);
             curl_close($c);
