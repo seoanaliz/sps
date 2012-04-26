@@ -32,7 +32,7 @@
                 }
             }
 
-            echo ObjectHelper::ToJSON($result);
+            echo 'callback(' . ObjectHelper::ToJSON($result) . ')';
         }
     }
 ?>
