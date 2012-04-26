@@ -288,7 +288,9 @@ $(document).ready(function(){
                 var $editField = $('<input />',{type:'text',id:'post_header'});
                 var $editArea = $('<textarea />',{id: 'post_description'});
                 this.header.append($editField.val(this.header.text()));
-                this.description.append($editArea.val(this.description.text()));
+                if (this.description) {
+                    this.description.append($editArea.val(this.description.text()));
+                }
 
                 this.bindEvts();
             },
