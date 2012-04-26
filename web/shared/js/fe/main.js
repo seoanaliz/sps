@@ -287,7 +287,9 @@ $(document).ready(function(){
             renderEditor: function() {
                 var $editField = $('<input />',{type:'text',id:'post_header'});
                 var $editArea = $('<textarea />',{id: 'post_description'});
-                this.header.append($editField.val(this.header.text()));
+                if (this.header) {
+                    this.header.append($editField.val(this.header.text()));
+                }
                 if (this.description) {
                     this.description.append($editArea.val(this.description.text()));
                 }
@@ -296,14 +298,18 @@ $(document).ready(function(){
             },
             bindEvts: function() {
                 var t = this;
-                this.header.click(function() {
-                    t.edit(t.header);
-                    return false;
-                });
-                this.description.click(function() {
-                    t.edit(t.description);
-                    return false;
-                });
+                if (this.header) {
+                    this.header.click(function() {
+                        t.edit(t.header);
+                        return false;
+                    });
+                }
+                if (this.description) {
+                    this.description.click(function() {
+                        t.edit(t.description);
+                        return false;
+                    });
+                }
                 if (this.image) {
                     this.image.click(function() {
                         t.editImage(t.description);
