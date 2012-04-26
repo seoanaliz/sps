@@ -81,10 +81,11 @@
             curl_setopt($c, CURLOPT_URL, $data['link']);
             curl_setopt($c, CURLOPT_POST, true);
             curl_setopt($c, CURLOPT_POSTFIELDS, 'data=' . $result . ' ');
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
             curl_exec($c);
             curl_close($c);
 
-            echo ObjectHelper::ToJSON($result);
+            echo $result;
         }
 
         private function getDimensions($coords) {
