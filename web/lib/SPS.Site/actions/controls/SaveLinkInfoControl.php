@@ -28,18 +28,19 @@
                 $originalObject = MetaDetailFactory::GetOne(array('url' => $metaDetail->url));
                 if (!empty($originalObject)) {
                     $metaDetail->metaDetailId = $originalObject->metaDetailId;
-                    $metaDetail->alt = $originalObject->alt;
+                    $metaDetail->alt = !empty($originalObject->alt) ? $originalObject->alt : '';
                 }
             }
 
             if (!empty($data['coords'])) {
                 $dimensions = $this->getDimensions($data['coords']);
 
-                $urlData = UrlParser::Parse($metaDetail->url);
+                $urlData = UrlParser::Parse($data['link']);
 
                 if (!empty($urlData['img'])) {
                     $tmpName = Site::GetRealPath('temp://') . md5($urlData['img']) . '.jpg';
                     $fileContent = (Site::IsDevel()) ? file_get_contents($urlData['img']) : UrlParser::getUrlContent($urlData['img']);
+
                     file_put_contents($tmpName, $fileContent);
                     $file = array(
                         'tmp_name'  => $tmpName,

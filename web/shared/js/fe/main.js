@@ -302,10 +302,12 @@ $(document).ready(function(){
                     t.edit(t.description);
                     return false;
                 });
-                this.image.click(function() {
-                    t.editImage(t.description);
-                    return false;
-                });
+                if (this.image) {
+                    this.image.click(function() {
+                        t.editImage(t.description);
+                        return false;
+                    });
+                }
             },
             editImage: function() {
                 this.renderEditImagePopup();
