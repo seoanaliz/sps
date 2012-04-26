@@ -37,9 +37,9 @@
 
                 $urlData = UrlParser::Parse($data['link']);
 
-                if (!empty($urlData['img'])) {
-                    $tmpName = Site::GetRealPath('temp://') . md5($urlData['img']) . '.jpg';
-                    $fileContent = (Site::IsDevel()) ? file_get_contents($urlData['img']) : UrlParser::getUrlContent($urlData['img']);
+                if (!empty($urlData['imgOriginal'])) {
+                    $tmpName = Site::GetRealPath('temp://') . md5($urlData['imgOriginal']) . '.jpg';
+                    $fileContent = (Site::IsDevel()) ? file_get_contents($urlData['imgOriginal']) : UrlParser::getUrlContent($urlData['imgOriginal']);
 
                     file_put_contents($tmpName, $fileContent);
                     $file = array(
