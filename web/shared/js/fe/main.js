@@ -215,8 +215,11 @@ $(document).ready(function(){
                     foundLink,
                     function(result) {
                         if (result) {
-                            $linkDescription.empty()
-                            $linkStatus.empty()
+                            $linkDescription.empty();
+                            $linkStatus.empty();
+
+                            var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
+                            $linkDescription.append($descriptionLayout);
 
                             // отрисовываем ссылку
                             if (result.img) {
@@ -224,10 +227,9 @@ $(document).ready(function(){
                                     {
                                         'background-image' : 'url('+result.img+')'
                                     }
-                                ),
-                                $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
-                                $linkDescription.append($imgBlock);
-                                $linkDescription.append($descriptionLayout);
+                                );
+
+                                $linkDescription.prepend($imgBlock);
                             }
                             if (result.title) {
                                 var $a = $('<a />', {
