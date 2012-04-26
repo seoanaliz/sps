@@ -66,6 +66,24 @@
                 $result = MetaDetailFactory::Add($metaDetail);
             }
 
+            if ($result) {
+                $result = array();
+                $result['url'] = $data['link'];
+                $result['title'] = !empty($metaDetail->pageTitle) ? $metaDetail->pageTitle : '';
+                $result['description'] = !empty($metaDetail->metaDescription) ? $metaDetail->metaDescription : '';
+                $result['img'] = !empty($metaDetail->alt) ? $metaDetail->alt : '';
+            }
+
+            $result = ObjectHelper::ToJSON($result);
+
+            //постим обратно
+            $c = curl_init();
+            curl_setopt($c, CURLOPT_URL, $data['link']);
+            curl_setopt($c, CURLOPT_POST, true);
+            curl_setopt($c, CURLOPT_POSTFIELDS, 'data=' . $result . ' ');
+            curl_exec($c);
+            curl_close($c);
+
             echo ObjectHelper::ToJSON($result);
         }
 
