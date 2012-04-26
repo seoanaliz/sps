@@ -16,12 +16,21 @@
             $data = Request::getArray('data');
 
             $metaDetail = new MetaDetail();
-            $metaDetail->url = $data['link'];
+            $metaDetail->url = trim($data['link'], '/');
             $metaDetail->pageTitle = !empty($data['header']) ? $data['header'] : '';
             $metaDetail->metaDescription = !empty($data['description']) ? $data['description'] : '';
             $metaDetail->alt = '';
             $metaDetail->isInheritable = false;
             $metaDetail->statusId = 1;
+
+            //original id
+            if (!empty($metaDetail->url)) {
+                $originalObject = MetaDetailFactory::GetOne(array('url' => $metaDetail->url));
+                if (!empty($originalObject)) {
+                    $metaDetail->metaDetailId = $originalObject->metaDetailId;
+                    $metaDetail->alt = $originalObject->alt;
+                }
+            }
 
             if (!empty($data['coords'])) {
                 $dimensions = $this->getDimensions($data['coords']);
@@ -47,14 +56,6 @@
 
                         $metaDetail->alt = $fileUploadResult['filename'];
                     }
-                }
-            }
-
-            //original id
-            if (!empty($metaDetail->url)) {
-                $originalObject = MetaDetailFactory::GetOne(array('url' => $metaDetail->url));
-                if (!empty($originalObject)) {
-                    $metaDetail->metaDetailId = $originalObject->metaDetailId;
                 }
             }
 

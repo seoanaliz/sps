@@ -15,7 +15,7 @@
         public function Execute() {
             $result = array();
 
-            $url = Request::getString('url');
+            $url = trim(Request::getString('url'), '/');
             if ($url) {
                 $metaDetail = MetaDetailFactory::GetOne(array('url' => $url));
                 if (!empty($metaDetail)) {
