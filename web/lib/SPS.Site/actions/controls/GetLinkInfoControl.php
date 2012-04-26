@@ -32,7 +32,7 @@
                 }
             }
 
-            echo 'callback(' . ObjectHelper::ToJSON($result) . ')';
+            echo Request::getString('callback') . '(' . ObjectHelper::ToJSON($result) . ')';
         }
     }
 ?>
