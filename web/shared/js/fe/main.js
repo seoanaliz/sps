@@ -248,7 +248,7 @@ $(document).ready(function(){
                                 $descriptionLayout.append($p);
                             }
 
-                            editPostDescribeLink.load($h,$p,$imgBlock,result.img);
+                            editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
 
                             var $span = $('<span />', { text: 'Ссылка: ' });
                             $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));

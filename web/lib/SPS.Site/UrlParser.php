@@ -19,13 +19,18 @@
             $title = $document->find('title')->html();
             $description = $document->find("meta[name='description']")->attr('content');
             $img = $document->find("link[rel='image_src']")->attr('href');
+            $imgOriginal = $document->find("#original_image_src")->attr('value');
 
             $title = trim($title);
             $description = trim($description);
 
             $result['title'] = !empty($title) ? $title : $url;
             if (!empty($description)) $result['description'] = $description;
-            if (!empty($img)) $result['img'] = $img;
+
+            if (!empty($img)) {
+                $result['img'] = $img;
+                $result['imgOriginal'] = !empty($imgOriginal) ? $imgOriginal : $img;
+            }
 
             return $result;
         }
