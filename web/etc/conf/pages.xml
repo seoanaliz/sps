@@ -2,7 +2,7 @@
 <sites>
     <site name="sps">
         <pages>
-            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
+            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="/">
                     <actions>SPS.Site.GetIndexPage</actions>
                     <template>tmpl://fe/index.tmpl.php</template>
@@ -17,7 +17,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
+            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://arcticles-list/">
                     <actions>SPS.Site.GetArticlesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
@@ -305,7 +305,7 @@
                 </page>
             </pageGroup>
 
-            <page uri="([^?]+)" boot="SPS.Site.GetSiteParams" shutdown="SPS.Site.GetMetaDetails, SPS.Site.GetNavigations">
+            <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>
             </page>
