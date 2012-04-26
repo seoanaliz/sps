@@ -71,7 +71,7 @@
                 $result['url'] = $data['link'];
                 $result['title'] = !empty($metaDetail->pageTitle) ? $metaDetail->pageTitle : '';
                 $result['description'] = !empty($metaDetail->metaDescription) ? $metaDetail->metaDescription : '';
-                $result['img'] = !empty($metaDetail->alt) ? $metaDetail->alt : '';
+                $result['img'] = !empty($metaDetail->alt) ? MediaUtility::GetFilePath( 'Link', 'photos', 'small', $metaDetail->alt, MediaServerManager::$MainLocation ) : '';
             }
 
             $result = ObjectHelper::ToJSON($result);
