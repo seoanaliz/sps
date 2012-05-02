@@ -73,7 +73,6 @@
 
         public function send_post()
         {
-            $try_cntr = 0; #счетчик количества попыток послать запрос
             $attachment = array();
 
             $fields1 = array(    'gid'           =>  $this->vk_group_id,
@@ -138,14 +137,14 @@
             }
 
             if (!empty($this->video_id)){
-                $attachment .= ','.implode(',', $this->video_id);
+                $attachment .= ',' . implode(',', $this->video_id);
             }
 
-            //if($this->post_text == ''){
-            //   $this->post_text = $this->header;
-            //}
+            if($this->post_text == ''){
+                $this->post_text = $this->header;
+            }
 
-            if ($this->post_text =='©' ) {
+            if ($this->post_text =='©' || $this->post_text == '' ) {
                 $this->post_text = "&#01;";
             }
 
@@ -155,8 +154,6 @@
                                 'attachment'    =>  $attachment);
             $url3 = self::METH . "/wall.post";
 
-
-            $try_cntr = 0;
             $fwd3 = $this->qurl_request($url3, $arr_fields);
 
             $fwd3 = json_decode($fwd3);
@@ -172,10 +169,12 @@
             if (!empty($fwd3->post_id)) {
                 if (!empty($this->link)){
                     $attachment .= ',' . $this->link;
+                    sleep(0.3);
+                    //удаление поста
                     $url = self::METH . 'wall.delete';
 
                     $params = array(
-                        'owner_id'      =>  '-'.$this->vk_group_id,
+                        'owner_id'      =>  '-' . $this->vk_group_id,
                         'post_id'       =>  $fwd3->post_id,
                         'access_token'  =>  $this->vk_access_token
                     );
@@ -193,8 +192,8 @@
                         'attachment'    =>  $attachment
                     );
                     $url3 = self::METH . "/wall.post";
+                    sleep(0.3);
 
-                    $try_cntr = 0;
                     $fwd3 = $this->qurl_request($url3, $arr_fields);
                     $fwd3 = json_decode($fwd3);
                     if (!empty ($fwd3->error)){

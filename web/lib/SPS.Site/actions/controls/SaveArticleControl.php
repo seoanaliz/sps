@@ -47,16 +47,16 @@
                 return false;
             }
 
-            if (empty($text) && empty($photos)) {
-                $result['message'] = 'emptyArticle';
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
             //parsing link
             $linkInfo = UrlParser::Parse($link);
             if (empty($linkInfo)) {
                 $link = null;
+            }
+
+            if (empty($text) && empty($photos) && empty($link)) {
+                $result['message'] = 'emptyArticle';
+                echo ObjectHelper::ToJSON($result);
+                return false;
             }
 
             //building data
