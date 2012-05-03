@@ -138,19 +138,19 @@ class Vsend{
         if (!empty($this->audio_id)){
             $attachment .= ','.implode(',', $this->audio_id);
         }
-            
+        
         if (!empty($this->video_id)){
             $attachment .= ',' . implode(',', $this->video_id);
         }
-          
-        if($this->post_text == ''){
+
+        if($this->post_text == '' && count($this->post_photo_array) == 0){
            $this->post_text = $this->header;
         }
-        
-        if ($this->post_text =='©' || $this->post_text == '' ) {
+
+        if (($this->post_text =='©' || $this->post_text == '' ) && count($this->post_photo_array) == 0) {
             $this->post_text = "&#01;";
         }
-            
+
         $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
                             'message'       =>  $this->post_text,
                             'access_token'  =>  $this->vk_access_token,
