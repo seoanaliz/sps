@@ -140,11 +140,11 @@
                 $attachment .= ',' . implode(',', $this->video_id);
             }
 
-            if($this->post_text == ''){
+            if($this->post_text == '' && count($this->post_photo_array) == 0){
                 $this->post_text = $this->header;
             }
 
-            if ($this->post_text =='©' || $this->post_text == '' ) {
+            if (($this->post_text =='©' || $this->post_text == '' ) && count($this->post_photo_array) == 0) {
                 $this->post_text = "&#01;";
             }
 
