@@ -74,7 +74,6 @@
         public function send_post()
         {
             $attachment = array();
-
             $fields1 = array(    'gid'           =>  $this->vk_group_id,
                                  'access_token'  =>  $this->vk_access_token);
             //        if (is_array($this->post_photo_array)){
@@ -139,13 +138,10 @@
             if (!empty($this->video_id)){
                 $attachment .= ',' . implode(',', $this->video_id);
             }
+            if (is_array($this->post_photo_array)) echo 'count = ' .  count($this->post_photo_array) . '<br>';
 
-            if($this->post_text == '' && count($this->post_photo_array) == 0){
-                $this->post_text = $this->header;
-            }
-
-            if (($this->post_text =='©' || $this->post_text == '' ) && count($this->post_photo_array) == 0) {
-                $this->post_text = "&#01;";
+            if (($this->post_text == '©' || $this->post_text == '') && !is_array($this->post_photo_array)){
+                $this->post_text =  "&#01;";
             }
 
             $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
