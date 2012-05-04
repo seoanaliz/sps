@@ -20,10 +20,13 @@
          * @return mixed
          */
         public static function IsAuth() {
-            if (!isset($_COOKIE['vk_app_' . self::$AppId]))
-                return false;
+            $vk_cookie = Cookie::getString('vk_app_trust' . self::$AppId);
+            if (empty($vk_cookie)) {
+                if (!isset($_COOKIE['vk_app_' . self::$AppId]))
+                    return false;
 
-            $vk_cookie = $_COOKIE['vk_app_' . self::$AppId];
+                $vk_cookie = $_COOKIE['vk_app_' . self::$AppId];
+            }
 
             if (!empty($vk_cookie)) {
                 $cookie_data = array();
@@ -38,6 +41,18 @@
 
                 if (md5($string) == $cookie_data['sig']) {
                     // sig не подделан - возвращаем ID пользователя ВКонтакте.
+                    // авторизуем пользователя совсем надолго
+                    $cookie_data['expire'] = time() + 86400 * 7;
+                    $cookie_data['sig'] = md5(sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$password));
+
+                    $newCookie = '';
+                    foreach ($cookie_data as $key => $value) {
+                        $newCookie .= "&$key=$value";
+                    }
+                    $newCookie = trim($newCookie, '&');
+
+                    Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
+
                     return $cookie_data['mid'];
                 }
             }
