@@ -53,6 +53,18 @@
          */
         protected function validate( $object ) {
             $errors = parent::$factory->Validate( $object );
+
+            if (!empty($object->externalId)) {
+                $duplicates = SourceFeedFactory::Count(
+                    array('externalId' => $object->externalId),
+                    array(BaseFactory::WithoutDisabled => false, BaseFactory::CustomSql => ' and "sourceFeedId" != ' . PgSqlConvert::ToString((int)$object->sourceFeedId))
+                );
+
+                if (!empty($duplicates)) {
+                    $errors['fields']['externalId']['unique'] = 'unique';
+                }
+            }
+
             
             return $errors;
         }

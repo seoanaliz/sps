@@ -77,7 +77,7 @@
 ?>
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.title}</td>
-                <td>{form:$object.externalId}</td>
+                <td><a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</td>
                 <td>{form:$object.publisher.name}</td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">

@@ -96,6 +96,17 @@
                     $errors['fields']['grids'] = $gridErrors;
                 }
             }
+
+            if (!empty($object->externalId)) {
+                $duplicates = TargetFeedFactory::Count(
+                    array('externalId' => $object->externalId),
+                    array(BaseFactory::WithoutDisabled => false, BaseFactory::CustomSql => ' and "targetFeedId" != ' . PgSqlConvert::ToString((int)$object->targetFeedId))
+                );
+
+                if (!empty($duplicates)) {
+                    $errors['fields']['externalId']['unique'] = 'unique';
+                }
+            }
             
             return $errors;
         }
