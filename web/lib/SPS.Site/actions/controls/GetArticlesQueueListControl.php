@@ -67,6 +67,7 @@
                 $date = date('d.m.Y');
             }
 
+            $now        = DateTimeWrapper::Now();
             $queueDate  = new DateTimeWrapper($date);
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
@@ -98,7 +99,8 @@
                             if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
                                 if (empty($gridItem['queue'])) {
                                     $gridItem['queue'] = $articlesQueueItem;
-                                    $gridItem['blocked'] = ($articlesQueueItem->statusId != 1);
+                                    $gridItem['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
+                                    $gridItem['failed'] = ($articlesQueueItem->statusId == 1 && $articlesQueueItem->endDate <= $now);
                                 }
                             }
                         }
