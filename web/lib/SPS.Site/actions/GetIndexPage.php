@@ -18,6 +18,11 @@
 
             $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
             Response::setArray( "targetFeeds", $targetFeeds );
+
+            $currentSourceFeedId = Session::getInteger('currentSourceFeedId');
+            $currentTargetFeedId = Session::getInteger('currentTargetFeedId');
+            Response::setInteger('currentSourceFeedId', $currentSourceFeedId);
+            Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
         }
     }
 ?>

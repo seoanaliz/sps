@@ -2,14 +2,25 @@ var timestampValue;
 
 //init first source and target
 $(document).ready(function(){
-    firstSource = $(".left-panel .drop-down ul :first-child");
-    firstTarget = $(".right-panel .drop-down ul :first-child");
-    if (firstSource.length > 0) {
-        Elements.leftdd(firstSource.data("id"));
+    var currentSource, currentTarget;
+
+    currentSource = $(".left-panel .drop-down ul li.active");
+    if (currentSource.length == 0) {
+        currentSource = $(".left-panel .drop-down ul :first-child");
+    }
+
+    if (currentSource.length > 0) {
+        Elements.leftdd(currentSource.data("id"));
         Events.fire('leftcolumn_dropdown_change', []);
     }
-    if (firstTarget.length > 0) {
-        Elements.rightdd(firstSource.data("id"));
+
+    currentTarget = $(".right-panel .drop-down ul li.active");
+    if (currentTarget.length == 0) {
+        currentTarget = $(".right-panel .drop-down ul :first-child");
+    }
+
+    if (currentTarget.length > 0) {
+        Elements.rightdd(currentTarget.data("id"));
         Events.fire('rightcolumn_dropdown_change', []);
     }
 });

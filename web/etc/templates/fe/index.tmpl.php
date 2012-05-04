@@ -10,7 +10,7 @@
                     <ul>
                         <?
                             foreach ($sourceFeeds as $sourceFeed) {
-                                ?><li data-id="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</li><?
+                                ?><li data-id="{$sourceFeed.sourceFeedId}" class="<?= $sourceFeed->sourceFeedId == $currentSourceFeedId ? 'active' : '' ?>">{$sourceFeed.title}</li><?
                             }
                         ?>
                     </ul>
@@ -49,7 +49,7 @@
                     <ul>
                         <?
                         foreach ($targetFeeds as $targetFeed) {
-                            ?><li data-id="{$targetFeed.targetFeedId}">{$targetFeed.title}</li><?
+                            ?><li data-id="{$targetFeed.targetFeedId}" class="<?= $targetFeed->targetFeedId == $currentTargetFeedId ? 'active' : '' ?>">{$targetFeed.title}</li><?
                         }
                         ?>
                     </ul>

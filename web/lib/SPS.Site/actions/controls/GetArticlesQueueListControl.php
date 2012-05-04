@@ -80,6 +80,8 @@
             $articlesQueue  = array();
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
+                Session::setInteger('currentTargetFeedId', $targetFeedId);
+
                 //вытаскиваем всю очередь на этот день на этот паблик
                 $articlesQueue = ArticleQueueFactory::Get(
                     array('targetFeedId' => $targetFeedId, 'startDateAsDate' => $date)

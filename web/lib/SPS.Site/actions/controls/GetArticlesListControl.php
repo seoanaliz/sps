@@ -20,6 +20,8 @@
                 return;
             }
 
+            Session::setInteger('currentSourceFeedId', $sourceFeedId);
+
             $page           = Session::getInteger( 'page' );
             $page = ($page < 0) ? 0 : $page;
             $clean = Request::getBoolean( 'clean' );
