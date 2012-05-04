@@ -65,6 +65,7 @@ i {font-style: italic;}
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, .08);
 }
 .drop-down ul li {padding:3px 9px;border-top:#fafafa 1px solid;margin-right:5px;overflow:hidden;}
+.drop-down ul li.active {font-weight: bold;color: green;}
 .drop-down ul li:hover {/*background: #ccc;*/font-weight: bold;color:#205f82;}
 .drop-down ul li:last-child:hover {-webkit-border-radius: 0 0 3px 3px;-moz-border-radius: 0 0 3px 3px;border-radius: 0 0 3px 3px;}
 .drop-down.expanded ul {display: block;}

@@ -761,6 +761,10 @@ $.fn.dd_sel = function(id){
     } else {
         elem = elem.find("li:first");
     }
+
+    $(this).find('li.active').removeClass('active');
+    elem.addClass('active');
+
     if(elem.length) {
         $(this)
             .data("selected",elem.data("id"))
