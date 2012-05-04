@@ -200,6 +200,15 @@ $(document).ready(function(){
                     parseUrl(input.text());
                 }, 10);
             })
+            .keydown(function (e) {
+                if (form.hasClass("collapsed")) {
+                    input.focus();
+                }
+
+                if (e.ctrlKey && e.keyCode == 13) {
+                    form.find('.save').click();
+                }
+            })
         ;
 
         var parseUrl = function(txt){
