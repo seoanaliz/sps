@@ -40,6 +40,11 @@
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
 
+            //check access
+            if (!AccessUtility::HasAccessToSourceFeedId($sourceFeedId)) {
+                $sourceFeedId = null;
+            }
+
             $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
             if (empty($sourceFeedId) || empty($sourceFeed)) {
                 $result['message'] = 'emptySourceFeedId';

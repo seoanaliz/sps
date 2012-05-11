@@ -82,6 +82,11 @@
             $articleRecords = array();
             $articlesQueue  = array();
 
+            //check access
+            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                $targetFeedId = null;
+            }
+
             if(!empty($targetFeedId) && !empty($targetFeed)) {
                 Session::setInteger('currentTargetFeedId', $targetFeedId);
 

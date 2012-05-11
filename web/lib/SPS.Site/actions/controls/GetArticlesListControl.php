@@ -20,6 +20,11 @@
                 return;
             }
 
+            //check access
+            if (!AccessUtility::HasAccessToSourceFeedId($sourceFeedId)) {
+                return;
+            }
+
             Session::setInteger('currentSourceFeedId', $sourceFeedId);
 
             $page           = Session::getInteger( 'page' );

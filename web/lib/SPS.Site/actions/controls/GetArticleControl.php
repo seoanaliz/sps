@@ -20,6 +20,11 @@
 
             if (empty($article)) return;
 
+            //check access
+            if (!AccessUtility::HasAccessToSourceFeedId($article->sourceFeedId)) {
+                return;
+            }
+
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
 
             if (empty($articleRecord)) return;

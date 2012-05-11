@@ -24,6 +24,11 @@
                 return;
             }
 
+            //check access
+            if (!AccessUtility::HasAccessToTargetFeedId($object->targetFeedId)) {
+                return;
+            }
+
             $o = new ArticleQueue();
             $o->statusId = 3;
             ArticleQueueFactory::UpdateByMask($o, array('statusId'), array('articleQueueId' => $id));

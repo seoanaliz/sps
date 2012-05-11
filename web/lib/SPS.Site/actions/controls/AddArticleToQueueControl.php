@@ -58,6 +58,12 @@
                 return false;
             }
 
+            //check access
+            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId) || !AccessUtility::HasAccessToSourceFeedId($article->sourceFeedId)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
             //проверяем, если ли такая $articleId в этой $targetFeedId
             $existsCount = ArticleQueueFactory::Count(
                 array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
