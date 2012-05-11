@@ -1,5 +1,3 @@
-var timestampValue;
-
 //init first source and target
 $(document).ready(function(){
     var currentSource, currentTarget;
@@ -21,7 +19,6 @@ $(document).ready(function(){
 
     if (currentTarget.length > 0) {
         Elements.rightdd(currentTarget.data("id"));
-        Events.fire('rightcolumn_dropdown_change', []);
     }
 });
 

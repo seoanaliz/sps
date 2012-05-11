@@ -9,7 +9,7 @@ $(document).ready(function(){
             monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
             firstDay: 1,
             showAnim: '',
-            dateFormat: "d MM"
+            dateFormat: "dd.mm.yy"
         }
     )
         .keydown(function(e){
@@ -18,7 +18,8 @@ $(document).ready(function(){
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
             Events.fire('calendar_change', [])
-        });
+        }).trigger('change');
+
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });

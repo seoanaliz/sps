@@ -72,6 +72,8 @@
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
 
+            Session::setInteger('currentTimestamp', $queueDate->format('U'));
+
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 

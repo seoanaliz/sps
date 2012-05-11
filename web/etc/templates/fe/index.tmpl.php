@@ -38,7 +38,7 @@
             <div class="header bb">
 
                 <div class="calendar">
-                    <input type="text" id="calendar"/>
+                    <input type="text" id="calendar" value="<?= $currentDate->DefaultDateFormat() ?>"/>
                     <div class="caption default">Дата</div>
                     <div class="tip"><b>cal</b></div>
                 </div>
