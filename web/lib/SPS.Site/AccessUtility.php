@@ -46,16 +46,17 @@
             return $result;
         }
 
-        public static function GetSourceFeedIds() {
-            if (!is_null(self::$sourceFeedIds)) {
-                return self::$sourceFeedIds;
+        public static function GetSourceFeedIds($currentTargetFeedId = null) {
+            $result = array(-1 => -1);
+
+            if (is_array(self::$sourceFeedIds) && array_key_exists($currentTargetFeedId, self::$sourceFeedIds)) {
+                return self::$sourceFeedIds[$currentTargetFeedId];
             }
 
-            $result = array(-1 => -1);
             $userId = AuthVkontakte::IsAuth();
 
             if (empty($userId)) {
-                self::$sourceFeedIds = $result;
+                self::$sourceFeedIds[$currentTargetFeedId] = $result;
                 return $result;
             }
 
@@ -75,26 +76,31 @@
                     if (!empty($targetFeedIds)) {
                         foreach ($targetFeedIds as $targetFeedId) {
                             if (self::HasAccessToTargetFeedId($targetFeedId)) {
-                                $result[$checkDataItem->sourceFeedId] = $checkDataItem->sourceFeedId;
-                                break;
+                                if (empty($currentTargetFeedId)) {
+                                    $result[$checkDataItem->sourceFeedId] = $checkDataItem->sourceFeedId;
+                                    break;
+                                } else if($targetFeedId == $currentTargetFeedId) {
+                                    $result[$checkDataItem->sourceFeedId] = $checkDataItem->sourceFeedId;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            self::$sourceFeedIds = $result;
+            self::$sourceFeedIds[$currentTargetFeedId] = $result;
             return $result;
         }
 
         public static function HasAccessToTargetFeedId($targetFeedId) {
             $accessIds = self::GetTargetFeedIds();
-            return array_key_exists($targetFeedId, $accessIds);
+            return empty($accessIds) || array_key_exists($targetFeedId, $accessIds);
         }
 
         public static function HasAccessToSourceFeedId($sourceFeedId) {
-            $accessIds = self::GetTargetFeedIds();
-            return array_key_exists($sourceFeedId, $accessIds);
+            $accessIds = self::GetSourceFeedIds();
+            return empty($accessIds) || array_key_exists($sourceFeedId, $accessIds);
         }
     }
 ?>

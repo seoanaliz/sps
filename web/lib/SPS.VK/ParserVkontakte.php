@@ -55,7 +55,7 @@
                         preg_match('/public.init\(.*?id":(.*?),/', $a, $gid);
                 preg_match('/(?s)id=".*?avatar.*?src="(.*?)"/', $a, $ava);
                 if (substr_count($ava[1], 'png')>0 || substr_count($ava[1], 'gif')>0) $ava = 'standard';
-                else $ava = $ava[1];
+                else $ava = !empty($ava[1]) ? $ava[1] : null;
                 return array(
                     'type'      =>  'public',
                     'id'        =>  $gid[1],
