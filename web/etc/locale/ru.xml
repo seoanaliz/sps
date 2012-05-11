@@ -298,6 +298,7 @@
             <startTime><![CDATA[Время начала сетки]]></startTime>
             <period><![CDATA[Шаг сетки]]></period>
             <grids><![CDATA[Изменения в сетке]]></grids>
+            <vkIds><![CDATA[VkId редакторов]]></vkIds>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>

@@ -26,6 +26,17 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="vkIds" class="row">
+            <label>{lang:vt.targetFeed.vkIds}</label>
+            <div class="hint">
+                <a href="#" class="hint-icon">?</a>
+                <div class="hint-text" style="display:none;">
+                    <span>?</span>
+                    Введите vkId редакторов через запятую
+                </div>
+            </div>
+            <?= FormHelper::FormInput( $prefix . '[vkIds]', $object->vkIds, 'vkIds', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="publisherId" class="row required">
             <label>{lang:vt.targetFeed.publisherId}</label>
             <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, false ); ?>

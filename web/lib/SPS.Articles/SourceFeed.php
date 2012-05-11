@@ -27,6 +27,9 @@
         /** @var string */
         public $processed;
 
+        /** @var string */
+        public $targetFeedIds;
+
         /** @var int */
         public $statusId;
 

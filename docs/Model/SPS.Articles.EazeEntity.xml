@@ -54,6 +54,14 @@
           <AttributeParameter Key="controlId" Value="useFullExport" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedIds" TitleKey="vt.sourceFeed.targetFeedIds" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedIds" />
+          <AttributeParameter Key="value" Value="targetFeedIds" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedIds" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="sourceFeedId" TitleKey="vt.sourceFeed.sourceFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -103,6 +111,15 @@
           <AttributeParameter Key="name" Value="useFullExport" />
           <AttributeParameter Key="value" Value="useFullExport" />
           <AttributeParameter Key="controlId" Value="useFullExport" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedIds" TitleKey="vt.sourceFeed.targetFeedIds" TitleValue="targetFeedIds" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedIds" />
+          <AttributeParameter Key="value" Value="targetFeedIds" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedIds" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>
@@ -169,6 +186,14 @@
           <AttributeParameter Key="controlId" Value="period" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="vkIds" TitleKey="vt.targetFeed.vkIds" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vkIds" />
+          <AttributeParameter Key="value" Value="vkIds" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vkIds" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -226,6 +251,15 @@
           <AttributeParameter Key="value" Value="period" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="period" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vkIds" TitleKey="vt.targetFeed.vkIds" TitleValue="vkIds" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vkIds" />
+          <AttributeParameter Key="value" Value="vkIds" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="vkIds" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

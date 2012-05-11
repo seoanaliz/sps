@@ -8,10 +8,11 @@
            LocaleLoader::Translate( "vt.targetFeed.title" )
             , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.targetFeed.publisherId" )
+            , LocaleLoader::Translate( "vt.targetFeed.vkIds" )
             , LocaleLoader::Translate( "vt.targetFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 3 => "publisherId", 4 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 3 => "publisherId", 4 => "vkIds", 5 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> TargetFeedFactory::CanPages()
@@ -79,6 +80,20 @@
                 <td class="header">{$object.title}</td>
                 <td><a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</td>
                 <td>{form:$object.publisher.name}</td>
+                <td class="left">
+                    <?
+                        if(!empty($object->vkIds)) {
+                            $links = array_map(function($val){
+                                return "<a href='http://vk.com/id$val' target='_blank'>$val</a>";
+                            }, explode(',',$object->vkIds));
+
+                            $links = implode(', ', $links);
+                            echo $links;
+                        } else {
+                            ?><span class="status red" title="Нет">Нет</span><?
+                        }
+                    ?>
+                </td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

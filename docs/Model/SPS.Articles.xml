@@ -9,6 +9,7 @@
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="useFullExport" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="useFullExport" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="processed" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="processed" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search />
@@ -24,6 +25,7 @@
         <Attribute Name="externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="externalId" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="startTime" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startTime" FieldType="TYPE_TIME" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="period" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="period" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="vkIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="vkIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>

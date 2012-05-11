@@ -52,6 +52,10 @@
                     , 'type'        => TYPE_STRING
                     , 'max'         => 100
                 )
+                ,'targetFeedIds' => array(
+                    'name'          => 'targetFeedIds'
+                    , 'type'        => TYPE_STRING
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER

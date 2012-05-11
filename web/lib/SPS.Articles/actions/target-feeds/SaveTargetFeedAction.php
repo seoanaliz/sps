@@ -48,6 +48,8 @@
 
             $object->grids = !empty($object->grids) ? $object->grids : array();
 
+            $object->vkIds = str_replace(' ', '', $object->vkIds);
+
             return $object;
         }
 

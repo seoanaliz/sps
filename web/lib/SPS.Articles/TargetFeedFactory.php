@@ -52,6 +52,10 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'vkIds' => array(
+                    'name'          => 'vkIds'
+                    , 'type'        => TYPE_STRING
+                )
                 ,'publisherId' => array(
                     'name'          => 'publisherId'
                     , 'type'        => TYPE_INTEGER

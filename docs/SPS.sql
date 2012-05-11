@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		20.04.2012
+Modified		11.05.2012
 Project		
 Model			
 Company		
@@ -200,6 +200,7 @@ Create table "sourceFeeds"
 	"externalId" Varchar(100) NOT NULL,
 	"useFullExport" Boolean NOT NULL Default false,
 	"processed" Varchar(100),
+	"targetFeedIds" Text,
 	"statusId" Integer NOT NULL,
  primary key ("sourceFeedId")
 ) Without Oids;
@@ -212,6 +213,7 @@ Create table "targetFeeds"
 	"externalId" Varchar(100) NOT NULL,
 	"startTime" Time NOT NULL Default '09:00:00',
 	"period" Integer NOT NULL Default 60,
+	"vkIds" Text,
 	"publisherId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("targetFeedId")

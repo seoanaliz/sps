@@ -27,6 +27,9 @@
         /** @var int */
         public $period;
 
+        /** @var string */
+        public $vkIds;
+
         /** @var int */
         public $publisherId;
 
