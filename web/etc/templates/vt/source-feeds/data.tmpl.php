@@ -9,6 +9,8 @@
     if ( !empty($errors["fatal"] ) ) {
 		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
 	}
+
+    $object->targetFeedIds = explode(',', $object->targetFeedIds);
 ?>
 <div class="tabs">
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
@@ -28,6 +30,10 @@
         <div data-row="useFullExport" class="row required">
             <label>{lang:vt.sourceFeed.useFullExport}</label>
             <?= FormHelper::FormCheckBox( $prefix . '[useFullExport]', null, 'useFullExport', null, $object->useFullExport ); ?>
+        </div>
+        <div data-row="targetFeedIds" class="row">
+            <label>{lang:vt.sourceFeed.targetFeedIds}</label>
+            <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', $object->targetFeedIds, 'targetFeedIds', null, null, array('style' => 'height: 200px;') ) ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.sourceFeed.statusId}</label>

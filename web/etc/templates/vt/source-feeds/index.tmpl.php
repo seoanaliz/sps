@@ -8,10 +8,11 @@
            LocaleLoader::Translate( "vt.sourceFeed.title" )
             , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.sourceFeed.useFullExport" )
+            , LocaleLoader::Translate( "vt.sourceFeed.targetFeedIds" )
             , LocaleLoader::Translate( "vt.sourceFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "useFullExport", 3 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "useFullExport", 3 => "targetFeedIds", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> SourceFeedFactory::CanPages()
@@ -75,6 +76,28 @@
                 <td class="header">{$object.title}</td>
                 <td><a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</td>
                 <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>
+                <td class="left">
+                    <?
+                        $targetFeedIds = explode(',', $object->targetFeedIds);
+                        $objectFeeds = array();
+                        foreach ($targetFeedIds as $targetFeedId) {
+                            if (!empty($targetFeeds[$targetFeedId])) {
+                                $objectFeeds[] = $targetFeeds[$targetFeedId];
+                            }
+                        }
+
+                        if (!empty($objectFeeds)) {
+                            $links = array_map(function($val){
+                                return "<a href='http://vk.com/id$val->externalId' target='_blank'>$val->title</a>";
+                            }, $objectFeeds);
+
+                            $links = implode(', ', $links);
+                            echo $links;
+                        } else {
+                            ?><span class="status red" title="Нет">Нет</span><?
+                        }
+                    ?>
+                </td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

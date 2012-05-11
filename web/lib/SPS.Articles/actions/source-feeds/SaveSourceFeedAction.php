@@ -40,7 +40,11 @@
             } else {
                 $object->processed = null;
             }
-            
+
+            $targetFeedIds = Request::getArray( 'targetFeedIds' );
+            $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
+            $object->targetFeedIds = implode(',', $targetFeedIds);
+
             return $object;
         }
         
@@ -99,6 +103,9 @@
         /**
          * Set Foreign Lists
          */
-        protected function setForeignLists() {}
+        protected function setForeignLists() {
+            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
+            Response::setArray( 'targetFeeds', $targetFeeds );
+        }
     }
 ?>
