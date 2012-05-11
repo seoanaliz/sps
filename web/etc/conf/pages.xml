@@ -56,6 +56,9 @@
                 <page uri="controls://link-info-upload/">
                     <actions>SPS.Site.SaveLinkInfoControl</actions>
                 </page>
+                <page uri="controls://source-feeds-list/">
+                    <actions>SPS.Site.GetSourceFeedsListControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

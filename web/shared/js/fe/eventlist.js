@@ -111,7 +111,34 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
+        $('div.left-drop-down ul li').remove();
+
         loadQueue();
+
+        //грузим источники для этого паблика
+        $.ajax({
+            url: controlsRoot + 'source-feeds-list/',
+            dataType : "json",
+            data: {
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                for (i in data) {
+                    item = data[i];
+                    $('div.left-drop-down ul').append('<li data-id="' + item.sourceFeedId + '">' + item.title + '</li>');
+                }
+
+                currentSource = $(".left-panel .drop-down ul li.active");
+                if (currentSource.length == 0) {
+                    currentSource = $(".left-panel .drop-down ul :first-child");
+                }
+
+                if (currentSource.length > 0) {
+                    Elements.leftdd(currentSource.data("id"));
+                    Events.fire('leftcolumn_dropdown_change', []);
+                }
+            }
+        });
     },
     calendar_change: function(){
         loadQueue();
