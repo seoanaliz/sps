@@ -73,7 +73,12 @@
                     'name'         => 'targetFeedId'
                     , 'foreignKey' => 'TargetFeedGrid'
                 ))
-            , 'search'    => array()
+            , 'search'    => array(
+                '_targetFeedId' => array(
+                    'name'         => 'targetFeedId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                ))
         );
         
         /** @return array */

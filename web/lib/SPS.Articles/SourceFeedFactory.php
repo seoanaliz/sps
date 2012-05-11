@@ -63,7 +63,12 @@
                     , 'foreignKey'  => 'Status'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                '_sourceFeedId' => array(
+                    'name'         => 'sourceFeedId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                ))
         );
         
         /** @return array */

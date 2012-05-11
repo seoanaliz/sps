@@ -12,7 +12,9 @@
         <Attribute Name="targetFeedIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
-      <Search />
+      <Search>
+        <Attribute Name="_sourceFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
       <Flags>
         <EFlag>CanCache</EFlag>
       </Flags>
@@ -29,7 +31,9 @@
         <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
-      <Search />
+      <Search>
+        <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
       <Flags>
         <EFlag>CanCache</EFlag>
       </Flags>
