@@ -7,6 +7,7 @@
         const GoogleMeta 		= "Google.Meta";
         const GoogleAnalytics 	= "Google.Analytics";
 		const GoogleAPI         = "Google.API";
+		const Redactors         = "Redactors";
 
         public static $SiteParamAliases = array(
               self::YandexAPI
@@ -15,6 +16,7 @@
 			, self::GoogleMeta
             , self::GoogleAnalytics
 			, self::GoogleAPI
+			, self::Redactors
         );
 
         public static $Params = array ();

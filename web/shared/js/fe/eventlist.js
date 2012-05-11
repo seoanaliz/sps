@@ -136,6 +136,9 @@ var Eventlist = {
                 if (currentSource.length > 0) {
                     Elements.leftdd(currentSource.data("id"));
                     Events.fire('leftcolumn_dropdown_change', []);
+                } else {
+                    Elements.leftdd(0);
+                    Events.fire('leftcolumn_dropdown_change', []);
                 }
             }
         });

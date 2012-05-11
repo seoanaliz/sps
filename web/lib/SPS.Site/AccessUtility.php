@@ -23,10 +23,16 @@
                 return $result;
             }
 
-            //TODO super admin check
-//            $result = array();
-//            self::$targetFeedIds = $result;
-//            return $result;
+            //redactor check
+            $redactors = SiteParamHelper::GetCachedParamValue(SiteParamHelper::Redactors);
+            if (!empty($redactors)) {
+                $redactors = explode(',', $redactors);
+                if (in_array($userId, $redactors)) {
+                    $result = array();
+                    self::$targetFeedIds = $result;
+                    return $result;
+                }
+            }
 
             $checkData = TargetFeedFactory::Get(
                 array()
@@ -46,7 +52,7 @@
             return $result;
         }
 
-        public static function GetSourceFeedIds($currentTargetFeedId = null) {
+        public static function GetSourceFeedIds($currentTargetFeedId = 0) {
             $result = array(-1 => -1);
 
             if (is_array(self::$sourceFeedIds) && array_key_exists($currentTargetFeedId, self::$sourceFeedIds)) {
@@ -60,10 +66,19 @@
                 return $result;
             }
 
-            //TODO super admin check
-            //            $result = array();
-            //            self::$sourceFeedIds = $result;
-            //            return $result;
+
+            //redactor check
+            if (empty($currentTargetFeedId)) {
+                $redactors = SiteParamHelper::GetCachedParamValue(SiteParamHelper::Redactors);
+                if (!empty($redactors)) {
+                    $redactors = explode(',', $redactors);
+                    if (in_array($userId, $redactors)) {
+                        $result = array();
+                        self::$sourceFeedIds[$currentTargetFeedId] = $result;
+                        return $result;
+                    }
+                }
+            }
 
             $checkData = SourceFeedFactory::Get(
                 array()
