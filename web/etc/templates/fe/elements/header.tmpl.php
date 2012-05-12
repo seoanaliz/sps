@@ -34,9 +34,10 @@
         AssetHelper::AnyBrowser => array(
             'css://fe/reset.css',
             'js://fe/file-uploader/fileuploader.css',
+            'css://fe/jquery-ui.css',
+            'css://fe/jquery.multiselect.css',
             'css://fe/main.css',
             'css://fe/custom.css',
-            //'js://ext/uploadify/uploadify.css',
             'js://ext/fancybox2/jquery.fancybox.css',
             'js://ext/fancybox2/helpers/jquery.fancybox-buttons.css',
         )
@@ -57,10 +58,8 @@
         'js://fe/eventlist.js',
         'js://fe/file-uploader/fileuploader.js',
         'js://fe/jquery.Jcrop.min.js',
+        'js://fe/jquery.multiselect.min.js',
         'js://fe/main.js',
-
-//        'js://ext/swfobject/swfobject.js',
-//        'js://ext/uploadify/jquery.uploadify.js',
         'js://fe/files.js',
     );
 

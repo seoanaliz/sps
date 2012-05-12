@@ -13,19 +13,21 @@
          * Entry Point
          */
         public function Execute() {
-            $currentSourceFeedId    = Session::getInteger('currentSourceFeedId');
-            $currentTargetFeedId    = Session::getInteger('currentTargetFeedId');
 
-            if (!AccessUtility::HasAccessToSourceFeedId($currentSourceFeedId)) {
-                $currentSourceFeedId = null;
-            }
+            /**
+             * current values from session
+             */
+            $currentTargetFeedId    = Session::getInteger('currentTargetFeedId');
             if (!AccessUtility::HasAccessToTargetFeedId($currentTargetFeedId)) {
                 $currentTargetFeedId = null;
             }
 
-            Response::setInteger('currentSourceFeedId', $currentSourceFeedId);
             Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
+            Response::setArray('currentSourceFeedIds', Session::getArray('currentSourceFeedIds'));
 
+            /**
+             * target feeds
+             */
             $targetFeeds = TargetFeedFactory::Get(
                 array('_targetFeedId' => AccessUtility::GetTargetFeedIds())
                 , array( BaseFactory::WithoutPages => true )

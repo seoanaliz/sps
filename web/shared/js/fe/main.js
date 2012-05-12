@@ -24,6 +24,18 @@ $(document).ready(function(){
         $(this).closest(".calendar").find("input").focus();
     });
 
+    $("#source-select").multiselect({
+        noneSelectedText: 'Источник',
+        checkAll: function(){
+            Events.fire('leftcolumn_dropdown_change', []);
+        },
+        uncheckAll: function(){
+            Events.fire('leftcolumn_dropdown_change', []);
+        }
+    });
+    $("#source-select").bind("multiselectclick", function(event, ui){
+        Events.fire('leftcolumn_dropdown_change', []);
+    });
 
     $(".drop-down").click(function(e){
         e.stopPropagation();
@@ -104,6 +116,16 @@ $(document).ready(function(){
             }
         });
     });
+
+    //init first source and target
+    var currentTarget = $(".right-panel .drop-down ul li.active");
+    if (currentTarget.length == 0) {
+        currentTarget = $(".right-panel .drop-down ul :first-child");
+    }
+
+    if (currentTarget.length > 0) {
+        Elements.rightdd(currentTarget.data("id"));
+    }
 
     (function(){
         var addInput = function(elem, defaultvalue, id){
@@ -679,12 +701,10 @@ var Elements = {
             });
         })();
     },
-    leftdd: function(value){
-        if(typeof value == 'undefined') {
-            return $(".left-panel .drop-down").data("selected");
-        } else {
-            $(".left-panel .drop-down").dd_sel(value);
-        }
+    leftdd: function(){
+        return $("select").multiselect("getChecked").map(function(){
+            return this.value;
+        }).get();
     },
     rightdd:function(value){
         if(typeof value == 'undefined') {

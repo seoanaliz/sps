@@ -4,17 +4,13 @@
         <div class="block">
             <div class="header bb">
 
-                <div class="drop-down left-drop-down">
-                    <div class="caption default">Источник</div>
-                    <div class="tip"><s></s></div>
-                    <ul>
-                        <?
-                            foreach ($sourceFeeds as $sourceFeed) {
-                                ?><li data-id="{$sourceFeed.sourceFeedId}" class="<?= $sourceFeed->sourceFeedId == $currentSourceFeedId ? 'active' : '' ?>">{$sourceFeed.title}</li><?
-                            }
-                        ?>
-                    </ul>
-                </div>
+                <select multiple="multiple" id="source-select">
+                    <?
+                        foreach ($sourceFeeds as $sourceFeed) {
+                            ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
+                        }
+                    ?>
+                </select>
 
                 <!--div class="controls">
                     <div class="ctl spr gear"></div>

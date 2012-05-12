@@ -1,25 +1,5 @@
-//init first source and target
 $(document).ready(function(){
-    var currentSource, currentTarget;
 
-    currentSource = $(".left-panel .drop-down ul li.active");
-    if (currentSource.length == 0) {
-        currentSource = $(".left-panel .drop-down ul :first-child");
-    }
-
-    if (currentSource.length > 0) {
-        Elements.leftdd(currentSource.data("id"));
-        Events.fire('leftcolumn_dropdown_change', []);
-    }
-
-    currentTarget = $(".right-panel .drop-down ul li.active");
-    if (currentTarget.length == 0) {
-        currentTarget = $(".right-panel .drop-down ul :first-child");
-    }
-
-    if (currentTarget.length > 0) {
-        Elements.rightdd(currentTarget.data("id"));
-    }
 });
 
 function loadArticles(clean) {
@@ -27,19 +7,23 @@ function loadArticles(clean) {
         $('div#wall').html('');
     }
 
-    if (!Elements.leftdd()) {
-        $('.newpost').hide();
+    if (Elements.leftdd().length == 0) {
         return;
     }
 
-    $('.newpost').show();
+    if (Elements.leftdd().length != 1) {
+        $('.newpost').hide();
+    } else {
+        $('.newpost').show();
+    }
+
 
     //clean and load left column
     $.ajax({
         url: controlsRoot + 'arcticles-list/',
         dataType : "html",
         data: {
-            sourceFeedId: Elements.leftdd(),
+            sourceFeedIds: Elements.leftdd(),
             clean: clean
         },
         success: function (data) {
@@ -111,7 +95,10 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
-        $('div.left-drop-down ul li').remove();
+        selectedSources = Elements.leftdd();
+
+        $('#source-select option').remove();
+        $('#source-select').multiselect("refresh");
 
         loadQueue();
 
@@ -125,21 +112,23 @@ var Eventlist = {
             success: function (data) {
                 for (i in data) {
                     item = data[i];
-                    $('div.left-drop-down ul').append('<li data-id="' + item.sourceFeedId + '">' + item.title + '</li>');
+                    $('#source-select').append('<option value="' + item.sourceFeedId + '">' + item.title + '</option>');
                 }
 
-                currentSource = $(".left-panel .drop-down ul li.active");
-                if (currentSource.length == 0) {
-                    currentSource = $(".left-panel .drop-down ul :first-child");
+                if (selectedSources) {
+                    $options = $('#source-select option');
+                    for (i in selectedSources) {
+                        $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                    }
                 }
 
-                if (currentSource.length > 0) {
-                    Elements.leftdd(currentSource.data("id"));
-                    Events.fire('leftcolumn_dropdown_change', []);
-                } else {
-                    Elements.leftdd(0);
-                    Events.fire('leftcolumn_dropdown_change', []);
+                $('#source-select').multiselect("refresh");
+
+                if (Elements.leftdd().length == 0) {
+                    $('#source-select').multiselect("checkAll");
                 }
+
+                Events.fire('leftcolumn_dropdown_change', []);
             }
         });
     },
@@ -194,6 +183,7 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data && data.id) {
+                    $('.newpost').show();
                     callback(true, data);
                 } else {
                     callback(false, null);
@@ -221,6 +211,13 @@ var Eventlist = {
     },
 
     post: function(text, photos, link, id, callback){
+        $sourceFeedIds = Elements.leftdd();
+        if ($sourceFeedIds.length != 1) {
+            $sourceFeedId = null;
+        } else {
+            $sourceFeedId = $sourceFeedIds[0];
+        }
+
         $.ajax({
             url: controlsRoot + 'arcticle-save/',
             type: 'POST',
@@ -230,7 +227,7 @@ var Eventlist = {
                 text: text,
                 photos: photos,
                 link: link,
-                sourceFeedId: Elements.leftdd()
+                sourceFeedId: $sourceFeedId
             },
             success: function (data) {
                 if(data.success) {

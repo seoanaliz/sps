@@ -1,16 +1,15 @@
 <?
     /** @var $articles Article[] */
     /** @var $articleRecords articleRecord[] */
-    /** @var $sourceFeed SourceFeed */
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             ?>
         <div class="post bb" data-id="{$article->articleId}">
             <div class="l d-hide">
-                <div class="userpic"><img src="{$sourceInfo[img]}" /></div>
+                <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" /></div>
             </div>
-            <div class="name d-hide">{$sourceInfo[name]}</div>
+            <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
             <div class="content">
                 <?
                     $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));

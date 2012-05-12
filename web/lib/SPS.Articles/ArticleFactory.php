@@ -64,6 +64,11 @@
                     , 'type'       => TYPE_STRING
                     , 'searchType' => SEARCHTYPE_ARRAY
                 )
+                ,'_sourceFeedId' => array(
+                    'name'         => 'sourceFeedId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
                 ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
