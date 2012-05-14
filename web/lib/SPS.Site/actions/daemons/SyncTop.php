@@ -56,7 +56,7 @@
             $externalIds    = array();
 
             foreach ($posts as $post) {
-                $externalId = TextHelper::ToUTF8($post['id']);
+                $externalId = TextHelper::ToUTF8('top-' . $post['id']);
                 $externalIds[] = $externalId;
             }
 
@@ -81,7 +81,7 @@
              * Обходим посты и созраняем их в бд, попутно сливая фотки
              */
             foreach ($posts as $post) {
-                $externalId = TextHelper::ToUTF8($post['id']);
+                $externalId = TextHelper::ToUTF8('top-' . $post['id']);
 
                 if (!empty($originalObjects[$externalId])) {
                     continue; //не сохраняем то что уже сохранили
@@ -96,6 +96,7 @@
 
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = $post['text'];
+                $articleRecord->link    = $post['link'];
                 $articleRecord->likes   = Convert::ToInteger($post['likes']);
                 $articleRecord->photos  = array();
 
