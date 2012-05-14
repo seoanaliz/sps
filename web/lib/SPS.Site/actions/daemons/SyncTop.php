@@ -134,7 +134,8 @@
             foreach ($data as $photo) {
                 //moving photo to local temp
                 $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-                file_put_contents($tmpName, file_get_contents($photo['url']));
+                $url = str_replace('https://', 'http://', $photo['url']);
+                file_put_contents($tmpName, file_get_contents($url));
                 $file = array(
                     'tmp_name'  => $tmpName,
                     'name'      => $tmpName,
