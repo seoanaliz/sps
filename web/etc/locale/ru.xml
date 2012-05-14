@@ -101,6 +101,10 @@
                     <title><![CDATA[Синхронизация по одной старнице каждого источника]]></title>
                     <time><![CDATA[Раз в 5 минут]]></time>
                 </syncsources>
+                <synctop>
+                    <title><![CDATA[Синхронизация топа]]></title>
+                    <time><![CDATA[Раз в сутки]]></time>
+                </synctop>
             </list>
             <header><![CDATA[Доступные демоны]]></header>
             <title><![CDATA[Название]]></title>

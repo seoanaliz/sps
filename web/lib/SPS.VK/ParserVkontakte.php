@@ -2,6 +2,10 @@
    
     class ParserVkontakte {
 
+        const TOP = 'top';
+
+        public static $SpecialIds = array(self::TOP);
+
         private $page_adr;
         private $count;
         const PAGE_SIZE = 20;

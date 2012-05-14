@@ -36,6 +36,9 @@
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
         </action>
+        <action name="SyncTop">
+            <path>daemons/SyncTop</path>
+        </action>
     </group>
 
     <group name="Controls">
