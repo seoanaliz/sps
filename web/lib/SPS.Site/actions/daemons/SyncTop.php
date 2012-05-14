@@ -101,7 +101,13 @@
 
                 //сохраняем фотки на медиа сервер
                 if (!empty($post['photo'])) {
-                    $articleRecord->photos = $this->savePostPhotos($post['photo']);
+                    try {
+                        $articleRecord->photos = $this->savePostPhotos($post['photo']);
+                    } catch (Exception $Ex) {
+
+                        //не скачали фотки, скачаем в след раз
+                        continue;
+                    }
                 }
 
                 //сохраняем в транзакции
@@ -135,7 +141,13 @@
                 //moving photo to local temp
                 $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
                 $url = str_replace('https://', 'http://', $photo['url']);
-                file_put_contents($tmpName, file_get_contents($url));
+
+                $fileContent = file_get_contents($url);
+                if ($fileContent === false) {
+                    throw new Exception('photo download failed');
+                }
+
+                file_put_contents($tmpName, $fileContent);
                 $file = array(
                     'tmp_name'  => $tmpName,
                     'name'      => $tmpName,
