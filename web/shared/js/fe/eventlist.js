@@ -1,7 +1,3 @@
-$(document).ready(function(){
-
-});
-
 function loadArticles(clean) {
     if (clean) {
         $('div#wall').html('');
@@ -16,7 +12,6 @@ function loadArticles(clean) {
     } else {
         $('.newpost').show();
     }
-
 
     //clean and load left column
     $.ajax({
@@ -126,6 +121,7 @@ var Eventlist = {
 
                 if (Elements.leftdd().length == 0) {
                     $('#source-select').multiselect("checkAll");
+                    $('#source-select').multiselect("refresh");
                 }
 
                 Events.fire('leftcolumn_dropdown_change', []);
