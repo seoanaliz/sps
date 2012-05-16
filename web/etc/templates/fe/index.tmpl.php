@@ -12,6 +12,12 @@
                     ?>
                 </select>
 
+                <div class="type-selector">
+                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
+                        <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                    <? } ?>
+                </div>
+
                 <!--div class="controls">
                     <div class="ctl spr gear"></div>
                     <div class="ctl spr plus"></div>

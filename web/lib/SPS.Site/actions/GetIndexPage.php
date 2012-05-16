@@ -25,6 +25,12 @@
             Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
             Response::setArray('currentSourceFeedIds', Session::getArray('currentSourceFeedIds'));
 
+            $currentSourceType = Session::getString('currentSourceType');
+            if (empty($currentSourceType) || empty(SourceFeedUtility::$Types[$currentSourceType])) {
+                $currentSourceType = SourceFeedUtility::Source;
+            }
+            Response::setString('currentSourceType', $currentSourceType);
+
             /**
              * target feeds
              */

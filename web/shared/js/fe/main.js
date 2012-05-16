@@ -62,6 +62,14 @@ $(document).ready(function(){
     $(".right-panel .drop-down").change(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
+    $(".type-selector a").click(function(e){
+        e.preventDefault();
+
+        $(".type-selector a").removeClass('active');
+        $(this).addClass('active');
+
+        Events.fire('rightcolumn_dropdown_change', []);
+    });
 
     $(".wall")
         .delegate(".post .delete", "click", function(){

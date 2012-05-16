@@ -1,9 +1,16 @@
+var articlesLoading = false;
+
 function loadArticles(clean) {
+    if (articlesLoading) return;
+
+    articlesLoading = true;
+
     if (clean) {
         $('div#wall').html('');
     }
 
     if (Elements.leftdd().length == 0) {
+        articlesLoading = false;
         return;
     }
 
@@ -23,6 +30,7 @@ function loadArticles(clean) {
         },
         success: function (data) {
             $('div#wall').append(data);
+            articlesLoading = false;
             Elements.addEvents();
             Elements.initImages('.post .images');
             Elements.initLinks();
@@ -91,6 +99,7 @@ var Eventlist = {
     },
     rightcolumn_dropdown_change: function(){
         selectedSources = Elements.leftdd();
+        sourceType = $(".type-selector a.active").data('type');
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
@@ -102,7 +111,8 @@ var Eventlist = {
             url: controlsRoot + 'source-feeds-list/',
             dataType : "json",
             data: {
-                targetFeedId: Elements.rightdd()
+                targetFeedId: Elements.rightdd(),
+                type: sourceType
             },
             success: function (data) {
                 for (i in data) {

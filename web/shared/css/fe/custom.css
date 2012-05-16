@@ -33,3 +33,29 @@
     background: #FFC0C0 !important;
     opacity: 1;
 }
+
+div.type-selector {
+    float: right;
+    margin-top: 2px;
+}
+
+div.type-selector a {
+    display: -moz-inline-box;
+    display: inline-block;
+    margin-left: 3px;
+    padding: 0 7px;
+    text-decoration: none;
+}
+
+div.type-selector a.active,
+div.type-selector a:hover {
+    background-color: #53a5e3;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+}
+
+div.type-selector a:hover {
+    background-color: #f5f5f5;
+}
