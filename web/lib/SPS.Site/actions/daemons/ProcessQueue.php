@@ -64,8 +64,18 @@ sql;
                 array('articleQueueId' => $articleQueue->articleQueueId)
             );
 
+            //check for article options
+            ArticleFactory::$mapping['view'] = ArticleFactory::$mapping['table'];
+            $article = ArticleFactory::GetById($articleQueue->articleId, array(), array(BaseFactory::WithoutDisabled => false));
+            $sourceFeed = SourceFeedFactory::GetOne(array('sourceFeedId' => $article->sourceFeedId));
+
             if (empty($targetFeed) || $targetFeed->publisher->statusId != 1 || empty($articleRecord)) {
                 return false;
+            }
+
+            $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
+            if ($isWithSmallPhoto) {
+                $articleRecord->photos = array();
             }
 
             $post_data = array(

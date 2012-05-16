@@ -1,9 +1,12 @@
 <?
     /** @var $articles Article[] */
-    /** @var $articleRecords articleRecord[] */
+    /** @var $articleRecords ArticleRecord[] */
+    /** @var $sourceFeeds SourceFeed[] */
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
+
+            $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeeds[$article->sourceFeedId], $articleRecord);
             ?>
         <div class="post bb" data-id="{$article->articleId}">
             <div class="l d-hide">
@@ -27,9 +30,13 @@
                     if (!empty($articleRecord->link)) {
                         ?>
                         <div class="link-info-content">
-                            <div class="link-description-content">
-                                <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
-                            </div>
+                            <? if ($isWithSmallPhoto) { ?>
+                                <div class="link-description-content">
+                                    <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
+                                </div>
+                            <? } else { ?>
+                                <div class="link-status-content"><span>Ссылка: <a href="{form:$articleRecord->link}" target="_blank">topface.ru</a></span></div>
+                            <? } ?>
                         </div>
                         <?
                     }

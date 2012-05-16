@@ -56,9 +56,9 @@
             $sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $sourceFeedIds));
             $this->setInfo($sourceFeeds);
 
-
             Response::setArray( 'articles', $articles );
             Response::setArray( 'articleRecords', $articleRecords );
+            Response::setArray( 'sourceFeeds', $sourceFeeds );
             Response::setBoolean( 'hasMore', $hasMore );
         }
 
