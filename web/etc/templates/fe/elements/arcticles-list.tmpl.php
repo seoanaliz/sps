@@ -7,6 +7,11 @@
             $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
 
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeeds[$article->sourceFeedId], $articleRecord);
+            $showLinkDescription = true;
+
+            if ($sourceFeeds[$article->sourceFeedId]->externalId = ParserVkontakte::TOP && !$isWithSmallPhoto && !empty($articleRecord->photos)) {
+                $showLinkDescription = false;
+            }
             ?>
         <div class="post bb" data-id="{$article->articleId}">
             <div class="l d-hide">
@@ -30,7 +35,7 @@
                     if (!empty($articleRecord->link)) {
                         ?>
                         <div class="link-info-content">
-                            <? if ($isWithSmallPhoto) { ?>
+                            <? if ($showLinkDescription) { ?>
                                 <div class="link-description-content">
                                     <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
                                 </div>
