@@ -10,6 +10,7 @@
         <Attribute Name="useFullExport" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="useFullExport" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="processed" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="processed" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="targetFeedIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="type" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="100" DbName="type" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>

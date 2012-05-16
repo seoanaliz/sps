@@ -292,6 +292,7 @@
             <useFullExport><![CDATA[Экспорт описаний фото]]></useFullExport>
             <processed><![CDATA[processed]]></processed>
             <targetFeedIds><![CDATA[Ленты отправки]]></targetFeedIds>
+            <type><![CDATA[Тип]]></type>
         </sourceFeed>
         <targetFeed>
             <deleteString><![CDATA[Вы действительно хотите удалить ленту отправки?]]></deleteString>

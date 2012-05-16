@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		11.05.2012
+Modified		16.05.2012
 Project		
 Model			
 Company		
@@ -201,6 +201,7 @@ Create table "sourceFeeds"
 	"useFullExport" Boolean NOT NULL Default false,
 	"processed" Varchar(100),
 	"targetFeedIds" Text,
+	"type" Varchar(100) NOT NULL Default 'source',
 	"statusId" Integer NOT NULL,
  primary key ("sourceFeedId")
 ) Without Oids;

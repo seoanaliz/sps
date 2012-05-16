@@ -30,6 +30,9 @@
         /** @var string */
         public $targetFeedIds;
 
+        /** @var string */
+        public $type;
+
         /** @var int */
         public $statusId;
 

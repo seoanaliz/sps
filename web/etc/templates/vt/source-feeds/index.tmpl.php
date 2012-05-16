@@ -9,10 +9,11 @@
             , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.sourceFeed.useFullExport" )
             , LocaleLoader::Translate( "vt.sourceFeed.targetFeedIds" )
+            , LocaleLoader::Translate( "vt.sourceFeed.type" )
             , LocaleLoader::Translate( "vt.sourceFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "useFullExport", 3 => "targetFeedIds", 4 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 2 => "useFullExport", 4 => "type", 5 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> SourceFeedFactory::CanPages()
@@ -55,6 +56,10 @@
                     <?= FormHelper::FormInput( "search[externalId]", $search['externalId'], 'externalId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
+                    <label>{lang:vt.sourceFeed.type}</label>
+                    <?= FormHelper::FormSelect( "search[type]", SourceFeedUtility::$Types, "", "", $search['type'], null, null, true ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.sourceFeed.statusId}</label>
                     <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Common[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
                 </div>
@@ -74,7 +79,11 @@
 ?>
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.title}</td>
-                <td><a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</td>
+                <td>
+                    <? if ($object->type == SourceFeedUtility::Source) { ?>
+                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}
+                    <? } ?>
+                </td>
                 <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>
                 <td class="left">
                     <?
@@ -98,6 +107,7 @@
                         }
                     ?>
                 </td>
+                <td><?= SourceFeedUtility::$Types[$object->type] ?></td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

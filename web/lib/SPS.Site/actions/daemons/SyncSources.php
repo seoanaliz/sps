@@ -29,7 +29,7 @@
             $this->daemon->maxExecutionTime = '01:00:00';
 
             //get sources
-            $sources = SourceFeedFactory::Get();
+            $sources = SourceFeedFactory::Get(array('type' => SourceFeedUtility::Source));
 
             foreach ($sources as $source) {
                 //пропускаем специальные источники

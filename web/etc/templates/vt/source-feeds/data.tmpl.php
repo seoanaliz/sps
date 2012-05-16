@@ -35,6 +35,10 @@
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>
             <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', $object->targetFeedIds, 'targetFeedIds', null, null, array('style' => 'height: 200px;') ) ?>
         </div>
+        <div data-row="type" class="row required">
+            <label>{lang:vt.sourceFeed.type}</label>
+            <?= FormHelper::FormSelect( $prefix . '[type]', SourceFeedUtility::$Types, "", "", $object->type, null, null, false ); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.sourceFeed.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>

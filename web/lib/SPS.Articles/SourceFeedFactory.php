@@ -56,6 +56,12 @@
                     'name'          => 'targetFeedIds'
                     , 'type'        => TYPE_STRING
                 )
+                ,'type' => array(
+                    'name'          => 'type'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                    , 'nullable'    => 'CheckEmpty'
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER

@@ -45,6 +45,10 @@
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
             $object->targetFeedIds = implode(',', $targetFeedIds);
 
+            if ($object->type != SourceFeedUtility::Source) {
+                $object->externalId = '-';
+            }
+
             return $object;
         }
         
@@ -69,6 +73,9 @@
                 }
             }
 
+            if ($object->type != SourceFeedUtility::Source && !empty($errors['fields']['externalId'])) {
+                unset($errors['fields']['externalId']);
+            }
             
             return $errors;
         }

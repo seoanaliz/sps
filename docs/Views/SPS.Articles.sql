@@ -5,6 +5,7 @@ SELECT "public"."sourceFeeds"."sourceFeedId"
 	, "public"."sourceFeeds"."useFullExport"
 	, "public"."sourceFeeds"."processed"
 	, "public"."sourceFeeds"."targetFeedIds"
+	, "public"."sourceFeeds"."type"
 	, "public"."sourceFeeds"."statusId"
  FROM "public"."sourceFeeds"
 	WHERE "public"."sourceFeeds"."statusId" != 3
