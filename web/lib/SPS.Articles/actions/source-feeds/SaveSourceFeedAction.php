@@ -76,7 +76,11 @@
             if ($object->type != SourceFeedUtility::Source && !empty($errors['fields']['externalId'])) {
                 unset($errors['fields']['externalId']);
             }
-            
+
+            if (empty($errors['fields'])) {
+                unset($errors['fields']);
+            }
+
             return $errors;
         }
         
