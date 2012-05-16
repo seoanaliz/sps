@@ -100,17 +100,23 @@
             ConnectionFactory::CommitTransaction($sqlResult);
 
             if ($sqlResult) {
-                //блокируем статью, чтобы ее больше никто не пытался отправить
-                $o = new Article();
-                $o->statusId = 2;
-                ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $article->articleId));
-
                 $result = array(
                     'success' => true,
                     'id' => $articleQueueRecord->articleQueueId
                 );
-            }
 
+                $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
+                if ($sourceFeed->type == SourceFeedUtility::Source) {
+                    //блокируем статью, чтобы ее больше никто не пытался отправить
+                    $o = new Article();
+                    $o->statusId = 2;
+                    ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $article->articleId));
+
+                    $result['moved'] = true;
+                } else {
+                    $result['moved'] = false;
+                }
+            }
             echo ObjectHelper::ToJSON($result);
         }
     }
