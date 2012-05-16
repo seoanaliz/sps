@@ -20,6 +20,8 @@ function loadArticles(clean) {
         $('.newpost').show();
     }
 
+    $('div#wall').append('<div style="text-align: center;" id="wall-loader"><img src="' + root + 'shared/images/fe/ajax-loader.gif"></div>');
+
     //clean and load left column
     $.ajax({
         url: controlsRoot + 'arcticles-list/',
@@ -29,6 +31,7 @@ function loadArticles(clean) {
             clean: clean
         },
         success: function (data) {
+            $('div#wall div#wall-loader').remove();
             $('div#wall').append(data);
             articlesLoading = false;
             Elements.addEvents();
