@@ -99,6 +99,7 @@
                 $articleRecord->link    = $post['link'];
                 $articleRecord->likes   = Convert::ToInteger($post['likes']);
                 $articleRecord->photos  = array();
+                $articleRecord->rate    = $articleRecord->likes;
 
                 //сохраняем фотки на медиа сервер
                 if (!empty($post['photo'])) {
