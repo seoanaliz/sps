@@ -109,11 +109,10 @@
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
         //          -1               пост не прошел отбора, его не нужно выводить
-        //          "x+" (x>=2)    - клевый пост, сильно выбивается из окружающих.
-        //                            чем больше х тем круче
-        //          "-"            -  лайков у поста меньше 20(попадает в выдачу из-за
-        //                            того, что остальные посты +- такие же)
-        //          "x%"(0<x<~100) -  относительная крутизна поста
+        //          "-"              лайков у поста меньше 20(попадает в выдачу из-за
+        //                           того, что остальные посты +- такие же)
+        //          "x%"(1<x<~100)   относительная крутизна поста
+
         //likes_tr - абсолютные лайки
         //id - внутренний id поста в контакте
         //text
@@ -227,7 +226,7 @@
                 if ($retweet){
 
                     $posts[$t]['retweet'] = $this->get_info(self::VK_URL.$retweet);
-                } else $posts[$t]['retweet'] = '';
+                } else $posts[$t]['retweet'] = array();
 
 
 
@@ -410,7 +409,8 @@
             while(isset($array[$i]['likes'])){
                 if ($array[$i]['likes'] > ($sr * 2) ){
                     if ($sr > 1){
-                        $array[$i]['likes'] = round($array[$i]['likes']/$sr) . '+' ;
+                        $array[$i]['likes'] = '+' ;
+                        //                        $array[$i]['likes'] = round(($array[$i]['likes'] * 100) / $ed ) . '%';
 
                     }else
                         $array[$i]['likes'] = '-';
@@ -447,20 +447,21 @@
             $t = 0;
             //отсев значений ниже порога, оценка оставшихся в %
             while (isset($array[$t]['likes'])){
-                if (substr_count($array[$t]['likes'], '%') > 0 ||
-                    substr_count($array[$t]['likes'], '+') > 0 ||
+                #
+                if (    substr_count($array[$t]['likes'], '%') > 0 ||
+                    # substr_count($array[$t]['likes'], '+') > 0 ||
                     $array[$t]['likes'] == '-1'
                     || substr_count($array[$t]['likes'], '-') > 0) {
                     $t++;
                     continue;
 
                 }
-                if ($array[$t]['likes'] >= (self::PROCENT_OTSEVA / 100) * $ed)
+                if ($array[$t]['likes_tr'] >= (self::PROCENT_OTSEVA / 100) * $ed)
                 {
                     if ($ed < 1)
                         $array[$t]['likes'] = '-';
                     else
-                        $array[$t]['likes'] = round(($array[$t]['likes'] * 100) / $ed ) . '%';
+                        $array[$t]['likes'] = round(($array[$t]['likes_tr'] * 100) / $ed ) . '%';
                 }
                 else {
                     $array[$t]['likes'] = -1;

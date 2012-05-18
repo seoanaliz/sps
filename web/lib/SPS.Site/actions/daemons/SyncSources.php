@@ -134,6 +134,7 @@
             /**
              * Обходим посты и созраняем их в бд, попутно сливая фотки
              */
+
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8($post['id']);
 
@@ -151,8 +152,22 @@
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = TextHelper::ToUTF8($post['text']);
                 $articleRecord->likes   = Convert::ToInteger($post['likes_tr']);
-                $articleRecord->link    = null;
+                $articleRecord->link    = Convert::ToString($post['link']);;
                 $articleRecord->photos  = array();
+
+                $articleRecord->retweet     = Convert::ToArray($post['retweet']);
+                $articleRecord->text_links  = Convert::ToArray($post['text_links']);
+                $articleRecord->video       = Convert::ToArray($post['video']);
+                $articleRecord->music       = Convert::ToArray($post['music']);
+                $articleRecord->poll        = Convert::ToString($post['poll']);;
+                $articleRecord->map         = Convert::ToString($post['map']);;
+                $articleRecord->doc         = Convert::ToString($post['doc']);;
+
+                $articleRecord->rate = 0;
+
+                if (strpos($post['likes'], '%') !== false) {
+                    $articleRecord->rate = Convert::ToInt(str_replace('%', '', $post['likes']));
+                }
 
                 if (!empty($originalObjects[$externalId])) {
                     //обновляем уже сохраненный пост и только определенные поля
@@ -161,7 +176,7 @@
                     if (!is_object($originalObjects[$externalId])) continue;
 
                     //фильтруем поля
-                    $fields = array('likes', 'link');
+                    $fields = array('likes', 'link', 'retweet', 'text_links', 'video', 'music', 'poll', 'map', 'doc', 'rate');
 
                     //обновляем запись
                     ArticleRecordFactory::UpdateByMask($articleRecord, $fields, array('articleId' => $originalObjects[$externalId]->articleId));
