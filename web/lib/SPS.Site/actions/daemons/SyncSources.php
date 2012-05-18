@@ -231,6 +231,9 @@
             $result = array();
 
             foreach ($data as $photo) {
+                //чтобы не блочили за частый слив фоточек
+                sleep(1);
+
                 //moving photo to local temp
                 $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
                 $content = file_get_contents($photo['url']);
@@ -255,9 +258,6 @@
                         'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : ''
                     );
                 }
-
-                //чтобы не блочили за частый слив фоточек
-                sleep(0.5);
             }
 
             return $result;

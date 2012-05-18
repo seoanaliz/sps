@@ -13,7 +13,7 @@
                 $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                 $dimensions = ImageHelper::GetImageSizes($path);
 
-                if ($dimensions['width'] < 200) {
+                if ($dimensions['width'] < 250) {
                     return true;
                 }
             }
