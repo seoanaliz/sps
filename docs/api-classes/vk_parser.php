@@ -226,7 +226,7 @@ header("Content-Type: text/html; charset=windows-1251");
                 if ($retweet){
                    
                     $posts[$t]['retweet'] = $this->get_info(self::VK_URL.$retweet);
-                } else $posts[$t]['retweet'] = '';
+                } else $posts[$t]['retweet'] = array();
                 
                 
                 
