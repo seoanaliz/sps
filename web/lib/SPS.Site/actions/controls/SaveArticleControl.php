@@ -72,6 +72,7 @@
             $article->importedAt = $article->createdAt;
             $article->sourceFeedId = $sourceFeedId;
             $article->externalId = -1;
+            $article->rate = 100;
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
