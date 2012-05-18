@@ -107,11 +107,10 @@ header("Content-Type: text/html; charset=windows-1251");
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
         //          -1               пост не прошел отбора, его не нужно выводить
-        //          "x+" (x>=2)    - клевый пост, сильно выбивается из окружающих.
-        //                            чем больше х тем круче
-        //          "-"            -  лайков у поста меньше 20(попадает в выдачу из-за
-        //                            того, что остальные посты +- такие же)
-        //          "x%"(0<x<~100) -  относительная крутизна поста
+        //          "-"              лайков у поста меньше 20(попадает в выдачу из-за
+        //                           того, что остальные посты +- такие же)
+        //          "x%"(1<x<~100)   относительная крутизна поста
+        //          "x%"(x>100)      клевый пост, сильно выбивается из окружающих, нужно как-то отметить
         //likes_tr - абсолютные лайки
         //id - внутренний id поста в контакте
         //text
@@ -398,28 +397,29 @@ header("Content-Type: text/html; charset=windows-1251");
         }
 
         
-        private function otsev($array)
-        {  
+         private function otsev($array)
+        {
             $res = array();
-            $sr =  $this->srednee($array);    
-            
+            $sr =  $this->srednee($array);
+
             $i = 0;
             $t = 0;
         //отсев крупных
             while(isset($array[$i]['likes'])){
                 if ($array[$i]['likes'] > ($sr * 2) ){
                     if ($sr > 1){
-                        $array[$i]['likes'] = round($array[$i]['likes']/$sr) . '+' ;
-                        
+                        $array[$i]['likes'] = '+' ;
+//                        $array[$i]['likes'] = round(($array[$i]['likes'] * 100) / $ed ) . '%';
+
                     }else
                         $array[$i]['likes'] = '-';
-                    
+
                     $t ++;
                 }
                 $i++;
             }
 
-            $sr =  $this->srednee($array);    
+            $sr =  $this->srednee($array);
 
             $i = 0;
             $t = 0;
@@ -431,40 +431,41 @@ header("Content-Type: text/html; charset=windows-1251");
                     $i++;
                     continue;
                 }
-                
+
                 if ($array[$i]['likes'] < $sr / 2 ) {
                     $t ++;
                     $array[$i]['likes'] = -1;
                 }
                 $i++;
             }
-                    
+
             $sr = $this->srednee($array);
             $ed = $sr * 2;
             unset($t);
-        
+
             $t = 0;
         //отсев значений ниже порога, оценка оставшихся в %
             while (isset($array[$t]['likes'])){
-                if (substr_count($array[$t]['likes'], '%') > 0 ||
-                        substr_count($array[$t]['likes'], '+') > 0 ||
+                #
+                if (    substr_count($array[$t]['likes'], '%') > 0 ||
+                       # substr_count($array[$t]['likes'], '+') > 0 ||
                         $array[$t]['likes'] == '-1'
                         || substr_count($array[$t]['likes'], '-') > 0) {
                         $t++;
                         continue;
 
                     }
-                if ($array[$t]['likes'] >= (self::PROCENT_OTSEVA / 100) * $ed)
+                if ($array[$t]['likes_tr'] >= (self::PROCENT_OTSEVA / 100) * $ed)
                 {
                     if ($ed < 1)
                          $array[$t]['likes'] = '-';
                     else
-                        $array[$t]['likes'] = round(($array[$t]['likes'] * 100) / $ed ) . '%';
+                        $array[$t]['likes'] = round(($array[$t]['likes_tr'] * 100) / $ed ) . '%';
                     }
                 else {
                     $array[$t]['likes'] = -1;
                 }
-               
+
                 $t++;
             }
          //удаление ненужных постов
@@ -477,8 +478,8 @@ header("Content-Type: text/html; charset=windows-1251");
 //                         unset($array[$i]);
                 elseif ($array[$i]['likes_tr'] < 20)
                     $array[$i]['likes'] = '-';
-            } 
-            
+            }
+
             $array = array_values($array);
             return $array;
 
