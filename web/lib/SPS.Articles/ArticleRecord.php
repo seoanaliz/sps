@@ -28,6 +28,30 @@
         public $photos;
 
         /** @var int */
+        public $rate;
+
+        /** @var array */
+        public $retweet;
+
+        /** @var array */
+        public $video;
+
+        /** @var array */
+        public $music;
+
+        /** @var string */
+        public $map;
+
+        /** @var string */
+        public $poll;
+
+        /** @var array */
+        public $text_links;
+
+        /** @var string */
+        public $doc;
+
+        /** @var int */
         public $articleId;
 
         /** @var Article */

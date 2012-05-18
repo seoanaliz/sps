@@ -92,6 +92,14 @@
         <Attribute Name="likes" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="likes" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="link" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="link" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="photos" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="photos" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="rate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="rate" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="retweet" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="retweet" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="video" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="video" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="music" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="music" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="map" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="map" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="poll" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="poll" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="text_links" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="text_links" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="doc" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="500" DbName="doc" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="articleQueueId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleQueue" ForeignKey="ArticleQueue" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>

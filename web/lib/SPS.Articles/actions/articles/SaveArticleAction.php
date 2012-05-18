@@ -80,6 +80,15 @@
             $photos = !empty($photos) ? $photos : array();
             $this->articleRecord->photos = $photos;
             $this->photosToResponse();
+
+            //fix arrays
+            $arrays = array('retweet', 'video', 'music', 'text_links');
+            $data   = Request::getArray( "articleRecord" );
+            foreach ($arrays as $arrayName) {
+                $value = !empty($data[$arrayName]) ? $data[$arrayName] : '[]';
+                $value = ObjectHelper::FromJSON($value);
+                $this->articleRecord->$arrayName = $value;
+            }
             
             return $object;
         }

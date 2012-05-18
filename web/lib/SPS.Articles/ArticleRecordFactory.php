@@ -48,6 +48,45 @@
                     , 'type'        => TYPE_ARRAY
                     , 'complexType' => 'php'
                 )
+                ,'rate' => array(
+                    'name'          => 'rate'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'retweet' => array(
+                    'name'          => 'retweet'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
+                ,'video' => array(
+                    'name'          => 'video'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
+                ,'music' => array(
+                    'name'          => 'music'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
+                ,'map' => array(
+                    'name'          => 'map'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 500
+                )
+                ,'poll' => array(
+                    'name'          => 'poll'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 500
+                )
+                ,'text_links' => array(
+                    'name'          => 'text_links'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
+                ,'doc' => array(
+                    'name'          => 'doc'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 500
+                )
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER

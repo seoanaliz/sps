@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		16.05.2012
+Modified		18.05.2012
 Project		
 Model			
 Company		
@@ -187,6 +187,14 @@ Create table "articleRecords"
 	"likes" Integer,
 	"photos" Text,
 	"link" Varchar(500),
+	"rate" Integer,
+	"retweet" Text,
+	"video" Text,
+	"music" Text,
+	"map" Varchar(500),
+	"poll" Varchar(500),
+	"text_links" Text,
+	"doc" Varchar(500),
 	"articleId" Integer,
 	"articleQueueId" Integer,
  primary key ("articleRecordId")

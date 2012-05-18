@@ -607,6 +607,70 @@
           <AttributeParameter Key="controlId" Value="link" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="rate" TitleKey="vt.articleRecord.rate" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="rate" />
+          <AttributeParameter Key="value" Value="rate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="rate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="retweet" TitleKey="vt.articleRecord.retweet" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="retweet" />
+          <AttributeParameter Key="value" Value="retweet" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="retweet" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="video" TitleKey="vt.articleRecord.video" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="video" />
+          <AttributeParameter Key="value" Value="video" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="video" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="music" TitleKey="vt.articleRecord.music" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="music" />
+          <AttributeParameter Key="value" Value="music" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="music" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="map" TitleKey="vt.articleRecord.map" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="map" />
+          <AttributeParameter Key="value" Value="map" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="map" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="poll" TitleKey="vt.articleRecord.poll" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="poll" />
+          <AttributeParameter Key="value" Value="poll" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="poll" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="text_links" TitleKey="vt.articleRecord.text_links" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="text_links" />
+          <AttributeParameter Key="value" Value="text_links" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="text_links" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="doc" TitleKey="vt.articleRecord.doc" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="doc" />
+          <AttributeParameter Key="value" Value="doc" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="doc" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleRecordId" TitleKey="vt.articleRecord.articleRecordId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -664,6 +728,70 @@
           <AttributeParameter Key="value" Value="link" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="link" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="rate" TitleKey="vt.articleRecord.rate" TitleValue="rate" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="rate" />
+          <AttributeParameter Key="value" Value="rate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="rate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="retweet" TitleKey="vt.articleRecord.retweet" TitleValue="retweet" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="retweet" />
+          <AttributeParameter Key="value" Value="retweet" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="retweet" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="video" TitleKey="vt.articleRecord.video" TitleValue="video" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="video" />
+          <AttributeParameter Key="value" Value="video" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="video" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="music" TitleKey="vt.articleRecord.music" TitleValue="music" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="music" />
+          <AttributeParameter Key="value" Value="music" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="music" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="map" TitleKey="vt.articleRecord.map" TitleValue="map" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="map" />
+          <AttributeParameter Key="value" Value="map" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="map" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="poll" TitleKey="vt.articleRecord.poll" TitleValue="poll" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="poll" />
+          <AttributeParameter Key="value" Value="poll" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="poll" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="text_links" TitleKey="vt.articleRecord.text_links" TitleValue="text_links" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="text_links" />
+          <AttributeParameter Key="value" Value="text_links" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="text_links" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="doc" TitleKey="vt.articleRecord.doc" TitleValue="doc" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="doc" />
+          <AttributeParameter Key="value" Value="doc" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="doc" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

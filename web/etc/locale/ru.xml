@@ -332,6 +332,14 @@
             <likes><![CDATA[Лайки]]></likes>
             <photos><![CDATA[Фото]]></photos>
             <link><![CDATA[Ссылка]]></link>
+            <rate><![CDATA[Рейтинг]]></rate>
+            <map><![CDATA[Карта]]></map>
+            <poll><![CDATA[Голосование]]></poll>
+            <doc><![CDATA[Документ]]></doc>
+            <retweet><![CDATA[Retweet]]></retweet>
+            <video><![CDATA[Видео]]></video>
+            <music><![CDATA[Музыка]]></music>
+            <textLinks><![CDATA[Ссылки в тексте]]></textLinks>
         </articleRecord>
         <publisher>
             <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>

@@ -82,6 +82,15 @@
             $photos = !empty($photos) ? $photos : array();
             $this->articleRecord->photos = $photos;
 
+            //fix arrays
+            $arrays = array('retweet', 'video', 'music', 'text_links');
+            $data   = Request::getArray( "articleRecord" );
+            foreach ($arrays as $arrayName) {
+                $value = !empty($data[$arrayName]) ? $data[$arrayName] : '[]';
+                $value = ObjectHelper::FromJSON($value);
+                $this->articleRecord->$arrayName = $value;
+            }
+
             //force articleId
             $articleId = Request::getInteger( 'articleId' );
             if ($articleId) {
@@ -95,10 +104,18 @@
                     );
 
                     if (!empty($forceArticleRecord)) {
-                        $this->articleRecord->content   = $forceArticleRecord->content;
-                        $this->articleRecord->likes     = $forceArticleRecord->likes;
-                        $this->articleRecord->photos    = $forceArticleRecord->photos;
-                        $this->articleRecord->link      = $forceArticleRecord->link;
+                        $this->articleRecord->content       = $forceArticleRecord->content;
+                        $this->articleRecord->likes         = $forceArticleRecord->likes;
+                        $this->articleRecord->photos        = $forceArticleRecord->photos;
+                        $this->articleRecord->link          = $forceArticleRecord->link;
+                        $this->articleRecord->rate          = $forceArticleRecord->rate;
+                        $this->articleRecord->retweet       = $forceArticleRecord->retweet;
+                        $this->articleRecord->video         = $forceArticleRecord->video;
+                        $this->articleRecord->music         = $forceArticleRecord->music;
+                        $this->articleRecord->map           = $forceArticleRecord->map;
+                        $this->articleRecord->poll          = $forceArticleRecord->poll;
+                        $this->articleRecord->text_links    = $forceArticleRecord->text_links;
+                        $this->articleRecord->doc           = $forceArticleRecord->doc;
                     }
                 }
             }
