@@ -1,5 +1,28 @@
 var articlesLoading = false;
 
+$(function(){
+    $( "#slider-range" ).slider({
+    range: true,
+    min: 0,
+    max: 1000,
+    values: [ 0, 1000 ],
+        slide: function( event, ui ) {
+            changeRange();
+        }
+        , change: function(event, ui) {
+            changeRange();
+            loadArticles(true);
+        }
+    });
+
+    changeRange();
+});
+
+function changeRange() {
+    $( "#slider-value" ).text( "❤" + $( "#slider-range" ).slider( "values", 0 ) +
+        " - ❤" + $( "#slider-range" ).slider( "values", 1 ) );
+}
+
 function loadArticles(clean) {
     if (articlesLoading) return;
 
@@ -28,7 +51,9 @@ function loadArticles(clean) {
         dataType : "html",
         data: {
             sourceFeedIds: Elements.leftdd(),
-            clean: clean
+            clean: clean,
+            from : $( "#slider-range" ).slider( "values", 0 ),
+            to : $( "#slider-range" ).slider( "values", 1 )
         },
         success: function (data) {
             $('div#wall div#wall-loader').remove();

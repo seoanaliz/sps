@@ -74,6 +74,16 @@
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 )
+                ,'rateGE' => array(
+                    'name'         => 'rate'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                ,'rateLE' => array(
+                    'name'         => 'rate'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_LE
+                )
                 ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER

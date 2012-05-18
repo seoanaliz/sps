@@ -24,6 +24,13 @@
                     <div class="ctl spr del"></div>
                 </div -->
 
+                <p style="padding: 5px;">
+                    <label>Лайки:</label>
+                    <span id="slider-value"></span>
+                </p>
+                <div style="padding: 10px !important;">
+                    <div id="slider-range"></div>
+                </div>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 

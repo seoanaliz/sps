@@ -55,6 +55,8 @@
       <Search>
         <Attribute Name="_externalId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="externalId" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
         <Attribute Name="_sourceFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="sourceFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+        <Attribute Name="rateGE" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="rate" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_GE" />
+        <Attribute Name="rateLE" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="rate" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_LE" />
         <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Search>

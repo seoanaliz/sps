@@ -30,8 +30,24 @@
                 $page = 0;
             }
 
+            $search = array(
+                '_sourceFeedId' => $sourceFeedIds,
+                'pageSize' => $pageSize + 1,
+                'page' => $page,
+            );
+
+            $from = Request::getInteger( 'from' );
+            $to = Request::getInteger( 'to' );
+
+            if ($from !== null) {
+                $search['rateGE'] = $from;
+            }
+            if ($to !== null) {
+                $search['rateLE'] = $to;
+            }
+
             $articles = ArticleFactory::Get(
-                array('_sourceFeedId' => $sourceFeedIds, 'pageSize' => $pageSize + 1, 'page' => $page)
+                $search
             );
 
             if (empty($articles)) {

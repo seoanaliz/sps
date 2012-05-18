@@ -55,6 +55,7 @@
         'js://ext/fancybox2/jquery.fancybox.js',
         'js://ext/fancybox2/helpers/jquery.fancybox-buttons.js',
         'js://fe/jquery.ui.datepicker.js',
+        'js://fe/jquery.ui.slider.js',
         'js://fe/eventlist.js',
         'js://fe/file-uploader/fileuploader.js',
         'js://fe/jquery.Jcrop.min.js',
