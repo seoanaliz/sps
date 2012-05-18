@@ -116,7 +116,7 @@
             ArticleFactory::$mapping = $__mapping;
 
             if (!empty($originalObjects)) {
-                $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId');
+                $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId', false);
             }
 
             /**
@@ -141,10 +141,6 @@
                     continue; //пропускаем определенные
                 }
 
-                if (!empty($originalObjects[$externalId])) {
-                    continue; //не сохраняем то что уже сохранили
-                }
-
                 $article = new Article();
                 $article->sourceFeedId  = $source->sourceFeedId;
                 $article->externalId    = $externalId;
@@ -154,29 +150,33 @@
 
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = TextHelper::ToUTF8($post['text']);
-                $articleRecord->likes   = Convert::ToInteger($post['likes']);
+                $articleRecord->likes   = Convert::ToInteger($post['likes_tr']);
+                $articleRecord->link    = null;
                 $articleRecord->photos  = array();
 
-                //сохраняем фотки на медиа сервер
-                if (!empty($post['photo'])) {
-                    $articleRecord->photos = $this->savePostPhotos($post['photo']);
-                }
+                if (!empty($originalObjects[$externalId])) {
+                    //обновляем уже сохраненный пост и только определенные поля
 
-                //сохраняем в транзакции
-                $conn = ConnectionFactory::Get();
-                $conn->begin();
+                    //проверка на уже существующие дубликаты
+                    if (!is_object($originalObjects[$externalId])) continue;
 
-                $result = ArticleFactory::Add($article);
+                    //фильтруем поля
+                    $fields = array('likes', 'link');
 
-                if ( $result ) {
-                    $articleRecord->articleId = ArticleFactory::GetCurrentId();
-                    $result = ArticleRecordFactory::Add( $articleRecord );
-                }
-
-                if ( $result ) {
-                    $conn->commit();
+                    //обновляем запись
+                    ArticleRecordFactory::UpdateByMask($articleRecord, $fields, array('articleId' => $originalObjects[$externalId]->articleId));
                 } else {
-                    $conn->rollback();
+                    //сохраняем фотки на медиа сервер
+                    if (!empty($post['photo'])) {
+                        try {
+                            $articleRecord->photos = $this->savePostPhotos($post['photo']);
+                        } catch (Exception $Ex) {
+                            AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
+                        }
+                    }
+
+                    //добавляем новый пост
+                    $this->addArticle($article, $articleRecord);
                 }
             }
 
@@ -184,6 +184,27 @@
                 //снимаем лок
                 $this->daemon->Unlock();
             }
+        }
+
+        private function addArticle(Article $article, $articleRecord) {
+            //сохраняем в транзакции
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+
+            $result = ArticleFactory::Add($article);
+
+            if ( $result ) {
+                $articleRecord->articleId = ArticleFactory::GetCurrentId();
+                $result = ArticleRecordFactory::Add( $articleRecord );
+            }
+
+            if ( $result ) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+
+            return $result;
         }
 
         /**
@@ -197,7 +218,13 @@
             foreach ($data as $photo) {
                 //moving photo to local temp
                 $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-                file_put_contents($tmpName, file_get_contents($photo['url']));
+                $content = file_get_contents($photo['url']);
+
+                if (!$content) {
+                    throw new Exception('failed to get content of photo ' . $photo['url']);
+                }
+
+                file_put_contents($tmpName, $content);
                 $file = array(
                     'tmp_name'  => $tmpName,
                     'name'      => $tmpName,
@@ -213,6 +240,9 @@
                         'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : ''
                     );
                 }
+
+                //чтобы не блочили за частый слив фоточек
+                sleep(0.5);
             }
 
             return $result;
