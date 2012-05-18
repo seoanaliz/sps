@@ -25,6 +25,9 @@
         public $externalId;
 
         /** @var int */
+        public $rate;
+
+        /** @var int */
         public $sourceFeedId;
 
         /** @var SourceFeed */

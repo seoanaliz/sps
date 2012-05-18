@@ -45,6 +45,11 @@
                     , 'max'         => 100
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'rate' => array(
+                    'name'          => 'rate'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'No'
+                )
                 ,'sourceFeedId' => array(
                     'name'          => 'sourceFeedId'
                     , 'type'        => TYPE_INTEGER

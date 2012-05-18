@@ -144,7 +144,7 @@
                 $url = str_replace('https://', 'http://', $photo['url']);
 
                 $fileContent = file_get_contents($url);
-                if ($fileContent === false) {
+                if (!$fileContent) {
                     throw new Exception('photo download failed');
                 }
 

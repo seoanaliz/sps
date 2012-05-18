@@ -37,6 +37,10 @@
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="rate" class="row required">
+            <label>{lang:vt.articleRecord.rate}</label>
+            <?= FormHelper::FormInput( $prefix . '[rate]', $object->rate, 'rate', null, array( 'size' => 80, 'style' => 'width: 100px;' ) ); ?>
+        </div>
         <div data-row="sourceFeedId" class="row required">
             <label>{lang:vt.article.sourceFeedId}</label>
             <?= FormHelper::FormSelect( $prefix . '[sourceFeedId]', $sourceFeeds, "sourceFeedId", "title", $object->sourceFeedId, null, null, false ); ?>

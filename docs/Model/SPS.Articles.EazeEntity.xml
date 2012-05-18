@@ -335,6 +335,14 @@
           <AttributeParameter Key="format" Value="d.m.Y G:i" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="rate" TitleKey="vt.article.rate" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="rate" />
+          <AttributeParameter Key="value" Value="rate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="rate" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -395,6 +403,14 @@
           <AttributeParameter Key="name" Value="createdAt" />
           <AttributeParameter Key="value" Value="createdAt" />
           <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="rate" TitleKey="vt.article.rate" TitleValue="rate" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="rate" />
+          <AttributeParameter Key="value" Value="rate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="rate" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

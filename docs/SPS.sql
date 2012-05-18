@@ -160,6 +160,7 @@ Create table "articles"
 	"importedAt" Timestamp NOT NULL,
 	"createdAt" Timestamp,
 	"externalId" Varchar(100) NOT NULL,
+	"rate" Integer NOT NULL Default 0,
 	"sourceFeedId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,
  primary key ("articleId")

@@ -163,11 +163,16 @@
                 $articleRecord->map         = Convert::ToString($post['map']);;
                 $articleRecord->doc         = Convert::ToString($post['doc']);;
 
+
+                //rate
+
                 $articleRecord->rate = 0;
 
                 if (strpos($post['likes'], '%') !== false) {
                     $articleRecord->rate = Convert::ToInt(str_replace('%', '', $post['likes']));
                 }
+
+                $article->rate = $articleRecord->rate;
 
                 if (!empty($originalObjects[$externalId])) {
                     //обновляем уже сохраненный пост и только определенные поля
@@ -180,6 +185,7 @@
 
                     //обновляем запись
                     ArticleRecordFactory::UpdateByMask($articleRecord, $fields, array('articleId' => $originalObjects[$externalId]->articleId));
+                    ArticleFactory::UpdateByMask($article, array('rate'), array('articleId' => $originalObjects[$externalId]->articleId));
                 } else {
                     //сохраняем фотки на медиа сервер
                     if (!empty($post['photo'])) {
