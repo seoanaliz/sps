@@ -39,12 +39,12 @@
     if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
 
     Request::Init();
-    if ( Request::getRemoteIp() == '127.0.0.1' ) {
+    //if ( Request::getRemoteIp() == '127.0.0.1' ) {
         $__level = Request::getParameter( '__level' );
         if ( !is_null( $__level ) ) {
             Logger::LogLevel( $__level );
         }
-    }
+    //}
     SiteManager::DetectSite();
 
     Logger::Info( __METHOD__, 'Done' );
