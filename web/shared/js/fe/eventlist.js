@@ -4,8 +4,8 @@ $(function(){
     $( "#slider-range" ).slider({
     range: true,
     min: 0,
-    max: 1000,
-    values: [ 0, 1000 ],
+    max: 100,
+    values: [ 50, 100 ],
         slide: function( event, ui ) {
             changeRange();
         }

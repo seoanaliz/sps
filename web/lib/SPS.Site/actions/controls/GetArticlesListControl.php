@@ -42,7 +42,7 @@
             if ($from !== null) {
                 $search['rateGE'] = $from;
             }
-            if ($to !== null) {
+            if ($to !== null && $to < 100) {
                 $search['rateLE'] = $to;
             }
 

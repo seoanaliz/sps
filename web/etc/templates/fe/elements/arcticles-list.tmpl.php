@@ -93,7 +93,7 @@
                         <? } else { ?>
                             Добавлена вручную
                         <? } ?>
-                    </span> | <span class="likes spr"></span><span class="likes-count">{$article->rate}</span>
+                    </span> | <span class="likes spr"></span><span class="likes-count"><?= ($article->rate > 100) ? 'TOP' : $article->rate ?></span>
                 </div>
             </div>
             <div class="delete spr"></div>
