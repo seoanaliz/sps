@@ -9,7 +9,7 @@
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeeds[$article->sourceFeedId], $articleRecord);
             $showLinkDescription = true;
 
-            if ($sourceFeeds[$article->sourceFeedId]->externalId = ParserVkontakte::TOP && !$isWithSmallPhoto && !empty($articleRecord->photos)) {
+            if ($sourceFeeds[$article->sourceFeedId]->externalId == ParserVkontakte::TOP && !$isWithSmallPhoto && !empty($articleRecord->photos)) {
                 $showLinkDescription = false;
             }
             ?>
