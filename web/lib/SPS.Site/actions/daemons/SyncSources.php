@@ -98,7 +98,6 @@
                 $postDate = new DateTimeWrapper(date('r', $post['time']));
                 if ($postDate >= $targetDate) {
                     $skipIds[] = $externalId;
-
                 }
             }
 
@@ -126,15 +125,11 @@
                 //обновляем pagesCountProcessed в базе, снимаем лок параллельному потоку
                 $source->processed = Convert::ToInt($source->processed) + 1;
                 SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
-
-                //снимаем лок
-                $this->daemon->Unlock();
             }
 
             /**
              * Обходим посты и созраняем их в бд, попутно сливая фотки
              */
-
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8($post['id']);
 
@@ -201,10 +196,7 @@
                 }
             }
 
-            if (!empty($skipIds)) {
-                //снимаем лок
-                $this->daemon->Unlock();
-            }
+            $this->daemon->Unlock();
         }
 
         private function addArticle(Article $article, $articleRecord) {
