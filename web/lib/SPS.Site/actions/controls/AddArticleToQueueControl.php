@@ -64,15 +64,20 @@
                 return false;
             }
 
-            //проверяем, если ли такая $articleId в этой $targetFeedId
-            $existsCount = ArticleQueueFactory::Count(
-                array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
-            );
+            //source feed
+            $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
 
-            if ($existsCount) {
-                $result['message'] = 'articleQueueExists';
-                echo ObjectHelper::ToJSON($result);
-                return false;
+            if ($sourceFeed->type == SourceFeedUtility::Source) {
+                //проверяем, если ли такая $articleId в этой $targetFeedId
+                $existsCount = ArticleQueueFactory::Count(
+                    array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
+                );
+
+                if ($existsCount) {
+                    $result['message'] = 'articleQueueExists';
+                    echo ObjectHelper::ToJSON($result);
+                    return false;
+                }
             }
 
             $object = new ArticleQueue();

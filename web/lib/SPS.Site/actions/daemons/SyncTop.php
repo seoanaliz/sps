@@ -101,6 +101,8 @@
                 $articleRecord->photos  = array();
                 $articleRecord->rate    = $articleRecord->likes;
 
+                $article->rate = $articleRecord->rate;
+
                 //сохраняем фотки на медиа сервер
                 if (!empty($post['photo'])) {
                     try {
