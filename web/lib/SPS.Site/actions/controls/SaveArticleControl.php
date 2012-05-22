@@ -11,8 +11,8 @@
 
         private function convert_line_breaks($string, $line_break=PHP_EOL) {
             $patterns = array(
-                "/(<br>|<br \/>|<br\/>)\s*/i",
-                "/(\r\n|\r|\n)/"
+                "/(<br>|<br \/>|<br\/>|<div>)\s*/i",
+                "/(\r\n|\r|\n)/",
             );
             $replacements = array(
                 PHP_EOL,
