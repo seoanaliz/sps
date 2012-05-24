@@ -173,6 +173,7 @@ i {font-style: italic;}
 
 .ui-datepicker {
     clip: auto !important;
+    position: fixed !important;
 }
 
 .layer {margin: 0 auto;width:1010px;}
