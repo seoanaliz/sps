@@ -29,7 +29,9 @@
         <Attribute Name="startTime" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startTime" FieldType="TYPE_TIME" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="period" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="period" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="vkIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="vkIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
-        <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="type" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="10" DbName="type" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="params" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="params" FieldType="TYPE_ARRAY" ComplexType="php" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>

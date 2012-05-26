@@ -18,6 +18,10 @@
     </ul>
 
     <div id="page-0" class="tab-page rows">
+        <div data-row="type" class="row required">
+            <label>{lang:vt.sourceFeed.type}</label>
+            <?= FormHelper::FormSelect( $prefix . '[type]', TargetFeedUtility::$Types, "", "", $object->type, null, null, false ); ?>
+        </div>
         <div data-row="title" class="row required">
             <label>{lang:vt.targetFeed.title}</label>
             <?= FormHelper::FormInput( $prefix . '[title]', $object->title, 'title', null, array( 'size' => 80 ) ); ?>
@@ -37,9 +41,9 @@
             </div>
             <?= FormHelper::FormInput( $prefix . '[vkIds]', $object->vkIds, 'vkIds', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="publisherId" class="row required">
+        <div data-row="publisherId" class="row">
             <label>{lang:vt.targetFeed.publisherId}</label>
-            <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, false ); ?>
+            <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, true ); ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.targetFeed.statusId}</label>

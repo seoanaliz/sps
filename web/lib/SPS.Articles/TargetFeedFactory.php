@@ -56,10 +56,20 @@
                     'name'          => 'vkIds'
                     , 'type'        => TYPE_STRING
                 )
+                ,'type' => array(
+                    'name'          => 'type'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 10
+                    , 'nullable'    => 'CheckEmpty'
+                )
+                ,'params' => array(
+                    'name'          => 'params'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
                 ,'publisherId' => array(
                     'name'          => 'publisherId'
                     , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Publisher'
                 )
                 ,'statusId' => array(

@@ -18,6 +18,8 @@ SELECT "public"."targetFeeds"."targetFeedId"
 	, "public"."targetFeeds"."startTime"
 	, "public"."targetFeeds"."period"
 	, "public"."targetFeeds"."vkIds"
+	, "public"."targetFeeds"."type"
+	, "public"."targetFeeds"."params"
 	, "public"."targetFeeds"."publisherId"
 	, "public"."targetFeeds"."statusId"
 	, "publisher"."publisherId" AS "publisher.publisherId"
@@ -28,7 +30,7 @@ SELECT "public"."targetFeeds"."targetFeedId"
 	, "publisher"."vk_seckey" AS "publisher.vk_seckey"
 	, "publisher"."statusId" AS "publisher.statusId"
  FROM "public"."targetFeeds"
-	INNER JOIN "public"."publishers" "publisher" ON
+	LEFT JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeeds"."publisherId"
 	WHERE "public"."targetFeeds"."statusId" != 3;
 	

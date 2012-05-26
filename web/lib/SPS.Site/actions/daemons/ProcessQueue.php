@@ -69,6 +69,11 @@ sql;
             $article = ArticleFactory::GetById($articleQueue->articleId, array(), array(BaseFactory::WithoutDisabled => false));
             $sourceFeed = SourceFeedFactory::GetOne(array('sourceFeedId' => $article->sourceFeedId));
 
+            if ($targetFeed->type == TargetFeedUtility::FB) {
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'Facebook posting not implemented');
+                return false;
+            }
+
             if (empty($targetFeed) || $targetFeed->publisher->statusId != 1 || empty($articleRecord)) {
                 return false;
             }

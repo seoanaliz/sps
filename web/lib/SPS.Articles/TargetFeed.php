@@ -30,6 +30,12 @@
         /** @var string */
         public $vkIds;
 
+        /** @var string */
+        public $type;
+
+        /** @var array */
+        public $params;
+
         /** @var int */
         public $publisherId;
 

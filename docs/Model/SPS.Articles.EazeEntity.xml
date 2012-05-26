@@ -210,6 +210,22 @@
           <AttributeParameter Key="controlId" Value="vkIds" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="type" TitleKey="vt.targetFeed.type" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="type" />
+          <AttributeParameter Key="value" Value="type" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="type" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="params" TitleKey="vt.targetFeed.params" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="params" />
+          <AttributeParameter Key="value" Value="params" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="params" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeed.targetFeedId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -276,6 +292,22 @@
           <AttributeParameter Key="rows" Value="5" />
           <AttributeParameter Key="cols" Value="80" />
           <AttributeParameter Key="controlId" Value="vkIds" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="type" TitleKey="vt.targetFeed.type" TitleValue="Тип" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="type" />
+          <AttributeParameter Key="value" Value="type" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="type" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="params" TitleKey="vt.targetFeed.params" TitleValue="params" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="params" />
+          <AttributeParameter Key="value" Value="params" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="params" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

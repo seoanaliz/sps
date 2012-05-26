@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		18.05.2012
+Modified		26.05.2012
 Project		
 Model			
 Company		
@@ -224,7 +224,9 @@ Create table "targetFeeds"
 	"startTime" Time NOT NULL Default '09:00:00',
 	"period" Integer NOT NULL Default 60,
 	"vkIds" Text,
-	"publisherId" Integer NOT NULL,
+	"type" Varchar(10) NOT NULL Default 'vk',
+	"params" Text,
+	"publisherId" Integer,
 	"statusId" Integer NOT NULL,
  primary key ("targetFeedId")
 ) Without Oids;
