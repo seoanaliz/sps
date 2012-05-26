@@ -62,6 +62,9 @@
             <action name="DeleteArticleControl">
                 <path>controls/DeleteArticleControl</path>
             </action>
+            <action name="ClearArticleTextControl">
+                <path>controls/ClearArticleTextControl</path>
+            </action>
             <action name="GetArticlesQueueListControl">
                 <path>controls/GetArticlesQueueListControl</path>
             </action>

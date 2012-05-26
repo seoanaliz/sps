@@ -23,7 +23,7 @@
                     $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
                     $contentPart1 = mb_substr($content, 0, 300);
                     $contentPart2 = mb_substr($content, 300);
-                    $contentPart1 = !empty($contentPart1) ? $contentPart1 : '&nbsp;'
+                    $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
                 ?>
                 <div class="shortcut">{$contentPart1}</div>
                 <? if($contentPart2) { ?>
@@ -76,7 +76,7 @@
                 ?>
             </div>
             <div class="bottom d-hide">
-                <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a></div>
+                <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a> | <a class="clear-text" href="javascript:;">Очистить текст</a></div>
                 <div class="r">
                     <? if (!empty($articleRecord->link)) { ?>
                         <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>

@@ -100,6 +100,17 @@ var Eventlist = {
             }
         });
     },
+    leftcolumn_clear_post_text: function(post_id, callback){
+        $.ajax({
+            url: controlsRoot + 'arcticle-clear-text/',
+            data: {
+                id: post_id
+            },
+            success: function (data) {
+                callback(1);
+            }
+        });
+    },
     leftcolumn_recoverpost: function(post_id, callback){
         $.ajax({
             url: controlsRoot + 'arcticle-restore/',

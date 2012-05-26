@@ -25,6 +25,9 @@
                 <page uri="controls://arcticle-delete/">
                     <actions>SPS.Site.DeleteArticleControl</actions>
                 </page>
+                <page uri="controls://arcticle-clear-text/">
+                    <actions>SPS.Site.ClearArticleTextControl</actions>
+                </page>
                 <page uri="controls://arcticles-queue-list/">
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>

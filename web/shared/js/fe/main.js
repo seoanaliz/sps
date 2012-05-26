@@ -125,6 +125,21 @@ $(document).ready(function(){
         });
     });
 
+    $(".left-panel").delegate(".clear-text", "click", function(){
+        var id = $(this).closest(".post").data("id");
+        var post = $(this).closest(".post");
+
+        if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
+            Events.fire('leftcolumn_clear_post_text', [id, function(state){
+                if(state) {
+                    post.find('div.shortcut').html('');
+                    post.find('div.cut').html('');
+                    post.find('a.show-cut').remove();
+                }
+            }]);
+        }
+    });
+
     //init first source and target
     var currentTarget = $(".right-panel .drop-down ul li.active");
     if (currentTarget.length == 0) {
@@ -562,7 +577,7 @@ $(document).ready(function(){
             shortcut = $content.find('.shortcut').html(),
             cut      = $content.find('.cut').html();
 
-        $content.html(shortcut + ' ' + cut);
+        $content.html('<div class="shortcut">' + shortcut + ' ' + cut + '</div>');
         $(this).remove();
 
         e.preventDefault();
