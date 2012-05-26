@@ -90,34 +90,36 @@
             $uids = array();
             //перебор топов городов
             foreach($cities as $city){
-                $request_params  = array('sex'  =>  0, 'city' => $city);
-                $request = array(   'service'   =>  'top',
-                                    'data'      =>  $request_params,
-                                    'ssid'      =>  $ssid
-                );
-                $request  = json_encode($request);
-                $response = $this->qurl_request_js(self::API_URL, $request);
-                $response = json_decode($response);
-                if (isset($response->error)){
-                    throw new exception('Error in ' . __CLASS__ . '::' . __FUNCTION__ .
-                        ", problems with top request : " . $response->error->message);
-                }
-
-                foreach($response->result->top as &$entry){
-                    $uids[] = $entry->uid;
-                    $res[] = array(
-                        'id'      =>  $entry->uid,
-                        'link'    =>  'http://topface.ru/vklike/' . $entry->uid. '/',
-                        'likes'   =>  $entry->liked,
-                        'photo'   =>  array(
-                            '0' => array(
-                                'url' => $entry->photo
-                            )
-                        )
+                for ($sex = 0; $sex <= 1; $sex++) {
+                    $request_params  = array('sex'  =>  $sex, 'city' => $city);
+                    $request = array(   'service'   =>  'top',
+                                        'data'      =>  $request_params,
+                                        'ssid'      =>  $ssid
                     );
-                }
+                    $request  = json_encode($request);
+                    $response = $this->qurl_request_js(self::API_URL, $request);
+                    $response = json_decode($response);
+                    if (isset($response->error)){
+                        throw new exception('Error in ' . __CLASS__ . '::' . __FUNCTION__ .
+                            ", problems with top request : " . $response->error->message);
+                    }
 
-                sleep(0.1);
+                    foreach($response->result->top as &$entry){
+                        $uids[] = $entry->uid;
+                        $res[] = array(
+                            'id'      =>  $entry->uid,
+                            'link'    =>  'http://topface.ru/vklike/' . $entry->uid. '/',
+                            'likes'   =>  $entry->liked,
+                            'photo'   =>  array(
+                                '0' => array(
+                                    'url' => $entry->photo
+                                )
+                            )
+                        );
+                    }
+
+                    sleep(0.1);
+                }
             }
 
             $request_params = array(

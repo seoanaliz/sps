@@ -35,7 +35,6 @@
                     $posts = $parser->get_top();
 
                     $this->saveFeedPosts($source, $posts);
-
                     break;
                 } catch (Exception $Ex) {
                     AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
