@@ -603,6 +603,19 @@ $(document).ready(function(){
     });
 });
 
+var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
+            <div class="link-description-content">\
+                <div class="link-img l" />\
+                <div class="link-description-text l">\
+                    <a href="" target="_blank"></a>\
+                    <p></p>\
+                </div>\
+                <div class="clear"></div>\
+            </div>';
+
+var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
+            </div>';
+
 var Events = {
     fire : function(name, args){
         if(typeof args != "undefined") {
@@ -626,29 +639,6 @@ delete(Eventlist);
 
 var Elements = {
     initImages: function(selector){
-//        var root = $(selector);
-//        root.each(function(){
-//            var root = $(this);
-//            if(root.hasClass("ready")) { return }
-//            var imgs = root.find("img"),
-//                imgs_length = imgs.length;
-//            var wait = function(){
-//                if(imgs_length) { return; }
-//                imgs.each(function(){
-//                    var img = $(this).clone(),
-//                        div = $("<div/>");
-//                    $(this).replaceWith(div.append(img));
-//                    img.height(100);
-//                    div.css({width:img.width(), height:"100px", overflow:"hidden", display: "inline-block", padding:"10px"});
-//                    root.addClass("ready");
-//                });
-//            }
-//            root.find("img").load(function(){
-//                imgs_length--;
-//                wait();
-//            });
-//        });
-
         $(".fancybox-thumb").fancybox({
             prevEffect		: 'none',
             nextEffect		: 'none',
@@ -658,6 +648,25 @@ var Elements = {
                 title	: { type : 'inside' },
                 buttons	: {}
             }
+        });
+
+        //логика картинок топа
+        $("div.post-image-top img").bind("load", function () {
+            var src = $(this).attr('src');
+            var img = new Image();
+            var link = $(this).closest(".post").find('.ajax-loader-ext');
+
+            img.onload = function() {
+                if (this.width < 250 && this.height < 250) {
+                    //small
+                    Elements.initLinkLoader(link, true);
+                } else {
+                    //big
+                    Elements.initLinkLoader(link, false);
+                }
+            }
+
+            img.src = src;
         });
     },
     addEvents: function(){
@@ -752,55 +761,52 @@ var Elements = {
             $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
         }
     },
-    initLinks: function(){
-        var tpl = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
-            <div class="link-description-content">\
-                <div class="link-img l" />\
-                <div class="link-description-text l">\
-                    <a href="" target="_blank"></a>\
-                    <p></p>\
-                </div>\
-                <div class="clear"></div>\
-            </div>';
-
-        $('img.ajax-loader').each(function(){
-            var container   = $(this).parents('div.link-info-content');
-            var link        = $(this).attr('rel');
-            $.ajax({
-                url: controlsRoot + 'parse-url/',
-                type: 'GET',
-                dataType : "json",
-                data: {
-                    url: link
-                },
-                success: function (data) {
-                    container.html(tpl);
-                    if (data.img) {
-                        container.find('.link-img').css('background-image', 'url(' + data.img + ')');
-                    } else {
-                        container.find('.link-img').remove();
-                    }
-                    if (data.title) {
-                        container.find('div.link-description-text a').text(data.title);
-                    }
-                    if (data.description) {
-                        container.find('div.link-description-text p').text(data.description);
-                    }
-
-                    container.find('a').attr('href', link);
-
-                    var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
-                        matches;
-                    matches = link.match(pattern);
-
-                    shortLink = link;
-                    if (matches[1]) {
-                        shortLink = matches[1];
-                    }
-                    container.find('div.link-status-content span a').text(shortLink);
+    initLinkLoader: function(obj, full){
+        var container   = obj.parents('div.link-info-content');
+        var link        = obj.attr('rel');
+        $.ajax({
+            url: controlsRoot + 'parse-url/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                url: link
+            },
+            success: function (data) {
+                if (full) {
+                    container.html(linkTplFull);
+                } else {
+                    container.html(linkTplShort);
                 }
-            });
 
+                if (data.img) {
+                    container.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                } else {
+                    container.find('.link-img').remove();
+                }
+                if (data.title) {
+                    container.find('div.link-description-text a').text(data.title);
+                }
+                if (data.description) {
+                    container.find('div.link-description-text p').text(data.description);
+                }
+
+                container.find('a').attr('href', link);
+
+                var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
+                    matches;
+                matches = link.match(pattern);
+
+                shortLink = link;
+                if (matches[1]) {
+                    shortLink = matches[1];
+                }
+                container.find('div.link-status-content span a').text(shortLink);
+            }
+        });
+    },
+    initLinks: function(){
+        $('img.ajax-loader').each(function(){
+            Elements.initLinkLoader($(this), true);
         });
     }
 }

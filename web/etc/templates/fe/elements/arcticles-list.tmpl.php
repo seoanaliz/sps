@@ -4,13 +4,13 @@
     /** @var $sourceFeeds SourceFeed[] */
     if (!empty($articles)) {
         foreach($articles as $article) {
-            $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
+            $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
+            $sourceFeed     = $sourceFeeds[$article->sourceFeedId];
 
-            $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeeds[$article->sourceFeedId], $articleRecord);
-            $showLinkDescription = true;
+            $extLinkLoader  = false;
 
-            if ($sourceFeeds[$article->sourceFeedId]->externalId == ParserVkontakte::TOP && !$isWithSmallPhoto && !empty($articleRecord->photos)) {
-                $showLinkDescription = false;
+            if ($sourceFeed->externalId == ParserVkontakte::TOP && !empty($articleRecord->photos)) {
+                $extLinkLoader = true;
             }
             ?>
         <div class="post bb" data-id="{$article->articleId}">
@@ -35,13 +35,9 @@
                     if (!empty($articleRecord->link)) {
                         ?>
                         <div class="link-info-content">
-                            <? if ($showLinkDescription) { ?>
-                                <div class="link-description-content">
-                                    <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
-                                </div>
-                            <? } else { ?>
-                                <div class="link-status-content"><span>Ссылка: <a href="{form:$articleRecord->link}" target="_blank">topface.ru</a></span></div>
-                            <? } ?>
+                            <div class="link-description-content">
+                                <img src="{web:images://fe/ajax-loader.gif}" alt="" class="<?= ($extLinkLoader) ? 'ajax-loader-ext' : 'ajax-loader' ?>" rel="{form:$articleRecord->link}" />
+                            </div>
                         </div>
                         <?
                     }
@@ -65,7 +61,7 @@
                             }
 
                             ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
-                                <div class="post-image">
+                                <div class="post-image <?= ($sourceFeed->externalId == ParserVkontakte::TOP) ? 'post-image-top' : '' ?>">
                                     <img src="{$path}" class="{$imgClass}" alt="" />
                                 </div>
                             </a>
