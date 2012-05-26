@@ -68,6 +68,14 @@ $(document).ready(function(){
         $(".type-selector a").removeClass('active');
         $(this).addClass('active');
 
+        if ($(this).data('type') == 'ads') {
+            $('#slider-text').hide();
+            $('#slider-cont').hide();
+        } else {
+            $('#slider-text').show();
+            $('#slider-cont').show();
+        }
+
         Events.fire('rightcolumn_dropdown_change', []);
     });
 

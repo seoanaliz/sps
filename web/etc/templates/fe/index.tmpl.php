@@ -24,11 +24,11 @@
                     <div class="ctl spr del"></div>
                 </div -->
 
-                <p style="padding: 5px;">
+                <p style="padding: 5px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-text">
                     <label>Лайки:</label>
                     <span id="slider-value"></span>
                 </p>
-                <div style="padding: 10px !important;">
+                <div style="padding: 10px !important; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
                     <div id="slider-range"></div>
                 </div>
             </div>

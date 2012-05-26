@@ -45,6 +45,14 @@ function loadArticles(clean) {
 
     $('div#wall').append('<div style="text-align: center;" id="wall-loader"><img src="' + root + 'shared/images/fe/ajax-loader.gif"></div>');
 
+    var from = $( "#slider-range" ).slider( "values", 0 );
+    var to = $( "#slider-range" ).slider( "values", 1 );
+
+    if ($('.type-selector a.active').data('type') == 'ads') {
+        from = 0;
+        to = 100;
+    }
+
     //clean and load left column
     $.ajax({
         url: controlsRoot + 'arcticles-list/',
@@ -52,8 +60,8 @@ function loadArticles(clean) {
         data: {
             sourceFeedIds: Elements.leftdd(),
             clean: clean,
-            from : $( "#slider-range" ).slider( "values", 0 ),
-            to : $( "#slider-range" ).slider( "values", 1 )
+            from : from,
+            to : to
         },
         success: function (data) {
             $('div#wall div#wall-loader').remove();
