@@ -2,10 +2,6 @@
    
     class ParserVkontakte {
 
-        const TOP = 'top';
-
-        public static $SpecialIds = array(self::TOP);
-
         private $page_adr;
         private $page_id;
         private $page_short_name;

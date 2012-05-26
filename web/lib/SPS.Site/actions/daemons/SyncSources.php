@@ -33,7 +33,7 @@
 
             foreach ($sources as $source) {
                 //пропускаем специальные источники
-                if (in_array($source->externalId, ParserVkontakte::$SpecialIds)) {
+                if (SourceFeedUtility::IsTopFeed($source)) {
                     continue;
                 }
 

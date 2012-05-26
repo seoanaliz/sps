@@ -9,7 +9,7 @@
 
             $extLinkLoader  = false;
 
-            if ($sourceFeed->externalId == ParserVkontakte::TOP && !empty($articleRecord->photos)) {
+            if (SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
                 $extLinkLoader = true;
             }
             ?>
@@ -61,7 +61,7 @@
                             }
 
                             ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
-                                <div class="post-image <?= ($sourceFeed->externalId == ParserVkontakte::TOP) ? 'post-image-top' : '' ?>">
+                                <div class="post-image <?= SourceFeedUtility::IsTopFeed($sourceFeed) ? 'post-image-top' : '' ?>">
                                     <img src="{$path}" class="{$imgClass}" alt="" />
                                 </div>
                             </a>

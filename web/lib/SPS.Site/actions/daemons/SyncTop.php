@@ -16,8 +16,14 @@
             set_time_limit(0);
             Logger::LogLevel(ELOG_DEBUG);
 
-            $source = SourceFeedFactory::GetOne(array('externalId' => ParserVkontakte::TOP));
+            $sourceFemale = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_FEMALE));
+            $sourceMale = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_MALE));
 
+            $this->parseTop($sourceFemale, 0);
+            $this->parseTop($sourceMale, 1);
+        }
+
+        private function parseTop($source, $sex) {
             if (empty($source)) {
                 return;
             }
@@ -32,8 +38,7 @@
                 Logger::Info('Try number ' . $i);
 
                 try {
-                    $posts = $parser->get_top();
-
+                    $posts = $parser->get_top($sex);
                     $this->saveFeedPosts($source, $posts);
                     break;
                 } catch (Exception $Ex) {
