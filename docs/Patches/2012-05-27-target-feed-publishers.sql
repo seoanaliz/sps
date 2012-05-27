@@ -23,3 +23,8 @@ SELECT "public"."targetFeedPublishers"."targetFeedId"
  FROM "public"."targetFeedPublishers"
 	INNER JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeedPublishers"."publisherId";
+		
+INSERT INTO "targetFeedPublishers"
+SELECT "targetFeedId", "publisherId"
+FROM "targetFeeds"
+WHERE "publisherId" IS NOT NULL;

@@ -59,7 +59,7 @@ sql;
             $result = false;
 
             //select objects
-            $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId);
+            $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             $articleRecord = ArticleRecordFactory::GetOne(
                 array('articleQueueId' => $articleQueue->articleQueueId)
             );
@@ -74,8 +74,14 @@ sql;
                 return false;
             }
 
-            if (empty($targetFeed) || $targetFeed->publisher->statusId != 1 || empty($articleRecord)) {
-                return false;
+            if ($targetFeed->type == TargetFeedUtility::VK) {
+                if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
+                    return false;
+                }
+
+                //TODO switch publishers
+                $publisher = current($targetFeed->publishers);
+                $publisher = $publisher->publisher;
             }
 
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
@@ -86,8 +92,8 @@ sql;
             $post_data = array(
                 'text' => $articleRecord->content,
                 'group_id' => $targetFeed->externalId,
-                'vk_app_seckey' => $targetFeed->publisher->vk_seckey,
-                'vk_access_token' => $targetFeed->publisher->vk_token,
+                'vk_app_seckey' => $publisher->vk_seckey,
+                'vk_access_token' => $publisher->vk_token,
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
