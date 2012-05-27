@@ -7,13 +7,12 @@
         "columns" => array(
            LocaleLoader::Translate( "vt.targetFeed.title" )
             , LocaleLoader::Translate( "vt.common.externalId" )
-            , LocaleLoader::Translate( "vt.targetFeed.publisherId" )
             , LocaleLoader::Translate( "vt.targetFeed.vkIds" )
             , LocaleLoader::Translate( "vt.sourceFeed.type" )
             , LocaleLoader::Translate( "vt.targetFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 4 => "type", 5 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 3 => "type", 4 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> TargetFeedFactory::CanPages()
@@ -56,10 +55,6 @@
                     <?= FormHelper::FormInput( "search[externalId]", $search['externalId'], 'externalId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.targetFeed.publisherId}</label>
-                    <?= FormHelper::FormSelect( "search[publisherId]", $publishers, "publisherId", "name", $search['publisherId'], null, null, true ); ?>
-                </div>
-                <div class="row">
                     <label>{lang:vt.sourceFeed.type}</label>
                     <?= FormHelper::FormSelect( "search[type]", TargetFeedUtility::$Types, "", "", $search['type'], null, null, true ); ?>
                 </div>
@@ -90,7 +85,6 @@
                         {form:$object.externalId}
                     <? } ?>
                 </td>
-                <td>{form:$object.publisher.name}</td>
                 <td class="left">
                     <?
                         if(!empty($object->vkIds)) {

@@ -50,6 +50,28 @@
 
             $object->vkIds = str_replace(' ', '', $object->vkIds);
 
+            //type
+            if (empty($object->type) || empty(TargetFeedUtility::$Types[$object->type])) {
+                $object->type = TargetFeedUtility::VK;
+            }
+
+            //publishers
+            $publisherIds   = Request::getArray( 'publisherIds' );
+            $publisherIds   = !empty($publisherIds) ? array_unique($publisherIds) : array();
+            $publishers     = Response::getArray( 'publishers' );
+
+            $object->publishers = array();
+            if (!empty($publisherIds)) {
+                foreach ($publisherIds as $publisherId) {
+                    if (empty($publishers[$publisherId])) continue;
+
+                    $tfp = new TargetFeedPublisher();
+                    $tfp->publisherId = $publisherId;
+
+                    $object->publishers[$publisherId] = $tfp;
+                }
+            }
+
             return $object;
         }
 
@@ -67,6 +89,15 @@
             }
 
             Response::setString('gridData', ObjectHelper::ToJSON($gridData));
+
+            //publishers
+            $publisherIds = array();
+            if (!empty($this->currentObject->publishers)) {
+                foreach ($this->currentObject->publishers as $feedPublisher) {
+                    $publisherIds[$feedPublisher->publisherId] = $feedPublisher->publisherId;
+                }
+            }
+            Response::setArray( 'publisherIds', $publisherIds );
         }
         
         
@@ -109,6 +140,10 @@
                     $errors['fields']['externalId']['unique'] = 'unique';
                 }
             }
+
+            if ($object->type == TargetFeedUtility::VK && empty($object->publishers)) {
+                $errors['fields']['publishers']['null'] = 'null';
+            }
             
             return $errors;
         }
@@ -124,13 +159,20 @@
             ConnectionFactory::BeginTransaction();
 
             $result = parent::$factory->Add( $object );
+            $objectId = parent::$factory->GetCurrentId();
 
             if ($result && !empty($object->grids)) {
-                $objectId = parent::$factory->GetCurrentId();
                 foreach ($object->grids as $grid) {
                     $grid->targetFeedId = $objectId;
                 }
                 $result = TargetFeedGridFactory::AddRange($object->grids);
+            }
+
+            if ($result && !empty($object->publishers)) {
+                foreach ($object->publishers as $publisher) {
+                    $publisher->targetFeedId = $objectId;
+                }
+                $result = TargetFeedPublisherFactory::AddRange($object->publishers);
             }
 
             ConnectionFactory::CommitTransaction($result);
@@ -148,13 +190,22 @@
             ConnectionFactory::BeginTransaction();
 
             $result = parent::$factory->Update( $object );
+            $objectId = $object->targetFeedId;
 
             if ($result) {
-                $objectId = $object->targetFeedId;
                 foreach ($object->grids as $grid) {
                     $grid->targetFeedId = $objectId;
                 }
                 $result = TargetFeedGridFactory::SaveArray($object->grids, $this->originalObject->grids);
+            }
+
+            if ($result) {
+                foreach ($object->publishers as $publisher) {
+                    $publisher->targetFeedId = $objectId;
+                }
+
+                TargetFeedPublisherFactory::DeleteByMask(array('targetFeedId' => $objectId));
+                $result = TargetFeedPublisherFactory::AddRange($object->publishers);
             }
 
             ConnectionFactory::CommitTransaction($result);

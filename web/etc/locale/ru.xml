@@ -305,6 +305,7 @@
             <period><![CDATA[Шаг сетки]]></period>
             <grids><![CDATA[Изменения в сетке]]></grids>
             <vkIds><![CDATA[VkId редакторов]]></vkIds>
+            <publishers><![CDATA[Издатели]]></publishers>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>

@@ -41,9 +41,9 @@
             </div>
             <?= FormHelper::FormInput( $prefix . '[vkIds]', $object->vkIds, 'vkIds', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="publisherId" class="row">
-            <label>{lang:vt.targetFeed.publisherId}</label>
-            <?= FormHelper::FormSelect( $prefix . '[publisherId]', $publishers, "publisherId", "name", $object->publisherId, null, null, true ); ?>
+        <div data-row="publishers" class="row">
+            <label>{lang:vt.targetFeed.publishers}</label>
+            <?= FormHelper::FormSelectMultiple( 'publisherIds[]', $publishers, 'publisherId', 'name', $publisherIds, 'publisherIds', null, null, array('style' => 'height: 200px;') ) ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.targetFeed.statusId}</label>
