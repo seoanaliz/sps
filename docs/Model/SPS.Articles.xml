@@ -42,6 +42,7 @@
       </Flags>
       <Lists>
         <Attribute Name="grids" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" ForeignKey="TargetFeedGrid" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="publishers" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" ForeignKey="TargetFeedPublisher" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Lists>
     </Entity>
     <Entity Name="Article" PackageName="SPS.Articles" Table="articles" View="getArticles" DefaultConnection="">
@@ -140,6 +141,20 @@
         <Attribute Name="startDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="period" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="period" FieldType="TYPE_INTEGER" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeed" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="TargetFeedPublisher" PackageName="SPS.Articles" Table="targetFeedPublishers" View="getTargetFeedPublishers" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFee" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="publisherId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="publisher" ForeignKey="Publisher" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>
         <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />

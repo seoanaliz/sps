@@ -26,3 +26,8 @@ SELECT "public"."targetFeeds"."targetFeedId"
 	LEFT JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeeds"."publisherId"
 	WHERE "public"."targetFeeds"."statusId" != 3;
+	
+INSERT INTO "targetFeedPublishers"
+SELECT "targetFeedId", "publisherId"
+FROM "targetFeeds"
+WHERE "publisherId" IS NOT NULL;

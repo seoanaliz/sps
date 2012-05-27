@@ -7,86 +7,37 @@
     Package::Load( 'SPS.Articles' );
 
     /**
-     * TargetFeed Factory
+     * TargetFeedPublisher Factory
      *
      * @package SPS
      * @subpackage Articles
      */
-    class TargetFeedFactory implements IFactory {
+    class TargetFeedPublisherFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** TargetFeed instance mapping  */
+        /** TargetFeedPublisher instance mapping  */
         public static $mapping = array (
-            'class'       => 'TargetFeed'
-            , 'table'     => 'targetFeeds'
-            , 'view'      => 'getTargetFeeds'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
-            , 'cacheDeps' => array()
+            'class'       => 'TargetFeedPublisher'
+            , 'table'     => 'targetFeedPublishers'
+            , 'view'      => 'getTargetFeedPublishers'
+            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'cacheDeps' => array( 'targetFeeds', 'publishers' )
             , 'fields'    => array(
                 'targetFeedId' => array(
                     'name'          => 'targetFeedId'
                     , 'type'        => TYPE_INTEGER
-                    , 'key'         => true
-                )
-                ,'title' => array(
-                    'name'          => 'title'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 500
                     , 'nullable'    => 'CheckEmpty'
-                )
-                ,'externalId' => array(
-                    'name'          => 'externalId'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 100
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'startTime' => array(
-                    'name'          => 'startTime'
-                    , 'type'        => TYPE_TIME
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'period' => array(
-                    'name'          => 'period'
-                    , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'vkIds' => array(
-                    'name'          => 'vkIds'
-                    , 'type'        => TYPE_STRING
-                )
-                ,'type' => array(
-                    'name'          => 'type'
-                    , 'type'        => TYPE_STRING
-                    , 'max'         => 10
-                    , 'nullable'    => 'CheckEmpty'
-                )
-                ,'params' => array(
-                    'name'          => 'params'
-                    , 'type'        => TYPE_ARRAY
-                    , 'complexType' => 'php'
+                    , 'foreignKey'  => 'TargetFeed'
                 )
                 ,'publisherId' => array(
                     'name'          => 'publisherId'
                     , 'type'        => TYPE_INTEGER
-                    , 'foreignKey'  => 'Publisher'
-                )
-                ,'statusId' => array(
-                    'name'          => 'statusId'
-                    , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Status'
+                    , 'foreignKey'  => 'Publisher'
                 ))
-            , 'lists'     => array(
-                'grids' => array(
-                    'name'         => 'targetFeedId'
-                    , 'foreignKey' => 'TargetFeedGrid'
-                )
-                ,'publishers' => array(
-                    'name'         => 'targetFeedId'
-                    , 'foreignKey' => 'TargetFeedPublisher'
-                ))
+            , 'lists'     => array()
             , 'search'    => array(
                 '_targetFeedId' => array(
                     'name'         => 'targetFeedId'
@@ -142,17 +93,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed[] */
+        /** @return TargetFeedPublisher[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return TargetFeedPublisher */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return TargetFeed */
+        /** @return TargetFeedPublisher */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -177,7 +128,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return TargetFeed */
+        /** @return TargetFeedPublisher */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

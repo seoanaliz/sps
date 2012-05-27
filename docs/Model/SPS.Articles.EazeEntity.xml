@@ -1054,4 +1054,59 @@
       </TemplateAttribute>
     </Attributes>
   </EazeEntity>
+  <EazeEntity Name="TargetFeedPublisher">
+    <TerminalPath>targetFeedPublishers</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>targetFeeds publishers</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeedPublisher.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.targetFeedPublisher.publisherId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.targetFeedPublisher.targetFeedId" TitleValue="targetFeedId" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFee.title" TitleKey="vt.targetFeedPublisher.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="publisherId" TitleKey="vt.targetFeedPublisher.publisherId" TitleValue="publisherId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="publisherId" />
+          <AttributeParameter Key="value" Value="publisherId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="publisherId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
 </ArrayOfEazeEntity>

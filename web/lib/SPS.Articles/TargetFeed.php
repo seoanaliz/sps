@@ -50,5 +50,8 @@
 
         /** @var TargetFeedGrid[] */
         public $grids;
+
+        /** @var TargetFeedPublisher[] */
+        public $publishers;
     }
 ?>

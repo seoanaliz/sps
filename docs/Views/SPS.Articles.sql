@@ -96,3 +96,17 @@ SELECT "public"."targetFeedGrids"."targetFeedGridId"
 	, "public"."targetFeedGrids"."targetFeedId"
  FROM "public"."targetFeedGrids"
 ORDER BY "public"."targetFeedGrids"."startDate";
+
+CREATE OR REPLACE VIEW "getTargetFeedPublishers" AS
+SELECT "public"."targetFeedPublishers"."targetFeedId"
+	, "public"."targetFeedPublishers"."publisherId"
+	, "publisher"."publisherId" AS "publisher.publisherId"
+	, "publisher"."name" AS "publisher.name"
+	, "publisher"."vk_id" AS "publisher.vk_id"
+	, "publisher"."vk_app" AS "publisher.vk_app"
+	, "publisher"."vk_token" AS "publisher.vk_token"
+	, "publisher"."vk_seckey" AS "publisher.vk_seckey"
+	, "publisher"."statusId" AS "publisher.statusId"
+ FROM "public"."targetFeedPublishers"
+	INNER JOIN "public"."publishers" "publisher" ON
+		"publisher"."publisherId" = "public"."targetFeedPublishers"."publisherId";
