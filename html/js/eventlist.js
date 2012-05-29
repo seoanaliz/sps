@@ -1,6 +1,7 @@
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){callback(1)},
     leftcolumn_recoverpost: function(post_id, callback){callback(1)},
+    leftcolumn_editpost: function(post_id, callback){callback(1)},
 
     rightcolumn_deletepost: function(post_id, callback){callback(1)},
 
@@ -39,7 +40,7 @@ var Eventlist = {
                 description: 'Эксклюзивный материал для программы Дарьи Герман и Николая Воробьёва Школа Соблазна'
             });
         }
-        
+
     },
 
     post: function(html, id, callback) {
