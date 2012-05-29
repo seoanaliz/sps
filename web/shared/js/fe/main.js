@@ -1,3 +1,5 @@
+var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im
+
 $(document).ready(function(){
     $("#calendar")
         .datepicker(
@@ -266,13 +268,12 @@ $(document).ready(function(){
         ;
 
         var parseUrl = function(txt){
-            var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
-                matches;
-            matches = txt.match(pattern);
+            var matches = txt.match(pattern);
+
             // если приаттачили ссылку
             if (matches && matches[0] && matches[1] && !foundLink) {
                 foundLink   = matches[0];
-                foundDomain = matches[1];
+                foundDomain = matches[2];
 
                 Events.fire("post_describe_link", [
                     foundLink,
@@ -296,7 +297,7 @@ $(document).ready(function(){
                             }
                             if (result.title) {
                                 var $a = $('<a />', {
-                                    href: 'http://' + foundLink,
+                                    href: foundLink,
                                     target: '_blank',
                                     html: '<span>'+result.title+'</span>',
                                     title:'Редактировать заголовок'
@@ -316,7 +317,7 @@ $(document).ready(function(){
                             editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
 
                             var $span = $('<span />', { text: 'Ссылка: ' });
-                            $span.append($('<a />', { href: 'http://' + foundLink, target: '_blank', text: foundDomain }));
+                            $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
 
                             var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
                                 // убираем аттач ссылки
@@ -792,13 +793,11 @@ var Elements = {
 
                 container.find('a').attr('href', link);
 
-                var pattern = /([a-zA-Z0-9-.]+\.(?:ru|com|net|me|edu|org|info|biz|uk|ua))([a-zA-Z0-9-_?\/#,&;]+)?/im,
-                    matches;
-                matches = link.match(pattern);
+                var matches = link.match(pattern);
 
                 shortLink = link;
-                if (matches[1]) {
-                    shortLink = matches[1];
+                if (matches[2]) {
+                    shortLink = matches[2];
                 }
                 container.find('div.link-status-content span a').text(shortLink);
             }
