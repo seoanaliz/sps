@@ -61,12 +61,12 @@ $(document).ready(function(){
             elem.removeClass("expanded");
             $(document).unbind("click", hidethis);
             elem.find("li").unbind("click", click_li);
-        }
+        };
         var click_li = function(e){
             e.stopPropagation();
             elem.dd_sel($(this).data("id"));
             hidethis();
-        }
+        };
         $(document).bind("click", hidethis);
         elem.find("li").click(click_li);
         elem.addClass("expanded");
@@ -107,6 +107,49 @@ $(document).ready(function(){
                 }
             }]);
         });
+//        .delegate('a.edit', 'click', function() {
+//            var elem = $(this).closest(".post"),
+//                pid = elem.data("id"),
+//                content = elem.find('.content'),
+//                showCut = content.find('.show-cut'),
+//                shortСut = content.find('.shortcut'),
+//                editPanel = elem.find('.bottom.edit'),
+//                bottomPanel = elem.find('.bottom.d-hide');
+//
+//            Events.fire('leftcolumn_editpost', [pid, function(state) {
+//                if (showCut.get(0)) showCut.click();
+//                var text = shortСut.html();
+//
+//                function save(e) {
+//                    editPanel.hide();
+//                    bottomPanel.show();
+//                    shortСut.attr('contenteditable', false)
+//                        .unbind('blur')
+//                        .blur();
+//                }
+//                function cancel(e) {
+//                    editPanel.hide();
+//                    bottomPanel.show();
+//                    shortСut.attr('contenteditable', false)
+//                        .unbind('blur')
+//                        .html(text)
+//                        .blur();
+//                }
+//
+//                shortСut.attr('contenteditable', true).focus();
+//                bottomPanel.hide();
+//                window.getSelection().collapse(shortСut.get(0), shortСut.text().length);
+//                if (!editPanel.get(0)) {
+//                    editPanel = $('<div class="bottom edit"/>')
+//                        .appendTo(elem)
+//                        .append($('<a href="javascript:;">Сохранить</a>').click(save))
+//                        .append($('<a href="javascript:;">Отменить</a>').click(cancel))
+//                } else {
+//                    editPanel.show();
+//                }
+//            }]);
+//        });
+
     $(".items").delegate(".slot .post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
@@ -169,10 +212,10 @@ $(document).ready(function(){
             });
             if(defaultvalue) input.val(defaultvalue);
             return input;
-        }
+        };
         var getDD = function(elem){
             return $(elem).closest(".header").find(".drop-down");
-        }
+        };
         $(".controls .del").click(function(){
             var dd = getDD(this),
                 val = dd.data("selected");
@@ -208,12 +251,12 @@ $(document).ready(function(){
         var form = $(".newpost"),
             input = $(".input", form),
             tip = $(".tip", form);
-            
+
         var $linkInfo = $('.link-info', form),
             $linkDescription = $('.link-description', $linkInfo),
             $linkStatus = $('.link-status', $linkInfo),
             foundLink, foundDomain;
-        
+
         tip.click(function(){input.focus();});
         form.click(function(e){ e.stopPropagation(); });
         input
@@ -236,8 +279,8 @@ $(document).ready(function(){
                             foundLink,
                             function(result) {
                                 if (result) {
-                                    $linkDescription.empty()
-                                    $linkStatus.empty()
+                                    $linkDescription.empty();
+                                    $linkStatus.empty();
 
                                     // отрисовываем ссылку
                                     if (result.img) {
@@ -251,20 +294,20 @@ $(document).ready(function(){
 										$linkDescription.append($descriptionLayout);
                                     }
                                     if (result.title) {
-                                        var $a = $('<a />', { 
-											href: foundLink, 
-											target: '_blank', 
+                                        var $a = $('<a />', {
+											href: foundLink,
+											target: '_blank',
 											html: '<span>'+result.title+'</span>',
-											title:'Редактировать заголовок' 
+											title:'Редактировать заголовок'
 										});
 										var $h = $('<div></div>',{'class':'post_describe_header'});
                                         $h.append($a);
                                         $descriptionLayout.append($h);
                                     }
                                     if (result.description) {
-                                        var $p = $('<p />', { 
+                                        var $p = $('<p />', {
 											html: '<span>'+result.description+'</span>',
-											title:'Редактировать описание' 
+											title:'Редактировать описание'
 										});
                                         $descriptionLayout.append($p);
                                     }
@@ -275,8 +318,8 @@ $(document).ready(function(){
 
                                     var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
                                         // убираем аттач ссылки
-                                        $linkDescription.empty()
-                                        $linkStatus.empty()
+                                        $linkDescription.empty();
+                                        $linkStatus.empty();
                                         $linkInfo.hide();
                                         foundLink = false;
                                         foundDomain = false;
@@ -306,7 +349,7 @@ $(document).ready(function(){
 				var $editArea = $('<textarea />',{id: 'post_description'});
 				this.header.append($editField.val(this.header.text()));
 				this.description.append($editArea.val(this.description.text()));
-				
+
 				this.bindEvts();
 			},
 			bindEvts: function() {
@@ -351,12 +394,12 @@ $(document).ready(function(){
 						height: $(document).height()
 					});
 				});
-				
+
 				$popup.find('.save').click(function() {
 					t.post();
 				});
-				
-				
+
+
 				this.closeImagePopup($popup);
 				this.crop();
 				this.upload();
@@ -403,7 +446,7 @@ $(document).ready(function(){
 			showPreview: function (coords,t) {
 				var rx = $('.previewLayout').width() / coords.w;
 				var ry = $('.previewLayout').height() / coords.h;
-				
+
 				$('#preview').css({
 					width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
 					height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
@@ -439,7 +482,7 @@ $(document).ready(function(){
         var stop = function(){
             $(window).unbind("click", stop);
             if(!input.text().length) form.addClass("collapsed");
-        }
+        };
         form.find(".save").click(function(){
             form.addClass("spinner");
             Events.fire("post", [
@@ -470,12 +513,71 @@ $(document).ready(function(){
         });
     })();
 
+//    (function(){
+//        var form = $(".newpost"),
+//            input = $(".input", form);
+//        input.focus(function(){
+//            form.removeClass("collapsed");
+//        });
+//        input.blur(function(e) {
+//            if(!input.val().length) form.addClass("collapsed");
+//        });
+//        input.bind('keydown keyup focus', function(e) {
+//            if (!input.autoResize) {
+//                input.autoResize = $('<div/>')
+//                    .appendTo('body')
+//                    .css({
+//                        width: input.width(),
+//                        minHeight: input.height(),
+//                        padding: input.css('padding'),
+//                        lineHeight: input.css('line-height'),
+//                        font: input.css('font'),
+//                        fontSize: input.css('font-size'),
+//                        position: 'absolute',
+//                        top: -10000
+//                    });
+//            }
+//            input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
+//            input.css({
+//                height: input.autoResize.height() + 20
+//            });
+//        });
+//        form.find(".save").click(function(){
+//            form.addClass("spinner");
+//            Events.fire("post", [
+//                input.val(),
+//                input.data("id"),
+//                function(state){
+//                    if(state) {
+//                        input.data("id", 0);
+//                        input.val('').blur();
+//                    }
+//                    form.removeClass("spinner");
+//                }
+//            ])
+//        });
+//        form.find('.cancel').click(function(e) {
+//            input.val('').blur();
+//            form.addClass('collapsed');
+//            e.preventDefault();
+//        });
+//        form.find(".attach").click(
+//            /*TODO: attach*/
+//        );
+//
+//        $(".left-panel").delegate(".post .edit", "click" ,function(){
+//            /*TODO: edit*/
+//            input.data("id", $(this).closest("post").data("id"));
+//        });
+//    })();
+
     $('.left-panel .show-cut').click(function(e) {
         var $content = $(this).closest('.content'),
-            shortcut = $content.find('.shortcut').html(),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
             cut      = $content.find('.cut').html();
 
-        $content.html(shortcut + ' ' + cut);
+        $shortcut.html(shortcut + ' ' + cut);
         $(this).remove();
 
         e.preventDefault();
@@ -491,6 +593,22 @@ $(document).ready(function(){
 
         e.preventDefault();
     });
+
+    (function(w) {
+        var $elem = $('#go-to-top');
+        $elem.click(function() {
+            $(w).scrollTop(0);
+        });
+        $(w).bind('scroll', function(e) {
+            if (e.currentTarget.scrollY <= 0) {
+                $elem.hide();
+            } else if (!$elem.is(':visible')) {
+                $elem.show();
+            }
+        });
+    })(window);
+
+    Elements.addEvents();
 });
 
 var Events = {
@@ -510,63 +628,65 @@ var Events = {
             }
         }
     }
-}
+};
 $.extend(Events, Eventlist);
 delete(Eventlist);
 
 var Elements = {
     addEvents: function(){
         (function(){
-            $(".slot .post").addClass("dragged");
+            $(".slot .post .content").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, callback, failback){
                 Events.fire('post_moved', [post, slot, function(state){
                     (state ? callback : failback)();
                 }]);
-            }
-            $(".post").draggable({
+            };
+
+            var draggableParams = {
                 revert: 'invalid',
-                cursorAt: {top: 60, left: 150},
-                helper: function(){
-                    return $(this).clone().addClass("dragged moving");
+                appendTo: 'body',
+                cursor: 'move',
+                cursorAt: {left: 5, top: 0},
+                helper: function() {
+                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
                 },
-                start: function(){
-                    $(this).addClass("removed");
+                start: function() {
+                    var self = $(this),
+                        post = self.closest('.post');
+                    console.log(self);
                 },
-                stop: function(){
-                    $(this).removeClass("removed");
-                    target = $(target);
-                    var elem = $(this);
-                    if(target.hasClass("empty")) {
-                        if(!$(this).hasClass("dragged")) {
-                            dragdrop($(this).data("id"), target.data("id"), function(){
-                                target.append(elem.addClass("dragged"));
-                                target.removeClass("empty");
-                                target.append(elem.addClass("dragged"));
-                                elem.removeClass("spinner");
-                            },function(){
-                                elem.removeClass("spinner");
-                            });
-                        } else {
-                            dragdrop($(this).data("id"), target.data("id"), function(){
-                                elem.closest(".slot").addClass("empty");
-                                target.removeClass("empty");
-                                target.append(elem.addClass("dragged"));
-                                elem.removeClass("spinner");
-                            },function(){
-                                elem.removeClass("spinner");
-                            });
-                        }
-                        elem.addClass("spinner");
-                    }
+                stop: function() {
+                    var self = $(this),
+                        post = self.closest('.post');
+                    console.log(self);
                 }
-            });
+            };
+
+            $(".post").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",
                 hoverClass: "ui-state-hover",
-                drop: function(){
-                    target = this;
+
+                drop: function(e, ui) {
+                    var target = $(this),
+                        post = $(ui.draggable),
+                        slot = post.closest('.slot'),
+                        helper = $(ui.helper);
+
+                    if (target.hasClass('empty')) {
+                        if (post.hasClass('movable')) {
+                            target.html(post);
+                        } else {
+                            var copy = post.clone();
+                            copy.addClass("dragged");
+                            target.html(copy);
+                            copy.draggable(draggableParams);
+                        }
+                        slot.addClass('empty');
+                        target.removeClass('empty');
+                    }
                 }
             });
         })();
@@ -581,10 +701,10 @@ var Elements = {
     rightdd:function(value){
         if(typeof value == 'undefined') {
             return $(".right-panel .drop-down").data("selected");
-            } else {
-                $(".right-panel .drop-down").dd_sel(value);
-            }
-        },
+        } else {
+            $(".right-panel .drop-down").dd_sel(value);
+        }
+    },
     calendar: function(value){
         if(typeof value == 'undefined') {
             var timestamp = $("#calendar").datepicker("getDate");
@@ -593,7 +713,7 @@ var Elements = {
             $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
         }
     }
-}
+};
 
 $.fn.dd_sel = function(id){
     var elem = $(this);
