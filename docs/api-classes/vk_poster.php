@@ -12,12 +12,18 @@
         protected $link;                //ссылка на источник
         protected $sign;                //ссыль на пользователя, пока неактивно
         protected $header;              //заголовок ссылки
-        const METH = 'https://api.vk.com/method/';
+        
+        const METH          =   'https://api.vk.com/method/';
+        const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
+        const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
+        const TESTING       =   true;
+        const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
+        //(например, получение разгаданной капчи)
         
         public function __construct($post_date)
         {
             $post_date = json_decode($post_date);
-            print_r($post_date);
+            //print_r($post_date);
             $this->post_photo_array     = $post_date -> photo_array; //массив путей к фоткам
             $this->post_text            = $post_date -> text;
             $this->vk_group_id          = $post_date -> group_id;
@@ -113,7 +119,7 @@
                     }
     
                     //заливка фото
-                        $content = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
+                    $content = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
                     $content = json_decode($content);
                     if (empty($content->photo)) {
                         throw new exception(" Error uploading photo. Response : $content");
@@ -163,16 +169,25 @@
                 $this->post_text = "&#01;";
             }
     
+    
+    
             $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
                                 'message'       =>  $this->post_text,
                                 'access_token'  =>  $this->vk_access_token,
                                 'attachment'    =>  $attachment . ',' . $other_attachments,
-                                'from_group'    =>  1
+                                'from_group'    =>   1
                 );
+    
+    
             $url = self::METH . "/wall.post";
             $fwd3 = '';
     
             $link_attached = 0;
+            if (strlen($arr_fields['attachment']) < 2) {
+                 $arr_fields['attachment'] = $this->link;
+                 $link_attached = 1;
+            }
+    
             //цикл для отправки
             $capcha_tries = 0;
             $old_id = '';
@@ -181,7 +196,7 @@
                 $counter ++;
                 if ($counter > 8)
                     throw new exception( __CLASS__ . '::' . __FUNCTION__ .
-                                " it seems we have an endless cicle here");
+                                " it seems we have an endless circle here");
                 if ( $capcha_tries > self::FALSE_COUNTER ) {
                     return '-1';
                 }
@@ -233,6 +248,7 @@
     
     //                        print_r($f);
                             if (is_array($f->attachments)) {
+                                $attachment = array();
                                 foreach($f->attachments as $k) {
                                     if (!empty($k->photo->owner_id)) {
                                         $attachment[] = 'photo' . $k->photo->owner_id . '_' . $k->photo->pid;
@@ -274,13 +290,12 @@
                          $arr_fields['attachment'] = trim($arr_fields['attachment'], ',');
                      }
     
-                 //    echo '<br><br>';
+                     echo '<br><br>';
                 }
     
                 //выходы из цикла
                 if ($fwd3->response->processing == 1 || (!$this->link && $old_id))
                     break;
-    //            echo '<br>++++++++++++++++++++++++++++++++++++++++<br>';
                 unset ($fwd3);
             }
     
@@ -289,6 +304,7 @@
             return true;
     
         }
+
     
         private function remove_tags()
         {
