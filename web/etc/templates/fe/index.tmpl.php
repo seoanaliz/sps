@@ -1,4 +1,5 @@
 {increal:tmpl://fe/elements/header.tmpl.php}
+<div id="go-to-top">Наверх</div>
 <div class="layer">
     <div class="left-panel">
         <div class="block">

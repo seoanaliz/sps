@@ -25,7 +25,7 @@
                             <span class="hash-span" title="Пост с хештэгом">#hash</span>
                         <? } ?>
                     </div>
-                    <div class="post <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
+                    <div class="post movable <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
                         <div class="content">
                             <?
                                 $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));

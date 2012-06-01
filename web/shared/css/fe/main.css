@@ -348,3 +348,99 @@ i {font-style: italic;}
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
 }
+
+/* Added */
+.post *[contenteditable=true] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f7f7f7;
+    overflow: hidden;
+}
+.post .bottom.edit a {
+    margin-right: 10px;
+}
+#go-to-top {
+    position: fixed;
+    width: 100px;
+    height: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+    line-height: 100px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    opacity: .3;
+    background: none;
+}
+#go-to-top:hover {
+    background: #ddd;
+    opacity: .7;
+}
+.link-info-content .link-status-content {
+    margin: 10px 0 0 10px;
+}
+.images-ready {
+    margin-top: 10px;
+    overflow: hidden;
+}
+.dragged.moving {
+    background-color: #fff;
+    box-shadow: 0px 20px 60px rgba(0,0,0,0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 5px 10px;
+    pointer-events: none;
+}
+.dragged.moving img {
+    opacity: .1;
+}
+.post.removed {
+    background-color: #d8e1e4;
+}
+.post.removed * {
+    color: #999;
+}
+.post.removed img {
+    opacity: .6;
+}
+.post .post-image .img:first-child {
+    width: 40%;
+    float: left;
+}
+.post .post-image .img {
+    width: 19.6%;
+    float: right;
+    margin-bottom: 3px;
+    margin-right: .5%;
+    overflow: hidden;
+    background-color: #fff;
+    text-align: center;
+}
+.left-panel .img:first-child {
+    height: 300px;
+}
+.left-panel .img {
+    height: 98px;
+}
+.left-panel .post .post-image .img img {
+    max-height: 120%;
+    max-width: 120%;
+}
+.right-panel .img:first-child {
+    height: 120px;
+}
+.right-panel .img {
+    height: 38px;
+}
+.right-panel .img img {
+    max-height: 130%;
+    max-width: 130%;
+}
+.right-panel .shortcut {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.right-panel .show-cut {
+}

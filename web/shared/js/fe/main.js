@@ -583,10 +583,11 @@ $(document).ready(function(){
 
     $(".left-panel").delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
-            shortcut = $content.find('.shortcut').html(),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
             cut      = $content.find('.cut').html();
 
-        $content.html('<div class="shortcut">' + shortcut + ' ' + cut + '</div>');
+        $shortcut.html(shortcut + ' ' + cut);
         $(this).remove();
 
         e.preventDefault();
@@ -602,6 +603,22 @@ $(document).ready(function(){
 
         e.preventDefault();
     });
+
+    (function(w) {
+        var $elem = $('#go-to-top');
+        $elem.click(function() {
+            $(w).scrollTop(0);
+        });
+        $(w).bind('scroll', function(e) {
+            if (e.currentTarget.scrollY <= 0) {
+                $elem.hide();
+            } else if (!$elem.is(':visible')) {
+                $elem.show();
+            }
+        });
+    })(window);
+
+    Elements.addEvents();
 });
 
 var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
@@ -672,7 +689,7 @@ var Elements = {
     },
     addEvents: function(){
         (function(){
-            $(".slot .post").addClass("dragged");
+            $(".slot .post .content").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, queueId, callback, failback){
                 Events.fire('post_moved', [post, slot, queueId, function(state, newId){
@@ -682,62 +699,56 @@ var Elements = {
                         failback();
                     }
                 }]);
-            }
-            $(".post").draggable({
-                revert: 'invalid',
-                cursorAt: {top: 60, left: 150},
-                helper: function(){
-                    return $(this).clone().addClass("dragged moving");
-                },
-                start: function(){
-                    $(this).addClass("removed");
-                },
-                stop: function(){
-                    $(this).removeClass("removed");
-                    target = $(target);
-                    var elem = $(this);
-                    if(target.hasClass("empty")) {
-                        if(!$(this).hasClass("dragged")) {
-                            dragdrop($(this).data("id"), target.data("id"), $(this).data("queue-id"), function(newId){
-                                elem.data("id", newId);
-                                elem.data("queue-id", newId);
-                                target.append(elem.addClass("dragged"));
-                                target.removeClass("empty");
-                                target.append(elem.addClass("dragged"));
-                                elem.removeClass("spinner");
+            };
 
-                                if (elem.find('.attach-icon-link').length > 0) {
-                                    target.find('.time').append(' <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>');
-                                }
-                                if (elem.find('.attach-icon-link-red').length > 0) {
-                                    target.find('.time').append(' <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>');
-                                }
-                                if (elem.find('.hash-span').length > 0) {
-                                    target.find('.time').append(' <span class="hash-span" title="Пост с хештэгом">#hash</span>');
-                                }
-                            },function(){
-                                elem.removeClass("spinner");
-                            });
-                        } else {
-                            dragdrop($(this).data("id"), target.data("id"), $(this).data("queue-id"), function(){
-                                elem.closest(".slot").addClass("empty");
-                                target.removeClass("empty");
-                                target.append(elem.addClass("dragged"));
-                                elem.removeClass("spinner");
-                            },function(){
-                                elem.removeClass("spinner");
-                            });
-                        }
-                        elem.addClass("spinner");
-                    }
+            var draggableParams = {
+                revert: 'invalid',
+                appendTo: 'body',
+                cursor: 'move',
+                cursorAt: {left: 5, top: 0},
+                helper: function() {
+                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+                },
+                start: function() {
+                    var self = $(this),
+                        post = self.closest('.post');
+                },
+                stop: function() {
+                    var self = $(this),
+                        post = self.closest('.post');
                 }
-            });
+            };
+
+            $(".post").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",
                 hoverClass: "ui-state-hover",
-                drop: function(){
-                    target = this;
+
+                drop: function(e, ui) {
+                    var target = $(this),
+                        post = $(ui.draggable),
+                        slot = post.closest('.slot'),
+                        helper = $(ui.helper);
+
+                    if (target.hasClass('empty')) {
+                        dragdrop(post.data("id"), target.data("id"), post.data("queue-id"), function(newId){
+                            if (post.hasClass('movable')) {
+                                target.html(post);
+                            } else {
+                                var copy = post.clone();
+                                copy.addClass("dragged");
+                                target.html(copy);
+                                copy.draggable(draggableParams);
+                            }
+                            slot.addClass('empty');
+                            target.removeClass('empty');
+
+                            target.find('.post').data("id", newId).data("queue-id", newId);
+                        },function(){
+
+                        });
+                    }
                 }
             });
         })();

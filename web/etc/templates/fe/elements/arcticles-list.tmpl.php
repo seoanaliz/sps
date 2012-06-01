@@ -13,7 +13,7 @@
                 $extLinkLoader = true;
             }
             ?>
-        <div class="post bb" data-id="{$article->articleId}">
+        <div class="post bb <?= ($sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-id="{$article->articleId}">
             <div class="l d-hide">
                 <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" /></div>
             </div>

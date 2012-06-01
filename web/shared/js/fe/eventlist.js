@@ -208,6 +208,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(1, data.id);
+                    loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
