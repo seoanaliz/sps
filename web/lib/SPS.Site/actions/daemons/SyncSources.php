@@ -38,7 +38,7 @@
                 }
 
                 //инитим парсер
-                $parser = new ParserVkontakte($source->externalId);
+                $parser = new ParserVkontakte(trim($source->externalId));
 
                 try {
                     $count = $parser->get_posts_count();
