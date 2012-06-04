@@ -37,13 +37,21 @@
                     continue;
                 }
 
+                if ($source->externalId != 35909997) continue;
+
                 //инитим парсер
                 $parser = new ParserVkontakte(trim($source->externalId));
 
                 try {
                     $count = $parser->get_posts_count();
                 } catch (Exception $Ex) {
-                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
+                    $message = $Ex->getMessage();
+                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $message);
+                    if (strpos($message, 'access denied') !== false) {
+                        $source->statusId = 2;
+                        SourceFeedFactory::Update($source);
+                        AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, 'auto disabled');
+                    }
                     break;
                 }
 
