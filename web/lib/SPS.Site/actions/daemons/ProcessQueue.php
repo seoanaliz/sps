@@ -70,8 +70,11 @@ sql;
             $sourceFeed = SourceFeedFactory::GetOne(array('sourceFeedId' => $article->sourceFeedId));
 
             if ($targetFeed->type == TargetFeedUtility::FB) {
-                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'Facebook posting not implemented');
-                return false;
+                if (empty($targetFeed) || empty($articleRecord)) {
+                    return false;
+                }
+
+                $this->sendPostToFb($targetFeed, $articleQueue, $articleRecord);
             }
 
             if ($targetFeed->type == TargetFeedUtility::VK) {
@@ -151,6 +154,58 @@ sql;
                     @unlink($localPath);
                 }
             }
+        }
+
+        /**
+         * @param TargetFeed $targetFeed
+         * @param ArticleQueue $articleQueue
+         * @param ArticleRecord $articleRecord
+         */
+        private function sendPostToFb($targetFeed, $articleQueue, $articleRecord) {
+            $fields_arr = array(
+                'album'         => $targetFeed->externalId,
+                'access_token'  => $targetFeed->params['token'],
+                'source'        => null,
+                'message'       => $articleRecord->content,
+                'targeting'     => array(
+                    'countries' => array('RU'),
+                    'locales'   => 17
+                )
+            );
+
+            if (!empty($articleRecord->photos)) {
+                $photoItem = current($articleRecord->photos);
+
+                $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
+
+                file_put_contents($localPath, file_get_contents($remotePath));
+
+                $fields_arr['source'] = '@' . $localPath;
+            } else {
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'Article has no photos');
+                return;
+            }
+
+            try {
+                $sender = new SenderFacebook(json_encode($fields_arr));
+                $result = $sender->send_photo();
+                Logger::Info($result);
+
+                //закрываем
+                $this->finishArticleQueue($articleQueue);
+            } catch (Exception $Ex) {
+                $err = $Ex->getMessage();
+                Logger::Warning($err);
+
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
+
+                //ставим обратно в очередь
+                $this->restartArticleQueue($articleQueue);
+            }
+
+            //unlink temp files
+            @unlink($localPath);
         }
 
         private function finishArticleQueue($articleQueue) {
