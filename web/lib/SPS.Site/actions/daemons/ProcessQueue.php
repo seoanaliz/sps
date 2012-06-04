@@ -79,11 +79,25 @@ sql;
                     return false;
                 }
 
-                //TODO switch publishers
-                $publisher = current($targetFeed->publishers);
-                $publisher = $publisher->publisher;
+                foreach ($targetFeed->publishers as $publisher) {
+                    try {
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher);
+                        return true;
+                    } catch (ChangeSenderException $Ex) {
+                        //ниче не делаем
+                    }
+                }
             }
+        }
 
+        /**
+         * @param SourceFeed $sourceFeed
+         * @param TargetFeed $targetFeed
+         * @param ArticleQueue $articleQueue
+         * @param ArticleRecord $articleRecord
+         * @param Publisher $publisher
+         */
+        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
             if ($isWithSmallPhoto) {
                 $articleRecord->photos = array();
@@ -119,6 +133,8 @@ sql;
 
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
+            } catch (ChangeSenderException $Ex){
+                throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
                 Logger::Warning($err);
@@ -135,8 +151,6 @@ sql;
                     @unlink($localPath);
                 }
             }
-
-            return $result;
         }
 
         private function finishArticleQueue($articleQueue) {
