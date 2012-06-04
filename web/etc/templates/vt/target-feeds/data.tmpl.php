@@ -41,6 +41,17 @@
             </div>
             <?= FormHelper::FormInput( $prefix . '[vkIds]', $object->vkIds, 'vkIds', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="token" class="row">
+            <label>{lang:vt.targetFeed.token}</label>
+            <div class="hint">
+                <a href="#" class="hint-icon">?</a>
+                <div class="hint-text" style="display:none;">
+                    <span>?</span>
+                    Используется только для Facebook
+                </div>
+            </div>
+            <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="publishers" class="row">
             <label>{lang:vt.targetFeed.publishers}</label>
             <?= FormHelper::FormSelectMultiple( 'publisherIds[]', $publishers, 'publisherId', 'name', $publisherIds, 'publisherIds', null, null, array('style' => 'height: 200px;') ) ?>

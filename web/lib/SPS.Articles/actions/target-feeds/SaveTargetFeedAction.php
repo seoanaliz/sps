@@ -144,7 +144,10 @@
             if ($object->type == TargetFeedUtility::VK && empty($object->publishers)) {
                 $errors['fields']['publishers']['null'] = 'null';
             }
-            
+            if ($object->type == TargetFeedUtility::FB && empty($object->params['token'])) {
+                $errors['fields']['token']['null'] = 'null';
+            }
+
             return $errors;
         }
         
@@ -172,7 +175,11 @@
                 foreach ($object->publishers as $publisher) {
                     $publisher->targetFeedId = $objectId;
                 }
-                $result = TargetFeedPublisherFactory::AddRange($object->publishers);
+                if (!empty($object->publishers)) {
+                    $result = TargetFeedPublisherFactory::AddRange($object->publishers);
+                } else {
+                    $result = true;
+                }
             }
 
             ConnectionFactory::CommitTransaction($result);
@@ -205,7 +212,11 @@
                 }
 
                 TargetFeedPublisherFactory::DeleteByMask(array('targetFeedId' => $objectId));
-                $result = TargetFeedPublisherFactory::AddRange($object->publishers);
+                if (!empty($object->publishers)) {
+                    $result = TargetFeedPublisherFactory::AddRange($object->publishers);
+                } else {
+                    $result = true;
+                }
             }
 
             ConnectionFactory::CommitTransaction($result);

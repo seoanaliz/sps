@@ -306,6 +306,7 @@
             <grids><![CDATA[Изменения в сетке]]></grids>
             <vkIds><![CDATA[VkId редакторов]]></vkIds>
             <publishers><![CDATA[Издатели]]></publishers>
+            <token><![CDATA[Token]]></token>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
