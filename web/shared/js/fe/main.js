@@ -344,7 +344,7 @@ $(document).ready(function(){
             }
         };
 
-        // Редактирование заголовка ссылки
+        // Редактирование ссылки
         var editPostDescribeLink = {
             load: function ($header,$description,$image,$imageSrc) {
                 this.header = $header;
@@ -604,6 +604,7 @@ $(document).ready(function(){
                                         font: input.css('font'),
                                         fontSize: input.css('font-size'),
                                         position: 'absolute',
+                                        wordWrap: 'break-word',
                                         top: -10000
                                     });
                             }
@@ -643,6 +644,21 @@ $(document).ready(function(){
                                     if (data.description) {
                                         el.find('div.link-description-text p').text(data.description);
                                     }
+                                    el.click(function() {
+                                        Events.fire('post_link_data', {
+                                            link: link,
+                                            header: data.title,
+                                            description: data.description,
+                                            coords: {
+                                                h: 189,
+                                                w: 389,
+                                                x: 73,
+                                                x2: 462,
+                                                y: 0,
+                                                y2: 189
+                                            }
+                                        }, function(state) {});
+                                    });
                                 }
                             ]);
                         }

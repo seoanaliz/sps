@@ -31,12 +31,19 @@
                                 $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
                             ?>
                             {$content}
-
-                            <? if (!empty($articleRecord->photos)) { ?>
-                                <? foreach($articleRecord->photos as $photoItem) { ?>
-                                <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
+                            <div class="images">
+                                <? if (!empty($articleRecord->photos)) { ?>
+                                    <? $i = 0; ?>
+                                    <? foreach($articleRecord->photos as $photoItem) {
+                                        $i++;
+                                        $size = ($i == 1) ? 'original' : 'small';
+                                    ?>
+                                        <div class="img">
+                                            <img {$add} src="<?= MediaUtility::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
+                                        </div>
+                                    <? } ?>
                                 <? } ?>
-                            <? } ?>
+                            </div>
                         </div>
                         <? if(empty($gridItem['blocked'])) {?>
                             <div class="spr delete"></div>
