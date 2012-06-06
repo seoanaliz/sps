@@ -200,7 +200,6 @@ i {font-style: italic;}
 
 .images-ready {
     margin-top: 10px;
-    width: 520px;
     overflow: hidden;
 }
 
@@ -350,14 +349,63 @@ i {font-style: italic;}
 }
 
 /* Added */
-.post *[contenteditable=true] {
+.post .editing *[contenteditable=true],
+.post .editing textarea {
     padding: 10px;
     border: 1px solid #ddd;
     background-color: #f7f7f7;
     overflow: hidden;
+    width: 508px;
+    font-family: Tahoma;
+    font-size: 12px;
+    line-height: normal;
 }
-.post .bottom.edit a {
-    margin-right: 10px;
+.post .editing .actions {
+    margin-top: 10px;
+    position: relative;
+}
+.post .editing .actions a {
+    margin-left: 10px;
+    line-height: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.post .editing .actions .save {}
+.post .editing .actions .cancel {}
+.post .editing .actions .upload {}
+.post .editing .actions .upload * {
+    background: none;
+    margin: 0;
+    padding: 0;
+    color: #205F82;
+    border: none;
+}
+
+.post .editing .delete-attach {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    margin: 0;
+    background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
+    cursor: pointer;
+    border: 3px solid white;
+    border-radius: 2px;
+    opacity: .8;
+    filter: alpha(opacity=80);
+}
+.post .editing .attachments {
+    margin-top: 10px;
+}
+.post .editing .attachment {
+    position: relative;
+    display: inline-block;
+    margin: 7px 7px 0 0;
+}
+.post .editing .attachment img {
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.5);
 }
 #go-to-top {
     position: fixed;
@@ -379,10 +427,7 @@ i {font-style: italic;}
 }
 .link-info-content .link-status-content {
     margin: 10px 0 0 10px;
-}
-.images-ready {
-    margin-top: 10px;
-    overflow: hidden;
+    position: relative;
 }
 .dragged.moving {
     background-color: #fff;
@@ -404,43 +449,25 @@ i {font-style: italic;}
 .post.removed img {
     opacity: .6;
 }
-.post .post-image .img:first-child {
-    width: 40%;
-    float: left;
+.left-panel .images-ready {}
+.left-panel .images-ready .post-image.first {
+    max-height: 298px;
+    min-height: 198px;
 }
-.post .post-image .img {
-    width: 19.6%;
-    float: right;
-    margin-bottom: 3px;
-    margin-right: .5%;
+.left-panel .images-ready .post-image.else {}
+.left-panel .images-ready .post-image {
+    height: 98px;
+    width: 98px;
+    background-color: #f1f1f1;
+    padding: 0;
+    margin-bottom: 2px;
+    margin-right: 2px;
     overflow: hidden;
-    background-color: #fff;
     text-align: center;
 }
-.left-panel .img:first-child {
-    height: 300px;
-}
-.left-panel .img {
-    height: 98px;
-}
-.left-panel .post .post-image .img img {
-    max-height: 120%;
+.left-panel .images-ready .post-image img {
     max-width: 120%;
 }
-.right-panel .img:first-child {
-    height: 120px;
-}
-.right-panel .img {
-    height: 38px;
-}
-.right-panel .img img {
-    max-height: 130%;
-    max-width: 130%;
-}
-.right-panel .shortcut {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
-.right-panel .show-cut {
+.left-panel .images-ready .post-image {
+
 }

@@ -7,16 +7,16 @@
     box-shadow: inset 0 0 1px 1px #c8b71e;
 }
 
-.link-info-content .link-description-content { overflow: hidden; margin-top: 15px; padding: 10px; background: #fff; border: #c0cad4 solid 1px; }
+.link-info-content .link-description-content { overflow: hidden; margin-top: 5px; padding: 10px; background: #f1f1f1; border-left: #CCCCCC solid 3px; }
 .link-info-content .link-description-content img { float: left; margin-right: 10px; }
 .link-info-content .link-description-content a { float: none; margin: 0; display: block;}
 .link-info-content .link-description-content p { float: left; }
 .link-info-content .link-description-content a + p { margin-top: 5px; }
 .link-info-content .link-description-content img ~ a,
 .link-info-content .link-description-content img ~ p { width: 450px; }
-.link-info-content .link-status-content { margin: 10px 0 0 10px; }
+.link-info-content .link-status-content { margin: 10px 0 0 0; }
 .link-info-content .link-status-content span { position: relative; }
-.link-info-content .link-description-text { position: relative; width: 375px; }
+.link-info-content .link-description-text { position: relative; width: 365px; }
 .link-info-content img.ajax-loader {
     margin: 0 auto;
     display: block;
@@ -27,6 +27,7 @@
     height: 63px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
+    margin-right: 10px;
 }
 
 .failed {

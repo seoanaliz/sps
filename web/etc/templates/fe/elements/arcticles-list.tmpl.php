@@ -55,14 +55,21 @@
                             $photoTitle = nl2br($photoTitle);
 
                             if ($i == 1) {
+                                $count = count($articleRecord->photos);
                                 $imgClass = 'first';
+                                $imgWidth = ($count == 1) ? false : 228;
+                                $imgHeight = ($count == 1) ? false : (ceil(($count - 1) / 3) * 100) - 2;
                             } else {
                                 $imgClass = 'else';
+                                $imgWidth = 98;
+                                $imgHeight = 98;
                             }
+                            $imgWidth = $imgWidth ? $imgWidth.'px' : 'auto';
+                            $imgHeight = $imgHeight ? $imgHeight.'px' : 'auto';
 
                             ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
-                                <div class="post-image <?= SourceFeedUtility::IsTopFeed($sourceFeed) ? 'post-image-top' : '' ?>">
-                                    <img src="{$path}" class="{$imgClass}" alt="" />
+                                <div style="width:{$imgWidth};height:{$imgHeight}" class="{$imgClass} post-image <?= SourceFeedUtility::IsTopFeed($sourceFeed) ? 'post-image-top' : '' ?>">
+                                    <img src="{$path}" alt="" />
                                 </div>
                             </a>
                             <?

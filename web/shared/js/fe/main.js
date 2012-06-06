@@ -1,32 +1,34 @@
-var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im
+var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
     $("#calendar")
-        .datepicker(
-        {
-            dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-            dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-            dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-            monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-            monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-            firstDay: 1,
-            showAnim: '',
-            dateFormat: "dd.mm.yy"
-        }
-    )
+        .datepicker (
+            {
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                firstDay: 1,
+                showAnim: '',
+                dateFormat: "dd.mm.yy"
+            }
+        )
         .keydown(function(e){
             if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
             Events.fire('calendar_change', [])
-        }).trigger('change');
+        })
+        .trigger('change');
 
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });
 
     $("#source-select").multiselect({
+        height: 250,
         noneSelectedText: 'Источник',
         checkAll: function(){
             Events.fire('leftcolumn_dropdown_change', []);
@@ -47,12 +49,12 @@ $(document).ready(function(){
             elem.removeClass("expanded");
             $(document).unbind("click", hidethis);
             elem.find("li").unbind("click", click_li);
-        }
+        };
         var click_li = function(e){
             e.stopPropagation();
             elem.dd_sel($(this).data("id"));
             hidethis();
-        }
+        };
         $(document).bind("click", hidethis);
         elem.find("li").click(click_li);
         elem.addClass("expanded");
@@ -199,14 +201,14 @@ $(document).ready(function(){
             });
             if(defaultvalue) input.val(defaultvalue);
             return input;
-        }
+        };
         var getDD = function(elem){
             return $(elem).closest(".header").find(".drop-down");
-        }
+        };
         $(".controls .del").click(function(){
             var dd = getDD(this),
                 val = dd.data("selected");
-            if(!val) {return};
+            if(!val) {return}
             var column = (dd.closest(".right-panel").length) ? "right" : "left";
             Events.fire(column + "column_source_deleted", [val, function(state){
                 if(!state) { return; }
@@ -216,7 +218,7 @@ $(document).ready(function(){
         });
         $(".controls .gear").click(function(){
             var dd = getDD(this);
-            if(!dd.data("selected")) {return};
+            if(!dd.data("selected")) {return}
             addInput(dd,dd.find(".caption").text(),dd.data("selected"));
         });
         $(".controls .plus").click(function(){
@@ -224,6 +226,7 @@ $(document).ready(function(){
         });
     })();
 
+    // Автоподгрузка записей
     (function(){
         var w = $(window),
             b = $("#wallloadmore");
@@ -234,6 +237,7 @@ $(document).ready(function(){
         });
     })();
 
+    // Добавление записи в борд
     (function(){
         var form = $(".newpost"),
             input = $(".input", form),
@@ -248,9 +252,9 @@ $(document).ready(function(){
         form.click(function(e){ e.stopPropagation(); });
         input
             .focus(function(){
-            form.removeClass("collapsed");
-            $(window).bind("click", stop);
-        })
+                form.removeClass("collapsed");
+                $(window).bind("click", stop);
+            })
             .bind('paste', function() {
                 setTimeout(function() {
                     parseUrl(input.text());
@@ -338,8 +342,9 @@ $(document).ready(function(){
                     }
                 ]);
             }
-        }
+        };
 
+        // Редактирование заголовка ссылки
         var editPostDescribeLink = {
             load: function ($header,$description,$image,$imageSrc) {
                 this.header = $header;
@@ -506,7 +511,7 @@ $(document).ready(function(){
             input.data("id", 0).html('');
             $('.qq-upload-list').html('');
             deleteLink();
-        }
+        };
 
         var stop = function(){
             $(window).unbind("click", stop);
@@ -516,7 +521,7 @@ $(document).ready(function(){
                 form.addClass("collapsed");
                 deleteLink();
             }
-        }
+        };
 
         var deleteLink = function(){
             $linkDescription.empty();
@@ -524,7 +529,7 @@ $(document).ready(function(){
             $linkInfo.hide();
             foundLink = false;
             foundDomain = false;
-        }
+        };
 
         form.delegate(".save", "click" ,function(e){
             var photos = new Array();
@@ -555,27 +560,203 @@ $(document).ready(function(){
             form.addClass('collapsed');
             e.preventDefault();
         });
-        $(".left-panel").delegate(".post .edit", "click" ,function(){
-            clearForm();
 
-            id = $(this).closest(".post").data("id");
+        // Редактирование поста в левом меню
+        $(".left-panel").delegate(".post .edit", "click", function(){
 
-            Events.fire('load_post_edit', [id, function(state, data){
-                if(state && data) {
-                    tip.click();
-                    input.data("id", id);
-                    input.html(data.text);
-                    $('html, body').animate({scrollTop:0}, 'slow');
-                    if(data.photos) {
-                        $("#fileTemplate").tmpl( eval(data.photos), { counter: filesCounter } ).appendTo(".qq-upload-list");
-                        $(".qq-upload-success a.delete-attach").click(function(e){
-                            $(this).closest('li').remove();
-                            e.preventDefault();
+            var $post = $(this).closest(".post"),
+                $content = $post.find('.content'),
+                $buttonPanel = $post.find('.bottom.d-hide'),
+                postId = $post.data("id");
+
+            if ($post.editing) return;
+
+            Events.fire('load_post_edit', [postId, function(state, data){
+                if (state && data) {
+
+                    (function($post, $el, data) {
+
+                        function setSelectionRange(input, selectionStart, selectionEnd) {
+                            if (input.setSelectionRange) {
+                                input.focus();
+                                input.setSelectionRange(selectionStart, selectionEnd);
+                            }
+                            else if (input.createTextRange) {
+                                var range = input.createTextRange();
+                                range.collapse(true);
+                                range.moveEnd('character', selectionEnd);
+                                range.moveStart('character', selectionStart);
+                                range.select();
+                            }
+                        }
+                        function setCaretToPos (input, pos) {
+                            setSelectionRange(input, pos, pos);
+                        }
+                        function autoResize(input) {
+                            if (!input.autoResize) {
+                                input.autoResize = $('<div/>')
+                                    .appendTo('body')
+                                    .css({
+                                        width: input.width(),
+                                        minHeight: input.height(),
+                                        padding: input.css('padding'),
+                                        lineHeight: input.css('line-height'),
+                                        font: input.css('font'),
+                                        fontSize: input.css('font-size'),
+                                        position: 'absolute',
+                                        top: -10000
+                                    });
+                            }
+                            input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
+                            input.css({
+                                height: input.autoResize.height() + 15
+                            });
+                        }
+
+                        function parseUrl(txt, callback) {
+                            var matches = txt.match(pattern);
+                            // если приаттачили ссылку
+                            if (matches && matches[0] && matches[1]) {
+                                var foundLink = matches[0];
+                                var foundDomain = matches[2];
+                                if ($.isFunction(callback)) callback(foundLink, foundDomain);
+                            }
+                        }
+                        function addLink(link, domain, el) {
+                            Events.fire("post_describe_link", [
+                                link,
+                                function(data) {
+                                    var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                                        $links.html('');
+                                    });
+                                    el.html(linkTplFull);
+                                    el.find('a').attr('href', link).html(domain);
+                                    el.find('.link-status-content').append($del);
+                                    if (data.img) {
+                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                                    } else {
+                                        el.find('.link-img').remove();
+                                    }
+                                    if (data.title) {
+                                        el.find('div.link-description-text a').text(data.title);
+                                    }
+                                    if (data.description) {
+                                        el.find('div.link-description-text p').text(data.description);
+                                    }
+                                    console.log('LINK >>>');
+                                    console.log(data);
+                                    console.log('<<< LINK');
+                                }
+                            ]);
+                        }
+                        function addPhoto(path, filename, el) {
+                            var $photo = $('<span/>', {class: 'attachment'})
+                                .append('<img src="' + path + '" alt="" />')
+                                .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
+                                .click(function() {
+                                        $photo.remove();
+                                    })
+                                )
+                                .append($('<input />', {type: 'hidden', name: '', value: filename}))
+                                .appendTo(el);
+                        }
+
+                        var cache = {
+                            html: $el.html(),
+                            scroll: $(window).scrollTop()
+                        };
+                        $post.draggable('disable');
+                        $post.editing = true;
+                        $buttonPanel.hide();
+                        $el.html('');
+
+                        var $edit = $('<div/>', {class: 'editing'}).appendTo($el);
+                        var $content = $('<div/>').appendTo($edit);
+                        var $attachments = $('<div/>', {class: 'attachments'}).appendTo($edit);
+                        var $text = $('<textarea/>').appendTo($content);
+                        var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
+                        var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
+                        var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
+                        var $saveBtn = $('<div/>', {class: 'save button spr l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                        var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
+                        var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
+
+                        var uploader = new qq.FileUploader({
+                            debug: true,
+                            element: $uploadBtn.get(0),
+                            action: root + 'int/controls/image-upload/',
+                            template: '<div class="qq-uploader">' +
+                                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+                                '<div class="qq-upload-button">Прикрепить</div>' +
+                                '<ul class="qq-upload-list"></ul>' +
+                                '</div>',
+                            onComplete: function(id, fileName, res) {
+                                addPhoto(res.image, res.filename, $photos);
+                            }
                         });
-                    }
-                    if (data.link) {
-                        parseUrl(data.link);
-                    }
+                        var onSave = function() {
+                            var text = $text.val();
+                            var link = $links.find('a').attr('href');
+                            var photos = new Array();
+                            $photos.children().each(function() {
+                                var photo = new Object();
+                                photo.filename = $(this).find('input:hidden').val();
+                                photos.push(photo);
+                            });
+                            Events.fire("post", [
+                                text,
+                                photos,
+                                link,
+                                postId,
+                                function(data) {
+//                                    $post.draggable('enable').removeClass('editable');
+//                                    $buttonPanel.show();
+//                                    $edit.remove();
+                                }
+                            ]);
+                        };
+                        var onCancel = function() {
+                            $post.draggable('enable');
+                            $post.editing = false;
+                            $buttonPanel.show();
+                            $el.html(cache.html);
+                            $edit.remove();
+                        };
+
+                        if (true || data.text) {
+                            var text = data.text;
+                            $text
+                                .val(text.split('<br />').join('')) // because it's textarea
+                                .appendTo($content)
+                                .bind('keyup', function(e) {
+                                    autoResize($text);
+                                    parseUrl($text.val(), function(link, domain) {
+                                        if ($text.link == link) return;
+                                        $text.link = link;
+                                        addLink(link, domain, $links);
+                                    });
+                                    if (e.ctrlKey && e.keyCode == 13) {
+                                        onSave();
+                                    }
+                                })
+                                .keyup().focus();
+                            setCaretToPos($text.get(0), text.length);
+                        }
+
+                        if (data.link) {
+                            var link = data.link;
+                            parseUrl($text.val(), function(link, domain) {
+                                addLink(link, domain, $links);
+                            });
+                        }
+
+                        if (data.photos) {
+                            var photos = eval(data.photos);
+                            $(photos).each(function() {
+                                addPhoto(this.path, this.filename, $photos);
+                            });
+                        }
+                    })($post, $content, data);
                 }
             }]);
         });
@@ -651,7 +832,7 @@ var Events = {
             }
         }
     }
-}
+};
 $.extend(Events, Eventlist);
 delete(Eventlist);
 
@@ -682,7 +863,7 @@ var Elements = {
                     //big
                     Elements.initLinkLoader(link, false);
                 }
-            }
+            };
 
             img.src = src;
         });
@@ -819,7 +1000,7 @@ var Elements = {
             Elements.initLinkLoader($(this), true);
         });
     }
-}
+};
 
 $.fn.dd_sel = function(id){
     var elem = $(this);
