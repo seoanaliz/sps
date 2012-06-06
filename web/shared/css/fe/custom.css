@@ -41,6 +41,10 @@ div.type-selector {
 }
 
 div.type-selector a {
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
     display: -moz-inline-box;
     display: inline-block;
     margin-left: 3px;
@@ -49,12 +53,10 @@ div.type-selector a {
 }
 
 div.type-selector a.active,
-div.type-selector a:hover {
+div.type-selector a.active:hover {
     background-color: #53a5e3;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -khtml-border-radius: 10px;
+    color: #fff;
+    text-shadow: 0 1px 1px #4992C9;
 }
 
 div.type-selector a:hover {

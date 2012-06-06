@@ -643,9 +643,6 @@ $(document).ready(function(){
                                     if (data.description) {
                                         el.find('div.link-description-text p').text(data.description);
                                     }
-                                    console.log('LINK >>>');
-                                    console.log(data);
-                                    console.log('<<< LINK');
                                 }
                             ]);
                         }
@@ -728,13 +725,18 @@ $(document).ready(function(){
                             $text
                                 .val(text.split('<br />').join('')) // because it's textarea
                                 .appendTo($content)
+                                .bind('paste', function(e) {
+                                    setTimeout(function() {
+                                        parseUrl($text.val(), function(link, domain) {
+                                            if ($text.link && $links.html() || $text.link == link) return;
+                                            $text.link = link;
+                                            addLink(link, domain, $links);
+                                        });
+                                    }, 0);
+                                })
                                 .bind('keyup', function(e) {
                                     autoResize($text);
-                                    parseUrl($text.val(), function(link, domain) {
-                                        if ($text.link == link) return;
-                                        $text.link = link;
-                                        addLink(link, domain, $links);
-                                    });
+
                                     if (e.ctrlKey && e.keyCode == 13) {
                                         onSave();
                                     }
@@ -745,7 +747,7 @@ $(document).ready(function(){
 
                         if (data.link) {
                             var link = data.link;
-                            parseUrl($text.val(), function(link, domain) {
+                            parseUrl(data.link, function(link, domain) {
                                 addLink(link, domain, $links);
                             });
                         }
@@ -886,7 +888,7 @@ var Elements = {
                 revert: 'invalid',
                 appendTo: 'body',
                 cursor: 'move',
-                cursorAt: {left: 5, top: 0},
+                cursorAt: {left: 100, top: 20},
                 helper: function() {
                     return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
                 },
