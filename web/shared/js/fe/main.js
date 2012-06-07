@@ -536,7 +536,7 @@ $(document).ready(function(){
         var stop = function(){
             $(window).unbind("click", stop);
 
-            if(!input.text().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
+            if(!input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
                 input.data("id", 0);
                 form.addClass("collapsed");
                 deleteLink();
@@ -561,7 +561,7 @@ $(document).ready(function(){
             });
             form.addClass("spinner");
             Events.fire("post", [
-                input.html(),
+                input.val(),
                 photos,
                 $linkStatus.find('a').attr('href'),
                 input.data("id"),
@@ -576,7 +576,7 @@ $(document).ready(function(){
         });
         form.delegate(".cancel", "click" ,function(e){
             clearForm();
-            input.text('').blur();
+            input.val('').blur();
             form.addClass('collapsed');
             e.preventDefault();
         });
@@ -757,7 +757,7 @@ $(document).ready(function(){
                             html: $el.html(),
                             scroll: $(window).scrollTop()
                         };
-                        $post.draggable('disable');
+                        $post.find('> .content').draggable('disable');
                         $post.editing = true;
                         $buttonPanel.hide();
                         $el.html('');
@@ -808,7 +808,7 @@ $(document).ready(function(){
                             ]);
                         };
                         var onCancel = function() {
-                            $post.draggable('enable');
+                            $post.find('> .content').draggable('enable');
                             $post.editing = false;
                             $buttonPanel.show();
                             $el.html(cache.html);
@@ -990,7 +990,7 @@ var Elements = {
                 }
             };
 
-            $(".post").draggable(draggableParams);
+            $(".post > .content").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",
@@ -998,7 +998,7 @@ var Elements = {
 
                 drop: function(e, ui) {
                     var target = $(this),
-                        post = $(ui.draggable),
+                        post = $(ui.draggable).closest('.post'),
                         slot = post.closest('.slot'),
                         helper = $(ui.helper);
 

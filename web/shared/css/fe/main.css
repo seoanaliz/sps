@@ -7,7 +7,7 @@ body {
 a {color: #205f82;text-decoration: none;}
 a:hover {color: #205f82;text-decoration: underline;}
 
-.bb {border-bottom: 1px solid #ddd;}
+.bb {border-bottom: 1px solid #aaa;}
 .bt {border-top: 1px solid #ddd;}
 .clear {clear:both;}
 .hidden {display: none;}
@@ -82,18 +82,18 @@ i {font-style: italic;}
 .calendar .caption.default {text-indent: 0;}
 
 .block {
-    background: #e6e6e6;
+    background: #e1e1e1;
     -webkit-border-radius: 5px 5px 0 0;
     -moz-border-radius: 5px 5px 0 0;
     border-radius: 5px 5px 0 0;
-    -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.15);
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255,255,255,.7) inset;
+    -moz-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255,255,255,.7) inset;
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255,255,255,.7) inset;
 }
 .header {padding: 15px;font-size: 12px;}
 
 .right-panel {position: fixed; width: 370px;margin-left: 620px;top: 10px;bottom: 0;z-index:-1;}
-.left-panel {margin:10px;width: 600px;float:left;z-index: 2;}
+.left-panel {margin:10px 20px 10px 0;width: 600px;float:left;z-index: 2;}
 
 .left-panel .newpost {background: #f2f2f2;padding: 15px;font-size: 12px;line-height: 17px;}
 .left-panel .newpost.collapsed {line-height: 12px;}
@@ -404,7 +404,7 @@ i {font-style: italic;}
 .newpost textarea,
 .post .editing textarea {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     overflow: hidden;
     font-family: Tahoma;
     font-size: 12px;
@@ -416,7 +416,7 @@ i {font-style: italic;}
     width: 548px;
 }
 .post .editing textarea {
-    width: 508px;
+    width: 518px;
 }
 .post .editing .actions {
     margin-top: 10px;
@@ -447,9 +447,7 @@ i {font-style: italic;}
 }
 .post .editing .link-description-text > a[contenteditable=true],
 .post .editing .link-description-text > p[contenteditable=true] {
-    border: 1px solid #CCC;
-    background-color: #f7f7f7;
-    padding: 5px;
+    padding: 0 2px;
     opacity: 1;
     cursor: text;
 }
