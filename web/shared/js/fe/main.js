@@ -616,7 +616,6 @@ $(document).ready(function(){
 
                         function parseUrl(txt, callback) {
                             var matches = txt.match(pattern);
-                            // если приаттачили ссылку
                             if (matches && matches[0] && matches[1]) {
                                 var foundLink = matches[0];
                                 var foundDomain = matches[2];
@@ -627,38 +626,119 @@ $(document).ready(function(){
                             Events.fire("post_describe_link", [
                                 link,
                                 function(data) {
+                                    var savePost = function(d) {
+                                        d = d || {};
+                                        Events.fire('post_link_data', [
+                                            {
+                                                link: d.link || link,
+                                                header: d.title || data.title,
+                                                coords: d.coords || data.coords,
+                                                description: d.description || data.description
+                                            }, function(state) {
+                                                if (state) {
+                                                    popupSuccess('Изменения сохранены');
+                                                }
+                                            }
+                                        ]);
+                                    };
                                     var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
                                         $links.html('');
                                     });
                                     el.html(linkTplFull);
                                     el.find('a').attr('href', link).html(domain);
                                     el.find('.link-status-content').append($del);
+
                                     if (data.img) {
-                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                                        el.find('.link-img')
+                                            .css('background-image', 'url(' + data.img + ')')
+                                            .click(function() {
+                                                var originalImage = new Image();
+                                                originalImage.src = data.imgOriginal;
+                                                originalImage.onload = function () {
+                                                    var linkImageCoords = {};
+                                                    var closePopup = function() {
+                                                        $popup.remove();
+                                                        $bg.remove();
+                                                    };
+                                                    var showPreview = function(coords)
+                                                    {
+                                                        linkImageCoords = coords;
+                                                        var $preview = $popup.find('.preview');
+                                                        var rx = $preview.width() / coords.w;
+                                                        var ry = $preview.height() / coords.h;
+
+                                                        $preview.find('> img').css({
+                                                            width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+                                                            height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+                                                            marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                                                            marginTop: '-' + Math.round(ry * coords.y) + 'px'
+                                                        });
+                                                    };
+                                                    var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
+                                                    var $popup = $('<div/>', {
+                                                            'class': 'popup-image-edit',
+                                                            'html': '<div class="title">Редактировать изображение</div>'+
+                                                                '<div class="close"></div>' +
+                                                                '<div class="left-column">' +
+                                                                    '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                                                '</div>' +
+                                                                '<div class="right-column">' +
+                                                                    '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                                                    '<div class="button spr save">Сохранить</div>'+
+                                                                '</div>'
+                                                        })
+                                                        .appendTo('body');
+
+                                                    $bg.click(closePopup);
+                                                    $popup.css({'margin-left': -$popup.width()/2});
+                                                    $popup.find('.close').click(closePopup);
+                                                    $popup.find('.save').click(function() {
+                                                        data.coords = linkImageCoords;
+                                                        savePost({coords: linkImageCoords});
+                                                        closePopup();
+                                                    });
+                                                    $popup.find('.original > img').Jcrop({
+                                                        onChange: showPreview,
+                                                        onSelect: showPreview,
+                                                        aspectRatio: 2.06,
+                                                        minSize: [130,63],
+                                                        setSelect: [0,0,130,63]
+                                                    });
+                                                };
+                                            });
                                     } else {
                                         el.find('.link-img').remove();
                                     }
                                     if (data.title) {
-                                        el.find('div.link-description-text a').text(data.title);
+                                        el.find('div.link-description-text a')
+                                            .text(data.title)
+                                            .click(function() {
+                                                var $title = $(this);
+                                                $title.attr('contenteditable', true).focus();
+                                                return false;
+                                            })
+                                            .blur(function() {
+                                                var $title = $(this);
+                                                $title.attr('contenteditable', false);
+                                                data.title = $title.text();
+                                                savePost({title: $title.text()});
+                                            });
                                     }
                                     if (data.description) {
-                                        el.find('div.link-description-text p').text(data.description);
+                                        el.find('div.link-description-text p')
+                                            .text(data.description)
+                                            .click(function() {
+                                                var $description = $(this);
+                                                $description.attr('contenteditable', true).focus();
+                                                return false;
+                                            })
+                                            .blur(function() {
+                                                var $description = $(this);
+                                                $description.attr('contenteditable', false);
+                                                data.description = $description.text();
+                                                savePost({description: $description.text()});
+                                            });
                                     }
-                                    el.click(function() {
-                                        Events.fire('post_link_data', {
-                                            link: link,
-                                            header: data.title,
-                                            description: data.description,
-                                            coords: {
-                                                h: 189,
-                                                w: 389,
-                                                x: 73,
-                                                x2: 462,
-                                                y: 0,
-                                                y2: 189
-                                            }
-                                        }, function(state) {});
-                                    });
                                 }
                             ]);
                         }
@@ -792,15 +872,8 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
-    $(".right-panel").delegate(".show-cut", "click" ,function(e){
-        var $content = $(this).closest('.content'),
-            txt      = $(this).text();
-
-        $content.find('.cut').toggle();
-
-        $(this).text(txt == '«' ? '»' : '«');
-
-        e.preventDefault();
+    $(".right-panel").delegate(".toggle-text", "click", function(e) {
+        $(this).parent().toggleClass('collapsed');
     });
 
     (function(w) {

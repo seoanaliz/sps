@@ -99,12 +99,17 @@ i {font-style: italic;}
 .left-panel .newpost.collapsed {line-height: 12px;}
 
 .left-panel .wall {background: #fff; overflow: hidden;}
-.post {background: #fff;padding:15px;position:relative;
+.post {
+    background: #fff;
+    position: relative;
+    padding: 10px;
     -webkit-box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
 }
-
+.post:hover {
+    background-color: rgba(32, 95, 130, 0.1);
+}
 
 .show-cut { font-weight: 800; }
 .left-panel .show-cut { display: block; color: #8fa3bb; }
@@ -165,11 +170,39 @@ i {font-style: italic;}
 }
 .right-panel .items {overflow-y: auto;overflow-x: hidden;position: fixed;width: 370px;top: 66px;bottom: 0px;}
 
-.right-panel .items .slot .post {position:relative;line-height: 16px;}
+.right-panel .items .slot .post {position:relative;line-height: 16px;min-height: 70px;}
 .right-panel .items .slot .time {padding-left:16px;padding-top:12px;font-size: 11px;color:#888;position: absolute;z-index: 100;}
 .right-panel .items .slot.ui-state-hover .time,
 .right-panel .items .slot.ui-state-active .time {z-index: 1;}
 .right-panel .post {padding-top: 30px;}
+.right-panel .post .content .text {
+    position: relative;
+}
+.right-panel .post .content .text .toggle-text {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    bottom: 1px;
+    color: #205f82;
+    font-weight: bold;
+    font-size: 14px;
+}
+.right-panel .post .content .text .toggle-text:after {
+    content: '«';
+}
+.right-panel .post .content .text.collapsed .toggle-text:after {
+    content: '»';
+}
+.right-panel .post .content .text.collapsed br {
+    display: none;
+}
+.right-panel .post .content .text.collapsed {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 14px;
+}
 
 .ui-datepicker {
     clip: auto !important;
@@ -349,7 +382,25 @@ i {font-style: italic;}
 }
 
 /* Added */
-.post .editing *[contenteditable=true],
+#go-to-top {
+    position: fixed;
+    width: 100px;
+    height: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+    line-height: 100px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    opacity: .3;
+    background: none;
+}
+#go-to-top:hover {
+    background: #ddd;
+    opacity: .7;
+}
+
 .post .editing textarea {
     padding: 10px;
     border: 1px solid #ddd;
@@ -380,6 +431,21 @@ i {font-style: italic;}
     color: #205F82;
     border: none;
 }
+.post .editing .link-description-text > a:hover,
+.post .editing .link-description-text > p:hover,
+.post .editing .link-img:hover {
+    opacity: .5;
+    filter: alpha(opacity=50);
+    cursor: pointer;
+}
+.post .editing .link-description-text > a[contenteditable=true],
+.post .editing .link-description-text > p[contenteditable=true] {
+    border: 1px solid #CCC;
+    background-color: #f7f7f7;
+    padding: 5px;
+    opacity: 1;
+    cursor: text;
+}
 
 .post .editing .delete-attach {
     position: absolute;
@@ -407,24 +473,17 @@ i {font-style: italic;}
     border-radius: 3px;
     box-shadow: 0 1px 4px rgba(0,0,0,.5);
 }
-#go-to-top {
-    position: fixed;
-    width: 100px;
-    height: 100%;
-    left: 0;
-    top: 0;
-    text-align: center;
-    line-height: 100px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    opacity: .3;
-    background: none;
+
+.post.removed {
+    background-color: #d8e1e4;
 }
-#go-to-top:hover {
-    background: #ddd;
-    opacity: .7;
+.post.removed * {
+    color: #999;
 }
+.post.removed img {
+    opacity: .6;
+}
+
 .link-info-content .link-status-content {
     margin: 10px 0 0 10px;
     position: relative;
@@ -440,15 +499,7 @@ i {font-style: italic;}
 .dragged.moving img {
     opacity: .1;
 }
-.post.removed {
-    background-color: #d8e1e4;
-}
-.post.removed * {
-    color: #999;
-}
-.post.removed img {
-    opacity: .6;
-}
+
 .left-panel .images-ready {}
 .left-panel .images-ready .post-image.first {
     max-height: 298px;
@@ -458,7 +509,7 @@ i {font-style: italic;}
 .left-panel .images-ready .post-image {
     height: 98px;
     width: 98px;
-    background-color: #f1f1f1;
+    background-color: #fff;
     padding: 0;
     margin-bottom: 2px;
     margin-right: 2px;
@@ -470,7 +521,9 @@ i {font-style: italic;}
 }
 
 .right-panel {}
-.right-panel .images {}
+.right-panel .images {
+    margin-top: 5px;
+}
 .right-panel .images:after {
     content: '.';
     display: block;
@@ -482,16 +535,83 @@ i {font-style: italic;}
     float: left;
     width: 60px;
     height: 38px;
-    background-color: #f1f1f1;
+    background-color: #fff;
     text-align: center;
     overflow: hidden;
     margin: 0 3px 3px 0
 }
 .right-panel .images .img:first-child {
-    width: 120px;
+    width: 130px;
     height: 120px;
 }
 .right-panel .images .img img {
     max-width: 130%;
     max-height: 130%;
+}
+.right-panel .link-info-content .link-img {
+    height: 45px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2) inset;
+}
+.right-panel .link-info-content .link-description-content {
+    margin-top: 0;
+    padding: 5px;
+    font-size: 11px;
+    line-height: 11px;
+    border-left-width: 2px;
+}
+.right-panel .link-info-content .link-description-content a + p {
+    margin-top: 5px;
+}
+
+.popup-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: .5;
+    filter: alpha(opacity=50);
+}
+.popup-image-edit {
+    position: fixed;
+    left: 50%;
+    top: 100px;
+    z-index: 999;
+    background-color: #fff;
+    min-width: 300px;
+    min-height: 300px;
+    margin-left: -150px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+.popup-image-edit .close {
+    position: absolute;
+    cursor: pointer;
+    top: 15px;
+    right: 15px;
+    width: 10px;
+    height: 10px;
+    background: url("../../images/fe/controls.png") no-repeat scroll -44px -2px;
+}
+.popup-image-edit .title {
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+.popup-image-edit .left-column,
+.popup-image-edit .right-column {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 0 10px 10px;
+}
+.popup-image-edit .right-column {
+    overflow: hidden;
+    padding-left: 0;
+}
+.popup-image-edit .preview {
+    width: 130px;
+    height: 63px;
+    overflow: hidden;
+    margin: 0 auto 10px;
 }
