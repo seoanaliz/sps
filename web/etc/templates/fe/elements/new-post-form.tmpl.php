@@ -1,6 +1,5 @@
 <div class="newpost collapsed bb">
-    <div class="input" contenteditable="true"></div>
-    <div class="tip">Есть чем поделиться?</div>
+    <textarea placeholder="Есть чем поделиться?"></textarea>
     <div class="link-info" style="display: none;">
         <div class="link-description"><!-- --></div>
         <div class="link-status"><!-- --></div>

@@ -107,9 +107,6 @@ i {font-style: italic;}
     -moz-box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
 }
-.post:hover {
-    background-color: rgba(32, 95, 130, 0.1);
-}
 
 .show-cut { font-weight: 800; }
 .left-panel .show-cut { display: block; color: #8fa3bb; }
@@ -401,15 +398,25 @@ i {font-style: italic;}
     opacity: .7;
 }
 
+.post:hover {
+    background-color: rgba(32, 95, 130, 0.1);
+}
+.newpost textarea,
 .post .editing textarea {
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: #f1f1f1;
     overflow: hidden;
-    width: 508px;
     font-family: Tahoma;
     font-size: 12px;
     line-height: normal;
+    box-shadow: 0 2px 5px rgba(0,0,0,.1) inset;
+    border-radius: 2px;
+}
+.newpost textarea {
+    width: 548px;
+}
+.post .editing textarea {
+    width: 508px;
 }
 .post .editing .actions {
     margin-top: 10px;

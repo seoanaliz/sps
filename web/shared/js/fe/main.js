@@ -237,10 +237,33 @@ $(document).ready(function(){
         });
     })();
 
+    // Автовысота у textarea
+    function autoResize(input) {
+        if (!input.autoResize) {
+            input.autoResize = $('<div/>')
+                .appendTo('body')
+                .css({
+                    width: input.width(),
+                    minHeight: input.height(),
+                    padding: input.css('padding'),
+                    lineHeight: input.css('line-height'),
+                    font: input.css('font'),
+                    fontSize: input.css('font-size'),
+                    position: 'absolute',
+                    wordWrap: 'break-word',
+                    top: -10000
+                });
+        }
+        input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
+        input.css({
+            height: input.autoResize.height() + 15
+        });
+    }
+
     // Добавление записи в борд
     (function(){
         var form = $(".newpost"),
-            input = $(".input", form),
+            input = $("textarea", form),
             tip = $(".tip", form);
 
         var $linkInfo = $('.link-info', form),
@@ -257,18 +280,15 @@ $(document).ready(function(){
             })
             .bind('paste', function() {
                 setTimeout(function() {
-                    parseUrl(input.text());
+                    parseUrl(input.val());
                 }, 10);
             })
-            .keydown(function (e) {
-                if (form.hasClass("collapsed")) {
-                    input.focus();
-                }
-
+            .keyup(function (e) {
                 if (e.ctrlKey && e.keyCode == 13) {
                     form.find('.save').click();
                 }
-            })
+                autoResize(input);
+            }).keyup()
         ;
 
         var parseUrl = function(txt){
@@ -591,27 +611,6 @@ $(document).ready(function(){
                         }
                         function setCaretToPos (input, pos) {
                             setSelectionRange(input, pos, pos);
-                        }
-                        function autoResize(input) {
-                            if (!input.autoResize) {
-                                input.autoResize = $('<div/>')
-                                    .appendTo('body')
-                                    .css({
-                                        width: input.width(),
-                                        minHeight: input.height(),
-                                        padding: input.css('padding'),
-                                        lineHeight: input.css('line-height'),
-                                        font: input.css('font'),
-                                        fontSize: input.css('font-size'),
-                                        position: 'absolute',
-                                        wordWrap: 'break-word',
-                                        top: -10000
-                                    });
-                            }
-                            input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
-                            input.css({
-                                height: input.autoResize.height() + 15
-                            });
                         }
 
                         function parseUrl(txt, callback) {
