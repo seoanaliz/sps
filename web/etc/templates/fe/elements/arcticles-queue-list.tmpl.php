@@ -52,7 +52,7 @@
                                         $size = ($i == 1) ? 'original' : 'small';
                                     ?>
                                         <div class="img">
-                                            <img {$add} src="<?= MediaUtility::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
+                                            <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
                                         </div>
                                     <? } ?>
                                 </div>

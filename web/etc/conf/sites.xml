@@ -52,7 +52,6 @@
 			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
-				<webroot>web</webroot>
                 <settings>
                     <modules>
                         <mediaServer class="MediaServerManager">

@@ -90,6 +90,8 @@ function loadQueue() {
         success: function (data) {
             $('div#queue').show().html(data);
             Elements.addEvents();
+            Elements.initImages('.post .images');
+            Elements.initLinks();
 
             $('.post.blocked').draggable('disable');
         }
