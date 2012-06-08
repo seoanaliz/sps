@@ -633,9 +633,11 @@ $(document).ready(function(){
                                                 header: d.title || data.title,
                                                 coords: d.coords || data.coords,
                                                 description: d.description || data.description
-                                            }, function(state) {
-                                                if (state) {
-                                                    //console.log(state.img);
+                                            }, function(data) {
+                                                if (data) {
+                                                    if (data.img) {
+                                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                                                    }
                                                     popupSuccess('Изменения сохранены');
                                                 }
                                             }
