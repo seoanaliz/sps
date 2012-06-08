@@ -504,11 +504,19 @@ i {font-style: italic;}
 .dragged.moving img {
     opacity: .1;
 }
+.post.moving {
+    opacity: .5;
+    box-shadow: 0 0 20px rgba(0,0,0,.5) inset;
+}
 
 .left-panel .images-ready {}
 .left-panel .images-ready .post-image.first {
     max-height: 298px;
     min-height: 198px;
+}
+.left-panel .images-ready .post-image.first img {
+    max-width: 510px;
+    max-height: 310px;
 }
 .left-panel .images-ready .post-image.else {}
 .left-panel .images-ready .post-image {

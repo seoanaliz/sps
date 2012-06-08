@@ -985,11 +985,13 @@ var Elements = {
                 },
                 start: function() {
                     var self = $(this),
-                        post = self.closest('.post');
+                        $post = self.closest('.post');
+                    $post.addClass('moving');
                 },
                 stop: function() {
                     var self = $(this),
-                        post = self.closest('.post');
+                        $post = self.closest('.post');
+                    $post.removeClass('moving');
                 }
             };
 
