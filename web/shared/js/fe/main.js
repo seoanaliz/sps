@@ -636,6 +636,7 @@ $(document).ready(function(){
                                                 description: d.description || data.description
                                             }, function(state) {
                                                 if (state) {
+                                                    //console.log(state.img);
                                                     popupSuccess('Изменения сохранены');
                                                 }
                                             }

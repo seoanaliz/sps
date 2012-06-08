@@ -335,8 +335,10 @@ var Eventlist = {
             success: function (data) {
                 if (data) {
                     $('.reload-link').click();
+                    callback(data);
                 } else {
                     popupError('Ошибка сохренения информации о ссылке');
+                    callback(false);
                 }
             }
         });
