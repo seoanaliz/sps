@@ -237,10 +237,33 @@ $(document).ready(function(){
         });
     })();
 
+    // Автовысота у textarea
+    function autoResize(input) {
+        if (!input.autoResize) {
+            input.autoResize = $('<div/>')
+                .appendTo('body')
+                .css({
+                    width: input.width(),
+                    minHeight: input.height(),
+                    padding: input.css('padding'),
+                    lineHeight: input.css('line-height'),
+                    font: input.css('font'),
+                    fontSize: input.css('font-size'),
+                    position: 'absolute',
+                    wordWrap: 'break-word',
+                    top: -10000
+                });
+        }
+        input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
+        input.css({
+            height: input.autoResize.height() + 15
+        });
+    }
+
     // Добавление записи в борд
     (function(){
         var form = $(".newpost"),
-            input = $(".input", form),
+            input = $("textarea", form),
             tip = $(".tip", form);
 
         var $linkInfo = $('.link-info', form),
@@ -257,18 +280,15 @@ $(document).ready(function(){
             })
             .bind('paste', function() {
                 setTimeout(function() {
-                    parseUrl(input.text());
+                    parseUrl(input.val());
                 }, 10);
             })
-            .keydown(function (e) {
-                if (form.hasClass("collapsed")) {
-                    input.focus();
-                }
-
+            .keyup(function (e) {
                 if (e.ctrlKey && e.keyCode == 13) {
                     form.find('.save').click();
                 }
-            })
+                autoResize(input);
+            }).keyup()
         ;
 
         var parseUrl = function(txt){
@@ -508,7 +528,7 @@ $(document).ready(function(){
         };
 
         var clearForm = function(){
-            input.data("id", 0).html('');
+            input.data("id", 0).val('');
             $('.qq-upload-list').html('');
             deleteLink();
         };
@@ -516,7 +536,7 @@ $(document).ready(function(){
         var stop = function(){
             $(window).unbind("click", stop);
 
-            if(!input.text().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
+            if(!input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
                 input.data("id", 0);
                 form.addClass("collapsed");
                 deleteLink();
@@ -541,7 +561,7 @@ $(document).ready(function(){
             });
             form.addClass("spinner");
             Events.fire("post", [
-                input.html(),
+                input.val(),
                 photos,
                 $linkStatus.find('a').attr('href'),
                 input.data("id"),
@@ -556,7 +576,7 @@ $(document).ready(function(){
         });
         form.delegate(".cancel", "click" ,function(e){
             clearForm();
-            input.text('').blur();
+            input.val('').blur();
             form.addClass('collapsed');
             e.preventDefault();
         });
@@ -592,27 +612,6 @@ $(document).ready(function(){
                         function setCaretToPos (input, pos) {
                             setSelectionRange(input, pos, pos);
                         }
-                        function autoResize(input) {
-                            if (!input.autoResize) {
-                                input.autoResize = $('<div/>')
-                                    .appendTo('body')
-                                    .css({
-                                        width: input.width(),
-                                        minHeight: input.height(),
-                                        padding: input.css('padding'),
-                                        lineHeight: input.css('line-height'),
-                                        font: input.css('font'),
-                                        fontSize: input.css('font-size'),
-                                        position: 'absolute',
-                                        wordWrap: 'break-word',
-                                        top: -10000
-                                    });
-                            }
-                            input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
-                            input.css({
-                                height: input.autoResize.height() + 15
-                            });
-                        }
 
                         function parseUrl(txt, callback) {
                             var matches = txt.match(pattern);
@@ -634,9 +633,11 @@ $(document).ready(function(){
                                                 header: d.title || data.title,
                                                 coords: d.coords || data.coords,
                                                 description: d.description || data.description
-                                            }, function(state) {
-                                                if (state) {
-                                                    //console.log(state.img);
+                                            }, function(data) {
+                                                if (data) {
+                                                    if (data.img) {
+                                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                                                    }
                                                     popupSuccess('Изменения сохранены');
                                                 }
                                             }
@@ -759,7 +760,7 @@ $(document).ready(function(){
                             html: $el.html(),
                             scroll: $(window).scrollTop()
                         };
-                        $post.draggable('disable');
+                        $post.find('> .content').draggable('disable');
                         $post.editing = true;
                         $buttonPanel.hide();
                         $el.html('');
@@ -810,7 +811,7 @@ $(document).ready(function(){
                             ]);
                         };
                         var onCancel = function() {
-                            $post.draggable('enable');
+                            $post.find('> .content').draggable('enable');
                             $post.editing = false;
                             $buttonPanel.show();
                             $el.html(cache.html);
@@ -984,15 +985,17 @@ var Elements = {
                 },
                 start: function() {
                     var self = $(this),
-                        post = self.closest('.post');
+                        $post = self.closest('.post');
+                    $post.addClass('moving');
                 },
                 stop: function() {
                     var self = $(this),
-                        post = self.closest('.post');
+                        $post = self.closest('.post');
+                    $post.removeClass('moving');
                 }
             };
 
-            $(".post").draggable(draggableParams);
+            $(".post > .content").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",
@@ -1000,7 +1003,7 @@ var Elements = {
 
                 drop: function(e, ui) {
                     var target = $(this),
-                        post = $(ui.draggable),
+                        post = $(ui.draggable).closest('.post'),
                         slot = post.closest('.slot'),
                         helper = $(ui.helper);
 
