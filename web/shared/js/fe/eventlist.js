@@ -90,8 +90,28 @@ function loadQueue() {
         success: function (data) {
             $('div#queue').show().html(data);
             Elements.addEvents();
+            Elements.initImages('.post .images');
+            Elements.initLinks();
 
             $('.post.blocked').draggable('disable');
+        }
+    });
+}
+
+function reloadArticle(id) {
+    $.ajax({
+        url: controlsRoot + 'arcticle-item/',
+        dataType : "html",
+        data: {
+            id: id
+        },
+        success: function (data) {
+            elem = $("div.post[data-id=" + id + "]");
+            elem.replaceWith(data);
+
+            Elements.addEvents();
+            Elements.initImages('.post .images');
+            Elements.initLinks();
         }
     });
 }
@@ -284,7 +304,14 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    loadArticles(true);
+                    if (id) {
+                        //перезагружаем тело поста
+                        reloadArticle(id);
+                    } else {
+                        //перезагружаем весь левый блок
+                        loadArticles(true);
+                    }
+
                     callback(true);
                 } else {
                     if (data.message) {
@@ -308,8 +335,10 @@ var Eventlist = {
             success: function (data) {
                 if (data) {
                     $('.reload-link').click();
+                    callback(data);
                 } else {
                     popupError('Ошибка сохренения информации о ссылке');
+                    callback(false);
                 }
             }
         });
