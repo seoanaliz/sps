@@ -22,6 +22,10 @@
                     <actions>SPS.Site.GetArticlesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
                 </page>
+                <page uri="controls://arcticle-item/">
+                    <actions>SPS.Site.GetArticleItemControl</actions>
+                    <template>tmpl://fe/elements/arcticle-item.tmpl.php</template>
+                </page>
                 <page uri="controls://arcticle-delete/">
                     <actions>SPS.Site.DeleteArticleControl</actions>
                 </page>

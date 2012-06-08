@@ -98,6 +98,24 @@ function loadQueue() {
     });
 }
 
+function reloadArticle(id) {
+    $.ajax({
+        url: controlsRoot + 'arcticle-item/',
+        dataType : "html",
+        data: {
+            id: id
+        },
+        success: function (data) {
+            elem = $("div.post[data-id=" + id + "]");
+            elem.replaceWith(data);
+
+            Elements.addEvents();
+            Elements.initImages('.post .images');
+            Elements.initLinks();
+        }
+    });
+}
+
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
         $.ajax({
@@ -286,7 +304,14 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    loadArticles(true);
+                    if (id) {
+                        //перезагружаем тело поста
+                        reloadArticle(id);
+                    } else {
+                        //перезагружаем весь левый блок
+                        loadArticles(true);
+                    }
+
                     callback(true);
                 } else {
                     if (data.message) {

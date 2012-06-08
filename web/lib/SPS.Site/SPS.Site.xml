@@ -59,6 +59,9 @@
             <action name="GetArticlesListControl">
                 <path>controls/GetArticlesListControl</path>
             </action>
+            <action name="GetArticleItemControl">
+                <path>controls/GetArticleItemControl</path>
+            </action>
             <action name="DeleteArticleControl">
                 <path>controls/DeleteArticleControl</path>
             </action>
