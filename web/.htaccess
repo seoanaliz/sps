@@ -11,5 +11,11 @@ RewriteRule ^updating.html - [L]
 #Header set Retry-After "3600"
 #ErrorDocument 503 /updating.html
 
+#force domain
+RewriteCond %{HTTP_HOST} ^www.socialboard.ru$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www.sps.verumnets.ru$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^sps.verumnets.ru$ [NC]
+RewriteRule ^(.*)$ http://socialboard.ru/$1 [L,R=301]
+
 RewriteRule ^(vt)$ /$1/? [R=301,L]
 RewriteRule .* eaze.php
