@@ -37,8 +37,6 @@
                     continue;
                 }
 
-                if ($source->externalId != 35909997) continue;
-
                 //инитим парсер
                 $parser = new ParserVkontakte(trim($source->externalId));
 
