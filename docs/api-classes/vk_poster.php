@@ -1,6 +1,6 @@
     <?php
     header("Content-Type: text/html; charset=utf-8");
-     class Vsend{
+        class Vsend{
 
         protected $post_photo_array;    //массив адресов фоток
         protected $post_text;           //текст поста
@@ -43,8 +43,7 @@
                     if ($this->rec_arr($str, $entry) == true)
                             return true;
                 } else {
-
-                    if ((string)$entry === (string)$str){
+                    if ((string)$entry == (string)$str){
                         return true;
                     }
                 }
@@ -55,7 +54,8 @@
         private function get_attaches()
         {
             $check_arr = array();
-            if ($this->post_text)
+            var_dump($this->post_text);
+            if ($this->post_text && $this->post_text == "&#01;")
                 $check_arr[] = $this->post_text;
 //            echo '<br>текст<br>';
             if ($this->audio_id)
@@ -117,6 +117,7 @@
 
        //возвращаемые значения
         //Удачная отсылка
+        //      true - пост со ссылкой
         //      -ХХХ_УУУ - id поста (ХХХ - id паблика, УУУ - поста в этом паблике)
         //Неудачная
         //      исключение 'please change admin'  -  всплыла капча и не удалось ее убить антигейтом, либо слишком много сообщений
@@ -387,11 +388,13 @@
 
                 foreach($check_arr as $attach) {
                     if ($this->rec_arr($attach, $post)) {
-//                        echo $counter++ . '<br>';
+                        $counter++;
+//                        echo  'Найдено!<br>';
                         continue;
                     }
                 }
                 if ($counter == $quan) {
+
                     return $post_id;
                 }
             }
@@ -509,6 +512,7 @@
             return false;
         }
     }
+
 
     
     //данные тестового паблика
