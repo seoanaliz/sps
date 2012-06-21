@@ -3,7 +3,15 @@
 <div class="layer">
     <div class="left-panel">
         <div class="block">
-            <div class="header bb">
+            <div class="header">
+
+                <div id="wall-load"></div>
+
+                <div class="type-selector">
+                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
+                    <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                    <? } ?>
+                </div>
 
                 <select multiple="multiple" id="source-select">
                     <?
@@ -13,31 +21,20 @@
                     ?>
                 </select>
 
-                <div class="type-selector">
-                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                        <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
-                    <? } ?>
-                </div>
-
                 <!--div class="controls">
                     <div class="ctl spr gear"></div>
                     <div class="ctl spr plus"></div>
                     <div class="ctl spr del"></div>
                 </div -->
 
-                <p style="padding: 5px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-text">
-                    <label>Лайки:</label>
-                    <span id="slider-value"></span>
-                </p>
-                <div style="padding: 10px !important; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
+                <div style="position: absolute; top: 48px; right: 18px; width: 330px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
                     <div id="slider-range"></div>
                 </div>
             </div>
+
+            <div class="wall-title">114 записей</div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
-
-            <div class="wall" id="wall">
-
-            </div>
+            <div class="wall" id="wall"></div>
 
             <div id="wallloadmore" class="hidden">Больше</div>
         </div>
@@ -73,7 +70,7 @@
 
             </div>
 
-            <div class="items block drop" id="queue" style="display: none;">
+            <div class="items drop" id="queue" style="display: none;">
             </div>
         </div>
     </div>

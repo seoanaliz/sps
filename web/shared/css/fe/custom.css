@@ -1,10 +1,49 @@
 .newpost.collapsed .uploadify {display: none;}
 .newpost.collapsed .uploadifyQueue {display: none;}
 
+.ui-state-default {
+    background: #fff;
+    border-radius: 0;
+    border-color: #D8DFEA;
+}
+
+.ui-state-hover {
+    border-color: #97A4C4;
+}
+
 .ui-state-highlight {
     -webkit-box-shadow: inset 0 0 1px 1px #c8b71e;
     -moz-box-shadow: inset 0 0 1px 1px #c8b71e;
     box-shadow: inset 0 0 1px 1px #c8b71e;
+}
+
+.ui-slider-horizontal {
+    height: 8px;
+    border-radius: 2px;
+    background: #D0D9E3;
+    border-color: #C4CDE0;
+}
+.ui-slider-range {
+    background: #A2B3C6;
+    border-color: #97A4C4;
+}
+.ui-slider-handle {
+    border-radius: 2px;
+    border-color: #C4CDE0 !important;
+    background: #fff !important;
+    font-weight: bold !important;
+    font-size: 10px !important;
+    color: #45688E !important;
+    text-decoration: none !important;
+    text-align: center;
+    outline: none;
+}
+.ui-slider-horizontal .ui-slider-handle {
+    top: -7px;
+    margin-left: -13px;
+    width: 26px !important;
+    height: 20px !important;
+    line-height: 20px;
 }
 
 .link-info-content .link-description-content { overflow: hidden; margin-top: 5px; padding: 10px; background: #fff; border-left: #CCCCCC solid 3px; }
@@ -38,29 +77,29 @@
 }
 
 div.type-selector {
-    float: right;
-    margin-top: 2px;
+    margin-bottom: 8px;
 }
 
 div.type-selector a {
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -khtml-border-radius: 10px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
     display: -moz-inline-box;
     display: inline-block;
-    margin-left: 3px;
-    padding: 0 7px;
+    margin-right: 5px;
+    padding: 0 8px;
     text-decoration: none;
+    line-height: 1.8em;
+    font-weight: bold;
 }
 
 div.type-selector a.active,
 div.type-selector a.active:hover {
-    background-color: #53a5e3;
     color: #fff;
+    background-color: #45688E;
     text-shadow: 0 1px 1px #4992C9;
 }
 
 div.type-selector a:hover {
-    background-color: #f5f5f5;
+    background-color: #DEE5EB;
 }

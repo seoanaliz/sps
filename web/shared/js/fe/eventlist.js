@@ -2,25 +2,28 @@ var articlesLoading = false;
 
 $(function(){
     $( "#slider-range" ).slider({
-    range: true,
-    min: 0,
-    max: 100,
-    values: [ 50, 100 ],
-        slide: function( event, ui ) {
+        range: true,
+        min: 0,
+        max: 100,
+        animate: 100,
+        values: [50, 100],
+        create: function(event, ui) {
             changeRange();
-        }
-        , change: function(event, ui) {
+        },
+        slide: function(event, ui) {
+            changeRange();
+        },
+        change: function(event, ui) {
             changeRange();
             loadArticles(true);
         }
     });
-
-    changeRange();
 });
 
 function changeRange() {
-    $( "#slider-value" ).text( "❤" + $( "#slider-range" ).slider( "values", 0 ) +
-        " - ❤" + $( "#slider-range" ).slider( "values", 1 ) );
+    var top = $("#slider-range").slider("values", 1);
+    $("#slider-range").find('a:first').html($("#slider-range").slider("values", 0));
+    $("#slider-range").find('a:last').html(top == 100 ? 'TOP' : top);
 }
 
 function loadArticles(clean) {
@@ -28,9 +31,7 @@ function loadArticles(clean) {
 
     articlesLoading = true;
 
-    if (clean) {
-        $('div#wall').html('');
-    }
+    $('#wall-load').show();
 
     if (Elements.leftdd().length == 0) {
         articlesLoading = false;
@@ -64,6 +65,10 @@ function loadArticles(clean) {
             to : to
         },
         success: function (data) {
+            if (clean) {
+                $('div#wall').html('');
+            }
+            $('#wall-load').hide();
             $('div#wall div#wall-loader').remove();
             $('div#wall').append(data);
             articlesLoading = false;

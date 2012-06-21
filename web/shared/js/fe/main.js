@@ -231,7 +231,7 @@ $(document).ready(function(){
         var w = $(window),
             b = $("#wallloadmore");
         w.scroll(function(){
-            if(w.scrollTop() > (b.offset().top - w.outerHeight(true))) {
+            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - 300)) {
                 b.click();
             }
         });
@@ -244,19 +244,19 @@ $(document).ready(function(){
                 .appendTo('body')
                 .css({
                     width: input.width(),
-                    minHeight: input.height(),
+                    minHeight: input.height() - (input.css('padding-top') + input.css('padding-bottom')),
                     padding: input.css('padding'),
                     lineHeight: input.css('line-height'),
                     font: input.css('font'),
                     fontSize: input.css('font-size'),
                     position: 'absolute',
                     wordWrap: 'break-word',
-                    top: -10000
+                    top: -100000
                 });
         }
-        input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
+        input.autoResize.html(input.val().split('\n').join('<br/> '));
         input.css({
-            height: input.autoResize.height() + 15
+            height: input.autoResize.height() + 10
         });
     }
 

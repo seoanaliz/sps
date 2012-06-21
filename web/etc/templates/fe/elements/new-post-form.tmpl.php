@@ -1,5 +1,8 @@
 <div class="newpost collapsed bb">
-    <textarea placeholder="Есть чем поделиться?"></textarea>
+    <div class="textarea-wrap">
+        <textarea placeholder="Есть чем поделиться?"></textarea>
+        <div class="image-attach"></div>
+    </div>
     <div class="link-info" style="display: none;">
         <div class="link-description"><!-- --></div>
         <div class="link-status"><!-- --></div>
