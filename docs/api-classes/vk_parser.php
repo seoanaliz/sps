@@ -561,12 +561,21 @@ header("Content-Type: text/html; charset=windows-1251");
 
         private function remove_tags($text)
         {
-  
+                $text = str_replace( '<br>',    "\r\n", $text );
+
+                $text = str_replace( '&#189;',  "½",    $text );
+                $text = str_replace( '&#188;',  "¼",    $text );
+                $text = str_replace( '&#190;',  "¾",    $text );
+                $text = str_replace( '&#9658;', "►",    $text );
+                $text = str_replace( '&#33;',   "!",    $text );
+                $text = str_replace( '&#9829;', "",    $text );
+                $text = str_replace( '&#8243;', "",    $text );
                 $text = htmlspecialchars_decode($text);
                 $text = html_entity_decode($text);
                 $text = strip_tags( $text );
                 return $text;
-            }
+        }
+
             
         private function get_photo_desc(&$picsArr, $text)
         {   
