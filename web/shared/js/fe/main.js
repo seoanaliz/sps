@@ -926,6 +926,153 @@ var Events = {
         }
     }
 };
+
+(function($) {
+    $.fn.imageComposition = function(hardPosition) {
+        return this.each(function() {
+            var $wrap = $(this);
+            var $images = $wrap.find('img');
+            var num = $images.length;
+            var border = 0; //Забил, из-за него все едет.
+            var wrap = {
+                el: $wrap,
+                width: $wrap.width(), //510
+                height: $wrap.height(), //310
+                type: ''
+            };
+            var VER = 'ver',
+                HOR = 'hor';
+
+            $images.each(function(i, image) {
+                var $img = $(image);
+                if ($img.width()) return onLoadImages();
+                $img.bind('load', function() {
+                    if (i == num - 1) {
+                        return onLoadImages();
+                    }
+                });
+            });
+
+            // ======================== //
+            function isHor($image) {
+                var w = $image.width();
+                var h = $image.height();
+                var isH = !!(w / h > 1.1);
+                return (hardPosition == 'right') ? false : (hardPosition == 'bottom') ? true : isH;
+            }
+
+            function isVer($image) {
+                return !isHor($image);
+            }
+
+            function relativeResize(size, type, width) {
+                var w = (type == 'width') ? 'width' : 'height';
+                var h = (type == 'height') ? 'width' : 'height';
+                var coef = size[w] / size[h];
+
+                size[w] = width;
+                size[h] = size[w] / coef;
+
+                return size;
+            }
+
+            function onLoadImages() {
+                var $firstImage;
+                var columns = [];
+
+                $images.each(function(i) {
+                    var $image = $(this);
+
+                    if (i == 0) {
+                        $firstImage = $image;
+                        if (isHor($firstImage)) {
+                            $firstImage.width(Math.min(wrap.width, $firstImage.width()));
+                            wrap.width = $firstImage.width();
+                            $wrap.width(wrap.width + border);
+                        } else {
+                            $firstImage.height(Math.min(wrap.height, $firstImage.height()));
+                            wrap.height = $firstImage.height();
+                            $wrap.height(wrap.height + border);
+                        }
+                    } else {
+                        var columnIndex = Math.floor((i - 1) / (isHor($firstImage) ? 4 : 99));
+                        if (!columns[columnIndex]) columns[columnIndex] = {};
+
+                        var column = columns[columnIndex];
+                        if (!column.images) column.images = [];
+                        if (!column.columnHeight) column.columnHeight = 99999;
+                        if (isHor($firstImage)) {
+                            column.columnHeight = Math.min(column.columnHeight, $image.height());
+                        } else {
+                            column.columnHeight = Math.min(column.columnHeight, $image.width());
+                        }
+                        column.images.push($image);
+                    }
+                });
+
+                $(columns).each(function(columnIndex, column) {
+                    $(column.images).each(function(imageIndex, $image) {
+                        if (!column.columnWidth) column.columnWidth = 0;
+                        if (isHor($firstImage)) {
+                            $image.height(column.columnHeight);
+                            column.columnWidth += $image.width();
+                        } else {
+                            $image.width(column.columnHeight);
+                            column.columnWidth += $image.height();
+                        }
+                    });
+                });
+
+                var columnsHeight = 0;
+                $(columns).each(function(columnIndex, column) {
+                    var coef = 0;
+                    var columnHeight = 0;
+
+                    if (isHor($firstImage)) {
+                        coef = wrap.width / column.columnWidth;
+                    } else {
+                        coef = wrap.height / column.columnWidth;
+                    }
+
+                    $(column.images).each(function(imageIndex, $image) {
+                        var s = {};
+                        if (isHor($firstImage)) {
+                            s = relativeResize(
+                                {
+                                    'width': $image.width(),
+                                    'height': $image.height()
+                                },
+                                'width', ($image.width() * coef - (border / (num - 1) * (num - 2))));
+
+                            $image.width(s['width']);
+                            $image.height(s['height']);
+                            columnHeight = s['height'] + border;
+                        } else {
+                            s = relativeResize(
+                                {
+                                    'width': $image.width(),
+                                    'height': $image.height()
+                                },
+                                'height', ($image.height() * coef - border));
+
+                            $image.width(s['width']);
+                            $image.height(s['height']);
+                            columnHeight = s['width'] + border;
+                        }
+                    });
+                    columnsHeight += columnHeight;
+                });
+
+                if (isHor($firstImage)) {
+                    $wrap.height($firstImage.height() + columnsHeight);
+                } else {
+                    $wrap.width($firstImage.width() + columnsHeight);
+                }
+            }
+        });
+    };
+})(jQuery);
+
 $.extend(Events, Eventlist);
 delete(Eventlist);
 
@@ -960,6 +1107,9 @@ var Elements = {
 
             img.src = src;
         });
+
+        $('.left-panel .images-ready').imageComposition();
+        $('.right-panel .images').imageComposition('right');
     },
     addEvents: function(){
         (function(){

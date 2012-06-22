@@ -511,7 +511,11 @@ i {font-style: italic;}
 }
 
 .post:hover {
-    background-color: rgba(32, 95, 130, 0.1);
+    background-color: rgb(232, 238, 242);
+}
+.post:hover .post-image,
+.post:hover .img {
+    outline-color: rgb(232, 238, 242) !important;
 }
 .newpost textarea,
 .post .editing textarea {
@@ -607,8 +611,10 @@ i {font-style: italic;}
     margin: 7px 7px 0 0;
 }
 .post .editing .attachment img {
-    border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(0,0,0,.5);
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.5);
+    width: 60px;
+    height: 60px;
 }
 
 .post.removed {
@@ -641,33 +647,30 @@ i {font-style: italic;}
     box-shadow: 0 0 20px rgba(0,0,0,.5) inset;
 }
 
-.left-panel .images-ready {}
-.left-panel .images-ready .post-image.first {
-    max-height: 298px;
-    min-height: 198px;
-}
-.left-panel .images-ready .post-image.first img {
-    max-width: 510px;
-    max-height: 310px;
+.left-panel .images-ready {
+    width: 510px;
+    height: 310px;
+    overflow: hidden;
 }
 .left-panel .images-ready .post-image.else {}
 .left-panel .images-ready .post-image {
-    height: 98px;
-    width: 98px;
-    background-color: #fff;
+    background-color: #eee;
     padding: 0;
-    margin-bottom: 2px;
-    margin-right: 2px;
+    /*margin-bottom: 3px;*/
+    /*margin-right: 3px;*/
+    outline: 3px solid #fff;
     overflow: hidden;
     text-align: center;
 }
 .left-panel .images-ready .post-image img {
-    max-width: 120%;
 }
 
 .right-panel {}
 .right-panel .images {
     margin-top: 5px;
+    width: 330px;
+    height: 150px;
+    overflow: hidden;
 }
 .right-panel .images:after {
     content: '.';
@@ -678,21 +681,12 @@ i {font-style: italic;}
 }
 .right-panel .images .img {
     float: left;
-    width: 60px;
-    height: 38px;
     background-color: #fff;
     text-align: center;
     overflow: hidden;
-    margin: 0 3px 3px 0
+    outline: 3px solid #fff;
 }
-.right-panel .images .img:first-child {
-    width: 130px;
-    height: 120px;
-}
-.right-panel .images .img img {
-    max-width: 130%;
-    max-height: 130%;
-}
+.right-panel .images .img img {}
 .right-panel .link-info-content .link-img {
     height: 45px;
     box-shadow: 0 2px 4px rgba(0,0,0,.2) inset;
