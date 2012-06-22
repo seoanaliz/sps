@@ -49,7 +49,8 @@
                                     <? $i = 0; ?>
                                     <? foreach($articleRecord->photos as $photoItem) {
                                         $i++;
-                                        $size = ($i == 1) ? 'original' : 'small';
+                                        //$size = ($i == 1) ? 'original' : 'small';
+                                        $size = 'original';
                                     ?>
                                         <div class="img">
                                             <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
