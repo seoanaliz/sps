@@ -195,7 +195,9 @@
                     }
 
                     //добавляем новый пост
-                    $this->addArticle($article, $articleRecord);
+                    if (!in_array($externalId, $skipIds)) {
+                        $this->addArticle($article, $articleRecord);
+                    }
                 }
             }
 
