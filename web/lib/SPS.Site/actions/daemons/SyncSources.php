@@ -125,15 +125,6 @@
             }
 
             /**
-             * если массив $skipIds непуст, то значит по каким-то условиям не сохраняем все посты
-             */
-            if (empty($skipIds)) {
-                //обновляем pagesCountProcessed в базе, снимаем лок параллельному потоку
-                $source->processed = Convert::ToInt($source->processed) + 1;
-                SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
-            }
-
-            /**
              * Обходим посты и созраняем их в бд, попутно сливая фотки
              */
             foreach ($posts as $post) {
@@ -194,12 +185,27 @@
                             $articleRecord->photos = $this->savePostPhotos($post['photo']);
                         } catch (Exception $Ex) {
                             AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
+
+                            /**
+                             * Если хоть одна фотка не загрузилась, то мы добавляем $externalId в $skipIds
+                             * Из-за этого не обновится processed у источника и мы проапдейтим пост в следующий раз
+                             */
+                            $skipIds[] = $externalId;
                         }
                     }
 
                     //добавляем новый пост
                     $this->addArticle($article, $articleRecord);
                 }
+            }
+
+            /**
+             * если массив $skipIds непуст, то значит по каким-то условиям не сохраняем все посты
+             */
+            if (empty($skipIds)) {
+                //обновляем pagesCountProcessed в базе, снимаем лок параллельному потоку
+                $source->processed = Convert::ToInt($source->processed) + 1;
+                SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
             }
 
             $this->daemon->Unlock();
