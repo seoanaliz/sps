@@ -595,7 +595,7 @@ $(document).ready(function(){
         form.delegate(".save", "click" ,function(e){
             var link = $linkStatus.find('a').attr('href');
             var photos = new Array();
-            $('.qq-upload-success').each(function(){
+            $('.newpost .qq-upload-success').each(function(){
                 var photo = new Object();
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
@@ -626,6 +626,10 @@ $(document).ready(function(){
             input.val('').blur();
             form.addClass('collapsed');
             e.preventDefault();
+        });
+        form.delegate(".image-attach", "click" ,function(e){
+            input.focus();
+            $('.newpost .qq-upload-button').trigger('focus');
         });
 
         // Редактирование поста в левом меню
