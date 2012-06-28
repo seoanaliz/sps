@@ -51,7 +51,7 @@
             <div class="header bb">
 
                 <div class="user-info">
-                    <img width="22px" src="" alt="" />
+                    <img width="22px" src="http://app.uxpin.com/u/a/0/9/a09e2c748e10258cd892f11307202c77/e_d7f264dc.jpg" alt="" />
                     Вася Пупскин
 
                     <span class="counter">
@@ -127,12 +127,14 @@
                         <a href="#" class="" data-type="content">Контент <span class="counter">8</span></a>
                         <a href="#" class="" data-type="ads2">Реклама</a>
                     </div>
+
                 </div>
 
             </div>
 
-            <div class="items drop" id="queue" style="display: none;">
-            </div>
+            <div class="queue-title">18 запланировано</div>
+
+            <div class="items drop" id="queue" style="display: none;"></div>
         </div>
     </div>
 </div>

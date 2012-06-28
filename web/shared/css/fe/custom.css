@@ -102,6 +102,10 @@
     color: #45688E;
     font-weight: bold;
 }
+.ui-multiselect-checkboxes li input {
+    top: 0;
+    margin-right: 7px;
+}
 .ui-multiselect-checkboxes li input:focus {
     outline: none;
 }

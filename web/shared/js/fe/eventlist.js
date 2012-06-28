@@ -39,7 +39,7 @@ function loadArticles(clean) {
         $('.newpost').show();
     }
 
-    $('div#wall').append('<div style="text-align: center;" id="wall-loader"><img src="' + root + 'shared/images/fe/ajax-loader.gif"></div>');
+    $('div#wall').append('<div style="text-align: center;" id="wall-loader"></div>');
 
     var from = $( "#slider-range" ).slider( "values", 0 );
     var to = $( "#slider-range" ).slider( "values", 1 );

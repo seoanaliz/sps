@@ -256,7 +256,8 @@ i {font-style: italic;}
 .left-panel .wall:empty:after {
     content: 'Пусто';
 }
-.left-panel .wall-title {
+.left-panel .wall-title,
+.right-panel .queue-title {
     background: #DEE5EB;
     color: #45688E;
     height: 26px;
@@ -380,7 +381,7 @@ i {font-style: italic;}
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
-    top: 120px;
+    top: 146px;
     bottom: 0;
     width: 368px;
 }
@@ -668,6 +669,11 @@ i {font-style: italic;}
     position: absolute;
     top: 10px;
     right: 10px;
+}
+#wall-loader {
+    height: 100px;
+    line-height: 100px;
+    background: url('../../images/fe/upload.gif') center no-repeat;
 }
 
 .post:hover {
@@ -965,7 +971,8 @@ i {font-style: italic;}
     background: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
 }
-.right-panel *:hover::-webkit-scrollbar-thumb {
+.right-panel *:hover::-webkit-scrollbar-thumb,
+.right-panel *:focus::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.4);
 }
 .right-panel *::-webkit-resizer,

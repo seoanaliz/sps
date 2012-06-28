@@ -985,9 +985,14 @@ var Events = {
             var VER = 'ver',
                 HOR = 'hor';
 
+            if ((num - 1) % imagesPerColumn == 1) {
+                imagesPerColumn++;
+            } else if ((num - 1) % imagesPerColumn == 2) {
+                imagesPerColumn--;
+            }
+
             $images.each(function(i, image) {
                 var $img = $(image);
-                if ($img.width()) return onLoadImages();
 
                 var img = new Image();
                 img.src = $img.attr('src');
@@ -1208,7 +1213,7 @@ var Events = {
                             $item.addClass(CLASS_MENU_ITEM_ACTIVE);
                         }
                         close();
-                        methods.run(p.onchange, $el, item);
+                        run(p.onchange, $el, item);
                     });
                     $el.data('menu').append($item);
                 });
@@ -1229,7 +1234,7 @@ var Events = {
 
                 $('html, body').bind(p.openEvent, function(e) {
                     close();
-                    methods.run(p.onclose, $el, $el.data('menu'));
+                    run(p.onclose, $el, $el.data('menu'));
                 });
 
                 function open() {
@@ -1238,36 +1243,41 @@ var Events = {
                         width: p.width || $el.width()
                     });
 
-                    var menu = $el.data('menu');
+                    var $menu = $el.data('menu');
+                    var isFixed = !!($menu.css('position') == 'fixed');
                     var offset = $el.offset();
                     var offsetTop = offset.top;
                     var offsetLeft = offset.left
-                        + parseFloat(menu.css('margin-left'))
-                        - parseFloat(menu.css('margin-right'));
+                        + parseFloat($menu.css('margin-left'))
+                        - parseFloat($menu.css('margin-right'));
                     if (p.position == 'right') {
-                        offsetLeft += ($el.width() - menu.width())
+                        offsetLeft += ($el.width() - $menu.width())
+                    }
+                    if (isFixed) {
+                        offsetTop -= $(document).scrollTop();
+                        offsetLeft -= $(document).scrollLeft();
                     }
 
-                    menu.css({
+                    $menu.css({
                         top: offsetTop + $el.outerHeight(),
                         left: offsetLeft
                     }).show();
-                    methods.run(p.onopen, $el, $el.data('menu'));
+                    run(p.onopen, $el, $el.data('menu'));
                 }
 
                 function close() {
                     $el.removeClass(CLASS_ACTIVE);
                     $el.data('menu').hide();
-                    methods.run(p.onclose, $el, $el.data('menu'));
+                    run(p.onclose, $el, $el.data('menu'));
                 }
 
-                methods.run(p.oncreate, $el);
+                run(p.oncreate, $el);
             });
-        },
 
-        run: function(f, context, argument) {
-            if ($.isFunction(f)) {
-                f.call(context, argument);
+            function run(f, context, argument) {
+                if ($.isFunction(f)) {
+                    f.call(context, argument);
+                }
             }
         },
 
@@ -1325,6 +1335,21 @@ var Elements = {
             img.src = src;
         });
 
+        $(".left-panel .timestamp").easydate({
+            date_parse: function(date) {
+                if (!date) return;
+                var d = date.split('.');
+                var i = d[1];
+                d[1] = d[0];
+                d[0] = i;
+                var date = d.join('.');
+                console.log(date);
+                return Date.parse(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
         $('.left-panel .images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
