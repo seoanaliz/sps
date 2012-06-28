@@ -287,7 +287,7 @@
                                             " не удалось получить фото поста $id со стены " . $this->page_adr."?offset=$offset");
                                     }
 
-                            $img_arr[$image]['url']  =  $postlink . '.jpg';
+                            $img_arr[$image]['url']  = $link . $postlink . '.jpg';
                             $image++;
                         }
                         //видео
