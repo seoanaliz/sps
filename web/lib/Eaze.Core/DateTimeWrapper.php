@@ -147,7 +147,7 @@
          * @param string $format
          * @return void
          */
-        public function DefaultDateFormat( $format = 'd.m.Y' ) {
+        public function DefaultDateFormat( $format = 'd M, Y' ) {
             return $this->format( $format );
         }
 

@@ -1,6 +1,7 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
+    // Календарь
     $("#calendar")
         .datepicker (
             {
@@ -11,7 +12,7 @@ $(document).ready(function(){
                 monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 firstDay: 1,
                 showAnim: '',
-                dateFormat: "dd.mm.yy"
+                dateFormat: "d MM"
             }
         )
         .keydown(function(e){
@@ -19,7 +20,7 @@ $(document).ready(function(){
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change', [])
+            Events.fire('calendar_change', []);
         })
         .trigger('change');
 
@@ -27,9 +28,31 @@ $(document).ready(function(){
         $(this).closest(".calendar").find("input").focus();
     });
 
+    // Приведение вида календаря из 22.12.2012 в 22 декабря
+    $("#calendar").datepicker('setDate', new Date($("#calendar").val()));
+
+    // Кнопки вперед-назад в календаре
+    (function($) {
+        var day = (86000 * 1000);
+
+        $(".calendar .prev").click(function(){
+            var date = $('#calendar').datepicker('getDate').getTime();
+            $("#calendar").datepicker('setDate', new Date(date - day)).trigger('change');
+        });
+        $(".calendar .next").click(function(){
+            var date = $('#calendar').datepicker('getDate').getTime();
+            $("#calendar").datepicker('setDate', new Date(date + day * 2)).trigger('change');
+        });
+    })(jQuery);
+
+    // Left menu multiselect
     $("#source-select").multiselect({
+        minWidth: 250,
         height: 250,
-        noneSelectedText: 'Источник',
+        checkAllText: 'Выделить все',
+        uncheckAllText: 'Сбросить',
+        noneSelectedText: '<span class="gray">Источник не выбран</span>',
+        selectedText: '<span class="counter">#</span> выбрано',
         checkAll: function(){
             Events.fire('leftcolumn_dropdown_change', []);
         },
@@ -41,35 +64,53 @@ $(document).ready(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
-    $(".drop-down").click(function(e){
-        e.stopPropagation();
-        $(document).click();
-        var elem = $(this);
-        var hidethis = function(){
-            elem.removeClass("expanded");
-            $(document).unbind("click", hidethis);
-            elem.find("li").unbind("click", click_li);
-        };
-        var click_li = function(e){
-            e.stopPropagation();
-            elem.dd_sel($(this).data("id"));
-            hidethis();
-        };
-        $(document).bind("click", hidethis);
-        elem.find("li").click(click_li);
-        elem.addClass("expanded");
-    });
+    // Dropdowns
+//    $(".drop-down").click(function(e){
+//        e.stopPropagation();
+//        $(document).click();
+//        var elem = $(this);
+//        var hidethis = function(){
+//            elem.removeClass("expanded");
+//            $(document).unbind("click", hidethis);
+//            elem.find("li").unbind("click", click_li);
+//        };
+//        var click_li = function(e){
+//            e.stopPropagation();
+//            elem.dd_sel($(this).data("id"));
+//            hidethis();
+//        };
+//        $(document).bind("click", hidethis);
+//        elem.find("li").click(click_li);
+//        elem.addClass("expanded");
+//    });
 
     $(".left-panel .drop-down").change(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
-    $(".right-panel .drop-down").change(function(){
-        Events.fire('rightcolumn_dropdown_change', []);
+
+    $('.wall-title a').dropdown({
+        width: 'auto',
+        addClass: 'wall-title-menu',
+        position: 'right',
+        data: [
+            {title: 'новые записи'},
+            {title: 'старые записи'},
+            {title: 'лучшие записи'}
+        ],
+        onopen: function() {
+        },
+        onclose: function() {
+        },
+        onchange: function(item) {
+            $('.wall-title a').text(item.title);
+        }
     });
-    $(".type-selector a").click(function(e){
+
+    // Вкладки "Источники", "Реклама" в левон меню
+    $(".left-panel .type-selector a").click(function(e){
         e.preventDefault();
 
-        $(".type-selector a").removeClass('active');
+        $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
         if ($(this).data('type') == 'ads') {
@@ -83,10 +124,12 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
+    // Wall init
     $(".wall")
         .delegate(".post .delete", "click", function(){
             var elem = $(this).closest(".post"),
-                pid = elem.data("id");
+                pid = elem.data("id"),
+                gid = elem.data('group');
             Events.fire('leftcolumn_deletepost', [pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
@@ -95,12 +138,25 @@ $(document).ready(function(){
                         $('#' + deleteMessageId).show();
                     } else {
                         // иначе добавляем
-                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Пост удален. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
+                        elem.before($(
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                                'Пост удален. <a href="javascript:;" class="recover">Восстановить</a><br/>' +
+                                '<span class="button ignore">Не показывать новости сообщества</span>' +
+                            '</div>'
+                        ));
                     }
 
                     elem.hide();
                 }
             }]);
+        })
+        .delegate('.post .ignore', 'click', function() {
+            var elem = $(this).closest(".post"),
+                gid = elem.data("group");
+            var $menu = $("#source-select").multiselect('widget');
+            $menu.find('[value=' + gid + ']:checkbox').each(function() {
+                this.click();
+            });
         })
         .delegate('.post .recover', 'click', function() {
             var elem = $(this).closest(".post"),
@@ -112,6 +168,7 @@ $(document).ready(function(){
             }]);
         });
 
+    // Удание постов правом меню
     $(".items").delegate(".slot .post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
@@ -125,6 +182,7 @@ $(document).ready(function(){
         }]);
     });
 
+    // Загрузка стены по клику
     $("#wallloadmore").click(function(){
         var b = $(this);
         if(b.hasClass("disabled")) { return; }
@@ -137,6 +195,7 @@ $(document).ready(function(){
         });
     });
 
+    // Очистка текста
     $(".left-panel").delegate(".clear-text", "click", function(){
         var id = $(this).closest(".post").data("id");
         var post = $(this).closest(".post");
@@ -152,16 +211,20 @@ $(document).ready(function(){
         }
     });
 
-    //init first source and target
-    var currentTarget = $(".right-panel .drop-down ul li.active");
-    if (currentTarget.length == 0) {
-        currentTarget = $(".right-panel .drop-down ul :first-child");
-    }
+    // Показать полностью в левом меню
+    $(".left-panel").delegate(".show-cut", "click" ,function(e){
+        var $content = $(this).closest('.content'),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
+            cut      = $content.find('.cut').html();
 
-    if (currentTarget.length > 0) {
-        Elements.rightdd(currentTarget.data("id"));
-    }
+        $shortcut.html(shortcut + ' ' + cut);
+        $(this).remove();
 
+        e.preventDefault();
+    });
+
+    // Устарело?
     (function(){
         var addInput = function(elem, defaultvalue, id){
             var input = $("<input/>");
@@ -231,34 +294,11 @@ $(document).ready(function(){
         var w = $(window),
             b = $("#wallloadmore");
         w.scroll(function(){
-            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - 300)) {
+            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
                 b.click();
             }
         });
     })();
-
-    // Автовысота у textarea
-    function autoResize(input) {
-        if (!input.autoResize) {
-            input.autoResize = $('<div/>')
-                .appendTo('body')
-                .css({
-                    width: input.width(),
-                    minHeight: input.height() - (input.css('padding-top') + input.css('padding-bottom')),
-                    padding: input.css('padding'),
-                    lineHeight: input.css('line-height'),
-                    font: input.css('font'),
-                    fontSize: input.css('font-size'),
-                    position: 'absolute',
-                    wordWrap: 'break-word',
-                    top: -100000
-                });
-        }
-        input.autoResize.html(input.val().split('\n').join('<br/> '));
-        input.css({
-            height: input.autoResize.height() + 10
-        });
-    }
 
     // Добавление записи в борд
     (function(){
@@ -283,11 +323,11 @@ $(document).ready(function(){
                     parseUrl(input.val());
                 }, 10);
             })
+            .autoResize()
             .keyup(function (e) {
                 if (e.ctrlKey && e.keyCode == 13) {
                     form.find('.save').click();
                 }
-                autoResize(input);
             }).keyup()
         ;
 
@@ -303,6 +343,7 @@ $(document).ready(function(){
                     foundLink,
                     function(result) {
                         if (result) {
+                            console.log('asd');
                             $linkDescription.empty();
                             $linkStatus.empty();
 
@@ -552,6 +593,7 @@ $(document).ready(function(){
         };
 
         form.delegate(".save", "click" ,function(e){
+            var link = $linkStatus.find('a').attr('href');
             var photos = new Array();
             $('.qq-upload-success').each(function(){
                 var photo = new Object();
@@ -559,20 +601,25 @@ $(document).ready(function(){
                 photo.title = $(this).find('textarea').val();
                 photos.push(photo);
             });
-            form.addClass("spinner");
-            Events.fire("post", [
-                input.val(),
-                photos,
-                $linkStatus.find('a').attr('href'),
-                input.data("id"),
-                function(state){
-                    if(state) {
-                        clearForm();
-                        stop();
+            if (!($.trim(input.val() || photos.length || link))) {
+                return input.focus();
+            } else {
+                form.addClass("spinner");
+                Events.fire("post", [
+                    input.val(),
+                    photos,
+                    link,
+                    input.data("id"),
+                    function(state){
+                        if(state) {
+                            clearForm();
+                            stop();
+                        }
+                        form.removeClass("spinner");
+                        input.blur();
                     }
-                    form.removeClass("spinner");
-                }
-            ]);
+                ]);
+            }
         });
         form.delegate(".cancel", "click" ,function(e){
             clearForm();
@@ -798,17 +845,17 @@ $(document).ready(function(){
                                 photo.filename = $(this).find('input:hidden').val();
                                 photos.push(photo);
                             });
-                            Events.fire("post", [
-                                text,
-                                photos,
-                                link,
-                                postId,
-                                function(data) {
-//                                    $post.draggable('enable').removeClass('editable');
-//                                    $buttonPanel.show();
-//                                    $edit.remove();
-                                }
-                            ]);
+                            if (!($.trim(text) || link || photos.length)) {
+                                return $text.focus();
+                            } else {
+                                Events.fire("post", [
+                                    text,
+                                    photos,
+                                    link,
+                                    postId,
+                                    function(data) {}
+                                ]);
+                            }
                         };
                         var onCancel = function() {
                             $post.find('> .content').draggable('enable');
@@ -833,12 +880,11 @@ $(document).ready(function(){
                                     }, 0);
                                 })
                                 .bind('keyup', function(e) {
-                                    autoResize($text);
-
                                     if (e.ctrlKey && e.keyCode == 13) {
                                         onSave();
                                     }
                                 })
+                                .autoResize()
                                 .keyup().focus();
                             setCaretToPos($text.get(0), text.length);
                         }
@@ -862,22 +908,12 @@ $(document).ready(function(){
         });
     })();
 
-    $(".left-panel").delegate(".show-cut", "click" ,function(e){
-        var $content = $(this).closest('.content'),
-            $shortcut = $content.find('.shortcut'),
-            shortcut = $shortcut.html(),
-            cut      = $content.find('.cut').html();
-
-        $shortcut.html(shortcut + ' ' + cut);
-        $(this).remove();
-
-        e.preventDefault();
-    });
-
+    // Показать полностью в правом меню
     $(".right-panel").delegate(".toggle-text", "click", function(e) {
         $(this).parent().toggleClass('collapsed');
     });
 
+    // Кнопка "наверх"
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {
@@ -927,12 +963,14 @@ var Events = {
     }
 };
 
+// Image composition
 (function($) {
     $.fn.imageComposition = function(hardPosition) {
         return this.each(function() {
             var $wrap = $(this);
             var $images = $wrap.find('img');
             var num = $images.length;
+            var imagesPerColumn = 5;
             var border = 0; //Забил, из-за него все едет.
             var wrap = {
                 el: $wrap,
@@ -946,11 +984,14 @@ var Events = {
             $images.each(function(i, image) {
                 var $img = $(image);
                 if ($img.width()) return onLoadImages();
-                $img.bind('load', function() {
+
+                var img = new Image();
+                img.src = $img.attr('src');
+                img.onload = function() {
                     if (i == num - 1) {
                         return onLoadImages();
                     }
-                });
+                };
             });
 
             // ======================== //
@@ -995,7 +1036,7 @@ var Events = {
                             $wrap.height(wrap.height + border);
                         }
                     } else {
-                        var columnIndex = Math.floor((i - 1) / (isHor($firstImage) ? 4 : 99));
+                        var columnIndex = Math.floor((i - 1) / (isHor($firstImage) ? imagesPerColumn : 99));
                         if (!columns[columnIndex]) columns[columnIndex] = {};
 
                         var column = columns[columnIndex];
@@ -1070,6 +1111,178 @@ var Events = {
                 }
             }
         });
+    };
+})(jQuery);
+
+// Автовысота у textarea
+(function($) {
+    $.fn.autoResize = function() {
+        return this.each(function() {
+            var $input = $(this);
+            if (!$input._autoResize) {
+                $input
+                    ._autoResize = $('<div/>')
+                    .appendTo('body')
+                    .css({
+                        width: $input.width(),
+                        minHeight: $input.height() - ($input.css('padding-top') + $input.css('padding-bottom')),
+                        padding: $input.css('padding'),
+                        lineHeight: $input.css('line-height'),
+                        font: $input.css('font'),
+                        fontSize: $input.css('font-size'),
+                        position: 'absolute',
+                        wordWrap: 'break-word',
+                        top: -100000
+                    });
+                $input.bind('keyup blur', function(e) {
+                    $input._autoResize.html($input.val().split('\n').join('<br/> '));
+                    $input.css({
+                        height: $input._autoResize.height() + 10
+                    });
+                });
+            }
+        });
+    };
+})(jQuery);
+
+// Дропдауны
+(function($) {
+    var CLASS_ACTIVE = 'active';
+    var CLASS_MENU = 'ui-dropdown-menu';
+    var CLASS_MENU_ITEM = 'ui-dropdown-menu-item';
+    var CLASS_MENU_ITEM_ACTIVE = 'active';
+    var CLASS_MENU_ICON = 'icon';
+    var CLASS_MENU_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ICON_RIGHT = 'icon-right';
+    var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
+
+    var methods = {
+        init: function(parameters) {
+            return this.each(function() {
+                var defaults = {
+                    el: $(this),
+                    type: 'normal',
+                    width: '',
+                    addClass: '',
+                    position: 'left',
+                    iconPosition: 'left',
+                    openEvent: 'mousedown',
+                    closeEvent: 'click', // Not use
+                    data: [{}],
+                    onchange: function() {},
+                    oncreate: function() {},
+                    onopen: function() {},
+                    onclose: function() {}
+                };
+                var t = this;
+                var p = t.p = $.extend(defaults, parameters);
+                var $el = p.el;
+
+                if ($el.data('menu') || !p.data) return false;
+
+                $el.data('menu', $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
+                $(p.data).each(function(i, item) {
+                    var $item = $('<div>' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
+                    if (item.icon) {
+                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                        $item.append($icon);
+                        if (p.iconPosition == 'left') {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_LEFT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_LEFT);
+                        } else {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_RIGHT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_RIGHT);
+                        }
+                    }
+                    if (item.isActive) {
+                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                    }
+                    $item.mouseup(function() {
+                        if (p.type == 'checkbox') {
+                            $el.data('menu').find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
+                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                        }
+                        close();
+                        methods.run(p.onchange, $el, item);
+                    });
+                    $el.data('menu').append($item);
+                });
+
+                $el.bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                    if (!$el.data('menu').is(':visible')) {
+                        $('html, body').trigger(p.openEvent);
+                        open();
+                    } else {
+                        close();
+                    }
+                });
+
+                $el.data('menu').bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                });
+
+                $('html, body').bind(p.openEvent, function(e) {
+                    close();
+                    methods.run(p.onclose, $el, $el.data('menu'));
+                });
+
+                function open() {
+                    $el.addClass(CLASS_ACTIVE);
+                    $el.data('menu').css({
+                        width: p.width || $el.width()
+                    });
+
+                    var menu = $el.data('menu');
+                    var offset = $el.offset();
+                    var offsetTop = offset.top;
+                    var offsetLeft = offset.left
+                        + parseFloat(menu.css('margin-left'))
+                        - parseFloat(menu.css('margin-right'));
+                    if (p.position == 'right') {
+                        offsetLeft += ($el.width() - menu.width())
+                    }
+
+                    menu.css({
+                        top: offsetTop + $el.outerHeight(),
+                        left: offsetLeft
+                    }).show();
+                    methods.run(p.onopen, $el, $el.data('menu'));
+                }
+
+                function close() {
+                    $el.removeClass(CLASS_ACTIVE);
+                    $el.data('menu').hide();
+                    methods.run(p.onclose, $el, $el.data('menu'));
+                }
+
+                methods.run(p.oncreate, $el);
+            });
+        },
+
+        run: function(f, context, argument) {
+            if ($.isFunction(f)) {
+                f.call(context, argument);
+            }
+        },
+
+        menu: function() {
+            return this.each(function() {
+                return 123;
+//                return $(this).data('menu');
+            });
+        }
+    };
+
+    $.fn.dropdown = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || ! method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
+        }
     };
 })(jQuery);
 
@@ -1180,14 +1393,17 @@ var Elements = {
         })();
     },
     leftdd: function(){
-        return $("select").multiselect("getChecked").map(function(){
+        var res = $("select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
+
+        return res;
     },
     rightdd:function(value){
-        if(typeof value == 'undefined') {
-            return $(".right-panel .drop-down").data("selected");
+        if (typeof value == 'undefined') {
+            return $("#right-drop-down").data("selected");
         } else {
+            console.log(value);
             $(".right-panel .drop-down").dd_sel(value);
         }
     },

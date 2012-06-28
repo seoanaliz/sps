@@ -33,11 +33,6 @@ function loadArticles(clean) {
 
     $('#wall-load').show();
 
-    if (Elements.leftdd().length == 0) {
-        articlesLoading = false;
-        return;
-    }
-
     if (Elements.leftdd().length != 1) {
         $('.newpost').hide();
     } else {
@@ -56,27 +51,29 @@ function loadArticles(clean) {
 
     //clean and load left column
     $.ajax({
-        url: controlsRoot + 'arcticles-list/',
-        dataType : "html",
-        data: {
-            sourceFeedIds: Elements.leftdd(),
-            clean: clean,
-            from : from,
-            to : to
-        },
-        success: function (data) {
-            if (clean) {
-                $('div#wall').html('');
+            url: controlsRoot + 'arcticles-list/',
+            dataType : "html",
+            data: {
+                sourceFeedIds: Elements.leftdd(),
+                clean: clean,
+                from : from,
+                to : to
             }
+        })
+        .always(function() {
             $('#wall-load').hide();
+            if (clean) {
+                $('div#wall').empty();
+            }
+        })
+        .done(function(data) {
             $('div#wall div#wall-loader').remove();
             $('div#wall').append(data);
             articlesLoading = false;
             Elements.addEvents();
             Elements.initImages('.post .images');
             Elements.initLinks();
-        }
-    });
+        });
 }
 
 function loadQueue() {
@@ -271,8 +268,6 @@ var Eventlist = {
     },
 
     post_describe_link: function(link, callback) {
-//        $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
-//        $('div.link-info').show();
         $.ajax({
             url: controlsRoot + 'parse-url/',
             type: 'GET',
@@ -281,8 +276,6 @@ var Eventlist = {
                 url: link
             },
             success: function (data) {
-//                $('div.link-description').html('');
-//                $('div.link-info').hide();
                 callback(data);
             }
         });
@@ -350,7 +343,7 @@ var Eventlist = {
     },
 
     eof: null
-}
+};
 
 function popupSuccess( message ) {
     $.blockUI({

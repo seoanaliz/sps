@@ -16,8 +16,8 @@
         const Ads = 'ads';
 
         public static $Types = array(
-            self::Source => 'Источник',
-            self::Ads => 'Рекламная лента',
+            self::Source => 'Источники',
+            self::Ads => 'Реклама',
         );
 
         public static function IsTopFeed(SourceFeed $sourceFeed) {
