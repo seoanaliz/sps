@@ -39,7 +39,7 @@
         //      short_name  :   короткий адрес(берется из ссылки, то есть может быть вида id234242, vasyapupkin...)
         //      если страница удалена, вернет false. при проблемах с закачкой - exception
 
-        public function get_info($url)
+         public function get_info($url)
         {
             if (self::TESTING) echo '<br>get info'.$url . '<br>';
             $a = $this->get_page($url);
@@ -48,56 +48,55 @@
             }
 
             $url = trim($url, '/');
-            Logger::Debug($url);
             $short_name = end(explode('/',$url));
 
             if (substr_count($a, 'profile_avatar')> 0){
-                if (!preg_match('/user_id":(.*?),/', $a, $oid));
-                preg_match('/"loc":"\?id=(.*?)"/', $a, $oid);
-                preg_match('/profile_avatar".*? src="(.*?)"/', $a, $ava);
-                if (substr_count($ava[1], 'png') > 0 || substr_count($ava[1], 'gif') > 0) $ava = 'standard';
-                else $ava = $ava[1];
-                $err_counter = 0;
-                if(!preg_match('/(?s)id="header.*?b>([^<].*?)<\/h1/', $a, $name)){
-                    preg_match('/(?s)id="header.*?title">([^<].*?)<\/h1/', $a, $name);
-                }
-                $name = $name[1];
-                return array(
-                    'type'      =>  'id',
-                    'id'        =>  $oid[1],
-                    'avatarа'    =>  $ava,
-                    'name'      =>  $name,
-                    'short_name' =>     $short_name
-                );
+                    if (!preg_match('/user_id":(.*?),/', $a, $oid));
+                        preg_match('/"loc":"\?id=(.*?)"/', $a, $oid);
+                    preg_match('/profile_avatar".*? src="(.*?)"/', $a, $ava);
+                        if (substr_count($ava[1], 'png') > 0 || substr_count($ava[1], 'gif') > 0) $ava = 'standard';
+                    else $ava = $ava[1];
+                    $err_counter = 0;
+                    if(!preg_match('/(?s)id="header.*?b>([^<].*?)<\/h1/', $a, $name)){
+                        preg_match('/(?s)id="header.*?title">([^<].*?)<\/h1/', $a, $name);
+                    }
+                    $name = $name[1];
+                    return array(
+                                    'type'      =>  'id',
+                                    'id'        =>  $oid[1],
+                                    'avatara'    =>  $ava,
+                                    'name'      =>  $name,
+                                    'short_name' =>     $short_name
+                                );
 
             } elseif(substr_count($a, 'public_avatar')> 0 || substr_count($a, 'group_avatar')> 0){
                 if (substr_count($a, 'public_avatar')> 0 )
-                    $type = 'public';
+                        $type = 'public';
                 else
-                    $type = 'group';
+                      $type = 'group';
 
                 preg_match('/(?s)top_header">(.*?)<\/div>/', $a, $name);
                 if (!preg_match('/group_id":(.*?),/',$a, $gid))
                     if(!preg_match('/loc":"\?gid=(.*?)[&"]/', $a, $gid))
-                        preg_match('/public.init\(.*?id":(.*?),/', $a, $gid);
+                            preg_match('/public.init\(.*?id":(.*?),/', $a, $gid);
                 preg_match('/(?s)id=".*?avatar.*?src="(.*?)"/', $a, $ava);
                 if (substr_count($ava[1], 'png') > 0 || substr_count($ava[1], 'gif') > 0)
-                    $ava = 'standard';
+                        $ava = 'standard';
                 else
-                    $ava = $ava[1];
-                if (!preg_match('/Groups.init.*\"loc\":\"(.*?)\"/', $a, $short_name))
+                        $ava = $ava[1];
+               if (!preg_match('/Groups.init.*\"loc\":\"(.*?)\"/', $a, $short_name))
                     if (!preg_match('/public.init.*?\"public_link\":\"(.*?)\"/', $a, $short_name))
                         echo 'error _____ preg_match()<br><br>';
-                $short_name = $short_name[1];
-                $short_name = str_replace('/', '', $short_name);
-                $short_name = str_replace('\\', '', $short_name);
-                return array(
-                    'type'       =>     $type,
-                    'id'         =>     $gid[1],
-                    'avatarа'    =>     $ava,
-                    'name'       =>     !empty($name[1]) ? $name[1] : '',
-                    'short_name' =>     $short_name
-                );
+               $short_name = $short_name[1];
+               $short_name = str_replace('/', '', $short_name);
+               $short_name = str_replace('\\', '', $short_name);
+               return array(
+                                    'type'       =>     $type,
+                                    'id'         =>     $gid[1],
+                                    'avatara'    =>     $ava,
+                                    'name'       =>     $name[1],
+                                    'short_name' =>     $short_name
+                                );
             }
             return false;
         }
@@ -105,10 +104,11 @@
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
         //          -1               пост не прошел отбора, его не нужно выводить
-        //          "-"              лайков у поста меньше 20(попадает в выдачу из-за
-        //                           того, что остальные посты +- такие же)
-        //          "x%"(1<x<~100)   относительная крутизна поста
-
+        //          "x+" (x>=2)    - клевый пост, сильно выбивается из окружающих.
+        //                            чем больше х тем круче
+        //          "-"            -  лайков у поста меньше 20(попадает в выдачу из-за
+        //                            того, что остальные посты +- такие же)
+        //          "x%"(0<x<~100) -  относительная крутизна поста
         //likes_tr - абсолютные лайки
         //id - внутренний id поста в контакте
         //text
@@ -138,7 +138,7 @@
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
 
-        public function get_posts($page_number, $trig_inc = false)
+        public function get_posts($page_number, $short_name = '')
         {
             $offset = $page_number * self::PAGE_SIZE;
             if (!isset($this->count))
@@ -148,6 +148,8 @@
                 throw new Exception("wall's end");
             }
 
+
+            require_once 'phpquery-onefile.php';
             $a = $this->get_page($this->page_adr."?offset=$offset?own=1");
 
             if (!$a) {
@@ -155,9 +157,9 @@
             }
 
             //чистим HTML TODO
-            //            if (extension_loaded('tidy')){
-            //
-            //            }
+//            if (extension_loaded('tidy')){
+//
+//            }
 
             $document = phpQuery::newDocument($a);
             $hentry = $document->find('div.post_info');
@@ -168,56 +170,62 @@
             foreach ($hentry as $el) {
                 $pq = pq($el);
 
-                //определение авторства поста. Нужно только для групп
-                //                $author =  $pq->find('a.author')->attr('href');
-                //                $author = str_replace('/',  '', $author);
-                //                $author = str_replace('\\', '', $author);
-                //
-                //                if ( $author != $this->page_short_name) {
-                //                    echo '<br>несовпадение!<br>';
-                //                    continue;
-                //                }
+            //определение авторства поста. Нужно только для групп
+//                $author =  $pq->find('a.author')->attr('href');
+//                $author = str_replace('/',  '', $author);
+//                $author = str_replace('\\', '', $author);
+//
+//                if ( $author != $this->page_short_name) {
+//                    echo '<br>несовпадение!<br>';
+//                    continue;
+//                }
+                //todo привести в норм вид
+                $sign = $pq->find('div.wall_signed')->html();
+//                if (!$sign) throw new Exception(__CLASS__.'::' .__FUNCTION__.
+//                        ' не удалось получить id поста со стены ' . $this->page_adr);
+//                $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
+                $posts[$t]['sign'] = $pq->find('div.wall_signed')->html();
 
-                //контактовский номер поста
+            //контактовский номер поста
                 $id = $pq->find('div.reply_link_wrap')->attr('id');
                 if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                    ' не удалось получить id поста со стены ' . $this->page_adr);
+                        ' не удалось получить id поста со стены ' . $this->page_adr);
                 $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
 
-                //голосования
+            //голосования
                 $poll = $pq->find('div.page_media_poll')->attr('id');
                 $poll = str_replace('post_poll', '', $poll);
                 if (!$poll) $poll = '';
                 $posts[$t]['poll'] = $poll;
 
-                //карты
+            //карты
                 $maps  =  $pq->find('img.page_media_map')->attr('src');
                 $maps  = str_replace(self::MAP_SIZE, self::MAP_NEW_SIZE, $maps);
                 if (!$maps) $maps= '';
                 $posts[$t]['map'] = $maps;
 
 
-                //лайки
+            //лайки
                 $likes = $pq->find('div.post_like')->text();
                 if (!$likes) $likes = 0;
                 $posts[$t]['likes'] = (int)$likes;
                 $posts[$t]['likes_tr'] = (int)$likes;
 
-                //время
+            //время
                 $time = $pq->find('div.replies > div.reply_link_wrap');
                 $time =  $time->find('span')->text();
 
-                //                iconv( "windows-1251", "utf-8", $time->find('span')->text());
+//                iconv( "windows-1251", "utf-8", $time->find('span')->text());
                 $time = $this->get_time($time);
 
                 if (!$time)
                     throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                        " не удалось получить time поста $id со стены " . $this->page_adr);
+                            " не удалось получить time поста $id со стены " . $this->page_adr);
                 $posts[$t]['time'] = $time;
-                //                echo $time.'<br>';
+//                echo $time.'<br>';
 
 
-                //ретвит
+            //ретвит
                 $retweet = $pq->find('a.published_by')->attr('href');
                 if ($retweet){
 
@@ -226,28 +234,35 @@
 
 
 
-                //текст
+            //текст
                 $text = $pq->find('div.wall_post_text')->html();
-                if (substr_count($text, '<span style="display: none">') > 0){
-                    $text = explode('<span style="display: none">', $text);
-                    $text = end($text);
-                }
-                //                    if (substr_count($text, 'section=search') > 0){
-                //                        preg_match_all('/>#.*?</', $text, $matches);
-                //                        print_r($matches);
-                //                        $text = preg_replace('/(?s)(.*?)(<a onclick.*?href.*?\&amp.*?\/a>)(.*)/','$1<<###>>$3', $text);
-                //
-                //                    }
+                    if (substr_count($text, '<span style="display: none">') > 0){
+                        $text = explode('<span style="display: none">', $text);
+                        $text = end($text);
+                    }
+
+//                   print_r($text);
+//                   echo '<br><br>';
+//                    if (substr_count($text, 'section=search') > 0){
+//                        preg_match_all('/>#.*?</', $text, $matches);
+//                        print_r($matches);
+//                        $text = preg_replace('/(?s)(.*?)(<a onclick.*?href.*?\&amp.*?\/a>)(.*)/','$1<<###>>$3', $text);
+//
+//                    }
 
                 $text = $this->remove_tags($text);
+//                file_put_contents('1.txt', $text . "\r\n\r\n" . $text2);
+//                print_r($text);
+//                die();
+//                echo '<br><br>';
                 $posts[$t]['text'] = $text;
 
-                //ссылки, хештеги
-                //в текст будут вставлятся 'якоря', к которым будут привязыватся ссылки и хеши
+            //ссылки, хештеги
+            //в текст будут вставлятся 'якоря', к которым будут привязыватся ссылки и хеши
                 $posts[$t]['text_links'] = array();
 
 
-                //изображения, видео, аудио
+            //изображения, видео, аудио
                 $img_arr = array();
                 $vid_arr = array();
                 $mus_arr = array();
@@ -260,15 +275,17 @@
                 foreach($pq->find('a') as $link){
                     $oncl = pq($link)->attr('onclick');
 
-                    //фото
-                    if (substr_count($oncl, 'showPhoto') > 0){
+
+
+            //фото
+                    if (substr_count($oncl, 'showPhoto') > 0) {
                         preg_match("/showPhoto\('(.*?)',/", $oncl, $match);
                         if (!isset($match[1])) continue;
 
                         $img_arr[$image]['id'] = $match[1];
                         $img_arr[$image]['desc'] = '';
                         //продгоняем инфу о фото под формат json
-                        preg_match("/temp:({.*?})/", $oncl, $match);
+                        preg_match("/temp:(\{.*?})/", $oncl, $match);
                         if (isset($match[1])){
                             $match[1] = str_replace('x_:', '"x_":', $match[1]);
                             $match[1] = str_replace('y_:', '"y_":', $match[1]);
@@ -286,11 +303,17 @@
                                         throw new Exception(__CLASS__.'::' .__FUNCTION__.
                                             " не удалось получить фото поста $id со стены " . $this->page_adr."?offset=$offset");
                                     }
+                            if (substr_count($postlink, 'http') > 0 )
+                                    $img_arr[$image]['url']  = $postlink . '.jpg';
+                            else {
+                                $img_arr[$image]['url']  = $link . $postlink . '.jpg';
+                            }
+//
 
-                            $img_arr[$image]['url']  = $link . $postlink . '.jpg';
+//                          echo $img_arr[$image]['url']. '<br>';
                             $image++;
                         }
-                        //видео
+             //видео
                     }elseif (substr_count($oncl, "act: 'graffiti'") > 0){
                         $img_arr[$image]['id'] = pq($link)->attr('href');
                         $img_arr[$image]['desc'] = '';
@@ -298,26 +321,28 @@
                         if (self::TESTING) print_r($img_arr[$image]);
                         if (!$img_arr[$image]['id'] || !$img_arr[$image]['url'])
                             throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                                " не удалось получить данные поста (гаффити)
+                                            " не удалось получить данные поста (гаффити)
                                             $id со стены " . $this->page_adr."?offset=$offset");
                         $image++;
 
                     }elseif (substr_count($oncl, 'showVideo') > 0){
-                        preg_match("/showVideo\('(.*?)',/", $oncl, $match);
-                        if (!isset($match[1])) continue;
-                        $vid_arr[$video]['id'] = $match[1];
-                        $video++;
-                        //музыка
+                         preg_match("/showVideo\('(.*?)',/", $oncl, $match);
+                         if (!isset($match[1])) continue;
+                         $vid_arr[$video]['id'] = $match[1];
+                         $video++;
+             //музыка
                     }elseif(substr_count($oncl, 'playAudio') > 0){
-                        preg_match("/playAudioNew\('(.*?)'/", $oncl, $match);
-                        if (!isset($match[1])) continue;
-                        $mus_arr[$music]['id'] = $match[1];
-                        $music++;
-                        //линки и документы
+                         preg_match("/playAudioNew\('(.*?)'/", $oncl, $match);
+                         if (!isset($match[1])) continue;
+                         $mus_arr[$music]['id'] = $match[1];
+                         $music++;
+
+             //подпись
+
+             //линки и документы
                     }elseif (pq($link)->attr('class') == 'lnk') {
                         $link = pq($link)->attr('href');
 
-                        $doc = '';
                         if (substr_count($link, '/away.php?to=') > 0){
                             $link = str_replace('/away.php?to=', '', $link);
                             $link = urldecode($link);
@@ -329,14 +354,14 @@
                             $doc = '';
                         }
 
-                        $posts[$t]['link'] = $link;
-                        $posts[$t]['doc'] = $doc;
+                        $posts[$t]['link']  = $link;
+                        $posts[$t]['doc']   = $doc;
                     }
 
                 }
 
-                //получение описания каждой фотки, крайне сомнительная вещь
-                if ( count($img_arr) > 0 and $trig_inc) {
+           //получение описания каждой фотки, крайне сомнительная вещь
+                if ( count($img_arr) > 0 and self::GET_PHOTO_DESC) {
                     $this->get_photo_desc($img_arr, $text);//спорно
                 }
 
@@ -368,12 +393,13 @@
 
             if (count($posts) > 0){
                 $posts = $this->otsev($posts);
-                return $posts;
+                return serialize($posts);
             } else{
-                //                echo '<br>zero<br>';
+//                echo '<br>zero<br>';
                 return false;
             }
-        }
+         }
+
 
         private function srednee(array &$a)
         {
