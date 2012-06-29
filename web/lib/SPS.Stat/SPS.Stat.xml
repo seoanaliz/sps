@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <group name="Daemons">
+	    <action name="WrTopics">
+            <path>daemons/WrTopics</path>
+        </action>
+	    <action name="WrPosts">
+            <path>daemons/WrPosts</path>
+        </action>
+	    <action name="WrPoints">
+            <path>daemons/WrPoints</path>
+        </action>
+    </group>
+</actions>
