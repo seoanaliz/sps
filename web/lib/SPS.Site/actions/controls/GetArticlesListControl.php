@@ -50,7 +50,7 @@
             if ($sortType == 'old') {
                 $options[BaseFactory::OrderBy] = ' "createdAt" ASC, "articleId" ASC ';
             } else if ($sortType == 'best') {
-                $options[BaseFactory::OrderBy] = ' "rate" ASC, "articleId" DESC ';
+                $options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
             }
 
             $articles = ArticleFactory::Get( $search, $options );

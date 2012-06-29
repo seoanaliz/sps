@@ -581,9 +581,9 @@ $(document).ready(function(){
 
                 $('.editImagePopup .close').click();
 
-                Events.fire('post_link_data', data, function(state){
+                Events.fire('post_link_data', [data, function(state){
 
-                });
+                }]);
             }
         };
 
