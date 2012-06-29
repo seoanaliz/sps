@@ -79,7 +79,6 @@
                         <div class="tip"><s></s></div>
                         <div class="icon"></div>
                         <script type="text/javascript">
-                            (function() {
                                 <?
                                 $json = array();
                                 foreach ($targetFeeds as $targetFeed) {
@@ -92,30 +91,6 @@
                                 }
                                 echo 'var rightPanelData = '.json_encode($json);
                                 ?>
-
-                                $("#right-drop-down").dropdown({
-                                    data: rightPanelData,
-                                    type: 'checkbox',
-                                    addClass: 'right',
-                                    onchange: function(item) {
-                                        $(this)
-                                            .data('selected', item.id)
-                                            .find('.caption').text(item.title);
-                                        if (item.icon) {
-                                            var icon = $(this).find('.icon img');
-                                            if (!icon.length) {
-                                                icon = $('<img src="' + item.icon + '"/>').appendTo($(this).find('.icon'))
-                                            }
-                                            icon.attr('src', item.icon);
-                                        }
-                                        Events.fire('rightcolumn_dropdown_change', []);
-                                    },
-                                    oncreate: function() {
-                                        $(this).find('.default').removeClass('default');
-                                        $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item.active').mouseup();
-                                    }
-                                });
-                            })();
                         </script>
                     </div>
 

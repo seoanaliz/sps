@@ -69,6 +69,30 @@ $(document).ready(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
+    // right dropdown
+    $("#right-drop-down").dropdown({
+        data: rightPanelData,
+        type: 'checkbox',
+        addClass: 'right',
+        onchange: function(item) {
+            $(this)
+                .data('selected', item.id)
+                .find('.caption').text(item.title);
+            if (item.icon) {
+                var icon = $(this).find('.icon img');
+                if (!icon.length) {
+                    icon = $('<img src="' + item.icon + '"/>').appendTo($(this).find('.icon'))
+                }
+                icon.attr('src', item.icon);
+            }
+            Events.fire('rightcolumn_dropdown_change', []);
+        },
+        oncreate: function() {
+            $(this).find('.default').removeClass('default');
+            Elements.rightdd($("#right-drop-down").data('menu').find('.ui-dropdown-menu-item.active').data('id'));
+        }
+    });
+
     //Dropdowns
 //    $(".drop-down").click(function(e){
 //        e.stopPropagation();
@@ -960,7 +984,6 @@ $(document).ready(function(){
             if (data.response) {
                 r = data.response;
                 if (r.me) {
-                    console.log(r.me);
                     var $userInfo = $('.user-info');
                     $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
                     $('a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
@@ -1283,7 +1306,7 @@ var Events = {
 
                 $el.data('menu', $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
                 $(p.data).each(function(i, item) {
-                    var $item = $('<div>' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
+                    var $item = $('<div data-id="' + item.id + '">' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
                     if (item.icon) {
                         var $icon = $('<div><img src="' + item.icon + '" /></div>');
                         $item.append($icon);
@@ -1512,7 +1535,7 @@ var Elements = {
         })();
     },
     leftdd: function(){
-        return $("select").multiselect("getChecked").map(function(){
+        return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
     },
@@ -1520,8 +1543,7 @@ var Elements = {
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
-            console.log(value);
-            $(".right-panel .drop-down").dd_sel(value);
+            $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
     },
     calendar: function(value){
