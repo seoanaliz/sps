@@ -48,7 +48,6 @@
             }
 
             $url = trim($url, '/');
-            Logger::Debug($url);
             $short_name = end(explode('/',$url));
 
             if (substr_count($a, 'profile_avatar')> 0){
@@ -62,10 +61,11 @@
                     preg_match('/(?s)id="header.*?title">([^<].*?)<\/h1/', $a, $name);
                 }
                 $name = $name[1];
+
                 return array(
                     'type'      =>  'id',
                     'id'        =>  $oid[1],
-                    'avatarа'    =>  $ava,
+                    'avatara'   =>  $ava,
                     'name'      =>  $name,
                     'short_name' =>     $short_name
                 );
@@ -91,16 +91,21 @@
                 $short_name = $short_name[1];
                 $short_name = str_replace('/', '', $short_name);
                 $short_name = str_replace('\\', '', $short_name);
+                preg_match('/(?s)id=\"public_followers\".*?span class=\"fl_r\".?>.*?(\d.*?)<\/div>/', $a, $population);
+                $population = str_replace('<span class="num_delim"> </span>', '', $population[1]);
+                $population =  (int)$population;
                 return array(
                     'type'       =>     $type,
                     'id'         =>     $gid[1],
-                    'avatarа'    =>     $ava,
-                    'name'       =>     !empty($name[1]) ? $name[1] : '',
-                    'short_name' =>     $short_name
+                    'avatara'    =>     $ava,
+                    'name'       =>     $name[1],
+                    'short_name' =>     $short_name,
+                    'population' =>     $population
                 );
             }
             return false;
         }
+
 
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
@@ -631,7 +636,7 @@
             $da = date("d,m,Y");
             $da = explode(',' ,$da);
             $today_zero = mktime(0, 0, 0, $da[1], $da[0], $da[2]);
-
+            $result = false;
             if (is_numeric($date) && strlen($date) == 10) return $date;
             $nowtime = time() + 10800;
             //случай с недавним постом(в пределах 5 минут)
