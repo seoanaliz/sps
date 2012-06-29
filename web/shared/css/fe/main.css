@@ -71,7 +71,10 @@ i {font-style: italic;}
 .newpost .link-info .link-status .delete-link { position: absolute; top: 2px; right: -12px; width: 10px; height: 10px; margin: 0; background: url(../../images/fe/controls.png) no-repeat -44px -2px; text-indent: -9999px; }
 
 .collapsed .attach-file { display: none; }
-.attach-file { display: block; }
+.attach-file {
+    display: block;
+    height: 20px;
+}
 .qq-upload-list { overflow: hidden; margin: 0; margin-top: 10px; }
 .qq-upload-list li {
     position: relative;

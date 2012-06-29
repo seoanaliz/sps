@@ -9,15 +9,15 @@
 
                 <div class="type-selector">
                     <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                    <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                        <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
                     <? } ?>
                 </div>
 
                 <select multiple="multiple" id="source-select">
                     <?
-                        foreach ($sourceFeeds as $sourceFeed) {
-                            ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
-                        }
+                    foreach ($sourceFeeds as $sourceFeed) {
+                        ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
+                    }
                     ?>
                 </select>
 
@@ -38,9 +38,11 @@
                     <a href="#">новые записи</a>
                 </span>
             </div>
-
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
-            <div class="wall" id="wall"></div>
+
+            <div class="wall" id="wall">
+
+            </div>
 
             <div id="wallloadmore" class="hidden">Больше</div>
         </div>
@@ -51,9 +53,14 @@
             <div class="header bb">
 
                 <div class="user-info">
-                    <img width="22px" src="http://app.uxpin.com/u/a/0/9/a09e2c748e10258cd892f11307202c77/e_d7f264dc.jpg" alt="" />
-                    Вася Пупскин
-
+                    <span class="user-photo">
+                        <a target="_blank">
+                            <img width="22px" src="http://app.uxpin.com/u/a/0/9/a09e2c748e10258cd892f11307202c77/e_d7f264dc.jpg" alt="" />
+                        </a>
+                    </span>
+                    <span class="user-name">
+                        <a target="_blank">...</a>
+                    </span>
                     <span class="counter">
                         11000
                     </span>
@@ -134,7 +141,8 @@
 
             <div class="queue-title">18 запланировано</div>
 
-            <div class="items drop" id="queue" style="display: none;"></div>
+            <div class="items drop" id="queue" style="display: none;">
+            </div>
         </div>
     </div>
 </div>

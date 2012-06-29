@@ -64,7 +64,7 @@ $(document).ready(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
-    // Dropdowns
+    //Dropdowns
 //    $(".drop-down").click(function(e){
 //        e.stopPropagation();
 //        $(document).click();
@@ -211,19 +211,6 @@ $(document).ready(function(){
         }
     });
 
-    // Показать полностью в левом меню
-    $(".left-panel").delegate(".show-cut", "click" ,function(e){
-        var $content = $(this).closest('.content'),
-            $shortcut = $content.find('.shortcut'),
-            shortcut = $shortcut.html(),
-            cut      = $content.find('.cut').html();
-
-        $shortcut.html(shortcut + ' ' + cut);
-        $(this).remove();
-
-        e.preventDefault();
-    });
-
     // Устарело?
     (function(){
         var addInput = function(elem, defaultvalue, id){
@@ -343,7 +330,6 @@ $(document).ready(function(){
                     foundLink,
                     function(result) {
                         if (result) {
-                            console.log('asd');
                             $linkDescription.empty();
                             $linkStatus.empty();
 
@@ -912,6 +898,19 @@ $(document).ready(function(){
         });
     })();
 
+    // Показать полностью в левом меню
+    $(".left-panel").delegate(".show-cut", "click" ,function(e){
+        var $content = $(this).closest('.content'),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
+            cut      = $content.find('.cut').html();
+
+        $shortcut.html(shortcut + ' ' + cut);
+        $(this).remove();
+
+        e.preventDefault();
+    });
+
     // Показать полностью в правом меню
     $(".right-panel").delegate(".toggle-text", "click", function(e) {
         $(this).parent().toggleClass('collapsed');
@@ -932,6 +931,37 @@ $(document).ready(function(){
         });
     })(window);
 
+    // Подгрузка имени и аватара
+    (function() {
+        VK.init({
+            apiId: vk_appId,
+            nameTransportPath: '/xd_receiver.htm'
+        });
+        getInitData();
+
+        function getInitData() {
+            var code;
+            code = 'return {';
+            code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
+            code += '};';
+            VK.Api.call('execute', {'code': code}, onGetInitData);
+        }
+        function onGetInitData(data) {
+            var r;
+            if (data.response) {
+                r = data.response;
+                if (r.me) {
+                    console.log(r.me);
+                    var $userInfo = $('.user-info');
+                    $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
+                    $('a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
+                    $('.user-photo img', $userInfo).attr('src', r.me.photo);
+                }
+            }
+        }
+    })();
+
+    // ===
     Elements.addEvents();
 });
 
@@ -975,11 +1005,12 @@ var Events = {
             var $images = $wrap.find('img');
             var num = $images.length;
             var imagesPerColumn = 5;
-            var border = 0; //Забил, из-за него все едет.
             var wrap = {
                 el: $wrap,
-                width: $wrap.width(), //510
-                height: $wrap.height(), //310
+                width: 0,
+                height: 0,
+                maxWidth: $wrap.width(),
+                maxHeight: $wrap.height(),
                 type: ''
             };
             var VER = 'ver',
@@ -990,6 +1021,10 @@ var Events = {
             } else if ((num - 1) % imagesPerColumn == 2) {
                 imagesPerColumn--;
             }
+            if (num == 2 && !hardPosition) {
+                hardPosition = 'right';
+            }
+            $wrap.addClass('image-compositing');
 
             $images.each(function(i, image) {
                 var $img = $(image);
@@ -1036,13 +1071,13 @@ var Events = {
                     if (i == 0) {
                         $firstImage = $image;
                         if (isHor($firstImage)) {
-                            $firstImage.width(Math.min(wrap.width, $firstImage.width()));
+                            $firstImage.width(Math.min(wrap.maxWidth, $firstImage.width()));
                             wrap.width = $firstImage.width();
-                            $wrap.width(wrap.width + border);
+                            $wrap.width(wrap.width);
                         } else {
-                            $firstImage.height(Math.min(wrap.height, $firstImage.height()));
+                            $firstImage.height(Math.min(wrap.maxHeight, $firstImage.height()));
                             wrap.height = $firstImage.height();
-                            $wrap.height(wrap.height + border);
+                            $wrap.height(wrap.height);
                         }
                     } else {
                         var columnIndex = Math.floor((i - 1) / (isHor($firstImage) ? imagesPerColumn : 99));
@@ -1092,26 +1127,40 @@ var Events = {
                                     'width': $image.width(),
                                     'height': $image.height()
                                 },
-                                'width', ($image.width() * coef - (border / (num - 1) * (num - 2))));
+                                'width', ($image.width() * coef));
 
                             $image.width(s['width']);
                             $image.height(s['height']);
-                            columnHeight = s['height'] + border;
+                            columnHeight = s['height'];
                         } else {
                             s = relativeResize(
                                 {
                                     'width': $image.width(),
                                     'height': $image.height()
                                 },
-                                'height', ($image.height() * coef - border));
+                                'height', ($image.height() * coef));
 
                             $image.width(s['width']);
                             $image.height(s['height']);
-                            columnHeight = s['width'] + border;
+                            columnHeight = s['width'];
                         }
                     });
                     columnsHeight += columnHeight;
                 });
+
+                if (isHor($firstImage)) {
+                    if (columnsHeight > wrap.height) {
+                        console.log($firstImage);
+                        console.log('Вышла слшком высокой :(');
+                        console.log('=========');
+                    }
+                } else {
+                    if (columnsHeight > wrap.width) {
+                        console.log($firstImage);
+                        console.log('Вышла слшком широкой :(');
+                        console.log('=========');
+                    }
+                }
 
                 if (isHor($firstImage)) {
                     $wrap.height($firstImage.height() + columnsHeight);
@@ -1343,7 +1392,6 @@ var Elements = {
                 d[1] = d[0];
                 d[0] = i;
                 var date = d.join('.');
-                console.log(date);
                 return Date.parse(date);
             },
             uneasy_format: function(date) {
@@ -1422,11 +1470,9 @@ var Elements = {
         })();
     },
     leftdd: function(){
-        var res = $("select").multiselect("getChecked").map(function(){
+        return $("select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
-
-        return res;
     },
     rightdd:function(value){
         if (typeof value == 'undefined') {
