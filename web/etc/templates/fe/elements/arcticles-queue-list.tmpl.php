@@ -4,7 +4,7 @@
         if (empty($gridItem['queue'])) {
             ?>
                 <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>" data-id="{$id}">
-                    <div class="time"><?= $gridItem['dateTime']->defaultFormat() ?></div>
+                    <div class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></div>
                     <div class="content"></div>
                 </div>
             <?
@@ -14,7 +14,7 @@
             ?>
                 <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>" data-id="{$id}">
                     <div class="time">
-                        <?= $gridItem['dateTime']->defaultFormat() ?>
+                        <?= $gridItem['dateTime']->defaultTimeFormat() ?>
                         <? if (!empty($articleRecord->link)) { ?>
                             <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
                         <? } ?>
