@@ -1051,6 +1051,9 @@ var Events = {
                 type: ''
             };
 
+            if ($wrap.data('image-compositing')) return;
+            
+            $wrap.data('image-compositing', true);
             $wrap.addClass(CLASS_LOADING);
             $images.each(function(i, image) {
                 var $img = $(image);
