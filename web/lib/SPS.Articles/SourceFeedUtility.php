@@ -24,11 +24,11 @@
             return in_array($sourceFeed->externalId, self::$Tops);
         }
 
-        public static function GetInfo($sourceFeeds) {
+        public static function GetInfo($sourceFeeds, $key = 'sourceFeedId') {
             $sourceInfo = array();
 
             foreach ($sourceFeeds as $sourceFeed) {
-                $sourceInfo[$sourceFeed->sourceFeedId] = array(
+                $sourceInfo[$sourceFeed->$key] = array(
                     'name' => $sourceFeed->title,
                     'img' => ''
                 );
@@ -41,7 +41,7 @@
                     $path .= '?v=' . filemtime(Site::GetRealPath($path));
                 }
 
-                $sourceInfo[$sourceFeed->sourceFeedId]['img'] = Site::GetWebPath($path);
+                $sourceInfo[$sourceFeed->$key]['img'] = Site::GetWebPath($path);
             }
 
             return $sourceInfo;

@@ -86,7 +86,7 @@
                                     array_push($json, array(
                                         'id' => $targetFeed->targetFeedId,
                                         'title' => $targetFeed->title,
-                                        'icon' => 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg',
+                                        'icon' => $targetInfo[$targetFeed->targetFeedId]['img'],
                                         'isActive' => ($targetFeed->targetFeedId == $currentTargetFeedId),
                                     ));
                                 }

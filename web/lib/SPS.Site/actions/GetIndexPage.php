@@ -38,6 +38,7 @@
                 array('_targetFeedId' => AccessUtility::GetTargetFeedIds())
                 , array( BaseFactory::WithoutPages => true )
             );
+            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
             Response::setArray( "targetFeeds", $targetFeeds );
 
             if (empty($currentTargetFeedId)) {
