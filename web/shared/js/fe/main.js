@@ -1016,14 +1016,6 @@ var Events = {
             var VER = 'ver',
                 HOR = 'hor';
 
-            if ((num - 1) % imagesPerColumn == 1) {
-                imagesPerColumn++;
-            } else if ((num - 1) % imagesPerColumn == 2) {
-                imagesPerColumn--;
-            }
-            if (num == 2 && !hardPosition) {
-                hardPosition = 'right';
-            }
             $wrap.addClass('image-compositing');
 
             $images.each(function(i, image) {
@@ -1039,17 +1031,6 @@ var Events = {
             });
 
             // ======================== //
-            function isHor($image) {
-                var w = $image.width();
-                var h = $image.height();
-                var isH = !!(w / h > 1.1);
-                return (hardPosition == 'right') ? false : (hardPosition == 'bottom') ? true : isH;
-            }
-
-            function isVer($image) {
-                return !isHor($image);
-            }
-
             function relativeResize(size, type, width) {
                 var w = (type == 'width') ? 'width' : 'height';
                 var h = (type == 'height') ? 'width' : 'height';
@@ -1064,6 +1045,18 @@ var Events = {
             function onLoadImages() {
                 var $firstImage;
                 var columns = [];
+                var position = hardPosition;
+
+                if ((num - 1) % imagesPerColumn == 1) {
+                    imagesPerColumn++;
+                } else if ((num - 1) % imagesPerColumn == 2) {
+                    imagesPerColumn--;
+                }
+                if (num == 2 && !position) {
+                    position = 'right';
+                    wrap.width = wrap.maxWidth;
+                    $firstImage = $wrap;
+                }
 
                 $images.each(function(i) {
                     var $image = $(this);
@@ -1149,23 +1142,34 @@ var Events = {
                 });
 
                 if (isHor($firstImage)) {
-                    if (columnsHeight > wrap.height) {
+                    wrap.height = $firstImage.height() + columnsHeight;
+                    $wrap.height(wrap.height);
+
+                    if (wrap.height > wrap.maxHeight) {
                         console.log($firstImage);
                         console.log('Вышла слшком высокой :(');
                         console.log('=========');
                     }
                 } else {
-                    if (columnsHeight > wrap.width) {
+                    wrap.width = $firstImage.width() + columnsHeight;
+                    $wrap.width(wrap.width);
+
+                    if (wrap.width > wrap.maxWidth) {
                         console.log($firstImage);
                         console.log('Вышла слшком широкой :(');
                         console.log('=========');
                     }
                 }
 
-                if (isHor($firstImage)) {
-                    $wrap.height($firstImage.height() + columnsHeight);
-                } else {
-                    $wrap.width($firstImage.width() + columnsHeight);
+                function isHor($image) {
+                    var w = $image.width();
+                    var h = $image.height();
+                    var isH = !!(w / h > 1.1);
+                    return (position == 'right') ? false : (position == 'bottom') ? true : isH;
+                }
+
+                function isVer($image) {
+                    return !isHor($image);
                 }
             }
         });
