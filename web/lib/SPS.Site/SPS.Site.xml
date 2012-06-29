@@ -39,6 +39,9 @@
         <action name="SyncTop">
             <path>daemons/SyncTop</path>
         </action>
+        <action name="SyncUserpics">
+            <path>daemons/SyncUserpics</path>
+        </action>
     </group>
 
     <group name="Controls">

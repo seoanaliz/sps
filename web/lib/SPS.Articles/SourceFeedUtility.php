@@ -35,26 +35,33 @@
 
                 //group image
                 $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
-                $filePath = Site::GetRealPath($path);
-                if (!file_exists($filePath)) {
-                    $avatarPath = Site::GetWebPath('images://fe/no-avatar.png');
-
-                    try {
-                        $parser = new ParserVkontakte();
-                        $info = $parser->get_info(ParserVkontakte::VK_URL . '/public' . $sourceFeed->externalId);
-
-                        if (!empty($info['avatarа'])) {
-                            $avatarPath = $info['avatarа'];
-                        }
-                    } catch (Exception $Ex) {}
-
-                    file_put_contents($filePath, file_get_contents($avatarPath));
+                if (!file_exists(Site::GetRealPath($path))) {
+                    $path = 'images://fe/no-avatar.png';
+                } else {
+                    $path .= '?v=' . filemtime(Site::GetRealPath($path));
                 }
 
                 $sourceInfo[$sourceFeed->sourceFeedId]['img'] = Site::GetWebPath($path);
             }
 
             return $sourceInfo;
+        }
+
+        public static function SaveRemoteImage($externalId) {
+            $path = 'temp://userpic-' . $externalId . '.jpg';
+            $filePath = Site::GetRealPath($path);
+            try {
+                $parser = new ParserVkontakte();
+                $info = $parser->get_info(ParserVkontakte::VK_URL . '/public' . $externalId);
+
+                if (!empty($info['avatarа'])) {
+                    $avatarPath = $info['avatarа'];
+                    $content = file_get_contents($avatarPath);
+                    if (!empty($content)) {
+                        file_put_contents($filePath, $content);
+                    }
+                }
+            } catch (Exception $Ex) {}
         }
     }
 ?>

@@ -105,6 +105,10 @@
                     <title><![CDATA[Синхронизация топа]]></title>
                     <time><![CDATA[Раз в сутки]]></time>
                 </synctop>
+                <syncuserpics>
+                    <title><![CDATA[Обновление картинок источников и пабликов]]></title>
+                    <time><![CDATA[Вручную]]></time>
+                </syncuserpics>
             </list>
             <header><![CDATA[Доступные демоны]]></header>
             <title><![CDATA[Название]]></title>

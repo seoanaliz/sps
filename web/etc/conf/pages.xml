@@ -316,6 +316,9 @@
                 <page uri="daemons://sync-top/">
                     <actions>SPS.Site.SyncTop</actions>
                 </page>
+                <page uri="daemons://sync-userpics/">
+                    <actions>SPS.Site.SyncUserpics</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
