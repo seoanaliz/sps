@@ -995,13 +995,15 @@ i {font-style: italic;}
     position: relative;
 }
 .image-compositing:after {
-    content: '';
+    content: '' !important;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: url('../../images/fe/upload.gif') center no-repeat #fff;
-    width: 100%;
-    height: 100%;
-    z-index: 999;}
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 999;
+    visibility: visible !important;
+}

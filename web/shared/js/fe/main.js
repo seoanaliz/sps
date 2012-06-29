@@ -21,18 +21,23 @@ $(document).ready(function(){
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
             Events.fire('calendar_change', []);
-        })
-        .trigger('change');
-
+        });
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });
 
     // Приведение вида календаря из 22.12.2012 в 22 декабря
-    $("#calendar").datepicker('setDate', new Date($("#calendar").val()));
+    (function() {
+        var d = $("#calendar").val().split('.');
+        var i = d[1];
+        d[1] = d[0];
+        d[0] = i;
+        var date = d.join('.');
+        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
+    })();
 
     // Кнопки вперед-назад в календаре
-    (function($) {
+    (function() {
         var day = (86000 * 1000);
 
         $(".calendar .prev").click(function(){
@@ -43,7 +48,7 @@ $(document).ready(function(){
             var date = $('#calendar').datepicker('getDate').getTime();
             $("#calendar").datepicker('setDate', new Date(date + day * 2)).trigger('change');
         });
-    })(jQuery);
+    })();
 
     // Left menu multiselect
     $("#source-select").multiselect({
