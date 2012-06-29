@@ -35,7 +35,7 @@
             <div class="wall-title">
                 <span class="count">&nbsp;</span>
                 <span class="filter">
-                    <a href="#" data-type="new">новые записи</a>
+                    <a href="javascript:;" data-type="new">новые записи</a>
                 </span>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
@@ -61,12 +61,8 @@
                     <span class="user-name">
                         <a target="_blank">...</a>
                     </span>
-                    <span class="counter">
-                        11000
-                    </span>
-                    <span class="counter">
-                        68%
-                    </span>
+<!--                    <span class="counter">11000</span>-->
+<!--                    <span class="counter">68%</span>-->
                 </div>
 
                 <div class="filter">
@@ -129,11 +125,11 @@
                        <div class="ctl spr del"></div>
                    </div -->
 
-                    <div class="type-selector">
+                    <!--div class="type-selector">
                         <a href="#" class="active" data-type="all">Все записи</a>
                         <a href="#" class="" data-type="content">Контент <span class="counter">8</span></a>
                         <a href="#" class="" data-type="ads2">Реклама</a>
-                    </div>
+                    </div-->
 
                 </div>
 
