@@ -118,5 +118,11 @@
             $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
             Response::setArray( 'targetFeeds', $targetFeeds );
         }
+
+        protected function afterAction($result) {
+            if ($result && $this->currentObject->type == SourceFeedUtility::Source) {
+                SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
+            }
+        }
     }
 ?>

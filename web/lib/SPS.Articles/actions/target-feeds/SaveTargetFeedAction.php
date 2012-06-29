@@ -231,5 +231,11 @@
             $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
             Response::setArray( "publishers", $publishers );
         }
+
+        protected function afterAction($result) {
+            if ($result && $this->currentObject->type == TargetFeedUtility::VK) {
+                SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
+            }
+        }
     }
 ?>

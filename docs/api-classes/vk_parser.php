@@ -290,8 +290,11 @@ header("Content-Type: text/html; charset=windows-1251");
                                         throw new Exception(__CLASS__.'::' .__FUNCTION__.
                                             " не удалось получить фото поста $id со стены " . $this->page_adr."?offset=$offset");   
                                     }
-                            
-                            $img_arr[$image]['url']  =  $postlink . '.jpg';
+                            if (substr_count($postlink, 'http') > 0 )
+                                    $img_arr[$image]['url']  = $postlink . '.jpg';
+                            else {
+                                $img_arr[$image]['url']  = $link . $postlink . '.jpg';
+                            }
                             $image++; 
                         }
              //видео
