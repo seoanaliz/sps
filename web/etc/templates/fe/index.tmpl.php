@@ -33,9 +33,9 @@
             </div>
 
             <div class="wall-title">
-                114 записей
+                <span class="count">&nbsp;</span>
                 <span class="filter">
-                    <a href="#">новые записи</a>
+                    <a href="#" data-type="new">новые записи</a>
                 </span>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
@@ -139,7 +139,7 @@
 
             </div>
 
-            <div class="queue-title">18 запланировано</div>
+            <div class="queue-title">&nbsp;</div>
 
             <div class="items drop" id="queue" style="display: none;">
             </div>

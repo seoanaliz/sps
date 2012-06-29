@@ -93,16 +93,20 @@ $(document).ready(function(){
         addClass: 'wall-title-menu',
         position: 'right',
         data: [
-            {title: 'новые записи'},
-            {title: 'старые записи'},
-            {title: 'лучшие записи'}
+            {title: 'новые записи', type : 'new'},
+            {title: 'старые записи', type : 'old'},
+            {title: 'лучшие записи', type : 'best'}
         ],
+        oncreate: function() {
+
+        },
         onopen: function() {
         },
         onclose: function() {
         },
         onchange: function(item) {
-            $('.wall-title a').text(item.title);
+            $('.wall-title a').text(item.title).data('type', item.type);
+            Events.fire('leftcolumn_sort_type_change', []);
         }
     });
 
