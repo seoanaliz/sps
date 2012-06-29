@@ -1,4 +1,5 @@
 <?
+    $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
     /** @var $articles Article[] */
     /** @var $articleRecords ArticleRecord[] */
     /** @var $sourceFeeds SourceFeed[] */
@@ -10,8 +11,11 @@
             ?>{increal:tmpl://fe/elements/arcticle-item.tmpl.php}<?
         }
     }
+
+    $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension( $articlesCount ));
 ?>
 <script type="text/javascript">
+    $('.wall-title span.count').text('{$articlesCountText}');
     <?
         if (!empty($hasMore)) {
             ?>$("#wallloadmore").removeClass('hidden');<?

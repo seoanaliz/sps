@@ -1,5 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language name="ru">
+    <fe>
+        <common>
+            <records>
+                <declension1><![CDATA[запись]]></declension1>
+                <declension2><![CDATA[записи]]></declension2>
+                <declension5><![CDATA[записей]]></declension5>
+            </records>
+            <planned>
+                <declension1><![CDATA[запланирована]]></declension1>
+                <declension2><![CDATA[запланировано]]></declension2>
+                <declension5><![CDATA[запланировано]]></declension5>
+            </planned>
+        </common>
+    </fe>
     <errors>
         <desc>
             <validation><![CDATA[Ошибки при проверке]]></validation>

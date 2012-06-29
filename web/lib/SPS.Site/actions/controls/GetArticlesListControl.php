@@ -50,6 +50,11 @@
                 $search
             );
 
+            $articlesCount = ArticleFactory::Count(
+                $search
+                , array(BaseFactory::WithoutPages => true)
+            );
+
             if (empty($articles)) {
                 return;
             }
@@ -75,6 +80,7 @@
             Response::setArray( 'articleRecords', $articleRecords );
             Response::setArray( 'sourceFeeds', $sourceFeeds );
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($sourceFeeds) );
+            Response::setInteger( 'articlesCount', $articlesCount );
             Response::setBoolean( 'hasMore', $hasMore );
         }
     }
