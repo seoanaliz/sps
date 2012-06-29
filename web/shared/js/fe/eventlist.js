@@ -96,8 +96,14 @@ function loadQueue() {
             Elements.initLinks();
 
             $('.post.blocked').draggable('disable');
+            renderQueueSize();
         }
     });
+}
+
+function renderQueueSize() {
+    var size = $('div#queue div.post').length;
+    $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
 }
 
 function reloadArticle(id) {
@@ -160,6 +166,7 @@ var Eventlist = {
             },
             success: function (data) {
                 callback(1);
+                renderQueueSize();
             }
         });
     },
