@@ -2,25 +2,28 @@ var articlesLoading = false;
 
 $(function(){
     $( "#slider-range" ).slider({
-    range: true,
-    min: 0,
-    max: 100,
-    values: [ 50, 100 ],
-        slide: function( event, ui ) {
+        range: true,
+        min: 0,
+        max: 100,
+        animate: 100,
+        values: [50, 100],
+        create: function(event, ui) {
             changeRange();
-        }
-        , change: function(event, ui) {
+        },
+        slide: function(event, ui) {
+            changeRange();
+        },
+        change: function(event, ui) {
             changeRange();
             loadArticles(true);
         }
     });
-
-    changeRange();
 });
 
 function changeRange() {
-    $( "#slider-value" ).text( "❤" + $( "#slider-range" ).slider( "values", 0 ) +
-        " - ❤" + $( "#slider-range" ).slider( "values", 1 ) );
+    var top = $("#slider-range").slider("values", 1);
+    $("#slider-range").find('a:first').html($("#slider-range").slider("values", 0));
+    $("#slider-range").find('a:last').html(top == 100 ? 'TOP' : top);
 }
 
 function loadArticles(clean) {
@@ -28,14 +31,7 @@ function loadArticles(clean) {
 
     articlesLoading = true;
 
-    if (clean) {
-        $('div#wall').html('');
-    }
-
-    if (Elements.leftdd().length == 0) {
-        articlesLoading = false;
-        return;
-    }
+    $('#wall-load').show();
 
     if (Elements.leftdd().length != 1) {
         $('.newpost').hide();
@@ -43,10 +39,11 @@ function loadArticles(clean) {
         $('.newpost').show();
     }
 
-    $('div#wall').append('<div style="text-align: center;" id="wall-loader"><img src="' + root + 'shared/images/fe/ajax-loader.gif"></div>');
+    $('div#wall').append('<div style="text-align: center;" id="wall-loader"></div>');
 
     var from = $( "#slider-range" ).slider( "values", 0 );
     var to = $( "#slider-range" ).slider( "values", 1 );
+    var sortType = $('.wall-title a').data('type');
 
     if ($('.type-selector a.active').data('type') == 'ads') {
         from = 0;
@@ -55,23 +52,30 @@ function loadArticles(clean) {
 
     //clean and load left column
     $.ajax({
-        url: controlsRoot + 'arcticles-list/',
-        dataType : "html",
-        data: {
-            sourceFeedIds: Elements.leftdd(),
-            clean: clean,
-            from : from,
-            to : to
-        },
-        success: function (data) {
+            url: controlsRoot + 'arcticles-list/',
+            dataType : "html",
+            data: {
+                sourceFeedIds: Elements.leftdd(),
+                clean: clean,
+                from : from,
+                to : to,
+                sortType : sortType
+            }
+        })
+        .always(function() {
+            $('#wall-load').hide();
+            if (clean) {
+                $('div#wall').empty();
+            }
+        })
+        .done(function(data) {
             $('div#wall div#wall-loader').remove();
             $('div#wall').append(data);
             articlesLoading = false;
             Elements.addEvents();
             Elements.initImages('.post .images');
             Elements.initLinks();
-        }
-    });
+        });
 }
 
 function loadQueue() {
@@ -94,8 +98,14 @@ function loadQueue() {
             Elements.initLinks();
 
             $('.post.blocked').draggable('disable');
+            renderQueueSize();
         }
     });
+}
+
+function renderQueueSize() {
+    var size = $('div#queue div.post').length;
+    $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
 }
 
 function reloadArticle(id) {
@@ -158,6 +168,7 @@ var Eventlist = {
             },
             success: function (data) {
                 callback(1);
+                renderQueueSize();
             }
         });
     },
@@ -266,8 +277,6 @@ var Eventlist = {
     },
 
     post_describe_link: function(link, callback) {
-//        $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
-//        $('div.link-info').show();
         $.ajax({
             url: controlsRoot + 'parse-url/',
             type: 'GET',
@@ -276,8 +285,6 @@ var Eventlist = {
                 url: link
             },
             success: function (data) {
-//                $('div.link-description').html('');
-//                $('div.link-info').hide();
                 callback(data);
             }
         });
@@ -344,8 +351,12 @@ var Eventlist = {
         });
     },
 
+    leftcolumn_sort_type_change: function() {
+        loadArticles(true);
+    },
+
     eof: null
-}
+};
 
 function popupSuccess( message ) {
     $.blockUI({

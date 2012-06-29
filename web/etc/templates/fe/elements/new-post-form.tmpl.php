@@ -1,13 +1,16 @@
 <div class="newpost collapsed bb">
-    <textarea placeholder="Есть чем поделиться?"></textarea>
-    <div class="link-info" style="display: none;">
-        <div class="link-description"><!-- --></div>
-        <div class="link-status"><!-- --></div>
+    <div class="textarea-wrap">
+        <textarea placeholder="Есть чем поделиться?"></textarea>
+        <div class="image-attach"></div>
     </div>
     <div id="attach-file" class="buttons attach-file">
         <div class="save button spr l">Отправить</div>
         <a href="#" class="cancel spr l">Отменить</a>
         <!-- Штука для загрузки файла -->
+    </div>
+    <div class="link-info" style="display: none;">
+        <div class="link-description"><!-- --></div>
+        <div class="link-status"><!-- --></div>
     </div>
     <div class="clear"></div>
 </div>

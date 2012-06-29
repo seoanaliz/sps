@@ -3,15 +3,9 @@
 <div class="layer">
     <div class="left-panel">
         <div class="block">
-            <div class="header bb">
+            <div class="header">
 
-                <select multiple="multiple" id="source-select">
-                    <?
-                        foreach ($sourceFeeds as $sourceFeed) {
-                            ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
-                        }
-                    ?>
-                </select>
+                <div id="wall-load"></div>
 
                 <div class="type-selector">
                     <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
@@ -19,19 +13,30 @@
                     <? } ?>
                 </div>
 
+                <select multiple="multiple" id="source-select">
+                    <?
+                    foreach ($sourceFeeds as $sourceFeed) {
+                        ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
+                    }
+                    ?>
+                </select>
+
                 <!--div class="controls">
                     <div class="ctl spr gear"></div>
                     <div class="ctl spr plus"></div>
                     <div class="ctl spr del"></div>
                 </div -->
 
-                <p style="padding: 5px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-text">
-                    <label>Лайки:</label>
-                    <span id="slider-value"></span>
-                </p>
-                <div style="padding: 10px !important; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
+                <div style="position: absolute; top: 48px; right: 18px; width: 300px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
                     <div id="slider-range"></div>
                 </div>
+            </div>
+
+            <div class="wall-title">
+                <span class="count">&nbsp;</span>
+                <span class="filter">
+                    <a href="javascript:;" data-type="new">новые записи</a>
+                </span>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 
@@ -47,33 +52,67 @@
         <div class="block">
             <div class="header bb">
 
-                <div class="calendar">
-                    <input type="text" id="calendar" value="<?= $currentDate->DefaultDateFormat() ?>"/>
-                    <div class="caption default">Дата</div>
-                    <div class="tip"><b>cal</b></div>
+                <div class="user-info">
+                    <span class="user-photo">
+                        <a target="_blank">
+                            <img width="22px" src="http://app.uxpin.com/u/a/0/9/a09e2c748e10258cd892f11307202c77/e_d7f264dc.jpg" alt="" />
+                        </a>
+                    </span>
+                    <span class="user-name">
+                        <a target="_blank">...</a>
+                    </span>
+<!--                    <span class="counter">11000</span>-->
+<!--                    <span class="counter">68%</span>-->
                 </div>
 
-                <div class="drop-down right-drop-down">
-                    <div class="caption default">Паблик</div>
-                    <div class="tip"><s></s></div>
-                    <ul>
-                        <?
-                        foreach ($targetFeeds as $targetFeed) {
-                            ?><li data-id="{$targetFeed.targetFeedId}" class="<?= $targetFeed->targetFeedId == $currentTargetFeedId ? 'active' : '' ?>">{$targetFeed.title}</li><?
-                        }
-                        ?>
-                    </ul>
-                </div>
+                <div class="filter">
+                    <div class="calendar">
+                        <div class="prev"></div>
+                        <input type="text" id="calendar" value="<?= $currentDate->DefaultDateFormat() ?>"/>
+                        <div class="next"></div>
+                        <div class="caption default">Дата</div>
+                        <div class="tip"></div>
+                    </div>
 
-                <!--div class="controls">
-                    <div class="ctl spr gear"></div>
-                    <div class="ctl spr plus"></div>
-                    <div class="ctl spr del"></div>
-                </div -->
+                    <div id="right-drop-down" class="drop-down right-drop-down">
+                        <div class="caption default">Паблик</div>
+                        <div class="tip"><s></s></div>
+                        <div class="icon"></div>
+                        <script type="text/javascript">
+                                <?
+                                $json = array();
+                                foreach ($targetFeeds as $targetFeed) {
+                                    array_push($json, array(
+                                        'id' => $targetFeed->targetFeedId,
+                                        'title' => $targetFeed->title,
+                                        'icon' => $targetInfo[$targetFeed->targetFeedId]['img'],
+                                        'isActive' => ($targetFeed->targetFeedId == $currentTargetFeedId),
+                                    ));
+                                }
+                                echo 'var rightPanelData = '.json_encode($json);
+                                ?>
+                        </script>
+                    </div>
+
+                    <!--div class="controls">
+                       <div class="ctl spr gear"></div>
+                       <div class="ctl spr plus"></div>
+                       <div class="ctl spr del"></div>
+                   </div -->
+
+                    <!--div class="type-selector">
+                        <a href="#" class="active" data-type="all">Все записи</a>
+                        <a href="#" class="" data-type="content">Контент <span class="counter">8</span></a>
+                        <a href="#" class="" data-type="ads2">Реклама</a>
+                    </div-->
+
+                </div>
 
             </div>
 
-            <div class="items block drop" id="queue" style="display: none;">
+            <div class="queue-title">&nbsp;</div>
+
+            <div class="items drop" id="queue" style="display: none;">
             </div>
         </div>
     </div>

@@ -8,7 +8,7 @@
         ?>
             <div class="slot locked">
                 <div class="time">
-                    <?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->DefaultFormat() : '' ?>
+                    <?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : '' ?>
                     <? if (!empty($articleRecord->link)) { ?>
                     <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
                     <? } ?>

@@ -1,6 +1,7 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
+    // Календарь
     $("#calendar")
         .datepicker (
             {
@@ -11,7 +12,7 @@ $(document).ready(function(){
                 monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 firstDay: 1,
                 showAnim: '',
-                dateFormat: "dd.mm.yy"
+                dateFormat: "d MM"
             }
         )
         .keydown(function(e){
@@ -19,17 +20,44 @@ $(document).ready(function(){
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change', [])
-        })
-        .trigger('change');
-
+            Events.fire('calendar_change', []);
+        });
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });
 
+    // Приведение вида календаря из 22.12.2012 в 22 декабря
+    (function() {
+        var d = $("#calendar").val().split('.');
+        var i = d[1];
+        d[1] = d[0];
+        d[0] = i;
+        var date = d.join('.');
+        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
+    })();
+
+    // Кнопки вперед-назад в календаре
+    (function() {
+        var day = (86000 * 1000);
+
+        $(".calendar .prev").click(function(){
+            var date = $('#calendar').datepicker('getDate').getTime();
+            $("#calendar").datepicker('setDate', new Date(date - day)).trigger('change');
+        });
+        $(".calendar .next").click(function(){
+            var date = $('#calendar').datepicker('getDate').getTime();
+            $("#calendar").datepicker('setDate', new Date(date + day * 2)).trigger('change');
+        });
+    })();
+
+    // Left menu multiselect
     $("#source-select").multiselect({
+        minWidth: 250,
         height: 250,
-        noneSelectedText: 'Источник',
+        checkAllText: 'Выделить все',
+        uncheckAllText: 'Сбросить',
+        noneSelectedText: '<span class="gray">Источник не выбран</span>',
+        selectedText: '<span class="counter">#</span> выбрано',
         checkAll: function(){
             Events.fire('leftcolumn_dropdown_change', []);
         },
@@ -41,35 +69,81 @@ $(document).ready(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
-    $(".drop-down").click(function(e){
-        e.stopPropagation();
-        $(document).click();
-        var elem = $(this);
-        var hidethis = function(){
-            elem.removeClass("expanded");
-            $(document).unbind("click", hidethis);
-            elem.find("li").unbind("click", click_li);
-        };
-        var click_li = function(e){
-            e.stopPropagation();
-            elem.dd_sel($(this).data("id"));
-            hidethis();
-        };
-        $(document).bind("click", hidethis);
-        elem.find("li").click(click_li);
-        elem.addClass("expanded");
+    // right dropdown
+    $("#right-drop-down").dropdown({
+        data: rightPanelData,
+        type: 'checkbox',
+        addClass: 'right',
+        onchange: function(item) {
+            $(this)
+                .data('selected', item.id)
+                .find('.caption').text(item.title);
+            if (item.icon) {
+                var icon = $(this).find('.icon img');
+                if (!icon.length) {
+                    icon = $('<img src="' + item.icon + '"/>').appendTo($(this).find('.icon'))
+                }
+                icon.attr('src', item.icon);
+            }
+            Events.fire('rightcolumn_dropdown_change', []);
+        },
+        oncreate: function() {
+            $(this).find('.default').removeClass('default');
+            Elements.rightdd($("#right-drop-down").data('menu').find('.ui-dropdown-menu-item.active').data('id'));
+        }
     });
+
+    //Dropdowns
+//    $(".drop-down").click(function(e){
+//        e.stopPropagation();
+//        $(document).click();
+//        var elem = $(this);
+//        var hidethis = function(){
+//            elem.removeClass("expanded");
+//            $(document).unbind("click", hidethis);
+//            elem.find("li").unbind("click", click_li);
+//        };
+//        var click_li = function(e){
+//            e.stopPropagation();
+//            elem.dd_sel($(this).data("id"));
+//            hidethis();
+//        };
+//        $(document).bind("click", hidethis);
+//        elem.find("li").click(click_li);
+//        elem.addClass("expanded");
+//    });
 
     $(".left-panel .drop-down").change(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
-    $(".right-panel .drop-down").change(function(){
-        Events.fire('rightcolumn_dropdown_change', []);
+
+    $('.wall-title a').dropdown({
+        width: 'auto',
+        addClass: 'wall-title-menu',
+        position: 'right',
+        data: [
+            {title: 'новые записи', type : 'new'},
+            {title: 'старые записи', type : 'old'},
+            {title: 'лучшие записи', type : 'best'}
+        ],
+        oncreate: function() {
+
+        },
+        onopen: function() {
+        },
+        onclose: function() {
+        },
+        onchange: function(item) {
+            $('.wall-title a').text(item.title).data('type', item.type);
+            Events.fire('leftcolumn_sort_type_change', []);
+        }
     });
-    $(".type-selector a").click(function(e){
+
+    // Вкладки "Источники", "Реклама" в левон меню
+    $(".left-panel .type-selector a").click(function(e){
         e.preventDefault();
 
-        $(".type-selector a").removeClass('active');
+        $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
         if ($(this).data('type') == 'ads') {
@@ -83,10 +157,12 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
+    // Wall init
     $(".wall")
         .delegate(".post .delete", "click", function(){
             var elem = $(this).closest(".post"),
-                pid = elem.data("id");
+                pid = elem.data("id"),
+                gid = elem.data('group');
             Events.fire('leftcolumn_deletepost', [pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
@@ -95,12 +171,25 @@ $(document).ready(function(){
                         $('#' + deleteMessageId).show();
                     } else {
                         // иначе добавляем
-                        elem.before($('<div id="' + deleteMessageId + '" class="post deleted-post" data-id="' + pid + '">Пост удален. <a href="javascript:;" class="recover">Восстановить.</a></div>'));
+                        elem.before($(
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                                'Пост удален. <a href="javascript:;" class="recover">Восстановить</a><br/>' +
+                                '<span class="button ignore">Не показывать новости сообщества</span>' +
+                            '</div>'
+                        ));
                     }
 
                     elem.hide();
                 }
             }]);
+        })
+        .delegate('.post .ignore', 'click', function() {
+            var elem = $(this).closest(".post"),
+                gid = elem.data("group");
+            var $menu = $("#source-select").multiselect('widget');
+            $menu.find('[value=' + gid + ']:checkbox').each(function() {
+                this.click();
+            });
         })
         .delegate('.post .recover', 'click', function() {
             var elem = $(this).closest(".post"),
@@ -112,6 +201,7 @@ $(document).ready(function(){
             }]);
         });
 
+    // Удание постов правом меню
     $(".items").delegate(".slot .post .delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
@@ -125,6 +215,7 @@ $(document).ready(function(){
         }]);
     });
 
+    // Загрузка стены по клику
     $("#wallloadmore").click(function(){
         var b = $(this);
         if(b.hasClass("disabled")) { return; }
@@ -137,6 +228,7 @@ $(document).ready(function(){
         });
     });
 
+    // Очистка текста
     $(".left-panel").delegate(".clear-text", "click", function(){
         var id = $(this).closest(".post").data("id");
         var post = $(this).closest(".post");
@@ -152,16 +244,7 @@ $(document).ready(function(){
         }
     });
 
-    //init first source and target
-    var currentTarget = $(".right-panel .drop-down ul li.active");
-    if (currentTarget.length == 0) {
-        currentTarget = $(".right-panel .drop-down ul :first-child");
-    }
-
-    if (currentTarget.length > 0) {
-        Elements.rightdd(currentTarget.data("id"));
-    }
-
+    // Устарело?
     (function(){
         var addInput = function(elem, defaultvalue, id){
             var input = $("<input/>");
@@ -231,34 +314,11 @@ $(document).ready(function(){
         var w = $(window),
             b = $("#wallloadmore");
         w.scroll(function(){
-            if(w.scrollTop() > (b.offset().top - w.outerHeight(true))) {
+            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
                 b.click();
             }
         });
     })();
-
-    // Автовысота у textarea
-    function autoResize(input) {
-        if (!input.autoResize) {
-            input.autoResize = $('<div/>')
-                .appendTo('body')
-                .css({
-                    width: input.width(),
-                    minHeight: input.height(),
-                    padding: input.css('padding'),
-                    lineHeight: input.css('line-height'),
-                    font: input.css('font'),
-                    fontSize: input.css('font-size'),
-                    position: 'absolute',
-                    wordWrap: 'break-word',
-                    top: -10000
-                });
-        }
-        input.autoResize.html(input.val().split('\n').join('<br/>$nbsp;'));
-        input.css({
-            height: input.autoResize.height() + 15
-        });
-    }
 
     // Добавление записи в борд
     (function(){
@@ -283,11 +343,11 @@ $(document).ready(function(){
                     parseUrl(input.val());
                 }, 10);
             })
+            .autoResize()
             .keyup(function (e) {
                 if (e.ctrlKey && e.keyCode == 13) {
                     form.find('.save').click();
                 }
-                autoResize(input);
             }).keyup()
         ;
 
@@ -552,33 +612,43 @@ $(document).ready(function(){
         };
 
         form.delegate(".save", "click" ,function(e){
+            var link = $linkStatus.find('a').attr('href');
             var photos = new Array();
-            $('.qq-upload-success').each(function(){
+            $('.newpost .qq-upload-success').each(function(){
                 var photo = new Object();
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
                 photos.push(photo);
             });
-            form.addClass("spinner");
-            Events.fire("post", [
-                input.val(),
-                photos,
-                $linkStatus.find('a').attr('href'),
-                input.data("id"),
-                function(state){
-                    if(state) {
-                        clearForm();
-                        stop();
+            if (!($.trim(input.val() || photos.length || link))) {
+                return input.focus();
+            } else {
+                form.addClass("spinner");
+                Events.fire("post", [
+                    input.val(),
+                    photos,
+                    link,
+                    input.data("id"),
+                    function(state){
+                        if(state) {
+                            clearForm();
+                            stop();
+                        }
+                        form.removeClass("spinner");
+                        input.blur();
                     }
-                    form.removeClass("spinner");
-                }
-            ]);
+                ]);
+            }
         });
         form.delegate(".cancel", "click" ,function(e){
             clearForm();
             input.val('').blur();
             form.addClass('collapsed');
             e.preventDefault();
+        });
+        form.delegate(".image-attach", "click" ,function(e){
+            input.focus();
+            $('.newpost .qq-upload-button').trigger('focus');
         });
 
         // Редактирование поста в левом меню
@@ -798,17 +868,17 @@ $(document).ready(function(){
                                 photo.filename = $(this).find('input:hidden').val();
                                 photos.push(photo);
                             });
-                            Events.fire("post", [
-                                text,
-                                photos,
-                                link,
-                                postId,
-                                function(data) {
-//                                    $post.draggable('enable').removeClass('editable');
-//                                    $buttonPanel.show();
-//                                    $edit.remove();
-                                }
-                            ]);
+                            if (!($.trim(text) || link || photos.length)) {
+                                return $text.focus();
+                            } else {
+                                Events.fire("post", [
+                                    text,
+                                    photos,
+                                    link,
+                                    postId,
+                                    function(data) {}
+                                ]);
+                            }
                         };
                         var onCancel = function() {
                             $post.find('> .content').draggable('enable');
@@ -833,12 +903,11 @@ $(document).ready(function(){
                                     }, 0);
                                 })
                                 .bind('keyup', function(e) {
-                                    autoResize($text);
-
                                     if (e.ctrlKey && e.keyCode == 13) {
                                         onSave();
                                     }
                                 })
+                                .autoResize()
                                 .keyup().focus();
                             setCaretToPos($text.get(0), text.length);
                         }
@@ -862,6 +931,7 @@ $(document).ready(function(){
         });
     })();
 
+    // Показать полностью в левом меню
     $(".left-panel").delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
             $shortcut = $content.find('.shortcut'),
@@ -874,10 +944,12 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    // Показать полностью в правом меню
     $(".right-panel").delegate(".toggle-text", "click", function(e) {
         $(this).parent().toggleClass('collapsed');
     });
 
+    // Кнопка "наверх"
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {
@@ -892,6 +964,36 @@ $(document).ready(function(){
         });
     })(window);
 
+    // Подгрузка имени и аватара
+    (function() {
+        VK.init({
+            apiId: vk_appId,
+            nameTransportPath: '/xd_receiver.htm'
+        });
+        getInitData();
+
+        function getInitData() {
+            var code;
+            code = 'return {';
+            code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
+            code += '};';
+            VK.Api.call('execute', {'code': code}, onGetInitData);
+        }
+        function onGetInitData(data) {
+            var r;
+            if (data.response) {
+                r = data.response;
+                if (r.me) {
+                    var $userInfo = $('.user-info');
+                    $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
+                    $('a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
+                    $('.user-photo img', $userInfo).attr('src', r.me.photo);
+                }
+            }
+        }
+    })();
+
+    // ===
     Elements.addEvents();
 });
 
@@ -927,38 +1029,46 @@ var Events = {
     }
 };
 
+// Image composition
 (function($) {
     $.fn.imageComposition = function(hardPosition) {
         return this.each(function() {
+            var CLASS_LOADING = 'image-compositing';
+            var VER = 'ver', HOR = 'hor';
+            hardPosition == 'right' ? VER : (hardPosition == 'bottom' ? HOR : false);
+
+            var position = hardPosition;
             var $wrap = $(this);
             var $images = $wrap.find('img');
             var num = $images.length;
-            var border = 0; //Забил, из-за него все едет.
+            var imagesPerColumn = 5;
             var wrap = {
                 el: $wrap,
-                width: $wrap.width(), //510
-                height: $wrap.height(), //310
+                width: 0,
+                height: 0,
+                maxWidth: $wrap.width(),
+                maxHeight: $wrap.height(),
                 type: ''
             };
-            var VER = 'ver',
-                HOR = 'hor';
 
+            $wrap.addClass(CLASS_LOADING);
             $images.each(function(i, image) {
                 var $img = $(image);
-                if ($img.width()) return onLoadImages();
-                $img.bind('load', function() {
+
+                var img = new Image();
+                img.src = $img.attr('src');
+                img.onload = function() {
                     if (i == num - 1) {
                         return onLoadImages();
                     }
-                });
+                };
             });
 
             // ======================== //
             function isHor($image) {
                 var w = $image.width();
                 var h = $image.height();
-                var isH = !!(w / h > 1.1);
-                return (hardPosition == 'right') ? false : (hardPosition == 'bottom') ? true : isH;
+                return !!(w / h > 1.1);
             }
 
             function isVer($image) {
@@ -980,28 +1090,41 @@ var Events = {
                 var $firstImage;
                 var columns = [];
 
+                if ((num - 1) % imagesPerColumn == 1) {
+                    imagesPerColumn++;
+                } else if ((num - 1) % imagesPerColumn == 2) {
+                    imagesPerColumn--;
+                }
+                if (num == 2 && !hardPosition) {
+                    position = VER;
+                    wrap.width = wrap.maxWidth;
+                    $firstImage = $wrap;
+                }
+
                 $images.each(function(i) {
                     var $image = $(this);
 
                     if (i == 0) {
                         $firstImage = $image;
-                        if (isHor($firstImage)) {
-                            $firstImage.width(Math.min(wrap.width, $firstImage.width()));
+                        if (!position && isHor($firstImage)) {
+                            position = HOR;
+                            $firstImage.width(Math.min(wrap.maxWidth, $firstImage.width()));
                             wrap.width = $firstImage.width();
-                            $wrap.width(wrap.width + border);
+                            $wrap.width(wrap.width);
                         } else {
-                            $firstImage.height(Math.min(wrap.height, $firstImage.height()));
+                            position = VER;
+                            $firstImage.height(Math.min(wrap.maxHeight, $firstImage.height()));
                             wrap.height = $firstImage.height();
-                            $wrap.height(wrap.height + border);
+                            $wrap.height(wrap.height);
                         }
                     } else {
-                        var columnIndex = Math.floor((i - 1) / (isHor($firstImage) ? 4 : 99));
+                        var columnIndex = Math.floor((i - 1) / (position == HOR ? imagesPerColumn : 99));
                         if (!columns[columnIndex]) columns[columnIndex] = {};
 
                         var column = columns[columnIndex];
                         if (!column.images) column.images = [];
                         if (!column.columnHeight) column.columnHeight = 99999;
-                        if (isHor($firstImage)) {
+                        if (position == HOR) {
                             column.columnHeight = Math.min(column.columnHeight, $image.height());
                         } else {
                             column.columnHeight = Math.min(column.columnHeight, $image.width());
@@ -1013,7 +1136,7 @@ var Events = {
                 $(columns).each(function(columnIndex, column) {
                     $(column.images).each(function(imageIndex, $image) {
                         if (!column.columnWidth) column.columnWidth = 0;
-                        if (isHor($firstImage)) {
+                        if (position == HOR) {
                             $image.height(column.columnHeight);
                             column.columnWidth += $image.width();
                         } else {
@@ -1028,7 +1151,7 @@ var Events = {
                     var coef = 0;
                     var columnHeight = 0;
 
-                    if (isHor($firstImage)) {
+                    if (position == HOR) {
                         coef = wrap.width / column.columnWidth;
                     } else {
                         coef = wrap.height / column.columnWidth;
@@ -1036,40 +1159,258 @@ var Events = {
 
                     $(column.images).each(function(imageIndex, $image) {
                         var s = {};
-                        if (isHor($firstImage)) {
+                        if (position == HOR) {
                             s = relativeResize(
                                 {
                                     'width': $image.width(),
                                     'height': $image.height()
                                 },
-                                'width', ($image.width() * coef - (border / (num - 1) * (num - 2))));
+                                'width', ($image.width() * coef));
 
                             $image.width(s['width']);
                             $image.height(s['height']);
-                            columnHeight = s['height'] + border;
+                            columnHeight = s['height'];
                         } else {
                             s = relativeResize(
                                 {
                                     'width': $image.width(),
                                     'height': $image.height()
                                 },
-                                'height', ($image.height() * coef - border));
+                                'height', ($image.height() * coef));
 
                             $image.width(s['width']);
                             $image.height(s['height']);
-                            columnHeight = s['width'] + border;
+                            columnHeight = s['width'];
                         }
                     });
                     columnsHeight += columnHeight;
                 });
 
-                if (isHor($firstImage)) {
-                    $wrap.height($firstImage.height() + columnsHeight);
+                var coef;
+                if (position == HOR) {
+                    wrap.height = $firstImage.height() + columnsHeight;
+
+                    if (wrap.height > wrap.maxHeight) {
+                        coef = wrap.maxHeight / wrap.height;
+
+                        $images.each(function(i) {
+                            var $image = $(this);
+                            var size = relativeResize(
+                                {
+                                    'width': $image.width(),
+                                    'height': $image.height()
+                                },
+                                'height', ($image.height() * coef));
+                            $image.width(size['width']);
+                            $image.height(size['height']);
+                        });
+                        wrap.width *= coef;
+                        wrap.height *= coef;
+                    }
                 } else {
-                    $wrap.width($firstImage.width() + columnsHeight);
+                    wrap.width = $firstImage.width() + columnsHeight;
+
+                    if (wrap.width > wrap.maxWidth) {
+                        coef = wrap.maxWidth / wrap.width;
+
+                        $images.each(function(i) {
+                            var $image = $(this);
+                            var size = relativeResize(
+                                {
+                                    'width': $image.width(),
+                                    'height': $image.height()
+                                },
+                                'width', ($image.width() * coef));
+                            $image.width(size['width']);
+                            $image.height(size['height']);
+                        });
+                        wrap.width *= coef;
+                        wrap.height *= coef;
+                    }
                 }
+
+                $wrap.width(wrap.width);
+                $wrap.height(wrap.height);
+                $wrap.removeClass(CLASS_LOADING);
             }
         });
+    };
+})(jQuery);
+
+// Автовысота у textarea
+(function($) {
+    $.fn.autoResize = function() {
+        return this.each(function() {
+            var $input = $(this);
+            if (!$input._autoResize) {
+                $input
+                    ._autoResize = $('<div/>')
+                    .appendTo('body')
+                    .css({
+                        width: $input.width(),
+                        minHeight: $input.height() - ($input.css('padding-top') + $input.css('padding-bottom')),
+                        padding: $input.css('padding'),
+                        lineHeight: $input.css('line-height'),
+                        font: $input.css('font'),
+                        fontSize: $input.css('font-size'),
+                        position: 'absolute',
+                        wordWrap: 'break-word',
+                        top: -100000
+                    });
+                $input.bind('keyup blur', function(e) {
+                    $input._autoResize.html($input.val().split('\n').join('<br/> '));
+                    $input.css({
+                        height: $input._autoResize.height() + 10
+                    });
+                });
+            }
+        });
+    };
+})(jQuery);
+
+// Дропдауны
+(function($) {
+    var CLASS_ACTIVE = 'active';
+    var CLASS_MENU = 'ui-dropdown-menu';
+    var CLASS_MENU_ITEM = 'ui-dropdown-menu-item';
+    var CLASS_MENU_ITEM_ACTIVE = 'active';
+    var CLASS_MENU_ICON = 'icon';
+    var CLASS_MENU_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ICON_RIGHT = 'icon-right';
+    var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
+
+    var methods = {
+        init: function(parameters) {
+            return this.each(function() {
+                var defaults = {
+                    el: $(this),
+                    type: 'normal',
+                    width: '',
+                    addClass: '',
+                    position: 'left',
+                    iconPosition: 'left',
+                    openEvent: 'mousedown',
+                    closeEvent: 'click', // Not use
+                    data: [{}],
+                    onchange: function() {},
+                    oncreate: function() {},
+                    onopen: function() {},
+                    onclose: function() {}
+                };
+                var t = this;
+                var p = t.p = $.extend(defaults, parameters);
+                var $el = p.el;
+
+                if ($el.data('menu') || !p.data) return false;
+
+                $el.data('menu', $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
+                $(p.data).each(function(i, item) {
+                    var $item = $('<div data-id="' + item.id + '">' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
+                    if (item.icon) {
+                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                        $item.append($icon);
+                        if (p.iconPosition == 'left') {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_LEFT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_LEFT);
+                        } else {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_RIGHT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_RIGHT);
+                        }
+                    }
+                    if (item.isActive) {
+                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                    }
+                    $item.mouseup(function() {
+                        if (p.type == 'checkbox') {
+                            $el.data('menu').find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
+                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                        }
+                        close();
+                        run(p.onchange, $el, item);
+                    });
+                    $el.data('menu').append($item);
+                });
+
+                $el.bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                    if (!$el.data('menu').is(':visible')) {
+                        $('html, body').trigger(p.openEvent);
+                        open();
+                    } else {
+                        close();
+                    }
+                });
+
+                $el.data('menu').bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                });
+
+                $('html, body').bind(p.openEvent, function(e) {
+                    close();
+                    run(p.onclose, $el, $el.data('menu'));
+                });
+
+                function open() {
+                    $el.addClass(CLASS_ACTIVE);
+                    $el.data('menu').css({
+                        width: p.width || $el.width()
+                    });
+
+                    var $menu = $el.data('menu');
+                    var isFixed = !!($menu.css('position') == 'fixed');
+                    var offset = $el.offset();
+                    var offsetTop = offset.top;
+                    var offsetLeft = offset.left
+                        + parseFloat($menu.css('margin-left'))
+                        - parseFloat($menu.css('margin-right'));
+                    if (p.position == 'right') {
+                        offsetLeft += ($el.width() - $menu.width())
+                    }
+                    if (isFixed) {
+                        offsetTop -= $(document).scrollTop();
+                        offsetLeft -= $(document).scrollLeft();
+                    }
+
+                    $menu.css({
+                        top: offsetTop + $el.outerHeight(),
+                        left: offsetLeft
+                    }).show();
+                    run(p.onopen, $el, $el.data('menu'));
+                }
+
+                function close() {
+                    $el.removeClass(CLASS_ACTIVE);
+                    $el.data('menu').hide();
+                    run(p.onclose, $el, $el.data('menu'));
+                }
+
+                run(p.oncreate, $el);
+            });
+
+            function run(f, context, argument) {
+                if ($.isFunction(f)) {
+                    f.call(context, argument);
+                }
+            }
+        },
+
+        menu: function() {
+            return this.each(function() {
+                return 123;
+//                return $(this).data('menu');
+            });
+        }
+    };
+
+    $.fn.dropdown = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || ! method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
+        }
     };
 })(jQuery);
 
@@ -1108,6 +1449,20 @@ var Elements = {
             img.src = src;
         });
 
+        $(".left-panel .timestamp").easydate({
+            date_parse: function(date) {
+                if (!date) return;
+                var d = date.split('.');
+                var i = d[1];
+                d[1] = d[0];
+                d[0] = i;
+                var date = d.join('.');
+                return Date.parse(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
         $('.left-panel .images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
@@ -1180,15 +1535,15 @@ var Elements = {
         })();
     },
     leftdd: function(){
-        return $("select").multiselect("getChecked").map(function(){
+        return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
     },
     rightdd:function(value){
-        if(typeof value == 'undefined') {
-            return $(".right-panel .drop-down").data("selected");
+        if (typeof value == 'undefined') {
+            return $("#right-drop-down").data("selected");
         } else {
-            $(".right-panel .drop-down").dd_sel(value);
+            $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
     },
     calendar: function(value){
