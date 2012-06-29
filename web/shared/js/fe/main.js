@@ -22,6 +22,7 @@ $(document).ready(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
             Events.fire('calendar_change', []);
         });
+
     $(".calendar .tip").click(function(){
         $(this).closest(".calendar").find("input").focus();
     });
@@ -960,7 +961,6 @@ $(document).ready(function(){
             if (data.response) {
                 r = data.response;
                 if (r.me) {
-                    console.log(r.me);
                     var $userInfo = $('.user-info');
                     $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
                     $('a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
@@ -1520,7 +1520,6 @@ var Elements = {
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
-            console.log(value);
             $(".right-panel .drop-down").dd_sel(value);
         }
     },
