@@ -35,9 +35,11 @@
                 'pageSize' => $pageSize + 1,
                 'page' => $page,
             );
+            $options = array();
 
             $from = Request::getInteger( 'from' );
             $to = Request::getInteger( 'to' );
+            $sortType = Request::getString( 'sortType' );
 
             if ($from !== null) {
                 $search['rateGE'] = $from;
@@ -45,15 +47,14 @@
             if ($to !== null && $to < 100) {
                 $search['rateLE'] = $to;
             }
+            if ($sortType == 'old') {
+                $options[BaseFactory::OrderBy] = ' "createdAt" ASC, "articleId" ASC ';
+            } else if ($sortType == 'best') {
+                $options[BaseFactory::OrderBy] = ' "rate" ASC, "articleId" DESC ';
+            }
 
-            $articles = ArticleFactory::Get(
-                $search
-            );
-
-            $articlesCount = ArticleFactory::Count(
-                $search
-                , array(BaseFactory::WithoutPages => true)
-            );
+            $articles = ArticleFactory::Get( $search, $options );
+            $articlesCount = ArticleFactory::Count( $search, array(BaseFactory::WithoutPages => true) );
 
             if (empty($articles)) {
                 return;

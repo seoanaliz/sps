@@ -43,6 +43,7 @@ function loadArticles(clean) {
 
     var from = $( "#slider-range" ).slider( "values", 0 );
     var to = $( "#slider-range" ).slider( "values", 1 );
+    var sortType = $('.wall-title a').data('type');
 
     if ($('.type-selector a.active').data('type') == 'ads') {
         from = 0;
@@ -57,7 +58,8 @@ function loadArticles(clean) {
                 sourceFeedIds: Elements.leftdd(),
                 clean: clean,
                 from : from,
-                to : to
+                to : to,
+                sortType : sortType
             }
         })
         .always(function() {
@@ -347,6 +349,10 @@ var Eventlist = {
                 }
             }
         });
+    },
+
+    leftcolumn_sort_type_change: function() {
+        loadArticles(true);
     },
 
     eof: null
