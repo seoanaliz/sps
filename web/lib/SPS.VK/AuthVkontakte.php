@@ -64,8 +64,8 @@
          * Производит разлогинивание
          */
         public static function Logout() {
-            // Заменяем куку от ВКонтакте на пустую
-            setcookie('vk_app_' . self::$AppId, '', 0, "/", '.'.$_SERVER['HTTP_HOST']);
+            Cookie::setCookie(  'vk_app_' . self::$AppId,    "", time() - 1024, '/' );
+            Cookie::setCookie(  'vk_app_trust' . self::$AppId, "", time() - 1024, '/' );
         }
     }
 ?>
