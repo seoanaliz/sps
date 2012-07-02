@@ -50,9 +50,9 @@
             $url = trim($url, '/');
             $short_name = end(explode('/',$url));
 
-            if (substr_count($a, 'profile_avatar')> 0){
-                if (!preg_match('/user_id":(.*?),/', $a, $oid));
-                preg_match('/"loc":"\?id=(.*?)"/', $a, $oid);
+            if (substr_count($a, 'profile_avatar')> 0) {
+                if (!preg_match('/user_id":(.*?),/', $a, $oid))
+                    preg_match('/"loc":"\?id=(.*?)"/', $a, $oid);
                 preg_match('/profile_avatar".*? src="(.*?)"/', $a, $ava);
                 if (substr_count($ava[1], 'png') > 0 || substr_count($ava[1], 'gif') > 0) $ava = 'standard';
                 else $ava = $ava[1];
@@ -70,7 +70,7 @@
                     'short_name' =>     $short_name
                 );
 
-            } elseif(substr_count($a, 'public_avatar')> 0 || substr_count($a, 'group_avatar')> 0){
+            } elseif(substr_count($a, 'public_avatar')> 0 || substr_count($a, 'group_avatar')> 0) {
                 if (substr_count($a, 'public_avatar')> 0 )
                     $type = 'public';
                 else
