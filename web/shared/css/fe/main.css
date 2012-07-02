@@ -1012,3 +1012,7 @@ i {font-style: italic;}
     z-index: 1;
     visibility: visible !important;
 }
+
+.ui-draggable {
+    cursor: move;
+}

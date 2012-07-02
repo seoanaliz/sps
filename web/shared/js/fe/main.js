@@ -1510,27 +1510,14 @@ var Elements = {
                 hoverClass: "ui-state-hover",
 
                 drop: function(e, ui) {
-                    var target = $(this),
-                        post = $(ui.draggable).closest('.post'),
-                        slot = post.closest('.slot'),
-                        helper = $(ui.helper);
+                    var $target = $(this),
+                        $post = $(ui.draggable).closest('.post'),
+                        $slot = $post.closest('.slot'),
+                        $helper = $(ui.helper);
 
-                    if (target.hasClass('empty')) {
-                        dragdrop(post.data("id"), target.data("id"), post.data("queue-id"), function(newId){
-                            if (post.hasClass('movable')) {
-                                target.html(post);
-                            } else {
-                                var copy = post.clone();
-                                copy.addClass("dragged");
-                                target.html(copy);
-                                copy.draggable(draggableParams);
-                            }
-                            slot.addClass('empty');
-                            target.removeClass('empty');
-
-                            target.find('.post').data("id", newId).data("queue-id", newId);
-                        },function(){
-
+                    if ($target.hasClass('empty')) {
+                        dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
+                            $target.addClass('image-compositing');
                         });
                     }
                 }
