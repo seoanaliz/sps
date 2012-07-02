@@ -67,7 +67,7 @@
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
             </pageGroup>
-			
+
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
                     <template>tmpl://vt/login.tmpl.php</template>
@@ -77,7 +77,7 @@
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
-				
+
                 <pageGroup name="SPS.Common">
                     <pageGroup name="siteParam">
                         <page uri="vt://site-params/">
@@ -270,7 +270,7 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-				
+
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -316,14 +316,17 @@
                 <page uri="daemons://sync-top/">
                     <actions>SPS.Site.SyncTop</actions>
                 </page>
+                <page uri="daemons://sync-userpics/">
+                    <actions>SPS.Site.SyncUserpics</actions>
+                </page>
                 <page uri="daemons://wr-topics/">
-                    <actions>SPS.Stat.WrPoints</actions>
+                    <actions>SPS.Site.WrTopics</actions>
                 </page>
                 <page uri="daemons://wr-posts/">
-                    <actions>SPS.Stat.WrPosts</actions>
+                    <actions>SPS.Site.WrPosts</actions>
                 </page>
                 <page uri="daemons://wr-points/">
-                    <actions>SPS.Stat.WrTopics</actions>
+                    <actions>SPS.Site.WrPoints</actions>
                 </page>
             </pageGroup>
 
