@@ -16,15 +16,15 @@
         "minute": "минуту",
         "minutes": "мин",
         "hour": "час",
-        "hours": "ч",
+        "hours": ["час", "часа", "часов"],
         "day": "день",
-        "days": "д",
+        "days": ["день", "дня", "дней"],
         "week": "неделю",
-        "weeks": "нед",
+        "weeks": ["неделю", "недели", "недель"],
         "month": "месяц",
         "months": "мес",
         "year": "год",
-        "years": "г",
+        "years": ["год", "года", "лет"],
         "yesterday": "вчера",
         "tomorrow": "завтра",
         "now": "только что",
@@ -99,9 +99,22 @@
 
     function __(str, value, settings)
     {
-        if(!isNaN(value) && value != 1)
+        function a(number, titles) {
+            var cases = [2, 0, 1, 1, 1, 2];
+            return titles[(number%100 > 4 && number%100 < 20)? 2 : cases[(number%10 < 5) ? number%10 : 5]];
+        }
+
+        var result;
+        if (!isNaN(value) && value != 1) {
             str = str + "s";
-        return settings.locale[str] || str;
+        }
+        result = settings.locale[str] || str;
+
+        if (typeof result === 'object') {
+            result = a(value, result);
+        }
+
+        return result;
     }
 
     // Pauses live updates of elements matching the given selector. If the
