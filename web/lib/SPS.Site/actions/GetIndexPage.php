@@ -22,9 +22,6 @@
                 $currentTargetFeedId = null;
             }
 
-            Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
-            Response::setArray('currentSourceFeedIds', Session::getArray('currentSourceFeedIds'));
-
             $currentSourceType = Session::getString('currentSourceType');
             if (empty($currentSourceType) || empty(SourceFeedUtility::$Types[$currentSourceType])) {
                 $currentSourceType = SourceFeedUtility::Source;
@@ -38,8 +35,6 @@
                 array('_targetFeedId' => AccessUtility::GetTargetFeedIds())
                 , array( BaseFactory::WithoutPages => true )
             );
-            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
-            Response::setArray( "targetFeeds", $targetFeeds );
 
             if (empty($currentTargetFeedId)) {
                 //пытаемся получить источники для первого паблика
@@ -54,7 +49,6 @@
                 array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($currentTargetFeedId))
                 , array( BaseFactory::WithoutPages => true )
             );
-            Response::setArray( "sourceFeeds", $sourceFeeds );
 
             $currentTimestamp = Session::getInteger('currentTimestamp');
             if (empty($currentTimestamp)) {
@@ -62,6 +56,12 @@
             } else {
                 $currentDate = new DateTimeWrapper(date('d.m.Y', $currentTimestamp));
             }
+
+            Response::setArray( "sourceFeeds", $sourceFeeds );
+            Response::setArray('currentSourceFeedIds', Session::getArray('currentSourceFeedIds'));
+            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
+            Response::setArray( "targetFeeds", $targetFeeds );
+            Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
             Response::setParameter('currentDate', $currentDate);
         }
     }
