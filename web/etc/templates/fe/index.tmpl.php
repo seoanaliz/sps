@@ -55,11 +55,11 @@
                 <div class="user-info">
                     <span class="user-photo">
                         <a target="_blank">
-                            <img width="22px" src="http://app.uxpin.com/u/a/0/9/a09e2c748e10258cd892f11307202c77/e_d7f264dc.jpg" alt="" />
+                            <img width="22px" src="" alt="" />
                         </a>
                     </span>
                     <span class="user-name">
-                        <a target="_blank">...</a>
+                        <a target="_blank"></a>
                     </span>
 <!--                    <span class="counter">11000</span>-->
 <!--                    <span class="counter">68%</span>-->

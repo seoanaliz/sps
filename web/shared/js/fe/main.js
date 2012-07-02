@@ -57,7 +57,10 @@ $(document).ready(function(){
         checkAllText: 'Выделить все',
         uncheckAllText: 'Сбросить',
         noneSelectedText: '<span class="gray">Источник не выбран</span>',
-        selectedText: '<span class="counter">#</span> выбрано',
+        selectedText: function(i) {
+            return '<span class="counter">' + i + '</span> '
+                + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
+        },
         checkAll: function(){
             Events.fire('leftcolumn_dropdown_change', []);
         },
@@ -1232,8 +1235,8 @@ var Events = {
                     }
                 }
 
-                $wrap.width(wrap.width);
-                $wrap.height(wrap.height);
+                $wrap.width(wrap.width + 2);
+                $wrap.height(wrap.height + 2);
                 $wrap.removeClass(CLASS_LOADING);
             }
         });
