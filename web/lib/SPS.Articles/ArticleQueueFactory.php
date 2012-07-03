@@ -49,6 +49,12 @@
                     'name'          => 'sentAt'
                     , 'type'        => TYPE_DATETIME
                 )
+                ,'type' => array(
+                    'name'          => 'type'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 10
+                    , 'nullable'    => 'CheckEmpty'
+                )
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER

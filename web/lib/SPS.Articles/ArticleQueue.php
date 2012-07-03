@@ -27,6 +27,9 @@
         /** @var DateTimeWrapper */
         public $sentAt;
 
+        /** @var string */
+        public $type;
+
         /** @var int */
         public $articleId;
 

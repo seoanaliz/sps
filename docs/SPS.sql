@@ -174,6 +174,7 @@ Create table "articleQueues"
 	"endDate" Timestamp NOT NULL,
 	"createdAt" Timestamp NOT NULL,
 	"sentAt" Timestamp,
+	"type" Varchar(10) NOT NULL Default 'content',
 	"articleId" Integer NOT NULL,
 	"targetFeedId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,

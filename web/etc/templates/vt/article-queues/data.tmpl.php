@@ -29,6 +29,10 @@
             <label>{lang:vt.articleQueue.articleId}</label>
             <?= FormHelper::FormInput( $prefix . '[articleId]', $object->articleId, 'articleId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="type" class="row required">
+            <label>{lang:vt.sourceFeed.type}</label>
+            <?= FormHelper::FormSelect( $prefix . '[type]', GridLineUtility::$Types, "", "", $object->type, null, null, false ); ?>
+        </div>
         <div data-row="startDate" class="row required">
             <label>{lang:vt.articleQueue.startDate}</label>
             <?= FormHelper::FormDateTime( $prefix . '[startDate]', $object->startDate, 'd.m.Y G:i' ); ?>

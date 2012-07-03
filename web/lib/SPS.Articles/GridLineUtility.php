@@ -9,7 +9,7 @@
         const TYPE_CONTENT = 'content';
         const TYPE_ADS = 'ads';
 
-        public static $types = array(
+        public static $Types = array(
             self::TYPE_CONTENT => self::TYPE_CONTENT,
             self::TYPE_ADS => self::TYPE_ADS,
         );
