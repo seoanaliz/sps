@@ -13,8 +13,8 @@
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));
             $object->endDate = new DateTimeWrapper(date('r', $timestamp));
 
-            $object->startDate->modify('-10 minutes');
-            $object->endDate->modify('+10 minutes');
+            $object->startDate->modify('-5 minutes');
+            $object->endDate->modify('+15 minutes');
         }
 
         /**

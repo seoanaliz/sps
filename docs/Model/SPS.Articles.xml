@@ -165,5 +165,34 @@
       </Flags>
       <Lists />
     </Entity>
+    <Entity Name="GridLine" PackageName="SPS.Articles" Table="gridLines" View="getGridLines" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="gridLineId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="gridLineId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="startDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="startDate" FieldType="TYPE_DATE" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="endDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="endDate" FieldType="TYPE_DATE" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="time" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="time" FieldType="TYPE_TIME" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="type" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="10" DbName="type" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFee" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="GridLineItem" PackageName="SPS.Articles" Table="gridLineItems" View="getGridLineItems" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="gridLineItemId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="gridLineItemId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="date" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="date" FieldType="TYPE_DATE" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="gridLineId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="gridLine" ForeignKey="GridLine" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
   </Entities>
 </Package>

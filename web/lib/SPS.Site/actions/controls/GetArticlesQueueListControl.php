@@ -77,7 +77,8 @@
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
-            $grid = $this->getGrid($date, $targetFeed);
+            //$grid = $this->getGrid($date, $targetFeed);
+            $grid = GridLineUtility::GetGrid($targetFeedId, $date);
 
             $articleRecords = array();
             $articlesQueue  = array();

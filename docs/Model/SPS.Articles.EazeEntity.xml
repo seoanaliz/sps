@@ -1109,4 +1109,181 @@
       </TemplateAttribute>
     </Attributes>
   </EazeEntity>
+  <EazeEntity Name="GridLine">
+    <TerminalPath>gridLines</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>targetFeeds</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="gridLineId" TitleKey="vt.gridLine.gridLineId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineId" />
+          <AttributeParameter Key="value" Value="gridLineId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.gridLine.startDate" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="startDate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="endDate" TitleKey="vt.gridLine.endDate" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="endDate" />
+          <AttributeParameter Key="value" Value="endDate" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="endDate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="time" TitleKey="vt.gridLine.time" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="time" />
+          <AttributeParameter Key="value" Value="time" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="time" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="type" TitleKey="vt.gridLine.type" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="type" />
+          <AttributeParameter Key="value" Value="type" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="type" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.gridLine.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="gridLineId" TitleKey="vt.gridLine.gridLineId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineId" />
+          <AttributeParameter Key="value" Value="gridLineId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="startDate" TitleKey="vt.gridLine.startDate" TitleValue="Дата начала" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="startDate" />
+          <AttributeParameter Key="value" Value="startDate" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="startDate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="endDate" TitleKey="vt.gridLine.endDate" TitleValue="Дата окончания" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="endDate" />
+          <AttributeParameter Key="value" Value="endDate" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="endDate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="time" TitleKey="vt.gridLine.time" TitleValue="time" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="time" />
+          <AttributeParameter Key="value" Value="time" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="time" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="type" TitleKey="vt.gridLine.type" TitleValue="Тип" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="type" />
+          <AttributeParameter Key="value" Value="type" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="type" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.gridLine.targetFeedId" TitleValue="targetFeedId" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFee.title" TitleKey="vt.gridLine.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFees" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="GridLineItem">
+    <TerminalPath>gridLineItems</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>gridLines</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="gridLineItemId" TitleKey="vt.gridLineItem.gridLineItemId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineItemId" />
+          <AttributeParameter Key="value" Value="gridLineItemId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineItemId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="date" TitleKey="vt.gridLineItem.date" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="date" />
+          <AttributeParameter Key="value" Value="date" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="gridLineId" TitleKey="vt.gridLineItem.gridLineId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineId" />
+          <AttributeParameter Key="value" Value="gridLineId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="gridLineItemId" TitleKey="vt.gridLineItem.gridLineItemId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineItemId" />
+          <AttributeParameter Key="value" Value="gridLineItemId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineItemId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="date" TitleKey="vt.gridLineItem.date" TitleValue="date" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="date" />
+          <AttributeParameter Key="value" Value="date" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="gridLineId" TitleKey="vt.gridLineItem.gridLineId" TitleValue="gridLineId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="gridLineId" />
+          <AttributeParameter Key="value" Value="gridLineId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="gridLineId" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
 </ArrayOfEazeEntity>
