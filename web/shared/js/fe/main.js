@@ -1520,6 +1520,9 @@ var Elements = {
 
                     if ($target.hasClass('empty')) {
                         dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
+                            if ($post.hasClass('movable')) {
+                                $target.html($post);
+                            }
                             $target.addClass('image-compositing');
                         });
                     }
