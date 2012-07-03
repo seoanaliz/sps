@@ -1,10 +1,10 @@
 <?php
-    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.Site' );
+/*    Package::Load( 'SPS.Articles' );
+    Package::Load( 'SPS.Site' );*/
     Package::Load( 'SPS.Stat' );
 //    include 'wrapper.php';
 
-set_time_limit(600);
+    set_time_limit(600);
     class WrPoints extends wrapper
     {
         const BASE_RENEW = false;

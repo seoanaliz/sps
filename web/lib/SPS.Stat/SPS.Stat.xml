@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+    <action name="GraphGrow" />
+        <path>GraphGrow</path>
     <group name="Daemons">
-	    <action name="WrTopics">
+        <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
 	    <action name="WrPosts">
@@ -11,4 +13,5 @@
             <path>daemons/WrPoints</path>
         </action>
     </group>
+
 </actions>

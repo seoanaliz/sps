@@ -77,6 +77,11 @@
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
+                <page uri="vt://stat/">
+                    <actions>Sps.Stat.GraphGrow</actions>
+                    <!--<template>tmpl://vt/stat/index.tmpl.php</template>-->
+
+                </page>
 
                 <pageGroup name="SPS.Common">
                     <pageGroup name="siteParam">
@@ -84,6 +89,11 @@
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetSiteParamList, SPS.Common.SetSiteParamsMenu</actions>
                             <template>tmpl://vt/site-params/index.tmpl.php</template>
                         </page>
+                        <page uri="vt://statistics">
+                            <!--<actions>SPS.Site.GetIndexPage</actions>-->
+                            <template>tmpl://vt/statistic/statistic.tmpl.php</template>
+                        </page>
+
                         <page uri="vt://site-params/add">
                             <actions>SPS.Common.SaveSiteParam</actions>
                             <template>tmpl://vt/site-params/add.tmpl.php</template>
@@ -320,13 +330,13 @@
                     <actions>SPS.Site.SyncUserpics</actions>
                 </page>
                 <page uri="daemons://wr-topics/">
-                    <actions>SPS.Site.WrTopics</actions>
+                    <actions>SPS.Stat.WrTopics</actions>
                 </page>
                 <page uri="daemons://wr-posts/">
-                    <actions>SPS.Site.WrPosts</actions>
+                    <actions>SPS.Stat.WrPosts</actions>
                 </page>
                 <page uri="daemons://wr-points/">
-                    <actions>SPS.Site.WrPoints</actions>
+                    <actions>SPS.Stat.WrPoints</actions>
                 </page>
             </pageGroup>
 
