@@ -1062,12 +1062,12 @@ var Events = {
                 var $img = $(image);
 
                 var img = new Image();
-                img.src = $img.attr('src');
                 img.onload = function() {
                     if (i == num - 1) {
                         return onLoadImages();
                     }
                 };
+                img.src = $img.attr('src');
             });
 
             // ======================== //
