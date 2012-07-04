@@ -172,7 +172,7 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_add_slot: function(post_id, text, callback) {
+    rightcolumn_add_slot: function(text, callback) {
         callback(true);
     },
     rightcolumn_time_edit: function(post_id, text, callback) {

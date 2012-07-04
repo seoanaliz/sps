@@ -191,37 +191,45 @@ $(document).ready(function(){
                 pid = elem.data("id");
             Events.fire('rightcolumn_deletepost', [pid, function(state){
                 if(state) {
-                    elem.closest(".slot").addClass('empty');
-                    elem.closest(".slot").find('span.attach-icon').remove();
-                    elem.closest(".slot").find('span.hash-span').remove();
                     elem.remove();
                 }
             }]);
         })
         // Смена даты
-        .delegate('.time', 'click', function() {
-            var $date = $(this);
-            $date.attr('contenteditable', true).focus().select();
-        })
-        .delegate('.time', 'blur', function() {
+        .delegate('.time', 'click', function(e) {
             var $time = $(this);
-            var $post = $time.closest('.slot');
+            var $post = $time.closest('.slot-header');
+            var $input = $('<input />')
+                .attr({class: "time-edit", type: "text"})
+                .css({width: $time.width() + 2})
+                .val($time.text())
+                .appendTo($post);
+            $input.mask("99:99").focus().select();
+        })
+        .delegate('.time-edit', 'blur keydown', function(e) {
+            var $input = $(this);
+
+            if (e.type == 'keydown' && e.keyCode != 13) return;
+            if (!$input.length) return;
+
+            var $post = $input.closest('.slot');
+            var text = $input.val();
             var pid = $post.data('id');
-            var text = $time.text();
+            $input.remove();
 
             if ($post.hasClass('new')) {
                 // Добавление ячейки
-                Events.fire('rightcolumn_add_slot', [pid, text, function(state){
+                Events.fire('rightcolumn_add_slot', [text, function(state){
                     if (state) {
                         $post.animate({height: 0}, 400, function() {$(this).remove()});
-                        $time.attr('contenteditable', false);
+                        console.log('New!');
                     }
                 }]);
             } else {
                 // Редактирование ячейки
                 Events.fire('rightcolumn_time_edit', [pid, text, function(state){
                     if (state) {
-                        $time.attr('contenteditable', false);
+                        console.log('Edit!');
                     }
                 }]);
             }

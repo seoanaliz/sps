@@ -438,20 +438,17 @@ i {font-style: italic;}
     top: 7px;
     left: 7px;
     z-index: 1;
-}
-.right-panel .items .slot .slot-header span {
-    display: inline-block;
-    vertical-align: middle;
-    height: 14px;
-    line-height: 14px;
+    margin: 0;
 }
 .right-panel .items .slot .datepicker {
+    vertical-align: top;
     display: inline-block;
+    height: 13px;
     width: 13px;
     background: url('../../images/fe/datepicker-dis.png') center no-repeat;
     cursor: pointer;
     opacity: 0;
-    margin-top: -2px;
+    margin-top: 2px;
     margin-left: 4px;
     -moz-transition: all .2s;
     -webkit-transition: all .2s;
@@ -465,15 +462,21 @@ i {font-style: italic;}
 }
 .right-panel .items .slot .time {
     cursor: pointer;
-    padding: 0 4px;
-    border: 1px solid transparent;
+    padding: 2px 4px;
 }
 .right-panel .items .slot .time:hover {
     background-color: #E9EDF1;
 }
-.right-panel .items .slot .time:focus {
-    cursor: text;
-    background-color: #fff;
+.right-panel .items .slot .time-edit {
+    font: inherit;
+    color: inherit;
+    border: 1px solid transparent;
+    padding: 2px;
+    background: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 12px;
 }
 
 .right-panel .post {

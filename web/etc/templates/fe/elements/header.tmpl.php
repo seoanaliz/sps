@@ -60,6 +60,7 @@
         'js://fe/file-uploader/fileuploader.js',
         'js://fe/jquery.Jcrop.min.js',
         'js://fe/jquery.easydate-0.2.4.js',
+        'js://fe/jquery.maskedinput-1.3.js',
         'js://fe/jquery.multiselect.min.js',
         'js://fe/main.js',
         'js://fe/files.js',
