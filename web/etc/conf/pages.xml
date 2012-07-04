@@ -319,6 +319,15 @@
                 <page uri="daemons://sync-userpics/">
                     <actions>SPS.Site.SyncUserpics</actions>
                 </page>
+                <page uri="daemons://wr-topics/">
+                    <actions>SPS.Stat.WrTopics</actions>
+                </page>
+                <page uri="daemons://wr-posts/">
+                    <actions>SPS.Stat.WrPosts</actions>
+                </page>
+                <page uri="daemons://wr-points/">
+                    <actions>SPS.Stat.WrPoints</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
