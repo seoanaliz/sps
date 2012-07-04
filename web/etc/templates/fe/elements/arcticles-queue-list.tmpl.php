@@ -18,15 +18,8 @@
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
-                        <? if (!empty($articleRecord->link)) { ?>
-                            <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
-                        <? } ?>
-                        <? if (UrlParser::IsContentWithLink($articleRecord->content)) { ?>
-                            <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>
-                        <? } ?>
-                        <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
-                            <span class="hash-span" title="Пост с хештэгом">#hash</span>
-                        <? } ?>
+
+                        {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                     </div>
                     <div class="post movable <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}">
                         <div class="content">
