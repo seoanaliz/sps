@@ -375,7 +375,7 @@ i {font-style: italic;}
 .controls .ctl {float:left;margin-right: 9px;cursor: pointer;}
 
 .right-panel .items .slot {background: #fff;position:relative;border-bottom: 1px solid #ddd;min-height: 105px;}
-.right-panel .items .slot.empty {background: #ffe;}
+.right-panel .items .slot.empty {}
 .right-panel .items .slot.ui-state-active {background: #edf4f8; border: none;border-bottom: 1px solid #ddd}
 .right-panel .items .slot.ui-state-hover {background: #e9eff2;
     -webkit-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
@@ -392,18 +392,26 @@ i {font-style: italic;}
     width: 368px;
 }
 
-.right-panel .items .slot .post {position:relative;line-height: 16px;min-height: 70px;}
+.right-panel .items .slot .post {
+    position: relative;
+    line-height: 16px;
+    min-height: 70px;
+}
 .right-panel .items .slot .time {
-    padding-left:10px;
-    padding-top:10px;
     font-size: 11px;
     color:#888;
     position: absolute;
-    z-index: 100;
+    top: 7px;
+    left: 7px;
+    z-index: 1;
+    padding: 0 3px;
 }
-.right-panel .items .slot.ui-state-hover .time,
-.right-panel .items .slot.ui-state-active .time {z-index: 1;}
-.right-panel .post {padding-top: 30px;}
+.right-panel .items .slot .time:hover {
+    background-color: #ccc;
+}
+.right-panel .post {
+    padding-top: 30px;
+}
 .right-panel .post .content .text {
     position: relative;
 }

@@ -96,26 +96,6 @@ $(document).ready(function(){
         }
     });
 
-    //Dropdowns
-//    $(".drop-down").click(function(e){
-//        e.stopPropagation();
-//        $(document).click();
-//        var elem = $(this);
-//        var hidethis = function(){
-//            elem.removeClass("expanded");
-//            $(document).unbind("click", hidethis);
-//            elem.find("li").unbind("click", click_li);
-//        };
-//        var click_li = function(e){
-//            e.stopPropagation();
-//            elem.dd_sel($(this).data("id"));
-//            hidethis();
-//        };
-//        $(document).bind("click", hidethis);
-//        elem.find("li").click(click_li);
-//        elem.addClass("expanded");
-//    });
-
     $(".left-panel .drop-down").change(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
@@ -204,8 +184,8 @@ $(document).ready(function(){
             }]);
         });
 
-    // Удание постов правом меню
-    $(".items").delegate(".slot .post .delete", "click", function(){
+    // Удаление постов правом меню
+    $(".right-panel .items").delegate(".delete", "click", function(){
         var elem = $(this).closest(".post"),
             pid = elem.data("id");
         Events.fire('rightcolumn_deletepost', [pid, function(state){
