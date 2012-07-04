@@ -107,12 +107,12 @@
                     </div>
 
                 </div>
-
             </div>
 
             <div class="queue-title">&nbsp;</div>
-
-            <div class="items drop" id="queue" style="display: none;">
+            <div class="items drop" id="queue" style="display: none;"></div>
+            <div class="queue-footer">
+                <a class="add-button" href="javascript:;">Добавить ячейку</a>
             </div>
         </div>
     </div>
