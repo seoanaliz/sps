@@ -124,6 +124,7 @@ i {font-style: italic;}
     bottom:0;
     width:25px;
     text-align: center;
+    background: url('../../images/fe/datepicker-big.png') center no-repeat;
 }
 .calendar .tip {
     border-left: 1px solid #C4CDE0;
@@ -420,7 +421,7 @@ i {font-style: italic;}
     overflow-x: hidden;
     position: absolute;
     top: 146px;
-    bottom: 0;
+    bottom: 31px;
     width: 368px;
 }
 
@@ -798,7 +799,7 @@ i {font-style: italic;}
 }
 
 .post .editing textarea {
-    width: 518px;
+    width: 516px;
 }
 .post .editing .actions {
     margin-top: 10px;
