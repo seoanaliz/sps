@@ -98,6 +98,9 @@
             <action name="SaveGridLineControl">
                 <path>controls/grid/SaveGridLineControl</path>
             </action>
+            <action name="SaveGridLineItemControl">
+                <path>controls/grid/SaveGridLineItemControl</path>
+            </action>
         </group>
     </group>
 

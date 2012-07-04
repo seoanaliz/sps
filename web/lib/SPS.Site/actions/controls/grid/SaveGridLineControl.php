@@ -39,13 +39,16 @@
             $object = new GridLine();
             $object->startDate = DateTimeWrapper::Now();
             $object->endDate = DateTimeWrapper::Now();
+            $object->endDate->modify('+7 days');
             $object->time = new DateTimeWrapper($time);
             $object->type = $type;
             $object->targetFeedId = $targetFeedId;
 
-            $sqlResult = GridLineFactory::Add($object);
+            $queryResult = GridLineFactory::Add($object);
 
-            if ($sqlResult) {
+            if (!$queryResult) {
+                $result['message'] = 'saveError';
+            } else {
                 $result['success'] = true;
             }
 

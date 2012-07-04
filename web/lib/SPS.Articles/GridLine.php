@@ -31,6 +31,6 @@
         public $targetFeedId;
 
         /** @var TargetFeed */
-        public $targetFee;
+        public $targetFeed;
     }
 ?>

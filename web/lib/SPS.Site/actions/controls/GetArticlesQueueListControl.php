@@ -68,11 +68,7 @@
          */
         public function Execute() {
             $timestamp = Request::getInteger( 'timestamp' );
-            if ($timestamp) {
-                $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
-            } else {
-                $date = date('d.m.Y');
-            }
+            $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
 
             $type = Request::getString('type');
             if (empty($type) || empty(GridLineUtility::$Types[$type])) {

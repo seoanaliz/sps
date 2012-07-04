@@ -181,14 +181,14 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_add_slot: function(id, text, callback) {
+    rightcolumn_save_slot: function(gridLineId, time, callback) {
         $.ajax({
             url: controlsRoot + 'grid-line-save/',
             dataType : "json",
             data: {
                 startDate : null, //TODO
                 endDate : null, //TODO
-                time: text,
+                time: time,
                 type: Elements.rightType(),
                 targetFeedId: Elements.rightdd()
             },
@@ -205,8 +205,28 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_time_edit: function(post_id, text, callback) {
-        callback(true);
+    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, callback) {
+        $.ajax({
+            url: controlsRoot + 'grid-line-item-save/',
+            dataType : "json",
+            data: {
+                gridLineId: gridLineId,
+                gridLineItemId: gridLineItemId,
+                time: time,
+                timestamp: Elements.calendar()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                    loadQueue();
+                } else {
+                    if (data.message) {
+                        popupError(Lang[data.message]);
+                    }
+                    callback(false);
+                }
+            }
+        });
     },
     leftcolumn_dropdown_change: function(){
         loadArticles(true);

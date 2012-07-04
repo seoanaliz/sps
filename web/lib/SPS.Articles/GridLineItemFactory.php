@@ -32,7 +32,7 @@
                 )
                 ,'date' => array(
                     'name'          => 'date'
-                    , 'type'        => TYPE_DATE
+                    , 'type'        => TYPE_DATETIME
                     , 'nullable'    => 'No'
                 )
                 ,'gridLineId' => array(

@@ -217,11 +217,14 @@ $(document).ready(function(){
             var $time = $(this);
             var $post = $time.closest('.slot');
             var pid = $post.data('id');
-            var text = $time.text();
+            var time = $time.text();
+
+            var gridLineId = $post.data('grid-id');
+            var gridLineItemId = $post.data('grid-item-id');
 
             if ($post.hasClass('new')) {
                 // Добавление ячейки
-                Events.fire('rightcolumn_add_slot', [pid, text, function(state){
+                Events.fire('rightcolumn_save_slot', [gridLineId, time, function(state){
                     if (state) {
                         $post.animate({height: 0}, 400, function() {$(this).remove()});
                         $time.attr('contenteditable', false);
@@ -229,7 +232,7 @@ $(document).ready(function(){
                 }]);
             } else {
                 // Редактирование ячейки
-                Events.fire('rightcolumn_time_edit', [pid, text, function(state){
+                Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, function(state){
                     if (state) {
                         $time.attr('contenteditable', false);
                     }
