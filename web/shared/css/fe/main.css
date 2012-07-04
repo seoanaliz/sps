@@ -386,8 +386,7 @@ i {font-style: italic;}
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
-    /*top: 146px;*/
-    top: 121px;
+    top: 146px;
     bottom: 0;
     width: 368px;
 }
@@ -433,8 +432,7 @@ i {font-style: italic;}
     height: 14px;
 }
 .right-panel .header {
-    /*height: 118px;*/
-    height: 93px;
+    height: 118px;
     padding: 0;
 }
 

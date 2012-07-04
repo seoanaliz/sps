@@ -21,16 +21,7 @@
                 </div>
                 <div class="post blocked <?= empty($articleQueueItem->sentAt) ? 'failed' : '' ?>">
                     <div class="content">
-                        <?
-                        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
-                        ?>
-                        {$content}
-
-                        <? if (!empty($articleRecord->photos)) { ?>
-                        <? foreach($articleRecord->photos as $photoItem) { ?>
-                            <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
-                            <? } ?>
-                        <? } ?>
+                        {increal:tmpl://fe/elements/arcticles-queue-item-content.tmpl.php}
                     </div>
                 </div>
             </div>

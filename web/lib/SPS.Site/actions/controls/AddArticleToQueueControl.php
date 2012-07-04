@@ -29,8 +29,9 @@
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $timestamp = Request::getInteger( 'timestamp' );
             $queueId = Request::getInteger( 'queueId' );
+            $type = Request::getString('type');
 
-            if (empty($articleId) || empty($targetFeedId) || empty($timestamp)) {
+            if (empty($articleId) || empty($targetFeedId) || empty($timestamp) || empty($type) || empty(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -84,6 +85,7 @@
             $object->createdAt = DateTimeWrapper::Now();
             $object->articleId = $article->articleId;
             $object->targetFeedId = $targetFeed->targetFeedId;
+            $object->type = $type;
             $this->buildDates($object, $timestamp);
 
             $object->statusId = 1;

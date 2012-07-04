@@ -8,6 +8,7 @@
     class GridLineUtility {
         const TYPE_CONTENT = 'content';
         const TYPE_ADS = 'ads';
+        const TYPE_ALL = 'all';
 
         public static $Types = array(
             self::TYPE_CONTENT => self::TYPE_CONTENT,
@@ -15,11 +16,17 @@
         );
 
         public static function GetGrid($targetFeedId, $date = null, $type = self::TYPE_CONTENT) {
+            $result = array();
             $now = DateTimeWrapper::Now();
 
-            $result = array();
             if (empty($date)) {
                 $date = DateTimeWrapper::Now();
+            } else {
+                $date = new DateTimeWrapper($date);
+            }
+
+            if ($type == self::TYPE_ALL) {
+                return $result;
             }
 
             $sql = <<<sql
@@ -58,6 +65,7 @@ sql;
                     'gridLineItemId' => $ds->GetDateTime('gridLineItemId'),
                 );
 
+                $item['dateTime'] = new DateTimeWrapper($date->DefaultDateFormat() . ' ' . $item['dateTime']->DefaultTimeFormat() );
                 $item['blocked'] = ($item['dateTime'] <= $now);
 
                 $result[] = $item;

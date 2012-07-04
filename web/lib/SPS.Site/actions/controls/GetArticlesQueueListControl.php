@@ -9,6 +9,13 @@
      */
     class GetArticlesQueueListControl {
 
+        /**
+         * @param $date
+         * @param $targetFeed
+         * @return array
+         *
+         * @deprecated see GridLineUtility::GetGrid
+         */
         private function getGrid($date, $targetFeed) {
             //generate table
             $result = array();
@@ -67,6 +74,11 @@
                 $date = date('d.m.Y');
             }
 
+            $type = Request::getString('type');
+            if (empty($type) || empty(GridLineUtility::$Types[$type])) {
+                $type = GridLineUtility::TYPE_ALL;
+            }
+
             $now        = DateTimeWrapper::Now();
             $queueDate  = new DateTimeWrapper($date);
             $today      = new DateTimeWrapper(date('d.m.Y'));
@@ -77,9 +89,6 @@
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
-            //$grid = $this->getGrid($date, $targetFeed);
-            $grid = GridLineUtility::GetGrid($targetFeedId, $date);
-
             $articleRecords = array();
             $articlesQueue  = array();
 
@@ -88,12 +97,19 @@
                 $targetFeedId = null;
             }
 
+            //$grid = $this->getGrid($date, $targetFeed);
+            $grid = GridLineUtility::GetGrid($targetFeedId, $date, $type);
+
             if(!empty($targetFeedId) && !empty($targetFeed)) {
                 Session::setInteger('currentTargetFeedId', $targetFeedId);
 
                 //вытаскиваем всю очередь на этот день на этот паблик
                 $articlesQueue = ArticleQueueFactory::Get(
-                    array('targetFeedId' => $targetFeedId, 'startDateAsDate' => $date)
+                    array(
+                        'targetFeedId' => $targetFeedId
+                        , 'startDateAsDate' => $date
+                        , 'type' => ($type == GridLineUtility::TYPE_ALL) ? null : $type
+                    )
                     , array(
                         BaseFactory::WithoutPages => true
                         , BaseFactory::OrderBy => ' "sentAt" DESC '
@@ -130,6 +146,10 @@
 
             if ($isHistory) {
                 Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-history.tmpl.php';
+            }
+
+            if ($type == GridLineUtility::TYPE_ALL) {
+                Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-view.tmpl.php';
             }
         }
     }

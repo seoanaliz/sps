@@ -160,6 +160,16 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
+    // Вкладки "Все записи", "Контент", "Реклама" в правом меню
+    $(".right-panel .type-selector a").click(function(e){
+        e.preventDefault();
+
+        $(".right-panel .type-selector a").removeClass('active');
+        $(this).addClass('active');
+
+        Events.fire('rightcolumn_type_change', []);
+    });
+
     // Wall init
     $(".wall")
         .delegate(".post .delete", "click", function(){
@@ -1481,7 +1491,7 @@ var Elements = {
                     if (state) {
                         callback(newId);
                     } else {
-                        failback();
+                        popupError('Ошибка планирования поста');
                     }
                 }]);
             };

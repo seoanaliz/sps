@@ -83,13 +83,16 @@ function loadQueue() {
         return;
     }
 
+    type = $(".right-panel .type-selector a.active").data('type');
+
     //clean and load right column
     $.ajax({
         url: controlsRoot + 'arcticles-queue-list/',
         dataType : "html",
         data: {
             targetFeedId: Elements.rightdd(),
-            timestamp: Elements.calendar()
+            timestamp: Elements.calendar(),
+            type: type
         },
         success: function (data) {
             $('div#queue').show().html(data);
@@ -177,7 +180,7 @@ var Eventlist = {
     },
     rightcolumn_dropdown_change: function(){
         selectedSources = Elements.leftdd();
-        sourceType = $(".type-selector a.active").data('type');
+        sourceType = $(".left-panel .type-selector a.active").data('type');
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
@@ -219,6 +222,9 @@ var Eventlist = {
     calendar_change: function(){
         loadQueue();
     },
+    rightcolumn_type_change: function(){
+        loadQueue();
+    },
     wall_load_more: function(callback){
         if (!$("#wallloadmore").hasClass('hidden')) {
             $("#wallloadmore").addClass('hidden');
@@ -227,6 +233,7 @@ var Eventlist = {
         callback(true);
     },
     post_moved: function(post_id, slot_id, queueId, callback){
+        type = $(".right-panel .type-selector a.active").data('type');
         $.ajax({
             url: controlsRoot + 'arcticle-add-to-queue/',
             dataType : "json",
@@ -234,7 +241,8 @@ var Eventlist = {
                 articleId: post_id,
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
-                queueId: queueId
+                queueId: queueId,
+                type: type
             },
             success: function (data) {
                 if(data.success) {
