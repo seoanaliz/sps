@@ -44,7 +44,12 @@
                     $count = $parser->get_posts_count();
                 } catch (Exception $Ex) {
                     $message = $Ex->getMessage();
-                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $message);
+
+                    //wall's end exclude
+                    if (strpos($message, "wall's end") === false) {
+                        AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $message);
+                    }
+
                     if (strpos($message, 'access denied') !== false) {
                         $source->statusId = 2;
                         SourceFeedFactory::Update($source);
