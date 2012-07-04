@@ -93,6 +93,12 @@
                 <path>controls/GetSourceFeedsListControl</path>
             </action>
         </group>
+
+        <group name="Grid">
+            <action name="SaveGridLineControl">
+                <path>controls/grid/SaveGridLineControl</path>
+            </action>
+        </group>
     </group>
 
 	<!-- Put your's frontend actions here -->

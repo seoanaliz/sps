@@ -1630,6 +1630,12 @@ var Elements = {
         $('img.ajax-loader').each(function(){
             Elements.initLinkLoader($(this), true);
         });
+    },
+    leftType:function(){
+        return $(".left-panel .type-selector a.active").data('type');
+    },
+    rightType:function(){
+        return $(".right-panel .type-selector a.active").data('type');
     }
 };
 

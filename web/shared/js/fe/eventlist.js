@@ -83,7 +83,13 @@ function loadQueue() {
         return;
     }
 
-    type = $(".right-panel .type-selector a.active").data('type');
+    var type = Elements.rightType();
+
+    if (type == 'all') {
+        $('.queue-footer').hide();
+    } else {
+        $('.queue-footer').show();
+    }
 
     //clean and load right column
     $.ajax({
@@ -175,8 +181,29 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_add_slot: function(post_id, text, callback) {
-        callback(true);
+    rightcolumn_add_slot: function(id, text, callback) {
+        $.ajax({
+            url: controlsRoot + 'grid-line-save/',
+            dataType : "json",
+            data: {
+                startDate : null, //TODO
+                endDate : null, //TODO
+                time: text,
+                type: Elements.rightType(),
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                    loadQueue();
+                } else {
+                    if (data.message) {
+                        popupError(Lang[data.message]);
+                    }
+                    callback(false);
+                }
+            }
+        });
     },
     rightcolumn_time_edit: function(post_id, text, callback) {
         callback(true);
@@ -185,8 +212,8 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
-        selectedSources = Elements.leftdd();
-        sourceType = $(".left-panel .type-selector a.active").data('type');
+        var selectedSources = Elements.leftdd();
+        var sourceType = Elements.leftType();
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
@@ -239,7 +266,6 @@ var Eventlist = {
         callback(true);
     },
     post_moved: function(post_id, slot_id, queueId, callback){
-        type = $(".right-panel .type-selector a.active").data('type');
         $.ajax({
             url: controlsRoot + 'arcticle-add-to-queue/',
             dataType : "json",
@@ -248,7 +274,7 @@ var Eventlist = {
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
-                type: type
+                type: Elements.rightType()
             },
             success: function (data) {
                 if(data.success) {

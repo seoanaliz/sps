@@ -3,7 +3,7 @@
         $id = $gridItem['dateTime']->format('U');
         if (empty($gridItem['queue'])) {
             ?>
-                <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>" data-id="{$id}">
+                <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>" data-id="{$id}" data-grid-id="{$gridItem[gridLineId]}" data-grid-item-id="{$gridItem[gridLineItemId]}">
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
@@ -14,7 +14,7 @@
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             ?>
-                <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>" data-id="{$id}">
+                <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>" data-id="{$id}" data-grid-id="{$gridItem[gridLineId]}" data-grid-item-id="{$gridItem[gridLineItemId]}">
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>

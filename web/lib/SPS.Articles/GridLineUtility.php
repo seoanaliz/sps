@@ -55,14 +55,13 @@ sql;
 
             $ds = $cmd->Execute();
 
-
             while ($ds->Next()) {
                 $item = array(
                     'gridLineId' => $ds->GetInteger('gridLineId'),
+                    'gridLineItemId' => $ds->GetInteger('gridLineItemId'),
                     'startDate' => $ds->GetDateTime('startDate'),
                     'endDate' => $ds->GetDateTime('endDate'),
                     'dateTime' => $ds->GetDateTime('time'),
-                    'gridLineItemId' => $ds->GetDateTime('gridLineItemId'),
                 );
 
                 $item['dateTime'] = new DateTimeWrapper($date->DefaultDateFormat() . ' ' . $item['dateTime']->DefaultTimeFormat() );

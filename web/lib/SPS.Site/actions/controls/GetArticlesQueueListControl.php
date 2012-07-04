@@ -79,7 +79,6 @@
                 $type = GridLineUtility::TYPE_ALL;
             }
 
-            $now        = DateTimeWrapper::Now();
             $queueDate  = new DateTimeWrapper($date);
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
@@ -96,9 +95,6 @@
             if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                 $targetFeedId = null;
             }
-
-            //$grid = $this->getGrid($date, $targetFeed);
-            $grid = GridLineUtility::GetGrid($targetFeedId, $date, $type);
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
                 Session::setInteger('currentTargetFeedId', $targetFeedId);
@@ -117,19 +113,6 @@
                 );
 
                 if(!empty($articlesQueue)) {
-                    foreach($articlesQueue as $articlesQueueItem) {
-                        //ищем место в grid для текущей $articlesQueueItem
-                        foreach ($grid as &$gridItem) {
-                            if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
-                                if (empty($gridItem['queue'])) {
-                                    $gridItem['queue'] = $articlesQueueItem;
-                                    $gridItem['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
-                                    $gridItem['failed'] = ($articlesQueueItem->statusId == 1 && $articlesQueueItem->endDate <= $now);
-                                }
-                            }
-                        }
-                    }
-
                     //load arciles data
                     $articleRecords = ArticleRecordFactory::Get(
                         array('_articleQueueId' => array_keys($articlesQueue))
@@ -142,15 +125,37 @@
 
             Response::setArray( 'articleRecords',   $articleRecords );
             Response::setArray( 'articlesQueue',    $articlesQueue );
-            Response::setArray( 'grid',             $grid );
 
             if ($isHistory) {
                 Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-history.tmpl.php';
+            } else if ($type == GridLineUtility::TYPE_ALL) {
+                Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-view.tmpl.php';
+            } else {
+                $this->setGrid($targetFeedId, $date, $type, $articlesQueue);
+            }
+        }
+
+        private function setGrid($targetFeedId, $date, $type, $articlesQueue) {
+            $now = DateTimeWrapper::Now();
+
+            $grid = GridLineUtility::GetGrid($targetFeedId, $date, $type);
+
+            if(!empty($articlesQueue)) {
+                foreach($articlesQueue as $articlesQueueItem) {
+                    //ищем место в grid для текущей $articlesQueueItem
+                    foreach ($grid as &$gridItem) {
+                        if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
+                            if (empty($gridItem['queue'])) {
+                                $gridItem['queue'] = $articlesQueueItem;
+                                $gridItem['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
+                                $gridItem['failed'] = ($articlesQueueItem->statusId == 1 && $articlesQueueItem->endDate <= $now);
+                            }
+                        }
+                    }
+                }
             }
 
-            if ($type == GridLineUtility::TYPE_ALL) {
-                Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-view.tmpl.php';
-            }
+            Response::setArray( 'grid', $grid );
         }
     }
 ?>
