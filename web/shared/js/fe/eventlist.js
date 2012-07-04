@@ -172,6 +172,12 @@ var Eventlist = {
             }
         });
     },
+    rightcolumn_add_slot: function(post_id, text, callback) {
+        callback(true);
+    },
+    rightcolumn_time_edit: function(post_id, text, callback) {
+        callback(true);
+    },
     leftcolumn_dropdown_change: function(){
         loadArticles(true);
     },

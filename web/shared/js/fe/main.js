@@ -184,18 +184,63 @@ $(document).ready(function(){
             }]);
         });
 
-    // Удаление постов правом меню
-    $(".right-panel .items").delegate(".delete", "click", function(){
-        var elem = $(this).closest(".post"),
-            pid = elem.data("id");
-        Events.fire('rightcolumn_deletepost', [pid, function(state){
-            if(state) {
-                elem.closest(".slot").addClass('empty');
-                elem.closest(".slot").find('span.attach-icon').remove();
-                elem.closest(".slot").find('span.hash-span').remove();
-                elem.remove();
+    $("#queue")
+        // Удаление постов
+        .delegate(".delete", "click", function(){
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('rightcolumn_deletepost', [pid, function(state){
+                if(state) {
+                    elem.closest(".slot").addClass('empty');
+                    elem.closest(".slot").find('span.attach-icon').remove();
+                    elem.closest(".slot").find('span.hash-span').remove();
+                    elem.remove();
+                }
+            }]);
+        })
+        // Смена даты
+        .delegate('.time', 'click', function() {
+            var $date = $(this);
+            $date.attr('contenteditable', true).focus().select();
+        })
+        .delegate('.time', 'blur', function() {
+            var $time = $(this);
+            var $post = $time.closest('.slot');
+            var pid = $post.data('id');
+            var text = $time.text();
+
+            if ($post.hasClass('new')) {
+                // Добавление ячейки
+                Events.fire('rightcolumn_add_slot', [pid, text, function(state){
+                    if (state) {
+                        $post.animate({height: 0}, 400, function() {$(this).remove()});
+                        $time.attr('contenteditable', false);
+                    }
+                }]);
+            } else {
+                // Редактирование ячейки
+                Events.fire('rightcolumn_time_edit', [pid, text, function(state){
+                    if (state) {
+                        $time.attr('contenteditable', false);
+                    }
+                }]);
             }
-        }]);
+        })
+        .delegate('.datepicker', 'click', function() {
+        })
+    ;
+
+    $('.queue-footer .add-button').click(function() {
+        $("#queue").scrollTo(0);
+        var $newPost = $(
+            '<div class="new slot empty">' +
+                '<div class="slot-header">' +
+                    '<span class="time">23:59</span>' +
+                    '<span class="datepicker"></span>' +
+                '</div>' +
+            '</div>'
+        ).prependTo('#queue').animate({height: 105}, 200);
+        $newPost.find('.time').click();
     });
 
     // Загрузка стены по клику
@@ -1035,7 +1080,7 @@ var Events = {
             };
 
             if ($wrap.data('image-compositing')) return;
-            
+
             $wrap.data('image-compositing', true);
             $wrap.addClass(CLASS_LOADING);
             $images.each(function(i, image) {

@@ -4,8 +4,10 @@
         if (empty($gridItem['queue'])) {
             ?>
                 <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>" data-id="{$id}">
-                    <div class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></div>
-                    <div class="content"></div>
+                    <div class="slot-header">
+                        <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                        <span class="datepicker"></span>
+                    </div>
                 </div>
             <?
         } else {
@@ -13,8 +15,9 @@
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             ?>
                 <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>" data-id="{$id}">
-                    <div class="time">
-                        <?= $gridItem['dateTime']->defaultTimeFormat() ?>
+                    <div class="slot-header">
+                        <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                        <span class="datepicker"></span>
                         <? if (!empty($articleRecord->link)) { ?>
                             <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
                         <? } ?>
