@@ -76,7 +76,7 @@ i {font-style: italic;}
     display: block;
     height: 20px;
 }
-.qq-upload-list { overflow: hidden; margin: 0; margin-top: 10px; }
+.qq-upload-list {overflow: hidden; margin: 0; margin-top: 10px; }
 .qq-upload-list li {
     position: relative;
     float: left;
@@ -402,13 +402,12 @@ i {font-style: italic;}
     background: #fff;
     position:relative;
     border-bottom: 1px solid #ddd;
-    overflow: hidden;
     min-height: 105px;
 }
 .right-panel .items .slot.empty {}
 .right-panel .items .slot.new {
     min-height: 0;
-    background-color: #EFFFF4;
+    background-color: #E8EEF2;
 }
 .right-panel .items .slot.ui-state-active {background: #edf4f8; border: none;border-bottom: 1px solid #ddd}
 .right-panel .items .slot.ui-state-hover {background: #e9eff2;
@@ -457,6 +456,7 @@ i {font-style: italic;}
 .right-panel .items .slot:hover .datepicker {
     opacity: .5;
 }
+.right-panel .items .slot .datepicker.active,
 .right-panel .items .slot .datepicker:hover {
     opacity: 1;
 }

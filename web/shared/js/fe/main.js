@@ -1,6 +1,11 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
+    $.mask.definitions['2']='[012]';
+    $.mask.definitions['3']='[0123]';
+    $.mask.definitions['5']='[012345]';
+    $.datepick.setDefaults($.datepick.regional['ru']);
+
     // Календарь
     $("#calendar")
         .datepicker (
@@ -199,42 +204,94 @@ $(document).ready(function(){
         .delegate('.time', 'click', function(e) {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
-            var $input = $('<input />')
-                .attr({class: "time-edit", type: "text"})
-                .css({width: $time.width() + 2})
-                .val($time.text())
-                .appendTo($post);
-            $input.mask("99:99").focus().select();
+            var $input = $time.data('input');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr({class: "time-edit", type: "text"})
+                    .css({width: $time.width() + 2})
+                    .val($time.text())
+                    .appendTo($post);
+                $time.data('input', $input);
+            } else {
+                $time.data('input').show();
+            }
+            $input.mask("23:59").focus().select();
         })
         .delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
+            var $post = $input.closest('.slot');
+            var $time = $post.find('.time');
 
             if (e.type == 'keydown' && e.keyCode != 13) return;
-            if (!$input.length) return;
 
-            var $post = $input.closest('.slot');
-            var text = $input.val();
+            var text = ($input.val() == '__:__') ? '23:59' : $input.val();
             var pid = $post.data('id');
-            $input.remove();
+            $input.hide().val(text);
 
-            if ($post.hasClass('new')) {
-                // Добавление ячейки
-                Events.fire('rightcolumn_add_slot', [text, function(state){
-                    if (state) {
-                        $post.animate({height: 0}, 400, function() {$(this).remove()});
-                        console.log('New!');
-                    }
-                }]);
-            } else {
-                // Редактирование ячейки
-                Events.fire('rightcolumn_time_edit', [pid, text, function(state){
-                    if (state) {
-                        console.log('Edit!');
-                    }
-                }]);
+            if (text && text != $time.text()) {
+                $time.text(text);
+                if ($post.hasClass('new')) {
+                    // Добавление ячейки
+                    Events.fire('rightcolumn_add_slot', [text, function(state){
+                        if (state) {
+                            //$post.animate({height: 0}, 400, function() {$(this).remove()});
+                            console.log('New!');
+                        }
+                    }]);
+                } else {
+                    // Редактирование ячейки
+                    Events.fire('rightcolumn_time_edit', [pid, text, function(state){
+                        if (state) {
+                            console.log(pid + ': Edit: ' + text);
+                        }
+                    }]);
+                }
             }
         })
         .delegate('.datepicker', 'click', function() {
+            var $target = $(this);
+            var $header = $target.parent();
+
+            if (!$header.data('datepicker')) {
+                var $datepicker = $('<input type="text" />');
+                var $post = $target.closest('.slot');
+                var pid = $post.data('id');
+                var text = $datepicker.val();
+
+                $header.data('datepicker', $datepicker);
+                $target.after($datepicker);
+                $target.remove();
+                $datepicker.datepick({
+                    //rangeSelect: true,
+                    showTrigger: $target,
+                    showAnim: 'fadeIn',
+                    showSpeed: 'fast',
+                    minDate: 0,
+                    multiSelect: 999,
+                    monthsToShow: 2,
+                    renderer: $.extend($.datepick.defaultRenderer, {
+                        picker: $.datepick.defaultRenderer.picker
+                            .replace(/\{popup:start\}[\s\S]*\{popup:end\}/, '')
+                            .replace(/\{link:today\}/, '')
+                    }),
+                    onShow: function() {
+                        $header.find('span.datepicker').addClass('active');
+                        $('#queue').css('overflow', 'hidden');
+                    },
+                    onClose: function() {
+                        text = $datepicker.val();
+                        $header.find('span.datepicker').removeClass('active');
+                        $('#queue').css('overflow', 'auto');
+                        Events.fire('rightcolumn_date_edit', [pid, text, function(state) {
+                            if (state) {
+                                console.log(pid + ': Mega Edit: ' + text);
+                            }
+                        }]);
+                    }
+                });
+                $datepicker.width(13).hide().focus();
+            }
         })
     ;
 

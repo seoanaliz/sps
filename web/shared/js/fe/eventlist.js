@@ -178,6 +178,9 @@ var Eventlist = {
     rightcolumn_time_edit: function(post_id, text, callback) {
         callback(true);
     },
+    rightcolumn_date_edit: function(post_id, date, callback) {
+        callback(true);
+    },
     leftcolumn_dropdown_change: function(){
         loadArticles(true);
     },
