@@ -263,7 +263,7 @@ $(document).ready(function(){
                 $target.after($datepicker);
                 $target.remove();
                 $datepicker.datepick({
-                    //rangeSelect: true,
+//                    rangeSelect: true,
                     showTrigger: $target,
                     showAnim: 'fadeIn',
                     showSpeed: 'fast',
@@ -272,7 +272,7 @@ $(document).ready(function(){
                     monthsToShow: 2,
                     renderer: $.extend($.datepick.defaultRenderer, {
                         picker: $.datepick.defaultRenderer.picker
-                            .replace(/\{popup:start\}[\s\S]*\{popup:end\}/, '')
+//                            .replace(/\{popup:start\}[\s\S]*\{popup:end\}/, '')
                             .replace(/\{link:today\}/, '')
                     }),
                     onShow: function() {

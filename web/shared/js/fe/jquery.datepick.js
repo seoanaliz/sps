@@ -1099,8 +1099,11 @@ $.extend(Datepicker.prototype, {
 		var dateFormat = inst.get('dateFormat');
 		var multiSelect = inst.get('multiSelect');
 		var rangeSelect = inst.get('rangeSelect');
-		datesText = datesText.split(multiSelect ? inst.get('multiSeparator') :
-			(rangeSelect ? inst.get('rangeSeparator') : '\x00'));
+		datesText = datesText.split(
+            multiSelect ?
+            inst.get('multiSeparator') :
+            (rangeSelect ? inst.get('rangeSeparator') : '\x00')
+        );
 		var dates = [];
 		for (var i = 0; i < datesText.length; i++) {
 			try {
@@ -1134,7 +1137,6 @@ $.extend(Datepicker.prototype, {
 	                   (element) the control to use
 	   @param  hidden  (boolean) true to initially hide the datepicker */
 	_update: function(target, hidden) {
-        //console.log('update');
 		target = $(target.target || target);
 		var inst = $.data(target[0], $.datepick.dataName);
 		if (inst) {
@@ -1665,7 +1667,7 @@ $.extend(Datepicker.prototype, {
 	/* Select a date for this datepicker.
 	   @param  target  (element) the control to examine
 	   @param  elem    (element) the selected datepicker element */
-	selectDate: function(target, elem) {
+	selectDate: function(target, elem, event) {
 		var inst = $.data(target, this.dataName);
 		if (inst && !this.isDisabled(target)) {
 			var date = this.retrieveDate(target, elem);
@@ -1681,28 +1683,47 @@ $.extend(Datepicker.prototype, {
 					}
 				}
 				if (!found && inst.selectedDates.length < multiSelect) {
-					inst.selectedDates.push(date);
-				}
+                    if (event.shiftKey) {
+                        var fromDate = inst.selectedDates[inst.selectedDates.length - 1];
+                        var toDate = date;
+                        if (fromDate instanceof Date && toDate instanceof Date && fromDate != toDate) {
+                            var fromTime = Math.min(fromDate.getTime(), toDate.getTime());
+                            var toTime = Math.max(fromDate.getTime(), toDate.getTime());
+                            var currentTime = fromTime;
+                            while(currentTime < toTime) {
+                                currentTime += 86400000;
+                                var newFound = false;
+                                var newDate = new Date(currentTime);
+                                for (var i = 0; i < inst.selectedDates.length; i++) {
+                                    if (newDate.getTime() == inst.selectedDates[i].getTime()) {
+                                        inst.selectedDates.splice(i, 1);
+                                        newFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) inst.selectedDates.push(newDate);
+                            }
+                        }
+                    } else {
+                        inst.selectedDates.push(date);
+                    }
+                }
 			}
-			else if (rangeSelect) {
+            else if (rangeSelect) {
 				if (inst.pickingRange) {
 					inst.selectedDates[1] = date;
-				}
-				else {
+				} else {
 					inst.selectedDates = [date, date];
 				}
 				inst.pickingRange = !inst.pickingRange;
-			}
-			else {
+			} else {
 				inst.selectedDates = [date];
 			}
-			inst.prevDate = $.datepick.newDate(date);
+            inst.prevDate = $.datepick.newDate(date);
 			this._updateInput(target);
-			if (inst.inline || inst.pickingRange || inst.selectedDates.length <
-					(multiSelect || (rangeSelect ? 2 : 1))) {
+			if (inst.inline || inst.pickingRange || inst.selectedDates.length < (multiSelect || (rangeSelect ? 2 : 1))) {
 				this._update(target);
-			}
-			else {
+			} else {
 				//this.hide(target);
                 $.datepick._update(target, true);
             }
@@ -1776,8 +1797,8 @@ $.extend(Datepicker.prototype, {
 						find(renderer.daySelector + ' a').
 						removeClass(renderer.highlightedClass);
 				}).
-			click(function() {
-				self.selectDate(target, this);
+			click(function(e) {
+				self.selectDate(target, this, e);
 			}).end().
 			find('select.' + this._monthYearClass + ':not(.' + this._anyYearClass + ')').
 			change(function() {

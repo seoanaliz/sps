@@ -8,6 +8,13 @@
     font-weight: bold;
     color: #45688E;
     padding: 0.6em;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 .datepick-rtl {
 	direction: rtl;
@@ -66,22 +73,34 @@
     font-weight: bold;
 }
 .datepick-nav, .datepick-ctrl {
-	font-weight: bold;
-    width: 100%;
-    float: left;
-    margin-bottom: -2em;
-    z-index: 1;
-    position: relative;
+    font-weight: bold;
+	width: 100%;
+	float: left;
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
 }
-.datepick-ctrl {}
-.datepick-cmd {
+.datepick-nav {
+    z-index: 1;
+    position: relative;
+    margin-bottom: -2em;
+}
+.datepick-ctrl {
+    color: #fff;
+    margin-top: .6em;
+    font-size: 90%;
+}
+.datepick-nav .datepick-cmd {
 	width: 10%;
 }
 .datepick-cmd:hover {
     background-color: rgba(69, 104, 142, 0.15);
+}
+.datepick-ctrl .datepick-cmd {
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    padding: 0 1em;
 }
 .datepick-ctrl .datepick-cmd:hover {
     background-color: rgba(255,255,255,.3);
@@ -96,9 +115,14 @@ a.datepick-cmd {
 button.datepick-cmd {
 	text-align: center;
 }
+.datepick-cmd-prev {
+    background: url('../../images/fe/prev.png') no-repeat center;
+}
+.datepick-cmd-next {
+    background: url('../../images/fe/next.png') no-repeat center;
+}
 .datepick-cmd-prev, .datepick-cmd-prevJump, .datepick-cmd-clear {
 	float: left;
-    background: url('../../images/fe/prev.png') no-repeat center;
 }
 .datepick-cmd-current, .datepick-cmd-today {
 	float: left;
@@ -108,7 +132,6 @@ button.datepick-cmd {
 .datepick-cmd-next, .datepick-cmd-nextJump, .datepick-cmd-close {
 	float: right;
 	text-align: right;
-    background: url('../../images/fe/next.png') no-repeat center;
 }
 .datepick-rtl .datepick-cmd-prev, .datepick-rtl .datepick-cmd-prevJump,
 .datepick-rtl .datepick-cmd-clear {
@@ -147,8 +170,10 @@ button.datepick-cmd {
 .datepick-month {
 	float: left;
 	width: 15em;
-	border-right: 6px solid transparent;
 	text-align: center;
+}
+.datepick-month.first {
+	border-right: 6px solid transparent;
 }
 .datepick-month.last {
 	border-right: 0;
