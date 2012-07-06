@@ -19,7 +19,6 @@
             $to = Request::getInteger( 'to' );
             $sortType = Request::getString( 'sortType' );
 
-            SettingsUtility::SetSources($sourceFeedIds);
             if(empty($sourceFeedIds)) {
                 return;
             }

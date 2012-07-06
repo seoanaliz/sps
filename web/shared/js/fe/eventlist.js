@@ -262,6 +262,11 @@ var Eventlist = {
         });
     },
     leftcolumn_dropdown_change: function(){
+        var targetFeedId = Elements.rightdd();
+        var leftType = Elements.leftType();
+        if (leftType == 'source') {
+            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
+        }
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
