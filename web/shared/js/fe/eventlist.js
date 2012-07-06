@@ -186,6 +186,7 @@ var Eventlist = {
             url: controlsRoot + 'grid-line-save/',
             dataType : "json",
             data: {
+                gridLineId : gridLineId,
                 startDate : startDate,
                 endDate : endDate,
                 time: time,

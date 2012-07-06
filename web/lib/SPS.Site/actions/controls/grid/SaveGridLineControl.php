@@ -10,9 +10,12 @@
     class SaveGridLineControl {
 
         public function Execute() {
+            $gridLineId = Request::getInteger( 'gridLineId' );
             $time = Request::getString( 'time' );
             $type = Request::getString( 'type' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
+            $startDate = Request::getDateTime('startDate');
+            $endDate = Request::getDateTime('endDate');
 
             $result = array(
                 'success' => false
@@ -37,14 +40,18 @@
             }
 
             $object = new GridLine();
-            $object->startDate = DateTimeWrapper::Now();
-            $object->endDate = DateTimeWrapper::Now();
-            $object->endDate->modify('+7 days');
+            $object->gridLineId = $gridLineId;
+            $object->startDate = $startDate;
+            $object->endDate = $endDate;
             $object->time = new DateTimeWrapper($time);
             $object->type = $type;
             $object->targetFeedId = $targetFeedId;
 
-            $queryResult = GridLineFactory::Add($object);
+            if (empty($object->gridLineId)) {
+                $queryResult = GridLineFactory::Add($object);
+            } else {
+                $queryResult = GridLineFactory::Update($object);
+            }
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
