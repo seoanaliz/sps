@@ -152,7 +152,7 @@ $(document).ready(function(){
         $(".right-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        Events.fire('rightcolumn_dropdown_change', []);
+        Events.fire('rightcolumn_type_change', []);
     });
 
     // Wall init

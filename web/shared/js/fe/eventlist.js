@@ -232,7 +232,7 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
-        var selectedSources = Elements.leftdd();
+        var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
         $('#source-select option').remove();
@@ -245,7 +245,7 @@ var Eventlist = {
             url: controlsRoot + 'source-feeds-list/',
             dataType : "json",
             data: {
-                targetFeedId: Elements.rightdd(),
+                targetFeedId: targetFeedId,
                 type: sourceType
             },
             success: function (data) {
@@ -254,10 +254,15 @@ var Eventlist = {
                     $('#source-select').append('<option value="' + item.sourceFeedId + '">' + item.title + '</option>');
                 }
 
-                if (selectedSources) {
-                    $options = $('#source-select option');
-                    for (i in selectedSources) {
-                        $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                //get data from cookie
+                cookie = $.cookie('sourceFeedIds' + targetFeedId);
+                if (cookie) {
+                    var selectedSources = cookie.split(',');
+                    if (selectedSources) {
+                        var $options = $('#source-select option');
+                        for (i in selectedSources) {
+                            $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                        }
                     }
                 }
 

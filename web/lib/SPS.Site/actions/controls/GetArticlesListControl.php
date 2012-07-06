@@ -16,15 +16,14 @@
             $sourceFeedIds = Request::getArray('sourceFeedIds');
             $sourceFeedIds = !empty($sourceFeedIds) ? $sourceFeedIds : array();
 
-            $pageSize      = 20;
+            SettingsUtility::SetSources($sourceFeedIds);
             if(empty($sourceFeedIds)) {
                 return;
             }
 
-            Session::setArray('currentSourceFeedIds', $sourceFeedIds);
-
-            $page           = Session::getInteger( 'page' );
+            $page = Session::getInteger( 'page' );
             $page = ($page < 0) ? 0 : $page;
+            $pageSize = 20;
             $clean = Request::getBoolean( 'clean' );
             if ($clean) {
                 $page = 0;
