@@ -56,7 +56,6 @@
                     <modules>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps</param>
-                            <param name="host">media.sps.verumnets.ru</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
