@@ -93,8 +93,6 @@
             }
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
-                SettingsUtility::SetTarget($targetFeedId);
-
                 //вытаскиваем всю очередь на этот день на этот паблик
                 $articlesQueue = ArticleQueueFactory::Get(
                     array(

@@ -12,24 +12,16 @@
             Cookie::setCookie($key, $value, time() + 604800, '/', null, false, false);
         }
         private function get($key) {
-            $result = Session::getParameter($key);
-            if (empty($result)) {
-                $result = Cookie::getParameter($key);
-            }
-            return $result;
+            return Cookie::getParameter($key);
         }
 
-        public static function GetTarget() {
+        public static function GetTarget($checkAccess = true) {
             $targetFeedId = self::get('currentTargetFeedId');
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+            if ($checkAccess && !AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                 $targetFeedId = null;
             }
 
             return $targetFeedId;
-        }
-
-        public static function SetTarget($targetFeedId) {
-            self::set('currentTargetFeedId', $targetFeedId);
         }
 
         public static function GetDate() {
@@ -48,10 +40,9 @@
         }
 
         public static function SetSources($sourceFeedIds, $from, $to) {
-            $targetFeedId = self::GetTarget();
+            $targetFeedId = self::GetTarget(false);
             if (!empty($targetFeedId)) {
                 self::set('sourceFeedIds' . $targetFeedId, implode(',', $sourceFeedIds));
-                self::set('sourceFeedRange' . $targetFeedId, $from . ':' . $to);
             }
         }
     }
