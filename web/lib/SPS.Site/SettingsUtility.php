@@ -39,7 +39,7 @@
             self::set('currentTimestamp', $timestamp);
         }
 
-        public static function SetSources($sourceFeedIds, $from, $to) {
+        public static function SetSources($sourceFeedIds) {
             $targetFeedId = self::GetTarget(false);
             if (!empty($targetFeedId)) {
                 self::set('sourceFeedIds' . $targetFeedId, implode(',', $sourceFeedIds));
