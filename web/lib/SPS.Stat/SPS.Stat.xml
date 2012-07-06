@@ -6,12 +6,29 @@
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
+        <action name="WrUnix">
+            <path>daemons/WrUnix</path>
+        </action>
 	    <action name="WrPosts">
             <path>daemons/WrPosts</path>
         </action>
 	    <action name="WrPoints">
             <path>daemons/WrPoints</path>
         </action>
+    </group>
+
+    <group name="Controls">
+        <group name="Prices">
+            <action name="deletePostPrice">
+                <path>controls/deletePostPrice</path>
+            </action>
+            <action name="setPostPrice">
+                <path>controls/setPostPrice</path>
+            </action>
+            <action name="setGroup">
+                <path>controls/setGroup</path>
+            </action>
+        </group>
     </group>
 
 </actions>

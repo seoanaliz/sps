@@ -66,6 +66,15 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
+                <page uri="controls://setPrice/">
+                    <actions>SPS.Stat.setPostPrice</actions>
+                </page>
+                <page uri="controls://unsetPrice/">
+                    <actions>SPS.Stat.deletePostPrice</actions>
+                </page>
+	        <page uri="controls://setGroup/">
+                    <actions>SPS.Stat.setGroup</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
@@ -79,7 +88,7 @@
                 </page>
                 <page uri="vt://stat/">
                     <actions>Sps.Stat.GraphGrow</actions>
-                    <!--<template>tmpl://vt/stat/index.tmpl.php</template>-->
+                    <template>tmpl://vt/stat/index.tmpl.php</template>
 
                 </page>
 
@@ -337,6 +346,9 @@
                 </page>
                 <page uri="daemons://wr-points/">
                     <actions>SPS.Stat.WrPoints</actions>
+                </page>
+                <page uri="daemons://wr-unix/">
+                    <actions>SPS.Stat.WrUnix</actions>
                 </page>
             </pageGroup>
 
