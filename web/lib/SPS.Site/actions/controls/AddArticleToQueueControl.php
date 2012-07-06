@@ -38,9 +38,7 @@
 
             if (!empty($queueId)) {
                 //просто перемещаем элемент очереди
-                $object = new ArticleQueue();
-                $this->buildDates($object, $timestamp);
-                ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate'), array('articleQueueId' => $queueId, 'statusId' => 1));
+                ArticleUtility::ChangeQueueDates($queueId, $timestamp);
 
                 $result = array(
                     'success' => true,
@@ -86,7 +84,7 @@
             $object->articleId = $article->articleId;
             $object->targetFeedId = $targetFeed->targetFeedId;
             $object->type = $type;
-            $this->buildDates($object, $timestamp);
+            ArticleUtility::BuildDates($object, $timestamp);
 
             $object->statusId = 1;
 

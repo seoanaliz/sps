@@ -83,14 +83,19 @@
             if(!empty($articlesQueue)) {
                 foreach($articlesQueue as $articlesQueueItem) {
                     //ищем место в grid для текущей $articlesQueueItem
-                    foreach ($grid as &$gridItem) {
+                    $place = null;
+                    foreach ($grid as $key => $gridItem) {
                         if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
                             if (empty($gridItem['queue'])) {
-                                $gridItem['queue'] = $articlesQueueItem;
-                                $gridItem['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
-                                $gridItem['failed'] = ($articlesQueueItem->statusId != StatusUtility::Finished && $articlesQueueItem->endDate <= $now);
+                                $place = $key;
                             }
                         }
+                    }
+
+                    if ($place !== null) {
+                        $grid[$place]['queue'] = $articlesQueueItem;
+                        $grid[$place]['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
+                        $grid[$place]['failed'] = ($articlesQueueItem->statusId != StatusUtility::Finished && $articlesQueueItem->endDate <= $now);
                     }
                 }
             }

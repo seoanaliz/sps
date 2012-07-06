@@ -234,13 +234,11 @@ $(document).ready(function(){
             var $time = $post.find('.time');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
-            var startDate = $post.data('start-date');
-            var endDate = $post.data('end-date');
 
             if (e.type == 'keydown' && e.keyCode != 13) return;
 
             var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
-            var pid = $post.data('id');
+            var qid = $post.find('.post').data('queue-id');
             $input.hide().val(time);
 
             if (time && time != $time.text()) {
@@ -248,7 +246,7 @@ $(document).ready(function(){
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
                     // console.log([gridLineId, gridLineItemId, time]);
-                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, function(state){
+                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
                     }]);
                 }

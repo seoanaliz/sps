@@ -15,6 +15,7 @@
             $time = Request::getString( 'time' );
             $timestamp = Request::getInteger( 'timestamp' );
             $itemDate = new DateTimeWrapper(date('d.m.Y', !empty($timestamp) ? $timestamp : null) . ' ' . $time);
+            $queueId = Request::getInteger( 'queueId' );
 
             $result = array(
                 'success' => false
@@ -52,6 +53,11 @@
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
+            }
+
+            if (!empty($queueId)) {
+                //актуализируем время запланированного контента
+                ArticleUtility::ChangeQueueDates($queueId, $itemDate->format('U'));
             }
 
             echo ObjectHelper::ToJSON($result);
