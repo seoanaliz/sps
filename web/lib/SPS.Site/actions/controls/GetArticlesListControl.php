@@ -15,8 +15,11 @@
         public function Execute() {
             $sourceFeedIds = Request::getArray('sourceFeedIds');
             $sourceFeedIds = !empty($sourceFeedIds) ? $sourceFeedIds : array();
+            $from = Request::getInteger( 'from' );
+            $to = Request::getInteger( 'to' );
+            $sortType = Request::getString( 'sortType' );
 
-            SettingsUtility::SetSources($sourceFeedIds);
+            SettingsUtility::SetSources($sourceFeedIds, $from, $to);
             if(empty($sourceFeedIds)) {
                 return;
             }
@@ -35,10 +38,6 @@
                 'page' => $page,
             );
             $options = array();
-
-            $from = Request::getInteger( 'from' );
-            $to = Request::getInteger( 'to' );
-            $sortType = Request::getString( 'sortType' );
 
             if ($from !== null) {
                 $search['rateGE'] = $from;

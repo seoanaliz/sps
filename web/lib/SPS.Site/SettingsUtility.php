@@ -47,10 +47,11 @@
             self::set('currentTimestamp', $timestamp);
         }
 
-        public static function SetSources($sourceFeedIds) {
+        public static function SetSources($sourceFeedIds, $from, $to) {
             $targetFeedId = self::GetTarget();
             if (!empty($targetFeedId)) {
                 self::set('sourceFeedIds' . $targetFeedId, implode(',', $sourceFeedIds));
+                self::set('sourceFeedRange' . $targetFeedId, $from . ':' . $to);
             }
         }
     }

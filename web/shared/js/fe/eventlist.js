@@ -255,7 +255,7 @@ var Eventlist = {
                 }
 
                 //get data from cookie
-                cookie = $.cookie('sourceFeedIds' + targetFeedId);
+                var cookie = $.cookie('sourceFeedIds' + targetFeedId);
                 if (cookie) {
                     var selectedSources = cookie.split(',');
                     if (selectedSources) {
@@ -263,6 +263,28 @@ var Eventlist = {
                         for (i in selectedSources) {
                             $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
                         }
+                    }
+                }
+
+                //slider
+                $( "#slider-range" ).slider( "values", 0, 50 );
+                $( "#slider-range" ).slider( "values", 1, 100 );
+                cookie = $.cookie('sourceFeedRange' + targetFeedId);
+                if (cookie) {
+                    var ranges = cookie.split(':');
+                    if (ranges.length) {
+                        var from = parseInt(ranges[0]);
+                        var to = parseInt(ranges[1]);
+
+                        if (from < 0 || from > 100) {
+                            from = 50;
+                        }
+                        if (to < 0 || to > 100 || to < from) {
+                            to = 100;
+                        }
+
+                        $( "#slider-range" ).slider( "values", 0, from );
+                        $( "#slider-range" ).slider( "values", 1, to );
                     }
                 }
 
