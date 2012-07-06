@@ -10,60 +10,6 @@
     class GetArticlesQueueListControl {
 
         /**
-         * @param $date
-         * @param $targetFeed
-         * @return array
-         *
-         * @deprecated see GridLineUtility::GetGrid
-         */
-        private function getGrid($date, $targetFeed) {
-            //generate table
-            $result = array();
-
-            $startTime  = '9:00';
-            $period     = 60;
-
-            if (!empty($targetFeed)) {
-                //ищем настройки сетки
-                $queueDate = new DateTimeWrapper($date);
-                $sqlDate = PgSqlConvert::ToDate($queueDate);
-                $customSql = " AND cast(\"startDate\" as DATE) <= {$sqlDate} ORDER BY \"startDate\" DESC LIMIT 1 ";
-                $targetFeedGrid = TargetFeedGridFactory::GetOne(
-                    array('targetFeedId' => $targetFeed->targetFeedId)
-                    , array(BaseFactory::CustomSql => $customSql)
-                );
-
-                if (!empty($targetFeedGrid)) {
-                    $period = $targetFeedGrid->period;
-                    $startTime = $targetFeedGrid->startDate->format('G:i');
-                }
-            }
-
-            $period = max($period, 15);
-
-            //строим сетку
-            $now = DateTimeWrapper::Now();
-            $queueDate = new DateTimeWrapper($date . ' ' . $startTime);
-            while ($queueDate->DefaultDateFormat() == $date) {
-                $result[] = array(
-                    'dateTime' => new DateTimeWrapper($queueDate->DefaultFormat()),
-                    'blocked' => ($queueDate <= $now)
-                );
-
-                $queueDate->modify('+ ' . $period . ' minutes');
-
-                //фикс полуночи
-                if ($queueDate->format('G:i') == '0:00') {
-                    $queueDate->modify('-1 minute');
-                }
-            }
-
-            $result = array_reverse($result);
-
-            return $result;
-        }
-
-        /**
          * Entry Point
          */
         public function Execute() {
@@ -142,7 +88,7 @@
                             if (empty($gridItem['queue'])) {
                                 $gridItem['queue'] = $articlesQueueItem;
                                 $gridItem['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
-                                $gridItem['failed'] = ($articlesQueueItem->statusId == 1 && $articlesQueueItem->endDate <= $now);
+                                $gridItem['failed'] = ($articlesQueueItem->statusId != StatusUtility::Finished && $articlesQueueItem->endDate <= $now);
                             }
                         }
                     }

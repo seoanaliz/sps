@@ -7,11 +7,11 @@
      */
     class SettingsUtility {
 
-        private function set($key, $value) {
+        private static function set($key, $value) {
             Session::setParameter($key, $value);
             Cookie::setCookie($key, $value, time() + 604800, '/', null, false, false);
         }
-        private function get($key) {
+        private static function get($key) {
             return Cookie::getParameter($key);
         }
 

@@ -336,6 +336,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="vtControls" boot="">
+                <page uri="controls://generate-grid-sql/">
+                    <actions>SPS.Articles.GenerateGridSQL</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

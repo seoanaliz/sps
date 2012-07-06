@@ -1624,7 +1624,7 @@ var Elements = {
                 }
             };
 
-            $(".post > .content").draggable(draggableParams);
+            $(".post:not(.blocked) > .content").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",

@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <actions>
+    <group name="controls">
+        <action name="GenerateGridSQL">
+            <path>controls/GenerateGridSQL</path>
+        </action>
+    </group>
     <group name="sourcefeed">
         <action name="GetSourceFeedList">
             <path>source-feeds/GetSourceFeedListAction</path>

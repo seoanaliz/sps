@@ -8,7 +8,7 @@
         ?>
             <div class="slot locked">
                 <div class="slot-header">
-                    <span><?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : '' ?></span>
+                    <span>&nbsp;<?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : '' ?></span>
 
                     {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                 </div>
