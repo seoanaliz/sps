@@ -1,6 +1,11 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
+    $.mask.definitions['2']='[012]';
+    $.mask.definitions['3']='[0123]';
+    $.mask.definitions['5']='[012345]';
+    $.datepick.setDefaults($.datepick.regional['ru']);
+
     // Календарь
     $("#calendar")
         .datepicker (
@@ -140,14 +145,14 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
-    // Вкладки "Все записи", "Контент", "Реклама" в правом меню
+    // Вкладки в правом меню
     $(".right-panel .type-selector a").click(function(e){
         e.preventDefault();
 
         $(".right-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        Events.fire('rightcolumn_type_change', []);
+        Events.fire('rightcolumn_dropdown_change', []);
     });
 
     // Wall init
@@ -201,45 +206,104 @@ $(document).ready(function(){
                 pid = elem.data("id");
             Events.fire('rightcolumn_deletepost', [pid, function(state){
                 if(state) {
-                    elem.closest(".slot").addClass('empty');
-                    elem.closest(".slot").find('span.attach-icon').remove();
-                    elem.closest(".slot").find('span.hash-span').remove();
                     elem.remove();
                 }
             }]);
         })
         // Смена даты
-        .delegate('.time', 'click', function() {
-            var $date = $(this);
-            $date.attr('contenteditable', true).focus().select();
-        })
-        .delegate('.time', 'blur', function() {
+        .delegate('.time', 'click', function(e) {
             var $time = $(this);
-            var $post = $time.closest('.slot');
-            var pid = $post.data('id');
-            var time = $time.text();
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('input');
 
-            var gridLineId = $post.data('grid-id');
-            var gridLineItemId = $post.data('grid-item-id');
-
-            if ($post.hasClass('new')) {
-                // Добавление ячейки
-                Events.fire('rightcolumn_save_slot', [gridLineId, time, function(state){
-                    if (state) {
-                        $post.animate({height: 0}, 400, function() {$(this).remove()});
-                        $time.attr('contenteditable', false);
-                    }
-                }]);
+            if (!$input) {
+                $input = $('<input />')
+                    .attr({class: "time-edit", type: "text"})
+                    .css({width: $time.width() + 2})
+                    .val($time.text())
+                    .appendTo($post);
+                $time.data('input', $input);
             } else {
-                // Редактирование ячейки
-                Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, function(state){
-                    if (state) {
-                        $time.attr('contenteditable', false);
-                    }
-                }]);
+                $time.data('input').show();
+            }
+            $input.mask("23:59").focus().select();
+        })
+        .delegate('.time-edit', 'blur keydown', function(e) {
+            var $input = $(this);
+            var $post = $input.closest('.slot');
+            var $time = $post.find('.time');
+            var $gridLineId = $post.data('grid-id');
+            var $gridLineItemId = $post.data('grid-item-id');
+
+            if (e.type == 'keydown' && e.keyCode != 13) return;
+
+            var text = ($input.val() == '__:__') ? '23:59' : $input.val();
+            var pid = $post.data('id');
+            $input.hide().val(text);
+
+            if (text && text != $time.text()) {
+                $time.text(text);
+                if ($post.hasClass('new')) {
+                    // Добавление ячейки
+                    Events.fire('rightcolumn_save_slot', [$gridLineId, text, function(state){
+                        if (state) {
+
+                        }
+                    }]);
+                } else {
+                    // Редактирование времени ячейки для текущего дня
+                    Events.fire('rightcolumn_time_edit', [$gridLineId, $gridLineItemId, text, function(state){
+                        if (state) {
+
+                        }
+                    }]);
+                }
             }
         })
         .delegate('.datepicker', 'click', function() {
+            var $target = $(this);
+            var $header = $target.parent();
+
+            if (!$header.data('datepicker')) {
+                var $datepicker = $('<input type="text" />');
+                var $post = $target.closest('.slot');
+                var pid = $post.data('id');
+                var text = $datepicker.val();
+                var $gridLineId = $post.data('grid-id');
+
+                $header.data('datepicker', $datepicker);
+                $target.after($datepicker);
+                $target.remove();
+                $datepicker.datepick({
+//                    rangeSelect: true,
+                    showTrigger: $target,
+                    showAnim: 'fadeIn',
+                    showSpeed: 'fast',
+                    minDate: 0,
+                    multiSelect: 999,
+                    monthsToShow: 2,
+                    renderer: $.extend($.datepick.defaultRenderer, {
+                        picker: $.datepick.defaultRenderer.picker
+//                            .replace(/\{popup:start\}[\s\S]*\{popup:end\}/, '')
+                            .replace(/\{link:today\}/, '')
+                    }),
+                    onShow: function() {
+                        $header.find('span.datepicker').addClass('active');
+                        $('#queue').css('overflow', 'hidden');
+                    },
+                    onClose: function() {
+                        text = $datepicker.val();
+                        $header.find('span.datepicker').removeClass('active');
+                        $('#queue').css('overflow', 'auto');
+//                        Events.fire('rightcolumn_date_edit', [pid, text, function(state) {
+//                            if (state) {
+//                                console.log(pid + ': Mega Edit: ' + text);
+//                            }
+//                        }]);
+                    }
+                });
+                $datepicker.width(13).hide().focus();
+            }
         })
     ;
 
@@ -1519,7 +1583,7 @@ var Elements = {
                     if (state) {
                         callback(newId);
                     } else {
-                        popupError('Ошибка планирования поста');
+                        failback();
                     }
                 }]);
             };
@@ -1580,6 +1644,12 @@ var Elements = {
             $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
     },
+    leftType: function(){
+        return $('.left-panel .type-selector a.active').data('type');
+    },
+    rightType: function(){
+        return $('.right-panel .type-selector a.active').data('type');
+    },
     calendar: function(value){
         if(typeof value == 'undefined') {
             var timestamp = $("#calendar").datepicker("getDate");
@@ -1633,12 +1703,6 @@ var Elements = {
         $('img.ajax-loader').each(function(){
             Elements.initLinkLoader($(this), true);
         });
-    },
-    leftType:function(){
-        return $(".left-panel .type-selector a.active").data('type');
-    },
-    rightType:function(){
-        return $(".right-panel .type-selector a.active").data('type');
     }
 };
 
