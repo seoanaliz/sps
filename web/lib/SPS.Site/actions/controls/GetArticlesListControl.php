@@ -15,16 +15,18 @@
         public function Execute() {
             $sourceFeedIds = Request::getArray('sourceFeedIds');
             $sourceFeedIds = !empty($sourceFeedIds) ? $sourceFeedIds : array();
+            $from = Request::getInteger( 'from' );
+            $to = Request::getInteger( 'to' );
+            $sortType = Request::getString( 'sortType' );
 
-            $pageSize      = 20;
+            SettingsUtility::SetSources($sourceFeedIds);
             if(empty($sourceFeedIds)) {
                 return;
             }
 
-            Session::setArray('currentSourceFeedIds', $sourceFeedIds);
-
-            $page           = Session::getInteger( 'page' );
+            $page = Session::getInteger( 'page' );
             $page = ($page < 0) ? 0 : $page;
+            $pageSize = 20;
             $clean = Request::getBoolean( 'clean' );
             if ($clean) {
                 $page = 0;
@@ -36,10 +38,6 @@
                 'page' => $page,
             );
             $options = array();
-
-            $from = Request::getInteger( 'from' );
-            $to = Request::getInteger( 'to' );
-            $sortType = Request::getString( 'sortType' );
 
             if ($from !== null) {
                 $search['rateGE'] = $from;

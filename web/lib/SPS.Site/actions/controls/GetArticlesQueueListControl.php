@@ -79,7 +79,7 @@
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
 
-            Session::setInteger('currentTimestamp', $queueDate->format('U'));
+            SettingsUtility::SetDate($queueDate->format('U'));
 
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
@@ -93,8 +93,6 @@
             }
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
-                Session::setInteger('currentTargetFeedId', $targetFeedId);
-
                 //вытаскиваем всю очередь на этот день на этот паблик
                 $articlesQueue = ArticleQueueFactory::Get(
                     array(

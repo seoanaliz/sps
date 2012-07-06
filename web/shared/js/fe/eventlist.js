@@ -1,29 +1,57 @@
 var articlesLoading = false;
 
-$(function(){
-    $( "#slider-range" ).slider({
-        range: true,
-        min: 0,
-        max: 100,
-        animate: 100,
-        values: [50, 100],
-        create: function(event, ui) {
-            changeRange();
-        },
-        slide: function(event, ui) {
-            changeRange();
-        },
-        change: function(event, ui) {
-            changeRange();
-            loadArticles(true);
+function initSlider(targetFeedId) {
+    var cookie = $.cookie('sourceFeedRange' + targetFeedId);
+    var from = 50;
+    var to = 100;
+    if (cookie) {
+        var ranges = cookie.split(':');
+        if (ranges.length == 2) {
+            from = parseInt(ranges[0]);
+            to = parseInt(ranges[1]);
+
+            if (from < 0 || from > 100) {
+                from = 50;
+            }
+            if (to < 0 || to > 100) {
+                to = 100;
+            }
         }
-    });
-});
+    }
+
+    if (!$("#slider-range").data('slider')) {
+        $("#slider-range").slider({
+            range: true,
+            min: 0,
+            max: 100,
+            animate: 100,
+            values: [from, to],
+            create: function(event, ui) {
+                changeRange();
+            },
+            slide: function(event, ui) {
+                changeRange();
+            },
+            change: function(event, ui) {
+                changeRange();
+                loadArticles(true);
+            }
+        });
+    } else {
+        $("#slider-range").slider("values", 0, from);
+        $("#slider-range").slider("values", 1, to);
+    }
+}
 
 function changeRange() {
     var top = $("#slider-range").slider("values", 1);
     $("#slider-range").find('a:first').html($("#slider-range").slider("values", 0));
     $("#slider-range").find('a:last').html(top == 100 ? 'TOP' : top);
+
+    var targetFeedId = Elements.rightdd();
+    if (targetFeedId) {
+        $.cookie('sourceFeedRange' + targetFeedId, $("#slider-range").slider("values", 0) + ':' + $("#slider-range").slider("values", 1), { expires: 7, path: '/', secure: false });
+    }
 }
 
 function loadArticles(clean) {
@@ -79,9 +107,12 @@ function loadArticles(clean) {
 }
 
 function loadQueue() {
-    if (!Elements.rightdd()) {
+    var targetFeedId = Elements.rightdd();
+    if (!targetFeedId) {
         return;
     }
+
+    $.cookie('currentTargetFeedId', targetFeedId, { expires: 7, path: '/', secure: false });
 
     var type = Elements.rightType();
 
@@ -233,8 +264,11 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
-        var selectedSources = Elements.leftdd();
+        var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
+
+        //init slider
+        initSlider(targetFeedId);
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
@@ -246,7 +280,7 @@ var Eventlist = {
             url: controlsRoot + 'source-feeds-list/',
             dataType : "json",
             data: {
-                targetFeedId: Elements.rightdd(),
+                targetFeedId: targetFeedId,
                 type: sourceType
             },
             success: function (data) {
@@ -255,10 +289,15 @@ var Eventlist = {
                     $('#source-select').append('<option value="' + item.sourceFeedId + '">' + item.title + '</option>');
                 }
 
-                if (selectedSources) {
-                    $options = $('#source-select option');
-                    for (i in selectedSources) {
-                        $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                //get data from cookie
+                var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+                if (cookie) {
+                    var selectedSources = cookie.split(',');
+                    if (selectedSources) {
+                        var $options = $('#source-select option');
+                        for (i in selectedSources) {
+                            $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                        }
                     }
                 }
 
