@@ -224,7 +224,6 @@ div.type-selector a:hover {
 }
 .ui-dropdown-menu-item {
     cursor: default;
-    font-weight: bold;
     color: #45688E;
     padding: 4px 10px;
     text-overflow: ellipsis;
@@ -238,6 +237,7 @@ div.type-selector a:hover {
 .ui-dropdown-menu-item.active {
     background-color: #45688E;
     color: #fff;
+    font-weight: bold;
 }
 .ui-dropdown-menu-item .icon img {
     width: 100%;

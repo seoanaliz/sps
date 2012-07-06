@@ -226,7 +226,7 @@ $(document).ready(function(){
             } else {
                 $time.data('input').show();
             }
-            $input.mask("23:59").focus().select();
+            $input.mask("29:59").focus().select();
         })
         .delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
@@ -275,12 +275,12 @@ $(document).ready(function(){
                 $target.after($datepicker);
                 $target.remove();
                 $datepicker.datepick({
-//                    rangeSelect: true,
+                    rangeSelect: true,
                     showTrigger: $target,
                     showAnim: 'fadeIn',
                     showSpeed: 'fast',
                     minDate: 0,
-                    multiSelect: 999,
+//                    multiSelect: 999,
                     monthsToShow: 2,
                     renderer: $.extend($.datepick.defaultRenderer, {
                         picker: $.datepick.defaultRenderer.picker
@@ -312,7 +312,7 @@ $(document).ready(function(){
         var $newPost = $(
             '<div class="new slot empty">' +
                 '<div class="slot-header">' +
-                    '<span class="time">23:59</span>' +
+                    '<span class="time"></span>' +
                     '<span class="datepicker"></span>' +
                 '</div>' +
             '</div>'

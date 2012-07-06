@@ -19,7 +19,7 @@
 		currentText: 'Сегодня', currentStatus: '',
 		todayText: 'Сегодня', todayStatus: '',
 		clearText: 'Очистить', clearStatus: '',
-		closeText: 'Закрыть', closeStatus: '',
+		closeText: 'Сохранить', closeStatus: '',
 		yearStatus: '', monthStatus: '',
 		weekText: 'Не', weekStatus: '',
 		dayStatus: 'd M, DD', defaultStatus: '',
