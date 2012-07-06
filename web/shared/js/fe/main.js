@@ -232,31 +232,29 @@ $(document).ready(function(){
             var $input = $(this);
             var $post = $input.closest('.slot');
             var $time = $post.find('.time');
-            var $gridLineId = $post.data('grid-id');
-            var $gridLineItemId = $post.data('grid-item-id');
+            var gridLineId = $post.data('grid-id');
+            var gridLineItemId = $post.data('grid-item-id');
+            var startDate = $post.data('start-date');
+            var endDate = $post.data('end-date');
 
             if (e.type == 'keydown' && e.keyCode != 13) return;
 
-            var text = ($input.val() == '__:__') ? '23:59' : $input.val();
+            var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
             var pid = $post.data('id');
-            $input.hide().val(text);
+            $input.hide().val(time);
 
-            if (text && text != $time.text()) {
-                $time.text(text);
-                if ($post.hasClass('new')) {
-                    // Добавление ячейки
-                    Events.fire('rightcolumn_save_slot', [$gridLineId, text, function(state){
-                        if (state) {
-
-                        }
-                    }]);
-                } else {
+            if (time && time != $time.text()) {
+                $time.text(time);
+                if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', [$gridLineId, $gridLineItemId, text, function(state){
-                        if (state) {
-
-                        }
+                    // console.log([gridLineId, gridLineItemId, time]);
+                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, function(state){
+                        if (state) {}
                     }]);
+                }
+            } else if (!time) {
+                if ($post.hasClass('new')) {
+                    $post.animate({height: 0}, 200, function() {$(this).remove()});
                 }
             }
         })
@@ -267,9 +265,14 @@ $(document).ready(function(){
             if (!$header.data('datepicker')) {
                 var $datepicker = $('<input type="text" />');
                 var $post = $target.closest('.slot');
+                var $time = $post.find('.time');
                 var pid = $post.data('id');
-                var text = $datepicker.val();
-                var $gridLineId = $post.data('grid-id');
+                var gridLineId = $post.data('grid-id');
+                var startDate = $post.data('start-date');
+                var endDate = $post.data('end-date');
+                var defStartDate = $post.data('start-date');
+                var defEndDate = $post.data('end-date');
+                var time = $time.text();
 
                 $header.data('datepicker', $datepicker);
                 $target.after($datepicker);
@@ -279,30 +282,43 @@ $(document).ready(function(){
                     showTrigger: $target,
                     showAnim: 'fadeIn',
                     showSpeed: 'fast',
-                    minDate: 0,
-//                    multiSelect: 999,
                     monthsToShow: 2,
+                    minDate: 0,
                     renderer: $.extend($.datepick.defaultRenderer, {
-                        picker: $.datepick.defaultRenderer.picker
-//                            .replace(/\{popup:start\}[\s\S]*\{popup:end\}/, '')
-                            .replace(/\{link:today\}/, '')
+                        picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
                     }),
+                    onSelect: function(dates) {
+                        $post.data('start-date', $.datepick.formatDate(dates[0]));
+                        $post.data('end-date', $.datepick.formatDate(dates[1]));
+                        startDate = $post.data('start-date');
+                        endDate = $post.data('end-date');
+                    },
                     onShow: function() {
                         $header.find('span.datepicker').addClass('active');
                         $('#queue').css('overflow', 'hidden');
                     },
                     onClose: function() {
-                        text = $datepicker.val();
+                        time = $time.text();
                         $header.find('span.datepicker').removeClass('active');
                         $('#queue').css('overflow', 'auto');
-//                        Events.fire('rightcolumn_date_edit', [pid, text, function(state) {
-//                            if (state) {
-//                                console.log(pid + ': Mega Edit: ' + text);
-//                            }
-//                        }]);
+                        if ($post.hasClass('new')) {
+                            // Добавление ячейки
+                            // console.log([gridLineId, time, startDate, endDate]);
+                            Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state){
+                                if (state) {}
+                            }]);
+                        } else {
+                            // Редактироваиние ячейки
+                            if (defStartDate != startDate || defEndDate != endDate) {
+                                console.log([gridLineId, time, startDate, endDate]);
+                                Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state) {
+                                    if (state) {}
+                                }]);
+                            }
+                        }
                     }
                 });
-                $datepicker.width(13).hide().focus();
+                $datepicker.val(startDate + ' - ' + endDate).focus();
             }
         })
     ;
@@ -312,7 +328,7 @@ $(document).ready(function(){
         var $newPost = $(
             '<div class="new slot empty">' +
                 '<div class="slot-header">' +
-                    '<span class="time"></span>' +
+                    '<span class="time">__:__</span>' +
                     '<span class="datepicker"></span>' +
                 '</div>' +
             '</div>'

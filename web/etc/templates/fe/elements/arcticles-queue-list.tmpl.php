@@ -7,8 +7,8 @@
                      data-id="{$id}"
                      data-grid-id="{$gridItem[gridLineId]}"
                      data-grid-item-id="{$gridItem[gridLineItemId]}"
-                     data-start-date="<?= $gridItem['startDate']->format('U') ?>"
-                     data-end-date="<?= $gridItem['endDate']->format('U') ?>">
+                     data-start-date="<?= $gridItem['startDate']->format('d.m.Y') ?>"
+                     data-end-date="<?= $gridItem['endDate']->format('d.m.Y') ?>">
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
@@ -23,8 +23,8 @@
                      data-id="{$id}"
                      data-grid-id="{$gridItem[gridLineId]}"
                      data-grid-item-id="{$gridItem[gridLineItemId]}"
-                     data-start-date="<?= $gridItem['startDate']->format('U') ?>"
-                     data-end-date="<?= $gridItem['endDate']->format('U') ?>">
+                     data-start-date="<?= $gridItem['startDate']->format('d.m.Y') ?>"
+                     data-end-date="<?= $gridItem['endDate']->format('d.m.Y') ?>">
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>

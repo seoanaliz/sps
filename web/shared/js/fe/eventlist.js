@@ -181,13 +181,13 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_save_slot: function(gridLineId, time, callback) {
+    rightcolumn_save_slot: function(gridLineId, time, startDate, endDate, callback) {
         $.ajax({
             url: controlsRoot + 'grid-line-save/',
             dataType : "json",
             data: {
-                startDate : null, //TODO
-                endDate : null, //TODO
+                startDate : startDate,
+                endDate : endDate,
                 time: time,
                 type: Elements.rightType(),
                 targetFeedId: Elements.rightdd()
