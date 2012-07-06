@@ -100,11 +100,11 @@
                        <div class="ctl spr del"></div>
                    </div -->
 
-                    <!--div class="type-selector">
-                        <a href="#" class="active" data-type="all">Все записи</a>
-                        <a href="#" class="" data-type="content">Контент <span class="counter">8</span></a>
-                        <a href="#" class="" data-type="ads2">Реклама</a>
-                    </div-->
+                    <div class="type-selector">
+                        <a href="#" class="active" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
+                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                    </div>
 
                 </div>
             </div>

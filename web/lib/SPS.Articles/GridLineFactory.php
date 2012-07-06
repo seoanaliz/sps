@@ -7,47 +7,43 @@
     Package::Load( 'SPS.Articles' );
 
     /**
-     * ArticleQueue Factory
+     * GridLine Factory
      *
      * @package SPS
      * @subpackage Articles
      */
-    class ArticleQueueFactory implements IFactory {
+    class GridLineFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** ArticleQueue instance mapping  */
+        /** GridLine instance mapping  */
         public static $mapping = array (
-            'class'       => 'ArticleQueue'
-            , 'table'     => 'articleQueues'
-            , 'view'      => 'getArticleQueues'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
-            , 'cacheDeps' => array( 'articles', 'targetFeeds' )
+            'class'       => 'GridLine'
+            , 'table'     => 'gridLines'
+            , 'view'      => 'getGridLines'
+            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'cacheDeps' => array( 'targetFeeds' )
             , 'fields'    => array(
-                'articleQueueId' => array(
-                    'name'          => 'articleQueueId'
+                'gridLineId' => array(
+                    'name'          => 'gridLineId'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 )
                 ,'startDate' => array(
                     'name'          => 'startDate'
-                    , 'type'        => TYPE_DATETIME
-                    , 'nullable'    => 'No'
+                    , 'type'        => TYPE_DATE
+                    , 'nullable'    => 'CheckEmpty'
                 )
                 ,'endDate' => array(
                     'name'          => 'endDate'
-                    , 'type'        => TYPE_DATETIME
-                    , 'nullable'    => 'No'
+                    , 'type'        => TYPE_DATE
+                    , 'nullable'    => 'CheckEmpty'
                 )
-                ,'createdAt' => array(
-                    'name'          => 'createdAt'
-                    , 'type'        => TYPE_DATETIME
-                    , 'nullable'    => 'No'
-                )
-                ,'sentAt' => array(
-                    'name'          => 'sentAt'
-                    , 'type'        => TYPE_DATETIME
+                ,'time' => array(
+                    'name'          => 'time'
+                    , 'type'        => TYPE_TIME
+                    , 'nullable'    => 'CheckEmpty'
                 )
                 ,'type' => array(
                     'name'          => 'type'
@@ -55,40 +51,14 @@
                     , 'max'         => 10
                     , 'nullable'    => 'CheckEmpty'
                 )
-                ,'articleId' => array(
-                    'name'          => 'articleId'
-                    , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Article'
-                )
                 ,'targetFeedId' => array(
                     'name'          => 'targetFeedId'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'TargetFeed'
-                )
-                ,'statusId' => array(
-                    'name'          => 'statusId'
-                    , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
-                    , 'foreignKey'  => 'Status'
                 ))
             , 'lists'     => array()
-            , 'search'    => array(
-                'startDateAsDate' => array(
-                    'name'         => 'startDate'
-                    , 'type'       => TYPE_DATE
-                )
-                ,'page' => array(
-                    'name'         => 'page'
-                    , 'type'       => TYPE_INTEGER
-                    , 'default'    => 0
-                )
-                ,'pageSize' => array(
-                    'name'         => 'pageSize'
-                    , 'type'       => TYPE_INTEGER
-                    , 'default'    => 25
-                ))
+            , 'search'    => array()
         );
         
         /** @return array */
@@ -138,17 +108,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return ArticleQueue[] */
+        /** @return GridLine[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return ArticleQueue */
+        /** @return GridLine */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return ArticleQueue */
+        /** @return GridLine */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -173,7 +143,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return ArticleQueue */
+        /** @return GridLine */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

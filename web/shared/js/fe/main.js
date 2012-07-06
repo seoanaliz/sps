@@ -145,6 +145,16 @@ $(document).ready(function(){
         Events.fire('rightcolumn_dropdown_change', []);
     });
 
+    // Вкладки в правом меню
+    $(".right-panel .type-selector a").click(function(e){
+        e.preventDefault();
+
+        $(".right-panel .type-selector a").removeClass('active');
+        $(this).addClass('active');
+
+        Events.fire('rightcolumn_dropdown_change', []);
+    });
+
     // Wall init
     $(".wall")
         .delegate(".post .delete", "click", function(){
@@ -222,6 +232,8 @@ $(document).ready(function(){
             var $input = $(this);
             var $post = $input.closest('.slot');
             var $time = $post.find('.time');
+            var $gridLineId = $post.data('grid-id');
+            var $gridLineItemId = $post.data('grid-item-id');
 
             if (e.type == 'keydown' && e.keyCode != 13) return;
 
@@ -233,17 +245,16 @@ $(document).ready(function(){
                 $time.text(text);
                 if ($post.hasClass('new')) {
                     // Добавление ячейки
-                    Events.fire('rightcolumn_add_slot', [text, function(state){
+                    Events.fire('rightcolumn_save_slot', [$gridLineId, text, function(state){
                         if (state) {
-                            //$post.animate({height: 0}, 400, function() {$(this).remove()});
-                            console.log('New!');
+
                         }
                     }]);
                 } else {
-                    // Редактирование ячейки
-                    Events.fire('rightcolumn_time_edit', [pid, text, function(state){
+                    // Редактирование времени ячейки для текущего дня
+                    Events.fire('rightcolumn_time_edit', [$gridLineId, $gridLineItemId, text, function(state){
                         if (state) {
-                            console.log(pid + ': Edit: ' + text);
+
                         }
                     }]);
                 }
@@ -258,6 +269,7 @@ $(document).ready(function(){
                 var $post = $target.closest('.slot');
                 var pid = $post.data('id');
                 var text = $datepicker.val();
+                var $gridLineId = $post.data('grid-id');
 
                 $header.data('datepicker', $datepicker);
                 $target.after($datepicker);
@@ -283,11 +295,11 @@ $(document).ready(function(){
                         text = $datepicker.val();
                         $header.find('span.datepicker').removeClass('active');
                         $('#queue').css('overflow', 'auto');
-                        Events.fire('rightcolumn_date_edit', [pid, text, function(state) {
-                            if (state) {
-                                console.log(pid + ': Mega Edit: ' + text);
-                            }
-                        }]);
+//                        Events.fire('rightcolumn_date_edit', [pid, text, function(state) {
+//                            if (state) {
+//                                console.log(pid + ': Mega Edit: ' + text);
+//                            }
+//                        }]);
                     }
                 });
                 $datepicker.width(13).hide().focus();
@@ -1631,6 +1643,12 @@ var Elements = {
         } else {
             $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
+    },
+    leftType: function(){
+        return $('.left-panel .type-selector a.active').data('type');
+    },
+    rightType: function(){
+        return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
         if(typeof value == 'undefined') {

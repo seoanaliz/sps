@@ -83,13 +83,22 @@ function loadQueue() {
         return;
     }
 
+    var type = Elements.rightType();
+
+    if (type == 'all') {
+        $('.queue-footer').hide();
+    } else {
+        $('.queue-footer').show();
+    }
+
     //clean and load right column
     $.ajax({
         url: controlsRoot + 'arcticles-queue-list/',
         dataType : "html",
         data: {
             targetFeedId: Elements.rightdd(),
-            timestamp: Elements.calendar()
+            timestamp: Elements.calendar(),
+            type: type
         },
         success: function (data) {
             $('div#queue').show().html(data);
@@ -172,21 +181,59 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_add_slot: function(text, callback) {
-        callback(true);
+    rightcolumn_save_slot: function(gridLineId, time, callback) {
+        $.ajax({
+            url: controlsRoot + 'grid-line-save/',
+            dataType : "json",
+            data: {
+                startDate : null, //TODO
+                endDate : null, //TODO
+                time: time,
+                type: Elements.rightType(),
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                    loadQueue();
+                } else {
+                    if (data.message) {
+                        popupError(Lang[data.message]);
+                    }
+                    callback(false);
+                }
+            }
+        });
     },
-    rightcolumn_time_edit: function(post_id, text, callback) {
-        callback(true);
-    },
-    rightcolumn_date_edit: function(post_id, date, callback) {
-        callback(true);
+    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, callback) {
+        $.ajax({
+            url: controlsRoot + 'grid-line-item-save/',
+            dataType : "json",
+            data: {
+                gridLineId: gridLineId,
+                gridLineItemId: gridLineItemId,
+                time: time,
+                timestamp: Elements.calendar()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                    loadQueue();
+                } else {
+                    if (data.message) {
+                        popupError(Lang[data.message]);
+                    }
+                    callback(false);
+                }
+            }
+        });
     },
     leftcolumn_dropdown_change: function(){
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
-        selectedSources = Elements.leftdd();
-        sourceType = $(".type-selector a.active").data('type');
+        var selectedSources = Elements.leftdd();
+        var sourceType = Elements.leftType();
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
@@ -228,6 +275,9 @@ var Eventlist = {
     calendar_change: function(){
         loadQueue();
     },
+    rightcolumn_type_change: function(){
+        loadQueue();
+    },
     wall_load_more: function(callback){
         if (!$("#wallloadmore").hasClass('hidden')) {
             $("#wallloadmore").addClass('hidden');
@@ -243,7 +293,8 @@ var Eventlist = {
                 articleId: post_id,
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
-                queueId: queueId
+                queueId: queueId,
+                type: Elements.rightType()
             },
             success: function (data) {
                 if(data.success) {
