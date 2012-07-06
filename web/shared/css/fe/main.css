@@ -477,6 +477,7 @@ i {font-style: italic;}
     top: 0;
     left: 0;
     height: 12px;
+    min-width: 30px;
 }
 
 .right-panel .post {
