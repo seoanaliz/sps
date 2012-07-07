@@ -15,6 +15,9 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
+                <page uri="/stat" boot="">
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -77,7 +80,7 @@
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
-				
+
                 <pageGroup name="SPS.Common">
                     <pageGroup name="siteParam">
                         <page uri="vt://site-params/">
