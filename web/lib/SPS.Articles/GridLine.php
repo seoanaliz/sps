@@ -5,15 +5,15 @@
      */
 
     /**
-     * ArticleQueue
+     * GridLine
      *
      * @package SPS
      * @subpackage Articles
      */
-    class ArticleQueue {
+    class GridLine {
 
         /** @var int */
-        public $articleQueueId;
+        public $gridLineId;
 
         /** @var DateTimeWrapper */
         public $startDate;
@@ -22,30 +22,15 @@
         public $endDate;
 
         /** @var DateTimeWrapper */
-        public $createdAt;
-
-        /** @var DateTimeWrapper */
-        public $sentAt;
+        public $time;
 
         /** @var string */
         public $type;
-
-        /** @var int */
-        public $articleId;
-
-        /** @var Article */
-        public $article;
 
         /** @var int */
         public $targetFeedId;
 
         /** @var TargetFeed */
         public $targetFeed;
-
-        /** @var int */
-        public $statusId;
-
-        /** @var Status */
-        public $status;
     }
 ?>

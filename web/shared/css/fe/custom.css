@@ -224,7 +224,6 @@ div.type-selector a:hover {
 }
 .ui-dropdown-menu-item {
     cursor: default;
-    font-weight: bold;
     color: #45688E;
     padding: 4px 10px;
     text-overflow: ellipsis;
@@ -238,6 +237,7 @@ div.type-selector a:hover {
 .ui-dropdown-menu-item.active {
     background-color: #45688E;
     color: #fff;
+    font-weight: bold;
 }
 .ui-dropdown-menu-item .icon img {
     width: 100%;
@@ -305,7 +305,7 @@ div.type-selector a:hover {
     position: absolute;
     top: -6px;
     left: 50%;
-    margin-left: -5px;
+    margin-left: -6px;
 }
 .ui-datepicker-header {
     background: #fff;
@@ -313,11 +313,12 @@ div.type-selector a:hover {
     border: none;
     font-weight: bold !important;
     color: #45688E !important;
+    padding: 0;
 }
 .ui-datepicker-calendar {
     background: #fff;
     border-radius: 4px;
-    margin: .8em 0 0 !important;
+    margin: .6em 0 0 !important;
     overflow: hidden;
     font-weight: bold !important;
     color: #45688E !important;
@@ -336,12 +337,12 @@ div.type-selector a:hover {
 .ui-datepicker td span,
 .ui-datepicker td a {
     border: none !important;
-    width: 28px;
-    height: 28px;
     line-height: 28px;
     text-align: center;
     font-weight: bold !important;
     color: #45688E !important;
+    width: 28px;
+    height: 28px;
 }
 .ui-datepicker td .ui-state-default {
     background: #fff !important;
@@ -357,4 +358,32 @@ div.type-selector a:hover {
 .ui-datepicker td .ui-state-active {
     background: #45688E !important;
     color: #fff !important;
+}
+.ui-datepicker .ui-datepicker-title {
+    line-height: 2em;
+}
+.ui-datepicker .ui-datepicker-next,
+.ui-datepicker .ui-datepicker-prev {
+    top: 0;
+    height: 100%;
+    background: no-repeat center;
+    width: 1.5em;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+}
+.ui-datepicker .ui-datepicker-next-hover,
+.ui-datepicker .ui-datepicker-prev-hover {
+    background-color: #EDF1F5;
+}
+.ui-datepicker .ui-datepicker-prev {
+    left: 3em;
+    background-image: url('../../images/fe/prev.png');
+}
+.ui-datepicker .ui-datepicker-next {
+    right: 3em;
+    background-image: url('../../images/fe/next.png');
+}
+.ui-datepicker .ui-icon {
+    display: none !important;
 }

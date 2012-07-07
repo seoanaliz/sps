@@ -20,5 +20,19 @@
 
             return false;
         }
+
+        public static function ChangeQueueDates($queueId, $timestamp) {
+            $object = new ArticleQueue();
+            self::BuildDates($object, $timestamp);
+            ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate'), array('articleQueueId' => $queueId, 'statusId' => 1));
+        }
+
+        public static function BuildDates($object, $timestamp) {
+            $object->startDate = new DateTimeWrapper(date('r', $timestamp));
+            $object->endDate = new DateTimeWrapper(date('r', $timestamp));
+
+            $object->startDate->modify('-30 seconds');
+            $object->endDate->modify('+9 minutes');
+        }
     }
 ?>

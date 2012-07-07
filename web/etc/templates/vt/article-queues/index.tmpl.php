@@ -11,10 +11,11 @@
             , LocaleLoader::Translate( "vt.articleQueue.sentAt" )
             , LocaleLoader::Translate( "vt.articleQueue.articleId" )
             , LocaleLoader::Translate( "vt.articleQueue.targetFeedId" )
+            , LocaleLoader::Translate( "vt.sourceFeed.type" )
             , LocaleLoader::Translate( "vt.articleQueue.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "startDate", 1 => "endDate", 2 => "createdAt", 3 => "sentAt", 4 => "articleId", 5 => "targetFee.title", 6 => "statusId")
+        , "sorts"		=> array(0 => "startDate", 1 => "endDate", 2 => "createdAt", 3 => "sentAt", 4 => "articleId", 5 => "targetFee.title", 6 => "type", 7 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> ArticleQueueFactory::CanPages()
@@ -57,6 +58,10 @@
                     <?= FormHelper::FormSelect( "search[targetFeedId]", $targetFeeds, "targetFeedId", "title", $search['targetFeedId'], null, null, true ); ?>
                 </div>
                 <div class="row">
+                    <label>{lang:vt.sourceFeed.type}</label>
+                    <?= FormHelper::FormSelect( "search[type]", GridLineUtility::$Types, "", "", $search['type'], null, null, true ); ?>
+                </div>
+                <div class="row">
                     <label>{lang:vt.articleQueue.statusId}</label>
                     <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Queue[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
                 </div>
@@ -81,6 +86,7 @@
                 <td><?= ( !empty( $object->sentAt ) ? $object->sentAt->DefaultFormat() : '' ) ?></td>
                 <td>{$object.articleId}</td>
                 <td><?= !empty($targetFeeds[$object->targetFeedId]) ? $targetFeeds[$object->targetFeedId]->title : '' ?></td>
+                <td>{$object.type}</td>
                 <td><?= StatusUtility::GetQueueStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">

@@ -13,8 +13,8 @@
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));
             $object->endDate = new DateTimeWrapper(date('r', $timestamp));
 
-            $object->startDate->modify('-10 minutes');
-            $object->endDate->modify('+10 minutes');
+            $object->startDate->modify('-5 minutes');
+            $object->endDate->modify('+15 minutes');
         }
 
         /**
@@ -29,17 +29,16 @@
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $timestamp = Request::getInteger( 'timestamp' );
             $queueId = Request::getInteger( 'queueId' );
+            $type = Request::getString('type');
 
-            if (empty($articleId) || empty($targetFeedId) || empty($timestamp)) {
+            if (empty($articleId) || empty($targetFeedId) || empty($timestamp) || empty($type) || empty(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             if (!empty($queueId)) {
                 //просто перемещаем элемент очереди
-                $object = new ArticleQueue();
-                $this->buildDates($object, $timestamp);
-                ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate'), array('articleQueueId' => $queueId, 'statusId' => 1));
+                ArticleUtility::ChangeQueueDates($queueId, $timestamp);
 
                 $result = array(
                     'success' => true,
@@ -84,7 +83,8 @@
             $object->createdAt = DateTimeWrapper::Now();
             $object->articleId = $article->articleId;
             $object->targetFeedId = $targetFeed->targetFeedId;
-            $this->buildDates($object, $timestamp);
+            $object->type = $type;
+            ArticleUtility::BuildDates($object, $timestamp);
 
             $object->statusId = 1;
 

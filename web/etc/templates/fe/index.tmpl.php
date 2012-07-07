@@ -9,14 +9,14 @@
 
                 <div class="type-selector">
                     <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                        <a href="#" class="<?= ($sourceType == $currentSourceType) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                        <a href="#" class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
                     <? } ?>
                 </div>
 
                 <select multiple="multiple" id="source-select">
                     <?
                     foreach ($sourceFeeds as $sourceFeed) {
-                        ?><option value="{$sourceFeed.sourceFeedId}" <?= (in_array($sourceFeed->sourceFeedId, $currentSourceFeedIds)) ? 'selected="selected"' : '' ?>>{$sourceFeed.title}</option><?
+                        ?><option value="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</option><?
                     }
                     ?>
                 </select>
@@ -27,7 +27,7 @@
                     <div class="ctl spr del"></div>
                 </div -->
 
-                <div style="position: absolute; top: 48px; right: 18px; width: 300px; <?= ($currentSourceType == SourceFeedUtility::Ads) ? 'display: none;' : '' ?>" id="slider-cont">
+                <div style="position: absolute; top: 48px; right: 18px; width: 300px;" id="slider-cont">
                     <div id="slider-range"></div>
                 </div>
             </div>
@@ -100,19 +100,19 @@
                        <div class="ctl spr del"></div>
                    </div -->
 
-                    <!--div class="type-selector">
-                        <a href="#" class="active" data-type="all">Все записи</a>
-                        <a href="#" class="" data-type="content">Контент <span class="counter">8</span></a>
-                        <a href="#" class="" data-type="ads2">Реклама</a>
-                    </div-->
+                    <div class="type-selector">
+                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <a href="#" class="active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
+                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                    </div>
 
                 </div>
-
             </div>
 
             <div class="queue-title">&nbsp;</div>
-
-            <div class="items drop" id="queue" style="display: none;">
+            <div class="items drop" id="queue" style="display: none;"></div>
+            <div class="queue-footer">
+                <a class="add-button" href="javascript:;">Добавить ячейку</a>
             </div>
         </div>
     </div>

@@ -52,6 +52,7 @@ SELECT "public"."articleQueues"."articleQueueId"
 	, "public"."articleQueues"."endDate"
 	, "public"."articleQueues"."createdAt"
 	, "public"."articleQueues"."sentAt"
+	, "public"."articleQueues"."type"
 	, "public"."articleQueues"."articleId"
 	, "public"."articleQueues"."targetFeedId"
 	, "public"."articleQueues"."statusId"
@@ -110,3 +111,19 @@ SELECT "public"."targetFeedPublishers"."targetFeedId"
  FROM "public"."targetFeedPublishers"
 	INNER JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeedPublishers"."publisherId";
+		
+CREATE OR REPLACE VIEW "getGridLines" AS
+SELECT "public"."gridLines"."gridLineId"
+	, "public"."gridLines"."startDate"
+	, "public"."gridLines"."endDate"
+	, "public"."gridLines"."time"
+	, "public"."gridLines"."type"
+	, "public"."gridLines"."targetFeedId"
+ FROM "public"."gridLines"
+ORDER BY "time" DESC;
+
+CREATE OR REPLACE VIEW "getGridLineItems" AS
+SELECT "public"."gridLineItems"."gridLineItemId"
+	, "public"."gridLineItems"."date"
+	, "public"."gridLineItems"."gridLineId"
+ FROM "public"."gridLineItems";

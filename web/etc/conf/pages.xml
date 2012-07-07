@@ -66,6 +66,12 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
+                <page uri="controls://grid-line-save/">
+                    <actions>SPS.Site.SaveGridLineControl</actions>
+                </page>
+                <page uri="controls://grid-line-item-save/">
+                    <actions>SPS.Site.SaveGridLineItemControl</actions>
+                </page>
             </pageGroup>
 			
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
@@ -327,6 +333,12 @@
                 </page>
                 <page uri="daemons://wr-points/">
                     <actions>SPS.Stat.WrPoints</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="vtControls" boot="">
+                <page uri="controls://generate-grid-sql/">
+                    <actions>SPS.Articles.GenerateGridSQL</actions>
                 </page>
             </pageGroup>
 

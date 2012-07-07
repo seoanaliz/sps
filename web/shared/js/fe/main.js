@@ -1,6 +1,11 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 
 $(document).ready(function(){
+    $.mask.definitions['2']='[012]';
+    $.mask.definitions['3']='[0123]';
+    $.mask.definitions['5']='[012345]';
+    $.datepick.setDefaults($.datepick.regional['ru']);
+
     // Календарь
     $("#calendar")
         .datepicker (
@@ -96,26 +101,6 @@ $(document).ready(function(){
         }
     });
 
-    //Dropdowns
-//    $(".drop-down").click(function(e){
-//        e.stopPropagation();
-//        $(document).click();
-//        var elem = $(this);
-//        var hidethis = function(){
-//            elem.removeClass("expanded");
-//            $(document).unbind("click", hidethis);
-//            elem.find("li").unbind("click", click_li);
-//        };
-//        var click_li = function(e){
-//            e.stopPropagation();
-//            elem.dd_sel($(this).data("id"));
-//            hidethis();
-//        };
-//        $(document).bind("click", hidethis);
-//        elem.find("li").click(click_li);
-//        elem.addClass("expanded");
-//    });
-
     $(".left-panel .drop-down").change(function(){
         Events.fire('leftcolumn_dropdown_change', []);
     });
@@ -158,6 +143,16 @@ $(document).ready(function(){
         }
 
         Events.fire('rightcolumn_dropdown_change', []);
+    });
+
+    // Вкладки в правом меню
+    $(".right-panel .type-selector a").click(function(e){
+        e.preventDefault();
+
+        $(".right-panel .type-selector a").removeClass('active');
+        $(this).addClass('active');
+
+        Events.fire('rightcolumn_type_change', []);
     });
 
     // Wall init
@@ -204,18 +199,139 @@ $(document).ready(function(){
             }]);
         });
 
-    // Удание постов правом меню
-    $(".items").delegate(".slot .post .delete", "click", function(){
-        var elem = $(this).closest(".post"),
-            pid = elem.data("id");
-        Events.fire('rightcolumn_deletepost', [pid, function(state){
-            if(state) {
-                elem.closest(".slot").addClass('empty');
-                elem.closest(".slot").find('span.attach-icon').remove();
-                elem.closest(".slot").find('span.hash-span').remove();
-                elem.remove();
+    $("#queue")
+        // Удаление постов
+        .delegate(".delete", "click", function(){
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('rightcolumn_deletepost', [pid, function(state){
+                if(state) {
+                    elem.remove();
+                }
+            }]);
+        })
+        // Смена даты
+        .delegate('.time', 'click', function(e) {
+            var $time = $(this);
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('input');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr({class: "time-edit", type: "text"})
+                    .css({width: $time.width() + 2})
+                    .val($time.text())
+                    .appendTo($post);
+                $time.data('input', $input);
+            } else {
+                $time.data('input').show();
             }
-        }]);
+            $input.mask("29:59").focus().select();
+        })
+        .delegate('.time-edit', 'blur keydown', function(e) {
+            var $input = $(this);
+            var $post = $input.closest('.slot');
+            var $time = $post.find('.time');
+            var gridLineId = $post.data('grid-id');
+            var gridLineItemId = $post.data('grid-item-id');
+
+            if (e.type == 'keydown' && e.keyCode != 13) return;
+
+            var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
+            var qid = $post.find('.post').data('queue-id');
+            $input.hide().val(time);
+
+            if (time && time != $time.text()) {
+                $time.text(time);
+                if (!$post.hasClass('new')) {
+                    // Редактирование времени ячейки для текущего дня
+                    // console.log([gridLineId, gridLineItemId, time]);
+                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                        if (state) {}
+                    }]);
+                }
+            } else if (!time) {
+                if ($post.hasClass('new')) {
+                    $post.animate({height: 0}, 200, function() {$(this).remove()});
+                }
+            }
+        })
+        .delegate('.datepicker', 'click', function() {
+            var $target = $(this);
+            var $header = $target.parent();
+
+            if (!$header.data('datepicker')) {
+                var $datepicker = $('<input type="text" />');
+                var $post = $target.closest('.slot');
+                var $time = $post.find('.time');
+                var pid = $post.data('id');
+                var gridLineId = $post.data('grid-id');
+                var startDate = $post.data('start-date');
+                var endDate = $post.data('end-date');
+                var defStartDate = $post.data('start-date');
+                var defEndDate = $post.data('end-date');
+                var time = $time.text();
+
+                $header.data('datepicker', $datepicker);
+                $target.after($datepicker);
+                $target.remove();
+                $datepicker.datepick({
+                    rangeSelect: true,
+                    showTrigger: $target,
+                    showAnim: 'fadeIn',
+                    showSpeed: 'fast',
+                    monthsToShow: 2,
+                    minDate: 0,
+                    renderer: $.extend($.datepick.defaultRenderer, {
+                        picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
+                    }),
+                    onSelect: function(dates) {
+                        $post.data('start-date', $.datepick.formatDate(dates[0]));
+                        $post.data('end-date', $.datepick.formatDate(dates[1]));
+                        startDate = $post.data('start-date');
+                        endDate = $post.data('end-date');
+                    },
+                    onShow: function() {
+                        $header.find('span.datepicker').addClass('active');
+                        $('#queue').css('overflow', 'hidden');
+                    },
+                    onClose: function() {
+                        time = $time.text();
+                        $header.find('span.datepicker').removeClass('active');
+                        $('#queue').css('overflow', 'auto');
+                        if ($post.hasClass('new')) {
+                            // Добавление ячейки
+                            // console.log([gridLineId, time, startDate, endDate]);
+                            Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state){
+                                if (state) {}
+                            }]);
+                        } else {
+                            // Редактироваиние ячейки
+                            if (defStartDate != startDate || defEndDate != endDate) {
+                                console.log([gridLineId, time, startDate, endDate]);
+                                Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state) {
+                                    if (state) {}
+                                }]);
+                            }
+                        }
+                    }
+                });
+                $datepicker.val(startDate + ' - ' + endDate).focus();
+            }
+        })
+    ;
+
+    $('.queue-footer .add-button').click(function() {
+        $("#queue").scrollTo(0);
+        var $newPost = $(
+            '<div class="new slot empty">' +
+                '<div class="slot-header">' +
+                    '<span class="time">__:__</span>' +
+                    '<span class="datepicker"></span>' +
+                '</div>' +
+            '</div>'
+        ).prependTo('#queue').animate({height: 105}, 200);
+        $newPost.find('.time').click();
     });
 
     // Загрузка стены по клику
@@ -1055,7 +1171,7 @@ var Events = {
             };
 
             if ($wrap.data('image-compositing')) return;
-            
+
             $wrap.data('image-compositing', true);
             $wrap.addClass(CLASS_LOADING);
             $images.each(function(i, image) {
@@ -1506,7 +1622,7 @@ var Elements = {
                 }
             };
 
-            $(".post > .content").draggable(draggableParams);
+            $(".post:not(.blocked) > .content").draggable(draggableParams);
 
             $('.items .slot').droppable({
                 activeClass: "ui-state-active",
@@ -1541,6 +1657,12 @@ var Elements = {
         } else {
             $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
+    },
+    leftType: function(){
+        return $('.left-panel .type-selector a.active').data('type');
+    },
+    rightType: function(){
+        return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
         if(typeof value == 'undefined') {
