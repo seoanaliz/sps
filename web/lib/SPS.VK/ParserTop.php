@@ -6,7 +6,7 @@
      * @author     Shuler
      */
     class ParserTop {
-        const API_URL = 'api.topface.ru';
+        const API_URL = 'api.topface.com';
         const TESTING = 0;
 
         //отправляет данные в json
@@ -107,7 +107,7 @@
                     $uids[] = $entry->uid;
                     $res[] = array(
                         'id'      =>  $entry->uid,
-                        'link'    =>  'http://topface.ru/vklike/' . $entry->uid. '/',
+                        'link'    =>  'http://topface.com/vklike/' . $entry->uid. '/',
                         'likes'   =>  $entry->liked,
                         'photo'   =>  array(
                             '0' => array(
