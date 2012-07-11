@@ -87,7 +87,13 @@
                 <td>{$object.articleId}</td>
                 <td><?= !empty($targetFeeds[$object->targetFeedId]) ? $targetFeeds[$object->targetFeedId]->title : '' ?></td>
                 <td>{$object.type}</td>
-                <td><?= StatusUtility::GetQueueStatusTemplate($object->statusId) ?></td>
+                <td>
+                    <? if (!empty($object->externalId)) { ?>
+                        <a href="http://vk.com/wall{$object->externalId}" target="_blank"><?= StatusUtility::GetQueueStatusTemplate($object->statusId) ?></a>
+                    <? } else { ?>
+                        <?= StatusUtility::GetQueueStatusTemplate($object->statusId) ?>
+                    <? } ?>
+                </td>
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>

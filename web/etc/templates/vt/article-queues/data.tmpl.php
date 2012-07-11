@@ -49,6 +49,22 @@
             <label>{lang:vt.articleQueue.targetFeedId}</label>
             <?= FormHelper::FormSelect( $prefix . '[targetFeedId]', $targetFeeds, "targetFeedId", "title", $object->targetFeedId, null, null, false ); ?>
         </div>
+        <div data-row="author" class="row">
+            <label>{lang:vt.articleQueue.author}</label>
+            <?= FormHelper::FormInput( $prefix . '[author]', $object->author, 'author', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalId" class="row">
+            <label>{lang:vt.common.externalId}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalLikes" class="row">
+            <label>{lang:vt.articleQueue.externalLikes}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalLikes]', $object->externalLikes, 'externalLikes', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalRetweets" class="row">
+            <label>{lang:vt.articleQueue.externalRetweets}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalRetweets]', $object->externalRetweets, 'externalRetweets', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.articleQueue.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Queue[$__currentLang], "", "", $object->statusId, null, null, false ); ?>

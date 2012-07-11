@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		03.07.2012
+Modified		11.07.2012
 Project		
 Model			
 Company		
@@ -175,6 +175,10 @@ Create table "articleQueues"
 	"createdAt" Timestamp NOT NULL,
 	"sentAt" Timestamp,
 	"type" Varchar(10) NOT NULL Default 'content',
+	"author" Varchar(100),
+	"externalId" Varchar(100),
+	"externalLikes" Integer,
+	"externalRetweets" Integer,
 	"articleId" Integer NOT NULL,
 	"targetFeedId" Integer NOT NULL,
 	"statusId" Integer NOT NULL,

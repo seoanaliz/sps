@@ -84,6 +84,7 @@
             $object->articleId = $article->articleId;
             $object->targetFeedId = $targetFeed->targetFeedId;
             $object->type = $type;
+            $object->author = AuthVkontakte::IsAuth();
             ArticleUtility::BuildDates($object, $timestamp);
 
             $object->statusId = 1;

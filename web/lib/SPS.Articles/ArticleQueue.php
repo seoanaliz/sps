@@ -30,6 +30,18 @@
         /** @var string */
         public $type;
 
+        /** @var string */
+        public $author;
+
+        /** @var string */
+        public $externalId;
+
+        /** @var int */
+        public $externalLikes;
+
+        /** @var int */
+        public $externalRetweets;
+
         /** @var int */
         public $articleId;
 

@@ -132,8 +132,7 @@ sql;
             $sender = new SenderVkontakte($post_data);
 
             try {
-                $sender->send_post();
-
+                $articleQueue->externalId = $sender->send_post();
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
             } catch (ChangeSenderException $Ex){
@@ -211,7 +210,7 @@ sql;
         private function finishArticleQueue($articleQueue) {
             $articleQueue->statusId = StatusUtility::Finished;
             $articleQueue->sentAt = DateTimeWrapper::Now();
-            ArticleQueueFactory::UpdateByMask($articleQueue, array('statusId', 'sentAt'), array('articleQueueId' => $articleQueue->articleQueueId) );
+            ArticleQueueFactory::UpdateByMask($articleQueue, array('statusId', 'sentAt', 'externalId'), array('articleQueueId' => $articleQueue->articleQueueId) );
         }
 
         private function restartArticleQueue($articleQueue) {

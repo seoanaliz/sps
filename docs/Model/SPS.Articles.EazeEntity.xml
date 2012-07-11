@@ -524,6 +524,38 @@
           <AttributeParameter Key="controlId" Value="type" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="author" TitleKey="vt.articleQueue.author" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="author" />
+          <AttributeParameter Key="value" Value="author" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="author" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.articleQueue.externalId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalLikes" TitleKey="vt.articleQueue.externalLikes" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalLikes" />
+          <AttributeParameter Key="value" Value="externalLikes" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalLikes" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalRetweets" TitleKey="vt.articleQueue.externalRetweets" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalRetweets" />
+          <AttributeParameter Key="value" Value="externalRetweets" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalRetweets" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleQueueId" TitleKey="vt.articleQueue.articleQueueId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -606,6 +638,38 @@
           <AttributeParameter Key="value" Value="type" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="type" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="author" TitleKey="vt.articleQueue.author" TitleValue="author" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="author" />
+          <AttributeParameter Key="value" Value="author" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="author" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalId" TitleKey="vt.articleQueue.externalId" TitleValue="externalId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalId" />
+          <AttributeParameter Key="value" Value="externalId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalLikes" TitleKey="vt.articleQueue.externalLikes" TitleValue="externalLikes" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalLikes" />
+          <AttributeParameter Key="value" Value="externalLikes" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalLikes" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="externalRetweets" TitleKey="vt.articleQueue.externalRetweets" TitleValue="externalRetweets" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="externalRetweets" />
+          <AttributeParameter Key="value" Value="externalRetweets" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="externalRetweets" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>
