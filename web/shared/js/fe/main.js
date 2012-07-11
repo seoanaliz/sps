@@ -94,15 +94,28 @@ $(document).ready(function(){
                 icon.attr('src', item.icon);
             }
 
-            var targetFeedId = Elements.rightdd();
-            var cookieData = $.cookie('sourceTypes' + targetFeedId);
-            var sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
+            var targetFeedId = Elements.rightdd(),
+                cookieData = '',
+                sourceType = '',
+                targetType = '';
+
+            // проставление типа источника
+            cookieData = $.cookie('sourceTypes' + targetFeedId);
+            sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
             if (sourceType.length == 0) {
                 sourceType = $('.left-panel .type-selector a[data-type="source"]');
             }
-
             $(".left-panel .type-selector a").removeClass('active');
             sourceType.addClass('active');
+
+            // проставление типа ленты отправки
+            cookieData = $.cookie('targetTypes' + targetFeedId);
+            targetType = $('.right-panel .type-selector a[data-type="' + cookieData + '"]');
+            if (targetType.length == 0) {
+                targetType = $('.right-panel .type-selector a[data-type="content"]');
+            }
+            $(".right-panel .type-selector a").removeClass('active');
+            targetType.addClass('active');
 
             Events.fire('rightcolumn_dropdown_change', []);
         },

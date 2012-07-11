@@ -332,6 +332,7 @@ var Eventlist = {
         loadQueue();
     },
     rightcolumn_type_change: function(){
+        $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
         loadQueue();
     },
     wall_load_more: function(callback){
