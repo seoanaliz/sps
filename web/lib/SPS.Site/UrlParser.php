@@ -14,12 +14,25 @@
                 return $result;
             }
 
+            $urlData = parse_url($url);
+            $baseUrl = $urlData['scheme'] . '://' . $urlData['host'];
+
             $document = phpQuery::newDocument($html);
 
-            $title = $document->find('title')->html();
-            $description = $document->find("meta[name='description']")->attr('content');
-            $img = $document->find("link[rel='image_src']")->attr('href');
+            $title = $document->find( "meta[property='og:title']" )->attr('content');
+            $title = empty($title) ? $document->find('title')->html() : $title;
+
+            $description = $document->find( "meta[property='og:description']" )->attr('content');
+            $description = empty($description) ? $document->find("meta[name='description']")->attr('content') : $description;
+
+            $img = $document->find( "meta[property='og:image']" )->attr('content');
+            $img = empty($img) ? $document->find("link[rel='image_src']")->attr('href') : $img;
             $imgOriginal = $document->find("#original_image_src")->attr('value');
+
+            //fix img
+            if (strpos($img, 'http') === false) {
+                $img = $baseUrl . $img;
+            }
 
             $title = trim($title);
             $description = trim($description);

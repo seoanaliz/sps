@@ -25,8 +25,6 @@
             $today      = new DateTimeWrapper(date('d.m.Y'));
             $isHistory  = ($queueDate < $today);
 
-            SettingsUtility::SetDate($queueDate->format('U'));
-
             $targetFeedId = Request::getInteger( 'targetFeedId' );
             $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
