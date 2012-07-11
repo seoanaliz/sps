@@ -272,6 +272,16 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
+        if (sourceType == 'ads') {
+            $('#slider-text').hide();
+            $('#slider-cont').hide();
+        } else {
+            $('#slider-text').show();
+            $('#slider-cont').show();
+        }
+
+        $.cookie('sourceTypes' + targetFeedId, sourceType);
+
         //init slider
         initSlider(targetFeedId);
 
