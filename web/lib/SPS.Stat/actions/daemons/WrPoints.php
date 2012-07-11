@@ -1,10 +1,8 @@
 <?php
-    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.Site' );
     Package::Load( 'SPS.Stat' );
-//    include 'wrapper.php';
 
-set_time_limit(600);
+    set_time_limit(1600);
+    //
     class WrPoints extends wrapper
     {
         const BASE_RENEW = false;
@@ -12,19 +10,18 @@ set_time_limit(600);
 
     public function Execute()
     {
-            $this->db_wrap('connect');
+
             $this->ids = $this->get_publics();
             $this->points();
     }
 
 
-
+    //возвращает список лайкнувших(сделавших репост при $retweets=true) пост
     public function get_likes($post_id, $retweets = false)
     {
 
         $post_id = explode('_', $post_id);
 
-        $values = '';
         $ununique_ids = array();
 
 
@@ -39,16 +36,14 @@ set_time_limit(600);
         }
         $offset = 0;
         while (1) {
-
             $params['offset'] = $offset;
             $res = $this->vk_api_wrap('likes.getList', $params);
-//            print_r($res);
             sleep(0.3);
             $quan = count($res->users);
             if ($quan < 3)
                 break;
 
-            $ununique_ids = array_merge($ununique_ids,$res->users);
+            $ununique_ids = array_merge($ununique_ids, $res->users);
 
             if ($quan > 998) {
                 echo "next ($res->count > $offset )<br>";
@@ -57,17 +52,16 @@ set_time_limit(600);
                 break;
             }
         }
-        echo 'post_end<br>';
+
         return $ununique_ids;
 
     }
-
+//возвращает список
     public function get_comments($post_id)
     {
 
         $post_id = explode('_', $post_id);
 
-        $values = '';
         $ununique_reps = array();
 
 
@@ -86,12 +80,11 @@ set_time_limit(600);
             $quan = $res[0];
             unset($res[0]);
             echo $quan.'<br>';
-//            print_r($res);
             $arr = array();
             foreach ($res as $comm) {
                 $arr[] = $comm->uid;
             }
-            print_r($arr);
+
             sleep(0.3);
 
             if ($quan < 1)
@@ -106,11 +99,8 @@ set_time_limit(600);
                 break;
             }
         }
-        echo 'post_end<br>';
-        print_r($ununique_reps);
 
         return $ununique_reps;
-
     }
 
     public function points()

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+    <action name="GraphGrow" />
+        <path>GraphGrow</path>
     <group name="Daemons">
-	    <action name="WrTopics">
+        <action name="WrTopics">
             <path>daemons/WrTopics</path>
+        </action>
+        <action name="WrUnix">
+            <path>daemons/WrUnix</path>
         </action>
 	    <action name="WrPosts">
             <path>daemons/WrPosts</path>
@@ -11,4 +16,30 @@
             <path>daemons/WrPoints</path>
         </action>
     </group>
+
+    <group name="Controls">
+        <group name="Prices">
+            <action name="setPostPrice">
+                <path>controls/setPostPrice</path>
+            </action>
+            <action name="setGroup">
+                <path>controls/setGroup</path>
+            </action>
+            <action name="deleteGroup">
+                <path>controls/deleteGroup</path>
+            </action>
+            <action name="getEntries">
+                <path>controls/getEntries</path>
+            </action>
+            <action name="selectSAdmin">
+                <path>controls/selectSAdmin</path>
+            </action>
+            <action name="getGroupList">
+                <path>controls/getGroupList</path>
+            </action>
+
+
+        </group>
+    </group>
+
 </actions>

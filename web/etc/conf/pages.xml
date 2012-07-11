@@ -73,7 +73,7 @@
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
             </pageGroup>
-			
+
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
                     <template>tmpl://vt/login.tmpl.php</template>
@@ -90,6 +90,11 @@
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetSiteParamList, SPS.Common.SetSiteParamsMenu</actions>
                             <template>tmpl://vt/site-params/index.tmpl.php</template>
                         </page>
+                        <page uri="vt://statistics">
+                            <!--<actions>SPS.Site.GetIndexPage</actions>-->
+                            <template>tmpl://vt/statistic/statistic.tmpl.php</template>
+                        </page>
+
                         <page uri="vt://site-params/add">
                             <actions>SPS.Common.SaveSiteParam</actions>
                             <template>tmpl://vt/site-params/add.tmpl.php</template>

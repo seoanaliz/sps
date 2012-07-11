@@ -3,20 +3,20 @@
 
 class wrapper
 {
-    const  ACC_TOK_WRK = '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a';
+    const ACC_TOK_WRK = '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a';
     const VK_API_URL = 'https://api.vk.com/method/';
     const TESTING = false;
     public $db;
     public $id; // id паблика
     public $q_result;
 
-//    public function __construct()
-//    {
-//        //require_once 'config.inc.php';
-//        //if (!$this->db_wrap('connect', $db_config))
-//          //      die('bd lost');
-//
-//    }
+    public function __construct()
+    {
+        /*require_once 'config.inc.php';*/
+        if (!$this->db_wrap('connect'))
+            die('bd lost');
+
+    }
 
     public function vk_api_wrap($method, array $params, $ex = 1)
     {
@@ -68,8 +68,14 @@ class wrapper
                     return true;
             case 'get_row':
                 $source = $data ? $data : $this->q_result;
-                return pg_fetch_array($source);
+                return pg_fetch_array($source, NULL, PGSQL_ASSOC);
+            case 'affected_rows':
+                $rows_aff = pg_affected_rows($this->q_result);
+                $rows_selected = pg_num_rows($this->q_result);
+                if (!$rows_aff && !$rows_selected)
+                    return false;
 
+                return $rows_aff ? $rows_aff : $rows_selected;
             default:
                 echo 'Неправильный метод! <br>';
                 break;
@@ -169,7 +175,8 @@ class wrapper
     public function get_publics()
     {
         $sql = "select vk_id,name from publics where active=1";
-        $res_sql = $this->db_wrap('query', $sql);
+        $this->db_wrap('query', $sql);
+        $ids = array();
         while ($row = $this->db_wrap('get_row')) {
             $ids[] = array($row['vk_id'], $row['name']);
         }
