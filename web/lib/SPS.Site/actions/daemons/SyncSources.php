@@ -45,8 +45,8 @@
                 } catch (Exception $Ex) {
                     $message = $Ex->getMessage();
 
-                    //wall's end exclude, "failed to get conten" exclude
-                    if (strpos($message, "wall's end") === false && strpos($message, "failed to get conten") === false) {
+                    //wall's end exclude
+                    if (strpos($message, "wall's end") === false) {
                         AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $message);
                     }
 
@@ -189,7 +189,7 @@
                         try {
                             $articleRecord->photos = $this->savePostPhotos($post['photo']);
                         } catch (Exception $Ex) {
-                            AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
+                            //AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
 
                             /**
                              * Если хоть одна фотка не загрузилась, то мы добавляем $externalId в $skipIds
