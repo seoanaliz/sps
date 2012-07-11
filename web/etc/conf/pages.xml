@@ -69,8 +69,17 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
+                <page uri="controls://setPrice/">
+                    <actions>SPS.Stat.setPostPrice</actions>
+                </page>
+                <page uri="controls://unsetPrice/">
+                    <actions>SPS.Stat.deletePostPrice</actions>
+                </page>
+	        <page uri="controls://setGroup/">
+                    <actions>SPS.Stat.setGroup</actions>
+                </page>
             </pageGroup>
-			
+
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
                     <template>tmpl://vt/login.tmpl.php</template>
@@ -273,7 +282,7 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-				
+
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -330,6 +339,9 @@
                 </page>
                 <page uri="daemons://wr-points/">
                     <actions>SPS.Stat.WrPoints</actions>
+                </page>
+                <page uri="daemons://wr-unix/">
+                    <actions>SPS.Stat.WrUnix</actions>
                 </page>
             </pageGroup>
 

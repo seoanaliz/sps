@@ -3,20 +3,20 @@
 
 class wrapper
 {
-    const  ACC_TOK_WRK = '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a';
+    const ACC_TOK_WRK = '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a';
     const VK_API_URL = 'https://api.vk.com/method/';
     const TESTING = false;
     public $db;
     public $id; // id паблика
     public $q_result;
 
-//    public function __construct()
-//    {
-//        //require_once 'config.inc.php';
-//        //if (!$this->db_wrap('connect', $db_config))
-//          //      die('bd lost');
-//
-//    }
+    public function __construct()
+    {
+        /*require_once 'config.inc.php';*/
+        if (!$this->db_wrap('connect'))
+            die('bd lost');
+
+    }
 
     public function vk_api_wrap($method, array $params, $ex = 1)
     {
@@ -69,7 +69,8 @@ class wrapper
             case 'get_row':
                 $source = $data ? $data : $this->q_result;
                 return pg_fetch_array($source);
-
+            case 'affected_rows':
+                return pg_affected_rows($this->q_result);
             default:
                 echo 'Неправильный метод! <br>';
                 break;
