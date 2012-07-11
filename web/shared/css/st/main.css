@@ -6,6 +6,9 @@ html, body, input, textarea {
 html, body {
     padding: 0;
 }
+body {
+    overflow-y: scroll;
+}
 *:focus {
     outline: none;
     border-color: #597DA3 !important;
@@ -25,8 +28,19 @@ a {
     color: #2B587A;
     text-decoration: none;
 }
+a:focus,
 a:hover {
     text-decoration: underline;
+}
+
+#global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+    z-index: 999;
 }
 
 #main {
@@ -55,6 +69,13 @@ a:hover {
     color: #45688E;
     text-align: center;
     cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 #main > .content .table th .icon {
     opacity: 0;
@@ -66,6 +87,9 @@ a:hover {
 }
 #main > .content .table th.active .icon {
     opacity: 1;
+}
+#main > .content .table th.reverse .icon {
+    background-image: url('../../images/st/arrow-top.png');
 }
 #main > .content .table th .filter {
     padding: 5px;
@@ -97,7 +121,7 @@ a:hover {
 #main > .content .table td:last-child {
     text-align: left;
     font-weight: normal;
-    padding-right: 0;
+    position: relative;
 }
 
 #table-body:empty {
@@ -120,10 +144,15 @@ a:hover {
     margin-right: .4em;
     cursor: pointer;
     display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
 }
 .tab-bar > .tab:last-child {
     margin-right: 0;
 }
+.tab-bar > .tab:focus,
 .tab-bar > .tab:hover {
     background-color: #E1E7ED;
 }
@@ -147,6 +176,13 @@ a:hover {
     background-position: center;
     background-repeat: no-repeat;
     -webkit-transition: .2s opacity;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 .icon.plus {
     background-image: url('../../images/st/add.png');
@@ -166,8 +202,8 @@ a:hover {
 }
 .contact > .photo {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 3px;
+    left: 3px;
     bottom: 0;
     overflow: hidden;
     width: 32px;
@@ -177,29 +213,168 @@ a:hover {
     width: 32px;
 }
 .contact > .content {
-    margin-left: 40px;
-    margin-right: 40px;
     line-height: 16px;
+    margin-left: 0;
+    margin-right: 30px;
+    padding: 3px 20px 3px 40px;
+    position: relative;
+    cursor: pointer;
+    -webkit-transition: all .2s;
+    max-width: 10em;
+}
+.contact > .content .icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 2px;
+    height: auto;
+    opacity: .3;
+}
+.contact > .content:hover {
+    box-shadow: 0 0 0 1px #C4CDE0;
+}
+.contact > .content.selected {
+    box-shadow: 0 0 0 1px #597DA3;
+}
+.contact > .content.selected .icon,
+.contact > .content:hover .icon {
+    opacity: 1;
+    background-color: #EDF1F5;
+}
+.contact > .content > .name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .contact > .content > .description {
     color: #808080;
     font-size: 90%;
 }
-.contact > .actions {
+.actions {
     position: absolute;
     top: 0;
-    right: 0;
+    right: 1em;
     bottom: 0;
 }
-.contact > .actions > .action {
-    padding: .8em;
+.actions > .action {
+    padding: .4em;
     cursor: pointer;
     display: inline-block;
+    position: relative;
+    margin: 1.4em 0;
 }
-.contact > .actions > .action .icon {
+.actions > .action .icon {
     opacity: .3;
 }
-.contact > .actions > .action:hover .icon {
+.actions > .action.selected .icon,
+.actions > .action.active .icon,
+.actions > .action:hover .icon {
     opacity: 1;
 }
+.actions > .action.selected {
+    background-color: #597DA3;
+}
+.actions > .action.selected .icon.arrow {
+    background-image: url('../../images/st/select-white.png');
+}
+.actions > .action.selected .icon.plus {
+    background-image: url('../../images/st/add-white.png');
+}
+.actions > .action.selected .icon.select {
+    background-image: url('../../images/st/select-white.png');
+}
+
+.dropdown {
+    position: absolute;
+    border: 1px solid #597DA3;
+    background-color: #fff;
+    min-width: 150px;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.25);
+}
+.dropdown > .add-item,
+.dropdown > .item {
+    color: #45688E;
+    padding: .4em 1.6em .4em .6em;
+    cursor: pointer;
+    position: relative;
+    border: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 150px;
+}
+.dropdown > .add-item {
+    cursor: text;
+}
+.dropdown > .item > .icon {
+    opacity: 0;
+    position: absolute;
+    right: .4em;
+    top: 50%;
+    margin-top: -6px;
+    width: 12px;
+    height: 12px;
+}
+.dropdown > .item:hover {
+    background-color: #EDF1F5;
+}
+.dropdown > .item:hover > .icon {
+    opacity: .3;
+}
+
+.dropdown > .item.selected {
+    color: #fff;
+    background-color: #597DA3;
+    font-weight: bold;
+}
+.dropdown > .item.selected > .icon {
+    opacity: 1;
+    background-image: url('../../images/st/select-white.png');
+}
+
+.contact-dropdown {
+    position: absolute;
+    border: 1px solid #597DA3;
+    border-top-color: #C4CDE0;
+    background-color: #fff;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.25);
+}
+.contact-dropdown > .item {
+    position: relative;
+    cursor: pointer;
+}
+.contact-dropdown > .item:hover {
+    background-color: #EDF1F5;
+}
+.contact-dropdown > .item > .photo {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    bottom: 0;
+    overflow: hidden;
+    width: 32px;
+    height: 32px;
+}
+.contact-dropdown > .item img {
+    width: 32px;
+}
+.contact-dropdown > .item > .content {
+    margin-left: 0px;
+    line-height: 16px;
+    padding: 3px 3px 3px 40px;
+    position: relative;
+    cursor: pointer;
+    -webkit-transition: all .2s;
+}
+.contact-dropdown > .item > .content > .name {
+
+}
+.contact-dropdown > .item > .content > .description {
+    color: #808080;
+    font-size: 90%;
+}
+
 
