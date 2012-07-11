@@ -67,8 +67,6 @@ function loadArticles(clean) {
         $('.newpost').show();
     }
 
-    $('div#wall').append('<div style="text-align: center;" id="wall-loader"></div>');
-
     var from = $( "#slider-range" ).slider( "values", 0 );
     var to = $( "#slider-range" ).slider( "values", 1 );
     var sortType = $('.wall-title a').data('type');
@@ -97,7 +95,6 @@ function loadArticles(clean) {
             }
         })
         .done(function(data) {
-            $('div#wall div#wall-loader').remove();
             $('div#wall').append(data);
             articlesLoading = false;
             Elements.addEvents();
@@ -270,6 +267,8 @@ var Eventlist = {
         loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
+        articlesLoading = true;
+
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
@@ -314,6 +313,7 @@ var Eventlist = {
                     $('#source-select').multiselect("refresh");
                 }
 
+                articlesLoading = false;
                 Events.fire('leftcolumn_dropdown_change', []);
             }
         });
