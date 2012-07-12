@@ -155,6 +155,15 @@ var Eventlist = {
 $.extend(Events.eventList, Eventlist);
 
 $(document).ready(function() {
+    $.ajax({
+        url: Events.url + 'getGroupList/',
+        data: {
+            userId: 1
+        },
+        success: function (data) {
+            callback(false);
+        }
+    });
     Events.fire('load_list', DataUser.uid, function(dataList) {
         Events.fire('load_table', DataUser.uid, 123, 0, 100, function(dataTable) {
             updateList(dataList || DataList);
@@ -194,9 +203,6 @@ function updateTable(dataDef) {
                     $item.addClass('selected');
                     onChange($item);
                 });
-                $dropdown.bind('mousedown', function(e) {
-                    e.stopPropagation();
-                });
                 $(document).mousedown(function() {
                     if ($dropdown.is(':hidden')) return;
                     $dropdown.hide();
@@ -205,7 +211,7 @@ function updateTable(dataDef) {
 
                 function onChange($item) {
                     Events.fire('change_user', DataUser.uid, $item.data('user-id'), 123, function(data) {
-                        //$el.closest('.contact').html('');
+                        $el.closest('.contact').html('');
                     });
                 }
                 $el.data('dropdown', $dropdown);
@@ -234,10 +240,9 @@ function updateTable(dataDef) {
                     var $showInput = $dropdown.find('.show-input');
 
                     $showInput.bind('click', function() {
-                        $showInput.hide();
                         $input.show().focus();
                     });
-                    $dropdown.delegate('.item', 'mousedown', function(e) {
+                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
                         var $item = $(this);
                         $item.toggleClass('selected');
                         onChange($item);
@@ -259,6 +264,7 @@ function updateTable(dataDef) {
 
                     function onSave(text) {
                         Events.fire('add_list', DataUser.uid, text, function(data) {
+                            $input.hide();
                             $input.val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
                         });
                     }
@@ -476,7 +482,7 @@ var CONTACT =
 var DROPDOWN =
 '<div class="dropdown">' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
-    '<input type="text" class="add-item" placeholder="Создать список" />' +
+    '<input type="text" class="add-item" placeholder="Название списка" />' +
     '<div class="item show-input">Создать список</div>'
 '</div>';
 
