@@ -153,7 +153,7 @@
                 throw new Exception("wall's end");
             }
 
-            $a = $this->get_page($this->page_adr."?offset=$offset?own=1");
+            $a = $this->get_page($this->page_adr."?offset=$offset&own=1");
 
             if (!$a) {
                 throw new Exception('Не удалось скачать страницу '.$this->page_adr."?offset=$offset");
