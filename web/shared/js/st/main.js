@@ -2,17 +2,14 @@
  * Events
  */
 var Events = {
-    delay: 400,
+    url: controlsRoot,
+    delay: 0,
     eventList: {},
     fire: function(name, args){
-        if (typeof args != "undefined") {
-            if(!$.isArray(args)) args = [args];
-        } else {
-            args = [];
-        }
-        if ($.isFunction(this.eventList[name])) {
+        var t = this;
+        args = Array.prototype.slice.call(arguments, 1);
+        if ($.isFunction(t.eventList[name])) {
             try {
-                var t = this;
                 setTimeout(function() {
                     console.log(name + ':');
                     console.log(args.slice(0, -1));
@@ -131,6 +128,15 @@ var DataList = [
  */
 var Eventlist = {
     load_list: function(viewer_id, callback) {
+//        $.ajax({
+//            url: Events.url + 'arcticle-item/',
+//            data: {
+//                userId: viewer_id
+//            },
+//            success: function (data) {
+//                callback(false);
+//            }
+//        });
         callback(false);
     },
     load_table: function(viewer_id, list_id, offset, limit, callback) {
@@ -149,13 +155,13 @@ var Eventlist = {
 $.extend(Events.eventList, Eventlist);
 
 $(document).ready(function() {
-    Events.fire('load_list', [DataUser.uid, function(dataList) {
-        Events.fire('load_table', [DataUser.uid, 123, 0, 100, function(dataTable) {
+    Events.fire('load_list', DataUser.uid, function(dataList) {
+        Events.fire('load_table', DataUser.uid, 123, 0, 100, function(dataTable) {
             updateList(dataList || DataList);
             updateTable(dataTable || DataTable);
             $('#global-loader').fadeOut(200);
-        }]);
-    }]);
+        });
+    });
 });
 
 function updateTable(dataDef) {
@@ -198,9 +204,9 @@ function updateTable(dataDef) {
                 });
 
                 function onChange($item) {
-                    Events.fire('change_user', [DataUser.uid, $item.data('user-id'), 123, function(data) {
+                    Events.fire('change_user', DataUser.uid, $item.data('user-id'), 123, function(data) {
                         //$el.closest('.contact').html('');
-                    }]);
+                    });
                 }
                 $el.data('dropdown', $dropdown);
             }
@@ -218,14 +224,19 @@ function updateTable(dataDef) {
         var $dropdown = $el.data('dropdown');
         e.stopPropagation();
 
-        Events.fire('load_list', [DataUser.uid, function(dataList) {
+        Events.fire('load_list', DataUser.uid, function(dataList) {
             if (!$el.hasClass('selected')) {
                 $el.addClass('selected');
                 if (!$dropdown) {
                     var dataItems = dataList || DataList;
                     $dropdown = $(tmpl(DROPDOWN, {items: dataItems})).appendTo('body');
                     var $input = $dropdown.find('input');
+                    var $showInput = $dropdown.find('.show-input');
 
+                    $showInput.bind('click', function() {
+                        $showInput.hide();
+                        $input.show().focus();
+                    });
                     $dropdown.delegate('.item', 'mousedown', function(e) {
                         var $item = $(this);
                         $item.toggleClass('selected');
@@ -247,9 +258,9 @@ function updateTable(dataDef) {
                     });
 
                     function onSave(text) {
-                        Events.fire('add_list', [DataUser.uid, text, function(data) {
+                        Events.fire('add_list', DataUser.uid, text, function(data) {
                             $input.val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
-                        }]);
+                        });
                     }
                     function onChange($item) {
                         $el.find('.icon').addClass('select');
@@ -261,7 +272,7 @@ function updateTable(dataDef) {
                     left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
                 });
             }
-        }]);
+        });
     });
 
     $('.followers').click(function() {
@@ -344,9 +355,9 @@ function updateList(dataDef) {
         var $item = $(this);
         $item.addClass('selected');
 
-        Events.fire('load_table', [DataUser.uid, $item.data('id'), 0, 100, function(dataTable) {
+        Events.fire('load_table', DataUser.uid, $item.data('id'), 0, 100, function(dataTable) {
             updateTable(dataTable || DataTable);
-        }]);
+        });
     });
 }
 
@@ -465,7 +476,8 @@ var CONTACT =
 var DROPDOWN =
 '<div class="dropdown">' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
-    '<input type="text" class="add-item" placeholder="Создать список" />';
+    '<input type="text" class="add-item" placeholder="Создать список" />' +
+    '<div class="item show-input">Создать список</div>'
 '</div>';
 
 var DROPDOWN_ITEM =
