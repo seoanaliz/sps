@@ -46,6 +46,12 @@
 					<password></password>
 					<encoding>UTF8</encoding>
 				</database>
+                <database driver="PgSql" name="tst">
+                    <name>tst</name>
+                    <user>postgres</user>
+                    <password></password>
+                    <encoding>UTF8</encoding>
+                </database>
 			</databases>
 		</settings>
 		<hosts>
@@ -116,6 +122,12 @@
                     <databases>
                         <database driver="PgSql">
                             <name>sps</name>
+                            <user>sps</user>
+                            <password></password>
+                            <encoding>UTF8</encoding>
+                        </database>
+                        <database driver="PgSql" name="tst">
+                            <name>tst</name>
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
