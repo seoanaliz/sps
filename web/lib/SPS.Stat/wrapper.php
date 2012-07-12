@@ -40,7 +40,7 @@ class wrapper
         return  mktime(0, 0, 0, $date[0], $date[1], $date[2]);
     }
 
-    public function db_wrap($meth, $data='')
+    public function db_wrap($meth, $data='', $k=0)
     {
          switch ($meth) {
             case 'connect':
@@ -63,6 +63,10 @@ class wrapper
                         . pg_errormessage($this->db));
                 }
                 //TODO убить этот кошмар
+                if ($k) {
+                    $this->q_result = $res;
+                    return true;
+                }
                 if (substr_count($data, 'SELECT') > 0 ||substr_count($data, 'select') > 0)
                     $this->q_result = $res;
                     return true;
