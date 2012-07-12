@@ -44,7 +44,6 @@
 
                 $this->db_wrap('query', $query, 1);
                 $a = $this->db_wrap('get_row');
-                print_r($a);
                 $query = sprintf('INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(%1$d, %2$d,%3$d)'
                     ,$userId,$publId, $a['group_id']);
 
