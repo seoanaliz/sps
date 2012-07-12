@@ -12,18 +12,18 @@ class getEntries extends wrapper {
      * Entry Point
      */
     public function Execute() {
-        $userId = Request::getInteger( 'userId' );
-        $group  = Request::getString( 'groupName' );
-        $offset = Request::getInteger( 'offset' );
-        $limit  = Request::getInteger( 'limit' );
-        $offset = $offset ? $offset : 0;
-        $limit  = $limit  ? $limit  : 25;
+        $userId     =   Request::getInteger( 'userId' );
+        $groupId    =   Request::getInteger( 'groupId' );
+        $offset     =   Request::getInteger( 'offset' );
+        $limit      =   Request::getInteger( 'limit' );
+        $offset     =   $offset ? $offset : 0;
+        $limit      =   $limit  ? $limit  : 25;
         $t1 = 'gr50k';
         $t2 = 'publs50k';
         $t3 = 'publ_rels_names';
 
-        if (isset($group) && isset($userId)) {
-            $sql = sprintf('SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price, c.group_name,c.selected_admin
+        if (isset($groupId) && isset($userId)) {
+            $sql = sprintf('SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price,c.group_id,c.selected_admin
                     FROM
                       %1$s as a
                     INNER JOIN
@@ -31,10 +31,10 @@ class getEntries extends wrapper {
                     INNER JOIN
                       %3$s as c ON a.id=c.publ_id
                     WHERE
-                      c.user_id=%4$d and c.group_name=\'%5$s\'
+                      c.user_id=%4$d and c.group_id=%5$d
                     ORDER BY
                       a.id,a.time'
-                    , $t1, $t2, $t3, $userId, $group);
+                    , $t1, $t2, $t3, $userId, $groupId);
         } else {
             $sql = sprintf('SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price
                         FROM
@@ -67,12 +67,12 @@ class getEntries extends wrapper {
                 break;
 
             $resul[$row['id']]['quantity'][] = $row['quantity'];
-            $resul[$row['id']]['name']   = $row['name'];
-            $resul[$row['id']]['ava']    = $row['ava'];
-            $resul[$row['id']]['time']   = $row['time'];
-            $resul[$row['id']]['price']  = $row['price'];
-            $resul[$row['id']]['group']  = $row['group_name'];
-            $resul[$row['id']]['admins'] = $row['selected_admin'];
+            $resul[$row['id']]['name']       = $row['name'];
+            $resul[$row['id']]['ava']        = $row['ava'];
+            $resul[$row['id']]['time']       = $row['time'];
+            $resul[$row['id']]['price']      = $row['price'];
+            $resul[$row['id']]['group_id']   = $row['group_id'];
+            $resul[$row['id']]['admins']     = $row['selected_admin'];
         }
 
         foreach ($resul as $k=>&$v) {
