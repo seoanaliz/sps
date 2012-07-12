@@ -1,6 +1,10 @@
 /**
  * Initialization
  */
+var cur = {
+    selectedList: null // Выбраный список
+};
+
 $(document).ready(function() {
     VK.init({
         apiId: vk_appId,
@@ -21,16 +25,10 @@ $(document).ready(function() {
         if (data.response) {
             r = data.response;
             DataUser = r.me;
-            Events.fire('load_list', DataUser.uid, function(dataList) {
-                var selectedList;
-                for (var i in dataList) {
-                    if (dataList[i].itemSelected) {
-                        selectedList = dataList[i].itemId; break;
-                    }
-                }
-                Events.fire('load_table', DataUser.uid, selectedList, 0, 100, function(dataTable) {
+            Events.fire('load_list', function(dataList) {
+                updateList(dataList);
+                Events.fire('load_table', cur.selectedList, 0, 20, function(dataTable) {
                     try {
-                        updateList(dataList);
                         updateTable(dataTable);
                         $('#global-loader').fadeOut(200);
                     } catch(e) {
@@ -46,7 +44,7 @@ $(document).ready(function() {
 });
 
 function updateTable(dataDef) {
-    if (!dataDef.length) return;
+    if (!$.isArray(dataDef)) return;
 
     var dataTable = dataDef.slice(0);
     var $table;
@@ -84,7 +82,7 @@ function updateTable(dataDef) {
                 function onChange($item) {
                     var $contact = $el.closest('.contact');
                     $contact.css('opacity', .5);
-                    Events.fire('change_user', DataUser.uid, $item.data('user-id'), 123, 123, function(data) {
+                    Events.fire('change_user', $item.data('user-id'), cur.selectedList, dataTable.publicId, function(data) {
                         $contact
                             .html(tmpl(CONTACT, DataUsers[$item.data('user-id')-1]))
                             .animate({opacity: 1}, 100)
@@ -107,7 +105,7 @@ function updateTable(dataDef) {
         var $dropdown = $el.data('dropdown');
         e.stopPropagation();
 
-        Events.fire('load_list', DataUser.uid, function(dataList) {
+        Events.fire('load_list', function(dataList) {
             if (!$el.hasClass('selected')) {
                 $el.addClass('selected');
                 if (!$dropdown) {
@@ -141,13 +139,18 @@ function updateTable(dataDef) {
                     });
 
                     function onSave(text) {
-                        Events.fire('add_list', DataUser.uid, 123, text, function(data) {
-                            $input.hide();
-                            $input.val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
+                        var $public = $el.closest('.public');
+                        var publicId = $public.data('id');
+                        Events.fire('add_list', publicId, text, function(data) {
+                            $input.hide().val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
+                            Events.fire('load_list', function(dataList) {
+                                updateList(dataList);
+                            });
                         });
                     }
                     function onChange($item) {
                         $el.find('.icon').addClass('select');
+                        //todo: доделать
                     }
                     $el.data('dropdown', $dropdown);
                 }
@@ -238,8 +241,9 @@ function updateList(dataDef) {
         $('.header .tab').removeClass('selected');
         var $item = $(this);
         $item.addClass('selected');
+        cur.selectedList = $item.data('id');
 
-        Events.fire('load_table', DataUser.uid, $item.data('id'), 0, 100, function(dataTable) {
+        Events.fire('load_table', $item.data('id'), 0, 20, function(dataTable) {
             updateTable(dataTable);
         });
     });

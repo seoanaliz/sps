@@ -40,7 +40,7 @@ class wrapper
         return  mktime(0, 0, 0, $date[0], $date[1], $date[2]);
     }
 
-    public function db_wrap($meth, $data='', $k=0)
+    public function db_wrap($meth, $data='',$k=0)
     {
          switch ($meth) {
             case 'connect':
@@ -48,7 +48,7 @@ class wrapper
 //                $connect_line = "host={$data['host']} user={$data['user']}
 //                    password={$data['pass']} dbname={$data['name']}";
                 $connect_line = "host=localhost user=postgres
-                    password=qqqqqq dbname=tst";
+                    password='' dbname=sps";
                 $this->db = pg_connect($connect_line);
                 return true;
 
@@ -62,11 +62,12 @@ class wrapper
                     throw new Exception('Ошибка при работе с бд : '
                         . pg_errormessage($this->db));
                 }
-                //TODO убить этот кошмар
-                if ($k) {
+
+                if($k){
                     $this->q_result = $res;
                     return true;
                 }
+                //TODO убить этот кошмар
                 if (substr_count($data, 'SELECT') > 0 ||substr_count($data, 'select') > 0)
                     $this->q_result = $res;
                     return true;

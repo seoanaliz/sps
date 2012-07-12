@@ -25,69 +25,90 @@ var Events = {
     }
 };
 
+var simpleAjax = function(method, data, callback) {
+    $.ajax({
+        url: Events.url + method + '/',
+        dataType: 'json',
+        data: $.extend({
+            userId: DataUser.uid
+        }, data),
+        success: function (result) {
+            if (result && result.response) {
+                if ($.isFunction(data)) callback = data;
+                callback(result.response);
+            }
+        }
+    });
+};
+
 var Eventlist = {
-    load_list: function(viewer_id, callback) {
-        $.ajax({
-            url: Events.url + 'getGroupList/',
-            data: {
-                userId: viewer_id
-            },
-            success: function (data) {
-                callback(DataList);
-            }
+    load_list: function(callback) {
+        simpleAjax('getGroupList', function(dirtyData) {
+            var clearData = [];
+            if ($.isArray(dirtyData))
+                $.each(dirtyData, function(i, data) {
+                    clearData.push({
+                        itemId: data.group_id,
+                        itemTitle: data.name,
+                        itemSelected: false
+                    });
+                });
+            callback(clearData);
         });
     },
-    load_table: function(viewer_id, list_id, offset, limit, callback) {
-        $.ajax({
-            url: Events.url + 'getGroupList/',
-            data: {
-                userId: viewer_id,
-                groupId: list_id,
-                offset: offset,
-                limit: limit
-            },
-            success: function (data) {
-                callback(DataTable);
-            }
+    load_table: function(list_id, offset, limit, callback) {
+        simpleAjax('getEntries', {
+            groupId: list_id,
+            offset: offset,
+            limit: limit
+        }, function(dirtyData) {
+            var clearData = [];
+            if ($.isArray(dirtyData))
+                $.each(dirtyData, function(i, data) {
+                    clearData.push({
+                        publicId: data.id,
+                        publicImg: data.ava,
+                        publicName: data.name,
+                        publicFollowers: data.quantity,
+                        publicGrowthNum: '231',
+                        publicGrowthPer: '0.53%',
+                        users: DataUsers
+                    });
+                });
+            callback(clearData);
         });
     },
-    add_list: function(viewer_id, public_id, title, callback) {
-        $.ajax({
-            url: Events.url + 'setGroup/',
-            data: {
-                userId: viewer_id,
-                publId: public_id,
-                groupName: title
-            },
-            success: function (data) {
-                callback(false);
-            }
+    add_list: function(public_id, title, callback) {
+        simpleAjax('setGroup', {
+            publId: public_id,
+            groupName: title
+        }, function(dirtyData) {
+            callback(false);
         });
     },
-    remove_list: function(viewer_id, list_id, callback) {
-        $.ajax({
-            url: Events.url + 'deleteGroup/',
-            data: {
-                userId: viewer_id,
-                groupId: list_id
-            },
-            success: function (data) {
-                callback(false);
-            }
+    update_list: function(public_id, group_id, title, callback) {
+        simpleAjax('setGroup', {
+            groupId: group_id,
+            publId: public_id,
+            groupName: title
+        }, function(dirtyData) {
+            callback(false);
         });
     },
-    change_user: function(viewer_id, user_id, list_id, public_id, callback) {
-        $.ajax({
-            url: Events.url + 'selectSAdmin/',
-            data: {
-                userId: viewer_id,
-                adminId: user_id,
-                groupId: list_id,
-                publId: public_id
-            },
-            success: function (data) {
-                callback(false);
-            }
+    remove_list: function(list_id, callback) {
+        simpleAjax('setGroup', {
+            groupId: title
+        }, function(dirtyData) {
+            callback(false);
+        });
+    },
+    change_user: function(user_id, list_id, public_id, callback) {
+        simpleAjax('selectSAdmin', {
+            adminId: user_id,
+            groupId: list_id,
+            publId: public_id
+        }, function(dirtyData) {
+            callback(false);
         });
     }
 };

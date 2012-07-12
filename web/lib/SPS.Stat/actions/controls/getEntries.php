@@ -66,29 +66,32 @@ class getEntries extends wrapper {
             if ($i >= $offset + $limit )
                 break;
 
-            $resul[$row['id']]['quantity'][] = $row['quantity'];
-            $resul[$row['id']]['name']       = $row['name'];
-            $resul[$row['id']]['ava']        = $row['ava'];
-            $resul[$row['id']]['time']       = $row['time'];
-            $resul[$row['id']]['price']      = $row['price'];
-            $resul[$row['id']]['group_id']   = $row['group_id'];
-            $resul[$row['id']]['admins']     = $row['selected_admin'];
+            array_push($resul, array(
+                'id' => $row['id'],
+                'quantity' => $row['quantity'],
+                'name' => $row['name'],
+                'ava' => $row['ava'],
+                'time' => $row['time'],
+                'price' => $row['price'],
+                'group_id' => $row['group_id'],
+                'selected_admin' => $row['selected_admin'],
+            ));
         }
 
-        foreach ($resul as $k=>&$v) {
+        foreach ($resul as $k => &$v) {
             $v['admins'] = $this->get_admins($k, $v['admins']);
-            $time_last = end($v['quantity']);
-            $time_comparison = prev($v['quantity']);
-            if (count($v['quantity']) > 1  && $time_last != 0 && $time_comparison != 0) {
-                $v['diff_abs'] = $time_last - $time_comparison;
-                $v['diff_rel'] = round(( $time_last - $time_comparison )  / $time_comparison, 4) * 100 ;
-            } else {
-                $v['diff_abs'] = '-';
-                $v['diff_rel'] = '-';
-            }
-            $v['quantity'] = $time_last;
+//            $time_last = end($v['quantity']);
+//            $time_comparison = prev($v['quantity']);
+//            if (count($v['quantity']) > 1  && $time_last != 0 && $time_comparison != 0) {
+//                $v['diff_abs'] = $time_last - $time_comparison;
+//                $v['diff_rel'] = round(( $time_last - $time_comparison )  / $time_comparison, 4) * 100 ;
+//            } else {
+//                $v['diff_abs'] = '-';
+//                $v['diff_rel'] = '-';
+//            }
+//            $v['quantity'] = $time_last;
         }
-        echo ObjectHelper::ToJSON($resul);
+        echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
     //выбирает админов, в 0 элемент помещает "главного" для этой выборки

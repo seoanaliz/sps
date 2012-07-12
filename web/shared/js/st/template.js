@@ -38,6 +38,7 @@ var tmpl = (function() {
 
 var LIST =
 '<div class="tab-bar">' +
+    '<span class="tab selected">Все записи</span>' +
     '<? each(LIST_ITEM, items); ?>';
 '</div>';
 
@@ -71,7 +72,7 @@ var TABLE_BODY =
 '<? each(TABLE_ROW, rows); ?>';
 
 var TABLE_ROW =
-'<tr>' +
+'<tr class="public" data-id="<?=publicId?>">' +
     '<td>' +
         '<span class="photo">' +
             '<img src="<?=publicImg?>" alt="" />' +

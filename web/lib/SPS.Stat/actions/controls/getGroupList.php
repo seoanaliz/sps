@@ -23,10 +23,10 @@
             $this->db_wrap('query', $sql);
             $res = array();
             while ($row = $this->db_wrap('get_row'))
-                $res[$row['group_id']] = $row['name'];
+                array_push($res, $row);
 
             ksort($res);
-            echo ObjectHelper::ToJSON($res);
+            echo ObjectHelper::ToJSON(array('response' => $res));
         }
 
     }
