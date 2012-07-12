@@ -15,7 +15,7 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
-                <page uri="/stat" boot="">
+                <page uri="/stat">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
             </pageGroup>
