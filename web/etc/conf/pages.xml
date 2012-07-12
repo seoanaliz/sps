@@ -77,6 +77,27 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://setPostPrice/">
+                    <actions>SPS.Stat.setPostPrice</actions>
+                </page>
+                <page uri="controls://setGroup/">
+                    <actions>SPS.Stat.setGroup</actions>
+                </page>
+                <page uri="controls://deleteGroup/">
+                    <actions>SPS.Stat.deleteGroup</actions>
+                </page>
+                <page uri="controls://selectSAdmin/">
+                    <actions>SPS.Stat.selectSAdmin</actions>
+                </page>
+                <page uri="controls://getGroupList/">
+                    <actions>SPS.Stat.getGroupList</actions>
+                </page>
+                <page uri="controls://getEntries/">
+                    <actions>SPS.Stat.getEntries</actions>
+                </page>
+            </pageGroup>
+
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
                     <template>tmpl://vt/login.tmpl.php</template>
@@ -87,6 +108,15 @@
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
                 <pageGroup name="SPS.Common">
+                    <page uri="vt://statistics">
+                        <!--<actions>SPS.Site.GetIndexPage</actions>-->
+                        <template>tmpl://vt/statistic/statistic.tmpl.php</template>
+                    </page>
+                    <page uri="vt://stat/">
+                        <actions>Sps.Stat.GraphGrow</actions>
+                        <template>tmpl://vt/stat/index.tmpl.php</template>
+                    </page>
+
                     <pageGroup name="siteParam">
                         <page uri="vt://site-params/">
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetSiteParamList, SPS.Common.SetSiteParamsMenu</actions>
@@ -335,6 +365,9 @@
                 </page>
                 <page uri="daemons://wr-points/">
                     <actions>SPS.Stat.WrPoints</actions>
+                </page>
+                <page uri="daemons://wr-unix/">
+                    <actions>SPS.Stat.WrUnix</actions>
                 </page>
             </pageGroup>
 
