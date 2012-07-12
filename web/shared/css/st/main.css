@@ -58,6 +58,7 @@ a:hover {
     border-bottom: none;
     border-radius: 2px;
     padding: .7em;
+    padding-top: 0;
 }
 #main > .content {
 
@@ -99,7 +100,8 @@ a:hover {
     width: 200px;
 }
 #main > .content .table td {
-    padding: .7em;
+    height: 40px;
+    padding: 5px;
     text-align: center;
     border-top: 1px solid #DEE5EB;
     font-weight: bold;
@@ -107,15 +109,22 @@ a:hover {
 #main > .content .table th:first-child,
 #main > .content .table td:first-child {
     text-align: left;
+}
+#main > .content .table td:first-child {
     color: #45688E;
+    padding-left: 50px;
+    position: relative;
 }
 #main > .content .table td:first-child .photo {
-    margin-right: .5em;
     vertical-align: middle;
     display: inline-block;
     width: 32px;
     height: 32px;
     overflow: hidden;
+    position: absolute;
+    top: 50%;
+    margin-top: -16px;
+    left: .7em;
 }
 #main > .content .table td:first-child img {
     width: 32px;
@@ -140,6 +149,7 @@ a:hover {
 /* Universal */
 .tab-bar {}
 .tab-bar > .tab {
+    margin-top: .7em;
     color: #45688E;
     font-weight: bold;
     border-radius: .3em;
@@ -256,15 +266,18 @@ a:hover {
 .actions {
     position: absolute;
     top: 0;
-    right: 1em;
+    right: 0;
     bottom: 0;
+    width: 40px;
 }
 .actions > .action {
-    padding: .4em;
     cursor: pointer;
     display: inline-block;
-    position: relative;
-    margin: 1.4em 0;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    margin-top: -10px;
+    padding: 4px;
 }
 .actions > .action .icon {
     opacity: .3;

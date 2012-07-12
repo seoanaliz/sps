@@ -27,7 +27,7 @@ $(document).ready(function() {
             DataUser = r.me;
             Events.fire('load_list', function(dataList) {
                 updateList(dataList);
-                Events.fire('load_table', cur.selectedList, 0, 20, function(dataTable) {
+                Events.fire('load_table', cur.selectedList, 0, 200, function(dataTable) {
                     try {
                         updateTable(dataTable);
                         $('#global-loader').fadeOut(200);
@@ -141,7 +141,7 @@ function updateTable(dataDef) {
                     function onSave(text) {
                         var $public = $el.closest('.public');
                         var publicId = $public.data('id');
-                        Events.fire('add_list', publicId, text, function(data) {
+                        Events.fire('add_list', text, function(data) {
                             $input.hide().val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
                             Events.fire('load_list', function(dataList) {
                                 updateList(dataList);
@@ -172,7 +172,7 @@ function updateTable(dataDef) {
 
     $('.contacts').click(function() {
         sortTable(this, function(a) {
-            return a.user['userName'].toLowerCase();
+            return a.users[0]['userName'].toLowerCase();
         });
     });
 
@@ -189,7 +189,7 @@ function updateTable(dataDef) {
         var reverse = -1;
         var $target = $(target);
         var parse = $.isFunction(index) ? index : function(a) {
-            return parseInt(a[index].split(' ').join(''));
+            return parseFloat(a[index].toString().split(' ').join(''));
         };
         var sort = function(first, second) {
             var a = parse(first);

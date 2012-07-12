@@ -38,12 +38,12 @@ var tmpl = (function() {
 
 var LIST =
 '<div class="tab-bar">' +
-    '<span class="tab selected">Все записи</span>' +
-    '<? each(LIST_ITEM, items); ?>';
+    '<span data-id="null" class="tab selected">Все записи</span>' +
+    '<? each(LIST_ITEM, items); ?>' +
 '</div>';
 
 var LIST_ITEM =
-'<span data-id="<?=itemId?>" class="tab<?=isset("itemSelected") ? " selected" : "" ?>">' +
+'<span data-id="<?=itemId?>" class="tab">' +
     '<?=itemTitle?>' +
 '</span>';
 
@@ -59,13 +59,13 @@ var TABLE =
         '<th class="growth">' +
             'прирост<span class="icon arrow"></span>' +
         '</th>' +
-        '<th class="contacts" width="31%">' +
+        '<th class="contacts">' +
             'контакты<span class="icon arrow"></span>' +
         '</th>' +
     '</tr>' +
 '</thead>' +
 '<tbody id="table-body">' +
-    '<?=tmpl(TABLE_BODY, {rows: rows})?>'
+    '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
 '</tbody>';
 
 var TABLE_BODY =
@@ -82,11 +82,13 @@ var TABLE_ROW =
     '<td><?=publicFollowers?></td>' +
     '<td>' +
         '<span class="<? print(publicGrowthNum > 0 ? "plus" : "minus"); ?>">' +
-            '<?=publicGrowthNum?> <small><?=publicGrowthPer?></small>' +
+            '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
         '</span>' +
     '</td>' +
     '<td>' +
-        '<?=tmpl(CONTACT, users[0])?>' +
+        '<? if (isset("users") && users.length) { ?>' +
+            '<?=tmpl(CONTACT, users[0])?>' +
+        '<? } ?>' +
         '<div class="actions">' +
             '<span class="action add-to-list">' +
                 '<span class="icon plus"></span>' +
@@ -115,7 +117,7 @@ var DROPDOWN =
 '<div class="dropdown">' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
-    '<div class="item show-input">Создать список</div>'
+    '<div class="item show-input">Создать список</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =

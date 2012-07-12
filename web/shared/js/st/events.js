@@ -49,8 +49,7 @@ var Eventlist = {
                 $.each(dirtyData, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemSelected: false
+                        itemTitle: data.name
                     });
                 });
             callback(clearData);
@@ -65,22 +64,23 @@ var Eventlist = {
             var clearData = [];
             if ($.isArray(dirtyData))
                 $.each(dirtyData, function(i, data) {
+                    //todo: доделать
+                    var users = data.admins;
                     clearData.push({
                         publicId: data.id,
                         publicImg: data.ava,
                         publicName: data.name,
                         publicFollowers: data.quantity,
-                        publicGrowthNum: '231',
-                        publicGrowthPer: '0.53%',
-                        users: DataUsers
+                        publicGrowthNum: data.diff_abs,
+                        publicGrowthPer: data.diff_rel,
+                        users: users
                     });
                 });
             callback(clearData);
         });
     },
-    add_list: function(public_id, title, callback) {
+    add_list: function(title, callback) {
         simpleAjax('setGroup', {
-            publId: public_id,
             groupName: title
         }, function(dirtyData) {
             callback(false);
