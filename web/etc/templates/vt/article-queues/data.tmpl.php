@@ -29,6 +29,10 @@
             <label>{lang:vt.articleQueue.articleId}</label>
             <?= FormHelper::FormInput( $prefix . '[articleId]', $object->articleId, 'articleId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="type" class="row required">
+            <label>{lang:vt.sourceFeed.type}</label>
+            <?= FormHelper::FormSelect( $prefix . '[type]', GridLineUtility::$Types, "", "", $object->type, null, null, false ); ?>
+        </div>
         <div data-row="startDate" class="row required">
             <label>{lang:vt.articleQueue.startDate}</label>
             <?= FormHelper::FormDateTime( $prefix . '[startDate]', $object->startDate, 'd.m.Y G:i' ); ?>
@@ -44,6 +48,22 @@
         <div data-row="targetFeedId" class="row required">
             <label>{lang:vt.articleQueue.targetFeedId}</label>
             <?= FormHelper::FormSelect( $prefix . '[targetFeedId]', $targetFeeds, "targetFeedId", "title", $object->targetFeedId, null, null, false ); ?>
+        </div>
+        <div data-row="author" class="row">
+            <label>{lang:vt.articleQueue.author}</label>
+            <?= FormHelper::FormInput( $prefix . '[author]', $object->author, 'author', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalId" class="row">
+            <label>{lang:vt.common.externalId}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalLikes" class="row">
+            <label>{lang:vt.articleQueue.externalLikes}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalLikes]', $object->externalLikes, 'externalLikes', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+        </div>
+        <div data-row="externalRetweets" class="row">
+            <label>{lang:vt.articleQueue.externalRetweets}</label>
+            <?= FormHelper::FormInput( $prefix . '[externalRetweets]', $object->externalRetweets, 'externalRetweets', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.articleQueue.statusId}</label>

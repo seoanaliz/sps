@@ -7,30 +7,14 @@
         if (empty($articleRecord)) continue;
         ?>
             <div class="slot locked">
-                <div class="time">
-                    <?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : '' ?>
-                    <? if (!empty($articleRecord->link)) { ?>
-                    <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
-                    <? } ?>
-                    <? if (UrlParser::IsContentWithLink($articleRecord->content)) { ?>
-                    <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>
-                    <? } ?>
-                    <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
-                    <span class="hash-span" title="Пост с хештэгом">#hash</span>
-                    <? } ?>
+                <div class="slot-header">
+                    <span>&nbsp;<?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : '' ?></span>
+
+                    {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                 </div>
                 <div class="post blocked <?= empty($articleQueueItem->sentAt) ? 'failed' : '' ?>">
                     <div class="content">
-                        <?
-                        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
-                        ?>
-                        {$content}
-
-                        <? if (!empty($articleRecord->photos)) { ?>
-                        <? foreach($articleRecord->photos as $photoItem) { ?>
-                            <br /><img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
-                            <? } ?>
-                        <? } ?>
+                        {increal:tmpl://fe/elements/arcticles-queue-item-content.tmpl.php}
                     </div>
                 </div>
             </div>

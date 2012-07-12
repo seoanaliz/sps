@@ -28,7 +28,7 @@
                 return;
             }
 
-            $parser = new ParserTop();
+            $parser = new tf_parcer();
 
             $tries  = 3;
             $i      = 0;
@@ -134,6 +134,8 @@
                 } else {
                     $conn->rollback();
                 }
+
+                break;
             }
         }
 

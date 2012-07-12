@@ -19,15 +19,26 @@
 
     <group name="Controls">
         <group name="Prices">
-            <action name="deletePostPrice">
-                <path>controls/deletePostPrice</path>
-            </action>
             <action name="setPostPrice">
                 <path>controls/setPostPrice</path>
             </action>
             <action name="setGroup">
                 <path>controls/setGroup</path>
             </action>
+            <action name="deleteGroup">
+                <path>controls/deleteGroup</path>
+            </action>
+            <action name="getEntries">
+                <path>controls/getEntries</path>
+            </action>
+            <action name="selectSAdmin">
+                <path>controls/selectSAdmin</path>
+            </action>
+            <action name="getGroupList">
+                <path>controls/getGroupList</path>
+            </action>
+
+
         </group>
     </group>
 

@@ -346,6 +346,9 @@
             <articleId><![CDATA[ID Статьи]]></articleId>
             <targetFeedId><![CDATA[Лента отправки]]></targetFeedId>
             <statusId><![CDATA[Статус]]></statusId>
+            <author><![CDATA[Автор]]></author>
+            <externalLikes><![CDATA[Получено лайков]]></externalLikes>
+            <externalRetweets><![CDATA[Получено ретвитов]]></externalRetweets>
         </articleQueue>
         <articleRecord>
             <content><![CDATA[Содержание]]></content>

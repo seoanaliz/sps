@@ -69,14 +69,11 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
-                <page uri="controls://setPrice/">
-                    <actions>SPS.Stat.setPostPrice</actions>
+                <page uri="controls://grid-line-save/">
+                    <actions>SPS.Site.SaveGridLineControl</actions>
                 </page>
-                <page uri="controls://unsetPrice/">
-                    <actions>SPS.Stat.deletePostPrice</actions>
-                </page>
-	        <page uri="controls://setGroup/">
-                    <actions>SPS.Stat.setGroup</actions>
+                <page uri="controls://grid-line-item-save/">
+                    <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
             </pageGroup>
 
@@ -89,7 +86,6 @@
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
-
                 <pageGroup name="SPS.Common">
                     <pageGroup name="siteParam">
                         <page uri="vt://site-params/">
@@ -282,7 +278,7 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-
+				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -340,8 +336,11 @@
                 <page uri="daemons://wr-points/">
                     <actions>SPS.Stat.WrPoints</actions>
                 </page>
-                <page uri="daemons://wr-unix/">
-                    <actions>SPS.Stat.WrUnix</actions>
+            </pageGroup>
+
+            <pageGroup name="vtControls" boot="">
+                <page uri="controls://generate-grid-sql/">
+                    <actions>SPS.Articles.GenerateGridSQL</actions>
                 </page>
             </pageGroup>
 

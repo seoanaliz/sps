@@ -25,8 +25,6 @@
                 , array( BaseFactory::WithoutPages => true )
             );
 
-            Session::setString('currentSourceType', $type);
-
             echo ObjectHelper::ToJSON(array_values($sourceFeeds));
         }
     }

@@ -49,6 +49,30 @@
                     'name'          => 'sentAt'
                     , 'type'        => TYPE_DATETIME
                 )
+                ,'type' => array(
+                    'name'          => 'type'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 10
+                    , 'nullable'    => 'CheckEmpty'
+                )
+                ,'author' => array(
+                    'name'          => 'author'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                )
+                ,'externalId' => array(
+                    'name'          => 'externalId'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                )
+                ,'externalLikes' => array(
+                    'name'          => 'externalLikes'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'externalRetweets' => array(
+                    'name'          => 'externalRetweets'
+                    , 'type'        => TYPE_INTEGER
+                )
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER

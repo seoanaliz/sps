@@ -68,9 +68,14 @@ class wrapper
                     return true;
             case 'get_row':
                 $source = $data ? $data : $this->q_result;
-                return pg_fetch_array($source);
+                return pg_fetch_array($source, NULL, PGSQL_ASSOC);
             case 'affected_rows':
-                return pg_affected_rows($this->q_result);
+                $rows_aff = pg_affected_rows($this->q_result);
+                $rows_selected = pg_num_rows($this->q_result);
+                if (!$rows_aff && !$rows_selected)
+                    return false;
+
+                return $rows_aff ? $rows_aff : $rows_selected;
             default:
                 echo 'Неправильный метод! <br>';
                 break;
@@ -170,7 +175,8 @@ class wrapper
     public function get_publics()
     {
         $sql = "select vk_id,name from publics where active=1";
-        $res_sql = $this->db_wrap('query', $sql);
+        $this->db_wrap('query', $sql);
+        $ids = array();
         while ($row = $this->db_wrap('get_row')) {
             $ids[] = array($row['vk_id'], $row['name']);
         }

@@ -189,7 +189,7 @@
                         try {
                             $articleRecord->photos = $this->savePostPhotos($post['photo']);
                         } catch (Exception $Ex) {
-                            AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
+                            //AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
 
                             /**
                              * Если хоть одна фотка не загрузилась, то мы добавляем $externalId в $skipIds
