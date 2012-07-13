@@ -13,21 +13,21 @@
          */
         public function Execute() {
             //$userId   = Request::getInteger( 'userId' );
-            //$userId = AuthVkontakte::IsAuth();
             $groupId  = Request::getInteger ( 'groupId' );
             if (!$groupId) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
-                return;
+                die();
             }
-
-            $query = 'DELETE FROM publ_rels_names WHERE group_id = @groupId';
+            echo '123123';
+            $query = 'DELETE FROM publ_rels_names WHERE group_id=@group_id';
             $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@groupId', $groupId);
+            $cmd->SetInteger('@group_id', $groupId);
             $cmd->Execute();
 
-            $query = 'DELETE FROM groups WHERE group_id = @groupId';
+
+            $query = 'DELETE FROM groups WHERE group_id=@group_id';
             $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@groupId', $groupId);
+            $cmd->SetInteger('@group_id', $groupId);
             $cmd->Execute();
 
             echo  ObjectHelper::ToJSON(array('response' => true));
