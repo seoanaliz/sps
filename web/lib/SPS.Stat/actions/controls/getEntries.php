@@ -52,13 +52,37 @@ class getEntries extends wrapper {
         $resul = array();
         $i = 0;
         $old_id = '';
-
+        $quantity = array();
         while ($row = $this->db_wrap('get_row', $rest)) {
             $id = $row['id'];
 
             if ($id != $old_id) {
                 $i++;
                 $old_id = $id;
+                $admins = $this->get_admins($row['id'], $row['admins']);
+                $time_last = end($quantity);
+                $time_comparison = prev($quantity);
+                if (count($quantity) > 1  && $time_last != 0 && $time_comparison != 0) {
+                    $diff_abs = $time_last - $time_comparison;
+                    $diff_rel = round(( $time_last - $time_comparison ) / $time_comparison, 4) * 100 ;
+                } else {
+                    $diff_abs = '-';
+                    $diff_rel = '-';
+                }
+
+                $quantity = array();
+                array_push($resul, array(
+                    'id' => $row['id'],
+                    'quantity'  =>  $time_last,
+                    'name'      =>  $row['name'],
+                    'ava'       =>  $row['ava'],
+                    'time'      =>  $row['time'],
+                    'price'     =>  $row['price'],
+                    'group_id'  =>  $row['id'],
+                    'admins'    =>  $admins,
+                    'diff_abs'  =>  $diff_abs,
+                    'diff_rel'  =>  $diff_rel
+                ));
             }
 //
             if ($i < $offset)
@@ -66,32 +90,13 @@ class getEntries extends wrapper {
             if ($i >= $offset + $limit )
                 break;
 
-            $resul[$row['id']]['quantity'][] = $row['quantity'];
-            $resul[$row['id']]['name']       = $row['name'];
-            $resul[$row['id']]['ava']        = $row['ava'];
-            $resul[$row['id']]['time']       = $row['time'];
-            $resul[$row['id']]['price']      = $row['price'];
-            $resul[$row['id']]['group_id']   = $row['group_id'];
-            $resul[$row['id']]['admins']     = $row['selected_admin'];
+            $quantity[]= $row['quantity'];
         }
 
-        foreach ($resul as $k=>&$v) {
-            $v['admins'] = $this->get_admins($k, $v['admins']);
-            $time_last = end($v['quantity']);
-            $time_comparison = prev($v['quantity']);
-            if (count($v['quantity']) > 1  && $time_last != 0 && $time_comparison != 0) {
-                $v['diff_abs'] = $time_last - $time_comparison;
-                $v['diff_rel'] = round(( $time_last - $time_comparison )  / $time_comparison, 4) * 100 ;
-            } else {
-                $v['diff_abs'] = '-';
-                $v['diff_rel'] = '-';
-            }
-            $v['quantity'] = $time_last;
-        }
         echo ObjectHelper::ToJSON($resul);
     }
 
-    //выбирает админов, в 0 элемент помещает "главного" для этой выборки
+    //РІС‹Р±РёСЂР°РµС‚ Р°РґРјРёРЅРѕРІ, РІ 0 СЌР»РµРјРµРЅС‚ РїРѕРјРµС‰Р°РµС‚ "РіР»Р°РІРЅРѕРіРѕ" РґР»СЏ СЌС‚РѕР№ РІС‹Р±РѕСЂРєРё
     private function get_admins($publ, $sadmin)
     {
         $sql = "select vk_id,role,name,ava,comments from admins where publ_id=" . $publ;
