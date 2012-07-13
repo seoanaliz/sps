@@ -23,7 +23,7 @@ var DataUser = {};
 
 $(document).ready(function() {
     VK.init({
-        apiId: configs.appId,
+        apiId: Configs.appId,
         nameTransportPath: '/xd_receiver.htm'
     });
     getInitData();
