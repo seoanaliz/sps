@@ -42,6 +42,7 @@ $jsFiles = array(
     'js://st/data.js',
     'js://st/events.js',
     'js://st/template.js',
+    'js://st/table.js',
     'js://st/main.js',
 );
 

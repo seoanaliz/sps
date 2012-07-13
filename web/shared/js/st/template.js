@@ -59,7 +59,7 @@ var TABLE =
         '<th class="growth">' +
             'прирост<span class="icon arrow"></span>' +
         '</th>' +
-        '<th class="contacts">' +
+        '<th class="contacts" width="30%">' +
             'контакты<span class="icon arrow"></span>' +
         '</th>' +
     '</tr>' +
@@ -81,7 +81,7 @@ var TABLE_ROW =
     '</td>' +
     '<td><?=publicFollowers?></td>' +
     '<td>' +
-        '<span class="<? print(publicGrowthNum > 0 ? "plus" : "minus"); ?>">' +
+        '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
         '</span>' +
     '</td>' +
@@ -91,7 +91,7 @@ var TABLE_ROW =
         '<? } ?>' +
         '<div class="actions">' +
             '<span class="action add-to-list">' +
-                '<span class="icon plus"></span>' +
+                '<span class="icon <?=lists ? "select" : "plus"?>"></span>' +
             '</span>' +
         '</div>' +
     '</td>' +

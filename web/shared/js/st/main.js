@@ -2,8 +2,15 @@
  * Initialization
  */
 var cur = {
-    selectedList: null // Выбраный список
+    dataTable: {},
+    dataAllTable: {},
+    selectedListId: null, // Выбраный список
+    wallLoaded: null,
+
+    etc: null
 };
+
+var DataUser = {};
 
 $(document).ready(function() {
     VK.init({
@@ -27,224 +34,107 @@ $(document).ready(function() {
             DataUser = r.me;
             Events.fire('load_list', function(dataList) {
                 updateList(dataList);
-                Events.fire('load_table', cur.selectedList, 0, 200, function(dataTable) {
-                    try {
-                        updateTable(dataTable);
-                        $('#global-loader').fadeOut(200);
-                    } catch(e) {
-                        $('#global-loader')
-                            .css('background-image', 'none')
-                            .html('Error: "' + e.arguments[0] + '" ' + e.type);
-                        throw e;
-                    }
+                Events.fire('load_table', cur.selectedListId, 0, 20, function(dataTable) {
+                    cur.wallLoaded = 20;
+                    updateTable(dataTable);
+                    $('#global-loader').fadeOut(200);
                 });
             });
         }
     }
 });
 
-function updateTable(dataDef) {
-    if (!$.isArray(dataDef)) return;
+/*
+var cur = {
+    dataList: {},
+    dataTable: {},
+    selectedListId: null, // Выбраный список
+    wallLoaded: null,
 
-    var dataTable = dataDef.slice(0);
-    var $table;
-    var $tableHead;
-    var $tableBody;
-    var $filter;
+    etc: null
+};
 
-    updateElements();
-    renderTable({rows: dataTable});
+var globalData = {
+    user: {},
+    table: {},
 
-    $table.delegate('.contact .content', 'click', function(e) {
-        var $el = $(this);
-        var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
-        e.stopPropagation();
+    etc: null
+};
 
-        if (!$el.hasClass('selected')) {
-            $el.addClass('selected');
-            if (!$dropdown) {
-                var dataItems = DataUsers;
-                $dropdown = $(tmpl(CONTACT_DROPDOWN, {users: dataItems})).appendTo('body');
-
-                $dropdown.delegate('.item', 'mousedown', function(e) {
-                    var $item = $(this);
-                    $dropdown.find('.item.selected').removeClass('selected');
-                    $item.addClass('selected');
-                    onChange($item);
-                });
-                $(document).mousedown(function() {
-                    if ($dropdown.is(':hidden')) return;
-                    $dropdown.hide();
-                    $el.removeClass('selected');
-                });
-
-                function onChange($item) {
-                    var $contact = $el.closest('.contact');
-                    $contact.css('opacity', .5);
-                    Events.fire('change_user', $item.data('user-id'), cur.selectedList, dataTable.publicId, function(data) {
-                        $contact
-                            .html(tmpl(CONTACT, DataUsers[$item.data('user-id')-1]))
-                            .animate({opacity: 1}, 100)
-                        ;
-                    });
-                }
-                $el.data('dropdown', $dropdown);
-            }
-            $dropdown.show().css({
-                top: offset.top + $el.outerHeight(),
-                left: offset.left - 1,
-                width: $el.outerWidth()
-            });
-        }
+$(document).ready(function() {
+    VK.init({
+        apiId: vk_appId,
+        nameTransportPath: '/xd_receiver.htm'
     });
+    getInitData();
 
-    $table.delegate('.action.add-to-list', 'click', function(e) {
-        var $el = $(this);
-        var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
-        e.stopPropagation();
-
-        Events.fire('load_list', function(dataList) {
-            if (!$el.hasClass('selected')) {
-                $el.addClass('selected');
-                if (!$dropdown) {
-                    var dataItems = dataList;
-                    $dropdown = $(tmpl(DROPDOWN, {items: dataItems})).appendTo('body');
-                    var $input = $dropdown.find('input');
-                    var $showInput = $dropdown.find('.show-input');
-
-                    $showInput.bind('click', function() {
-                        $input.show().focus();
-                    });
-                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
-                        var $item = $(this);
-                        $item.toggleClass('selected');
-                        onChange($item);
-                    });
-                    $dropdown.bind('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
-                    $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) return;
-                        $dropdown.hide();
-                        $el.removeClass('selected');
-                    });
-                    $input.bind('keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != 13) return false;
-                        if (!text) return false;
-                        if (e.keyCode == 13) return $input.blur();
-                        return onSave(text);
-                    });
-
-                    function onSave(text) {
-                        var $public = $el.closest('.public');
-                        var publicId = $public.data('id');
-                        Events.fire('add_list', text, function(data) {
-                            $input.hide().val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
-                            Events.fire('load_list', function(dataList) {
-                                updateList(dataList);
-                            });
-                        });
-                    }
-                    function onChange($item) {
-                        $el.find('.icon').addClass('select');
-                        //todo: доделать
-                    }
-                    $el.data('dropdown', $dropdown);
-                }
-                $dropdown.show().css({
-                    top: offset.top + $el.outerHeight(),
-                    left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
-                });
-            }
-        });
-    });
-
-    $('.followers').click(function() {
-        sortTable(this, 'publicFollowers');
-    });
-
-    $('.growth').click(function() {
-        sortTable(this, 'publicGrowthNum');
-    });
-
-    $('.contacts').click(function() {
-        sortTable(this, function(a) {
-            return a.users[0]['userName'].toLowerCase();
-        });
-    });
-
-    $filter.keyup(function() {
-        dataTable = $.grep(dataDef, function(n) {
-            return n.publicName.toLowerCase().indexOf($filter.val().toLowerCase()) != -1;
-        });
-        $tableHead.find('th.active').removeClass('active');
-        renderTableBody({rows: dataTable});
-    });
-
-    function sortTable(target, index) {
-        var rows;
-        var reverse = -1;
-        var $target = $(target);
-        var parse = $.isFunction(index) ? index : function(a) {
-            return parseFloat(a[index].toString().split(' ').join(''));
-        };
-        var sort = function(first, second) {
-            var a = parse(first);
-            var b = parse(second);
-            return (a > b) ? reverse : ((a < b) ? -reverse : 0);
-        };
-
-        $tableHead.find('th.active').not($target).removeClass('active');
-        if (!$target.hasClass('active')) {
-            $target.addClass('active');
-            rows = dataTable.slice(0).sort(sort);
-        } else if (!$target.hasClass('reverse')) {
-            $target.addClass('reverse');
-            reverse = -reverse;
-            rows = dataTable.slice(0).sort(sort);
-        } else {
-            $target.removeClass('active');
-            $target.removeClass('reverse');
-            rows = dataTable;
-        }
-        renderTableBody({rows: rows});
+    function getInitData() {
+        var code =
+            'return {' +
+                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
+            '};';
+        VK.Api.call('execute', {code: code}, initVK);
     }
+});
 
-    function updateElements() {
-        $table = $('#table');
-        $tableHead = $('#table-head');
-        $tableBody = $('#table-body');
-        $filter = $('#filter');
-        $table.unbind();
-        $filter.unbind();
-    }
+function initVK(data) {
+    if (data.response) {
+        var r = data.response;
+        globalData.user = r.me;
 
-    function renderTable(data) {
-        $table.empty().html(tmpl(TABLE, data));
-        updateElements();
-    }
-    function renderTableBody(data) {
-        $tableBody.empty().html(tmpl(TABLE_BODY, data));
+        List.init('.tab-bar');
     }
 }
 
-function updateList(dataDef) {
-    if (!dataDef.length) return;
+var List = {
+    container: null,
 
-    var dataList = dataDef.slice(0);
+    init: function(container) {
+        var t = this;
+        t.container = (typeof container == 'string') ? $(container) : container;
+        t.update();
+        t.onChange($('.tab.selected', t.container));
+    },
 
-    $('.header').empty().html(tmpl(LIST, {items: dataList}));
-    $('.header').delegate('.tab', 'click', function() {
-        $('.header .tab').removeClass('selected');
-        var $item = $(this);
+    update: function() {
+        var t = this;
+        var $container = this.container;
+        t.getData(function(data) {
+            $container.html(tmpl(LIST, {items: data}));
+            t.updateEvents();
+        });
+    },
+
+    onChange: function($item) {
+        var itemId = $item.data('id');
+        var $container = this.container;
+
+        $container.find('.tab').removeClass('selected');
         $item.addClass('selected');
-        cur.selectedList = $item.data('id');
 
-        Events.fire('load_table', $item.data('id'), 0, 20, function(dataTable) {
-            updateTable(dataTable);
+        Events.fire('load_table', itemId, 0, 9999, function(dataTable) {
+            initTable(dataTable);
         });
-    });
-}
+    },
+
+    updateEvents: function() {
+        var t = this;
+        var $container = this.container;
+
+        (function() {
+            $container.delegate('.tab', 'click', function() {
+                t.onChange($(this));
+            });
+        })();
+
+    },
+
+    getData: function(callback) {
+        Events.fire('load_list', function(dataList) {
+            callback(dataList);
+        });
+    },
+
+    etc: null
+};
+*/

@@ -9,7 +9,7 @@ var DataUser = {
 
 var DataUsers = [ {
     userId: 1,
-    userName: 'Asadasdfша Радославов',
+    userName: 'Sasha Радославов',
     userPhoto: 'http://cs4852.userapi.com/u78467867/d_689784aa.jpg',
     userDescription: 'Сотрудничество'
 }, {

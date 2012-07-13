@@ -6,6 +6,7 @@
     </div>
     <div class="content">
         <table class="table" id="table"></table>
+        <div id="load-more-table">Показать больше</div>
     </div>
 </div>
 {increal:tmpl://st/elements/footer.tmpl.php}

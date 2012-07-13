@@ -75,6 +75,8 @@ class getEntries extends wrapper {
                 'price' => $row['price'],
                 'group_id' => $row['group_id'],
                 'selected_admin' => $row['selected_admin'],
+                'diff_abs' => 231 + $row['id'],
+                'diff_rel' => 0.6,
             ));
         }
 

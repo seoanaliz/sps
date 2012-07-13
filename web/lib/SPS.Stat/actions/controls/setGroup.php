@@ -17,7 +17,7 @@
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
             $groupName  =   $groupName ? $groupName : 0;
-            if (!$publId || !$userId) {
+            if (!$userId) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
@@ -43,11 +43,11 @@
                     ,$groupName, $userId);
 
                 $this->db_wrap('query', $query, 1);
-                $a = $this->db_wrap('get_row');
-                $query = sprintf('INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(%1$d, %2$d,%3$d)'
-                    ,$userId,$publId, $a['group_id']);
+                //$a = $this->db_wrap('get_row');
+                //$query = sprintf('INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(%1$d, %2$d,%3$d)'
+                //    ,$userId,$publId, $a['group_id']);
 
-                $this->db_wrap('query', $query);
+                //$this->db_wrap('query', $query);
             }
             echo ObjectHelper::ToJSON(array('response' => true));
 

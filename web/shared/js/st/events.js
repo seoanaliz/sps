@@ -65,7 +65,15 @@ var Eventlist = {
             if ($.isArray(dirtyData))
                 $.each(dirtyData, function(i, data) {
                     //todo: доделать
-                    var users = data.admins;
+                    var users = [];
+                    $.each(data.admins, function(i, data) {
+                        users.push({
+                            userId: data.id,
+                            userName: data.name,
+                            userPhoto: data.photo,
+                            userDescription: data.description
+                        });
+                    });
                     clearData.push({
                         publicId: data.id,
                         publicImg: data.ava,
@@ -73,6 +81,7 @@ var Eventlist = {
                         publicFollowers: data.quantity,
                         publicGrowthNum: data.diff_abs,
                         publicGrowthPer: data.diff_rel,
+                        lists: data.group_id ? [data.group_id] : null,
                         users: users
                     });
                 });
@@ -86,9 +95,9 @@ var Eventlist = {
             callback(false);
         });
     },
-    update_list: function(public_id, group_id, title, callback) {
+    update_list: function(public_id, list_id, title, callback) {
         simpleAjax('setGroup', {
-            groupId: group_id,
+            groupId: list_id,
             publId: public_id,
             groupName: title
         }, function(dirtyData) {
@@ -96,8 +105,8 @@ var Eventlist = {
         });
     },
     remove_list: function(list_id, callback) {
-        simpleAjax('setGroup', {
-            groupId: title
+        simpleAjax('deleteGroup', {
+            groupId: list_id
         }, function(dirtyData) {
             callback(false);
         });
