@@ -19,12 +19,11 @@
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 return;
             }
-            $sql = 'SELECT * FROM groups WHERE user_id=' . $userId;
+            $sql = 'SELECT DISTINCT(group_name) FROM publ_rels_names WHERE user_id=' . $userId;
             $this->db_wrap('query', $sql);
             $res = array();
             while ($row = $this->db_wrap('get_row'))
-                $res[$row['group_id']] = $row['name'];
-
+                $res[] = $row['group_name'];
             ksort($res);
             echo ObjectHelper::ToJSON($res);
         }
