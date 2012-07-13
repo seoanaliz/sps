@@ -13,9 +13,9 @@
 
             $adminId    = Request::getInteger( 'adminId' );
             $publId     = Request::getInteger( 'publId' );
-            $groupId    = Request::getString(  'groupId' );
+            $groupName  = Request::getString(  'groupName' );
             $userId     = Request::getInteger( 'userId' );
-            if (!$adminId || !$publId || !$groupId || !$userId) {
+            if (!$adminId || !$publId || !$groupName || !$userId) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
@@ -24,8 +24,8 @@
                             SET
                                 selected_admin=%4$d
                             WHERE
-                                publ_id=%1$d AND group_id=%2$d AND user_id=%3$d' ,
-                               $publId,         $groupId,         $userId
+                                publ_id=%1$d AND group_name=\'%2$s\' AND user_id=%3$d' ,
+                               $publId,         $groupName,         $userId
                          ,$adminId);
             $this->db_wrap('query', $sql);
             echo ObjectHelper::ToJSON(array('response' => true));
