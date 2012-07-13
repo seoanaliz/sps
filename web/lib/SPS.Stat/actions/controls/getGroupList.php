@@ -19,12 +19,18 @@
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 return;
             }
-            $sql = 'SELECT DISTINCT(group_name) FROM publ_rels_names WHERE user_id=' . $userId;
-            $this->db_wrap('query', $sql);
+            $sql = 'SELECT * FROM groups WHERE user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $userId);
+            $ds = $cmd->Execute();
+
             $res = array();
-            while ($row = $this->db_wrap('get_row'))
-                $res[] = $row['group_name'];
+            while ($ds->Next()) {
+                $res[$ds->getValue('group_id',TYPE_INTEGER)] = $ds->getValue('name');
+            }
+
             ksort($res);
+            print_r($res);
             echo ObjectHelper::ToJSON($res);
         }
 
