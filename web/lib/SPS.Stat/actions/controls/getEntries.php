@@ -88,8 +88,8 @@ class getEntries extends wrapper {
                     $diff_abs = $time_last - $time_comparison;
                     $diff_rel = round(( $time_last - $time_comparison ) / $time_comparison, 4) * 100 ;
                 } else {
-                    $diff_abs = '-';
-                    $diff_rel = '-';
+                    $diff_abs = '0';
+                    $diff_rel = '0';
                 }
 
                 $quantity = array();
@@ -115,7 +115,7 @@ class getEntries extends wrapper {
 
             $quantity[] = $row['quantity'];
         }
-        echo ObjectHelper::ToJSON($resul);
+        echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
     //РІС‹Р±РёСЂР°РµС‚ Р°РґРјРёРЅРѕРІ, РІ 0 СЌР»РµРјРµРЅС‚ РїРѕРјРµС‰Р°РµС‚ "РіР»Р°РІРЅРѕРіРѕ" РґР»СЏ СЌС‚РѕР№ РІС‹Р±РѕСЂРєРё
