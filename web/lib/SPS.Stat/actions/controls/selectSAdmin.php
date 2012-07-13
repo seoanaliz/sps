@@ -13,21 +13,26 @@
 
             $adminId    = Request::getInteger( 'adminId' );
             $publId     = Request::getInteger( 'publId' );
-            $groupName  = Request::getString(  'groupName' );
+            $groupId    = Request::getInteger(  'groupId' );
             $userId     = Request::getInteger( 'userId' );
-            if (!$adminId || !$publId || !$groupName || !$userId) {
+            if (!$adminId || !$publId || !$groupId || !$userId) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-            $sql = sprintf('UPDATE
-                                publ_rels_names
-                            SET
-                                selected_admin=%4$d
-                            WHERE
-                                publ_id=%1$d AND group_name=\'%2$s\' AND user_id=%3$d' ,
-                               $publId,         $groupName,         $userId
-                         ,$adminId);
-            $this->db_wrap('query', $sql);
+            $sql = 'UPDATE
+                        publ_rels_names
+                    SET
+                        selected_admin=@admin_id
+                    WHERE
+                        publ_id=@publ_id AND group_id=@group_id AND user_id=@user_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id',    $userId);
+            $cmd->SetInteger('@group_id',   $groupId);
+            $cmd->SetInteger('@publ_id',    $publId);
+            $cmd->SetInteger('@admin_id',   $adminId);
+            $cmd->Execute();
+
             echo ObjectHelper::ToJSON(array('response' => true));
         }
     }
