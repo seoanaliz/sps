@@ -16,16 +16,20 @@
             $groupId  = Request::getInteger ( 'groupId' );
             if (!$groupId) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
-                return;
+                die();
             }
+            echo '123123';
+            $query = 'DELETE FROM publ_rels_names WHERE group_id=@group_id';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@group_id', $groupId);
+            $cmd->Execute();
 
-            $query = sprintf('DELETE FROM publ_rels_names WHERE group_id=%1$d',
-                 $groupId);
-            $this->db_wrap('query', $query);
 
-            $query = sprintf('DELETE FROM groups WHERE group_id=%1$d',
-                $groupId);
-            $this->db_wrap('query', $query);
+            $query = 'DELETE FROM groups WHERE group_id=@group_id';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@group_id', $groupId);
+            $cmd->Execute();
+
             echo  ObjectHelper::ToJSON(array('response' => true));
         }
     }

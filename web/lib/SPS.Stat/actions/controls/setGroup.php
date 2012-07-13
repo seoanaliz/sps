@@ -17,37 +17,55 @@
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
             $groupName  =   $groupName ? $groupName : 0;
-            if (!$userId) {
+            if (!$publId || !$userId) {
+
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
+            $query = 'SELECT * FROM groups WHERE "name"=@name AND user_id=@userId';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@userId', $userId);
+            $cmd->SetString('@name',    $groupName);
 
-            $query = sprintf('SELECT * FROM groups WHERE "name"=\'%1$s\' AND user_id=%2$d'
-                ,$groupName, $userId);
-            $this->db_wrap('query', $query);
-            if($this->db_wrap('affected_rows')) {
+            $ds = $cmd->Execute();
+            print_r($ds);
+            $ds->next();
+            echo '<br>';
+            print_r($ds);
+            if($ds->getValue('name')) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
+
             //rename
             if ($groupId) {
-               $query = sprintf('UPDATE groups SET "name"=\'%1$s\' WHERE group_id=%2$d'
-                        ,$groupName, $groupId);
-               $this->db_wrap('query', $query);
+                $query = 'UPDATE groups SET "name"=@name WHERE group_id=@group_id';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@group_id',   $groupId);
+                $cmd->SetString('@name',        $groupName);
+                $cmd->Execute();
+
+                echo $query;
             //new
             } elseif($groupName) {
+                $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@user_id', $userId);
+                $cmd->SetString('@name',     $groupName);
+                $ds = $cmd->Execute();
+                $ds->next();
+                print_r($ds);
+                $id = $ds->getValue('group_id', TYPE_INTEGER);
 
+                $query = 'INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(@user_id,@publ_id,@group_id)';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@user_id', $userId);
+                $cmd->SetInteger('@publ_id', $publId);
+                $cmd->SetInteger('@group_id',$id);
+                $cmd->Execute();
 
-                $query = sprintf('INSERT INTO groups("name",user_id) VALUES(\'%1$s\', %2$d) RETURNING group_id'
-                    ,$groupName, $userId);
-
-                $this->db_wrap('query', $query, 1);
-                //$a = $this->db_wrap('get_row');
-                //$query = sprintf('INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(%1$d, %2$d,%3$d)'
-                //    ,$userId,$publId, $a['group_id']);
-
-                //$this->db_wrap('query', $query);
+//
             }
             echo ObjectHelper::ToJSON(array('response' => true));
 

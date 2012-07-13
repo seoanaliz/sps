@@ -22,98 +22,151 @@ class getEntries extends wrapper {
         $t2 = 'publs50k';
         $t3 = 'publ_rels_names';
 
+
+
         if (isset($groupId) && isset($userId)) {
-            $sql = sprintf('SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price,c.group_id,c.selected_admin
+            $sql = "SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price,c.group_id,c.selected_admin
                     FROM
-                      %1$s as a
+                      $t1 as a
                     INNER JOIN
-                      %2$s as b ON a.id=b.vk_id
+                      $t2 as b ON a.id=b.vk_id
                     INNER JOIN
-                      %3$s as c ON a.id=c.publ_id
+                      $t3 as c ON a.id=c.publ_id
                     WHERE
-                      c.user_id=%4$d and c.group_id=%5$d
+                      c.user_id=@user_id and c.group_id=@group_id
                     ORDER BY
-                      a.id,a.time'
-                    , $t1, $t2, $t3, $userId, $groupId);
+                      a.id,a.time";
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $userId);
+            $cmd->SetInteger('@group_id',$groupId);
+
         } else {
-            $sql = sprintf('SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price
-                        FROM
-                            %1$s as a
-                        INNER JOIN
-                            %2$s as b
-                        ON
-                            a.id=b.vk_id
-                        ORDER BY a.id,a.time'
-                        ,$t1, $t2);
+            $sql = "SELECT a.id,a.time,a.quantity,b.ava,b.name, b.price
+                    FROM
+                        $t1   as a
+                    INNER JOIN
+                        $t2 as b
+                    ON
+                        a.id=b.vk_id
+                    ORDER BY a.id,a.time";
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         }
 
-        $this->db_wrap('query',$sql);
-        $rest = $this->q_result;
+        $ds = $cmd->Execute();
+        $structure = BaseFactory::getObjectTree( $ds->Columns );
         $resul = array();
         $i = 0;
         $old_id = '';
+        $quantity = array();
+        $trig = 1;
+        $size = $ds->getSize();
+        $t = 0;
 
-        while ($row = $this->db_wrap('get_row', $rest)) {
+        while ($ds->next()) {
+            $t++;
+            $row = $this->get_row($ds, $structure);
             $id = $row['id'];
 
-            if ($id != $old_id) {
-                $i++;
+            if  ($trig) {
+                $old_row = $row;
+                $trig = 0;
                 $old_id = $id;
             }
-//
+
+            if ($id != $old_id || $t == $size) {
+                $i++;
+                $old_id = $id;
+                $admins = $this->get_admins($old_row['id'], $old_row['admins']);
+                $groups = array();
+                if (isset($userId))
+                    $groups = $this->get_groups($old_row['id'], $userId);
+                $time_last = end($quantity);
+                $time_comparison = prev($quantity);
+
+                if (count($quantity) > 1  && $time_last != 0 && $time_comparison != 0) {
+                    $diff_abs = $time_last - $time_comparison;
+                    $diff_rel = round(( $time_last - $time_comparison ) / $time_comparison, 4) * 100 ;
+                } else {
+                    $diff_abs = '-';
+                    $diff_rel = '-';
+                }
+
+                $quantity = array();
+                array_push($resul, array(
+                    'id' => $old_row['id'],
+                    'quantity'  =>  $time_last,
+                    'name'      =>  $old_row['name'],
+                    'ava'       =>  $old_row['ava'],
+                    'time'      =>  $old_row['time'],
+                    'price'     =>  $old_row['price'],
+                    'group_id'  =>  $groups,
+                    'admins'    =>  $admins,
+                    'diff_abs'  =>  $diff_abs,
+                    'diff_rel'  =>  $diff_rel
+                ));
+            }
+
+            $old_row = $row;
             if ($i < $offset)
                 continue;
             if ($i >= $offset + $limit )
                 break;
 
-            array_push($resul, array(
-                'id' => $row['id'],
-                'quantity' => $row['quantity'],
-                'name' => $row['name'],
-                'ava' => $row['ava'],
-                'time' => $row['time'],
-                'price' => $row['price'],
-                'group_id' => $row['group_id'],
-                'selected_admin' => $row['selected_admin'],
-                'diff_abs' => 231 + $row['id'],
-                'diff_rel' => 0.6,
-            ));
+            $quantity[] = $row['quantity'];
         }
-
-        foreach ($resul as $k => &$v) {
-            $v['admins'] = $this->get_admins($k, $v['admins']);
-//            $time_last = end($v['quantity']);
-//            $time_comparison = prev($v['quantity']);
-//            if (count($v['quantity']) > 1  && $time_last != 0 && $time_comparison != 0) {
-//                $v['diff_abs'] = $time_last - $time_comparison;
-//                $v['diff_rel'] = round(( $time_last - $time_comparison )  / $time_comparison, 4) * 100 ;
-//            } else {
-//                $v['diff_abs'] = '-';
-//                $v['diff_rel'] = '-';
-//            }
-//            $v['quantity'] = $time_last;
-        }
-        echo ObjectHelper::ToJSON(array('response' => $resul));
+        echo ObjectHelper::ToJSON($resul);
     }
 
-    //выбирает админов, в 0 элемент помещает "главного" для этой выборки
+    //РІС‹Р±РёСЂР°РµС‚ Р°РґРјРёРЅРѕРІ, РІ 0 СЌР»РµРјРµРЅС‚ РїРѕРјРµС‰Р°РµС‚ "РіР»Р°РІРЅРѕРіРѕ" РґР»СЏ СЌС‚РѕР№ РІС‹Р±РѕСЂРєРё
+    private function get_row($ds, $structure)
+    {
+
+        $res = array();
+        foreach($structure as $field) {
+            $res[$field] = $ds->getValue($field);
+        }
+        return $res;
+    }
+
     private function get_admins($publ, $sadmin)
     {
-        $sql = "select vk_id,role,name,ava,comments from admins where publ_id=" . $publ;
-        $this->db_wrap('query', $sql);
         $resul = array();
-        $k = '';
-        while ($row = $this->db_wrap('get_row')) {
-            if ($row['vk_id'] == $sadmin) {
+        $sql = "select vk_id,role,name,ava,comments from admins where publ_id=@publ_id";
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd->SetInteger('@publ_id',   $publ);
+        $ds = $cmd->Execute();
+        $structure  = BaseFactory::getObjectTree( $ds->Columns );
+        while ( $ds->next() ) {
+            $vk_id = $ds->getValue('vk_id', TYPE_INTEGER);
+            if ($vk_id == $sadmin){
                 if (isset($resul[0]))
                     $k = $resul[0];
-                $resul[0] = $row;
+
+                $resul[0] = $this->get_row($ds, $structure);
+
                 if ($k)
                     $resul[] = $k;
             } else
-                $resul[] = $row;
+                 $resul[] = $this->get_row($ds, $structure);
         }
+
         return $resul;
+    }
+
+    private function get_groups($publId, $userId)
+    {
+        $groups = array();
+        $sql = "select group_id from publ_rels_names where publ_id=@publ_id AND user_id=@user_id";
+
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd->SetInteger('@publ_id',   $publId);
+        $cmd->SetInteger('@user_id',  $userId);
+        $ds = $cmd->Execute();
+        while ( $ds->next() ){
+            $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
+        }
+        return $groups;
     }
 }
 ?>
