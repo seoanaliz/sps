@@ -12,35 +12,63 @@
          * Entry Point
          */
         public function Execute() {
-            $publId     = Request::getInteger( 'publId' );
-            $userId     = Request::getInteger( 'userId' );
-            $prevGroupName  = Request::getString ( 'prevGroupName' );
-            $groupName  = Request::getString ( 'groupName' );
-            $groupName  = $groupName ? $groupName : 0;
+            $publId     =   Request::getInteger( 'publId' );
+            $userId     =   Request::getInteger( 'userId' );
+            $groupId    =   Request::getInteger( 'groupId' );
+            $groupName  =   Request::getString ( 'groupName' );
+            $groupName  =   $groupName ? $groupName : 0;
             if (!$publId || !$userId) {
+
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            $query = sprintf('SELECT * FROM publ_rels_names WHERE group_name=\'%1$s\' AND publ_id=%2$d AND user_id=%3$d'
-                ,$groupName, $publId, $userId);
-            echo $query . '<br>';
-            $this->db_wrap('query', $query);
-            if ($this->db_wrap('affected_rows'))
-            {
-                echo ObjectHelper::ToJSON(array('response' => false, 'mess' => 'Entry already was in table'));
+            $query = 'SELECT * FROM groups WHERE "name"=@name AND user_id=@userId';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@userId', $userId);
+            $cmd->SetString('@name',    $groupName);
+
+            $ds = $cmd->Execute();
+            print_r($ds);
+            $ds->next();
+            echo '<br>';
+            print_r($ds);
+            if($ds->getValue('name')) {
+                echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-            if ($prevGroupName) {
-                $query = sprintf('UPDATE publ_rels_names SET group_name=\'%1$s\' WHERE publ_id=%2$d AND user_id=%3$d AND group_name=\'%4$s\''
-                    ,$groupName, $publId, $userId, $prevGroupName);
-            }
-            else
-                $query = sprintf('INSERT INTO publ_rels_names(user_id, publ_id, group_name) VALUES (%3$d,%2$d,\'%1$s\')'
-                    ,$groupName, $publId, $userId);
 
-            $this->db_wrap('query', $query);
+            //rename
+            if ($groupId) {
+                $query = 'UPDATE groups SET "name"=@name WHERE group_id=@group_id';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@group_id',   $groupId);
+                $cmd->SetString('@name',        $groupName);
+                $cmd->Execute();
+
+                echo $query;
+            //new
+            } elseif($groupName) {
+                $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@user_id', $userId);
+                $cmd->SetString('@name',     $groupName);
+                $ds = $cmd->Execute();
+                $ds->next();
+                print_r($ds);
+                $id = $ds->getValue('group_id', TYPE_INTEGER);
+
+                $query = 'INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(@user_id,@publ_id,@group_id)';
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@user_id', $userId);
+                $cmd->SetInteger('@publ_id', $publId);
+                $cmd->SetInteger('@group_id',$id);
+                $cmd->Execute();
+
+//
+            }
             echo ObjectHelper::ToJSON(array('response' => true));
+
         }
     }
 
