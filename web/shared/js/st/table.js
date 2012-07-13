@@ -4,8 +4,8 @@ $(document).ready(function() {
             b = $("#load-more-table");
 
         b.click(function() {
-            cur.wallLoaded += 20;
-            var newDataTable = $.merge(cur.dataTable, cur.dataAllTable.slice(cur.wallLoaded, cur.wallLoaded + 20));
+            cur.wallLoaded += 1;
+            var newDataTable = $.merge(cur.dataTable, cur.dataAllTable.slice(cur.wallLoaded * Configs.tableLoadOffset, (cur.wallLoaded + 1) * Configs.tableLoadOffset));
             if (newDataTable.length == cur.dataAllTable.length) {
                 $("#load-more-table").hide();
             } else {
@@ -15,7 +15,7 @@ $(document).ready(function() {
             /*
              if (b.hasClass('loading')) return;
              b.addClass('loading');
-             Events.fire('load_table', cur.selectedListId, cur.wallLoaded, 20, function(data) {
+             Events.fire('load_table', cur.selectedListId, cur.wallLoaded * Configs.tableLoadOffset, 40, function(data) {
              cur.wallLoaded += 20;
              updateTable($.merge(cur.dataTable, data));
              b.removeClass('loading');
@@ -40,7 +40,7 @@ function updateTable(dataDef) {
     var $tableBody;
     var $filter;
 
-    Events.fire('load_table', cur.selectedListId, 0, 9999, function(dataAllTable) {
+    Events.fire('load_table', cur.selectedListId, 0, Configs.maxRows, function(dataAllTable) {
         cur.dataAllTable = dataAllTable;
         if (cur.dataAllTable.length != dataTable.length) {
             $("#load-more-table").show();
@@ -157,8 +157,9 @@ function updateTable(dataDef) {
 
                     function onSave(text) {
                         Events.fire('add_list', text, function(data) {
-                            $input.hide().val('').before(tmpl(DROPDOWN_ITEM, {itemId: 1, itemTitle: text}));
+                            $dropdown.hide();
                             Events.fire('load_list', function(dataList) {
+                                console.log(dataList);
                                 updateList(dataList);
                             });
                         });
@@ -194,6 +195,7 @@ function updateTable(dataDef) {
     $('.contacts').click(function() {
         sortTable(this, function(a) {
             if (a.users[0]) return a.users[0]['userName'].toLowerCase();
+            else return 0;
         });
     });
 
@@ -229,9 +231,9 @@ function updateTable(dataDef) {
         } else {
             $target.removeClass('active');
             $target.removeClass('reverse');
-            rows = dataTable;
+            rows = cur.dataAllTable;
         }
-        renderTableBody({rows: rows});
+        renderTableBody({rows: rows.splice(0, 20)});
     }
 
     function updateElements() {
@@ -253,24 +255,17 @@ function updateTable(dataDef) {
 }
 
 function updateList(dataDef) {
-    if (!dataDef.length) return;
-
+    dataDef = dataDef || [];
     var dataList = dataDef.slice(0);
-    var timeout;
 
     $('.header').empty().html(tmpl(LIST, {items: dataList}));
     $('.header').delegate('.tab', 'click', function() {
         var $item = $(this);
 
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            $('#global-loader').fadeIn(200);
-        }, 2000);
-        Events.fire('load_table', $item.data('id'), 0, 20, function(dataTable) {
-            clearTimeout(timeout);
-            $('#global-loader').fadeOut(200);
-            cur.wallLoaded = 20;
+        Events.fire('load_table', $item.data('id'), 0, 40, function(dataTable) {
+            cur.wallLoaded = 1;
             cur.selectedListId = $item.data('id');
+
             $item.closest('.header').find('.tab').removeClass('selected');
             $item.addClass('selected');
             updateTable(dataTable);

@@ -77,7 +77,7 @@ var TABLE_ROW =
         '<span class="photo">' +
             '<img src="<?=publicImg?>" alt="" />' +
         '</span>' +
-        '<?=publicName?>' +
+        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?>' +
     '</td>' +
     '<td><?=publicFollowers?></td>' +
     '<td>' +
@@ -91,7 +91,7 @@ var TABLE_ROW =
         '<? } ?>' +
         '<div class="actions">' +
             '<span class="action add-to-list">' +
-                '<span class="icon <?=lists ? "select" : "plus"?>"></span>' +
+                '<span class="icon <?=lists.legth ? "select" : "plus"?>"></span>' +
             '</span>' +
         '</div>' +
     '</td>' +

@@ -26,6 +26,13 @@ var Events = {
 };
 
 var simpleAjax = function(method, data, callback) {
+    var timeout;
+
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        $('#global-loader').fadeIn(200);
+    }, Configs.globalLoaderTimeout);
+
     $.ajax({
         url: Events.url + method + '/',
         dataType: 'json',
@@ -33,6 +40,9 @@ var simpleAjax = function(method, data, callback) {
             userId: DataUser.uid
         }, data),
         success: function (result) {
+            clearTimeout(timeout);
+            $('#global-loader').fadeOut(200);
+
             if (result && result.response) {
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
@@ -68,10 +78,10 @@ var Eventlist = {
                     var users = [];
                     $.each(data.admins, function(i, data) {
                         users.push({
-                            userId: data.id,
+                            userId: data.vk_id,
                             userName: data.name,
-                            userPhoto: data.photo,
-                            userDescription: data.description
+                            userPhoto: data.ava,
+                            userDescription: data.role || '&nbsp;'
                         });
                     });
                     clearData.push({
@@ -92,7 +102,7 @@ var Eventlist = {
         simpleAjax('setGroup', {
             groupName: title
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     },
     update_list: function(public_id, list_id, title, callback) {
@@ -101,7 +111,7 @@ var Eventlist = {
             publId: public_id,
             groupName: title
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     },
     remove_list: function(list_id, callback) {

@@ -26,12 +26,14 @@
 
             $res = array();
             while ($ds->Next()) {
-                $res[$ds->getValue('group_id',TYPE_INTEGER)] = $ds->getValue('name');
+                array_push($res, array(
+                    'group_id' => $ds->getValue('group_id',TYPE_INTEGER),
+                    'name' => $ds->getValue('name'),
+                ));
             }
 
             ksort($res);
-            print_r($res);
-            echo ObjectHelper::ToJSON($res);
+            echo ObjectHelper::ToJSON(array('response' => $res));
         }
 
     }

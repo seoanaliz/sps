@@ -4,8 +4,17 @@
 var cur = {
     dataTable: {},
     dataAllTable: {},
+    wallLoaded: null, // Сколько страниц загружено
     selectedListId: null, // Выбраный список
-    wallLoaded: null,
+
+    etc: null
+};
+
+var Configs = {
+    appId: vk_appId,
+    tableLoadOffset: 40,
+    maxRows: 1000,
+    globalLoaderTimeout: 2000,
 
     etc: null
 };
@@ -14,17 +23,17 @@ var DataUser = {};
 
 $(document).ready(function() {
     VK.init({
-        apiId: vk_appId,
+        apiId: configs.appId,
         nameTransportPath: '/xd_receiver.htm'
     });
     getInitData();
 
     function getInitData() {
-        var code;
-        code = 'return {';
-        code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
-        code += '};';
-        VK.Api.call('execute', {'code': code}, onGetInitData);
+        var code =
+            'return {' +
+                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
+            '};';
+        VK.Api.call('execute', {code: code}, onGetInitData);
     }
 
     function onGetInitData(data) {
@@ -32,10 +41,11 @@ $(document).ready(function() {
         if (data.response) {
             r = data.response;
             DataUser = r.me;
+
             Events.fire('load_list', function(dataList) {
-                updateList(dataList);
-                Events.fire('load_table', cur.selectedListId, 0, 20, function(dataTable) {
-                    cur.wallLoaded = 20;
+                Events.fire('load_table', cur.selectedListId, 0, Configs.tableLoadOffset, function(dataTable) {
+                    cur.wallLoaded = 1;
+                    updateList(dataList);
                     updateTable(dataTable);
                     $('#global-loader').fadeOut(200);
                 });

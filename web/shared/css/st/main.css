@@ -284,6 +284,10 @@ a:hover {
 .contact > .content > .description {
     color: #808080;
     font-size: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
 }
 .actions {
     position: absolute;
@@ -415,6 +419,7 @@ a:hover {
     position: relative;
     cursor: pointer;
     -webkit-transition: all .2s;
+    overflow: hidden;
 }
 .contact-dropdown > .item > .content > .name {
 
@@ -422,6 +427,10 @@ a:hover {
 .contact-dropdown > .item > .content > .description {
     color: #808080;
     font-size: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
 }
 
 
