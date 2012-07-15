@@ -275,9 +275,11 @@ var Eventlist = {
         if (sourceType == 'ads') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
+            $('#filter-list a').hide();
         } else {
             $('#slider-text').show();
             $('#slider-cont').show();
+            $('#filter-list a').show();
         }
 
         $.cookie('sourceTypes' + targetFeedId, sourceType);
