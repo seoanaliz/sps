@@ -16,25 +16,14 @@
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
-            $groupName  =   $groupName ? $groupName : 0;
+            $groupName  =   $groupName ? $groupName : '';
             if (!$publId || !$userId) {
-
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            $query = 'SELECT * FROM groups WHERE "name"=@name AND user_id=@userId';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@userId', $userId);
-            $cmd->SetString('@name',    $groupName);
-
-            $ds = $cmd->Execute();
-            print_r($ds);
-            $ds->next();
-            echo '<br>';
-            print_r($ds);
-            if($ds->getValue('name')) {
-                echo ObjectHelper::ToJSON(array('response' => false));
+            if ($this->exist_check($groupName, $userId)) {
+                echo ObjectHelper::ToJSON(array('response' => "true"));
                 die();
             }
 
@@ -46,7 +35,6 @@
                 $cmd->SetString('@name',        $groupName);
                 $cmd->Execute();
 
-                echo $query;
             //new
             } elseif($groupName) {
                 $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
@@ -55,19 +43,34 @@
                 $cmd->SetString('@name',     $groupName);
                 $ds = $cmd->Execute();
                 $ds->next();
-                print_r($ds);
                 $id = $ds->getValue('group_id', TYPE_INTEGER);
 
                 $query = 'INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(@user_id,@publ_id,@group_id)';
                 $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@user_id', $userId);
-                $cmd->SetInteger('@publ_id', $publId);
-                $cmd->SetInteger('@group_id',$id);
+                $cmd->SetInteger('@user_id',  $userId);
+                $cmd->SetInteger('@publ_id',  $publId);
+                $cmd->SetInteger('@group_id', $id);
                 $cmd->Execute();
 
 //
             }
             echo ObjectHelper::ToJSON(array('response' => true));
+        }
+
+        private function exist_check($groupName, $userId)
+        {
+            $query = 'SELECT * FROM groups WHERE "name"=@name AND user_id=@userId';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@userId', $userId);
+            $cmd->SetString('@name',    $groupName);
+
+            $ds = $cmd->Execute();
+
+            $ds->next();
+
+            if($ds->getValue('name'))
+                return true;
+            return false;
 
         }
     }
