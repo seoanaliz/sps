@@ -2,4 +2,5 @@
 /web/cache/
 /web/shared/temp/
 /media/
+/web/etc/conf/sites.xml
 SPS.~m2

@@ -12,6 +12,7 @@
          * Entry Point
          */
         public function Execute() {
+            error_reporting( 0 );
             $publId     =   Request::getInteger( 'publId' );
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
@@ -22,8 +23,8 @@
                 die();
             }
 
-            if ($this->exist_check($groupName, $userId)) {
-                echo ObjectHelper::ToJSON(array('response' => "true"));
+            if ($id = $this->exist_check($groupName, $userId)) {
+                echo ObjectHelper::ToJSON(array('response' => array('id'    =>  (int)$id)));
                 die();
             }
 
@@ -34,7 +35,7 @@
                 $cmd->SetInteger('@group_id',   $groupId);
                 $cmd->SetString('@name',        $groupName);
                 $cmd->Execute();
-
+                $id = $groupId;
             //new
             } elseif($groupName) {
                 $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
@@ -54,7 +55,7 @@
 
 //
             }
-            echo ObjectHelper::ToJSON(array('response' => true));
+            echo ObjectHelper::ToJSON( array('response' => array('id'    => (int)$id)));
         }
 
         private function exist_check($groupName, $userId)
@@ -68,8 +69,8 @@
 
             $ds->next();
 
-            if($ds->getValue('name'))
-                return true;
+            if($id = $ds->getValue('group_id'))
+                return $id;
             return false;
 
         }

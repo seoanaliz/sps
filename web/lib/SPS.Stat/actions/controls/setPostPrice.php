@@ -12,6 +12,8 @@
          * Entry Point
          */
         public function Execute() {
+            error_reporting( 0 );
+
             $publId = Request::getInteger( 'publId' );
             $price  = Request::getInteger( 'price' );
 

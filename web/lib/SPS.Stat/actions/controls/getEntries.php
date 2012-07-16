@@ -19,12 +19,12 @@ class getEntries extends wrapper {
     const T_PUBLICS_RELS   = 'publ_rels_names';
 
     public function Execute() {
+        error_reporting( 0 );
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $search     =   pg_escape_string(Request::getString( 'search' ));
-//        $search     =   textHelper::ToUTF8($search);
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $offset     =   $offset ? ' OFFSET ' . $offset : 0;
@@ -65,7 +65,6 @@ class getEntries extends wrapper {
                         . $offset .
                   ' LIMIT '
                         . $limit;
-            print_R($sql);
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
 
             $cmd->SetString('@sortBy', $sortBy);
@@ -145,7 +144,7 @@ class getEntries extends wrapper {
         $cmd->SetInteger('@user_id',  $userId);
         $cmd->SetInteger('@publ_id',   $publId);
         $ds = $cmd->Execute();
-        while ( $ds->next() ){
+        while ( $ds->next() ) {
             $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
         }
         return $groups;
