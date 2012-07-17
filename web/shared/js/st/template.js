@@ -60,7 +60,7 @@ var TABLE =
             'прирост<span class="icon arrow"></span>' +
         '</th>' +
         '<th class="contacts" width="30%">' +
-            'контакты<span class="icon arrow"></span>' +
+            'контакты' +
         '</th>' +
     '</tr>' +
 '</thead>' +
@@ -91,7 +91,7 @@ var TABLE_ROW =
         '<? } ?>' +
         '<div class="actions">' +
             '<span class="action add-to-list">' +
-                '<span class="icon <?=lists.legth ? "select" : "plus"?>"></span>' +
+                '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
             '</span>' +
         '</div>' +
     '</td>' +

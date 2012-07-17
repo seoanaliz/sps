@@ -55,8 +55,6 @@ var Eventlist = {
             callback(clearData);
         });
     },
-    //todo kohver: нужна поддержка всех параметров
-    //todo kohver: не работает лимит и оффсет
     load_table: function(options, callback) {
         var params = $.extend({
             listId: null,
@@ -67,12 +65,17 @@ var Eventlist = {
             search: ''
         }, options);
 
+        var sortByClear = {
+            followers: 'quantity',
+            contacts: '',
+            growth: 'diff_abs'
+        };
         simpleAjax('getEntries', {
             groupId: params.listId,
             offset: params.offset,
             limit: params.limit,
-            sortBy: params.sortBy,
-            sortReverse: params.sortReverse,
+            sortBy: sortByClear[params.sortBy],
+            sortReverse: params.sortReverse ? 1 : 0,
             search: params.search
         }, function(dirtyData) {
             var clearData = [];
@@ -87,6 +90,7 @@ var Eventlist = {
                             userDescription: data.role || '&nbsp;'
                         });
                     });
+                    //var users = DataUsers;
                     clearData.push({
                         publicId: data.id,
                         publicImg: data.ava,
@@ -94,8 +98,7 @@ var Eventlist = {
                         publicFollowers: data.quantity,
                         publicGrowthNum: data.diff_abs,
                         publicGrowthPer: data.diff_rel,
-                        //todo kohver: сделать список
-                        lists: data.group_id ? [21] : null,
+                        lists: ($.isArray(data.group_id) && data.group_id.length) ? data.group_id : [],
                         users: users
                     });
                 });
@@ -103,10 +106,11 @@ var Eventlist = {
         });
     },
     add_list: function(title, callback) {
+        //todo: error, need publ_id
         simpleAjax('setGroup', {
             groupName: title
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     },
     update_list: function(public_id, list_id, title, callback) {
@@ -115,23 +119,32 @@ var Eventlist = {
             publId: public_id,
             groupName: title
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     },
     remove_list: function(list_id, callback) {
         simpleAjax('deleteGroup', {
             groupId: list_id
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     },
     add_to_list: function(public_id, list_id, callback) {
-        //todo kohver: нужен метод
-        callback(false);
+        simpleAjax('implGroup', {
+            groupId: list_id,
+            publId: public_id
+        }, function(dirtyData) {
+            callback(true);
+        });
     },
     remove_from_list: function(public_id, list_id, callback) {
-        //todo kohver: нужен метод
-        callback(false);
+        //todo: доделать
+        simpleAjax('getGroupList', {
+            groupId: list_id,
+            publId: public_id
+        }, function(dirtyData) {
+            callback(true);
+        });
     },
     change_user: function(user_id, list_id, public_id, callback) {
         simpleAjax('selectSAdmin', {
@@ -139,7 +152,7 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
-            callback(false);
+            callback(true);
         });
     }
 };

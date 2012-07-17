@@ -12,12 +12,11 @@
          * Entry Point
          */
         public function Execute() {
-            $publId     =   Request::getInteger( 'publId' );
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
             $groupName  =   $groupName ? $groupName : '';
-            if (!$publId || !$userId) {
+            if (!$userId) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
@@ -45,10 +44,9 @@
                 $ds->next();
                 $id = $ds->getValue('group_id', TYPE_INTEGER);
 
-                $query = 'INSERT INTO publ_rels_names(user_id,publ_id,group_id) VALUES(@user_id,@publ_id,@group_id)';
+                $query = 'INSERT INTO publ_rels_names(user_id,group_id) VALUES(@user_id,@group_id)';
                 $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@user_id',  $userId);
-                $cmd->SetInteger('@publ_id',  $publId);
                 $cmd->SetInteger('@group_id', $id);
                 $cmd->Execute();
 

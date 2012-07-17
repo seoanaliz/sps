@@ -27,10 +27,10 @@ class getEntries {
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
-        $offset     =   $offset ? ' OFFSET ' . $offset : 0;
+        $offset     =   $offset ? $offset : 0;
         $limit      =   $limit  ?  $limit  :   25;
         $sortBy     =   $sortBy ? $sortBy  : ' vk_id ';
-        $sortReverse = $sortReverse? ' DESC ': '';
+        $sortReverse = !$sortReverse ? ' DESC ': '';
 
         if (isset($groupId) && isset($userId)) {
             $search = $search ? " AND a.name ILIKE '%" . $search . "%' ": '';
@@ -94,7 +94,7 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
-        echo ObjectHelper::ToJSON($resul);
+        echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
 
