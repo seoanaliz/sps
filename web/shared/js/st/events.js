@@ -106,7 +106,6 @@ var Eventlist = {
         });
     },
     add_list: function(title, callback) {
-        //todo: error, need publ_id
         simpleAjax('setGroup', {
             groupName: title
         }, function(dirtyData) {
@@ -138,8 +137,7 @@ var Eventlist = {
         });
     },
     remove_from_list: function(public_id, list_id, callback) {
-        //todo: доделать
-        simpleAjax('getGroupList', {
+        simpleAjax('exGroup', {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
