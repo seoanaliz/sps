@@ -331,7 +331,6 @@ var Table = (function(callback) {
         var $public = $el.closest('.public');
         var publicId = $public.data('id');
         var selectedLists = publicData.lists;
-        console.log(publicData.lists);
         var listId = null;
 
         e.stopPropagation();
@@ -373,7 +372,6 @@ var Table = (function(callback) {
 
                     function onSave(text) {
                         Events.fire('add_list', text, function(data) {
-                            console.log(123123123);
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
                                 $(document).mousedown();

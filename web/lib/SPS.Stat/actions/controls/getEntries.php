@@ -77,10 +77,10 @@ class getEntries {
         while ($ds->next()) {
             $row = $this->get_row($ds, $structure);
 
-            $admins = $this->get_admins($row['id'], $row['admins']);
+            $admins = $this->get_admins($row['vk_id'], $row['admins']);
             $groups = array();
             if (isset($userId))
-                $groups = $this->get_groups($row['id'], $userId);
+                $groups = $this->get_groups($row['vk_id'], $userId);
 
             $resul[] =  array(
                                 'id'        =>  $row['vk_id'],
