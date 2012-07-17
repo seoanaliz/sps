@@ -6,7 +6,7 @@
      * @package    SPS
      * @subpackage Stat
      */
-    class selectSAdmin extends wrapper {
+    class selectSAdmin {
 
 
         public function Execute() {

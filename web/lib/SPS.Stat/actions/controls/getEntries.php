@@ -8,7 +8,7 @@ Package::Load( 'SPS.Site' );
  */
 
 set_time_limit(10);
-class getEntries extends wrapper {
+class getEntries {
 
     /**
      * Entry Point
@@ -83,11 +83,10 @@ class getEntries extends wrapper {
                 $groups = $this->get_groups($row['id'], $userId);
 
             $resul[] =  array(
-                                'id'        =>  $row['id'],
+                                'id'        =>  $row['vk_id'],
                                 'quantity'  =>  $row['quantity'],
                                 'name'      =>  $row['name'],
                                 'ava'       =>  $row['ava'],
-                                'time'      =>  $row['time'],
                                 'price'     =>  $row['price'],
                                 'group_id'  =>  $groups,
                                 'admins'    =>  $admins,
