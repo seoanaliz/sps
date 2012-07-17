@@ -39,7 +39,7 @@ a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+    background: #fff /*url(http://st0.userapi.com/images/progress7.gif)*/ no-repeat center;
     z-index: 999;
     text-align: center;
     line-height: 300px;
@@ -98,6 +98,11 @@ a:hover {
 #main > .content .table th .filter {
     padding: 5px;
     width: 200px;
+}
+#main > .content .table th .filter.loading {
+    background-image: url('../../images/st/upload.gif');
+    background-repeat: no-repeat;
+    background-position: 95%;
 }
 #main > .content .table td {
     height: 40px;

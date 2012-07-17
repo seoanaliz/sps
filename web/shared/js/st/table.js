@@ -40,7 +40,11 @@ function updateTable(dataDef) {
     var $tableBody;
     var $filter;
 
-    Events.fire('load_table', cur.selectedListId, 0, Configs.maxRows, function(dataAllTable) {
+    Events.fire('load_table', {
+        listId: cur.selectedListId,
+        limit: Configs.maxRows
+    },
+    function(dataAllTable) {
         cur.dataAllTable = dataAllTable;
         if (cur.dataAllTable.length != dataTable.length) {
             $("#load-more-table").show();
@@ -122,10 +126,9 @@ function updateTable(dataDef) {
 
         e.stopPropagation();
 
-        Events.fire('load_list', function(dataList) {
-            if (!$el.hasClass('selected')) {
-                $el.addClass('selected');
-                if (!$dropdown) {
+        if (!$dropdown) {
+            Events.fire('load_list', function(dataList) {
+                if (!$el.hasClass('selected')) {
                     var lists = dataList;
                     $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
                     var $input = $dropdown.find('input');
@@ -157,31 +160,44 @@ function updateTable(dataDef) {
 
                     function onSave(text) {
                         Events.fire('add_list', text, function(data) {
-                            $dropdown.hide();
                             Events.fire('load_list', function(dataList) {
-                                console.log(dataList);
-                                updateList(dataList);
+                                $el.data('dropdown', false);
+                                $(document).mousedown();
+                                List.refresh();
                             });
                         });
                     }
                     function onChange($item) {
                         listId = $item.data('id');
-                        Events.fire('add_to_list', publicId, listId, function(data) {
+                        var isSelected = $item.hasClass('selected');
+                        var callback = function(data) {
                             if ($dropdown.find('.item.selected').length) {
                                 $el.find('.icon').removeClass('plus').addClass('select');
                             } else {
                                 $el.find('.icon').removeClass('select').addClass('plus');
                             }
-                        });
+                        };
+                        if (isSelected) {
+                            Events.fire('add_to_list', publicId, listId, callback);
+                        } else {
+                            Events.fire('remove_from_list', publicId, listId, callback);
+                        }
                     }
+                    $el.addClass('selected');
                     $el.data('dropdown', $dropdown);
+                    $dropdown.show().css({
+                        top: offset.top + $el.outerHeight(),
+                        left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
+                    });
                 }
-                $dropdown.show().css({
-                    top: offset.top + $el.outerHeight(),
-                    left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
-                });
-            }
-        });
+            });
+        } else {
+            $el.addClass('selected');
+            $dropdown.show().css({
+                top: offset.top + $el.outerHeight(),
+                left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
+            });
+        }
     });
 
     $('.followers').click(function() {
@@ -194,8 +210,9 @@ function updateTable(dataDef) {
 
     $('.contacts').click(function() {
         sortTable(this, function(a) {
-            if (a.users[0]) return a.users[0]['userName'].toLowerCase();
-            else return 0;
+            if (a.users[0]) {
+                return a.users[0]['userName'].toLowerCase().split(' ')[0];
+            }
         });
     });
 
@@ -262,7 +279,12 @@ function updateList(dataDef) {
     $('.header').delegate('.tab', 'click', function() {
         var $item = $(this);
 
-        Events.fire('load_table', $item.data('id'), 0, 40, function(dataTable) {
+        Events.fire('load_table', {
+            listId: $item.data('id'),
+            offset: 0,
+            limit: 40
+        },
+        function(dataTable) {
             cur.wallLoaded = 1;
             cur.selectedListId = $item.data('id');
 

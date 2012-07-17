@@ -2,8 +2,8 @@
  * Events
  */
 var Events = {
-    url: controlsRoot,
-    delay: 0,
+    url: Configs.controlsRoot,
+    delay: Configs.eventsDelay,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -26,23 +26,13 @@ var Events = {
 };
 
 var simpleAjax = function(method, data, callback) {
-    var timeout;
-
-    clearTimeout(timeout);
-    timeout = setTimeout(function() {
-        $('#global-loader').fadeIn(200);
-    }, Configs.globalLoaderTimeout);
-
     $.ajax({
         url: Events.url + method + '/',
         dataType: 'json',
         data: $.extend({
-            userId: DataUser.uid
+            userId: cur.dataUser.uid
         }, data),
         success: function (result) {
-            clearTimeout(timeout);
-            $('#global-loader').fadeOut(200);
-
             if (result && result.response) {
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
@@ -65,16 +55,29 @@ var Eventlist = {
             callback(clearData);
         });
     },
-    load_table: function(list_id, offset, limit, callback) {
+    //todo kohver: нужна поддержка всех параметров
+    load_table: function(options, callback) {
+        var params = $.extend({
+            listId: null,
+            offset: null,
+            limit: null,
+            sortBy: '',
+            sortReverse: false,
+            search: ''
+        }, options);
+
         simpleAjax('getEntries', {
-            groupId: list_id,
-            offset: offset,
-            limit: limit
+            groupId: params.listId,
+            offset: params.offset,
+            limit: params.limit,
+            sortBy: params.sortBy,
+            sortReverse: params.sortReverse,
+            search: params.search
         }, function(dirtyData) {
             var clearData = [];
             if ($.isArray(dirtyData))
                 $.each(dirtyData, function(i, data) {
-                    //todo: доделать
+                    //todo kohver: доделать
                     var users = [];
                     $.each(data.admins, function(i, data) {
                         users.push({
@@ -91,7 +94,8 @@ var Eventlist = {
                         publicFollowers: data.quantity,
                         publicGrowthNum: data.diff_abs,
                         publicGrowthPer: data.diff_rel,
-                        lists: data.group_id ? [data.group_id] : null,
+                        //todo kohver: сделать список юзеров
+                        lists: data.group_id ? [21] : null,
                         users: users
                     });
                 });
@@ -102,7 +106,7 @@ var Eventlist = {
         simpleAjax('setGroup', {
             groupName: title
         }, function(dirtyData) {
-            callback(true);
+            callback(false);
         });
     },
     update_list: function(public_id, list_id, title, callback) {
@@ -111,7 +115,7 @@ var Eventlist = {
             publId: public_id,
             groupName: title
         }, function(dirtyData) {
-            callback(true);
+            callback(false);
         });
     },
     remove_list: function(list_id, callback) {
@@ -120,6 +124,14 @@ var Eventlist = {
         }, function(dirtyData) {
             callback(false);
         });
+    },
+    add_to_list: function(public_id, list_id, callback) {
+        //todo kohver: нужен метод
+        callback(false);
+    },
+    remove_from_list: function(public_id, list_id, callback) {
+        //todo kohver: нужен метод
+        callback(false);
     },
     change_user: function(user_id, list_id, public_id, callback) {
         simpleAjax('selectSAdmin', {

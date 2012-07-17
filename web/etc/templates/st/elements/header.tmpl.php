@@ -39,11 +39,11 @@ $cssFiles = array(
 
 $jsFiles = array(
     'js://st/jquery-1.7.2.min.js',
+    'js://st/main.js',
     'js://st/data.js',
     'js://st/events.js',
     'js://st/template.js',
-    'js://st/table.js',
-    'js://st/main.js',
+//    'js://st/table.js',
 );
 
 CssHelper::Init(false);
