@@ -56,6 +56,7 @@ var Eventlist = {
         });
     },
     //todo kohver: нужна поддержка всех параметров
+    //todo kohver: не работает лимит и оффсет
     load_table: function(options, callback) {
         var params = $.extend({
             listId: null,
@@ -77,7 +78,6 @@ var Eventlist = {
             var clearData = [];
             if ($.isArray(dirtyData))
                 $.each(dirtyData, function(i, data) {
-                    //todo kohver: доделать
                     var users = [];
                     $.each(data.admins, function(i, data) {
                         users.push({
@@ -94,7 +94,7 @@ var Eventlist = {
                         publicFollowers: data.quantity,
                         publicGrowthNum: data.diff_abs,
                         publicGrowthPer: data.diff_rel,
-                        //todo kohver: сделать список юзеров
+                        //todo kohver: сделать список
                         lists: data.group_id ? [21] : null,
                         users: users
                     });

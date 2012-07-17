@@ -12,7 +12,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting(0);
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
