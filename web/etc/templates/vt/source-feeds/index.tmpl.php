@@ -97,7 +97,7 @@
 
                         if (!empty($objectFeeds)) {
                             $links = array_map(function($val){
-                                return "<a href='http://vk.com/id$val->externalId' target='_blank'>$val->title</a>";
+                                return "<a href='http://vk.com/public$val->externalId' target='_blank'>$val->title</a>";
                             }, $objectFeeds);
 
                             $links = implode(', ', $links);

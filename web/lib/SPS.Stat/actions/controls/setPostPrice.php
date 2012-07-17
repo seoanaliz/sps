@@ -12,6 +12,8 @@
          * Entry Point
          */
         public function Execute() {
+            error_reporting( 0 );
+
             $publId = Request::getInteger( 'publId' );
             $price  = Request::getInteger( 'price' );
 
@@ -21,8 +23,11 @@
             }
             $price = $price ? $price : 0;
 
-            $query = sprintf('UPDATE publs50k SET price=%1$d WHERE vk_id=%2$d', $price, $publId);
-            $this->db_wrap('query', $query);
+            $query = 'UPDATE publs50k SET price=@price WHERE vk_id=@publ_id';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@publ_id',    $publId);
+            $cmd->SetInteger('@price',   $price);
+            $cmd->Execute();
 
             echo ObjectHelper::ToJSON(array('response' => true));
         }

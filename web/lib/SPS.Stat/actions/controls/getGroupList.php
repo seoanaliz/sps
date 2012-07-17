@@ -14,6 +14,7 @@
     */
         public function Execute()
         {
+            error_reporting( 0 );
             $userId = Request::getInteger( 'userId' );
             if (!$userId) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
