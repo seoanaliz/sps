@@ -28,7 +28,7 @@ var tmpl = (function() {
             return data ? fn(data) : fn;
         }
         catch(e) {
-            if (console && console.log) console.log(format(str));
+            if (window.console && console.log) console.log(format(str));
             throw e;
         }
     };

@@ -11,13 +11,15 @@ var Events = {
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    console.log(name + ':');
-                    console.log(args.slice(0, -1));
-                    console.log('-------');
+                    if(window.console && console.log) {
+                        console.log(name + ':');
+                        console.log(args.slice(0, -1));
+                        console.log('-------');
+                    }
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if(console && $.isFunction(console.log)) {
+                if(window.console && console.log) {
                     console.log(e);
                 }
             }
