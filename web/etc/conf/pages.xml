@@ -96,6 +96,9 @@
                 <page uri="controls://getEntries/">
                     <actions>SPS.Stat.getEntries</actions>
                 </page>
+                <page uri="controls://implGroup/">
+                    <actions>SPS.Stat.implGroup</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

@@ -6,11 +6,11 @@
      * @package    SPS
      * @subpackage Stat
      */
-    class selectSAdmin extends wrapper {
+    class selectSAdmin {
 
 
         public function Execute() {
-
+            error_reporting( 0 );
             $adminId    = Request::getInteger( 'adminId' );
             $publId     = Request::getInteger( 'publId' );
             $groupId    = Request::getInteger(  'groupId' );

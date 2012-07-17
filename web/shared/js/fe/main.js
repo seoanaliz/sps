@@ -155,6 +155,10 @@ $(document).ready(function(){
     $(".left-panel .type-selector a").click(function(e){
         e.preventDefault();
 
+        if (articlesLoading) {
+            return;
+        }
+
         $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
@@ -164,6 +168,10 @@ $(document).ready(function(){
     // Вкладки в правом меню
     $(".right-panel .type-selector a").click(function(e){
         e.preventDefault();
+
+        if (articlesLoading) {
+            return;
+        }
 
         $(".right-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
@@ -784,6 +792,21 @@ $(document).ready(function(){
         form.delegate(".image-attach", "click" ,function(e){
             input.focus();
             $('.newpost .qq-upload-button').trigger('focus');
+        });
+
+        // Быстрое редактирование поста в левой колонке
+        $(".left-panel").delegate(".post .content .shortcut", "click", function(){
+            var $post = $(this).closest(".post"),
+                $content = $post.find('.content'),
+                postId = $post.data("id");
+
+            if ($post.editing) return;
+
+            Events.fire('load_post_edit', [postId, function(state, data){
+                if (state && data) {
+                    new SimpleEditPost(postId, $post, $content, data);
+                }
+            }]);
         });
 
         // Редактирование поста в левом меню

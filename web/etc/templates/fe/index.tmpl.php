@@ -34,7 +34,7 @@
 
             <div class="wall-title">
                 <span class="count">&nbsp;</span>
-                <span class="filter">
+                <span class="filter" id="filter-list">
                     <a href="javascript:;" data-type="new">новые записи</a>
                 </span>
             </div>
