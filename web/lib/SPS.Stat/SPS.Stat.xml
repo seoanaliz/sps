@@ -37,7 +37,9 @@
             <action name="getGroupList">
                 <path>controls/getGroupList</path>
             </action>
-
+            <action name="implGroup">
+                <path>controls/implGroup</path>
+            </action>
 
         </group>
     </group>

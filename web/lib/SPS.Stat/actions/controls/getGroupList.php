@@ -6,7 +6,7 @@
     * @package    SPS
     * @subpackage Stat
     */
-    class getGroupList extends wrapper
+    class getGroupList
     {
 
     /**

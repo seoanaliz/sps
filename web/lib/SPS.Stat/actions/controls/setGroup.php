@@ -6,7 +6,7 @@
      * @package    SPS
      * @subpackage Stat
      */
-    class setGroup extends wrapper {
+    class setGroup {
 
         /**
          * Entry Point

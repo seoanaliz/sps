@@ -6,7 +6,7 @@
      * @package    SPS
      * @subpackage Stat
      */
-    class deleteGroup extends wrapper {
+    class deleteGroup {
 
         /**
          * Entry Point

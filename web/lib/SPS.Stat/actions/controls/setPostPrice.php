@@ -6,7 +6,7 @@
      * @package    SPS
      * @subpackage Stat
      */
-    class setPostPrice extends wrapper {
+    class setPostPrice {
 
         /**
          * Entry Point
