@@ -2,9 +2,9 @@
     Package::Load( 'SPS.Stat' );
 
 //пару раз в день
-    set_time_limit(600);
-    class WrPosts extends wrapper
-    {
+set_time_limit(600);
+class WrPosts extends wrapper
+{
     const TESTING = false;
     const BASE_RENEW = true;
     public $id; // id паблика
