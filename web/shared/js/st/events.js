@@ -88,7 +88,7 @@ var Eventlist = {
                         users.push({
                             userId: data.vk_id,
                             userName: data.name,
-                            userPhoto: data.ava,
+                            userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
                             userDescription: data.role || '&nbsp;'
                         });
                     });

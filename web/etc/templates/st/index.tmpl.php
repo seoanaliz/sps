@@ -5,8 +5,9 @@
         <div class="tab-bar"></div>
     </div>
     <div class="content">
-        <table class="table" id="table"></table>
+        <div class="table" id="table"></div>
         <div id="load-more-table">Показать больше</div>
     </div>
+    <div id="go-to-top">Наверх</div>
 </div>
 {increal:tmpl://st/elements/footer.tmpl.php}

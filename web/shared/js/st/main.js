@@ -17,6 +17,20 @@ var cur = {
 };
 
 $(document).ready(function() {
+    (function(w) {
+        var $elem = $('#go-to-top');
+        $elem.click(function() {
+            $(w).scrollTop(0);
+        });
+        $(w).bind('scroll', function(e) {
+            if (w.scrollY <= 0) {
+                $elem.hide();
+            } else if (!$elem.is(':visible')) {
+                $elem.show();
+            }
+        });
+    })(window);
+
     VK.init({
         apiId: Configs.appId,
         nameTransportPath: '/xd_receiver.htm'
@@ -91,7 +105,7 @@ var Table = (function(callback) {
     }
     function loadMore() {
         var $el = $("#load-more-table");
-        var $tableBody = $('#table-body');
+        var $tableBody = $('.list-body');
         if ($el.hasClass('loading')) return;
 
         $el.addClass('loading');
@@ -107,7 +121,7 @@ var Table = (function(callback) {
                 pagesLoaded += 1;
                 if (data.length) {
                     dataTable = $.merge(dataTable, data);
-                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
                     $el.removeClass('loading');
                 } else {
                     $el.removeClass('loading');
@@ -117,7 +131,7 @@ var Table = (function(callback) {
         );
     }
     function sort(field, reverse, callback) {
-        var $tableBody = $('#table-body');
+        var $tableBody = $('.list-body');
 
         Events.fire('load_table', {
                 listId: currentListId,
@@ -137,7 +151,7 @@ var Table = (function(callback) {
         );
     }
     function search(text, callback) {
-        var $tableBody = $('#table-body');
+        var $tableBody = $('.list-body');
 
         Events.fire('load_table', {
                 listId: currentListId,
@@ -152,6 +166,11 @@ var Table = (function(callback) {
                 currentSearch = text;
                 $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                 if ($.isFunction(callback)) callback(data);
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
             }
         );
     }
@@ -165,7 +184,18 @@ var Table = (function(callback) {
                 dataTable = data;
                 currentListId = listId;
                 $container.html(tmpl(TABLE, {rows: data}));
+                $container.find('.growth').addClass('active');
                 $('#global-loader').fadeOut(200);
+                if (!currentListId) {
+                    $container.removeClass('no-list-id');
+                } else {
+                    $container.addClass('no-list-id');
+                }
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
             }
         );
     }
@@ -179,7 +209,7 @@ var Table = (function(callback) {
             for (var i in dataTable) {
                 if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
             }
-            _createDropdownContact(e, publicData)
+            _createDropdownContact(e, publicData);
         });
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
@@ -194,50 +224,44 @@ var Table = (function(callback) {
 
         $container.delegate('.followers', 'click', function(e) {
             var $target = $(this);
-            $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
                 sort('followers', true);
             } else {
                 $target.addClass('active');
+                $target.removeClass('reverse');
                 sort('followers', false);
             }
         });
 
         $container.delegate('.growth', 'click', function(e) {
             var $target = $(this);
-            $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
                 sort('growth', true);
             } else {
                 $target.addClass('active');
+                $target.removeClass('reverse');
                 sort('growth', false);
             }
         });
 
         $container.delegate('.contacts', 'click', function(e) {
+            //todo: sort by contacts
+            /*
             var $target = $(this);
-            $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
                 sort('contacts', true);
             } else {
                 $target.addClass('active');
+                $target.removeClass('reverse');
                 sort('contacts', false);
             }
+            */
         });
 
         (function() {
@@ -250,7 +274,7 @@ var Table = (function(callback) {
                     $filter.addClass('loading');
                     search($.trim($filter.val()), function() {
                         $filter.removeClass('loading');
-                        $filter.closest('thead').find('th').removeClass('reverse active');
+                        $filter.closest('.list-head').find('.item').removeClass('reverse active');
                     });
                 }, 500);
             });
@@ -287,6 +311,7 @@ var Table = (function(callback) {
                 $dropdown = $(tmpl(CONTACT_DROPDOWN, {users: users})).appendTo('body');
 
                 $dropdown.delegate('.item', 'mousedown', function(e) {
+                    if ($(e.target).is('a')) return false;
                     var $item = $(this);
                     $dropdown.find('.item.selected').removeClass('selected');
                     $item.addClass('selected');
@@ -341,18 +366,24 @@ var Table = (function(callback) {
                     var lists = dataList;
                     $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
                     var $input = $dropdown.find('input');
-                    var $showInput = $dropdown.find('.show-input');
 
                     $.each(selectedLists, function(i, listId) {
                         $dropdown.find('[data-id=' + listId + ']').addClass('selected');
                     });
 
-                    $showInput.bind('click', function() {
+                    $dropdown.delegate('.show-input', 'click', function() {
                         $input.show().focus();
                     });
                     $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
                         var $item = $(this);
                         onChange($item);
+                    });
+                    $dropdown.delegate('input', 'keyup blur', function(e) {
+                        var text = $.trim($input.val());
+                        if (e.keyCode && e.keyCode != 13) return false;
+                        if (!text) return false;
+                        if (e.keyCode == 13) return $input.blur();
+                        return onSave(text);
                     });
                     $dropdown.bind('mousedown', function(e) {
                         e.stopPropagation();
@@ -362,19 +393,14 @@ var Table = (function(callback) {
                         $dropdown.hide();
                         $el.removeClass('selected');
                     });
-                    $input.bind('keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != 13) return false;
-                        if (!text) return false;
-                        if (e.keyCode == 13) return $input.blur();
-                        return onSave(text);
-                    });
 
                     function onSave(text) {
                         Events.fire('add_list', text, function(data) {
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
-                                $(document).mousedown();
+                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
+                                $dropdown.html($tmpDropdown.html());
+                                $input = $dropdown.find('input');
                                 List.refresh();
                             });
                         });
