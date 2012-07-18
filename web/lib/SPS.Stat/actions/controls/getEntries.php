@@ -29,7 +29,7 @@ class getEntries {
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $offset     =   $offset ? ' OFFSET ' . $offset : 0;
         $limit      =   $limit  ?  $limit  :   25;
-        $sortBy     =   $sortBy ? $sortBy  : ' vk_id ';
+        $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
         $sortReverse = $sortReverse? ' DESC ': '';
 
         if (isset($groupId) && isset($userId)) {
