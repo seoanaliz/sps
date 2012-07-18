@@ -16,59 +16,67 @@ set_time_limit(600);
                     'info'  =>  'our_publs2',
                     'stata' =>  'our_publs_points')
             );
-        const T_PUBLICS_POINTS = 'gr50k';
-        const T_PUBLICS_LIST   = 'publs50k';
-
 
         public function Execute()
         {
             $i = 0;
 
 
-//            die();
             foreach ($this->publs as $p_array) {
                 $this->get_id_arr($p_array['stata']);
-                $this->get_public_grow();
-//                $this->update_quantity($p_array['info'], $p_array['stata']);
+                $this->update_quantity($p_array['info'], $p_array['stata']);
                 die();
             }
         }
 
-        public function get_id_arr()
+        public function get_id_arr($table_name)
         {
-            $sql = "select vk_id FROM " . self::T_PUBLICS_LIST. " ORDER BY vk_id";
+            $sql = "select id,vk_id FROM $table_name ORDER BY id";
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $ds = $cmd->Execute();
 
             while ( $ds->Next() ) {
-                $res[$ds->getValue('vk_id', TYPE_INTEGER)] = $ds->getValue('vk_id', TYPE_INTEGER);
+                $res[$ds->getValue('id', TYPE_INTEGER)] = $ds->getValue('vk_id', TYPE_INTEGER);
             }
             $this->ids = $res;
         }
 
-        public function get_public_grow()
+        public function get_public_grow($id, quantity)
         {
-            foreach($this->ids as $id) {
 
-                $sql = 'SELECT quantity FROM ' . self::T_PUBLICS_POINTS . ' WHERE id=@publ_id ORDER BY "time" DESC LIMIT 1';
+
+
+                $sql = 'UPDATE';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@publ_id',  $id);
+                $cmd->SetInteger('@publ_id',  $publ_id);
                 $ds = $cmd->Execute();
-                $ds->Next();
-                $quantity = $ds->getValue('quantity', TYPE_INTEGER);
-                echo $id.' '.$quantity . '<br>';
-                $sql = 'UPDATE ' . self::T_PUBLICS_LIST . '
-                        SET diff_abs=@new_quantity - quantity,
-                            diff_rel=ROUND(@new_quantity * 1000/ quantity - 1000, 0),
-                            quantity=@new_quantity
-                        WHERE vk_id=@publ_id';
+                $quantity = array();
 
+                while( $ds->Next() ) {
+                    $quantity[] = $ds->getValue('quantity', TYPE_INTEGER);
+                }
+
+                $quantity_last = end($quantity);
+                $quantity_comparison = prev($quantity);
+
+                if (count($quantity) > 1  && $quantity_last != 0 && $quantity_comparison != 0 ) {
+                    $diff_abs = $quantity_last - $quantity_comparison;
+                    $diff_rel= round(( $quantity_last - $quantity_comparison ) / $quantity_comparison, 4) * 10000 ;
+                } else {
+                    $diff_abs = '-';
+                    $diff_rel = '-';
+                }
+
+                $sql = 'UPDATE ' . self::T_PUBLICS_LIST . '
+                SET diff_abs=quantity-@new_quantity,
+                    diff_rel=ROUND((quantity-@new_quantity)/@new_quantity, 0) * 10000,
+                    quantity=@new_quantity
+                WHERE vk_id=@publ_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@publ_id',   $id);
-                $cmd->SetInteger('@new_quantity',  $quantity);
+                $cmd->SetInteger('@publ_id',   $publ_id);
+                $cmd->SetInteger('@new_quantity',  $quantity_last);
                 $cmd->Execute();
 
-            }
         }
 
         public function update_quantity($info_t, $points_t)
@@ -102,8 +110,6 @@ set_time_limit(600);
                         $cmd->SetInteger( '@quantity', $entry->count );
                         $cmd->Execute();
                         echo "New entry: $key, $time, $entry->count <br>";
-
-
                     }
 
                     sleep(0.3);
