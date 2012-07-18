@@ -15,16 +15,16 @@
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
-            $groupName  =   $groupName ? $groupName : '';
-            if (!$userId) {
+            if (!$groupName || !$userId) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            if ($id = $this->exist_check($groupName, $userId)) {
-                echo ObjectHelper::ToJSON(array('response' => array('id'    =>  (int)$id)));
-                die();
-            }
+
+//            if ($id = $this->exist_check($groupName, $userId)) {
+//                echo ObjectHelper::ToJSON(array('response' => array('id'    =>  (int)$id)));
+//                die();
+//            }
 
             //rename
             if ($groupId) {
@@ -33,7 +33,8 @@
                 $cmd->SetInteger('@group_id',   $groupId);
                 $cmd->SetString('@name',        $groupName);
                 $cmd->Execute();
-                $id = $groupId;
+                echo ObjectHelper::ToJSON(array('response' => true));
+                die();
             //new
             } elseif($groupName) {
                 $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
@@ -43,34 +44,19 @@
                 $ds = $cmd->Execute();
                 $ds->next();
                 $id = $ds->getValue('group_id', TYPE_INTEGER);
+                if (!$id || $id == NULL) {
+                    echo ObjectHelper::ToJSON(array('response' => false));
+                    die();
+                }
 
-                $query = 'INSERT INTO publ_rels_names(user_id,group_id) VALUES(@user_id,@group_id)';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@user_id',  $userId);
-                $cmd->SetInteger('@group_id', $id);
-                $cmd->Execute();
-
-//
+                echo ObjectHelper::ToJSON( array('response' => array('id'    => $id)));
+                die();
             }
-            echo ObjectHelper::ToJSON( array('response' => array('id'    => (int)$id)));
+            echo ObjectHelper::ToJSON(array('response' => false));
+            die();
         }
 
-        private function exist_check($groupName, $userId)
-        {
-            $query = 'SELECT * FROM groups WHERE "name"=@name AND user_id=@userId';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@userId', $userId);
-            $cmd->SetString('@name',    $groupName);
 
-            $ds = $cmd->Execute();
-
-            $ds->next();
-
-            if($id = $ds->getValue('group_id'))
-                return $id;
-            return false;
-
-        }
     }
 
 ?>

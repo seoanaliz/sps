@@ -36,7 +36,7 @@ class getEntries {
             $search = $search ? " AND a.name ILIKE '%" . $search . "%' ": '';
 
             $sql = 'SELECT
-                        a.vk_id,a.ava,a.name,a.price,a.diff_abs,a.diff_rel,a.quantity
+                        a.vk_id,a.ava,a.name,a.price,a.diff_abs,a.diff_rel,a.quantity,b.selected_admin
                     FROM
                         ' . self::T_PUBLICS_LIST . ' as a,' . self::T_PUBLICS_RELS . ' as b
                     WHERE
@@ -51,14 +51,13 @@ class getEntries {
             $cmd->SetInteger('@group_id', $groupId);
             $cmd->SetInteger('@user_id', $userId);
 
-
         } else {
             $search     =   $search ? " WHERE name ILIKE '%" . $search . "%' ": '';
             $sql = 'SELECT
                         vk_id,ava,name,price,diff_abs,diff_rel,quantity
                     FROM '
                         . self::T_PUBLICS_LIST .
-                  $search .
+                    $search .
                   ' ORDER BY '
                         . $sortBy . $sortReverse .
                   ' OFFSET '
@@ -77,10 +76,11 @@ class getEntries {
         while ($ds->next()) {
             $row = $this->get_row($ds, $structure);
 
-            $admins = $this->get_admins($row['vk_id'], $row['admins']);
+            $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
-            if (isset($userId))
+            if (isset($userId)) {
                 $groups = $this->get_groups($row['vk_id'], $userId);
+            }
 
             $resul[] =  array(
                                 'id'        =>  $row['vk_id'],
