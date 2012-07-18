@@ -48,54 +48,52 @@ var LIST_ITEM =
 '</span>';
 
 var TABLE =
-'<thead id="table-head">' +
-    '<tr>' +
-        '<th class="public" width="30%">' +
-            '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
-        '</th>' +
-        '<th class="followers">' +
-            'подписчики<span class="icon arrow"></span>' +
-        '</th>' +
-        '<th class="growth active">' +
-            'прирост<span class="icon arrow"></span>' +
-        '</th>' +
-        '<th class="contacts" width="30%">' +
-            'контакты' +
-        '</th>' +
-    '</tr>' +
-'</thead>' +
-'<tbody id="table-body">' +
+'<div class="list-head clear-fix">' +
+    '<div class="item publics">' +
+        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
+    '</div>' +
+    '<div class="item followers">' +
+        'подписчики<span class="icon arrow"></span>' +
+    '</div>' +
+    '<div class="item growth">' +
+        'прирост<span class="icon arrow"></span>' +
+    '</div>' +
+    '<div class="item contacts">' +
+        'контакты' +
+    '</div>' +
+'</div>' +
+'<div class="list-body">' +
     '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
-'</tbody>';
+'</div>';
 
 var TABLE_BODY =
 '<? each(TABLE_ROW, rows); ?>';
 
 var TABLE_ROW =
-'<tr class="public" data-id="<?=publicId?>">' +
-    '<td>' +
-        '<span class="photo">' +
+'<div class="public clear-fix" data-id="<?=publicId?>">' +
+    '<div class="public-info clear-fix" data-id="<?=publicId?>">' +
+        '<div class="photo">' +
             '<img src="<?=publicImg?>" alt="" />' +
-        '</span>' +
-        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?>' +
-    '</td>' +
-    '<td><?=publicFollowers?></td>' +
-    '<td>' +
+        '</div>' +
+        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
+    '</div>' +
+    '<div class="public-followers"><?=publicFollowers?></div>' +
+    '<div class="public-growth">' +
         '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
         '</span>' +
-    '</td>' +
-    '<td>' +
+    '</div>' +
+    '<div class="public-contacts">' +
         '<? if (isset("users") && users.length) { ?>' +
             '<?=tmpl(CONTACT, users[0])?>' +
         '<? } ?>' +
-        '<div class="actions">' +
-            '<span class="action add-to-list">' +
-                '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
-            '</span>' +
-        '</div>' +
-    '</td>' +
-'</tr>';
+    '</div>' +
+    '<div class="public-actions">' +
+        '<span class="action add-to-list">' +
+            '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
+        '</span>' +
+    '</div>' +
+'</div>';
 
 var CONTACT =
 '<div class="contact">' +
