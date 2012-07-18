@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sites>
     <site name="sps">
-        <settings>
-            <paths>
-                <path name="shared" value="/shared" />
-                <path name="js" value="/shared/js" />
-                <path name="css" value="/shared/css" />
-                <path name="flash" value="/shared/flash" />
-                <path name="images" value="/shared/images" />
-                <path name="lang" value="/etc/locale" />
-                <path name="vt" value="/vt" />
-                <path name="tmpl" value="/etc/templates" />
-                <path name="vfs" value="/shared/files" />
-                <path name="temp" value="/shared/temp" />
-                <path name="mail" value="/etc/templates/mail" />
-                <path name="controls" value="/int/controls" />
-                <path name="daemons" value="/int/daemons" />
-            </paths>
-            <!-- System modules Settings -->
-            <modules>
-                <localization class="LocaleLoader">
-                    <param name="path">lang://</param>
-                    <param name="default">ru</param>
-                    <param name="allowChange">false</param>
-                    <param name="htmlEncoding">utf-8</param>
-                </localization>
-                <mailFactory class="MailFactory">
-                    <param name="senderName">Administrator</param>
-                    <param name="senderEmail">admin@1adw.com</param>
-                    <param name="charset">utf-8</param>
-                </mailFactory>
+		<settings>
+			<paths>
+				<path name="shared" value="/shared" />
+				<path name="js" value="/shared/js" />
+				<path name="css" value="/shared/css" />
+				<path name="flash" value="/shared/flash" />
+				<path name="images" value="/shared/images" />
+				<path name="lang" value="/etc/locale" />
+				<path name="vt" value="/vt" />
+				<path name="tmpl" value="/etc/templates" />
+				<path name="vfs" value="/shared/files" />
+				<path name="temp" value="/shared/temp" />
+				<path name="mail" value="/etc/templates/mail" />
+				<path name="controls" value="/int/controls" />
+				<path name="daemons" value="/int/daemons" />
+			</paths>
+			<!-- System modules Settings -->
+			<modules>
+    			<localization class="LocaleLoader">
+				    <param name="path">lang://</param>
+				    <param name="default">ru</param>
+				    <param name="allowChange">false</param>
+					<param name="htmlEncoding">utf-8</param>
+    			</localization>
+    			<mailFactory class="MailFactory">
+				    <param name="senderName">Administrator</param>
+				    <param name="senderEmail">admin@1adw.com</param>
+				    <param name="charset">utf-8</param>
+    			</mailFactory>
                 <memcache class="MemcacheHelper">
-                    <param name="server">localhost</param>
-                    <param name="active">false</param>
-                </memcache>
+				    <param name="server">localhost</param>
+				    <param name="active">false</param>
+    			</memcache>
                 <vkapi class="AuthVkontakte">
                     <param name="appId">1868779</param>
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
                 </vkapi>
-            </modules>
-            <databases>
-                <database driver="PgSql">
-                    <name>sps</name>
+			</modules>
+			<databases>
+				<database driver="PgSql">
+					<name>sps</name>
+					<user>postgres</user>
+					<password></password>
+					<encoding>UTF8</encoding>
+				</database>
+                <database driver="PgSql" name="tst">
+                    <name>tst</name>
                     <user>postgres</user>
                     <password></password>
                     <encoding>UTF8</encoding>
                 </database>
-                <database driver="PgSql" name="tst">
-                    <name>tst</name>
-                    <user>postgres</user>
-                    <password>qqqqqq</password>
-                    <encoding>UTF8</encoding>
-                </database>
-            </databases>
-        </settings>
-        <hosts>
-            <host name="local" devel="true">
-                <hostname>sps</hostname>
-                <hostname>openapi.lc</hostname>
+			</databases>
+		</settings>
+		<hosts>
+			<host name="local" devel="true">
+				<hostname>sps</hostname>
+				<hostname>openapi.lc</hostname>
                 <settings>
                     <modules>
                         <mediaServer class="MediaServerManager">
@@ -71,7 +71,7 @@
                         </mediaServer>
                     </modules>
                 </settings>
-            </host>
+			</host>
             <host name="devel">
                 <hostname>mystery.vmkteam.ru</hostname>
                 <settings>
@@ -129,12 +129,12 @@
                         <database driver="PgSql" name="tst">
                             <name>tst</name>
                             <user>sps</user>
-                            <password>qqqqqq</password>
+                            <password></password>
                             <encoding>UTF8</encoding>
                         </database>
                     </databases>
                 </settings>
             </host>
-        </hosts>
-    </site>
+		</hosts>
+	</site>
 </sites>
