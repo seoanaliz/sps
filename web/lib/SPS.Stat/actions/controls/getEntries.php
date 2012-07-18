@@ -19,7 +19,7 @@ class getEntries {
     const T_PUBLICS_RELS   = 'publ_rels_names';
 
     public function Execute() {
-        error_reporting( 0 );
+//        error_reporting( 0 );
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
@@ -29,8 +29,8 @@ class getEntries {
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $offset     =   $offset ? $offset : 0;
         $limit      =   $limit  ?  $limit  :   25;
-        $sortBy     =   $sortBy ? $sortBy  : ' vk_id ';
-        $sortReverse = !$sortReverse ? ' DESC ': '';
+        $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
+        $sortReverse = $sortReverse? ' DESC ': '';
 
         if (isset($groupId) && isset($userId)) {
             $search = $search ? " AND a.name ILIKE '%" . $search . "%' ": '';
