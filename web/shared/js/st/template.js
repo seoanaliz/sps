@@ -56,7 +56,7 @@ var TABLE =
         '<th class="followers">' +
             'подписчики<span class="icon arrow"></span>' +
         '</th>' +
-        '<th class="growth">' +
+        '<th class="growth active">' +
             'прирост<span class="icon arrow"></span>' +
         '</th>' +
         '<th class="contacts" width="30%">' +

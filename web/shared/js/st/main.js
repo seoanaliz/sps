@@ -195,15 +195,12 @@ var Table = (function(callback) {
         $container.delegate('.followers', 'click', function(e) {
             var $target = $(this);
             $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
                 sort('followers', true);
             } else {
                 $target.addClass('active');
+                $target.removeClass('reverse');
                 sort('followers', false);
             }
         });
@@ -211,32 +208,26 @@ var Table = (function(callback) {
         $container.delegate('.growth', 'click', function(e) {
             var $target = $(this);
             $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
-                sort('growth', true);
+                sort('followers', true);
             } else {
                 $target.addClass('active');
-                sort('growth', false);
+                $target.removeClass('reverse');
+                sort('followers', false);
             }
         });
 
         $container.delegate('.contacts', 'click', function(e) {
             var $target = $(this);
             $target.closest('thead').find('th').not($target).removeClass('reverse active');
-            if ($target.hasClass('reverse')) {
-                $target.removeClass('reverse');
-                $target.removeClass('active');
-                sort('');
-            } else if ($target.hasClass('active')) {
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
-                sort('contacts', true);
+                sort('followers', true);
             } else {
                 $target.addClass('active');
-                sort('contacts', false);
+                $target.removeClass('reverse');
+                sort('followers', false);
             }
         });
 
