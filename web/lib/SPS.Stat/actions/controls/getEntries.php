@@ -19,7 +19,7 @@ class getEntries {
     const T_PUBLICS_RELS   = 'publ_rels_names';
 
     public function Execute() {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
