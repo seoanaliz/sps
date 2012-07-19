@@ -15,6 +15,9 @@
         /** CSS Type */
         const CSS = 'css';
 
+        /** CSS Type */
+        const LESS = 'less';
+
         /** All browsers */
         const AnyBrowser = 'any';
 
@@ -117,6 +120,9 @@
                 'src'        => '<link rel="stylesheet" type="text/css" href="%s" />'
                 , self::Line => '<style type="text/css">%s</style>'
             )
+            , self::LESS => array(
+                'src'        => '<link rel="stylesheet/less" type="text/css" href="%s">'
+            )
         );
 
         /**
@@ -126,6 +132,7 @@
         protected static $container = array(
             self::JS    => array()
             , self::CSS => array()
+            , self::LESS => array()
         );
 
 

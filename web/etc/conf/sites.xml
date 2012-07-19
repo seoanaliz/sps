@@ -6,6 +6,7 @@
 				<path name="shared" value="/shared" />
 				<path name="js" value="/shared/js" />
 				<path name="css" value="/shared/css" />
+				<path name="less" value="/shared/less" />
 				<path name="flash" value="/shared/flash" />
 				<path name="images" value="/shared/images" />
 				<path name="lang" value="/etc/locale" />
