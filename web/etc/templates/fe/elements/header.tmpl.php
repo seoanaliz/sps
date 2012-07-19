@@ -32,7 +32,7 @@
 	
     $cssFiles = array(
         AssetHelper::AnyBrowser => array(
-            'css://fe/reset.css',
+            'css://common/common.css',
             'js://fe/file-uploader/fileuploader.css',
             'css://fe/jquery-ui.css',
             'css://fe/jquery.multiselect.css',
@@ -47,7 +47,7 @@
 
     $jsFiles = array(
         'js://fe/locale/'. LocaleLoader::$CurrentLanguage . '.js',
-        'js://fe/jquery-1.7.1.min.js',
+        'js://common/jquery-1.7.2.min.js',
         'js://fe/jquery-ui-1.8.18.custom.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',
         'js://ext/jquery.plugins/jquery.blockui.js',

@@ -3,33 +3,6 @@ body {
     line-height: 160%;
     font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
 }
-input[type="checkbox"] {
-}
-input[type="checkbox"]:after {
-    content: '';
-    background: url('../../images/fe/check.gif') 0 0 no-repeat;
-    width: 14px;
-    height: 14px;
-    position: absolute;
-}
-input[type="checkbox"]:hover:after {
-    background-position: 0 -28px;
-}
-input[type="checkbox"]:checked:hover:after {
-    background-position: 0 -42px;
-}
-input[type="checkbox"]:checked:after {
-    background-position: 0 -14px;
-}
-input:focus,
-textarea:focus,
-[contenteditable]:focus {
-    outline: none;
-    border-color: #97A4C4 !important;
-}
-a {color: #205f82;text-decoration: none;}
-a:hover {color: #205f82;text-decoration: underline;}
-
 .bb {
     border-bottom: 1px solid #C4CDE0;
 }

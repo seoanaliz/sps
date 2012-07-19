@@ -383,6 +383,13 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="app" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="app://">
+                    <actions>SPS.Site.GetIndexPage</actions>
+                    <template>tmpl://app/index.tmpl.php</template>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

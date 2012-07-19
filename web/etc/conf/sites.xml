@@ -16,6 +16,7 @@
 				<path name="mail" value="/etc/templates/mail" />
 				<path name="controls" value="/int/controls" />
 				<path name="daemons" value="/int/daemons" />
+				<path name="app" value="/app" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>

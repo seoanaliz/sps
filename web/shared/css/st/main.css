@@ -1,36 +1,5 @@
-html, body, input, textarea {
-    font-size: 12px;
-    font-family: Arial;
-    margin: 0;
-}
-html, body {
-    padding: 0;
-}
 body {
     overflow-y: scroll;
-}
-*:focus {
-    outline: none;
-    border-color: #597DA3 !important;
-}
-input[type=text], textarea {
-    border-color: #C4CDE0;
-    border-width: 1px;
-    border-style: solid;
-}
-table, tr, td, th {
-    margin: 0;
-    padding: 0;
-    border-spacing: 0;
-    text-align: left;
-}
-a {
-    color: #2B587A;
-    text-decoration: none;
-}
-a:focus,
-a:hover {
-    text-decoration: underline;
 }
 
 #global-loader {
