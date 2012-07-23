@@ -1,115 +1,168 @@
 <?php
-//обновление данных по топу пабликов, раз в день ~4.30 ночи
+//обновление данных по топу пабликов, раз в день ~6 ночи
     Package::Load( 'SPS.Stat' );
 
-set_time_limit(600);
+    set_time_limit(600);
     class WrTopics extends wrapper
     {
         const TESTING = false;
+        const T_PUBLICS_POINTS = 'gr50k';
+        const T_PUBLICS_LIST   = 'publs50k';
 
-        public $ids;
-        private $publs = array(
-            'our'   =>  array(
-                    'info'  =>  'publs50k',
-                    'stata' =>  'gr50k'),
-            'not_our'   =>  array(
-                    'info'  =>  'our_publs2',
-                    'stata' =>  'our_publs_points')
-            );
+        private $ids;
 
         public function Execute()
         {
-            $i = 0;
+            if (! $this->check_time())
+                die('Не сейчас');
 
+            $this->get_id_arr();
 
-            foreach ($this->publs as $p_array) {
-                $this->get_id_arr($p_array['stata']);
-                $this->update_quantity($p_array['info'], $p_array['stata']);
-                die();
-            }
+            $this->update_quantity();
+            $this->update_public_info();
         }
 
-        public function get_id_arr($table_name)
+        public function get_id_arr()
         {
-            $sql = "select id,vk_id FROM $table_name ORDER BY id";
+            $sql = "select vk_id FROM ". self::T_PUBLICS_LIST ." ORDER BY vk_id";
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $ds = $cmd->Execute();
-
+            $res = array();
             while ( $ds->Next() ) {
-                $res[$ds->getValue('id', TYPE_INTEGER)] = $ds->getValue('vk_id', TYPE_INTEGER);
+                $res[] = $ds->getValue('vk_id', TYPE_INTEGER);
             }
             $this->ids = $res;
         }
 
-        public function get_public_grow($id, quantity)
+        public function check_time()
         {
-
-
-
-                $sql = 'UPDATE';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@publ_id',  $publ_id);
-                $ds = $cmd->Execute();
-                $quantity = array();
-
-                while( $ds->Next() ) {
-                    $quantity[] = $ds->getValue('quantity', TYPE_INTEGER);
-                }
-
-                $quantity_last = end($quantity);
-                $quantity_comparison = prev($quantity);
-
-                if (count($quantity) > 1  && $quantity_last != 0 && $quantity_comparison != 0 ) {
-                    $diff_abs = $quantity_last - $quantity_comparison;
-                    $diff_rel= round(( $quantity_last - $quantity_comparison ) / $quantity_comparison, 4) * 10000 ;
-                } else {
-                    $diff_abs = '-';
-                    $diff_rel = '-';
-                }
-
-                $sql = 'UPDATE ' . self::T_PUBLICS_LIST . '
-                SET diff_abs=quantity-@new_quantity,
-                    diff_rel=ROUND((quantity-@new_quantity)/@new_quantity, 0) * 10000,
-                    quantity=@new_quantity
-                WHERE vk_id=@publ_id';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@publ_id',   $publ_id);
-                $cmd->SetInteger('@new_quantity',  $quantity_last);
-                $cmd->Execute();
+            $sql = 'SELECT MAX(time) FROM ' . self::T_PUBLICS_POINTS . ' LIMIT 1';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            $diff =  time() - $ds->getValue('max', TYPE_INTEGER);
+            if (self::TESTING)
+                echo '<br>differing = ' . $diff . '<br>';
+            if ($diff < 86400 )
+                return false;
+            if ($diff > 86400 * 2 )
+                return ($diff/86400);
+            return 1;
 
         }
 
-        public function update_quantity($info_t, $points_t)
+//        public function tut()
+//        {
+//            $sql = 'select "name", vk_id from publs50k where vk_id=28045060';
+//            $k = $this->db_wrap('query', $sql);
+//            $row = $this->db_wrap('get_row', $k);
+//            var_dump($row);
+//            die ();
+//
+//
+//            while ($row = $this->db_wrap('get_row', $k)) {
+//                print_r($row);
+//                print_r($row['name']);
+//
+//                echo '<br>';
+//                $row['name'] = iconv ('windows-1251', 'utf-8', $row['name']);
+//                print_r($row['name']);
+//                $sql = 'UPDATE publs50k set "name"=\'' . $row['name'] . '\' where vk_id = 28045060' ;#. $row['30'];
+//                print_r($sql);
+//                die();
+//                $this->db_wrap('query', $sql);
+//                die();
+//            }
+//
+//        }
+
+        //проверяет изменения в пабликах(название и ава)
+        public function update_public_info()
+        {
+            if (self::TESTING)
+                echo '<br>update_public_info<br>';
+            $i = 0;
+            $ids = '';
+            $count = count($this->ids);
+            foreach($this->ids as $id) {
+                if ($i == 450 || $i == $count - 1)
+                {
+                    $params  = array(
+                        'gids'  =>  $ids
+                    );
+
+                    $res = $this->vk_api_wrap('groups.getById', $params);
+                    foreach($res as $public) {
+                        $sql = 'UPDATE ' . self::T_PUBLICS_LIST . ' SET
+                                                name=@name,
+                                                ava=@photo
+                                WHERE
+                                                vk_id=@vk_id';
+                        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                        $cmd->SetInteger('@vk_id', $public->gid);
+                        $cmd->SetString('@name', $public->name );
+                        $cmd->SetString('@photo', $public->photo);
+                        $cmd->Execute();
+                    }
+
+                   $count -= 450;
+                   $ids = '';
+                   $i = 0;
+
+                }
+                $i ++;
+                $ids .=  $id . ',';
+            }
+        }
+
+        //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем(TODO или больше))
+        public function set_public_grow($publ_id, $quantity, $period=1)
+        {
+                $sql = 'UPDATE ' . self::T_PUBLICS_LIST . '
+                SET diff_abs=(@new_quantity - quantity),
+                    quantity=@new_quantity,
+                    diff_rel=round((@new_quantity/quantity - 1)*100, 2)
+                WHERE vk_id=@publ_id';
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@publ_id',   $publ_id);
+                $cmd->SetFloat('@new_quantity',  $quantity + 0.1);
+                $cmd->Execute();
+        }
+
+        //собирает количество поситителей в пабликах
+        public function update_quantity()
         {
             $time = $this->morning(time());
             $i = 0;
             $return = "return{";
             $code = '';
 
-            $id_arr = $this->get_id_arr($info_t);
+            foreach($this->ids as $b) {
 
-            foreach($id_arr as $b) {
-        //
-                if ($i == 25 or !next($id_arr)) {
-                    if (!next($id_arr)) {
+                if ($i == 25 or !next($this->ids)) {
+                    if (!next($this->ids)) {
                         $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                         $return .= "\" a$b\":a$b,";
                     }
 
                     $code .= trim($return, ',') . "};";
+
+                    if (self::TESTING)
+                        echo '<br>' . $code;
                     $res = $this->vk_api_wrap('execute', array('code' =>  $code));
 
-                    foreach($res as $key=>$entry) {
+                    foreach($res as $key => $entry) {
 
                         $key = str_replace('a', '', $key);
-
-                        $sql = "insert into $points_t(id,time,quantity) values(@id,@time,@quantity)";
+                        $sql = "INSERT INTO " . self::T_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
                         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                        $cmd->SetInteger( '@id', $key );
-                        $cmd->SetInteger( '@time', $time );
-                        $cmd->SetInteger( '@quantity', $entry->count );
+                        $cmd->SetInteger( '@id',        $key );
+                        $cmd->SetInteger( '@time',      $time );
+                        $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
-                        echo "New entry: $key, $time, $entry->count <br>";
+
+                        $this->set_public_grow($key, $entry->count);
+
                     }
 
                     sleep(0.3);
@@ -125,7 +178,5 @@ set_time_limit(600);
 
         }
 }
-
-
 
 ?>

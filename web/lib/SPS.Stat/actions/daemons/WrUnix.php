@@ -3,6 +3,8 @@ header("Content-Type: text/html; charset=utf-8");
 
 set_time_limit(0);
 
+
+
 class WrUnix extends wrapper
 {
 
@@ -14,17 +16,14 @@ class WrUnix extends wrapper
 
     public function Execute()
     {
-        $this->ids = $this->get_publics();
+        $this->get_publics();
         $this->trunk();
         foreach($this->ids as $id) {
             $this->get_users($id[0]);
         }
         $this->find_unix();
-        echo $this->ununiq_id_count;
 
     }
-
-
 
     private function get_users($id)
     {

@@ -28,7 +28,7 @@ class getEntries {
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $offset     =   $offset ? $offset : 0;
-        $limit      =   $limit  ?  $limit  :   25;
+        $limit      =   $limit  ? $limit  :   25;
         $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
         $sortReverse = $sortReverse? '': ' DESC ';
 

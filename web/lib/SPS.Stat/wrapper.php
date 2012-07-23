@@ -6,6 +6,11 @@ class wrapper
     const ACC_TOK_WRK = '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a';
     const VK_API_URL = 'https://api.vk.com/method/';
     const TESTING = false;
+
+    const T_PUBLICS_POINTS = 'gr50k';
+    const T_PUBLICS_LIST   = 'publs50k';
+    const T_PUBLICS_RELS   = 'publ_rels_names';
+
     public $db;
     public $id; // id паблика
     public $q_result;
@@ -37,7 +42,7 @@ class wrapper
     {
         $date = date('m d Y', $timestamp);
         $date = explode(' ', $date);
-        return  mktime(0, 0, 0, $date[0], $date[1], $date[2]);
+        return  mktime(5, 5, 0, $date[0], $date[1], $date[2]);
     }
 
     public function db_wrap($meth, $data='',$k=0)
@@ -141,7 +146,6 @@ class wrapper
             }
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
@@ -179,7 +183,14 @@ class wrapper
 
     public function get_publics()
     {
-        $sql = "select vk_id,name from publics where active=1";
+        $sql = "select id from " . self::T_PUBLICS_LIST . " where active=1";
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $ds = $cmd->Execute();
+        while( $ds->Next() ) {
+
+        }
+
+
         $this->db_wrap('query', $sql);
         $ids = array();
         while ($row = $this->db_wrap('get_row')) {
