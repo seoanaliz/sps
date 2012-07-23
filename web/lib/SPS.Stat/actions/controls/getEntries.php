@@ -30,7 +30,7 @@ class getEntries {
         $offset     =   $offset ? $offset : 0;
         $limit      =   $limit  ?  $limit  :   25;
         $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
-        $sortReverse = $sortReverse? ' DESC ': '';
+        $sortReverse = $sortReverse? '': ' DESC ';
 
         if (isset($groupId) && isset($userId)) {
             $search = $search ? " AND a.name ILIKE '%" . $search . "%' ": '';
