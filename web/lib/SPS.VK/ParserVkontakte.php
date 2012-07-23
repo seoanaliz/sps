@@ -579,8 +579,7 @@
             $text = htmlspecialchars_decode($text);
             $text = html_entity_decode($text);
             $text = strip_tags( $text );
-            $text = preg_replace('/#[^\s]+/', '',$text);
-            return trim($text);
+            return $text;
         }
 
         private function get_photo_desc(&$picsArr, $text)
