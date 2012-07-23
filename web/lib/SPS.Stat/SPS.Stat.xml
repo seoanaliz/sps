@@ -43,6 +43,9 @@
             <action name="exGroup">
                 <path>controls/exGroup</path>
             </action>
+            <action name="togglePublVisibil">
+                <path>controls/togglePublVisibil</path>
+            </action>
 
         </group>
     </group>
