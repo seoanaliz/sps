@@ -24,23 +24,28 @@ class getEntries {
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
+
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
+        $show_in_mainlist = Request::getInteger( 'show' );
+
+
         $offset     =   $offset ? $offset : 0;
         $limit      =   $limit  ?  $limit  :   25;
         $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
-        $sortReverse = $sortReverse? ' DESC ': '';
+        $sortReverse = $sortReverse? '' : ' DESC ';
+        $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
         if (isset($groupId) && isset($userId)) {
-            $search = $search ? " AND a.name ILIKE '%" . $search . "%' ": '';
+            $search = $search ? " AND a.name ILIKE '%" . $search . "%' " : '';
 
             $sql = 'SELECT
                         a.vk_id,a.ava,a.name,a.price,a.diff_abs,a.diff_rel,a.quantity,b.selected_admin
                     FROM
                         ' . self::T_PUBLICS_LIST . ' as a,' . self::T_PUBLICS_RELS . ' as b
                     WHERE
-                        b.group_id=@group_id AND b.publ_id=a.vk_id AND b.user_id=@user_id '. $search . '
+                        b.group_id=@group_id AND b.publ_id=a.vk_id AND b.user_id=@user_id '. $search . $show_in_mainlist . '
                     ORDER BY '
                         . $sortBy . $sortReverse .
                   ' OFFSET '
@@ -52,12 +57,14 @@ class getEntries {
             $cmd->SetInteger('@user_id', $userId);
 
         } else {
-            $search     =   $search ? " WHERE name ILIKE '%" . $search . "%' ": '';
+            $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
+
             $sql = 'SELECT
                         vk_id,ava,name,price,diff_abs,diff_rel,quantity
                     FROM '
                         . self::T_PUBLICS_LIST .
-                    $search .
+                  ' WHERE 1=1 '.
+                        $search . $show_in_mainlist .
                   ' ORDER BY '
                         . $sortBy . $sortReverse .
                   ' OFFSET '
