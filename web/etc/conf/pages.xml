@@ -102,6 +102,9 @@
                 <page uri="controls://exGroup/">
                     <actions>SPS.Stat.exGroup</actions>
                 </page>
+                <page uri="controls://togglePublVisibil/">
+                    <actions>SPS.Stat.togglePublVisibil</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
