@@ -104,7 +104,7 @@ i {font-style: italic;}
 }
 .drop-down .tip s {
     position: absolute;
-    background: url('../../images/fe/darr_dd_out.gif') center no-repeat;
+    background: url('../../images/common/darr_dd_out.gif') center no-repeat;
     width: 16px;
     top: 0;
     right: 0;
@@ -267,7 +267,7 @@ i {font-style: italic;}
     padding-right: 15px;
     opacity: .6;
     color: #45688E;
-    background: url('../../images/fe/darr_dd_out.gif') right center no-repeat;
+    background: url('../../images/common/darr_dd_out.gif') right center no-repeat;
 }
 .left-panel .wall-title .filter a:hover,
 .left-panel .wall-title .filter a.active {
@@ -515,46 +515,6 @@ i {font-style: italic;}
 .newpost.collapsed .input { border: none; }
 .newpost .tip {display: none;position: absolute;top: 24px;left: 25px;color:#888;}
 .newpost.collapsed .tip {display: block;}
-
-.button {
-    border-radius: 2px;
-    display: inline-block;
-    border: 1px solid #4E6F93;
-
-    border: 1px solid #4E6F93;
-    border-top-color: #517295;
-    color:#fff;
-    margin: 0;
-    padding: 4px 14px;
-    cursor: pointer;
-    outline: none;
-    font-size: 11px;
-    white-space: nowrap;
-    text-shadow: 0 1px 0 #45688E;
-    box-shadow: 0 1px 1px rgba(255,255,255,.2) inset;
-
-    font-family: tahoma, verdana, arial, sans-serif, Lucida Sans;
-    background-image: linear-gradient(bottom, rgb(80,118,158) 0%, rgb(106,141,178) 100%);
-    background-image: -o-linear-gradient(bottom, rgb(80,118,158) 0%, rgb(106,141,178) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(80,118,158) 0%, rgb(106,141,178) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(80,118,158) 0%, rgb(106,141,178) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(80,118,158) 0%, rgb(106,141,178) 100%);
-}
-.button:hover {
-    color: #fff;
-    text-decoration: none;
-    background-image: linear-gradient(bottom, rgb(89,128,169) 0%, rgb(120,154,191) 100%);
-    background-image: -o-linear-gradient(bottom, rgb(89,128,169) 0%, rgb(120,154,191) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(89,128,169) 0%, rgb(120,154,191) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(89,128,169) 0%, rgb(120,154,191) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(89,128,169) 0%, rgb(120,154,191) 100%);
-}
-.button:active {
-    box-shadow: none;
-    background:#5E80A5;
-    border: 1px solid #5E80A5;
-}
-
 .newpost .button {}
 .newpost.collapsed .button {display: none;}
 .newpost a {
@@ -733,7 +693,7 @@ i {font-style: italic;}
     opacity: .7;
 }
 #wall-load {
-    background-image: url('../../images/fe/upload.gif');
+    background-image: url('../../images/common/upload.gif');
     width: 32px;
     height: 8px;
     position: absolute;
@@ -743,7 +703,7 @@ i {font-style: italic;}
 #wall-loader {
     height: 100px;
     line-height: 100px;
-    background: url('../../images/fe/upload.gif') center no-repeat;
+    background: url('../../images/common/upload.gif') center no-repeat;
 }
 
 .post:hover {
@@ -1069,7 +1029,7 @@ i {font-style: italic;}
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('../../images/fe/upload.gif') center no-repeat #fff;
+    background: url('../../images/common/upload.gif') center no-repeat #fff;
     width: 100% !important;
     height: 100% !important;
     z-index: 1;

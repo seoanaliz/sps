@@ -1,8 +1,443 @@
-html {
-    body {
-        color: #fff;
-        &:hover {
-            color: red;
+@link_color: #2B587A;
+@light_blue: #99ADC2;
+@hover_bg: #E1E7ED;
+
+.user-select(@select: text) {
+    -webkit-touch-callout: @select;
+    -webkit-user-select: @select;
+    -khtml-user-select: @select;
+    -moz-user-select: @select;
+    -ms-user-select: @select;
+    -o-user-select: @select;
+    user-select: @select;
+}
+.transition(@params) {
+    -webkit-transition: @params;
+    -moz-transition: @params;
+    -o-transition: @params;
+    transition: @params;
+}
+.border-radius(@params) {
+    -webkit-border-radius: @params;
+    -moz-border-radius: @params;
+    border-radius: @params;
+}
+.opacity(@opacity) {
+    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
+    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
+    opacity: @opacity;
+}
+
+html, body {
+    background-color: #f1f1f1;
+}
+
+.main {
+    width: 630px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,.1);
+    padding: 10px;
+
+    .left-column {
+        float: left;
+        width: 420px;
+        margin-right: 10px;
+
+        &>.header {
+            .user-info {
+                position: relative;
+                min-height: 40px;
+
+                &>.photo {
+                    position: absolute;
+                    overflow: hidden;
+                    top: 0;
+                    left: 0;
+                    width: 40px;
+                    height: 40px;
+
+                    img {
+                        max-width: 40px;
+                    }
+                }
+                &>.info {
+                    margin-left: 50px;
+
+                    &>.title {
+                        font-size: 1.1em;
+                        font-weight: bold;
+                    }
+                    &>.other {
+                        margin-top: 9px;
+                        font-weight: bold;
+                        color: @link_color;
+
+                        &>.rating {}
+                        &>.likes {}
+                        &>.diff {
+                            font-size: .9em;
+                            .opacity(.5);
+                        }
+                    }
+                }
+            }
+        }
+        &>.wall {
+            margin-top: 10px;
+
+            &>.title {
+                font-weight: bold;
+                color: @link_color;
+                background-color: #DEE5EB;
+                padding: 5px 10px;
+
+                &>.text {
+                    float: left;
+                }
+                &>.dropdown {
+                    float: right;
+                    cursor: pointer;
+                    color: @link_color;
+                    padding-right: 12px;
+                    background: url('../../images/common/darr_dd_out.gif') right center no-repeat;
+
+                    .opacity(.5);
+
+                    &:hover {
+                        .opacity(1);
+                    }
+                }
+            }
+            .new-post {
+                padding: 10px;
+                position: relative;
+                background-color: #f1f1f1;
+
+                &>.actions {
+                    display: none;
+                }
+                &>.textarea-wrap {
+                    padding-right: 12px;
+
+                    textarea {
+                        width: 100%;
+                        height: 22px;
+                    }
+                    .add-photo {
+                        position: absolute;
+                        top: 16px;
+                        right: 16px;
+                        width: 20px;
+                        height: 20px;
+                        cursor: pointer;
+                        background: url('../../images/fe/attach_photo.gif') center no-repeat;
+
+                        .opacity(.5);
+                        .transition(.2s opacity);
+
+                        &:hover {
+                            .opacity(1);
+                        }
+                    }
+                }
+
+                &.open {
+                    &>.actions {
+                        display: block;
+                        margin-top: 10px;
+
+                        &>.text {
+                            color: gray;
+                            margin-left: 10px;
+                        }
+                    }
+                    &>.textarea-wrap {
+                        textarea {
+
+                            height: auto;
+                        }
+                    }
+                }
+            }
+            &>.list {
+                &>.post {
+                    position: relative;
+                    overflow: hidden;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #DEE5EB;
+
+                    &>.photo {
+                        position: absolute;
+                        overflow: hidden;
+                        width: 50px;
+                        height: 50px;
+
+                        img {
+                            max-width: 50px;
+                        }
+                    }
+                    &>.content {
+                        margin-left: 60px;
+
+                        &>.title {
+                            font-weight: bold;
+                        }
+                        &>.text {
+                            margin: .5em 0;
+                        }
+                        &>.attachments {
+                            margin: .5em 0;
+                        }
+                        &>.sign {
+
+                            &>.user-info {
+                                float: left;
+                                margin-top: 5px;
+
+                                &>.photo {
+                                    overflow: hidden;
+                                    width: 20px;
+                                    height: 20px;
+                                    display: inline-block;
+                                    vertical-align: middle;
+                                    margin-right: 5px;
+
+                                    img {
+                                        max-width: 20px;
+                                    }
+                                }
+                                &>.name {
+                                    font-weight: bold;
+                                }
+                                &>.date {
+                                    color: #999;
+                                    font-size: .9em;
+                                }
+                            }
+                            &>.likes {
+                                float: right;
+                                border-radius: 3px;
+                                padding: 3px;
+
+                                .opacity(.5);
+                                .transition(.2s opacity);
+                                .user-select(none);
+
+                                &>.icon,
+                                &>.counter {
+                                    vertical-align: middle;
+                                    display: inline-block;
+                                }
+                                &>.icon {
+                                    width: 1.2em;
+                                    height: 1.2em;
+                                    background: url('../../images/app/like.gif') center no-repeat;
+                                }
+                                &>.counter {
+                                    color: @link_color;
+                                    font-weight: bold;
+                                    height: 1.2em;
+                                }
+
+                                &:hover {
+                                    background-color: @hover_bg;
+
+                                    .opacity(1);
+                                }
+                            }
+                        }
+                        &>.comments {
+                            margin-top: 10px;
+
+                            &>.list {
+                                &>.show-more {
+                                    text-align: center;
+                                    padding: 7px 0;
+                                    cursor: pointer;
+                                    color: #6A7989;
+                                    background-color: @hover_bg;
+
+                                    &.hide {
+                                        background-color: transparent;
+
+                                        &:hover {
+                                            background-color: @hover_bg;
+                                        }
+                                    }
+                                }
+                                &>.comment {
+                                    position: relative;
+                                    border-top: 1px solid #DEE5EB;
+                                    padding: 10px 0;
+
+                                    &>.photo {
+                                        position: absolute;
+                                        overflow: hidden;
+                                        left: 0;
+                                        width: 32px;
+                                        height: 32px;
+
+                                        img {
+                                            max-width: 32px;
+                                        }
+                                    }
+                                    &>.content {
+                                        margin-left: 42px;
+
+                                        &>.title {}
+                                        &>.text {
+                                            margin: .2em 0;
+                                        }
+                                        &>.date {
+                                            color: #999;
+                                            font-size: .9em;
+                                        }
+                                    }
+                                }
+                            }
+
+                            &>.new-comment {
+                                padding: 6px;
+                                background-color: #f1f1f1;
+                                position: relative;
+
+                                &>.photo,
+                                &>.actions {
+                                    display: none;
+                                }
+                                &>.textarea-wrap {
+                                    padding-right: 12px;
+
+                                    textarea {
+                                        width: 100%;
+                                        height: 17px;
+                                    }
+                                }
+
+                                &.open {
+                                    margin-left: -6px;
+
+                                    &>.photo,
+                                    &>.actions {
+                                        display: block;
+                                    }
+                                    &>.photo {
+                                        position: absolute;
+                                        width: 32px;
+                                        height: 32px;
+
+                                        img {
+                                            max-width: 32px;
+                                        }
+                                    }
+                                    &>.actions {
+                                        margin-top: 6px;
+                                        margin-left: 38px;
+
+                                        &>.text {
+                                            color: gray;
+                                            margin-left: 5px;
+                                        }
+                                    }
+                                    &>.textarea-wrap {
+                                        margin-left: 38px;
+
+                                        textarea {
+                                            height: 20px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                &>.show-more {
+                    text-align: center;
+                    padding: 7px 0;
+                    cursor: pointer;
+                    color: #6A7989;
+
+                    &:hover {
+                        background-color: @hover_bg;
+                    }
+                    &.load {
+                        background-image: url('../../images/common/upload.gif');
+                        background-position: cetner;
+                        background-repeat: no-repeat;
+                    }
+                }
+            }
+        }
+    }
+    .right-column {
+        float: left;
+        width: 200px;
+
+        &>.menu {
+            &>.item {
+                position: relative;
+                color: @link_color;
+                cursor: pointer;
+                height: 30px;
+                padding: 5px 10px;
+                margin-bottom: 1px;
+
+                &>.photo {
+                    position: absolute;
+                    overflow: hidden;
+                    top: 5px;
+                    left: 5px;
+                    width: 30px;
+                    height: 30px;
+
+                    img {
+                        max-width: 30px;
+                    }
+                }
+                &>.content {
+                    &>.text {}
+                    &>.description {
+                        color: #999;
+                        font-size: .9em;
+                    }
+                    &>.counter {
+                        font-weight: bold;
+                        margin: 0 .5em;
+                    }
+                }
+                &.my {
+                    line-height: 30px;
+                }
+                &.public {
+                    line-height: 30px;
+                }
+                &.user, &.public {
+                    &>.content {
+                        margin-left: 35px;
+
+                        &>.counter {
+                            position: absolute;
+                            top: 50%;
+                            right: 0;
+                            height: 1.8em;
+                            line-height: 1.8em;
+                            margin-top: -.9em;
+                            padding: 0 4px;
+                            background-color: #D5DDE5;
+                            border-radius: 3px;
+                        }
+                    }
+                }
+
+                &.selected,
+                &:hover {
+                    background-color: @hover_bg;
+                }
+                &.selected {
+                    font-weight: bold;
+                }
+            }
         }
     }
 }

@@ -33,17 +33,20 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.css',
+        'css://app/main.css',
     ),
     AssetHelper::IE7 => array(),
 );
 
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
-    'js://common/less-1.3.0.min.js',
+    'js://common/jquery.easydate-0.2.4.js',
     'js://app/main.js',
+    'js://app/events.js',
 );
 
 CssHelper::Init(false);
+LessHelper::Init(false);
 JsHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);
@@ -71,9 +74,8 @@ if(!empty($jsFilesAdds)) {
     <? } ?>
     <link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
-    <link rel="stylesheet/less" type="text/css" href="http://openapi.lc/shared/css/app/main.css">
+    <script src="http://vk.com/js/api/xd_connection.js" type="text/javascript"></script>
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>
