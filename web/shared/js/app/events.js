@@ -2,6 +2,7 @@
  * Events
  */
 var Events = {
+    delay: 200,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -17,7 +18,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if(window.console && console.log) {
+                if (window.console && console.log) {
                     console.log(e);
                 }
             }
@@ -51,8 +52,7 @@ var Eventlist = {
         var params = $.extend({
             postId: null,
             offset: null,
-            limit: null,
-            filter: null
+            limit: null
         }, options);
 
         callback(true);

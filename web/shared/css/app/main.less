@@ -104,6 +104,7 @@ html, body {
 
                     .opacity(.5);
 
+                    &.active,
                     &:hover {
                         .opacity(1);
                     }
@@ -265,6 +266,11 @@ html, body {
                                             background-color: @hover_bg;
                                         }
                                     }
+                                    &.load {
+                                        background-image: url('../../images/common/upload.gif');
+                                        background-position: center;
+                                        background-repeat: no-repeat;
+                                    }
                                 }
                                 &>.comment {
                                     position: relative;
@@ -363,7 +369,7 @@ html, body {
                     }
                     &.load {
                         background-image: url('../../images/common/upload.gif');
-                        background-position: cetner;
+                        background-position: center;
                         background-repeat: no-repeat;
                     }
                 }
@@ -439,5 +445,13 @@ html, body {
                 }
             }
         }
+    }
+}
+
+.ui-dropdown-menu {
+    position: absolute;
+    background-color: #fff;
+
+    .ui-dropdown-menu-item {
     }
 }

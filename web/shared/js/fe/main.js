@@ -1554,13 +1554,6 @@ var Events = {
                     f.call(context, argument);
                 }
             }
-        },
-
-        menu: function() {
-            return this.each(function() {
-                return 123;
-//                return $(this).data('menu');
-            });
         }
     };
 
