@@ -62,7 +62,7 @@
         protected function validate( $object ) {
             $errors = parent::$factory->Validate( $object );
 
-            if (!empty($object->externalId)) {
+            if (!empty($object->externalId) && ($object->externalId != '-')) {
                 $duplicates = SourceFeedFactory::Count(
                     array('externalId' => $object->externalId),
                     array(BaseFactory::WithoutDisabled => false, BaseFactory::CustomSql => ' and "sourceFeedId" != ' . PgSqlConvert::ToString((int)$object->sourceFeedId))
