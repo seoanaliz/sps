@@ -24,6 +24,9 @@
         /**
          * Set Foreign Lists
          */
-        protected function setForeignLists() {}
+        protected function setForeignLists() {
+            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
+            Response::setArray( 'targetFeeds', $targetFeeds );
+        }
     }
 ?>

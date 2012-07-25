@@ -9,6 +9,7 @@
             , LocaleLoader::Translate( "vt.author.firstName" )
             , LocaleLoader::Translate( "vt.author.lastName" )
             , LocaleLoader::Translate( "vt.author.avatar" )
+            , LocaleLoader::Translate( "vt.sourceFeed.targetFeedIds" )
             , LocaleLoader::Translate( "vt.author.statusId" )
         )
         , "colspans"	=> array()
@@ -69,10 +70,34 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td>{$object.vkId}</td>
-                <td>{$object.firstName}</td>
-                <td>{$object.lastName}</td>
+                <td class="header">
+                    <a href="http://vk.com/id{form:$object.vkId}" target="_blank">http://vk.com/id{form:$object.vkId}</a>
+                </td>
+                <td>{form:$object.firstName}</td>
+                <td>{form:$object.lastName}</td>
                 <td>{$object.avatar}</td>
+                <td class="left">
+                    <?
+                    $targetFeedIds = explode(',', $object->targetFeedIds);
+                    $objectFeeds = array();
+                    foreach ($targetFeedIds as $targetFeedId) {
+                        if (!empty($targetFeeds[$targetFeedId])) {
+                            $objectFeeds[] = $targetFeeds[$targetFeedId];
+                        }
+                    }
+
+                    if (!empty($objectFeeds)) {
+                        $links = array_map(function($val){
+                            return "<a href='http://vk.com/public$val->externalId' target='_blank'>$val->title</a>";
+                        }, $objectFeeds);
+
+                        $links = implode(', ', $links);
+                        echo $links;
+                    } else {
+                        ?><span class="status red" title="Нет">Нет</span><?
+                    }
+                    ?>
+                </td>
                 <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
