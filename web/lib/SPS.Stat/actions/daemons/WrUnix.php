@@ -1,30 +1,30 @@
 <?php
 header("Content-Type: text/html; charset=utf-8");
 
-set_time_limit(0);
+set_time_limit(600);
+
+
 
 class WrUnix extends wrapper
 {
 
     const TESTING = true;
-    const WORK_TABLE = 'temp_res_uniq';
+    const TEMP_TABLE = 'temp_res_uniq';
 
     private $ids;
     private $ununiq_id_count ;
 
     public function Execute()
     {
-        $this->ids = $this->get_publics();
+        $this->get_publics();
         $this->trunk();
         foreach($this->ids as $id) {
             $this->get_users($id[0]);
         }
+
         $this->find_unix();
-        echo $this->ununiq_id_count;
 
     }
-
-
 
     private function get_users($id)
     {
@@ -32,6 +32,7 @@ class WrUnix extends wrapper
             echo $id . '<br>';
 
         $offset = 0;
+
         //собираем id юзеров паблика
         while (1) {
 
@@ -41,13 +42,14 @@ class WrUnix extends wrapper
                                   );
 
             $result = $this->vk_api_wrap('groups.getMembers',$query_params);
-
+            print_r($result);
+            die();
             if (count($result->users) == 0) break;
 
             $values = implode('),(', $result->users);
             $values = '(' . $values . ')';
 
-            $query = "INSERT INTO " . self::WORK_TABLE . " (id) VALUES $values";
+            $query = "INSERT INTO " . self::TEMP_TABLE . " (id) VALUES $values";
             $this->db_wrap('query', $query);
 
             $offset += 1000;
@@ -62,10 +64,10 @@ class WrUnix extends wrapper
 
     }
 
-    private function trunk($table = 'temp_res_uniq')
+    private function trunk()
     {
-        $query = 'TRUNCATE TABLE ' .  $table;
-        wrapper::db_wrap('query',$query);
+        $query = 'TRUNCATE TABLE ' .  TEMP_TABLE;
+
     }
 
     public function find_unix()
