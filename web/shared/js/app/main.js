@@ -8,16 +8,31 @@ var VK = VK || {
     api: function(name, p, cb) {}
 };
 
+$(document).ready(function() {
+    VK.init(function() {
+        var apiResult = getURLParameter('api_result');
+        var obj = window.JSON && JSON.parse(apiResult) || $.parseJSON(apiResult);
+    });
+
+    app.init();
+});
+
 var app = (function () {
     var isInitialized = false;
+    var $leftColumn;
+    var $rightColumn;
     var $wall;
+    var $menu;
     var $newPost;
     var $loadMore;
 
-    function init(apiResult) {
+    function init() {
         if (isInitialized) return;
 
+        $leftColumn = $('#left-column');
+        $rightColumn = $('#right-column');
         $wall = $('#wall');
+        $menu = $('#menu');
         $newPost = $('.new-post', $wall);
         $loadMore = $('#wall-show-more', $wall);
 
@@ -27,11 +42,12 @@ var app = (function () {
     }
 
     function _initEvents() {
+        /*Window*/
         (function() {
             var b = $loadMore, w = $(window);
 
             b.click(function() {
-                showMore();
+                if (!b.hasClass('load')) showMore();
             });
 
             VK.callMethod('scrollSubscribe');
@@ -79,6 +95,7 @@ var app = (function () {
             }
         });
 
+        /*Left column*/
         $wall.find('.date').easydate({
             date_parse: function(date) {
                 if (!date) return;
@@ -92,10 +109,11 @@ var app = (function () {
                 return date.toLocaleDateString();
             }
         });
-
         $wall.find('> .title > .dropdown').dropdown({
             position: 'right',
+            width: 'auto',
             data: [
+                {title: 'где меню блять', type : 'new'},
                 {title: 'новые записи', type : 'new'},
                 {title: 'старые записи', type : 'old'},
                 {title: 'лучшие записи', type : 'best'}
@@ -114,6 +132,15 @@ var app = (function () {
         $newPost.find('.send').bind('click', function() {
             _wallPost(this);
         });
+        $wall.delegate('.post > .delete', 'click', function() {
+            var $target = $(this);
+            var $post = $target.closest('.post');
+            var postId = $post.data('id');
+            Events.fire('wall_delete', postId, function() {
+                //todo: восстановление сообщения
+                $post.remove();
+            });
+        });
 
         $wall.delegate('.new-comment textarea', 'focus', function() {
             $(this).autoResize();
@@ -128,7 +155,16 @@ var app = (function () {
         $wall.delegate('.new-comment .send', 'click', function() {
             _commentPost(this);
         });
-        $wall.delegate('.comments .show-more:not(.hide)', 'click', function() {
+        $wall.delegate('.comment > .delete', 'click', function() {
+            var $target = $(this);
+            var $comment = $target.closest('.comment');
+            var commentId = $comment.data('id');
+            Events.fire('comment_delete', commentId, function() {
+                //todo: восстановление сообщения
+                $comment.remove();
+            });
+        });
+        $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {
             var $target = $(this);
             var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
@@ -138,7 +174,7 @@ var app = (function () {
                 $target.removeClass('load').html(tmpText);
             });
         });
-        $wall.delegate('.comments .show-more.hide', 'click', function() {
+        $wall.delegate('.comments .show-more.hide:not(.load)', 'click', function() {
             var $target = $(this);
             var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
@@ -147,18 +183,28 @@ var app = (function () {
             Events.fire('comment_load', {}, function() {
                 $target.removeClass('load').html(tmpText);
             });
+        });
+
+        /*Right column*/
+        $menu.delegate('.item', 'click', function() {
+            //todo: выбор паблика
+            console.log('Select!');
         });
     }
 
     function _wallPost(target) {
         var $target = $(target);
         var $post = $target.closest('.new-post');
-        var $button = $post.find('.send');
+        var $button = $post.find('.send:not(.load)');
         var $textarea = $post.find('textarea');
         if (!$textarea.val()) {
             $textarea.focus();
         } else {
             $button.addClass('load');
+            Events.fire('wall_post', {text: $textarea.val()}, function() {
+                $button.removeClass('load');
+                $textarea.val('');
+            });
         }
     }
 
@@ -166,15 +212,17 @@ var app = (function () {
         var $target = $(target);
         var $comment = $target.closest('.new-comment');
         var $textarea = $comment.find('textarea');
-        var $button = $comment.find('.send');
-        var $post = $comment.closest('.comment');
+        var $button = $comment.find('.send:not(.load)');
+        var $post = $comment.closest('.post');
         var postId = $post.data('id');
         if (!$textarea.val()) {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('comment_post', postId, $textarea.val(), function() {
+            Events.fire('comment_post', postId, $textarea.val(), function(data) {
                 $button.removeClass('load');
+                $textarea.val('');
+                //todo: data должна быть последними комментами
             });
         }
     }
@@ -197,15 +245,6 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
-
-$(document).ready(function() {
-    VK.init(function() {
-        var apiResult = getURLParameter('api_result');
-        var obj = window.JSON && JSON.parse(apiResult) || $.parseJSON(apiResult);
-
-        app.init(obj);
-    });
-});
 
 // Парсинг URL
 function getURLParameter(name) {
@@ -281,7 +320,9 @@ function getURLParameter(name) {
                 $el.data(p.dataKey, $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
                 $(p.data).each(function(i, item) {
                     var $item = $('<div>' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
-                    $item.data('id', item.id);
+                    if (item.id) {
+                        $item.data('id', item.id);
+                    }
                     if (item.icon) {
                         var $icon = $('<div><img src="' + item.icon + '" /></div>');
                         $item.append($icon);

@@ -46,7 +46,9 @@ var Eventlist = {
 
         callback(true);
     },
-    wall_delete: function(postId, callback) {},
+    wall_delete: function(postId, callback) {
+        callback(true);
+    },
 
     comment_load: function(options, callback) {
         var params = $.extend({

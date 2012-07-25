@@ -1,4 +1,5 @@
 <div class="comment" data-id="1">
+    <div class="delete"></div>
     <div class="photo">
         <a target="_blank" href="http://vk.com/id">
             <img src="http://vk.cc/Q2PuP" alt="" />
