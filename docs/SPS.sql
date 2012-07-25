@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		11.07.2012
+Modified		25.07.2012
 Project		
 Model			
 Company		
@@ -310,6 +310,19 @@ Create table "gridLineItems"
 ) Without Oids;
 
 
+Create table "authors"
+(
+	"authorId" Serial NOT NULL,
+	"vkId" Integer NOT NULL UNIQUE,
+	"firstName" Varchar(1000),
+	"lastName" Varchar(1000),
+	"avatar" Varchar(1000),
+	"targetFeedIds" Text,
+	"statusId" Integer NOT NULL,
+ primary key ("authorId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -350,6 +363,8 @@ Create index "IX_FK_targetFeedsStatusId_targetFeeds" on "targetFeeds" ("statusId
 Alter table "targetFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_publishersStatusId_publishers" on "publishers" ("statusId");
 Alter table "publishers" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_authorsStatusId_authors" on "authors" ("statusId");
+Alter table "authors" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
 Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");

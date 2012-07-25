@@ -39,6 +39,10 @@
                 )
             )
         )
+        , "authors" => array(
+            "title"  => "vt.menu.authors"
+            , "link" => "vt://authors/"
+        )
         , "meta-details" => array(
             "title"  => "vt.menu.metaDetails"
             , "link" => "vt://meta-details/"

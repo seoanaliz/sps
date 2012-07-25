@@ -314,6 +314,26 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
+
+                <pageGroup name="SPS.App">
+                    <pageGroup name="author">
+                        <page uri="vt://authors/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.App.GetAuthorList, SPS.Common.SetAuthorsMenu</actions>
+                            <template>tmpl://vt/authors/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://authors/add">
+                            <actions>SPS.App.SaveAuthor</actions>
+                            <template>tmpl://vt/authors/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://authors/delete/([0-9]+)">
+                            <actions>SPS.App.DeleteAuthor</actions>
+                        </page>
+                        <page uri="vt://authors/edit/([0-9]+)">
+                            <actions>SPS.App.SaveAuthor</actions>
+                            <template>tmpl://vt/authors/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                </pageGroup>
 				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">

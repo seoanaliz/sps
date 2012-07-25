@@ -209,6 +209,11 @@
                 <addTitle><![CDATA[Добавление события]]></addTitle>
                 <editTitle><![CDATA[Редактирование события]]></editTitle>
             </auditEvent>
+            <author>
+                <list><![CDATA[Список авторов]]></list>
+                <addTitle><![CDATA[Добавление автора]]></addTitle>
+                <editTitle><![CDATA[Редактирование автора]]></editTitle>
+            </author>
         </screens>
         <vfs>
             <queue>
@@ -247,6 +252,7 @@
             <targetFeeds><![CDATA[Ленты отправки]]></targetFeeds>
             <articlesQueue><![CDATA[Очередь]]></articlesQueue>
             <publishers><![CDATA[Издатели]]></publishers>
+            <authors><![CDATA[Авторы]]></authors>
         </menu>
         <metaDetail>
             <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
@@ -325,6 +331,8 @@
             <vkIds><![CDATA[VkId редакторов]]></vkIds>
             <publishers><![CDATA[Издатели]]></publishers>
             <token><![CDATA[Token]]></token>
+            <type><![CDATA[Тип]]></type>
+            <params><![CDATA[params]]></params>
         </targetFeed>
         <article>
             <deleteString><![CDATA[Вы действительно хотите удалить статью?]]></deleteString>
@@ -335,6 +343,7 @@
             <recordInfo><![CDATA[Данные статьи]]></recordInfo>
             <statusId><![CDATA[Статус]]></statusId>
             <externalId><![CDATA[externalId]]></externalId>
+            <rate><![CDATA[rate]]></rate>
         </article>
         <articleQueue>
             <deleteString><![CDATA[Вы действительно хотите удалить очередь?]]></deleteString>
@@ -349,6 +358,8 @@
             <author><![CDATA[Автор]]></author>
             <externalLikes><![CDATA[Получено лайков]]></externalLikes>
             <externalRetweets><![CDATA[Получено ретвитов]]></externalRetweets>
+            <type><![CDATA[Тип]]></type>
+            <externalId><![CDATA[externalId]]></externalId>
         </articleQueue>
         <articleRecord>
             <content><![CDATA[Содержание]]></content>
@@ -383,6 +394,16 @@
             <message><![CDATA[Сообщение]]></message>
             <createdAt><![CDATA[Дата создания]]></createdAt>
         </auditEvent>
+        <author>
+            <deleteString><![CDATA[Вы действительно хотите удалить автора?]]></deleteString>
+            <header><![CDATA[авторы]]></header>
+            <vkId><![CDATA[Vk Id]]></vkId>
+            <firstName><![CDATA[Имя]]></firstName>
+            <lastName><![CDATA[Фамилия]]></lastName>
+            <avatar><![CDATA[Аватар]]></avatar>
+            <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
+            <statusId><![CDATA[Статус]]></statusId>
+        </author>
     </vt>
     <objects>
         <siteParam>
@@ -469,5 +490,12 @@
             <singleGenitive><![CDATA[события]]></singleGenitive>
             <singleAccusative><![CDATA[событие]]></singleAccusative>
         </auditEvent>
+        <author>
+            <single><![CDATA[автор]]></single>
+            <plural><![CDATA[авторы]]></plural>
+            <pluralGenitive><![CDATA[авторов]]></pluralGenitive>
+            <singleGenitive><![CDATA[автора]]></singleGenitive>
+            <singleAccusative><![CDATA[автора]]></singleAccusative>
+        </author>
     </objects>
 </language>

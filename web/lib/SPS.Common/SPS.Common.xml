@@ -258,5 +258,13 @@
                 </response>
             </parameters>
         </action>
+        <action name="SetAuthorsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"authors"</param>
+                </response>
+            </parameters>
+        </action>
     </group>
 </actions>
