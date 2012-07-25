@@ -81,7 +81,7 @@
                 <td class="header">{$object.title}</td>
                 <td>
                     <? if ($object->type == SourceFeedUtility::Source) { ?>
-                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}
+                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</a>
                     <? } ?>
                 </td>
                 <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>

@@ -3,3 +3,5 @@
 /web/shared/temp/
 /media/
 SPS.~m2
+/docs/rebuild-database-from-dump.bat
+/docs/Dump/
