@@ -30,8 +30,7 @@ var Eventlist = {
     wall_load: function(options, callback) {
         var params = $.extend({
             publicId: null,
-            offset: null,
-            limit: null,
+            clear: null,
             filter: null
         }, options);
 

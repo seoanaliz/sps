@@ -22,6 +22,7 @@ var app = (function () {
     var $leftColumn;
     var $rightColumn;
     var $wall;
+    var $wallList;
     var $menu;
     var $newPost;
     var $loadMore;
@@ -32,11 +33,13 @@ var app = (function () {
         $leftColumn = $('#left-column');
         $rightColumn = $('#right-column');
         $wall = $('#wall');
+        $wallList = $('> .list', $wall);
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
         $loadMore = $('#wall-show-more', $wall);
 
         _initEvents();
+        pageLoad();
 
         isInitialized = true;
     }
@@ -187,8 +190,8 @@ var app = (function () {
 
         /*Right column*/
         $menu.delegate('.item', 'click', function() {
-            //todo: выбор паблика
-            console.log('Select!');
+            var $item = $(this);
+            pageLoad($item.data('id'));
         });
     }
 
@@ -230,8 +233,28 @@ var app = (function () {
     function showMore() {
         var tmpText = $loadMore.text();
         $loadMore.addClass('load').html('&nbsp;');
-        Events.fire('wall_load', {}, function() {
+        Events.fire('wall_load', {clear: false}, function(data) {
             $loadMore.removeClass('load').html(tmpText);
+            //$wallList.append(data);
+        });
+    }
+
+    function pageLoad(id) {
+        Events.fire('wall_load', {clear: true}, function(data) {
+            var $targetItem = $menu.find('.item[data-id="' + id + '"]');
+            var $targetList = $targetItem.next('.list');
+            var $selectedItem = $menu.find('.item.selected').not($targetItem);
+            var $selectedList = $menu.find('.list.selected');
+
+            $targetItem.addClass('selected');
+            $targetList.addClass('selected').slideDown(100);
+
+            $selectedItem.removeClass('selected');
+            if ($selectedList[0] && $selectedList[0] != $targetItem.closest('.list')[0]) {
+                $selectedList.removeClass('selected').slideUp(100);
+            }
+
+            //$wallList.html(data);
         });
     }
 
