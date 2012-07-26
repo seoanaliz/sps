@@ -104,8 +104,13 @@
         </group>
     </group>
 
-	<!-- Put your's frontend actions here -->
     <group name="Site">
         <action name="GetIndexPage" />
+    </group>
+
+    <group name="AppSite">
+        <action name="GetAppIndexPage">
+            <path>app/GetAppIndexPage</path>
+        </action>
     </group>
 </actions>

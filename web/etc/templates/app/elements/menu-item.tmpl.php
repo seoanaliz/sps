@@ -1,9 +1,13 @@
+<?
+    /** @var $targetFeed TargetFeed */
+    /** @var $targetInfo array */
+?>
 <div class="item public">
-    <div class="photo"><img src="http://vk.cc/Q3gWv" alt="" /></div>
+    <div class="photo"><img src="<?= $targetInfo[$targetFeed->targetFeedId]['img'] ?>" alt="" /></div>
     <div class="content">
-        <div class="text">Travels</div>
+        <div class="text">{$targetFeed->title}</div>
         <? if ($counter) { ?>
-        <span class="counter">+11</span>
+        <span class="counter">+{$counter}</span>
         <? } ?>
     </div>
 </div>
