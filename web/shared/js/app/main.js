@@ -39,7 +39,7 @@ var app = (function () {
         $loadMore = $('#wall-show-more', $wall);
 
         _initEvents();
-        pageLoad();
+        pageLoad($menu.find('.item.selected').data('id'));
 
         isInitialized = true;
     }
@@ -240,7 +240,7 @@ var app = (function () {
     }
 
     function pageLoad(id) {
-        Events.fire('wall_load', {clear: true}, function(data) {
+        Events.fire('wall_load', {clear: true, type: id}, function(data) {
             var $targetItem = $menu.find('.item[data-id="' + id + '"]');
             var $targetList = $targetItem.next('.list');
             var $selectedItem = $menu.find('.item.selected').not($targetItem);

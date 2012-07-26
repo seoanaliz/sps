@@ -29,7 +29,7 @@ var Events = {
 var Eventlist = {
     wall_load: function(options, callback) {
         var params = $.extend({
-            publicId: null,
+            type: null,
             clear: null,
             filter: null
         }, options);
