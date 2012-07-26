@@ -15,9 +15,12 @@
 
         const Ads = 'ads';
 
+        const Authors = 'authors';
+
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
+            self::Authors => 'Авторские',
         );
 
         public static function IsTopFeed(SourceFeed $sourceFeed) {

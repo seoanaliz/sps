@@ -8,7 +8,7 @@
 
         $extLinkLoader  = false;
 
-        if (SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
+        if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
             $extLinkLoader = true;
         }
 ?>

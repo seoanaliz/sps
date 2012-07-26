@@ -18,8 +18,9 @@
             $from = Request::getInteger( 'from' );
             $to = Request::getInteger( 'to' );
             $sortType = Request::getString( 'sortType' );
+            $type = Request::getString( 'type' );
 
-            if(empty($sourceFeedIds)) {
+            if (empty($sourceFeedIds) && ($type != SourceFeedUtility::Authors)) {
                 return;
             }
 
@@ -50,6 +51,19 @@
                 $options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
             }
 
+            //авторские посты
+            if ($type == SourceFeedUtility::Authors) {
+                $targetFeedId = Request::getInteger( 'targetFeedId' );
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                    return;
+                }
+
+                $search['rateGE'] = null;
+                $search['rateLE'] = null;
+                $search['sourceFeedId'] = -1;
+                $search['targetFeedId'] = $targetFeedId;
+            }
+
             $articles = ArticleFactory::Get( $search, $options );
             $articlesCount = ArticleFactory::Count( $search, array(BaseFactory::WithoutPages => true) );
 
@@ -72,7 +86,11 @@
                 Session::setInteger('page', $page+1);
             }
 
-            $sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $sourceFeedIds));
+            if (!empty($sourceFeedIds)) {
+                $sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $sourceFeedIds));
+            } else {
+                $sourceFeeds = array();
+            }
 
             Response::setArray( 'articles', $articles );
             Response::setArray( 'articleRecords', $articleRecords );

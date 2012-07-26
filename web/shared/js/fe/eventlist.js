@@ -85,7 +85,9 @@ function loadArticles(clean) {
                 clean: clean,
                 from : from,
                 to : to,
-                sortType : sortType
+                sortType : sortType,
+                type: Elements.leftType(),
+                targetFeedId: Elements.rightdd()
             }
         })
         .always(function() {
@@ -272,7 +274,7 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
-        if (sourceType == 'ads') {
+        if (sourceType != 'source') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list a').hide();

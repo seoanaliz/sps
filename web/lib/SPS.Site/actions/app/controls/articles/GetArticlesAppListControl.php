@@ -100,6 +100,8 @@
                     $this->search['authorId'] = $author->authorId;
                     break;
             }
+
+            $this->options[BaseFactory::WithoutDisabled] = false;
         }
 
         private function getObjects() {
