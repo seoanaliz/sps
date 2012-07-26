@@ -113,4 +113,12 @@
             <path>app/GetAppIndexPage</path>
         </action>
     </group>
+
+    <group name="AppControls">
+        <group name="Articles">
+            <action name="SaveArticleAppControl">
+                <path>app/controls/articles/SaveArticleAppControl</path>
+            </action>
+        </group>
+    </group>
 </actions>

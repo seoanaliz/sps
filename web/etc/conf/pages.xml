@@ -416,6 +416,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="appControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuthSilent">
+                <page uri="appControls://article-save/">
+                    <actions>SPS.Site.SaveArticleAppControl</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

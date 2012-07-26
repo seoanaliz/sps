@@ -44,7 +44,19 @@ var Eventlist = {
             photos: null
         }, options);
 
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'article-save/',
+            type: 'POST',
+            dataType : "json",
+            data: params,
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
     },
     wall_delete: function(postId, callback) {
         callback(true);
