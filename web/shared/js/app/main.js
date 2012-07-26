@@ -23,9 +23,9 @@ var app = (function () {
     var $rightColumn;
     var $wall;
     var $wallList;
+    var $loadMore;
     var $menu;
     var $newPost;
-    var $loadMore;
 
     function init() {
         if (isInitialized) return;
@@ -42,24 +42,21 @@ var app = (function () {
         $rightColumn = $('#right-column');
         $wall = $('#wall');
         $wallList = $('> .list', $wall);
+        $loadMore = $('> .show-more', $wallList);
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
-        $loadMore = $('#wall-show-more', $wall);
     }
 
     function _initEvents() {
         /*Window*/
         (function() {
-            var b = $loadMore, w = $(window);
-
-            b.click(function() {
-                if (!b.hasClass('load')) showMore();
-            });
+            var w = $(window);
 
             VK.callMethod('scrollSubscribe');
             VK.addCallback('onScroll', function(scrollTop) {
-                if (b.is(':visible') && scrollTop + screen.availHeight > (b.offset().top)) {
-                    b.click();
+                _updateItems();
+                if ($loadMore.is(':visible') && scrollTop + screen.availHeight > (b.offset().top)) {
+                    $loadMore.click();
                 }
             });
         })();
@@ -138,6 +135,7 @@ var app = (function () {
         $newPost.find('.send').bind('click', function() {
             _wallPost(this);
         });
+
         $wall.delegate('.post > .delete', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
@@ -147,7 +145,9 @@ var app = (function () {
                 $post.remove();
             });
         });
-
+        $wall.delegate('#wall > .list > .show-more', 'click', function() {
+            showMore();
+        });
         $wall.delegate('.new-comment textarea', 'focus', function() {
             $(this).autoResize();
             var $newComment = $(this).closest('.new-comment');
@@ -234,20 +234,22 @@ var app = (function () {
     }
 
     function showMore() {
+        _updateItems();
+
         var tmpText = $loadMore.text();
+
+        if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
         Events.fire('wall_load', {clear: false}, function(data) {
-            _updateItems();
-
             $loadMore.removeClass('load').html(tmpText);
             $wallList.append(data);
         });
     }
 
     function pageLoad(id) {
-        Events.fire('wall_load', {clear: true, type: id}, function(data) {
-            _updateItems();
+        _updateItems();
 
+        Events.fire('wall_load', {clear: true, type: id}, function(data) {
             var $targetItem = $menu.find('.item[data-id="' + id + '"]');
             var $targetList = $targetItem.next('.list');
             var $selectedItem = $menu.find('.item.selected').not($targetItem);
