@@ -21,7 +21,7 @@
     <div id="page-0" class="tab-page rows">
         <div data-row="vkId" class="row required">
             <label>{lang:vt.author.vkId}</label>
-            <?= FormHelper::FormInput( $prefix . '[vkId]', $object->vkId, 'vkId', null, array( 'size' => 80 ) ); ?>
+            <?= FormHelper::FormInput( 'vkId', $object->vkId, 'vkId', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="targetFeedIds" class="row">
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>

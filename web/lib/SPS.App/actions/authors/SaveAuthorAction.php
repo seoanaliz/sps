@@ -38,6 +38,13 @@
                 $object->authorId = $originalObject->authorId;
             }
 
+            //parse id from input
+            $vkId = Request::getString( 'vkId' );
+            preg_match('/\d+/im', $vkId, $matches);
+            if (!empty($matches)) {
+                $object->vkId = current($matches);
+            }
+
             $targetFeedIds = Request::getArray( 'targetFeedIds' );
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
             $object->targetFeedIds = implode(',', $targetFeedIds);
