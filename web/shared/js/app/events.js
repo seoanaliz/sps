@@ -2,7 +2,7 @@
  * Events
  */
 var Events = {
-    delay: 200,
+    delay: 0,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -34,7 +34,14 @@ var Eventlist = {
             filter: null
         }, options);
 
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'articles-list/',
+            dataType : "html",
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     wall_post: function(options, callback) {
         var params = $.extend({

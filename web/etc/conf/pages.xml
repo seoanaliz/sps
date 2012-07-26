@@ -420,6 +420,10 @@
                 <page uri="appControls://article-save/">
                     <actions>SPS.Site.SaveArticleAppControl</actions>
                 </page>
+                <page uri="appControls://articles-list/">
+                    <actions>SPS.Site.GetArticlesAppListControl</actions>
+                    <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

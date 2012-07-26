@@ -235,7 +235,7 @@ var app = (function () {
         $loadMore.addClass('load').html('&nbsp;');
         Events.fire('wall_load', {clear: false}, function(data) {
             $loadMore.removeClass('load').html(tmpText);
-            //$wallList.append(data);
+            $wallList.append(data);
         });
     }
 
@@ -254,7 +254,7 @@ var app = (function () {
                 $selectedList.removeClass('selected').slideUp(100);
             }
 
-            //$wallList.html(data);
+            $wallList.html(data);
         });
     }
 
