@@ -249,17 +249,19 @@ var app = (function () {
     function pageLoad(id) {
 
         Events.fire('wall_load', {clear: true, type: id}, function(data) {
-            var $targetItem = $menu.find('.item[data-id="' + id + '"]');
-            var $targetList = $targetItem.next('.list');
-            var $selectedItem = $menu.find('.item.selected').not($targetItem);
-            var $selectedList = $menu.find('.list.selected');
+            if (id) {
+                var $targetItem = $menu.find('.item[data-id="' + id + '"]');
+                var $targetList = $targetItem.next('.list');
+                var $selectedItem = $menu.find('.item.selected').not($targetItem);
+                var $selectedList = $menu.find('.list.selected');
 
-            $targetItem.addClass('selected');
-            $targetList.addClass('selected').slideDown(100);
+                $targetItem.addClass('selected');
+                $targetList.addClass('selected').slideDown(100);
 
-            $selectedItem.removeClass('selected');
-            if ($selectedList[0] && $selectedList[0] != $targetItem.closest('.list')[0]) {
-                $selectedList.removeClass('selected').slideUp(100);
+                $selectedItem.removeClass('selected');
+                if ($selectedList[0] && $selectedList[0] != $targetItem.closest('.list')[0]) {
+                    $selectedList.removeClass('selected').slideUp(100);
+                }
             }
 
             $wallList.html(data);
