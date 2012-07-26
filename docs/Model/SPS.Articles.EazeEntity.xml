@@ -375,6 +375,14 @@
           <AttributeParameter Key="controlId" Value="rate" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.article.authorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -443,6 +451,14 @@
           <AttributeParameter Key="value" Value="rate" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="rate" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.article.authorId" TitleValue="authorId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

@@ -58,6 +58,10 @@
                 $object->articleId = $originalObject->articleId;
             }
 
+            if (empty($object->sourceFeedId)) {
+                $object->sourceFeedId = -1;
+            }
+
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
             $this->articleRecord->articleQueueId    = null; //NB
             $this->articleRecord->articleRecordId   = null; //NB
@@ -109,6 +113,10 @@
                 foreach( $articleRecordErrors['fields'] as $key => $value ) {
                     $errors['fields'][$key] = $value;
                 }
+            }
+
+            if ($object->sourceFeedId == -1 && empty($object->authorId)) {
+                $errors['fields']['authorId']['null'] = 'null';
             }
             
             return $errors;
@@ -181,8 +189,7 @@
          * Set Foreign Lists
          */
         protected function setForeignLists() {
-            $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            Response::setArray( "sourceFeeds", $sourceFeeds );
+            Response::setArray( "sourceFeeds", SourceFeedUtility::GetAll() );
 
             /*
             * Creating new ArticleRecord object or select existing
