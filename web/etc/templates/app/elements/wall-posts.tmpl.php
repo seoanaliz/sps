@@ -14,6 +14,6 @@
         </div>
     </div>
     <div class="list">
-        {increal:tmpl://app/elements/wall-posts-list.tmpl.php}
+
     </div>
 </div>
