@@ -30,7 +30,9 @@
             }
 
             // определяем паблики, к которым у чувака есть доступ вообще
-            $targetFeedIds = explode(',', $author->targetFeedIds);
+            if (!empty($author->targetFeedIds)) {
+                $targetFeedIds = explode(',', $author->targetFeedIds);
+            }
             if (empty($targetFeedIds)) {
                 $targetFeedIds = array(-1 => -1); //это важно для дальнейших запросов к базе
             }
