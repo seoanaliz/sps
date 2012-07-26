@@ -12,7 +12,7 @@
         public function Execute() {
             $api_id     = Request::getInteger('api_id');
             $viewer_id  = Request::getInteger('viewer_id');
-            $secret     = 'X1zsnZdfoL1ywzRODpEg';
+            $secret     = AuthVkontakte::$AuthSecret;
             $auth_key   = Request::getString('auth_key');
             $auth_key_trust = md5($api_id . '_' . $viewer_id . '_' . $secret);
 

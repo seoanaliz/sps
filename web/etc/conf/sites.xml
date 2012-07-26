@@ -40,6 +40,7 @@
                 <vkapi class="AuthVkontakte">
                     <param name="appId">1868779</param>
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
+                    <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                 </vkapi>
 			</modules>
 			<databases>
@@ -82,6 +83,7 @@
                         <vkapi class="AuthVkontakte">
                             <param name="appId">2853330</param>
                             <param name="password">1h2pQNcNMw54IwO6kuVi</param>
+                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.mystery.vmkteam.ru</param>
@@ -111,6 +113,7 @@
                         <vkapi class="AuthVkontakte">
                             <param name="appId">2879919</param>
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
+                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps.verumnets.ru</param>

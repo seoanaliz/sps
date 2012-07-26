@@ -5,6 +5,8 @@
 
         public static $Password;
 
+        public static $AuthSecret;
+
         public static function Init( DOMNodeList $params ) {
             foreach ( $params as $param ) {
                 $name   = $param->getAttribute( 'name' );
@@ -12,6 +14,7 @@
 
                 if ($name == 'appId') self::$AppId = $value;
                 if ($name == 'password') self::$Password = $value;
+                if ($name == 'authSecret') self::$AuthSecret = $value;
             }
         }
 
