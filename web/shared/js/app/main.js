@@ -54,7 +54,6 @@ var app = (function () {
 
             VK.callMethod('scrollSubscribe');
             VK.addCallback('onScroll', function(scrollTop) {
-                _updateItems();
                 if ($loadMore.is(':visible') && scrollTop + screen.availHeight > ($loadMore.offset().top)) {
                     $loadMore.click();
                 }
@@ -209,7 +208,8 @@ var app = (function () {
             $button.addClass('load');
             Events.fire('wall_post', {text: $textarea.val()}, function() {
                 $button.removeClass('load');
-                $textarea.val('');
+                $textarea.val('').focus();
+                pageLoad();
             });
         }
     }
@@ -227,14 +227,13 @@ var app = (function () {
             $button.addClass('load');
             Events.fire('comment_post', postId, $textarea.val(), function(data) {
                 $button.removeClass('load');
-                $textarea.val('');
+                $textarea.val('').focus();
                 //todo: data должна быть последними комментами
             });
         }
     }
 
     function showMore() {
-        _updateItems();
 
         var tmpText = $loadMore.text();
 
@@ -243,11 +242,11 @@ var app = (function () {
         Events.fire('wall_load', {clear: false}, function(data) {
             $loadMore.remove();
             $wallList.append(data);
+            _updateItems();
         });
     }
 
     function pageLoad(id) {
-        _updateItems();
 
         Events.fire('wall_load', {clear: true, type: id}, function(data) {
             var $targetItem = $menu.find('.item[data-id="' + id + '"]');
@@ -264,6 +263,7 @@ var app = (function () {
             }
 
             $wallList.html(data);
+            _updateItems();
         });
     }
 
@@ -304,7 +304,7 @@ function getURLParameter(name) {
                         top: -100000
                     })
                 ;
-                $input.bind('keyup', function(e) {
+                $input.bind('keyup focus blur', function(e) {
                     $autoResize.html($input.val().split('\n').join('<br/>.') + '<br/>.');
                     $input.css('height', $autoResize.height());
                 });
