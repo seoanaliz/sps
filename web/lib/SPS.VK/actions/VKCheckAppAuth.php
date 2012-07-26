@@ -20,9 +20,25 @@
                 return 'empty';
             }
 
-            //TODO проверить, имеет ли чувак вообще доступ
+            // ищем чувака в базе
+            $author = AuthorFactory::GetOne(
+                array('vkId' => $viewer_id)
+            );
 
-            Session::setInteger('vk_user_id', $viewer_id);
+            if (empty($author)) {
+                return 'empty';
+            }
+
+            // определяем паблики, к которым у чувака есть доступ вообще
+            $targetFeedIds = explode(',', $author->targetFeedIds);
+            if (empty($targetFeedIds)) {
+                $targetFeedIds = array(-1 => -1); //это важно для дальнейших запросов к базе
+            }
+
+            Response::setObject('__Author', $author);
+            Session::setObject('Author', $author);
+            Session::setInteger('author_id', $viewer_id);
+            Session::setArray('targetFeedIds', $targetFeedIds);
         }
     }
 ?>
