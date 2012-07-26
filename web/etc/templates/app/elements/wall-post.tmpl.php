@@ -1,32 +1,39 @@
 <?
     /** @var $article Article */
     /** @var $articleRecord ArticleRecord */
+    /** @var $author Author */
+    /** @var $targetFeed TargetFeed */
+    /** @var $targetInfo array */
 
     if (!empty($article)) {
 ?>
 
 <div class="post" data-id="{$article->articleId}">
     <div class="delete"></div>
+    <? if (!empty($targetFeed) && !empty($targetInfo[$targetFeed->targetFeedId])) { ?>
     <div class="photo">
-        <a target="_blank" href="http://vk.com/public">
-            <img src="http://vk.cc/Q3gWv" alt="" />
+        <a target="_blank" href="http://vk.com/wall-{$targetFeed->externalId}">
+            <img src="<?= $targetInfo[$targetFeed->targetFeedId]['img'] ?>" alt="" />
         </a>
     </div>
+    <? } ?>
     <div class="content">
         <div class="title">
-            <a target="_blank" href="http://vk.com/public">Travels</a>
+            <a target="_blank" href="http://vk.com/wall-{$targetFeed->externalId}">{form:$targetFeed->title}</a>
         </div>
         <div class="text"><?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?></div>
         <div class="sign clear-fix">
             <div class="user-info">
+                <? if (!empty($author)) { ?>
                 <span class="photo">
-                    <a target="_blank" href="http://vk.com/id">
-                        <img src="http://vk.cc/Q2PuP" alt="" />
+                    <a target="_blank" href="http://vk.com/id{$author->vkId}">
+                        <img src="{$author->avatar}" alt="" />
                     </a>
                 </span>
                 <span class="name">
-                    <a target="_blank" href="http://vk.com/id">Artyom Kohver</a>
+                    <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                 </span>
+                <? } ?>
                 <span class="date">{$article->createdAt->defaultFormat()}</span>
             </div>
             <? if ($likes) { ?>

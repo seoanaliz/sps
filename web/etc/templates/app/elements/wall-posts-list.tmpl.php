@@ -2,9 +2,14 @@
     $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
     /** @var $articles Article[] */
     /** @var $articleRecords ArticleRecord[] */
+    /** @var $authors Author[] */
+    /** @var $targetFeeds TargetFeed[] */
+
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
+            $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
+            $targetFeed     = !empty($targetFeeds[$article->targetFeedId]) ? $targetFeeds[$article->targetFeedId] : null;
             ?>{increal:tmpl://app/elements/wall-post.tmpl.php}<?
         }
     }

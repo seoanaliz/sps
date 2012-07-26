@@ -10,11 +10,6 @@
     class GetArticlesAppListControl {
 
         /**
-         * @var int
-         */
-        private $pageSize = 20;
-
-        /**
          * @var Article[]
          */
         private $articles = array();
@@ -23,6 +18,21 @@
          * @var ArticleRecord[]
          */
         private $articleRecords = array();
+
+        /**
+         * @var TargetFeed[]
+         */
+        private $targetFeeds = array();
+
+        /**
+         * @var Author[]
+         */
+        private $authors = array();
+
+        /**
+         * @var int
+         */
+        private $pageSize = 20;
 
         /**
          * @var int
@@ -93,6 +103,22 @@
             if ($this->hasMore) {
                 Session::setInteger('gaal_page', $this->search['page'] + 1);
             }
+
+            //get articles target feeds with info and authors
+            if (!empty($this->articles)) {
+                $targetFeedIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('targetFeedId'));
+                $authorIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('authorId'));
+
+                if (!empty($targetFeedIds)) {
+                    $this->targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => array_unique($targetFeedIds)));
+                }
+                if (!empty($authorIds)) {
+                    $this->authors = AuthorFactory::Get(
+                        array('_authorId' => array_unique($authorIds)),
+                        array(BaseFactory::WithoutPages => true)
+                    );
+                }
+            }
         }
 
         private function setData() {
@@ -100,6 +126,9 @@
             Response::setArray( 'articleRecords', $this->articleRecords );
             Response::setInteger( 'articlesCount', $this->articlesCount );
             Response::setBoolean( 'hasMore', $this->hasMore );
+            Response::setArray( 'authors', $this->authors );
+            Response::setArray( 'targetFeeds', $this->targetFeeds );
+            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
         }
 
         /**
