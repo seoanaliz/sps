@@ -55,7 +55,7 @@ var app = (function () {
             VK.callMethod('scrollSubscribe');
             VK.addCallback('onScroll', function(scrollTop) {
                 _updateItems();
-                if ($loadMore.is(':visible') && scrollTop + screen.availHeight > (b.offset().top)) {
+                if ($loadMore.is(':visible') && scrollTop + screen.availHeight > ($loadMore.offset().top)) {
                     $loadMore.click();
                 }
             });
@@ -241,7 +241,7 @@ var app = (function () {
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
         Events.fire('wall_load', {clear: false}, function(data) {
-            $loadMore.removeClass('load').html(tmpText);
+            $loadMore.remove();
             $wallList.append(data);
         });
     }
