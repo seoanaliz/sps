@@ -30,6 +30,14 @@ var app = (function () {
     function init() {
         if (isInitialized) return;
 
+        _updateItems();
+        _initEvents();
+        pageLoad($menu.find('.item.selected').data('id'));
+
+        isInitialized = true;
+    }
+
+    function _updateItems() {
         $leftColumn = $('#left-column');
         $rightColumn = $('#right-column');
         $wall = $('#wall');
@@ -37,11 +45,6 @@ var app = (function () {
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
         $loadMore = $('#wall-show-more', $wall);
-
-        _initEvents();
-        pageLoad($menu.find('.item.selected').data('id'));
-
-        isInitialized = true;
     }
 
     function _initEvents() {
@@ -234,6 +237,8 @@ var app = (function () {
         var tmpText = $loadMore.text();
         $loadMore.addClass('load').html('&nbsp;');
         Events.fire('wall_load', {clear: false}, function(data) {
+            _updateItems();
+
             $loadMore.removeClass('load').html(tmpText);
             $wallList.append(data);
         });
@@ -241,6 +246,8 @@ var app = (function () {
 
     function pageLoad(id) {
         Events.fire('wall_load', {clear: true, type: id}, function(data) {
+            _updateItems();
+
             var $targetItem = $menu.find('.item[data-id="' + id + '"]');
             var $targetList = $targetItem.next('.list');
             var $selectedItem = $menu.find('.item.selected').not($targetItem);
