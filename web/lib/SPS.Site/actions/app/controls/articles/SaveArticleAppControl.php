@@ -21,7 +21,7 @@
 
             $text           = trim(Request::getString( 'text' ));
             $photos         = Request::getArray( 'photos' );
-            $targetFeedId   = Request::getInteger( 'publicId' );
+            $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
 
             $targetFeedIds = Session::getArray('targetFeedIds');
 

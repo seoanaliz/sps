@@ -68,14 +68,33 @@
             );
 
             $type = Request::getString('type');
-            if (empty($type)) {
+            if (empty($type) || $type == 'null') {
                 $type = Session::getString('gaal_type');
             }
             Session::setString('gaal_type', $type);
 
+            //все авторские посты
             $this->search['sourceFeedId'] = -1;
 
+            if (substr($type, 0, 1) == 'p') {
+                $targetFeedId   = substr($type, 1, strlen($type) - 1);
+                $targetFeedIds  = Session::getArray('targetFeedIds');
+                if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
+                    $type = 'my';
+                } else {
+                    $type = 'targetFeed';
+                }
+            } else {
+                $type = 'my';
+            }
+
+            Session::setInteger('gaal_targetFeedId', null);
+
             switch ($type) {
+                case 'targetFeed':
+                    $this->search['targetFeedId'] = $targetFeedId;
+                    Session::setInteger('gaal_targetFeedId', $targetFeedId);
+                    break;
                 case 'my':
                 default:
                     $this->search['authorId'] = $author->authorId;
