@@ -63,6 +63,9 @@ if(!empty($jsFilesAdds)) {
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<?= LocaleLoader::$HtmlEncoding ?>" />
+    <script type="text/javascript">
+        var controlsRoot = '{web:appControls://}';
+    </script>
     <title><?=$__pageTitle?></title>
     <meta name="keywords" content="{form:$__metaKeywords}" />
     <meta name="description" content="{form:$__metaDescription}" />

@@ -21,4 +21,7 @@
             <redirect name="empty" path="/app/landing/" />
         </redirects>
     </action>
+    <action name="VKCheckAppAuthSilent">
+        <path>VKCheckAppAuthSilent</path>
+    </action>
 </actions>

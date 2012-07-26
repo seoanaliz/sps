@@ -53,8 +53,18 @@
                 ,'sourceFeedId' => array(
                     'name'          => 'sourceFeedId'
                     , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
+                    , 'nullable'    => 'No'
                     , 'foreignKey'  => 'SourceFeed'
+                )
+                ,'targetFeedId' => array(
+                    'name'          => 'targetFeedId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'foreignKey'  => 'TargetFeed'
+                )
+                ,'authorId' => array(
+                    'name'          => 'authorId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'foreignKey'  => 'Author'
                 )
                 ,'statusId' => array(
                     'name'          => 'statusId'
