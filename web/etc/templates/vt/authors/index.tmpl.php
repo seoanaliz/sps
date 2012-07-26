@@ -75,7 +75,13 @@
                 </td>
                 <td>{form:$object.firstName}</td>
                 <td>{form:$object.lastName}</td>
-                <td>{$object.avatar}</td>
+                <td>
+                    <?
+                        if (!empty($object->avatar)) {
+                            ?><img src="{$object.avatar}" alt="" /><?
+                        }
+                    ?>
+                </td>
                 <td class="left">
                     <?
                     $targetFeedIds = explode(',', $object->targetFeedIds);

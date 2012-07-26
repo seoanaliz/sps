@@ -19,6 +19,7 @@
       <Flags>
         <EFlag>CanPages</EFlag>
         <EFlag>CanCache</EFlag>
+        <EFlag>IsLocked</EFlag>
       </Flags>
       <Lists />
     </Entity>

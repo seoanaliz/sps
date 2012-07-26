@@ -408,7 +408,7 @@
 
             <pageGroup name="app" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuth">
                 <page uri="app://">
-                    <actions>SPS.Site.GetIndexPage</actions>
+                    <actions>SPS.Site.GetAppIndexPage</actions>
                     <template>tmpl://app/index.tmpl.php</template>
                 </page>
                 <page uri="app://landing/" boot="">

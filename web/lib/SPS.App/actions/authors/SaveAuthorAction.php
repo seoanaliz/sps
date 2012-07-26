@@ -38,10 +38,27 @@
                 $object->authorId = $originalObject->authorId;
             }
 
+            //parse id from input
+            $vkId = Request::getString( 'vkId' );
+            preg_match('/\d+/im', $vkId, $matches);
+            if (!empty($matches)) {
+                $object->vkId = current($matches);
+            }
+
             $targetFeedIds = Request::getArray( 'targetFeedIds' );
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
             $object->targetFeedIds = implode(',', $targetFeedIds);
-            
+
+            try {
+                if (!empty($object->vkId)) {
+                    $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $object->vkId, 'fields' => 'photo'));
+                    $profile = current($profiles);
+                    $object->firstName = $profile['first_name'];
+                    $object->lastName = $profile['last_name'];
+                    $object->avatar = $profile['photo'];
+                }
+            } catch (Exception $Ex) {}
+
             return $object;
         }
         
