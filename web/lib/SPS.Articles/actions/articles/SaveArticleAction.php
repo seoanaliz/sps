@@ -115,8 +115,13 @@
                 }
             }
 
-            if ($object->sourceFeedId == -1 && empty($object->authorId)) {
-                $errors['fields']['authorId']['null'] = 'null';
+            if ($object->sourceFeedId == -1) {
+                if (empty($object->authorId)) {
+                    $errors['fields']['authorId']['null'] = 'null';
+                }
+                if (empty($object->targetFeedId)) {
+                    $errors['fields']['targetFeedId']['null'] = 'null';
+                }
             }
             
             return $errors;
@@ -190,6 +195,9 @@
          */
         protected function setForeignLists() {
             Response::setArray( "sourceFeeds", SourceFeedUtility::GetAll() );
+
+            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+            Response::setArray( "targetFeeds", $targetFeeds );
 
             /*
             * Creating new ArticleRecord object or select existing

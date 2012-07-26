@@ -56,6 +56,11 @@
                     , 'nullable'    => 'No'
                     , 'foreignKey'  => 'SourceFeed'
                 )
+                ,'targetFeedId' => array(
+                    'name'          => 'targetFeedId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'foreignKey'  => 'TargetFeed'
+                )
                 ,'authorId' => array(
                     'name'          => 'authorId'
                     , 'type'        => TYPE_INTEGER

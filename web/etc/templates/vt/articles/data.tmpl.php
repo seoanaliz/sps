@@ -45,6 +45,10 @@
             <label>{lang:vt.article.sourceFeedId}</label>
             <?= FormHelper::FormSelect( $prefix . '[sourceFeedId]', $sourceFeeds, "sourceFeedId", "title", $object->sourceFeedId, null, null, false ); ?>
         </div>
+        <div data-row="targetFeedId" class="row">
+            <label>{lang:vt.articleQueue.targetFeedId}</label>
+            <?= FormHelper::FormSelect( $prefix . '[targetFeedId]', $targetFeeds, "targetFeedId", "title", $object->targetFeedId, null, null, true ); ?>
+        </div>
         <div data-row="authorId" class="row">
             <label>{lang:vt.article.authorId}</label>
             <?= FormHelper::FormInput( $prefix . '[authorId]', $object->authorId, 'authorId', null, array( 'size' => 80 ) ); ?>

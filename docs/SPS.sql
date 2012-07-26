@@ -162,6 +162,7 @@ Create table "articles"
 	"externalId" Varchar(100) NOT NULL,
 	"rate" Integer NOT NULL Default 0,
 	"sourceFeedId" Integer NOT NULL,
+	"targetFeedId" Integer,
 	"authorId" Integer,
 	"statusId" Integer NOT NULL,
  primary key ("articleId")
@@ -394,6 +395,8 @@ Create index "IX_FK_targetFeedPublishersTagetFeedId_targetFeedPublishers" on "ta
 Alter table "targetFeedPublishers" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_gridLinesTargetFeedId_gridLines" on "gridLines" ("targetFeedId");
 Alter table "gridLines" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
+Create index "IX_FK_articlesTargetFeedId_articles" on "articles" ("targetFeedId");
+Alter table "articles" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
 Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedPublishersPublisherId_targetFeedPublishers" on "targetFeedPublishers" ("publisherId");

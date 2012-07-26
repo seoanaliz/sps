@@ -383,6 +383,16 @@
           <AttributeParameter Key="controlId" Value="authorId" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.article.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -459,6 +469,26 @@
           <AttributeParameter Key="value" Value="authorId" />
           <AttributeParameter Key="size" Value="80" />
           <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.article.targetFeedId" TitleValue="targetFeedId" Type="HTML_SELECT" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeed.title" TitleKey="vt.article.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="true" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>
