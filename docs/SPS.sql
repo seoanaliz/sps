@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		25.07.2012
+Modified		26.07.2012
 Project		
 Model			
 Company		
@@ -162,6 +162,8 @@ Create table "articles"
 	"externalId" Varchar(100) NOT NULL,
 	"rate" Integer NOT NULL Default 0,
 	"sourceFeedId" Integer NOT NULL,
+	"targetFeedId" Integer,
+	"authorId" Integer,
 	"statusId" Integer NOT NULL,
  primary key ("articleId")
 ) Without Oids;
@@ -385,8 +387,6 @@ Create index "IX_FK_articleRecordsArticleId_articleRecords" on "articleRecords" 
 Alter table "articleRecords" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
 Create index "IX_FK_articleRecordsArticleQueueId_articleRecords" on "articleRecords" ("articleQueueId");
 Alter table "articleRecords" add  foreign key ("articleQueueId") references "articleQueues" ("articleQueueId") on update restrict on delete restrict;
-Create index "IX_FK_articlesSourceFeedId_articles" on "articles" ("sourceFeedId");
-Alter table "articles" add  foreign key ("sourceFeedId") references "sourceFeeds" ("sourceFeedId") on update restrict on delete restrict;
 Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
 Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedGridsTargetFeedId_targetFeedGrids" on "targetFeedGrids" ("targetFeedId");
@@ -395,6 +395,8 @@ Create index "IX_FK_targetFeedPublishersTagetFeedId_targetFeedPublishers" on "ta
 Alter table "targetFeedPublishers" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_gridLinesTargetFeedId_gridLines" on "gridLines" ("targetFeedId");
 Alter table "gridLines" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
+Create index "IX_FK_articlesTargetFeedId_articles" on "articles" ("targetFeedId");
+Alter table "articles" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
 Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedPublishersPublisherId_targetFeedPublishers" on "targetFeedPublishers" ("publisherId");
@@ -403,6 +405,8 @@ Create index "IX_FK_auditEventsAuditEventTypeId_auditEvents" on "auditEvents" ("
 Alter table "auditEvents" add  foreign key ("auditEventTypeId") references "auditEventTypes" ("auditEventTypeId") on update restrict on delete restrict;
 Create index "IX_FK_gridLineItemsGridLineId_gridLineItems" on "gridLineItems" ("gridLineId");
 Alter table "gridLineItems" add  foreign key ("gridLineId") references "gridLines" ("gridLineId") on update restrict on delete restrict;
+Create index "IX_FK_articlesAuthorId_articles" on "articles" ("authorId");
+Alter table "articles" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
 
 
 /* Create Procedures */

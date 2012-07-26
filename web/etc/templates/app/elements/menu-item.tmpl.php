@@ -1,25 +1,13 @@
-<div class="item public" data-id="public12">
-    <div class="photo"><img src="http://vk.cc/Q3gWv" alt="" /></div>
+<?
+    /** @var $targetFeed TargetFeed */
+    /** @var $targetInfo array */
+?>
+<div class="item public" data-id="p{$targetFeed->targetFeedId}">
+    <div class="photo"><img src="<?= $targetInfo[$targetFeed->targetFeedId]['img'] ?>" alt="" /></div>
     <div class="content">
-        <div class="text">Travels</div>
+        <div class="text">{$targetFeed->title}</div>
         <? if ($counter) { ?>
-        <span class="counter">+11</span>
+        <span class="counter">+{$counter}</span>
         <? } ?>
-    </div>
-</div>
-<div class="list">
-    <div class="item user" data-id="user1">
-        <div class="photo"><img src="http://vk.cc/Q2PuP" alt="" /></div>
-        <div class="content">
-            <div class="text">Artyom Kohver</div>
-            <div class="description">General editor</div>
-        </div>
-    </div>
-    <div class="item user" data-id="user2">
-        <div class="photo"><img src="http://vk.cc/Q2PuP" alt="" /></div>
-        <div class="content">
-            <div class="text">Artyom Kohver</div>
-            <div class="description">General editor</div>
-        </div>
     </div>
 </div>

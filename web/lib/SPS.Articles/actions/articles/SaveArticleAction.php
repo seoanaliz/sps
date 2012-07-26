@@ -58,6 +58,10 @@
                 $object->articleId = $originalObject->articleId;
             }
 
+            if (empty($object->sourceFeedId)) {
+                $object->sourceFeedId = -1;
+            }
+
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
             $this->articleRecord->articleQueueId    = null; //NB
             $this->articleRecord->articleRecordId   = null; //NB
@@ -108,6 +112,15 @@
             if( !empty( $articleRecordErrors['fields'] ) && $this->action != BaseSaveAction::DeleteAction ) {
                 foreach( $articleRecordErrors['fields'] as $key => $value ) {
                     $errors['fields'][$key] = $value;
+                }
+            }
+
+            if ($object->sourceFeedId == -1) {
+                if (empty($object->authorId)) {
+                    $errors['fields']['authorId']['null'] = 'null';
+                }
+                if (empty($object->targetFeedId)) {
+                    $errors['fields']['targetFeedId']['null'] = 'null';
                 }
             }
             
@@ -181,8 +194,10 @@
          * Set Foreign Lists
          */
         protected function setForeignLists() {
-            $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            Response::setArray( "sourceFeeds", $sourceFeeds );
+            Response::setArray( "sourceFeeds", SourceFeedUtility::GetAll() );
+
+            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+            Response::setArray( "targetFeeds", $targetFeeds );
 
             /*
             * Creating new ArticleRecord object or select existing

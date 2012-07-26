@@ -63,5 +63,14 @@
                 }
             } catch (Exception $Ex) {}
         }
+
+        public static function GetAll() {
+            $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+            $sourceFeed = new SourceFeed();
+            $sourceFeed->sourceFeedId = -1;
+            $sourceFeed->title = 'Авторские';
+            $sourceFeeds = array(-1 => $sourceFeed) + $sourceFeeds;
+            return $sourceFeeds;
+        }
     }
 ?>

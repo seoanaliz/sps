@@ -34,6 +34,18 @@
         public $sourceFeed;
 
         /** @var int */
+        public $targetFeedId;
+
+        /** @var TargetFeed */
+        public $targetFeed;
+
+        /** @var int */
+        public $authorId;
+
+        /** @var Author */
+        public $author;
+
+        /** @var int */
         public $statusId;
 
         /** @var Status */

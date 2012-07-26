@@ -408,11 +408,21 @@
 
             <pageGroup name="app" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuth">
                 <page uri="app://">
-                    <actions>SPS.Site.GetIndexPage</actions>
+                    <actions>SPS.Site.GetAppIndexPage</actions>
                     <template>tmpl://app/index.tmpl.php</template>
                 </page>
                 <page uri="app://landing/" boot="">
                     <template>tmpl://app/landing.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="appControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuthSilent">
+                <page uri="appControls://article-save/">
+                    <actions>SPS.Site.SaveArticleAppControl</actions>
+                </page>
+                <page uri="appControls://articles-list/">
+                    <actions>SPS.Site.GetArticlesAppListControl</actions>
+                    <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
                 </page>
             </pageGroup>
 

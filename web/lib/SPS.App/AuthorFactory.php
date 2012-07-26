@@ -22,7 +22,7 @@
             'class'       => 'Author'
             , 'table'     => 'authors'
             , 'view'      => 'getAuthors'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache', 'IsLocked' => 'IsLocked' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'authorId' => array(

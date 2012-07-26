@@ -41,6 +41,8 @@ SELECT "public"."articles"."articleId"
 	, "public"."articles"."externalId"
 	, "public"."articles"."rate"
 	, "public"."articles"."sourceFeedId"
+	, "public"."articles"."targetFeedId"
+	, "public"."articles"."authorId"
 	, "public"."articles"."statusId"
  FROM "public"."articles"
 	WHERE "public"."articles"."statusId" != 3

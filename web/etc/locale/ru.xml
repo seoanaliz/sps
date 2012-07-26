@@ -344,6 +344,7 @@
             <statusId><![CDATA[Статус]]></statusId>
             <externalId><![CDATA[externalId]]></externalId>
             <rate><![CDATA[rate]]></rate>
+            <authorId><![CDATA[Автор]]></authorId>
         </article>
         <articleQueue>
             <deleteString><![CDATA[Вы действительно хотите удалить очередь?]]></deleteString>
