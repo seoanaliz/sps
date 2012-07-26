@@ -80,10 +80,12 @@
             $this->hasMore = (count($this->articles) > $this->pageSize);
             $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
 
-            //load arciles data
-            $this->articleRecords = ArticleRecordFactory::Get(
-                array('_articleId' => array_keys($this->articles))
-            );
+            //load articles data
+            if (!empty($this->articles)) {
+                $this->articleRecords = ArticleRecordFactory::Get(
+                    array('_articleId' => array_keys($this->articles))
+                );
+            }
             if (!empty($this->articleRecords)) {
                 $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleId', false);
             }

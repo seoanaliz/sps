@@ -3,6 +3,7 @@
         <div class="text"></div>
         <div class="dropdown">My posts</div>
     </div>
+    <? if (!empty($targetFeeds)) { ?>
     <div class="new-post">
         <div class="textarea-wrap">
             <textarea placeholder="Ваш текст..." rows="2"></textarea>
@@ -13,6 +14,7 @@
             <span class="text">Ctrl+Enter</span>
         </div>
     </div>
+    <? } ?>
     <div class="list">
 
     </div>
