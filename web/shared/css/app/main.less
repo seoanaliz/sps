@@ -432,7 +432,10 @@ html, body {
         width: 200px;
 
         &>.menu {
-            &>.item {
+            .list {
+                display: none;
+            }
+            .item {
                 position: relative;
                 color: @link_color;
                 cursor: pointer;
@@ -457,6 +460,7 @@ html, body {
                     &>.description {
                         color: #999;
                         font-size: .9em;
+                        font-weight: normal;
                     }
                     &>.counter {
                         font-weight: bold;
@@ -483,7 +487,6 @@ html, body {
                             padding: 0 4px;
                             background-color: #D5DDE5;
                             border-radius: 3px;
-
                             cursor: pointer;
 
                             .transition(.2s background-color);
