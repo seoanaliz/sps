@@ -1,4 +1,11 @@
-<div class="post" data-id="1">
+<?
+    /** @var $article Article */
+    /** @var $articleRecord ArticleRecord */
+
+    if (!empty($article)) {
+?>
+
+<div class="post" data-id="{$article->articleId}">
     <div class="delete"></div>
     <div class="photo">
         <a target="_blank" href="http://vk.com/public">
@@ -9,12 +16,7 @@
         <div class="title">
             <a target="_blank" href="http://vk.com/public">Travels</a>
         </div>
-        <div class="text">Arkhangelsk, Russia</div>
-        <div class="attachments">
-            <div class="photo">
-                <img src="http://vk.cc/Q2QOj" alt="" />
-            </div>
-        </div>
+        <div class="text"><?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?></div>
         <div class="sign clear-fix">
             <div class="user-info">
                 <span class="photo">
@@ -25,7 +27,7 @@
                 <span class="name">
                     <a target="_blank" href="http://vk.com/id">Artyom Kohver</a>
                 </span>
-                <span class="date">22.07.2012 13:44</span>
+                <span class="date">{$article->createdAt->defaultFormat()}</span>
             </div>
             <? if ($likes) { ?>
             <div class="likes">
@@ -37,3 +39,4 @@
         {increal:tmpl://app/elements/wall-comments.tmpl.php}
     </div>
 </div>
+<? } ?>

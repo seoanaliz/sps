@@ -63,13 +63,12 @@
             }
             Session::setString('gaal_type', $type);
 
-            //$this->search['sourceFeedId'] = -1;
-            $this->search['sourceFeedId'] = 6;
+            $this->search['sourceFeedId'] = -1;
 
             switch ($type) {
                 case 'my':
                 default:
-                    //$this->search['authorId'] = $author->authorId;
+                    $this->search['authorId'] = $author->authorId;
                     break;
             }
         }

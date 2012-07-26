@@ -8,7 +8,12 @@
             ?>{increal:tmpl://app/elements/wall-post.tmpl.php}<?
         }
     }
+
+    $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension( $articlesCount ));
 ?>
 <? if ($hasMore) {?>
     <div id="wall-show-more" class="show-more">Еще</div>
 <? } ?>
+<script type="text/javascript">
+    $('#wall > .title .text').text('{$articlesCountText}');
+</script>
