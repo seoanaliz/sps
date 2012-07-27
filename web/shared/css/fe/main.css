@@ -214,7 +214,6 @@ i {font-style: italic;}
     margin-left: 615px;
     top: 10px;
     bottom: 10px;
-    z-index:-1;
     width: 370px;
 }
 .right-panel .queue-footer {
