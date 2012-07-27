@@ -46,6 +46,7 @@ var app = (function () {
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
 
+        $wall.find('.comment textarea').placeholder();
         $wall.find('.date').easydate({
             live: true,
             date_parse: function(date) {
@@ -124,6 +125,8 @@ var app = (function () {
             ]
         });
 
+        $newPost.find('textarea').placeholder();
+
         $newPost.find('textarea').bind('focus', function() {
             $(this).autoResize();
             $newPost.addClass('open');
@@ -142,8 +145,16 @@ var app = (function () {
             var $post = $target.closest('.post');
             var postId = $post.data('id');
             Events.fire('wall_delete', postId, function() {
-                //todo: восстановление сообщения
-                $post.remove();
+                $post.data('html', $post.html());
+                $post.addClass('deleted').html('Сообщение удалено. <a class="restore" href="javascript:;">Восстановить</a>.');
+            });
+        });
+        $wall.delegate('.post.deleted > .restore', 'click', function() {
+            var $target = $(this);
+            var $post = $target.closest('.post');
+            var postId = $post.data('id');
+            Events.fire('wall_restore', postId, function() {
+                $post.removeClass('deleted').html($post.data('html'));
             });
         });
         $wall.delegate('#wall > .list > .show-more', 'click', function() {
@@ -311,6 +322,51 @@ function getURLParameter(name) {
                     $input.css('height', $autoResize.height());
                 });
             }
+        });
+    };
+})(jQuery);
+
+// Кроссбраузерные плейсхолдеры
+(function($) {
+    $.fn.placeholder = function(para) {
+        return this.each(function(parameters) {
+            var defaults = {
+                el: this,
+                color: '#CCC',
+                text: false,
+                helperClass: 'placeholder'
+            };
+            var t = this;
+            var p = t.p = $.extend(defaults, parameters);
+            var $input = $(p.el);
+            var placeholderText = p.text || $input.attr('placeholder');
+            var $wrapper = $('<div/>');
+            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
+                padding: $input.css('padding')
+            });
+
+            $input
+                .wrap($wrapper)
+                .data('placeholder', $placeholder)
+                .removeAttr('placeholder')
+                .parent().prepend($placeholder)
+            ;
+
+            $placeholder.bind('mousedown', function() {
+                $placeholder.hide();
+                $input.focus();
+            });
+            $placeholder.bind('mouseup', function() {
+                $input.focus();
+            });
+            $input.bind('blur', function() {
+                if (!$input.val()) {
+                    $placeholder.fadeIn(100);
+                }
+            });
+            $input.bind('focus', function() {
+                $placeholder.hide();
+            });
         });
     };
 })(jQuery);

@@ -171,6 +171,19 @@ html, body {
                 }
             }
             &>.list {
+                min-height: 400px;
+
+                &:empty {
+                    text-align: center;
+                    line-height: 60px;
+
+                    &:after {
+                        color: gray;
+                        font-size: 14px;
+                        content: 'На стене пока нет ни одной записи.';
+                    }
+                }
+
                 &>.post {
                     position: relative;
                     overflow: hidden;
@@ -392,6 +405,11 @@ html, body {
                             .opacity(.5);
                         }
                     }
+                    &.deleted {
+                        text-align: center;
+                        line-height: 50px;
+                        color: #999;
+                    }
 
                     &>.delete {
                         position: absolute;
@@ -456,7 +474,11 @@ html, body {
                     }
                 }
                 &>.content {
-                    &>.text {}
+                    &>.text {
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
                     &>.description {
                         color: #999;
                         font-size: .9em;
@@ -475,7 +497,7 @@ html, body {
                 }
                 &.user, &.public {
                     &>.content {
-                        margin-left: 35px;
+                        margin-left: 32px;
 
                         &>.counter {
                             position: absolute;
@@ -527,4 +549,11 @@ html, body {
             background-color: @link_color;
         }
     }
+}
+
+.placeholder {
+    position: absolute;
+    color: #999;
+
+    .user-select(none);
 }

@@ -67,6 +67,9 @@ var Eventlist = {
     wall_delete: function(postId, callback) {
         callback(true);
     },
+    wall_restore: function(postId, callback) {
+        callback(true);
+    },
 
     comment_load: function(options, callback) {
         var params = $.extend({
