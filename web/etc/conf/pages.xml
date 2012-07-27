@@ -427,6 +427,9 @@
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>
                 </page>
+                <page uri="appControls://article-restore/">
+                    <actions>SPS.Site.RestoreArticleAppControl</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
