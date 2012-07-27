@@ -93,7 +93,7 @@
 
             //не авторские посты
             if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors)) {
-                $this->search['_sourceFeedId'] = array(-1 => -1);
+                $this->search['_sourceFeedId'] = array(-2 => -2);
                 return;
             }
 
@@ -106,8 +106,15 @@
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
-                $this->search['sourceFeedId'] = -1;
+                $this->search['_sourceFeedId'] = array(-1 => -1);
                 $this->search['targetFeedId'] = $targetFeedId;
+
+                //фильтр источников выступает как фильтр авторов
+                if (!empty($sourceFeedIds)) {
+                    $this->search['_authorId'] = $sourceFeedIds;
+                } else {
+                    $this->search['_authorId'] = array(-1 => -1);
+                }
             }
         }
 

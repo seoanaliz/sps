@@ -113,7 +113,7 @@
                         <vkapi class="AuthVkontakte">
                             <param name="appId">2879919</param>
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
-                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps.verumnets.ru</param>
