@@ -50,7 +50,7 @@
 
             Response::setObject('__Author', $author);
             Session::setObject('Author', $author);
-            Session::setInteger('author_id', $viewer_id);
+            Session::setInteger('authorId', $viewer_id);
             Session::setArray('targetFeedIds', $targetFeedIds);
         }
     }
