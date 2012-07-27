@@ -1,5 +1,5 @@
 <!--Ajax template-->
-<? if ($comments_count > 3) { ?>
+<? if (!empty($comments_count) && $comments_count > 3) { ?>
 <div class="show-more">Show all 6 comments</div>
 <? } else { ?>
 <div class="show-more hide">Hide comments</div>

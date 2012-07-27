@@ -1,4 +1,4 @@
-<? if ($comments) { ?>
+<? if (!empty($comments)) { ?>
 <div class="comments">
     <div class="list">
         {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
