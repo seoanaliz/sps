@@ -102,6 +102,21 @@
             }
 
             $this->options[BaseFactory::WithoutDisabled] = false;
+
+            $filter = Request::getString( 'filter' );
+            switch ($filter) {
+                case 'best':
+                    $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
+                    break;
+                case 'new':
+                    // дефолтная сортировка
+                    break;
+                case 'my':
+                default:
+                    $this->search['authorId'] = $author->authorId;
+                    break;
+
+            }
         }
 
         private function getObjects() {

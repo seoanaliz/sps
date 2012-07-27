@@ -9,7 +9,9 @@
 ?>
 
 <div class="post" data-id="{$article->articleId}">
-    <div class="delete"></div>
+    <? if ($author->authorId == $__Author->authorId) { ?>
+        <div class="delete"></div>
+    <? } ?>
     <? if (!empty($targetFeed) && !empty($targetInfo[$targetFeed->targetFeedId])) { ?>
     <div class="photo">
         <a target="_blank" href="http://vk.com/public{$targetFeed->externalId}">
