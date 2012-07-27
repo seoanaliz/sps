@@ -305,7 +305,7 @@ var Eventlist = {
             success: function (data) {
                 for (i in data) {
                     item = data[i];
-                    $('#source-select').append('<option value="' + item.sourceFeedId + '">' + item.title + '</option>');
+                    $('#source-select').append('<option value="' + item.id + '">' + item.title + '</option>');
                 }
 
                 //get data from cookie

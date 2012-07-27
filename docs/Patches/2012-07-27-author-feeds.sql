@@ -12,4 +12,5 @@ SELECT "public"."authors"."authorId"
 	, "public"."authors"."targetFeedIds"
 	, "public"."authors"."statusId"
  FROM "public"."authors"
-	WHERE "public"."authors"."statusId" != 3;
+	WHERE "public"."authors"."statusId" != 3
+ORDER BY "firstName", "lastName";

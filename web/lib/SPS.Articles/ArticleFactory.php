@@ -94,6 +94,11 @@
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_LE
                 )
+                ,'_authorId' => array(
+                    'name'         => 'authorId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
                 ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
