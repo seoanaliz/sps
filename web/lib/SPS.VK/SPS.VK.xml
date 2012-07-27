@@ -22,6 +22,11 @@
         </redirects>
     </action>
     <action name="VKCheckAppAuthSilent">
-        <path>VKCheckAppAuthSilent</path>
+        <path>VKCheckAppAuth</path>
+        <parameters>
+            <request>
+                <param name="silent">true</param>
+            </request>
+        </parameters>
     </action>
 </actions>
