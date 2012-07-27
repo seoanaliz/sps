@@ -23,7 +23,7 @@
         </div>
         <div data-row="targetFeedIds" class="row">
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>
-            <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', $object->targetFeedIds, 'targetFeedIds', null, null, array('style' => 'height: 200px;') ) ?>
+            <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', !empty($object->targetFeedIds) ? $object->targetFeedIds : array(), 'targetFeedIds', null, null, array('style' => 'height: 200px;') ) ?>
         </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.author.statusId}</label>

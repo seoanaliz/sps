@@ -12,14 +12,14 @@
     <div class="delete"></div>
     <? if (!empty($targetFeed) && !empty($targetInfo[$targetFeed->targetFeedId])) { ?>
     <div class="photo">
-        <a target="_blank" href="http://vk.com/wall-{$targetFeed->externalId}">
+        <a target="_blank" href="http://vk.com/public{$targetFeed->externalId}">
             <img src="<?= $targetInfo[$targetFeed->targetFeedId]['img'] ?>" alt="" />
         </a>
     </div>
     <? } ?>
     <div class="content">
         <div class="title">
-            <a target="_blank" href="http://vk.com/wall-{$targetFeed->externalId}">{form:$targetFeed->title}</a>
+            <a target="_blank" href="http://vk.com/public{$targetFeed->externalId}">{form:$targetFeed->title}</a>
         </div>
         <div class="text"><?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?></div>
         <div class="sign clear-fix">

@@ -10,14 +10,23 @@
     class VKCheckAppAuth {
 
         public function Execute() {
+            $silent     = Request::getBoolean('silent');
             $api_id     = Request::getInteger('api_id');
             $viewer_id  = Request::getInteger('viewer_id');
             $secret     = AuthVkontakte::$AuthSecret;
             $auth_key   = Request::getString('auth_key');
             $auth_key_trust = md5($api_id . '_' . $viewer_id . '_' . $secret);
 
-            if ($auth_key != $auth_key_trust) {
-                return 'empty';
+            if (empty($silent)) {
+                if ($auth_key != $auth_key_trust) {
+                    return 'empty';
+                }
+            } else {
+                $viewer_id = -1;
+                $author = Session::getObject('Author');
+                if (!empty($author->vkId)) {
+                    $viewer_id = $author->vkId;
+                }
             }
 
             // ищем чувака в базе
@@ -26,6 +35,10 @@
             );
 
             if (empty($author)) {
+                if (!empty($silent)) {
+                    echo ObjectHelper::ToJSON(array('error' => 'auth'));
+                    die();
+                }
                 return 'empty';
             }
 

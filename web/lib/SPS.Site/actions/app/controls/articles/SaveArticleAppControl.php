@@ -22,8 +22,11 @@
             $text           = trim(Request::getString( 'text' ));
             $photos         = Request::getArray( 'photos' );
             $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
+            $targetFeedIds  = Session::getArray('targetFeedIds');
 
-            $targetFeedIds = Session::getArray('targetFeedIds');
+            if (!in_array($targetFeedId, $targetFeedIds)) {
+                $targetFeedId = null;
+            }
 
             //берем первый
             if (empty($targetFeedId) && empty($targetFeedIds[-1])) {
