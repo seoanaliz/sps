@@ -45,6 +45,21 @@ var app = (function () {
         $loadMore = $('> .show-more', $wallList);
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
+
+        $wall.find('.date').easydate({
+            live: true,
+            date_parse: function(date) {
+                if (!date) return;
+                var d = date.split('.');
+                var i = d[1];
+                d[1] = d[0];
+                d[0] = i;
+                return Date.parse(d.join('.'));
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
     }
 
     function _initEvents() {
@@ -98,19 +113,6 @@ var app = (function () {
         });
 
         /*Left column*/
-        $wall.find('.date').easydate({
-            date_parse: function(date) {
-                if (!date) return;
-                var d = date.split('.');
-                var i = d[1];
-                d[1] = d[0];
-                d[0] = i;
-                return Date.parse(d.join('.'));
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
-        });
         $wall.find('> .title > .dropdown').dropdown({
             position: 'right',
             width: 'auto',
@@ -234,7 +236,6 @@ var app = (function () {
     }
 
     function showMore() {
-
         var tmpText = $loadMore.text();
 
         if ($loadMore.hasClass('load')) return;
@@ -247,7 +248,6 @@ var app = (function () {
     }
 
     function pageLoad(id) {
-
         Events.fire('wall_load', {clear: true, type: id}, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
