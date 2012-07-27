@@ -37,6 +37,10 @@
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
 
+            if ($photos == array('[]')) {
+                $photos = array();
+            }
+
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
 
@@ -78,7 +82,7 @@
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
-            $articleRecord->photos = $photos;
+            $articleRecord->photos = !empty($photos) ? $photos : array();
             $articleRecord->link = $link;
 
             if (!empty($id)) {
