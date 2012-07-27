@@ -76,7 +76,15 @@ var Eventlist = {
         });
     },
     wall_restore: function(postId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'article-restore/',
+            data: {
+                id: postId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
 
     comment_load: function(options, callback) {
