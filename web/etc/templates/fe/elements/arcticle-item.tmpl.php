@@ -14,10 +14,17 @@
 ?>
 
 <div class="post bb <?= ($sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
-    <div class="l d-hide">
-        <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
-    </div>
-    <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
+    <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
+        <div class="l d-hide">
+            <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
+        </div>
+        <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
+    <? } else if (!empty($author)) { ?>
+        <div class="l d-hide">
+            <div class="userpic"><img src="{$author->avatar}" alt="" /></div>
+        </div>
+        <div class="name d-hide">{$author->FullName()}</div>
+    <? } ?>
     <div class="content">
         <?
         $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));

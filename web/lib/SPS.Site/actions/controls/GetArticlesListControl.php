@@ -10,45 +10,91 @@
     class GetArticlesListControl {
 
         /**
-         * Entry Point
+         * @var Article[]
          */
-        public function Execute() {
-            $sourceFeedIds = Request::getArray('sourceFeedIds');
-            $sourceFeedIds = !empty($sourceFeedIds) ? $sourceFeedIds : array();
-            $from = Request::getInteger( 'from' );
-            $to = Request::getInteger( 'to' );
-            $sortType = Request::getString( 'sortType' );
-            $type = Request::getString( 'type' );
+        private $articles = array();
 
-            if (empty($sourceFeedIds) && ($type != SourceFeedUtility::Authors)) {
-                return;
-            }
+        /**
+         * @var ArticleRecord[]
+         */
+        private $articleRecords = array();
+
+        /**
+         * @var TargetFeed[]
+         */
+        private $targetFeeds = array();
+
+        /**
+         * @var SourceFeed[]
+         */
+        private $sourceFeeds = array();
+
+        /**
+         * @var Author[]
+         */
+        private $authors = array();
+
+        /**
+         * @var int
+         */
+        private $pageSize = 20;
+
+        /**
+         * @var int
+         */
+        private $articlesCount = 0;
+
+        /**
+         * @var bool
+         */
+        private $hasMore = false;
+
+        /**
+         * @var array
+         */
+        private $search = array();
+
+        /**
+         * @var array
+         */
+        private $options = array();
+
+        private function processRequest() {
+            $sourceFeedIds  = Request::getArray('sourceFeedIds');
+            $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
+            $from           = Request::getInteger( 'from' );
+            $to             = Request::getInteger( 'to' );
+            $sortType       = Request::getString( 'sortType' );
+            $type           = Request::getString( 'type' );
 
             $page = Session::getInteger( 'page' );
             $page = ($page < 0) ? 0 : $page;
-            $pageSize = 20;
-            $clean = Request::getBoolean( 'clean' );
-            if ($clean) {
+            if (Request::getBoolean( 'clean' )) {
                 $page = 0;
             }
 
-            $search = array(
+            $this->search = array(
                 '_sourceFeedId' => $sourceFeedIds,
-                'pageSize' => $pageSize + 1,
+                'pageSize' => $this->pageSize + 1,
                 'page' => $page,
             );
-            $options = array();
 
             if ($from !== null) {
-                $search['rateGE'] = $from;
+                $this->search['rateGE'] = $from;
             }
             if ($to !== null && $to < 100) {
-                $search['rateLE'] = $to;
+                $this->search['rateLE'] = $to;
             }
             if ($sortType == 'old') {
-                $options[BaseFactory::OrderBy] = ' "createdAt" ASC, "articleId" ASC ';
+                $this->options[BaseFactory::OrderBy] = ' "createdAt" ASC, "articleId" ASC ';
             } else if ($sortType == 'best') {
-                $options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
+                $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
+            }
+
+            //не авторские посты
+            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors)) {
+                $this->search['_sourceFeedId'] = array(-1 => -1);
+                return;
             }
 
             //авторские посты
@@ -58,47 +104,67 @@
                     return;
                 }
 
-                $search['rateGE'] = null;
-                $search['rateLE'] = null;
-                $search['sourceFeedId'] = -1;
-                $search['targetFeedId'] = $targetFeedId;
+                $this->search['rateGE'] = null;
+                $this->search['rateLE'] = null;
+                $this->search['sourceFeedId'] = -1;
+                $this->search['targetFeedId'] = $targetFeedId;
+            }
+        }
+
+        private function getObjects() {
+            $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
+
+            $this->articles = ArticleFactory::Get($this->search, $this->options);
+            $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
+
+            $this->hasMore = (count($this->articles) > $this->pageSize);
+            $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
+
+            //load articles data
+            if (!empty($this->articles)) {
+                $this->articleRecords = ArticleRecordFactory::Get(
+                    array('_articleId' => array_keys($this->articles))
+                );
+            }
+            if (!empty($this->articleRecords)) {
+                $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleId', false);
             }
 
-            $articles = ArticleFactory::Get( $search, $options );
-            $articlesCount = ArticleFactory::Count( $search, array(BaseFactory::WithoutPages => true) );
-
-            if (empty($articles)) {
-                return;
+            if ($this->hasMore) {
+                Session::setInteger('page', $this->search['page'] + 1);
             }
 
-            $hasMore = (count($articles) > $pageSize);
-            $articles = array_slice($articles, 0, $pageSize, true);
-
-            //load arciles data
-            $articleRecords = ArticleRecordFactory::Get(
-                array('_articleId' => array_keys($articles))
-            );
-            if (!empty($articleRecords)) {
-                $articleRecords = BaseFactoryPrepare::Collapse($articleRecords, 'articleId', false);
+            //get articles target feeds with info and authors
+            if (!empty($this->articles)) {
+                $authorIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('authorId'));
+                if (!empty($authorIds)) {
+                    $this->authors = AuthorFactory::Get(
+                        array('_authorId' => array_unique($authorIds)),
+                        array(BaseFactory::WithoutPages => true)
+                    );
+                }
             }
+        }
 
-            if ($hasMore) {
-                Session::setInteger('page', $page+1);
-            }
+        private function setData() {
+            Response::setArray( 'articles', $this->articles );
+            Response::setArray( 'articleRecords', $this->articleRecords );
+            Response::setInteger( 'articlesCount', $this->articlesCount );
+            Response::setBoolean( 'hasMore', $this->hasMore );
+            Response::setArray( 'authors', $this->authors );
+            Response::setArray( 'targetFeeds', $this->targetFeeds );
+            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
+            Response::setArray( 'sourceFeeds', $this->sourceFeeds );
+            Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
+        }
 
-            if (!empty($sourceFeedIds)) {
-                $sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $sourceFeedIds));
-            } else {
-                $sourceFeeds = array();
-            }
-
-            Response::setArray( 'articles', $articles );
-            Response::setArray( 'articleRecords', $articleRecords );
-            Response::setArray( 'sourceFeeds', $sourceFeeds );
-            Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($sourceFeeds) );
-            Response::setInteger( 'articlesCount', $articlesCount );
-            Response::setBoolean( 'hasMore', $hasMore );
+        /**
+         * Entry Point
+         */
+        public function Execute() {
+            $this->processRequest();
+            $this->getObjects();
+            $this->setData();
         }
     }
-
 ?>
