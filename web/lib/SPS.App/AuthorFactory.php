@@ -52,7 +52,8 @@
                 )
                 ,'targetFeedIds' => array(
                     'name'          => 'targetFeedIds'
-                    , 'type'        => TYPE_STRING
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'int[]'
                 )
                 ,'statusId' => array(
                     'name'          => 'statusId'

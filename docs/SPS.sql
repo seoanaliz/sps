@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		26.07.2012
+Modified		27.07.2012
 Project		
 Model			
 Company		
@@ -319,7 +319,7 @@ Create table "authors"
 	"firstName" Varchar(1000),
 	"lastName" Varchar(1000),
 	"avatar" Varchar(1000),
-	"targetFeedIds" Text,
+	"targetFeedIds" Integer[],
 	"statusId" Integer NOT NULL,
  primary key ("authorId")
 ) Without Oids;
