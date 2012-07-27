@@ -24,6 +24,11 @@
             <a target="_blank" href="http://vk.com/public{$targetFeed->externalId}">{form:$targetFeed->title}</a>
         </div>
         <div class="text"><?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?></div>
+        <? if (!empty($attachments)) { ?>
+        <div class="attachments">
+            <img src="http://cs410520.userapi.com/v410520334/c07/9jORRofPL-c.jpg" /><img src="http://cs410520.userapi.com/v410520334/c07/9jORRofPL-c.jpg" /><img src="http://cs410520.userapi.com/v410520334/c07/9jORRofPL-c.jpg" /><img src="http://cs410520.userapi.com/v410520334/c07/9jORRofPL-c.jpg" />
+        </div>
+        <? } ?>
         <div class="sign clear-fix">
             <div class="user-info">
                 <? if (!empty($author)) { ?>

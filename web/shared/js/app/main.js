@@ -47,7 +47,7 @@ var app = (function () {
         $newPost = $('.new-post', $wall);
 
         $wall.find('.comment textarea').placeholder();
-        $wall.find('.date').easydate({
+        $wall.find('> .list .date').easydate({
             live: true,
             date_parse: function(date) {
                 if (!date) return;
@@ -61,6 +61,7 @@ var app = (function () {
                 return date.toLocaleDateString();
             }
         });
+        $wall.find('> .list .attachments').imageComposition();
     }
 
     function _initEvents() {
@@ -87,13 +88,16 @@ var app = (function () {
             }, 100);
         })();
 
-        $(document).bind('click', function(e) {
+        $(document).bind('mousedown', function(e) {
             var $newPost = $(e.target).closest('.new-post.open');
             if (!$newPost.length) {
                 $('.new-post.open').each(function() {
                     var $post = $(this);
                     var $textarea = $post.find('textarea');
-                    if (!$post.find('textarea').val()) {
+                    var $photos = $post.find('.attachments > .photos img');
+                    var text = $post.find('textarea').val();
+
+                    if (!text && !$photos.length) {
                         $post.removeClass('open');
                         $textarea.height('auto');
                     }
@@ -125,8 +129,30 @@ var app = (function () {
                 _wallPost(this);
             }
         });
-        $newPost.find('.send').bind('click', function() {
+        $newPost.delegate('.send', 'click', function() {
             _wallPost(this);
+        });
+        $newPost.delegate('.photo > .delete', 'click', function() {
+            $(this).parent().remove();
+        });
+        var uploader = new qq.FileUploader({
+            element: $newPost.find('.file-uploader')[0],
+            action: root + 'int/controls/image-upload/',
+            template: '<div class="qq-uploader">' +
+                '<div class="qq-upload-drop-area">Перенесите картинки сюда</div>' +
+                '<div class="qq-upload-button">Прикрепить</div>' +
+                '<ul class="qq-upload-list"></ul>' +
+                '</div>',
+            onComplete: function(id, fileName, res) {
+                var path = res.image;
+                var $photo = $(
+                    '<div class="photo">' +
+                        '<img src="' + path + '" />' +
+                        '<div class="delete"></div>' +
+                    '</div>'
+                );
+                $newPost.find('.attachments > .photos').append($photo);
+            }
         });
 
         $wall.delegate('.post > .delete', 'click', function() {
@@ -250,13 +276,22 @@ var app = (function () {
         var $post = $target.closest('.new-post');
         var $button = $post.find('.send:not(.load)');
         var $textarea = $post.find('textarea');
-        if (!$textarea.val()) {
+        var $photos = $post.find('.attachments > .photos');
+        var photos = [];
+        var text = $textarea.val();
+
+        $($photos).each(function() {
+            photos.push($(this).find('img').attr('src'));
+        });
+
+        if (!text && !photos.length) {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('wall_post', {text: $textarea.val()}, function() {
+            Events.fire('wall_post', {text: text, photos: photos}, function() {
                 $button.removeClass('load');
                 $textarea.val('').focus();
+                $photos.html('');
                 pageLoad();
             });
         }
@@ -325,41 +360,6 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
-
-// Парсинг URL
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
-}
-
-// Автовысота у textarea
-(function($) {
-    $.fn.autoResize = function() {
-        return this.each(function() {
-            var $input = $(this);
-            var $autoResize = $('<div/>').appendTo('body');
-            if (!$input.data('autoResize')) {
-                $input.data('autoResize', $autoResize);
-                $autoResize
-                    .css({
-                        width: $input.width(),
-                        minHeight: $input.height(),
-                        padding: $input.css('padding'),
-                        lineHeight: $input.css('line-height'),
-                        font: $input.css('font'),
-                        fontSize: $input.css('font-size'),
-                        position: 'absolute',
-                        wordWrap: 'break-word',
-                        top: -100000
-                    })
-                ;
-                $input.bind('keyup focus blur', function(e) {
-                    $autoResize.html($input.val().split('\n').join('<br/>.') + '<br/>.');
-                    $input.css('height', $autoResize.height());
-                });
-            }
-        });
-    };
-})(jQuery);
 
 // Кроссбраузерные плейсхолдеры
 (function($) {
@@ -470,11 +470,12 @@ function getURLParameter(name) {
 
                 $(p.data).each(function(i, item) {
                     var $item = $('<div/>')
-                        .text(item.title)
-                        .addClass(CLASS_MENU_ITEM)
-                        .data(ITEM_DATA_KEY, item)
-                        .appendTo($menu)
-                    ;
+                            .text(item.title)
+                            .addClass(CLASS_MENU_ITEM)
+                            .data('id', item.id)
+                            .data(ITEM_DATA_KEY, item)
+                            .appendTo($menu)
+                        ;
 
                     if (item.icon) {
                         var $icon = $('<div><img src="' + item.icon + '" /></div>');

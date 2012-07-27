@@ -81,6 +81,7 @@ $(document).ready(function(){
     $("#right-drop-down").dropdown({
         data: rightPanelData,
         type: 'checkbox',
+        dataKey: 'menu',
         addClass: 'right',
         onchange: function(item) {
             $(this)
@@ -132,6 +133,7 @@ $(document).ready(function(){
     $('.wall-title a').dropdown({
         width: 'auto',
         addClass: 'wall-title-menu',
+        dataKey: 'menu',
         position: 'right',
         data: [
             {title: 'новые записи', type : 'new'},
@@ -1187,387 +1189,6 @@ var Events = {
     }
 };
 
-// Image composition
-(function($) {
-    $.fn.imageComposition = function(hardPosition) {
-        return this.each(function() {
-            var CLASS_LOADING = 'image-compositing';
-            var VER = 'ver', HOR = 'hor';
-            hardPosition == 'right' ? VER : (hardPosition == 'bottom' ? HOR : false);
-
-            var position = hardPosition;
-            var $wrap = $(this);
-            var $images = $wrap.find('img');
-            var num = $images.length;
-            var imagesPerColumn = 5;
-            var wrap = {
-                el: $wrap,
-                width: 0,
-                height: 0,
-                maxWidth: $wrap.width(),
-                maxHeight: $wrap.height(),
-                type: ''
-            };
-
-            if ($wrap.data('image-compositing')) return;
-
-            $wrap.data('image-compositing', true);
-            $wrap.addClass(CLASS_LOADING);
-            $images.each(function(i, image) {
-                var $img = $(image);
-
-                var img = new Image();
-                img.onload = function() {
-                    if (i == num - 1) {
-                        return onLoadImages();
-                    }
-                };
-                img.src = $img.attr('src');
-            });
-
-            // ======================== //
-            function isHor($image) {
-                var w = $image.width();
-                var h = $image.height();
-                return !!(w / h > 1.1);
-            }
-
-            function isVer($image) {
-                return !isHor($image);
-            }
-
-            function relativeResize(size, type, width) {
-                var w = (type == 'width') ? 'width' : 'height';
-                var h = (type == 'height') ? 'width' : 'height';
-                var coef = size[w] / size[h];
-
-                size[w] = width;
-                size[h] = size[w] / coef;
-
-                return size;
-            }
-
-            function onLoadImages() {
-                var $firstImage;
-                var columns = [];
-
-                if ((num - 1) % imagesPerColumn == 1) {
-                    imagesPerColumn++;
-                } else if ((num - 1) % imagesPerColumn == 2) {
-                    imagesPerColumn--;
-                }
-                if (num == 2 && !hardPosition) {
-                    position = VER;
-                    wrap.width = wrap.maxWidth;
-                    $firstImage = $wrap;
-                }
-
-                $images.each(function(i) {
-                    var $image = $(this);
-
-                    if (i == 0) {
-                        $firstImage = $image;
-                        if (!position && isHor($firstImage)) {
-                            position = HOR;
-                            $firstImage.width(Math.min(wrap.maxWidth, $firstImage.width()));
-                            wrap.width = $firstImage.width();
-                            $wrap.width(wrap.width);
-                        } else {
-                            position = VER;
-                            $firstImage.height(Math.min(wrap.maxHeight, $firstImage.height()));
-                            wrap.height = $firstImage.height();
-                            $wrap.height(wrap.height);
-                        }
-                    } else {
-                        var columnIndex = Math.floor((i - 1) / (position == HOR ? imagesPerColumn : 99));
-                        if (!columns[columnIndex]) columns[columnIndex] = {};
-
-                        var column = columns[columnIndex];
-                        if (!column.images) column.images = [];
-                        if (!column.columnHeight) column.columnHeight = 99999;
-                        if (position == HOR) {
-                            column.columnHeight = Math.min(column.columnHeight, $image.height());
-                        } else {
-                            column.columnHeight = Math.min(column.columnHeight, $image.width());
-                        }
-                        column.images.push($image);
-                    }
-                });
-
-                $(columns).each(function(columnIndex, column) {
-                    $(column.images).each(function(imageIndex, $image) {
-                        if (!column.columnWidth) column.columnWidth = 0;
-                        if (position == HOR) {
-                            $image.height(column.columnHeight);
-                            column.columnWidth += $image.width();
-                        } else {
-                            $image.width(column.columnHeight);
-                            column.columnWidth += $image.height();
-                        }
-                    });
-                });
-
-                var columnsHeight = 0;
-                $(columns).each(function(columnIndex, column) {
-                    var coef = 0;
-                    var columnHeight = 0;
-
-                    if (position == HOR) {
-                        coef = wrap.width / column.columnWidth;
-                    } else {
-                        coef = wrap.height / column.columnWidth;
-                    }
-
-                    $(column.images).each(function(imageIndex, $image) {
-                        var s = {};
-                        if (position == HOR) {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
-
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['height'];
-                        } else {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
-
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['width'];
-                        }
-                    });
-                    columnsHeight += columnHeight;
-                });
-
-                var coef;
-                if (position == HOR) {
-                    wrap.height = $firstImage.height() + columnsHeight;
-
-                    if (wrap.height > wrap.maxHeight) {
-                        coef = wrap.maxHeight / wrap.height;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
-                    }
-                } else {
-                    wrap.width = $firstImage.width() + columnsHeight;
-
-                    if (wrap.width > wrap.maxWidth) {
-                        coef = wrap.maxWidth / wrap.width;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
-                    }
-                }
-
-                $wrap.width(wrap.width + 2);
-                $wrap.height(wrap.height + 2);
-                $wrap.removeClass(CLASS_LOADING);
-            }
-        });
-    };
-})(jQuery);
-
-// Автовысота у textarea
-(function($) {
-    $.fn.autoResize = function() {
-        return this.each(function() {
-            var $input = $(this);
-            if (!$input._autoResize) {
-                $input
-                    ._autoResize = $('<div/>')
-                    .appendTo('body')
-                    .css({
-                        width: $input.width(),
-                        minHeight: $input.height() - ($input.css('padding-top') + $input.css('padding-bottom')),
-                        padding: $input.css('padding'),
-                        lineHeight: $input.css('line-height'),
-                        font: $input.css('font'),
-                        fontSize: $input.css('font-size'),
-                        position: 'absolute',
-                        wordWrap: 'break-word',
-                        top: -100000
-                    });
-                $input.bind('keyup blur', function(e) {
-                    $input._autoResize.html($input.val().split('\n').join('<br/> '));
-                    $input.css({
-                        height: $input._autoResize.height() + 10
-                    });
-                });
-            }
-        });
-    };
-})(jQuery);
-
-// Дропдауны
-(function($) {
-    var CLASS_ACTIVE = 'active';
-    var CLASS_MENU = 'ui-dropdown-menu';
-    var CLASS_MENU_ITEM = 'ui-dropdown-menu-item';
-    var CLASS_MENU_ITEM_ACTIVE = 'active';
-    var CLASS_MENU_ICON = 'icon';
-    var CLASS_MENU_ICON_LEFT = 'icon-left';
-    var CLASS_MENU_ICON_RIGHT = 'icon-right';
-    var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
-    var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
-
-    var methods = {
-        init: function(parameters) {
-            return this.each(function() {
-                var defaults = {
-                    el: $(this),
-                    type: 'normal',
-                    width: '',
-                    addClass: '',
-                    position: 'left',
-                    iconPosition: 'left',
-                    openEvent: 'mousedown',
-                    closeEvent: 'click', // Not use
-                    data: [{}],
-                    onchange: function() {},
-                    oncreate: function() {},
-                    onopen: function() {},
-                    onclose: function() {}
-                };
-                var t = this;
-                var p = t.p = $.extend(defaults, parameters);
-                var $el = p.el;
-
-                if ($el.data('menu') || !p.data) return false;
-
-                $el.data('menu', $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
-                $(p.data).each(function(i, item) {
-                    var $item = $('<div data-id="' + item.id + '">' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
-                    if (item.icon) {
-                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
-                        $item.append($icon);
-                        if (p.iconPosition == 'left') {
-                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_LEFT});
-                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_LEFT);
-                        } else {
-                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_RIGHT});
-                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_RIGHT);
-                        }
-                    }
-                    if (item.isActive) {
-                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
-                    }
-                    $item.mouseup(function() {
-                        if (p.type == 'checkbox') {
-                            $el.data('menu').find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
-                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
-                        }
-                        close();
-                        run(p.onchange, $el, item);
-                    });
-                    $el.data('menu').append($item);
-                });
-
-                $el.bind(p.openEvent, function(e) {
-                    e.stopPropagation();
-                    if (!$el.data('menu').is(':visible')) {
-                        $('html, body').trigger(p.openEvent);
-                        open();
-                    } else {
-                        close();
-                    }
-                });
-
-                $el.data('menu').bind(p.openEvent, function(e) {
-                    e.stopPropagation();
-                });
-
-                $('html, body').bind(p.openEvent, function(e) {
-                    close();
-                    run(p.onclose, $el, $el.data('menu'));
-                });
-
-                function open() {
-                    $el.addClass(CLASS_ACTIVE);
-                    $el.data('menu').css({
-                        width: p.width || $el.width()
-                    });
-
-                    var $menu = $el.data('menu');
-                    var isFixed = !!($menu.css('position') == 'fixed');
-                    var offset = $el.offset();
-                    var offsetTop = offset.top;
-                    var offsetLeft = offset.left
-                        + parseFloat($menu.css('margin-left'))
-                        - parseFloat($menu.css('margin-right'));
-                    if (p.position == 'right') {
-                        offsetLeft += ($el.width() - $menu.width())
-                    }
-                    if (isFixed) {
-                        offsetTop -= $(document).scrollTop();
-                        offsetLeft -= $(document).scrollLeft();
-                    }
-
-                    $menu.css({
-                        top: offsetTop + $el.outerHeight(),
-                        left: offsetLeft
-                    }).show();
-                    run(p.onopen, $el, $el.data('menu'));
-                }
-
-                function close() {
-                    $el.removeClass(CLASS_ACTIVE);
-                    $el.data('menu').hide();
-                    run(p.onclose, $el, $el.data('menu'));
-                }
-
-                run(p.oncreate, $el);
-            });
-
-            function run(f, context, argument) {
-                if ($.isFunction(f)) {
-                    f.call(context, argument);
-                }
-            }
-        }
-    };
-
-    $.fn.dropdown = function(method) {
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || ! method) {
-            return methods.init.apply(this, arguments);
-        } else {
-            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
-        }
-    };
-})(jQuery);
-
 $.extend(Events, Eventlist);
 delete(Eventlist);
 
@@ -1777,3 +1398,148 @@ $.fn.dd_sel = function(id){
     }
     $(this).trigger("change");
 };
+
+// Дропдауны
+(function($) {
+    var CLASS_ACTIVE = 'active';
+    var CLASS_MENU = 'ui-dropdown-menu';
+    var CLASS_MENU_ITEM = 'ui-dropdown-menu-item';
+    var CLASS_MENU_ITEM_ACTIVE = 'active';
+    var CLASS_MENU_ICON = 'icon';
+    var CLASS_MENU_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ICON_RIGHT = 'icon-right';
+    var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
+    var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
+    var TRIGGER_OPEN = 'open';
+    var TRIGGER_CLOSE = 'close';
+    var TRIGGER_CHANGE = 'change';
+    var TRIGGER_CREATE = 'create';
+    var ITEM_DATA_KEY = 'item';
+
+    var methods = {
+        init: function(parameters) {
+            return this.each(function() {
+                var defaults = {
+                    el: $(this),
+                    type: 'normal',
+                    width: '',
+                    addClass: '',
+                    position: 'left',
+                    iconPosition: 'left',
+                    openEvent: 'mousedown',
+                    dataKey: 'dropdown',
+                    data: [{}],
+                    onchange: function() {},
+                    oncreate: function() {},
+                    onopen: function() {},
+                    onclose: function() {}
+                };
+                var t = this;
+                var p = t.p = $.extend(defaults, parameters);
+                var $el = p.el;
+
+                if ($el.data(p.dataKey) || !p.data) return false;
+
+                $el.data(p.dataKey, $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
+                $(p.data).each(function(i, item) {
+                    var $item = $('<div data-id="' + item.id + '">' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
+
+                    if (item.icon) {
+                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                        $item.append($icon);
+                        if (p.iconPosition == 'left') {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_LEFT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_LEFT);
+                        } else {
+                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_RIGHT});
+                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_RIGHT);
+                        }
+                    }
+                    if (item.isActive) {
+                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                    }
+                    $item.mouseup(function() {
+                        if (p.type == 'checkbox') {
+                            $el.data(p.dataKey).find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
+                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                        }
+                        close();
+                        run(p.onchange, $el, item);
+                    });
+                    $el.data(p.dataKey).append($item);
+                });
+
+                $el.bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                    if (!$el.data(p.dataKey).is(':visible')) {
+                        $('html, body').trigger(p.openEvent);
+                        open();
+                    } else {
+                        close();
+                    }
+                });
+
+                $el.data(p.dataKey).bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                });
+
+                $('html, body').bind(p.openEvent, function(e) {
+                    close();
+                    run(p.onclose, $el, $el.data(p.dataKey));
+                });
+
+                function open() {
+                    $el.addClass(CLASS_ACTIVE);
+                    $el.data(p.dataKey).css({
+                        width: p.width || $el.width()
+                    });
+
+                    var $menu = $el.data(p.dataKey);
+                    var isFixed = !!($menu.css('position') == 'fixed');
+                    var offset = $el.offset();
+                    var offsetTop = offset.top;
+                    var offsetLeft = offset.left
+                        + parseFloat($menu.css('margin-left'))
+                        - parseFloat($menu.css('margin-right'));
+                    if (p.position == 'right') {
+                        offsetLeft += ($el.width() - $menu.width())
+                    }
+                    if (isFixed) {
+                        offsetTop -= $(document).scrollTop();
+                        offsetLeft -= $(document).scrollLeft();
+                    }
+
+                    $menu.css({
+                        top: offsetTop + $el.outerHeight(),
+                        left: offsetLeft
+                    }).show();
+                    run(p.onopen, $el, $el.data(p.dataKey));
+                }
+
+                function close() {
+                    $el.removeClass(CLASS_ACTIVE);
+                    $el.data(p.dataKey).hide();
+                    run(p.onclose, $el, $el.data(p.dataKey));
+                }
+
+                run(p.oncreate, $el);
+            });
+
+            function run(f, context, argument) {
+                if ($.isFunction(f)) {
+                    f.call(context, argument);
+                }
+            }
+        }
+    };
+
+    $.fn.dropdown = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || ! method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
+        }
+    };
+})(jQuery);

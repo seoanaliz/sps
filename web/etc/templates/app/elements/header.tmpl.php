@@ -41,6 +41,8 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/jquery.easydate-0.2.4.js',
+    'js://common/common.js',
+    'js://fe/file-uploader/fileuploader.js',
     'js://app/main.js',
     'js://app/events.js',
 );
@@ -64,6 +66,7 @@ if(!empty($jsFilesAdds)) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<?= LocaleLoader::$HtmlEncoding ?>" />
     <script type="text/javascript">
+        var root = '{web:/}';
         var controlsRoot = '{web:appControls://}';
     </script>
     <title><?=$__pageTitle?></title>
