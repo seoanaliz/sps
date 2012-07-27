@@ -38,12 +38,6 @@
                 <? } ?>
                 <span class="date">{$article->createdAt->defaultFormat()}</span>
             </div>
-            <? if ($likes) { ?>
-            <div class="likes">
-                <span class="icon hart"></span>
-                <span class="counter">1720</span>
-            </div>
-            <? } ?>
         </div>
         {increal:tmpl://app/elements/wall-comments.tmpl.php}
     </div>

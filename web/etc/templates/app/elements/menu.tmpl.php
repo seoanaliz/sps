@@ -2,7 +2,6 @@
     <div class="item my selected" data-id="my">
         <div class="content">
             Мои публикации
-            <!--span class="counter">+1</span -->
         </div>
     </div>
     <? foreach($targetFeeds as $targetFeed) { ?>
