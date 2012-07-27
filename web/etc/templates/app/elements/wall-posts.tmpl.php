@@ -1,7 +1,7 @@
 <div class="wall" id="wall">
     <div class="title clear-fix">
         <div class="text"></div>
-        <div class="dropdown">My posts</div>
+        <div class="dropdown">мои записи</div>
     </div>
     <? if (!empty($targetFeeds)) { ?>
     <div class="new-post">

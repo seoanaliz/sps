@@ -118,11 +118,14 @@ var app = (function () {
             position: 'right',
             width: 'auto',
             data: [
-                {title: 'где меню блять', type : 'new'},
-                {title: 'новые записи', type : 'new'},
-                {title: 'старые записи', type : 'old'},
-                {title: 'лучшие записи', type : 'best'}
-            ]
+                {title: 'мои записи', type : 'my'},
+                {title: 'лучшие записи', type : 'best'},
+                {title: 'последние записи', type : 'new'}
+            ],
+            onchange: function(node) {
+                $(this).text(node.title);
+                pageLoad($menu.find('.item.selected').data('id'), node.type);
+            }
         });
 
         $newPost.find('textarea').placeholder();
@@ -258,8 +261,8 @@ var app = (function () {
         });
     }
 
-    function pageLoad(id) {
-        Events.fire('wall_load', {clear: true, type: id}, function(data) {
+    function pageLoad(id, filter) {
+        Events.fire('wall_load', {clear: true, type: id, filer: filter}, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
                 var $targetList = $targetItem.next('.list');
