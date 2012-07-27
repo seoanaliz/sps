@@ -32,6 +32,7 @@
 
             if (!empty($sourceFeeds)) {
                 foreach ($sourceFeeds as $sourceFeed) {
+                    if (empty($sourceFeed->$key)) continue;
                     $sourceInfo[$sourceFeed->$key] = array(
                         'name' => $sourceFeed->title,
                         'img' => ''
