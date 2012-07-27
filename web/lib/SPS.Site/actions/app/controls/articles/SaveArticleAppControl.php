@@ -59,7 +59,7 @@
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
-            $articleRecord->photos = array();
+            $articleRecord->photos = $photos;
 
             $queryResult = $this->add($article, $articleRecord);
 
