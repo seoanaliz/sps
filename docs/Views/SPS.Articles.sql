@@ -32,7 +32,8 @@ SELECT "public"."targetFeeds"."targetFeedId"
  FROM "public"."targetFeeds"
 	LEFT JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeeds"."publisherId"
-	WHERE "public"."targetFeeds"."statusId" != 3;
+	WHERE "public"."targetFeeds"."statusId" != 3
+ORDER BY "title";
 	
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
