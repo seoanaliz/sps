@@ -1,5 +1,8 @@
 {increal:tmpl://app/elements/header.tmpl.php}
 <div class="main clear-fix">
-    <h1>У Вас нет доступа</h1>
+    <div class="access-denied">
+        Доступ к приложению ограничен<br/>
+        Вы не связаны ни с одним из сообществ
+    </div>
 </div>
 {increal:tmpl://app/elements/footer.tmpl.php}

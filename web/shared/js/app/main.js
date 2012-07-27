@@ -231,14 +231,12 @@ var app = (function () {
                     width: 'auto',
                     data: dropdownItems,
                     oncreate: function() {
-                        console.log($(this));
                         var $defItem = $(this).data('dropdown').find('div:first');
                         var itemData = $defItem.data('item');
                         $(this).text(itemData.title);
                         pageLoad(itemId, itemData.type);
                     },
                     onchange: function(item) {
-                        console.log(item);
                         $(this).text(item.title);
                         pageLoad($menu.find('.item.selected').data('id'), item.type);
                     }
