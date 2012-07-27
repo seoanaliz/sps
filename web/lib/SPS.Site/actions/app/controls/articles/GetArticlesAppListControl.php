@@ -106,7 +106,7 @@
 
         private function getObjects() {
             $this->articles = ArticleFactory::Get($this->search, $this->options);
-            $this->articlesCount = ArticleFactory::Count($this->search, array(BaseFactory::WithoutPages => true));
+            $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
 
             $this->hasMore = (count($this->articles) > $this->pageSize);
             $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
