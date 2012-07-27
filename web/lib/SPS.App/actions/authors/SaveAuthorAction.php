@@ -45,9 +45,7 @@
                 $object->vkId = current($matches);
             }
 
-            $targetFeedIds = Request::getArray( 'targetFeedIds' );
-            $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
-            $object->targetFeedIds = implode(',', $targetFeedIds);
+            $object->targetFeedIds = Request::getArray( 'targetFeedIds' );
 
             try {
                 if (!empty($object->vkId)) {

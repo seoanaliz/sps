@@ -424,6 +424,9 @@
                     <actions>SPS.Site.GetArticlesAppListControl</actions>
                     <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
                 </page>
+                <page uri="appControls://article-delete/">
+                    <actions>SPS.Site.DeleteArticleAppControl</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

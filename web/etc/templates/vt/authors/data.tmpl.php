@@ -9,8 +9,6 @@
     if ( !empty($errors["fatal"] ) ) {
 		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
 	}
-
-    $object->targetFeedIds = explode(',', $object->targetFeedIds);
 ?>
 <div class="tabs">
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>

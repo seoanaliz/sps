@@ -52,7 +52,8 @@
                 )
                 ,'targetFeedIds' => array(
                     'name'          => 'targetFeedIds'
-                    , 'type'        => TYPE_STRING
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'int[]'
                 )
                 ,'statusId' => array(
                     'name'          => 'statusId'
@@ -62,7 +63,12 @@
                 ))
             , 'lists'     => array()
             , 'search'    => array(
-                'page' => array(
+                '_authorId' => array(
+                    'name'         => 'authorId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'page' => array(
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 0

@@ -65,7 +65,15 @@ var Eventlist = {
         });
     },
     wall_delete: function(postId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'article-delete/',
+            data: {
+                id: postId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
     wall_restore: function(postId, callback) {
         callback(true);

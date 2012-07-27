@@ -84,9 +84,8 @@
                 </td>
                 <td class="left">
                     <?
-                    $targetFeedIds = explode(',', $object->targetFeedIds);
                     $objectFeeds = array();
-                    foreach ($targetFeedIds as $targetFeedId) {
+                    foreach ($object->targetFeedIds as $targetFeedId) {
                         if (!empty($targetFeeds[$targetFeedId])) {
                             $objectFeeds[] = $targetFeeds[$targetFeedId];
                         }

@@ -21,7 +21,7 @@
 
             $text           = trim(Request::getString( 'text' ));
             $photos         = Request::getArray( 'photos' );
-            $targetFeedId   = Request::getInteger( 'publicId' );
+            $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
 
             $targetFeedIds = Session::getArray('targetFeedIds');
 
@@ -56,7 +56,7 @@
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
-            $articleRecord->photos = $photos;
+            $articleRecord->photos = array();
 
             $queryResult = $this->add($article, $articleRecord);
 

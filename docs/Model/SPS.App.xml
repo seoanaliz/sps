@@ -9,10 +9,11 @@
         <Attribute Name="firstName" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="firstName" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="lastName" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="lastName" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="avatar" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="avatar" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
-        <Attribute Name="targetFeedIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedIds" FieldType="TYPE_STRING" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="targetFeedIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedIds" FieldType="TYPE_ARRAY" ComplexType="int[]" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
       <Search>
+        <Attribute Name="_authorId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="authorId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
         <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
       </Search>

@@ -27,7 +27,7 @@
         /** @var string */
         public $avatar;
 
-        /** @var string */
+        /** @var array */
         public $targetFeedIds;
 
         /** @var int */
