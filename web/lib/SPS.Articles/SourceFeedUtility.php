@@ -30,21 +30,23 @@
         public static function GetInfo($sourceFeeds, $key = 'sourceFeedId') {
             $sourceInfo = array();
 
-            foreach ($sourceFeeds as $sourceFeed) {
-                $sourceInfo[$sourceFeed->$key] = array(
-                    'name' => $sourceFeed->title,
-                    'img' => ''
-                );
+            if (!empty($sourceFeeds)) {
+                foreach ($sourceFeeds as $sourceFeed) {
+                    $sourceInfo[$sourceFeed->$key] = array(
+                        'name' => $sourceFeed->title,
+                        'img' => ''
+                    );
 
-                //group image
-                $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
-                if (!file_exists(Site::GetRealPath($path))) {
-                    $path = 'images://fe/no-avatar.png';
-                } else {
-                    $path .= '?v=' . filemtime(Site::GetRealPath($path));
+                    //group image
+                    $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
+                    if (!file_exists(Site::GetRealPath($path))) {
+                        $path = 'images://fe/no-avatar.png';
+                    } else {
+                        $path .= '?v=' . filemtime(Site::GetRealPath($path));
+                    }
+
+                    $sourceInfo[$sourceFeed->$key]['img'] = Site::GetWebPath($path);
                 }
-
-                $sourceInfo[$sourceFeed->$key]['img'] = Site::GetWebPath($path);
             }
 
             return $sourceInfo;
