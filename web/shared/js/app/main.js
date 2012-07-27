@@ -32,7 +32,7 @@ var app = (function () {
 
         _updateItems();
         _initEvents();
-        pageLoad($menu.find('.item.selected').data('id'));
+        $menu.find('.item.selected').click();
 
         isInitialized = true;
     }
@@ -114,20 +114,6 @@ var app = (function () {
         });
 
         /*Left column*/
-        $wall.find('> .title > .dropdown').dropdown({
-            position: 'right',
-            width: 'auto',
-            data: [
-                {title: 'мои записи', type : 'my'},
-                {title: 'лучшие записи', type : 'best'},
-                {title: 'последние записи', type : 'new'}
-            ],
-            onchange: function(node) {
-                $(this).text(node.title);
-                pageLoad($menu.find('.item.selected').data('id'), node.type);
-            }
-        });
-
         $newPost.find('textarea').placeholder();
 
         $newPost.find('textarea').bind('focus', function() {
@@ -181,8 +167,16 @@ var app = (function () {
             var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
             Events.fire('comment_delete', commentId, function() {
-                //todo: восстановление сообщения
-                $comment.remove();
+                $comment.data('html', $comment.html());
+                $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+            });
+        });
+        $wall.delegate('.comment.deleted > .restore', 'click', function() {
+            var $target = $(this);
+            var $comment = $target.closest('.post');
+            var commentId = $comment.data('id');
+            Events.fire('comment_restore', commentId, function() {
+                $comment.removeClass('deleted').html($comment.data('html'));
             });
         });
         $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {
@@ -209,7 +203,47 @@ var app = (function () {
         /*Right column*/
         $menu.delegate('.item', 'click', function() {
             var $item = $(this);
-            pageLoad($item.data('id'));
+            var itemId = $item.data('id');
+            var isEmpty = $item.data('empty');
+
+            (function() {
+                var dropdownItems = [
+                    {title: 'мои записи', type: 'my'},
+                    {title: 'лучшие записи', type: 'best'},
+                    {title: 'последние записи', type: 'new'}
+                ];
+
+                if (itemId == 'my') {
+                    dropdownItems = [
+                        {title: 'мои записи', type: 'my'},
+                        {title: 'лучшие записи', type: 'best'}
+                    ];
+                }
+                if (isEmpty) {
+                    dropdownItems = [
+                        {title: 'лучшие записи', type: 'best'},
+                        {title: 'последние записи', type: 'new'}
+                    ];
+                }
+
+                $wall.find('> .title > .dropdown').dropdown({
+                    position: 'right',
+                    width: 'auto',
+                    data: dropdownItems,
+                    oncreate: function() {
+                        console.log($(this));
+                        var $defItem = $(this).data('dropdown').find('div:first');
+                        var itemData = $defItem.data('item');
+                        $(this).text(itemData.title);
+                        pageLoad(itemId, itemData.type);
+                    },
+                    onchange: function(item) {
+                        console.log(item);
+                        $(this).text(item.title);
+                        pageLoad($menu.find('.item.selected').data('id'), item.type);
+                    }
+                });
+            })();
         });
     }
 
@@ -385,6 +419,11 @@ function getURLParameter(name) {
     var CLASS_MENU_ICON_RIGHT = 'icon-right';
     var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
     var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
+    var TRIGGER_OPEN = 'open';
+    var TRIGGER_CLOSE = 'close';
+    var TRIGGER_CHANGE = 'change';
+    var TRIGGER_CREATE = 'create';
+    var ITEM_DATA_KEY = 'item';
 
     var methods = {
         init: function(parameters) {
@@ -407,15 +446,38 @@ function getURLParameter(name) {
                 var t = this;
                 var p = t.p = $.extend(defaults, parameters);
                 var $el = p.el;
+                var $menu = $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body');
 
-                if ($el.data(p.dataKey) || !p.data) return false;
+                if (!p.data) return false;
+                if ($el.data(p.dataKey)) {
+                    $el.data(p.dataKey).remove();
+                } else {
+                    $('html, body').bind(p.openEvent, function(e) {
+                        var $menu = $el.data(p.dataKey);
+                        close($menu);
+                        run(p.onclose, $el, $menu);
+                    });
+                    $el.bind(p.openEvent, function(e) {
+                        var $menu = $el.data(p.dataKey);
+                        e.stopPropagation();
+                        if (!$menu.is(':visible')) {
+                            $('html, body').trigger(p.openEvent);
+                            open($menu);
+                        } else {
+                            close($menu);
+                        }
+                    });
+                }
+                $el.data(p.dataKey, $menu);
 
-                $el.data(p.dataKey, $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
                 $(p.data).each(function(i, item) {
-                    var $item = $('<div>' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
-                    if (item.id) {
-                        $item.data('id', item.id);
-                    }
+                    var $item = $('<div/>')
+                        .text(item.title)
+                        .addClass(CLASS_MENU_ITEM)
+                        .data(ITEM_DATA_KEY, item)
+                        .appendTo($menu)
+                    ;
+
                     if (item.icon) {
                         var $icon = $('<div><img src="' + item.icon + '" /></div>');
                         $item.append($icon);
@@ -430,44 +492,21 @@ function getURLParameter(name) {
                     if (item.isActive) {
                         $item.addClass(CLASS_MENU_ITEM_ACTIVE);
                     }
-                    $item.mouseup(function() {
-                        if (p.type == 'checkbox') {
-                            $el.data(p.dataKey).find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
-                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
-                        }
-                        close();
-                        run(p.onchange, $el, item);
-                        $el.trigger('change');
-                    });
-                    $el.data(p.dataKey).append($item);
                 });
-
-                $el.bind(p.openEvent, function(e) {
-                    e.stopPropagation();
-                    if (!$el.data(p.dataKey).is(':visible')) {
-                        $('html, body').trigger(p.openEvent);
-                        open();
-                    } else {
-                        close();
-                    }
+                $menu.delegate('.' + CLASS_MENU_ITEM, 'mouseup', function() {
+                    close($menu);
+                    select($(this));
                 });
-
-                $el.data(p.dataKey).bind(p.openEvent, function(e) {
+                $menu.bind(p.openEvent, function(e) {
                     e.stopPropagation();
                 });
 
-                $('html, body').bind(p.openEvent, function(e) {
-                    close();
-                    run(p.onclose, $el, $el.data(p.dataKey));
-                });
-
-                function open() {
+                function open($menu) {
                     $el.addClass(CLASS_ACTIVE);
-                    $el.data(p.dataKey).css({
+                    $menu.css({
                         width: p.width || $el.width()
                     });
 
-                    var $menu = $el.data(p.dataKey);
                     var isFixed = !!($menu.css('position') == 'fixed');
                     var offset = $el.offset();
                     var offsetTop = offset.top;
@@ -486,19 +525,30 @@ function getURLParameter(name) {
                         top: offsetTop + $el.outerHeight(),
                         left: offsetLeft
                     }).show();
-                    run(p.onopen, $el, $el.data(p.dataKey));
-                    $el.trigger('open');
+
+                    run(p.onopen, $el, $menu);
+                    $el.trigger(TRIGGER_OPEN);
                 }
 
-                function close() {
+                function close($menu) {
                     $el.removeClass(CLASS_ACTIVE);
-                    $el.data(p.dataKey).hide();
-                    run(p.onclose, $el, $el.data(p.dataKey));
-                    $el.trigger('close');
+                    $menu.hide();
+                    run(p.onclose, $el, $menu);
+                    $el.trigger(TRIGGER_CLOSE);
+                }
+
+                function select($item) {
+                    var data = $item.data(ITEM_DATA_KEY);
+                    if (p.type == 'checkbox') {
+                        $menu.find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
+                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
+                    }
+                    run(p.onchange, $el, data);
+                    $el.trigger(TRIGGER_CHANGE);
                 }
 
                 run(p.oncreate, $el);
-                $el.trigger('create');
+                $el.trigger(TRIGGER_CREATE);
             });
 
             function run(f, context, argument) {

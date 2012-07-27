@@ -4,8 +4,8 @@
         <div class="image-attach"></div>
     </div>
     <div id="attach-file" class="buttons attach-file">
-        <div class="save button spr l">Отправить</div>
-        <a href="#" class="cancel spr l">Отменить</a>
+        <div class="save button l">Отправить</div>
+        <a href="#" class="cancel l">Отменить</a>
         <!-- Штука для загрузки файла -->
     </div>
     <div class="link-info" style="display: none;">
