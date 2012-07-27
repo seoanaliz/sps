@@ -20,8 +20,8 @@ $(document).ready(function() {
             action: root + 'int/controls/image-upload/',
             template: ' <div class="qq-uploader">' +
                 '<ul class="qq-upload-list"></ul>' +
-                '<div class="save button spr l">Отправить</div>' +
-                '<a href="javascript:;" class="cancel spr l">Отменить</a>' +
+                '<div class="save button l">Отправить</div>' +
+                '<a href="javascript:;" class="cancel l">Отменить</a>' +
                 '<a href="javascript:;" class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
             onComplete: function(id, fileName, responseJSON) {

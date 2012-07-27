@@ -619,7 +619,7 @@ $(document).ready(function(){
                         '<table><tr><td><img src="'+this.imageSrc+'" id="originalImage" /></td>'+
                         '<td><div class="previewContainer">'+
                         '<div class="previewLayout"><img id="preview" src="'+this.imageSrc+'" /></div>'+
-                        '<div class="button spr save">Сохранить</div>'+
+                        '<div class="button save">Сохранить</div>'+
                         '<div id="attach-image-file" class="buttons attach-file">'+
                         '</div>'+
                         '</div></td></tr></table><b class="close"></b>'
@@ -675,7 +675,7 @@ $(document).ready(function(){
                         action: root + 'int/controls/image-upload/',
                         template: ' <div class="qq-uploader">' +
                             '<ul class="qq-upload-list"></ul>' +
-                            //'<a href="#" class="button spr qq-upload-button">Загрузить картинку</a>' +
+                            //'<a href="#" class="button qq-upload-button">Загрузить картинку</a>' +
                             '</div>',
                         onComplete: function(id, fileName, responseJSON) {
                             popupNotice('Не реализовано');
@@ -914,7 +914,7 @@ $(document).ready(function(){
                                                                 '</div>' +
                                                                 '<div class="right-column">' +
                                                                     '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                                                    '<div class="button spr save">Сохранить</div>'+
+                                                                    '<div class="button save">Сохранить</div>'+
                                                                 '</div>'
                                                         })
                                                         .appendTo('body');
@@ -1000,7 +1000,7 @@ $(document).ready(function(){
                         var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
                         var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
                         var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
-                        var $saveBtn = $('<div/>', {class: 'save button spr l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                        var $saveBtn = $('<div/>', {class: 'save button l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
                         var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                         var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
