@@ -23,8 +23,12 @@
             self::Authors => 'Авторские',
         );
 
-        public static function IsTopFeed(SourceFeed $sourceFeed) {
-            return in_array($sourceFeed->externalId, self::$Tops);
+        public static function IsTopFeed($sourceFeed) {
+            if (empty($sourceFeed->externalId)) {
+                return false;
+            } else {
+                return in_array($sourceFeed->externalId, self::$Tops);
+            }
         }
 
         public static function GetInfo($sourceFeeds, $key = 'sourceFeedId') {
