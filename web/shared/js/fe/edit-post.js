@@ -1,5 +1,4 @@
 var SimpleEditPost = function(postId, $post, $el, data) {
-    console.log(data);
     function setSelectionRange(input, selectionStart, selectionEnd) {
         if (input.setSelectionRange) {
             input.focus();
@@ -19,7 +18,7 @@ var SimpleEditPost = function(postId, $post, $el, data) {
     var onSave = function() {
         var text = $text.val();
         var link = data.link;
-        var photos = data.photos;
+        var photos = $.parseJSON(data.photos);
         if (!($.trim(text) || link || photos.length)) {
             return $text.focus();
         } else {

@@ -37,10 +37,6 @@
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
 
-            if ($photos == array('[]')) {
-                $photos = array();
-            }
-
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
 
