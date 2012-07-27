@@ -262,7 +262,7 @@ var app = (function () {
     }
 
     function pageLoad(id, filter) {
-        Events.fire('wall_load', {clear: true, type: id, filer: filter}, function(data) {
+        Events.fire('wall_load', {clear: true, type: id, filter: filter}, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
                 var $targetList = $targetItem.next('.list');
