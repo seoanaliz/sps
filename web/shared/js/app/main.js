@@ -178,8 +178,16 @@ var app = (function () {
             var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
             Events.fire('comment_delete', commentId, function() {
-                //todo: восстановление сообщения
-                $comment.remove();
+                $comment.data('html', $comment.html());
+                $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+            });
+        });
+        $wall.delegate('.comment.deleted > .restore', 'click', function() {
+            var $target = $(this);
+            var $comment = $target.closest('.post');
+            var commentId = $comment.data('id');
+            Events.fire('comment_restore', commentId, function() {
+                $comment.removeClass('deleted').html($comment.data('html'));
             });
         });
         $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {

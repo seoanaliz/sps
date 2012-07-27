@@ -93,6 +93,9 @@ var Eventlist = {
     },
     comment_delete: function(commentId, callback) {
         callback(true);
+    },
+    comment_restore: function(commentId, callback) {
+        callback(true);
     }
 };
 $.extend(Events.eventList, Eventlist);
