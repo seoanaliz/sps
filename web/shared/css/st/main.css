@@ -7,9 +7,9 @@ table,tr,td{vertical-align:top;}
 #main td.filter>.audience{padding:10px 10px 0;}#main td.filter>.audience .slider-range{padding:0 10px 10px;text-align:center;color:#999;}
 #main td.filter>.period{padding:7px 7px 0;}#main td.filter>.period label{padding:3px;}
 #main td.filter>.period input{margin-right:5px;}
-#main td.filter>.list{margin:10px 10px 0;padding-top:7px;border-top:1px solid #D8DFEA;}#main td.filter>.list>.item{padding:4px 4px 4px 9px;cursor:pointer;color:#2B587A;}#main td.filter>.list>.item:hover{background-color:#E1E7ED;}#main td.filter>.list>.item:hover .icon{opacity:.5;}
-#main td.filter>.list>.item .icon{float:right;background-image:url('../../images/st/star.png');opacity:0;}#main td.filter>.list>.item .icon:hover,#main td.filter>.list>.item .icon.selected{opacity:1;}
-#main td.filter>.list>.item.selected{background-color:#5E82A8;color:#fff;box-shadow:0 0 1px rgba(0, 0, 0, 0.6) inset;}#main td.filter>.list>.item.selected .icon{background-image:url('../../images/st/select-white.png');}
+#main td.filter>.list{margin:10px 10px 0;padding-top:7px;border-top:1px solid #D8DFEA;}#main td.filter>.list>.item{padding:4px 4px 4px 9px;cursor:pointer;color:#2B587A;}#main td.filter>.list>.item:hover{background-color:#E1E7ED;}#main td.filter>.list>.item:hover .icon{opacity:.5;display:block;}
+#main td.filter>.list>.item .icon{float:right;background-image:url('../../images/st/star.png');display:none;padding:1px;}#main td.filter>.list>.item .icon:hover,#main td.filter>.list>.item .icon.selected{display:block;opacity:1;}
+#main td.filter>.list>.item.selected{background-color:#5E82A8;color:#fff;box-shadow:0 0 1px rgba(0, 0, 0, 0.6) inset;}#main td.filter>.list>.item.selected .icon{background-image:url('../../images/st/star-white.png');}
 #main td.content{width:700px;}#main td.content .list-head{background-color:#DEE5EB;cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;color:#45688E;}#main td.content .list-head .publics,#main td.content .list-head .followers,#main td.content .list-head .growth,#main td.content .list-head .contacts{float:left;text-align:center;font-weight:bold;padding:6px 0;line-height:27px;}
 #main td.content .list-head .publics{text-align:left;cursor:default;}
 #main td.content .list-head .contacts{cursor:default;}
@@ -24,8 +24,9 @@ table,tr,td{vertical-align:top;}
 #main td.content .list-head .followers,#main td.content .list-head .growth,#main td.content .public-followers,#main td.content .public-growth{width:15%;text-align:center;}
 #main td.content .list-head .contacts,#main td.content .public-contacts{width:25%;}
 #main td.content .public{border-top:1px solid #DEE5EB;font-weight:bold;line-height:37px;padding:6px 0;}
-#main td.content .public-info a{line-height:1.5em;}
-#main td.content .public-info .photo{width:32px;height:32px;overflow:hidden;margin:3px 10px;float:left;}
+#main td.content .public-info>*{vertical-align:middle;display:inline-block;}
+#main td.content .public-info a{line-height:1.5em;max-width:228px;}
+#main td.content .public-info .photo{width:32px;height:32px;overflow:hidden;margin:3px 10px;}
 #main td.content .public-info .photo img{max-width:32px;}
 #main td.content .table.no-list-id .public-actions>.action .icon{opacity:.3;}
 #main td.content .table.no-list-id .public-actions>.action:hover .icon,#main td.content .table.no-list-id .public-actions>.action.selected .icon{opacity:1;}

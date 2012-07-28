@@ -591,7 +591,6 @@ var Table = (function() {
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
                                 $dropdown.html($tmpDropdown.html());
                                 $input = $dropdown.find('input');
-                                List.refresh();
                                 Filter.listRefresh();
                             });
                         });

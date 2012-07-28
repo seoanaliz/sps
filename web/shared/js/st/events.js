@@ -60,16 +60,14 @@ var Eventlist = {
     load_bookmarks: function(callback) {
         simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData))
+            if ($.isArray(dirtyData)) {
                 $.each(dirtyData, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name
                     });
                 });
-            clearData = [
-                {itemId: 32, itemTitle: 'Первый список'}
-            ];
+            }
             callback(clearData);
         });
     },
