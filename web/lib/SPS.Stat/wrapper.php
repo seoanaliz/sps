@@ -15,6 +15,7 @@ class wrapper
     public $id; // id паблика
     public $q_result;
 
+
     public function __construct()
     {
         /*require_once 'config.inc.php';*/
@@ -100,7 +101,6 @@ class wrapper
     {
         switch ($meth){
             case 'connect':
-                print_r($data);
                 $this->db = new mysqli(
                                             $data['host'],
                                             $data['user'],

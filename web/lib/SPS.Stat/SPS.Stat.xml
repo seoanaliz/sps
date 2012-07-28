@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
     <action name="GraphGrow" />
+    <path>GraphGrow</path>
+
+    <action name="GraphGrow" />
         <path>GraphGrow</path>
     <group name="Daemons">
         <action name="WrTopics">
@@ -31,17 +34,29 @@
             <action name="getEntries">
                 <path>controls/getEntries</path>
             </action>
-            <action name="selectSAdmin">
-                <path>controls/selectSAdmin</path>
+            <action name="selectGroupAdmin">
+                <path>controls/selectGroupAdmin</path>
             </action>
             <action name="getGroupList">
                 <path>controls/getGroupList</path>
             </action>.
-            <action name="implGroup">
-                <path>controls/implGroup</path>
+            <action name="implPublic">
+                <path>controls/implPublic</path>
             </action>
             <action name="exGroup">
                 <path>controls/exGroup</path>
+            </action>
+            <action name="togglePublVisibil">
+                <path>controls/togglePublVisibil</path>
+            </action>
+            <action name="addUser">
+                <path>controls/addUser</path>
+            </action>
+            <action name="setUserRank">
+                <path>controls/setUserRank</path>
+            </action>
+            <action name="shareGroup">
+                <path>controls/shareGroup</path>
             </action>
 
         </group>
