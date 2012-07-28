@@ -38,14 +38,12 @@ var tmpl = (function() {
 
 var LIST =
 '<div class="tab-bar">' +
-    '<span data-id="null" class="tab selected">Все записи</span>' +
+    '<div class="tab selected" data-id="null">Все записи</div>' +
     '<? each(LIST_ITEM, items); ?>' +
 '</div>';
 
 var LIST_ITEM =
-'<span data-id="<?=itemId?>" class="tab">' +
-    '<?=itemTitle?>' +
-'</span>';
+'<span class="tab"data-id="<?=itemId?>"><?=itemTitle?></span>';
 
 var TABLE =
 '<div class="list-head clear-fix">' +
@@ -140,4 +138,14 @@ var CONTACT_DROPDOWN_ITEM =
             '<?=userDescription?>' +
         '</div>' +
     '</div>' +
+'</div>';
+
+var FILTER_LIST =
+'<div class="item selected" data-id="null">Все записи</div>' +
+'<? each(FILTER_LIST_ITEM, items); ?>';
+
+var FILTER_LIST_ITEM =
+'<div class="item" data-id="<?=itemId?>">' +
+    '<?=itemTitle?>' +
+    '<div class="icon bookmark"></div>' +
 '</div>';

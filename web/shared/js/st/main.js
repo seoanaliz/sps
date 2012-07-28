@@ -51,8 +51,10 @@ function initVK(data) {
         var r = data.response;
         cur.dataUser = r.me;
 
-        List.init(function() {
-            Table.init();
+        Filter.init(function() {
+            List.init(function() {
+                Table.init();
+            });
         });
     }
 }
@@ -65,43 +67,169 @@ var List = (function() {
         _initEvents();
         refresh(callback);
     }
-    function refresh(callback) {
-        Events.fire('load_list', function(data) {
-            $container.html(tmpl(LIST, {items: data}));
-            if ($.isFunction(callback)) callback();
-        });
-    }
-
     function _initEvents() {
         $container.delegate('.tab', 'click', function() {
             var $item = $(this);
-
-            $container.find('.tab').removeClass('selected');
-            $item.addClass('selected');
-
-            Table.changeList($item.data('id'));
+            select($item.data('id'));
         });
+    }
+
+    function refresh(callback) {
+        var $selectedItem = $container.find('.tab.selected');
+        var id = $selectedItem.data('id');
+        Events.fire('load_bookmarks', function(data) {
+            $container.html(tmpl(LIST, {items: data}));
+            if (id) {
+                select(id, function() {
+                    if ($.isFunction(callback)) callback();
+                });
+            } else if ($.isFunction(callback)) callback();
+        });
+    }
+
+    function select(id, callback) {
+        var $item = $container.find('.tab[data-id=' + id + ']');
+        $container.find('.tab.selected').removeClass('selected');
+        $item.addClass('selected');
+        if ($.isFunction(callback)) callback();
+        else {
+            Filter.listSelect($item.data('id'));
+        }
     }
 
     return {
         init: init,
-        refresh: refresh
+        refresh: refresh,
+        select: select
     };
 })();
 
-var Table = (function(callback) {
+var Filter = (function() {
+    var $container;
+    var $audience;
+    var $period;
+    var $list;
+
+    function init(callback) {
+        $container = $('td.filter');
+        $audience = $('> .audience', $container);
+        $period = $('> .period', $container);
+        $list = $('> .list', $container);
+
+        _initEvents();
+        listRefresh(callback);
+    }
+
+    function _initEvents() {
+        (function() {
+            var $slider = $audience.find('> .slider-wrap');
+            var $sliderRange = $audience.find('> .slider-range');
+            $slider.slider({
+                range: true,
+                min: 0,
+                max: 100,
+                animate: 100,
+                values: [0, 100],
+                create: function(event, ui) {
+                    renderRange();
+                },
+                slide: function(event, ui) {
+                    renderRange();
+                },
+                change: function(event, ui) {
+                    renderRange();
+                    changeRange();
+                }
+            });
+            function renderRange() {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                $sliderRange.html(audience[0] + ' - ' + audience[1]);
+            }
+            function changeRange() {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                Table.setAudience(audience);
+            }
+        })();
+        $period.delegate('input', 'change', function() {
+            var $input = $(this);
+            Table.setPeriod($input.val());
+        });
+        $list.delegate('.item', 'click', function() {
+            var $item = $(this);
+            listSelect($item.data('id'));
+        });
+        $list.delegate('.item > .bookmark', 'click', function(e) {
+            e.stopPropagation();
+            var $icon = $(this);
+            var $item = $icon.closest('.item');
+            var listId = $item.data('id');
+            if (!$icon.hasClass('selected')) {
+                Events.fire('add_to_bookmark', listId, function() {
+                    $icon.addClass('selected');
+                    List.refresh();
+                });
+            } else {
+                $icon.removeClass('selected');
+                Events.fire('remove_from_bookmark', listId, function() {
+                    $icon.removeClass('selected');
+                    List.refresh();
+                });
+            }
+        });
+    }
+    function listRefresh(callback) {
+        var $selectedItem = $list.find('.item.selected');
+        var id = $selectedItem.data('id');
+        Events.fire('load_list', function(data) {
+            $list.html(tmpl(FILTER_LIST, {items: data}));
+            if (id) {
+                listSelect(id, function() {
+                    if ($.isFunction(callback)) callback();
+                });
+            } else if ($.isFunction(callback)) callback();
+        });
+    }
+    function listSelect(id, callback) {
+        var $item = $list.find('.item[data-id=' + id + ']');
+        $list.find('.item.selected').removeClass('selected');
+        $item.addClass('selected');
+        if ($.isFunction(callback)) callback();
+        else {
+            List.select($item.data('id'), function() {
+                Table.changeList($item.data('id'));
+            });
+        }
+    }
+
+    return {
+        init: init,
+        listRefresh: listRefresh,
+        listSelect: listSelect
+    };
+})();
+
+var Table = (function() {
     var $container;
     var dataTable = {};
+    var pagesLoaded = 0;
     var currentListId = 0;
     var currentSearch = '';
     var currentSortBy = '';
-    var currentSortReverse = '';
-    var pagesLoaded = 0;
+    var currentSortReverse = false;
+    var currentPeriod = 'day';
+    var currentAudience = [];
 
-    function init() {
+    function init(callback) {
         $container = $('#table');
         _initEvents();
         changeList();
+        if ($.isFunction(callback)) callback();
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -111,11 +239,14 @@ var Table = (function(callback) {
         $el.addClass('loading');
         Events.fire('load_table', {
                 listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                offset: pagesLoaded * Configs.tableLoadOffset,
                 search: currentSearch,
                 sortBy: currentSortBy,
                 sortReverse: currentSortReverse,
-                offset: pagesLoaded * Configs.tableLoadOffset,
-                limit: Configs.tableLoadOffset
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded += 1;
@@ -126,7 +257,6 @@ var Table = (function(callback) {
                 } else {
                     $el.removeClass('loading');
                 }
-                if ($.isFunction(callback)) callback();
             }
         );
     }
@@ -135,10 +265,13 @@ var Table = (function(callback) {
 
         Events.fire('load_table', {
                 listId: currentListId,
-                search: currentSearch,
                 limit: Configs.tableLoadOffset,
+                search: currentSearch,
                 sortBy: field,
-                sortReverse: reverse
+                sortReverse: reverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
@@ -155,10 +288,13 @@ var Table = (function(callback) {
 
         Events.fire('load_table', {
                 listId: currentListId,
-                search: text,
                 limit: Configs.tableLoadOffset,
+                search: text,
                 sortBy: currentSortBy,
-                sortReverse: currentSortReverse
+                sortReverse: currentSortReverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
@@ -174,17 +310,74 @@ var Table = (function(callback) {
             }
         );
     }
+    function setPeriod(period, callback) {
+        var $tableBody = $('.list-body');
+
+        Events.fire('load_table', {
+                listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                search: currentSearch,
+                sortBy: currentSortBy,
+                sortReverse: currentSortReverse,
+                period: period,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
+            },
+            function(data) {
+                pagesLoaded = 1;
+                dataTable = data;
+                currentPeriod = period;
+                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
+    function setAudience(audience, callback) {
+        var $tableBody = $('.list-body');
+
+        Events.fire('load_table', {
+                listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                search: currentSearch,
+                sortBy: currentSortBy,
+                sortReverse: currentSortReverse,
+                period: currentPeriod,
+                audienceMin: audience[0],
+                audienceMax: audience[1]
+            },
+            function(data) {
+                pagesLoaded = 1;
+                dataTable = data;
+                currentAudience = audience;
+                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
     function changeList(listId) {
+        var newSearch = '';
+        var newSortBy = 'growth';
+        var newSortReverse = false;
+
         Events.fire('load_table', {
                 listId: listId,
-                limit: Configs.tableLoadOffset
+                limit: Configs.tableLoadOffset,
+                search: newSearch,
+                sortBy: newSortBy,
+                sortReverse: newSortReverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentListId = listId;
+                currentSearch = newSearch;
+                currentSortBy = newSortBy;
+                currentSortReverse = newSortReverse;
                 $container.html(tmpl(TABLE, {rows: data}));
-                $container.find('.growth').addClass('active');
+                $container.find('.' + currentSortBy).addClass('active');
                 $('#global-loader').fadeOut(200);
                 if (!currentListId) {
                     $container.removeClass('no-list-id');
@@ -248,22 +441,6 @@ var Table = (function(callback) {
             }
         });
 
-        $container.delegate('.contacts', 'click', function(e) {
-            //todo: sort by contacts
-            /*
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('contacts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('contacts', false);
-            }
-            */
-        });
-
         (function() {
             var timeout;
 
@@ -274,7 +451,6 @@ var Table = (function(callback) {
                     $filter.addClass('loading');
                     search($.trim($filter.val()), function() {
                         $filter.removeClass('loading');
-                        $filter.closest('.list-head').find('.item').removeClass('reverse active');
                     });
                 }, 500);
             });
@@ -416,6 +592,7 @@ var Table = (function(callback) {
                                 $dropdown.html($tmpDropdown.html());
                                 $input = $dropdown.find('input');
                                 List.refresh();
+                                Filter.listRefresh();
                             });
                         });
                     }
@@ -459,7 +636,35 @@ var Table = (function(callback) {
         changeList: changeList,
         loadMore: loadMore,
         sort: sort,
-        search: search
+        search: search,
+        setPeriod: setPeriod,
+        setAudience: setAudience
+    };
+})();
+
+var TestList = (function() {
+    var $container;
+
+    function init(callback) {
+        $container = $('.header');
+        _initEvents();
+        refresh(callback);
+    }
+    function _initEvents() {}
+
+    function refresh(callback) {
+        var $selectedItem = $('td.filter > .list .item.selected');
+        var data = [{
+            itemId: $selectedItem.data('id'),
+            itemTitle: $selectedItem.text()
+        }];
+        $container.html(tmpl(LIST, {items: data}));
+        if ($.isFunction(callback)) callback();
+    }
+
+    return {
+        init: init,
+        refresh: refresh
     };
 })();
 

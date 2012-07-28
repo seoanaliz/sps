@@ -32,10 +32,10 @@
 	
     $cssFiles = array(
         AssetHelper::AnyBrowser => array(
-            'css://common/common.css',
             'js://fe/file-uploader/fileuploader.css',
-            'css://fe/jquery-ui.css',
             'css://fe/jquery.multiselect.css',
+            'css://fe/jquery-ui.css',
+            'css://common/common.css',
             'css://fe/main.css',
             'css://fe/custom.css',
             'css://fe/jquery.datepick.css',

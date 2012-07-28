@@ -3,7 +3,6 @@
 
 .ui-state-default {
     background: #fff;
-    border-radius: 0;
     border-color: #D8DFEA;
     font-weight: bold;
 }
@@ -43,34 +42,6 @@
     box-shadow: inset 0 0 1px 1px #c8b71e;
 }
 
-.ui-slider-horizontal {
-    height: 8px;
-    border-radius: 2px;
-    background: #D0D9E3;
-    border-color: #C4CDE0;
-}
-.ui-slider-range {
-    background: #A2B3C6;
-    border-color: #97A4C4;
-}
-.ui-slider-handle {
-    border-radius: 2px;
-    border-color: #C4CDE0 !important;
-    background: #fff !important;
-    font-weight: bold !important;
-    font-size: 10px !important;
-    color: #45688E !important;
-    text-decoration: none !important;
-    text-align: center;
-    outline: none;
-}
-.ui-slider-horizontal .ui-slider-handle {
-    top: -7px;
-    margin-left: -13px;
-    width: 26px !important;
-    height: 20px !important;
-    line-height: 20px;
-}
 .ui-multiselect-menu {
     border-radius: 0;
     padding: 0;

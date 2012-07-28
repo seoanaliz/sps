@@ -40,6 +40,8 @@ $cssFiles = array(
 
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
+    'js://fe/jquery-ui-1.8.18.custom.min.js',
+    'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
     'js://st/data.js',
     'js://st/events.js',

@@ -57,14 +57,31 @@ var Eventlist = {
             callback(clearData);
         });
     },
+    load_bookmarks: function(callback) {
+        simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
+            var clearData = [];
+            if ($.isArray(dirtyData))
+                $.each(dirtyData, function(i, data) {
+                    clearData.push({
+                        itemId: data.group_id,
+                        itemTitle: data.name
+                    });
+                });
+            clearData = [
+                {itemId: 32, itemTitle: 'Первый список'}
+            ];
+            callback(clearData);
+        });
+    },
     load_table: function(options, callback) {
         var params = $.extend({
             listId: null,
-            offset: null,
             limit: null,
+            offset: null,
+            search: '',
             sortBy: '',
             sortReverse: false,
-            search: ''
+            period: ''
         }, options);
 
         var sortByClear = {
@@ -79,10 +96,11 @@ var Eventlist = {
             sortBy: sortByClear[params.sortBy],
             sortReverse: params.sortReverse ? 1 : 0,
             search: params.search,
+            period: params.period,
             show: 1
         }, function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData))
+            if ($.isArray(dirtyData)) {
                 $.each(dirtyData, function(i, data) {
                     var users = [];
                     $.each(data.admins, function(i, data) {
@@ -105,6 +123,7 @@ var Eventlist = {
                         users: users
                     });
                 });
+            }
             callback(clearData);
         });
     },
@@ -162,6 +181,12 @@ var Eventlist = {
         }, function(dirtyData) {
             callback(true);
         });
+    },
+    add_to_bookmark: function(listId, callback) {
+        callback(true);
+    },
+    remove_from_bookmark: function(listId, callback) {
+        callback(true);
     }
 };
 $.extend(Events.eventList, Eventlist);
