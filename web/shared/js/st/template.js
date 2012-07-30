@@ -40,6 +40,11 @@ var LIST =
 '<div class="tab-bar">' +
     '<div class="tab selected" data-id="null">Все записи</div>' +
     '<? each(LIST_ITEM, items); ?>' +
+    '<div class="actions">' +
+        '<a href="javascript:;" class="share">Поделиться</a> |' +
+        '<a href="javascript:;" class="edit">Редактировать</a> |' +
+        '<a href="javascript:;" class="delete">Удалить</a>' +
+    '</div> ' +
 '</div>';
 
 var LIST_ITEM =
