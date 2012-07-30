@@ -144,10 +144,9 @@ var app = (function () {
                 '<ul class="qq-upload-list"></ul>' +
                 '</div>',
             onComplete: function(id, fileName, res) {
-                var path = res.image;
                 var $photo = $(
                     '<div class="photo">' +
-                        '<img src="' + path + '" />' +
+                        '<img src="' + res.image + '" data-name="' + res.filename + '" />' +
                         '<div class="delete"></div>' +
                     '</div>'
                 );
@@ -280,8 +279,8 @@ var app = (function () {
         var photos = [];
         var text = $textarea.val();
 
-        $($photos).each(function() {
-            photos.push($(this).find('img').attr('src'));
+        $photos.find('img').each(function() {
+            photos.push($(this).data('name'));
         });
 
         if (!text && !photos.length) {
