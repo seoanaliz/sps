@@ -18,6 +18,9 @@
 	    <action name="WrPoints">
             <path>daemons/WrPoints</path>
         </action>
+        <action name="WrCleaner">
+            <path>daemons/WrCleaner</path>
+        </action>
     </group>
 
     <group name="Controls">

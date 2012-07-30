@@ -16,25 +16,27 @@ class getEntries {
 
     public function Execute() {
         error_reporting( 0 );
+        echo microtime(true) . '<br>';
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
+        $period     =   Request::getInteger( 'period' );
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
+
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
 
-
-        $quant_max = $quant_max ? $quant_max : 100000000;
-        $quant_min = $quant_min ? $quant_min : 0;
-        $offset     =   $offset ? $offset : 0;
-        $limit      =   $limit  ?  $limit  :   25;
-        $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
-        $sortReverse = $sortReverse? '' : ' DESC ';
+        $quant_max      =   $quant_max ? $quant_max : 100000000;
+        $quant_min      =   $quant_min ? $quant_min : 0;
+        $offset         =   $offset ? $offset : 0;
+        $limit          =   $limit  ?  $limit  :   25;
+        $sortBy         =   $sortBy ? $sortBy  : ' diff_abs ';
+        $sortReverse    =   $sortReverse? '' : ' DESC ';
         $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
 
@@ -60,18 +62,6 @@ class getEntries {
       ' LIMIT '
             . $limit;
 
-//            $sql = 'SELECT
-//                        a.vk_id,a.ava,a.name,a.price,a.diff_abs,a.diff_rel,a.quantity,b.selected_admin
-//                    FROM
-//                        ' . TABLE_STAT_PUBLICS . ' as a,' . self::T_PUBLICS_RELS . ' as b
-//                    WHERE
-//                        b.group_id=@group_id AND b.publ_id=a.vk_id AND b.user_id=@user_id '. $search . $show_in_mainlist . '
-//                    ORDER BY '
-//                        . $sortBy . $sortReverse .
-//                  ' OFFSET '
-//                        . $offset .
-//                  ' LIMIT '
-//                        . $limit;
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@group_id', $groupId);
             $cmd->SetInteger('@user_id', $userId);
@@ -104,6 +94,12 @@ class getEntries {
 
         while ($ds->next()) {
             $row = $this->get_row($ds, $structure);
+            if ($period) {
+                $diff = $this->get_difference( $row['quantity'], $period, $row['vk_id'] );
+                $row['diff_abs'] = $diff['diff_abs'];
+                $row['diff_rel'] = $diff['diff_rel'];
+
+            }
 
             $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
@@ -123,7 +119,10 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
-      echo ObjectHelper::ToJSON(array('response' => $resul));
+        echo microtime(true) . '<br>';
+
+        die();
+        echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
 
@@ -177,6 +176,27 @@ class getEntries {
         }
         return $groups;
     }
+
+    private function get_difference($current_quantity, $period, $public_id ) {
+        $time_b = wrapper::morning(time()) - $period * 24 * 60 * 60;
+        $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS . ' WHERE id=@public_id AND time=@time';
+
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
+        $cmd->SetString('@time', $time_b);
+        $cmd->SetInteger('@public_id', $public_id);
+
+        $ds = $cmd->Execute();
+        $ds->Next();
+        $quantity = $ds->getValue('quantity', TYPE_INTEGER);
+
+        return array (
+                        'diff_rel'  =>    round(($current_quantity / $quantity - 1) * 100, 2),
+                        'diff_abs'  =>  $current_quantity - $quantity
+                     );
+
+
+    }
+
 
 
 
