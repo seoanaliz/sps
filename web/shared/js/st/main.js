@@ -61,16 +61,26 @@ function initVK(data) {
 
 var List = (function() {
     var $container;
+    var $actions;
 
     function init(callback) {
         $container = $('.header');
-        _initEvents();
-        refresh(callback);
+
+        refresh(function() {
+            $actions = $('.actions', $container);
+            _initEvents();
+
+            if ($.isFunction(callback)) callback();
+        });
     }
     function _initEvents() {
         $container.delegate('.tab', 'click', function() {
             var $item = $(this);
             select($item.data('id'));
+        });
+
+        $actions.delegate('a', 'click', function() {
+            var listId = $container.find('.tab.selected').data('id');
         });
     }
 
@@ -641,29 +651,38 @@ var Table = (function() {
     };
 })();
 
-var TestList = (function() {
-    var $container;
+var Box = (function() {
+    var $layout;
+    var $box;
+    var initialized = false;
 
-    function init(callback) {
-        $container = $('.header');
-        _initEvents();
-        refresh(callback);
+    function init() {
+        $layout = $('<div/>').addClass('box-layout').appendTo('body');
+        $box = $('<div/>');
+
+        initialized = true;
     }
-    function _initEvents() {}
 
-    function refresh(callback) {
-        var $selectedItem = $('td.filter > .list .item.selected');
-        var data = [{
-            itemId: $selectedItem.data('id'),
-            itemTitle: $selectedItem.text()
-        }];
-        $container.html(tmpl(LIST, {items: data}));
-        if ($.isFunction(callback)) callback();
+    function show(options) {
+        var params = $.extend({
+            title: '',
+            html: '',
+            actions: []
+        }, options);
+
+        $box.html(tmpl(BOX, params));
+
+        $layout.show();
+        $box.show();
+    }
+
+    function hide() {
+        $layout.hide();
+        $box.show();
     }
 
     return {
-        init: init,
-        refresh: refresh
-    };
+        show: show,
+        hide: hide
+    }
 })();
-

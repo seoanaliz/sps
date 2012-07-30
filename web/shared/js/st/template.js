@@ -154,3 +154,8 @@ var FILTER_LIST_ITEM =
     '<?=itemTitle?>' +
     '<div class="icon bookmark"></div>' +
 '</div>';
+
+var BOX =
+'<div class="box-wrap">' +
+    '<div '
+'</div>';
