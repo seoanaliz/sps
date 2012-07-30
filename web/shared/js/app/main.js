@@ -47,7 +47,8 @@ var app = (function () {
         $newPost = $('.new-post', $wall);
 
         $wall.find('.comment textarea').placeholder();
-        $wall.find('> .list .date').easydate({
+        $wallList.find('.attachments').imageComposition();
+        $wallList.find('.date').easydate({
             live: true,
             date_parse: function(date) {
                 if (!date) return;
@@ -61,7 +62,6 @@ var app = (function () {
                 return date.toLocaleDateString();
             }
         });
-        $wall.find('> .list .attachments').imageComposition();
     }
 
     function _initEvents() {
@@ -280,7 +280,7 @@ var app = (function () {
         var text = $textarea.val();
 
         $photos.find('img').each(function() {
-            photos.push($(this).data('name'));
+            photos.push({'filename': $(this).data('name')});
         });
 
         if (!text && !photos.length) {
