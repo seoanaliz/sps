@@ -78,8 +78,10 @@
             if (!empty($photos)) {
                 foreach($photos as $photoItem) {
                     if (!is_array($photoItem) || empty($photoItem['filename'])) continue;
-
-                    $result[] = array('filename' => $photoItem['filename']);
+                    $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    if (URLUtility::CheckUrl($path)) {
+                        $result[] = array('filename' => $photoItem['filename']);
+                    }
                 }
             }
 
