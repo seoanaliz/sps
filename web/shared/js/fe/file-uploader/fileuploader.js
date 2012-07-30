@@ -275,9 +275,7 @@ qq.FileUploaderBasic = function(o){
             emptyError: "{file} is empty, please select files again without it.",
             onLeave: "The files are being uploaded, if you leave now the upload will be cancelled."            
         },
-        showMessage: function(message){
-            popupError(message);
-        }
+        showMessage: function(message){}
     };
     qq.extend(this._options, o);
         
