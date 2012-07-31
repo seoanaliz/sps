@@ -9,9 +9,13 @@
             <textarea placeholder="Ваш текст..." rows="2"></textarea>
             <div class="add-photo"></div>
         </div>
+        <div class="attachments">
+            <div class="photos clear-fix"></div>
+        </div>
         <div class="actions">
             <button class="button send">Отправить</button>
             <span class="text">Ctrl+Enter</span>
+            <span class="file-uploader">Attach</span>
         </div>
     </div>
     <? } ?>

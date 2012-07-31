@@ -20,7 +20,6 @@
             $author = Session::getObject('Author');
 
             $text           = trim(Request::getString( 'text' ));
-            $photos         = Request::getArray( 'photos' );
             $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
             $targetFeedIds  = Session::getArray('targetFeedIds');
 
@@ -40,12 +39,6 @@
                 return false;
             }
 
-            if (empty($text)) {
-                $result['message'] = 'emptyArticle';
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
             $article = new Article();
             $article->createdAt = DateTimeWrapper::Now();
             $article->importedAt = $article->createdAt;
@@ -59,7 +52,13 @@
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
-            $articleRecord->photos = $photos;
+            $articleRecord->photos = $this->getPhotos();
+
+            if (empty($articleRecord->content) && empty($articleRecord->photos)) {
+                $result['message'] = 'emptyArticle';
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
 
             $queryResult = $this->add($article, $articleRecord);
 
@@ -70,6 +69,21 @@
             }
 
             echo ObjectHelper::ToJSON($result);
+        }
+
+        private function getPhotos() {
+            $result = array();
+            $photos = Request::getArray( 'photos' );
+
+            if (!empty($photos)) {
+                foreach($photos as $photoItem) {
+                    if (!is_array($photoItem) || empty($photoItem['filename'])) continue;
+
+                    $result[] = array('filename' => $photoItem['filename']);
+                }
+            }
+
+            return $result;
         }
 
         private function add($article, $articleRecord) {

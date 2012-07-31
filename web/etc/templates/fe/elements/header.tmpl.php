@@ -49,6 +49,7 @@
         'js://fe/locale/'. LocaleLoader::$CurrentLanguage . '.js',
         'js://common/jquery-1.7.2.min.js',
         'js://common/jquery.easydate-0.2.4.js',
+        'js://common/common.js',
         'js://fe/jquery-ui-1.8.18.custom.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',
         'js://ext/jquery.plugins/jquery.blockui.js',
