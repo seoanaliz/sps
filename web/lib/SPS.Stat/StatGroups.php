@@ -3,14 +3,6 @@
     Package::Load( 'SPS.Site' );*/
 //    Package::Load( 'SPS.Stat' );
 
-    define( 'TABLE_PUBLICS_POINTS', 'gr50k');
-    define( 'T_PUBLICS_LIST',       'publs50k');
-    define( 'T_PUBLICS_RELS',       'publ_rels_names');
-
-    define('TABLE_STAT_USERS', 'stat_users');
-
-    define('ADMIN_RANK', 2);
-
     class StatGroups
     {
 
@@ -152,6 +144,28 @@
             $cmd->SetInteger('@group_id',   $groupId);
             $cmd->SetInteger('@admin_id',   $adminId);
             $cmd->Execute();
+        }
+
+        public static function check_group_name_free($user_id, $group_name) {
+            $sql = 'SELECT a.group_id
+                    FROM
+                    ' . TABLE_STAT_GROUP_USER_REL . ' as a
+                    , ' . TABLE_STAT_GROUPS . ' as b
+                    WHERE
+                        a.group_id = b.group_id
+                        AND a.user_id = @user_id
+                        AND b.name = @group_name';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id',      $user_id);
+            $cmd->SetString('@group_name',   $group_name);
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            if ($a = $ds->getValue( 'group_id' , TYPE_INTEGER ))
+                return false;
+
+            return true;
+
         }
 
     }

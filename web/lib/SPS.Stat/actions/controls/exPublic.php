@@ -6,6 +6,7 @@
      * @package    SPS
      * @subpackage Stat
      */
+
     //subtract public from group
     class exPublic {
 

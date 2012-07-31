@@ -26,7 +26,8 @@ class wrapper
 
     public function vk_api_wrap($method, array $params, $ex = 1)
     {
-        $params['access_token']  =  self::ACC_TOK_WRK;
+        if (!isset($params['access_token']))
+            $params['access_token']  =  self::ACC_TOK_WRK;
         $url = self::VK_API_URL . $method;
         $res = json_decode($this->qurl_request($url, $params));
 

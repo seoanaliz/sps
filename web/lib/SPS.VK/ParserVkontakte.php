@@ -707,5 +707,31 @@
             return $month;
         }
 
+        //$post_id  = idпаблика_idпоста
+        public function get_post_likes($post_id)
+        {
+            $post_id = trim($post_id, '-');
+
+            $params = array(
+                'posts'   =>   '-' . $post_id,
+                'access_token'  =>  $this->vk_access_token
+            );
+
+            $url = self::METH . 'wall.getById';
+            $fwd = $this->qurl_request($url, $params);
+            $fwd = json_decode($fwd);
+            if (!empty ($fwd->error)) {
+                $fwd = $fwd->error;
+                throw new exception("Error in wall.delete : $fwd->error_msg");
+            }
+
+            $res = array(
+                'likes'     =>  $fwd->response[0]->likes->count,
+                'reposts'   =>  $fwd->response[0]->reposts->count,
+            );
+            return $res;
+
+        }
+
     }
 ?>
