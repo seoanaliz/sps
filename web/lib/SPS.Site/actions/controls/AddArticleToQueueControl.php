@@ -112,7 +112,6 @@
                     'id' => $articleQueueRecord->articleQueueId
                 );
 
-                $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
                 if ($sourceFeed->type != SourceFeedUtility::Ads) {
                     //блокируем статью, чтобы ее больше никто не пытался отправить
                     $o = new Article();
