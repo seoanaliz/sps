@@ -65,6 +65,7 @@
 
             //source feed
             $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
+            $sourceFeed = !empty($sourceFeed) ? $sourceFeed : new SourceFeed();
 
             if ($sourceFeed->type != SourceFeedUtility::Ads) {
                 //проверяем, если ли такая $articleId в этой $targetFeedId
