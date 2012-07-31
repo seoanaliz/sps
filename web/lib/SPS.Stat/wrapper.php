@@ -29,7 +29,7 @@ class wrapper
         if (!isset($params['access_token']))
             $params['access_token']  =  self::ACC_TOK_WRK;
         $url = self::VK_API_URL . $method;
-        $res = json_decode($this->qurl_request($url, $params));
+        $res = json_decode(self::qurl_request($url, $params));
 
         if (isset($res->error))
             if ($ex)
@@ -38,6 +38,7 @@ class wrapper
                 return $res->error;
         return $res->response;
     }
+
 
     //return morning timesamp
     public function morning($timestamp)
