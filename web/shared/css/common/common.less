@@ -18,7 +18,6 @@ html, body {
 }
 
 textarea {
-    padding: 5px;
     resize: none;
 }
 
@@ -50,10 +49,11 @@ a {
     }
 }
 
+&[type="text"], textarea {
+    border: 1px solid #C4CDE0;
+    padding: 5px;
+}
 input {
-    &[type="text"], textarea {
-        border: 1px solid #C4CDE0;
-    }
     &[type="checkbox"]:after {
         content: '';
         background: url('../../images/common/check.gif') 0 0 no-repeat;
@@ -78,33 +78,53 @@ input {
     position: relative;
     border-radius: 2px;
     display: inline-block;
-    border: 1px solid #4E6F93;
-    border-top-color: #517295;
-    color: #fff;
     margin: 0;
-    padding: 4px 14px;
+    padding: 5px 14px;
     cursor: pointer;
     outline: none;
     font-size: 11px;
+    white-space: nowrap;
+    font-family: tahoma, verdana, arial, Lucida Sans, serif;
+    color: #fff;
+    border: 1px solid #4E6F93;
+    border-top-color: #517295;
     box-shadow: 0 1px 1px rgba(255,255,255,.2) inset;
     text-shadow: 0 1px 0 #45688E;
-    font-family: tahoma, verdana, arial, Lucida Sans, serif;
-    white-space: nowrap;
 
     .background-gradient(#6A8DB2, #50769E);
 
     &:focus,
     &:hover {
-        color: #fff;
         text-decoration: none;
 
         .background-gradient(#789ABF, #5980A9);
     }
     &.load,
     &:active {
-        border: 1px solid #5E80A5;
         box-shadow: none;
         background: #5E80A5;
+    }
+
+    &.white {
+        color: #444;
+        border: 1px solid #B3B3B3;
+        box-shadow: 0 1px 1px rgba(255,255,255,1) inset;
+        text-shadow: 0 1px 0 #fff;
+
+        .background-gradient(#fafafa, #d4d4d4);
+
+        &:focus,
+        &:hover {
+            text-decoration: none;
+
+            .background-gradient(#fff, #e5e5e5);
+        }
+
+        &.load,
+        &:active {
+            box-shadow: none;
+            background: #dcdcdc;
+        }
     }
 }
 

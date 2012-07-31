@@ -79,8 +79,49 @@ var List = (function() {
             select($item.data('id'));
         });
 
-        $actions.delegate('a', 'click', function() {
+        $actions.delegate('.share', 'click', function() {
             var listId = $container.find('.tab.selected').data('id');
+            var box = new Box({
+                id: 'share',
+                title: 'Поделиться',
+                html: tmpl(BOX_SHARE),
+                buttons: [
+                    {label: 'Отправить', onclick: share},
+                    {label: 'Отменить', isWhite: true}
+                ],
+                oncreate: function($box) {
+                    $box.find('input');
+                },
+                onshow: function($box) {
+                    $box.find('input[value=""]:first').focus();
+                }
+            }).show();
+
+            function share() {
+                this.hide();
+            }
+        });
+        $actions.delegate('.edit', 'click', function() {
+            var listId = $container.find('.tab.selected').data('id');
+            //Table.editMode(true);
+            $('.table').toggleClass('edit-mode');
+        });
+        $actions.delegate('.delete', 'click', function() {
+            var listId = $container.find('.tab.selected').data('id');
+            var box = new Box({
+                id: 'deleteList',
+                title: 'Удаление',
+                html: 'Вы уверены, что хотите удалить список?',
+                buttons: [
+                    {label: 'Удалить', onclick: deleteList},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function deleteList() {
+                alert(1);
+                this.hide();
+            }
         });
     }
 
@@ -404,7 +445,7 @@ var Table = (function() {
     }
 
     function _initEvents() {
-        $container.delegate('.contact .content', 'click', function(e) {
+        $container.delegate('.contact', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
@@ -652,37 +693,98 @@ var Table = (function() {
 })();
 
 var Box = (function() {
+    var $body;
     var $layout;
-    var $box;
-    var initialized = false;
+    var boxesCollection = {};
 
-    function init() {
-        $layout = $('<div/>').addClass('box-layout').appendTo('body');
-        $box = $('<div/>');
+    return function(options) {
+        if (typeof options != 'object') {
+            if (boxesCollection[options]) {
+                return boxesCollection[options];
+            } else {
+                throw Error('Box ' + options + ' not found.');
+            }
+        }
 
-        initialized = true;
-    }
-
-    function show(options) {
+        var box = {};
         var params = $.extend({
+            id: false,
             title: '',
             html: '',
-            actions: []
+            closeBtn: true,
+            buttons: [],
+            onshow: function() {},
+            onhide: function() {},
+            oncreate: function() {}
         }, options);
 
-        $box.html(tmpl(BOX, params));
+        if (!$layout) {
+            $body = $('body');
+            $layout = $('<div/>')
+                .addClass('box-layout')
+                .appendTo($body)
+            ;
+            $(document).keydown(function(e) {
+                if (e.keyCode == 27) {
+                    $layout.click();
+                }
+            });
+        } else {
+            $layout = $('body > .box-layout');
+        }
 
-        $layout.show();
-        $box.show();
-    }
+        if (params.id) {
+            if (boxesCollection[params.id]) {
+                return boxesCollection[params.id];
+            } else {
+                boxesCollection[params.id] = box;
+            }
+        }
 
-    function hide() {
-        $layout.hide();
-        $box.show();
-    }
+        var $box = $(tmpl(BOX_WRAP, {
+            title: params.title,
+            body: params.html,
+            buttons: params.buttons,
+            closeBtn: params.closeBtn
+        })).appendTo($layout);
 
-    return {
-        show: show,
-        hide: hide
-    }
+        $.each(params.buttons, function(i, button) {
+            var $button = $(tmpl(BOX_ACTION, button))
+                .appendTo($box.find('> .actions-wrap .actions'))
+                .click(function() {
+                    button.onclick ? button.onclick.call(box, $button) : box.hide();
+                });
+        });
+        if (params.closeBtn) {
+            $box.find('> .title').click(function() {
+                box.hide();
+            });
+        }
+
+        box.$box = $box;
+
+        box.show = function() {
+            $layout
+                .show()
+                .unbind()
+                .click(function(e) {
+                    if (e.target == e.currentTarget) box.hide();
+                })
+            ;
+            $box.show();
+            $body.css({overflow: 'hidden', paddingRight: 17});
+            params.onshow.call(box, $box);
+        };
+
+        box.hide = function() {
+            $layout.hide();
+            $box.hide();
+            $body.css({overflow: 'auto', paddingRight: 0});
+            params.onhide.call(box, $box);
+        };
+
+        params.oncreate.call(box, $box);
+
+        return box;
+    };
 })();

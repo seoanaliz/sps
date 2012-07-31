@@ -1,31 +1,32 @@
 /**
  * Templating
  */
-var tmpl = (function() {
-    var t = this;
+var tmpl = (function($) {
     var cache = {};
     var format = function(str) {
         return str
             .replace(/[\r\t\n]/g, ' ')
-            .split("<?").join("\t")
+            .split('<?').join('\t')
             .split("'").join("\\'")
             .replace(/\t=(.*?)\?>/g, "',$1,'")
-            .split("\t").join("');")
-            .split("?>").join("p.push('")
-            .split("\r").join("\\'");
+            .split('?>').join("p.push('")
+            .split('\t').join("');")
+            .split('\r').join("\\'");
     };
     var tmpl = function(str, data) {
         try {
-            var fn = (!/[^\w-]/.test(str))
-                ? (cache[str] = cache[str] || tmpl($.trim($('#' + str).html() || t[str])))
+            var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
+                ? function() {
+                    return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
+                }
                 : (new Function('obj',
-                'var p=[],' +
+                    'var p=[],' +
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
                     'each=function(ui,obj){for(var i=0; i<obj.length; i++) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
-            ));
-            return data ? fn(data) : fn;
+                ));
+            return (cache[str] = fn(data || {}));
         }
         catch(e) {
             if (window.console && console.log) console.log(format(str));
@@ -34,7 +35,7 @@ var tmpl = (function() {
     };
 
     return tmpl;
-})();
+})(jQuery);
 
 var LIST =
 '<div class="tab-bar">' +
@@ -155,7 +156,36 @@ var FILTER_LIST_ITEM =
     '<div class="icon bookmark"></div>' +
 '</div>';
 
-var BOX =
+var BOX_LAYOUT =
+'<div  class="box-layout"></div>';
+
+var BOX_WRAP =
 '<div class="box-wrap">' +
-    '<div '
+    '<? if (isset("title")) { ?>' +
+        '<div class="title">' +
+            '<?=title?>' +
+            '<? if (isset("closeBtn")) { ?>' +
+                '<div class="close"></div>' +
+            '<? } ?>' +
+        '</div>' +
+    '<? } ?>' +
+    '<div class="body"><?=body?></div>' +
+    '<? if (isset("buttons") && buttons.length) { ?>' +
+        '<div class="actions-wrap">' +
+            '<div class="actions"></div>' +
+        '</div>' +
+    '<? } ?>' +
+'</div>';
+
+var BOX_ACTION =
+'<button class="action button<?=isset("isWhite") ? " white" : ""?>"><?=label?></button>';
+
+var BOX_SHARE =
+'<div class="box-share">' +
+    '<div class="title">Выберите друзей</div>' +
+    '<input type="text" />' +
+    '<div class="title">Ваш комментарий</div>' +
+    '<textarea rows="3" cols=""></textarea>' +
+    '<div class="title">Выберите списки</div>' +
+    '<input type="text" />' +
 '</div>';

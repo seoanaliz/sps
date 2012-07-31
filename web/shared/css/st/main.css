@@ -19,17 +19,17 @@ table,tr,td{vertical-align:top;}
 #main td.content .list-head .item.reverse .icon{background-image:url('../../images/st/arrow-top.png');}
 #main td.content .list-head .item .filter{padding:5px;width:200px;margin-left:10px;}#main td.content .list-head .item .filter.loading{background-image:url('../../images/common/upload.gif');background-repeat:no-repeat;background-position:95%;}
 #main td.content .list-body:empty{line-height:100px;text-align:center;display:block;color:#808080;}#main td.content .list-body:empty:after{content:'Ничего не найдено';}
+#main td.content .table.no-list-id .public-actions>.action .icon{opacity:.3;}
+#main td.content .table.no-list-id .public-actions>.action:hover .icon,#main td.content .table.no-list-id .public-actions>.action.selected .icon{opacity:1;}
 #main td.content .public-info,#main td.content .public-growth,#main td.content .public-followers,#main td.content .public-contacts,#main td.content .public-actions{float:left;height:100%;}
 #main td.content .list-head .publics,#main td.content .public-info{width:40%;}
 #main td.content .list-head .followers,#main td.content .list-head .growth,#main td.content .public-followers,#main td.content .public-growth{width:15%;text-align:center;}
 #main td.content .list-head .contacts,#main td.content .public-contacts{width:25%;}
-#main td.content .public{border-top:1px solid #DEE5EB;font-weight:bold;line-height:37px;padding:6px 0;}
+#main td.content .public{border-top:1px solid #DEE5EB;font-weight:bold;line-height:37px;padding:6px 0;}#main td.content .public:hover{background-color:#edf1f5;}
 #main td.content .public-info>*{vertical-align:middle;display:inline-block;}
 #main td.content .public-info a{line-height:1.5em;max-width:228px;}
 #main td.content .public-info .photo{width:32px;height:32px;overflow:hidden;margin:3px 10px;}
 #main td.content .public-info .photo img{max-width:32px;}
-#main td.content .table.no-list-id .public-actions>.action .icon{opacity:.3;}
-#main td.content .table.no-list-id .public-actions>.action:hover .icon,#main td.content .table.no-list-id .public-actions>.action.selected .icon{opacity:1;}
 #main td.content .public-actions{width:5%;float:right;text-align:center;}#main td.content .public-actions>.action{cursor:pointer;display:inline-block;padding:4px;margin:8px 0;}#main td.content .public-actions>.action .icon.plus{opacity:.3;}
 #main td.content .public-actions>.action.selected .icon,#main td.content .public-actions>.action.active .icon,#main td.content .public-actions>.action:hover .icon{opacity:1;}
 #main td.content .public-actions>.action.selected{background-color:#597DA3;}#main td.content .public-actions>.action.selected .icon.arrow{background-image:url('../../images/st/select-white.png');}
