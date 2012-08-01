@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
-    <action name="GraphGrow" />
-    <path>GraphGrow</path>
 
     <action name="GraphGrow" />
         <path>GraphGrow</path>
@@ -21,6 +19,10 @@
         <action name="WrCleaner">
             <path>daemons/WrCleaner</path>
         </action>
+        <action name="OurAdminsStat">
+            <path>daemons/OurAdminsStat</path>
+        </action>
+
     </group>
 
     <group name="Controls">

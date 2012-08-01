@@ -410,6 +410,9 @@
                 <page uri="daemons://wr-cleaner/">
                     <actions>SPS.Stat.WrCleaner</actions>
                 </page>
+                <page uri="daemons://wr-oadmins/">
+                    <actions>SPS.Stat.OurAdminsStat</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">
