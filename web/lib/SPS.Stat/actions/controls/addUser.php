@@ -20,7 +20,7 @@
 
             $userId     =   Request::getInteger( 'userId' );
             $rank       =   Request::getInteger( 'rank' );
-            $comments   =   Request::getString( 'uComments' );
+            $comments   =   Request::getString ( 'uComments' );
 
             $rank = $rank ? $rank : 0;
 
