@@ -1,3 +1,17 @@
+@link_color: #2B587A;
+@light_blue: #99ADC2;
+@hover_bg: #E1E7ED;
+
+.user-select(@select: text) {
+    -webkit-touch-callout: @select;
+    -webkit-user-select: @select;
+    -khtml-user-select: @select;
+    -moz-user-select: @select;
+    -ms-user-select: @select;
+    -o-user-select: @select;
+    user-select: @select;
+}
+
 .background-gradient(@top-color: #fff, @bottom-color: #eee) {
     background-color: @top-color;
     background-image: -webkit-linear-gradient(top,@top-color,@bottom-color);
@@ -20,9 +34,10 @@ html, body {
 textarea {
     resize: none;
 }
-
-input, textarea {
-    border: 1px solid #C0CAD5;
+input[type="text"],
+textarea {
+    padding: 4px;
+    border: 1px solid #C4CDE0;
     background-color: #fff;
 }
 
@@ -49,10 +64,6 @@ a {
     }
 }
 
-&[type="text"], textarea {
-    border: 1px solid #C4CDE0;
-    padding: 5px;
-}
 input {
     &[type="checkbox"]:after {
         content: '';
@@ -204,6 +215,13 @@ input {
     &.delete {
         background-image: url('../../images/common/statusx_op.gif');
     }
+}
+
+.placeholder {
+    position: absolute;
+    color: #999;
+
+    .user-select(none);
 }
 
 /* --------- */

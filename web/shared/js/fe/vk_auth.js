@@ -23,7 +23,7 @@ function VK_doLogin() {
                 VK_getInitData();
             }
         }
-    );
+    , VK.access.FRIENDS);
 }
 
 function VK_getInitData() {

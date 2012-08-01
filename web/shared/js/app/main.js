@@ -360,51 +360,6 @@ var app = (function () {
     };
 })();
 
-// Кроссбраузерные плейсхолдеры
-(function($) {
-    $.fn.placeholder = function(para) {
-        return this.each(function(parameters) {
-            var defaults = {
-                el: this,
-                color: '#CCC',
-                text: false,
-                helperClass: 'placeholder'
-            };
-            var t = this;
-            var p = t.p = $.extend(defaults, parameters);
-            var $input = $(p.el);
-            var placeholderText = p.text || $input.attr('placeholder');
-            var $wrapper = $('<div/>');
-            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
-                padding: $input.css('padding')
-            });
-
-            $input
-                .wrap($wrapper)
-                .data('placeholder', $placeholder)
-                .removeAttr('placeholder')
-                .parent().prepend($placeholder)
-            ;
-
-            $placeholder.bind('mousedown', function() {
-                $placeholder.hide();
-                $input.focus();
-            });
-            $placeholder.bind('mouseup', function() {
-                $input.focus();
-            });
-            $input.bind('blur', function() {
-                if (!$input.val()) {
-                    $placeholder.fadeIn(100);
-                }
-            });
-            $input.bind('focus', function() {
-                $placeholder.hide();
-            });
-        });
-    };
-})(jQuery);
-
 // Дропдауны
 (function($) {
     var CLASS_ACTIVE = 'active';

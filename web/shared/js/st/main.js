@@ -80,36 +80,112 @@ var List = (function() {
         });
 
         $actions.delegate('.share', 'click', function() {
-            var listId = $container.find('.tab.selected').data('id');
+            var listId = $('.filter > .list > .item.selected').data('id');
+            var isFirstShow = true;
             var box = new Box({
-                id: 'share',
+                id: 'share' + listId,
                 title: 'Поделиться',
                 html: tmpl(BOX_SHARE),
                 buttons: [
                     {label: 'Отправить', onclick: share},
                     {label: 'Отменить', isWhite: true}
                 ],
-                oncreate: function($box) {
-                    $box.find('input');
-                },
                 onshow: function($box) {
-                    $box.find('input[value=""]:first').focus();
+                    var box = this;
+                    var $users = $box.find('.users');
+                    var $lists = $box.find('.lists');
+                    var $comment = $box.find('.comment');
+                    if (isFirstShow) {
+                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(data) {
+                            if (data.error) {
+                                box
+                                    .setTitle('Ошибка')
+                                    .setHTML('Вы не предоставили доступ к друзьям.')
+                                    .setButtons([
+                                        {label: 'Перелогиниться', onclick: function() {
+                                            VK.Auth.logout(function() {
+                                                location.replace('login/');
+                                            });
+                                        }},
+                                        {label: 'Отмена', isWhite: true}
+                                    ])
+                                ;
+                            } else {
+                                var res = data.response;
+                                var html = '';
+                                for (var i in res) {
+                                    var user = res[i];
+                                    html += user.first_name + ' ' + user.last_name + ', ';
+                                }
+                                //box.setHTML(html).setButtons();
+                            }
+                        });
+                        isFirstShow = false;
+                        $comment.autoResize();
+                        $users
+                            .textext({
+                                plugins : 'tags autocomplete filter',
+                                ext: {
+                                    itemManager: {
+                                        stringToItem: function(str) { return {name: str}; },
+                                        itemToString: function(item) { return item.name; },
+                                        compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                    }
+                                }
+                            })
+                            .bind('getSuggestions', function(e, data) {
+                                var list = [{id: 1, name: 'Артем'}, {id: 2, name: 'Вова'}],
+                                    textext = $(e.target).textext()[0],
+                                    query = (data ? data.query : '') || '';
+                                $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                            })
+                            .bind('setFormData', function(e, data) {
+                                $(e.target).data('tags', data);
+                            })
+                        ;
+                        $users.textext()[0].getFormData();
+                        $lists
+                            .textext({
+                                plugins : 'tags autocomplete filter',
+                                tagsItems: [{name: 'asadfdsgdfhretq'}],
+                                ext: {
+                                    itemManager: {
+                                        stringToItem: function(str) { return {name: str}; },
+                                        itemToString: function(item) { return item.name; },
+                                        compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                    }
+                                }
+                            })
+                            .bind('getSuggestions', function(e, data) {
+                                var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
+                                    textext = $(e.target).textext()[0],
+                                    query = (data ? data.query : '') || '';
+                                $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                            })
+                            .bind('setFormData', function(e, data) {
+                                $(e.target).data('tags', data);
+                            })
+                        ;
+                        $lists.textext()[0].getFormData();
+                    }
+                    $box.find('textarea[value=""]:first').focus();
                 }
             }).show();
 
-            function share() {
-                this.hide();
+            function share($button, $box) {
+                console.log($box.find('.users').data('tags'));
+                console.log($box.find('.lists').data('tags'));
             }
         });
         $actions.delegate('.edit', 'click', function() {
-            var listId = $container.find('.tab.selected').data('id');
+            var listId = $('.filter > .list > .item.selected').data('id');
             //Table.editMode(true);
             $('.table').toggleClass('edit-mode');
         });
         $actions.delegate('.delete', 'click', function() {
-            var listId = $container.find('.tab.selected').data('id');
+            var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
-                id: 'deleteList',
+                id: 'deleteList' + listId,
                 title: 'Удаление',
                 html: 'Вы уверены, что хотите удалить список?',
                 buttons: [
@@ -119,8 +195,14 @@ var List = (function() {
             }).show();
 
             function deleteList() {
-                alert(1);
                 this.hide();
+                Events.fire('remove_list', listId, function() {
+                    List.refresh(function() {
+                        Filter.listRefresh(function() {
+                            $('.filter > .list > .item[data-id="null"]').click();
+                        });
+                    });
+                });
             }
         });
     }
@@ -689,102 +771,5 @@ var Table = (function() {
         search: search,
         setPeriod: setPeriod,
         setAudience: setAudience
-    };
-})();
-
-var Box = (function() {
-    var $body;
-    var $layout;
-    var boxesCollection = {};
-
-    return function(options) {
-        if (typeof options != 'object') {
-            if (boxesCollection[options]) {
-                return boxesCollection[options];
-            } else {
-                throw Error('Box ' + options + ' not found.');
-            }
-        }
-
-        var box = {};
-        var params = $.extend({
-            id: false,
-            title: '',
-            html: '',
-            closeBtn: true,
-            buttons: [],
-            onshow: function() {},
-            onhide: function() {},
-            oncreate: function() {}
-        }, options);
-
-        if (!$layout) {
-            $body = $('body');
-            $layout = $('<div/>')
-                .addClass('box-layout')
-                .appendTo($body)
-            ;
-            $(document).keydown(function(e) {
-                if (e.keyCode == 27) {
-                    $layout.click();
-                }
-            });
-        } else {
-            $layout = $('body > .box-layout');
-        }
-
-        if (params.id) {
-            if (boxesCollection[params.id]) {
-                return boxesCollection[params.id];
-            } else {
-                boxesCollection[params.id] = box;
-            }
-        }
-
-        var $box = $(tmpl(BOX_WRAP, {
-            title: params.title,
-            body: params.html,
-            buttons: params.buttons,
-            closeBtn: params.closeBtn
-        })).appendTo($layout);
-
-        $.each(params.buttons, function(i, button) {
-            var $button = $(tmpl(BOX_ACTION, button))
-                .appendTo($box.find('> .actions-wrap .actions'))
-                .click(function() {
-                    button.onclick ? button.onclick.call(box, $button) : box.hide();
-                });
-        });
-        if (params.closeBtn) {
-            $box.find('> .title').click(function() {
-                box.hide();
-            });
-        }
-
-        box.$box = $box;
-
-        box.show = function() {
-            $layout
-                .show()
-                .unbind()
-                .click(function(e) {
-                    if (e.target == e.currentTarget) box.hide();
-                })
-            ;
-            $box.show();
-            $body.css({overflow: 'hidden', paddingRight: 17});
-            params.onshow.call(box, $box);
-        };
-
-        box.hide = function() {
-            $layout.hide();
-            $box.hide();
-            $body.css({overflow: 'auto', paddingRight: 0});
-            params.onhide.call(box, $box);
-        };
-
-        params.oncreate.call(box, $box);
-
-        return box;
     };
 })();

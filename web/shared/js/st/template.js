@@ -163,7 +163,7 @@ var BOX_WRAP =
 '<div class="box-wrap">' +
     '<? if (isset("title")) { ?>' +
         '<div class="title">' +
-            '<?=title?>' +
+            '<span class="text"><?=title?></span>' +
             '<? if (isset("closeBtn")) { ?>' +
                 '<div class="close"></div>' +
             '<? } ?>' +
@@ -182,10 +182,12 @@ var BOX_ACTION =
 
 var BOX_SHARE =
 '<div class="box-share">' +
+    '<div class="title">Поделитесь с друзьями</div>' +
+    '<input type="text" value="http://socialboard.ru/stat" />' +
     '<div class="title">Выберите друзей</div>' +
-    '<input type="text" />' +
-    '<div class="title">Ваш комментарий</div>' +
-    '<textarea rows="3" cols=""></textarea>' +
+    '<textarea rows="1" cols="" class="users"></textarea>' +
+//    '<div class="title">Ваш комментарий</div>' +
+//    '<textarea rows="2" cols="" class="comment"></textarea>' +
     '<div class="title">Выберите списки</div>' +
-    '<input type="text" />' +
+    '<textarea rows="1" cols="" class="lists"></textarea>' +
 '</div>';
