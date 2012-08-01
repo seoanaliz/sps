@@ -207,25 +207,25 @@ var app = (function () {
         $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
-            var $comments = $('.comments', $post);
+            var $commentsList = $('.comments > .list', $post);
             var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
             Events.fire('comment_load', {postId: postId, all: true}, function(html) {
                 $target.removeClass('load').html(tmpText);
-                $comments.html(html);
+                $commentsList.html(html);
             });
         });
         $wall.delegate('.comments .show-more.hide:not(.load)', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
-            var $comments = $('.comments', $post);
+            var $commentsList = $('.comments > .list', $post);
             var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
             Events.fire('comment_load', {postId: postId, all: false}, function(html) {
                 $target.removeClass('load').html(tmpText);
-                $comments.html(html);
+                $commentsList.html(html);
             });
         });
 
