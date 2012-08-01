@@ -17,6 +17,9 @@
 				<path name="mail" value="/etc/templates/mail" />
 				<path name="controls" value="/int/controls" />
 				<path name="daemons" value="/int/daemons" />
+				<path name="app" value="/app" />
+				<path name="appControls" value="/app/controls" />
+				<path name="tools" value="/tools" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
@@ -38,6 +41,7 @@
                 <vkapi class="AuthVkontakte">
                     <param name="appId">1868779</param>
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
+                    <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                 </vkapi>
 			</modules>
 			<databases>
@@ -80,6 +84,7 @@
                         <vkapi class="AuthVkontakte">
                             <param name="appId">2853330</param>
                             <param name="password">1h2pQNcNMw54IwO6kuVi</param>
+                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.mystery.vmkteam.ru</param>
@@ -109,6 +114,7 @@
                         <vkapi class="AuthVkontakte">
                             <param name="appId">2879919</param>
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps.verumnets.ru</param>

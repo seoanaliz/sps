@@ -15,33 +15,43 @@
 
         const Ads = 'ads';
 
+        const Authors = 'authors';
+
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
+            self::Authors => 'Авторские',
         );
 
-        public static function IsTopFeed(SourceFeed $sourceFeed) {
-            return in_array($sourceFeed->externalId, self::$Tops);
+        public static function IsTopFeed($sourceFeed) {
+            if (empty($sourceFeed->externalId)) {
+                return false;
+            } else {
+                return in_array($sourceFeed->externalId, self::$Tops);
+            }
         }
 
         public static function GetInfo($sourceFeeds, $key = 'sourceFeedId') {
             $sourceInfo = array();
 
-            foreach ($sourceFeeds as $sourceFeed) {
-                $sourceInfo[$sourceFeed->$key] = array(
-                    'name' => $sourceFeed->title,
-                    'img' => ''
-                );
+            if (!empty($sourceFeeds)) {
+                foreach ($sourceFeeds as $sourceFeed) {
+                    if (empty($sourceFeed->$key)) continue;
+                    $sourceInfo[$sourceFeed->$key] = array(
+                        'name' => $sourceFeed->title,
+                        'img' => ''
+                    );
 
-                //group image
-                $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
-                if (!file_exists(Site::GetRealPath($path))) {
-                    $path = 'images://fe/no-avatar.png';
-                } else {
-                    $path .= '?v=' . filemtime(Site::GetRealPath($path));
+                    //group image
+                    $path = 'temp://userpic-' . $sourceFeed->externalId . '.jpg';
+                    if (!file_exists(Site::GetRealPath($path))) {
+                        $path = 'images://fe/no-avatar.png';
+                    } else {
+                        $path .= '?v=' . filemtime(Site::GetRealPath($path));
+                    }
+
+                    $sourceInfo[$sourceFeed->$key]['img'] = Site::GetWebPath($path);
                 }
-
-                $sourceInfo[$sourceFeed->$key]['img'] = Site::GetWebPath($path);
             }
 
             return $sourceInfo;
@@ -62,6 +72,15 @@
                     }
                 }
             } catch (Exception $Ex) {}
+        }
+
+        public static function GetAll() {
+            $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+            $sourceFeed = new SourceFeed();
+            $sourceFeed->sourceFeedId = -1;
+            $sourceFeed->title = 'Авторские';
+            $sourceFeeds = array(-1 => $sourceFeed) + $sourceFeeds;
+            return $sourceFeeds;
         }
     }
 ?>

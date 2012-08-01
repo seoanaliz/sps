@@ -32,7 +32,8 @@ SELECT "public"."targetFeeds"."targetFeedId"
  FROM "public"."targetFeeds"
 	LEFT JOIN "public"."publishers" "publisher" ON
 		"publisher"."publisherId" = "public"."targetFeeds"."publisherId"
-	WHERE "public"."targetFeeds"."statusId" != 3;
+	WHERE "public"."targetFeeds"."statusId" != 3
+ORDER BY "title";
 	
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
@@ -41,6 +42,8 @@ SELECT "public"."articles"."articleId"
 	, "public"."articles"."externalId"
 	, "public"."articles"."rate"
 	, "public"."articles"."sourceFeedId"
+	, "public"."articles"."targetFeedId"
+	, "public"."articles"."authorId"
 	, "public"."articles"."statusId"
  FROM "public"."articles"
 	WHERE "public"."articles"."statusId" != 3
@@ -131,3 +134,14 @@ SELECT "public"."gridLineItems"."gridLineItemId"
 	, "public"."gridLineItems"."date"
 	, "public"."gridLineItems"."gridLineId"
  FROM "public"."gridLineItems";
+ 
+CREATE OR REPLACE VIEW "getEditors" AS
+SELECT "public"."editors"."editorId"
+	, "public"."editors"."vkId"
+	, "public"."editors"."firstName"
+	, "public"."editors"."lastName"
+	, "public"."editors"."avatar"
+	, "public"."editors"."targetFeedIds"
+	, "public"."editors"."statusId"
+ FROM "public"."editors"
+	WHERE "public"."editors"."statusId" != 3;

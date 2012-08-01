@@ -32,10 +32,16 @@
             $sourceFeed = SourceFeedFactory::GetById($object->sourceFeedId);
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $object->articleId));
 
+            if (!empty($object->authorId)) {
+                $author = AuthorFactory::GetById($object->authorId);
+                Response::setParameter( 'author', $author );
+            }
+
             Response::setParameter( 'article', $object );
             Response::setParameter( 'articleRecord', $articleRecord );
             Response::setParameter( 'sourceFeed', $sourceFeed );
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo(array($sourceFeed)) );
+            Response::setArray( 'commentsData', CommentUtility::GetLastComments(array($object->articleId)));
         }
     }
 

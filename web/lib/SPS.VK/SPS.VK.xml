@@ -15,4 +15,18 @@
             <redirect name="login" path="/login/" />
         </redirects>
     </action>
+    <action name="VKCheckAppAuth">
+        <path>VKCheckAppAuth</path>
+        <redirects>
+            <redirect name="empty" path="/app/landing/" />
+        </redirects>
+    </action>
+    <action name="VKCheckAppAuthSilent">
+        <path>VKCheckAppAuth</path>
+        <parameters>
+            <request>
+                <param name="silent">true</param>
+            </request>
+        </parameters>
+    </action>
 </actions>

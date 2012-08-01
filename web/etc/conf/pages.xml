@@ -114,7 +114,6 @@
                 <page uri="controls://shareGroup/">
                     <actions>SPS.Stat.shareGroup</actions>
                 </page>
-
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
@@ -330,6 +329,43 @@
                             <template>tmpl://vt/publishers/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+                    <pageGroup name="editor">
+                        <page uri="vt://editors/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetEditorList, SPS.Common.SetEditorsMenu</actions>
+                            <template>tmpl://vt/editors/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://editors/add">
+                            <actions>SPS.Articles.SaveEditor</actions>
+                            <template>tmpl://vt/editors/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://editors/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteEditor</actions>
+                        </page>
+                        <page uri="vt://editors/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveEditor</actions>
+                            <template>tmpl://vt/editors/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                </pageGroup>
+
+                <pageGroup name="SPS.App">
+                    <pageGroup name="author">
+                        <page uri="vt://authors/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.App.GetAuthorList, SPS.Common.SetAuthorsMenu</actions>
+                            <template>tmpl://vt/authors/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://authors/add">
+                            <actions>SPS.App.SaveAuthor</actions>
+                            <template>tmpl://vt/authors/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://authors/delete/([0-9]+)">
+                            <actions>SPS.App.DeleteAuthor</actions>
+                        </page>
+                        <page uri="vt://authors/edit/([0-9]+)">
+                            <actions>SPS.App.SaveAuthor</actions>
+                            <template>tmpl://vt/authors/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
                 </pageGroup>
 				
                 <pageGroup name="daemonLocks">
@@ -403,6 +439,52 @@
             <pageGroup name="vtControls" boot="">
                 <page uri="controls://generate-grid-sql/">
                     <actions>SPS.Articles.GenerateGridSQL</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="app" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuth">
+                <page uri="app://">
+                    <actions>SPS.Site.GetAppIndexPage</actions>
+                    <template>tmpl://app/index.tmpl.php</template>
+                </page>
+                <page uri="app://landing/" boot="">
+                    <template>tmpl://app/landing.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="appControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuthSilent">
+                <page uri="appControls://article-save/">
+                    <actions>SPS.Site.SaveArticleAppControl</actions>
+                </page>
+                <page uri="appControls://articles-list/">
+                    <actions>SPS.Site.GetArticlesAppListControl</actions>
+                    <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://article-delete/">
+                    <actions>SPS.Site.DeleteArticleAppControl</actions>
+                </page>
+                <page uri="appControls://article-restore/">
+                    <actions>SPS.Site.RestoreArticleAppControl</actions>
+                </page>
+                <page uri="appControls://(editor/)?comment-save/">
+                    <actions>SPS.Site.SaveCommentAppControl</actions>
+                    <template>tmpl://app/elements/wall-comment.tmpl.php</template>
+                </page>
+                <page uri="appControls://(editor/)?comments-load/">
+                    <actions>SPS.Site.LoadCommentsAppControl</actions>
+                    <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://(editor/)?comment-delete/">
+                    <actions>SPS.Site.DeleteCommentAppControl</actions>
+                </page>
+                <page uri="appControls://(editor/)?comment-restore/">
+                    <actions>SPS.Site.RestoreCommentAppControl</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="tools">
+                <page uri="tools://init-editors/">
+                    <actions>SPS.Common.InitEditorsTool</actions>
                 </page>
             </pageGroup>
 

@@ -32,13 +32,14 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
+        'css://common/common.css',
         'css://st/main.css',
    ),
     AssetHelper::IE7 => array(),
 );
 
 $jsFiles = array(
-    'js://st/jquery-1.7.2.min.js',
+    'js://common/jquery-1.7.2.min.js',
     'js://st/main.js',
     'js://st/data.js',
     'js://st/events.js',

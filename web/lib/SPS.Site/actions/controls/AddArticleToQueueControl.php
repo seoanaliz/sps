@@ -65,8 +65,9 @@
 
             //source feed
             $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
+            $sourceFeed = !empty($sourceFeed) ? $sourceFeed : new SourceFeed();
 
-            if ($sourceFeed->type == SourceFeedUtility::Source) {
+            if ($sourceFeed->type != SourceFeedUtility::Ads) {
                 //проверяем, если ли такая $articleId в этой $targetFeedId
                 $existsCount = ArticleQueueFactory::Count(
                     array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
@@ -111,8 +112,7 @@
                     'id' => $articleQueueRecord->articleQueueId
                 );
 
-                $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
-                if ($sourceFeed->type == SourceFeedUtility::Source) {
+                if ($sourceFeed->type != SourceFeedUtility::Ads) {
                     //блокируем статью, чтобы ее больше никто не пытался отправить
                     $o = new Article();
                     $o->statusId = 2;

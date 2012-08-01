@@ -27,6 +27,7 @@
     Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.FB' );
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.App' );
 
     // Initialize Logger
     Logger::Init( ELOG_DEBUG  );

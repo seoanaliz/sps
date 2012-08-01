@@ -78,7 +78,7 @@
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
             $articleRecord->likes = 0;
-            $articleRecord->photos = $photos;
+            $articleRecord->photos = !empty($photos) ? $photos : array();
             $articleRecord->link = $link;
 
             if (!empty($id)) {

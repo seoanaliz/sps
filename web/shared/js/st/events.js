@@ -78,7 +78,8 @@ var Eventlist = {
             limit: params.limit,
             sortBy: sortByClear[params.sortBy],
             sortReverse: params.sortReverse ? 1 : 0,
-            search: params.search
+            search: params.search,
+            show: 1
         }, function(dirtyData) {
             var clearData = [];
             if ($.isArray(dirtyData))
@@ -150,6 +151,13 @@ var Eventlist = {
         simpleAjax('selectSAdmin', {
             adminId: user_id,
             groupId: list_id,
+            publId: public_id
+        }, function(dirtyData) {
+            callback(true);
+        });
+    },
+    hide_public: function(public_id, callback) {
+        simpleAjax('togglePublVisibil', {
             publId: public_id
         }, function(dirtyData) {
             callback(true);

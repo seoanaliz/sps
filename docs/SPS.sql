@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		11.07.2012
+Modified		01.08.2012
 Project		
 Model			
 Company		
@@ -162,6 +162,8 @@ Create table "articles"
 	"externalId" Varchar(100) NOT NULL,
 	"rate" Integer NOT NULL Default 0,
 	"sourceFeedId" Integer NOT NULL,
+	"targetFeedId" Integer,
+	"authorId" Integer,
 	"statusId" Integer NOT NULL,
  primary key ("articleId")
 ) Without Oids;
@@ -310,6 +312,45 @@ Create table "gridLineItems"
 ) Without Oids;
 
 
+Create table "authors"
+(
+	"authorId" Serial NOT NULL,
+	"vkId" Integer NOT NULL UNIQUE,
+	"firstName" Varchar(1000),
+	"lastName" Varchar(1000),
+	"avatar" Varchar(1000),
+	"targetFeedIds" Integer[],
+	"statusId" Integer NOT NULL,
+ primary key ("authorId")
+) Without Oids;
+
+
+Create table "editors"
+(
+	"editorId" Serial NOT NULL,
+	"vkId" Integer NOT NULL UNIQUE,
+	"firstName" Varchar(1000),
+	"lastName" Varchar(1000),
+	"avatar" Varchar(1000),
+	"targetFeedIds" Integer[],
+	"statusId" Integer NOT NULL,
+ primary key ("editorId")
+) Without Oids;
+
+
+Create table "comments"
+(
+	"commentId" Serial NOT NULL,
+	"text" Varchar(1000) NOT NULL,
+	"createdAt" Timestamp NOT NULL Default now(),
+	"articleId" Integer NOT NULL,
+	"authorId" Integer,
+	"editorId" Integer,
+	"statusId" Integer NOT NULL,
+ primary key ("commentId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -350,6 +391,12 @@ Create index "IX_FK_targetFeedsStatusId_targetFeeds" on "targetFeeds" ("statusId
 Alter table "targetFeeds" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_publishersStatusId_publishers" on "publishers" ("statusId");
 Alter table "publishers" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_authorsStatusId_authors" on "authors" ("statusId");
+Alter table "authors" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_editorsStatusId_editors" on "editors" ("statusId");
+Alter table "editors" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_commentsStatusId_comments" on "comments" ("statusId");
+Alter table "comments" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
 Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");
@@ -368,10 +415,10 @@ Create index "IX_FK_articleQueuesArticleId_articleQueues" on "articleQueues" ("a
 Alter table "articleQueues" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
 Create index "IX_FK_articleRecordsArticleId_articleRecords" on "articleRecords" ("articleId");
 Alter table "articleRecords" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
+Create index "IX_FK_commentsArticleId_comments" on "comments" ("articleId");
+Alter table "comments" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
 Create index "IX_FK_articleRecordsArticleQueueId_articleRecords" on "articleRecords" ("articleQueueId");
 Alter table "articleRecords" add  foreign key ("articleQueueId") references "articleQueues" ("articleQueueId") on update restrict on delete restrict;
-Create index "IX_FK_articlesSourceFeedId_articles" on "articles" ("sourceFeedId");
-Alter table "articles" add  foreign key ("sourceFeedId") references "sourceFeeds" ("sourceFeedId") on update restrict on delete restrict;
 Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
 Alter table "articleQueues" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedGridsTargetFeedId_targetFeedGrids" on "targetFeedGrids" ("targetFeedId");
@@ -380,6 +427,8 @@ Create index "IX_FK_targetFeedPublishersTagetFeedId_targetFeedPublishers" on "ta
 Alter table "targetFeedPublishers" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_gridLinesTargetFeedId_gridLines" on "gridLines" ("targetFeedId");
 Alter table "gridLines" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
+Create index "IX_FK_articlesTargetFeedId_articles" on "articles" ("targetFeedId");
+Alter table "articles" add  foreign key ("targetFeedId") references "targetFeeds" ("targetFeedId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeeds_publisherId_targetFeeds" on "targetFeeds" ("publisherId");
 Alter table "targetFeeds" add  foreign key ("publisherId") references "publishers" ("publisherId") on update restrict on delete restrict;
 Create index "IX_FK_targetFeedPublishersPublisherId_targetFeedPublishers" on "targetFeedPublishers" ("publisherId");
@@ -388,6 +437,12 @@ Create index "IX_FK_auditEventsAuditEventTypeId_auditEvents" on "auditEvents" ("
 Alter table "auditEvents" add  foreign key ("auditEventTypeId") references "auditEventTypes" ("auditEventTypeId") on update restrict on delete restrict;
 Create index "IX_FK_gridLineItemsGridLineId_gridLineItems" on "gridLineItems" ("gridLineId");
 Alter table "gridLineItems" add  foreign key ("gridLineId") references "gridLines" ("gridLineId") on update restrict on delete restrict;
+Create index "IX_FK_articlesAuthorId_articles" on "articles" ("authorId");
+Alter table "articles" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
+Create index "IX_FK_commentsAuthorId_comments" on "comments" ("authorId");
+Alter table "comments" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
+Create index "IX_FK_commentsEditorId_comments" on "comments" ("editorId");
+Alter table "comments" add  foreign key ("editorId") references "editors" ("editorId") on update restrict on delete restrict;
 
 
 /* Create Procedures */

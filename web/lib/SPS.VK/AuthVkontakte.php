@@ -3,7 +3,9 @@
 
         public static $AppId;
 
-        private static $password;
+        public static $Password;
+
+        public static $AuthSecret;
 
         public static function Init( DOMNodeList $params ) {
             foreach ( $params as $param ) {
@@ -11,7 +13,8 @@
                 $value  = $param->nodeValue;
 
                 if ($name == 'appId') self::$AppId = $value;
-                if ($name == 'password') self::$password = $value;
+                if ($name == 'password') self::$Password = $value;
+                if ($name == 'authSecret') self::$AuthSecret = $value;
             }
         }
 
@@ -37,13 +40,13 @@
                 }
 
                 // Проверяем sig
-                $string = sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$password);
+                $string = sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$Password);
 
                 if (md5($string) == $cookie_data['sig']) {
                     // sig не подделан - возвращаем ID пользователя ВКонтакте.
                     // авторизуем пользователя совсем надолго
                     $cookie_data['expire'] = time() + 86400 * 7;
-                    $cookie_data['sig'] = md5(sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$password));
+                    $cookie_data['sig'] = md5(sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$Password));
 
                     $newCookie = '';
                     foreach ($cookie_data as $key => $value) {
@@ -53,11 +56,22 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
+                    self::Login($cookie_data['mid']);
+
                     return $cookie_data['mid'];
                 }
             }
 
             return false;
+        }
+
+        private static function Login($vkId) {
+            $editor = EditorFactory::GetOne(
+                array('vkId' => $vkId)
+            );
+
+            Session::setObject('Editor', $editor);
+            Response::setObject('__Editor', $editor);
         }
 
         /**

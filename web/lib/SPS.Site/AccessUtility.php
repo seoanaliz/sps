@@ -15,41 +15,22 @@
                 return self::$targetFeedIds;
             }
 
-            $result = array(-1 => -1);
+            self::$targetFeedIds = array(-1 => -1);
             $userId = AuthVkontakte::IsAuth();
 
             if (empty($userId)) {
-                self::$targetFeedIds = $result;
-                return $result;
+                return self::$targetFeedIds;
             }
 
-            //redactor check
-            $redactors = SiteParamHelper::GetCachedParamValue(SiteParamHelper::Redactors);
-            if (!empty($redactors)) {
-                $redactors = explode(',', $redactors);
-                if (in_array($userId, $redactors)) {
-                    $result = array();
-                    self::$targetFeedIds = $result;
-                    return $result;
+            /** @var $editor Editor */
+            $editor = Session::getObject('Editor');
+            if (!empty($editor) && !empty($editor->targetFeedIds)) {
+                foreach ($editor->targetFeedIds as $targetFeedId) {
+                    self::$targetFeedIds[$targetFeedId] = $targetFeedId;
                 }
             }
 
-            $checkData = TargetFeedFactory::Get(
-                array()
-                , array(BaseFactory::WithoutPages => true, BaseFactory::WithColumns => '"targetFeedId", "vkIds"')
-            );
-
-            if (!empty($checkData)) {
-                foreach ($checkData as $checkDataItem) {
-                    $vkIds = explode(',', $checkDataItem->vkIds);
-                    if (in_array($userId, $vkIds)) {
-                        $result[$checkDataItem->targetFeedId] = $checkDataItem->targetFeedId;
-                    }
-                }
-            }
-
-            self::$targetFeedIds = $result;
-            return $result;
+            return self::$targetFeedIds;
         }
 
         public static function GetSourceFeedIds($currentTargetFeedId = 0) {
@@ -64,20 +45,6 @@
             if (empty($userId)) {
                 self::$sourceFeedIds[$currentTargetFeedId] = $result;
                 return $result;
-            }
-
-
-            //redactor check
-            if (empty($currentTargetFeedId)) {
-                $redactors = SiteParamHelper::GetCachedParamValue(SiteParamHelper::Redactors);
-                if (!empty($redactors)) {
-                    $redactors = explode(',', $redactors);
-                    if (in_array($userId, $redactors)) {
-                        $result = array();
-                        self::$sourceFeedIds[$currentTargetFeedId] = $result;
-                        return $result;
-                    }
-                }
             }
 
             $checkData = SourceFeedFactory::Get(
@@ -108,9 +75,15 @@
             return $result;
         }
 
-        public static function HasAccessToTargetFeedId($targetFeedId) {
-            $accessIds = self::GetTargetFeedIds();
-            return empty($accessIds) || array_key_exists($targetFeedId, $accessIds);
+        public static function HasAccessToTargetFeedId($targetFeedId, $__editorMode = true) {
+            if ($__editorMode) {
+                $accessIds = self::GetTargetFeedIds();
+                return empty($accessIds) || array_key_exists($targetFeedId, $accessIds);
+            } else {
+                $accessIds = Session::getArray('targetFeedIds');
+                $accessIds = !empty($accessIds) ? $accessIds : array();
+                return in_array($targetFeedId, $accessIds);
+            }
         }
 
         public static function HasAccessToSourceFeedId($sourceFeedId) {

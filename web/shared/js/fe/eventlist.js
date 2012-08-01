@@ -85,7 +85,9 @@ function loadArticles(clean) {
                 clean: clean,
                 from : from,
                 to : to,
-                sortType : sortType
+                sortType : sortType,
+                type: Elements.leftType(),
+                targetFeedId: Elements.rightdd()
             }
         })
         .always(function() {
@@ -272,7 +274,7 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
-        if (sourceType == 'ads') {
+        if (sourceType != 'source') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list a').hide();
@@ -303,7 +305,7 @@ var Eventlist = {
             success: function (data) {
                 for (i in data) {
                     item = data[i];
-                    $('#source-select').append('<option value="' + item.sourceFeedId + '">' + item.title + '</option>');
+                    $('#source-select').append('<option value="' + item.id + '">' + item.title + '</option>');
                 }
 
                 //get data from cookie
@@ -472,6 +474,56 @@ var Eventlist = {
 
     leftcolumn_sort_type_change: function() {
         loadArticles(true);
+    },
+
+    comment_load: function(options, callback) {
+        var params = $.extend({
+            postId: null,
+            all: true
+        }, options);
+
+        $.ajax({
+            url: appControlsRoot + 'comments-load/',
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
+    },
+    comment_post: function(postId, text, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-save/',
+            type: 'POST',
+            data: {
+                id: postId,
+                text: text
+            },
+            success: function (data) {
+                callback(data);
+            }
+        });
+    },
+    comment_delete: function(commentId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-delete/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
+    },
+    comment_restore: function(commentId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-restore/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
 
     eof: null

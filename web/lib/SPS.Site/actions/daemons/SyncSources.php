@@ -33,7 +33,7 @@
 
             foreach ($sources as $source) {
                 //пропускаем специальные источники
-                if (SourceFeedUtility::IsTopFeed($source)) {
+                if (SourceFeedUtility::IsTopFeed($source) || $source->externalId == '-') {
                     continue;
                 }
 

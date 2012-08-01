@@ -11,8 +11,8 @@ $(document).ready(function(){
             action: 'upload.php',
             template: ' <div class="qq-uploader">' +
                 '<ul class="qq-upload-list"></ul>' +
-                '<div class="save button spr l">Отправить</div>' +
-                '<a href="#" class="cancel spr l">Отменить</a>' +
+                '<div class="save button l">Отправить</div>' +
+                '<a href="#" class="cancel l">Отменить</a>' +
                 '<a href="#" class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
             onComplete: function(id, fileName, responseJSON) {

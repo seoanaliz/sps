@@ -104,8 +104,44 @@
         </group>
     </group>
 
-	<!-- Put your's frontend actions here -->
     <group name="Site">
         <action name="GetIndexPage" />
+    </group>
+
+    <group name="AppSite">
+        <action name="GetAppIndexPage">
+            <path>app/GetAppIndexPage</path>
+        </action>
+    </group>
+
+    <group name="AppControls">
+        <group name="Articles">
+            <action name="SaveArticleAppControl">
+                <path>app/controls/articles/SaveArticleAppControl</path>
+            </action>
+            <action name="GetArticlesAppListControl">
+                <path>app/controls/articles/GetArticlesAppListControl</path>
+            </action>
+            <action name="DeleteArticleAppControl">
+                <path>app/controls/articles/DeleteArticleAppControl</path>
+            </action>
+            <action name="RestoreArticleAppControl">
+                <path>app/controls/articles/RestoreArticleAppControl</path>
+            </action>
+        </group>
+        <group name="Comments">
+            <action name="SaveCommentAppControl">
+                <path>app/controls/comments/SaveCommentAppControl</path>
+            </action>
+            <action name="LoadCommentsAppControl">
+                <path>app/controls/comments/LoadCommentsAppControl</path>
+            </action>
+            <action name="DeleteCommentAppControl">
+                <path>app/controls/comments/DeleteCommentAppControl</path>
+            </action>
+            <action name="RestoreCommentAppControl">
+                <path>app/controls/comments/RestoreCommentAppControl</path>
+            </action>
+        </group>
     </group>
 </actions>

@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<ArrayOfEazeEntity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <EazeEntity Name="Author">
+    <TerminalPath>authors</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies />
+    <Search>
+      <TemplateAttribute Name="authorId" TitleKey="vt.author.authorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vkId" TitleKey="vt.author.vkId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vkId" />
+          <AttributeParameter Key="value" Value="vkId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vkId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="firstName" TitleKey="vt.author.firstName" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="firstName" />
+          <AttributeParameter Key="value" Value="firstName" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="firstName" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="lastName" TitleKey="vt.author.lastName" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="lastName" />
+          <AttributeParameter Key="value" Value="lastName" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="lastName" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="avatar" TitleKey="vt.author.avatar" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="avatar" />
+          <AttributeParameter Key="value" Value="avatar" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="avatar" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedIds" TitleKey="vt.author.targetFeedIds" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedIds" />
+          <AttributeParameter Key="value" Value="targetFeedIds" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedIds" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.author.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="authorId" TitleKey="vt.author.authorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="vkId" TitleKey="vt.author.vkId" TitleValue="Vk Id" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="vkId" />
+          <AttributeParameter Key="value" Value="vkId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="vkId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="firstName" TitleKey="vt.author.firstName" TitleValue="Имя" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="firstName" />
+          <AttributeParameter Key="value" Value="firstName" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="firstName" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="lastName" TitleKey="vt.author.lastName" TitleValue="Фамилия" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="lastName" />
+          <AttributeParameter Key="value" Value="lastName" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="lastName" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="avatar" TitleKey="vt.author.avatar" TitleValue="Аватар" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="avatar" />
+          <AttributeParameter Key="value" Value="avatar" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="avatar" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedIds" TitleKey="vt.author.targetFeedIds" TitleValue="Паблики" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedIds" />
+          <AttributeParameter Key="value" Value="targetFeedIds" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedIds" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.author.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+  <EazeEntity Name="Comment">
+    <TerminalPath>comments</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>articles authors editors</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="commentId" TitleKey="vt.comment.commentId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="commentId" />
+          <AttributeParameter Key="value" Value="commentId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="commentId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="text" TitleKey="vt.comment.text" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="text" />
+          <AttributeParameter Key="value" Value="text" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="text" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.comment.createdAt" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.comment.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.comment.authorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="editorId" TitleKey="vt.comment.editorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="editorId" />
+          <AttributeParameter Key="value" Value="editorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="editorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.comment.statusId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="commentId" TitleKey="vt.comment.commentId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="commentId" />
+          <AttributeParameter Key="value" Value="commentId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="commentId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="text" TitleKey="vt.comment.text" TitleValue="text" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="text" />
+          <AttributeParameter Key="value" Value="text" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="text" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="createdAt" TitleKey="vt.comment.createdAt" TitleValue="Дата создания" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="createdAt" />
+          <AttributeParameter Key="value" Value="createdAt" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="articleId" TitleKey="vt.comment.articleId" TitleValue="articleId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="articleId" />
+          <AttributeParameter Key="value" Value="articleId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="articleId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.comment.authorId" TitleValue="authorId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="editorId" TitleKey="vt.comment.editorId" TitleValue="editorId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="editorId" />
+          <AttributeParameter Key="value" Value="editorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="editorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="statusId" TitleKey="vt.comment.statusId" TitleValue="Статус" Type="HTML_SELECT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="statusId" />
+          <AttributeParameter Key="values" Value="StatusUtility::$Common[$__currentLang]" />
+          <AttributeParameter Key="dataKey" Value="" />
+          <AttributeParameter Key="dataValue" Value="" />
+          <AttributeParameter Key="value" Value="statusId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
+</ArrayOfEazeEntity>

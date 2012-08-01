@@ -20,12 +20,39 @@
                 $type = SourceFeedUtility::Source;
             }
 
-            $sourceFeeds = SourceFeedFactory::Get(
-                array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId), 'type' => $type)
-                , array( BaseFactory::WithoutPages => true )
-            );
+            $result = array();
+            if (!empty($targetFeedId)) {
+                if ($type == SourceFeedUtility::Authors) {
+                    $authors = AuthorFactory::Get(
+                        array(),
+                        array(
+                            BaseFactory::WithoutPages => true,
+                            BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
+                        )
+                    );
 
-            echo ObjectHelper::ToJSON(array_values($sourceFeeds));
+                    foreach ($authors as $author) {
+                        $result[] =  array(
+                            'id' => $author->authorId,
+                            'title' => $author->FullName()
+                        );
+                    }
+                } else {
+                    $sourceFeeds = SourceFeedFactory::Get(
+                        array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId), 'type' => $type)
+                        , array( BaseFactory::WithoutPages => true )
+                    );
+
+                    foreach ($sourceFeeds as $sourceFeed) {
+                        $result[] =  array(
+                            'id' => $sourceFeed->sourceFeedId,
+                            'title' => $sourceFeed->title
+                        );
+                    }
+                }
+            }
+
+            echo ObjectHelper::ToJSON($result);
         }
     }
 

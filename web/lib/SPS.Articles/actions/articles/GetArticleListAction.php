@@ -25,8 +25,7 @@
          * Set Foreign Lists
          */
         protected function setForeignLists() {
-            $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            Response::setArray( "sourceFeeds", $sourceFeeds );
+            Response::setArray( "sourceFeeds", SourceFeedUtility::GetAll() );
         }
     }
 ?>

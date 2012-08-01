@@ -113,7 +113,7 @@
     display: none;
 }
 .ui-state-default .ui-icon {
-    background-image: url('../../images/fe/darr_dd_out.gif');
+    background-image: url('../../images/common/darr_dd_out.gif');
     background-position: center;
     width: 16px;
     height: auto;

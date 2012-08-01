@@ -32,7 +32,7 @@
 	
     $cssFiles = array(
         AssetHelper::AnyBrowser => array(
-            'css://fe/reset.css',
+            'css://common/common.css',
             'js://fe/file-uploader/fileuploader.css',
             'css://fe/jquery-ui.css',
             'css://fe/jquery.multiselect.css',
@@ -47,7 +47,9 @@
 
     $jsFiles = array(
         'js://fe/locale/'. LocaleLoader::$CurrentLanguage . '.js',
-        'js://fe/jquery-1.7.1.min.js',
+        'js://common/jquery-1.7.2.min.js',
+        'js://common/jquery.easydate-0.2.4.js',
+        'js://common/common.js',
         'js://fe/jquery-ui-1.8.18.custom.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',
         'js://ext/jquery.plugins/jquery.blockui.js',
@@ -62,7 +64,6 @@
         'js://fe/eventlist.js',
         'js://fe/file-uploader/fileuploader.js',
         'js://fe/jquery.Jcrop.min.js',
-        'js://fe/jquery.easydate-0.2.4.js',
         'js://fe/jquery.maskedinput-1.3.js',
         'js://fe/jquery.multiselect.min.js',
         'js://fe/edit-post.js',
@@ -91,6 +92,7 @@
         document.documentElement.id = "js";
         var root = '{web:/}';
         var controlsRoot = '{web:controls://}';
+        var appControlsRoot = '{web:appControls://editor/}';
         var vk_appId = <?= AuthVkontakte::$AppId ?>;
         var hostname = '<?= Site::$Host->GetHostname() ?>';
     </script>

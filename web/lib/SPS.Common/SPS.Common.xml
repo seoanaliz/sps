@@ -182,6 +182,12 @@
         </action>
     </group>
 
+    <group name="tools">
+        <action name="InitEditorsTool">
+            <path>tools/InitEditorsTool</path>
+        </action>
+    </group>
+
     <group name="VFS">
         <action name="GetVFSSmallImage">
             <path>GetResizedImageAction</path>
@@ -255,6 +261,22 @@
             <parameters>
                 <response>
                     <param name="__activeElement">"audit"</param>
+                </response>
+            </parameters>
+        </action>
+        <action name="SetAuthorsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"authors"</param>
+                </response>
+            </parameters>
+        </action>
+        <action name="SetEditorsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"editors"</param>
                 </response>
             </parameters>
         </action>

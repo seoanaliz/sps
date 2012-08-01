@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<actions>
+  <group name="author">
+    <action name="GetAuthorList">
+      <path>authors/GetAuthorListAction</path>
+    </action>
+    <action name="SaveAuthor">
+      <path>authors/SaveAuthorAction</path>
+      <redirects>
+        <redirect name="success" path="vt://authors/" />
+      </redirects>
+    </action>
+    <action name="DeleteAuthor">
+      <path>authors/SaveAuthorAction</path>
+      <parameters>
+        <request>
+          <param name="action">'delete'</param>
+        </request>
+      </parameters>
+    </action>
+  </group>
+</actions>
