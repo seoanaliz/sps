@@ -16,7 +16,6 @@ class getEntries {
 
     public function Execute() {
         error_reporting( 0 );
-        echo microtime(true) . '<br>';
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
@@ -119,9 +118,7 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
-        echo microtime(true) . '<br>';
 
-        die();
         echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
