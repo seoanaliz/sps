@@ -197,7 +197,7 @@ $(document).ready(function(){
 
     // Wall init
     $(".wall")
-        .delegate(".post .delete", "click", function(){
+        .delegate(".post > .delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
                 gid = elem.data('group');
@@ -1116,6 +1116,30 @@ $(document).ready(function(){
         var $newComment = $(this).closest('.new-comment');
         $newComment.addClass('open');
     });
+    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
+        if (e.ctrlKey && e.keyCode == 13) {
+            var $newComment = $(this).closest('.new-comment');
+            var $sendBtn = $newComment.find('.send');
+            $sendBtn.click();
+        }
+    });
+    $('.left-panel').delegate('.post > .comments .comment > .delete', 'click', function(e) {
+        var $target = $(this);
+        var $comment = $target.closest('.comment');
+        var commentId = $comment.data('id');
+        Events.fire('comment_delete', [commentId, function() {
+            $comment.data('html', $comment.html());
+            $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+        }]);
+    });
+    $('.left-panel').delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
+        var $target = $(this);
+        var $comment = $target.closest('.comment');
+        var commentId = $comment.data('id');
+        Events.fire('comment_restore', [commentId, function() {
+            $comment.removeClass('deleted').html($comment.data('html'));
+        }]);
+    });
     $('.left-panel').delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.new-comment');
@@ -1253,26 +1277,33 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
             </div>';
 
 var Events = {
-    fire : function(name, args){
+    delay: 0,
+    eventList: Eventlist,
+    fire: function(name, args){
+        var t = this;
         if(typeof args != "undefined") {
             if(!$.isArray(args)) args = [args];
         } else {
             args = [];
         }
-        if($.isFunction(this[name])) {
+        if ($.isFunction(t.eventList[name])) {
             try {
-                this[name].apply(window, args);
+                setTimeout(function() {
+                    if(window.console && console.log) {
+                        console.log(name + ':');
+                        console.log(args.slice(0, -1));
+                        console.log('-------');
+                    }
+                    t.eventList[name].apply(window, args);
+                }, t.delay);
             } catch(e) {
-                if(console && $.isFunction(console.log)) {
+                if (window.console && console.log) {
                     console.log(e);
                 }
             }
         }
     }
 };
-
-$.extend(Events, Eventlist);
-delete(Eventlist);
 
 var Elements = {
     initImages: function(selector){
