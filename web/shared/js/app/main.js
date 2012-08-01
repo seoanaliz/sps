@@ -26,6 +26,20 @@ var app = (function () {
     var $loadMore;
     var $menu;
     var $newPost;
+    var easydateParams = {
+        live: true,
+        date_parse: function(date) {
+            if (!date) return;
+            var d = date.split('.');
+            var i = d[1];
+            d[1] = d[0];
+            d[0] = i;
+            return Date.parse(d.join('.'));
+        },
+        uneasy_format: function(date) {
+            return date.toLocaleDateString();
+        }
+    };
 
     function init() {
         if (isInitialized) return;
@@ -48,20 +62,7 @@ var app = (function () {
 
         $wall.find('.comment textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
-        $wallList.find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                if (!date) return;
-                var d = date.split('.');
-                var i = d[1];
-                d[1] = d[0];
-                d[0] = i;
-                return Date.parse(d.join('.'));
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
-        });
+        $wallList.find('.date').easydate(easydateParams);
     }
 
     function _initEvents() {
@@ -213,7 +214,7 @@ var app = (function () {
             $target.addClass('load').html('&nbsp;');
             Events.fire('comment_load', {postId: postId, all: true}, function(html) {
                 $target.removeClass('load').html(tmpText);
-                $commentsList.html(html);
+                $commentsList.html(html).easydate(easydateParams);
             });
         });
         $wall.delegate('.comments .show-more.hide:not(.load)', 'click', function() {
@@ -225,7 +226,7 @@ var app = (function () {
             $target.addClass('load').html('&nbsp;');
             Events.fire('comment_load', {postId: postId, all: false}, function(html) {
                 $target.removeClass('load').html(tmpText);
-                $commentsList.html(html);
+                $commentsList.html(html).easydate(easydateParams);
             });
         });
 
@@ -315,7 +316,7 @@ var app = (function () {
             Events.fire('comment_post', postId, $textarea.val(), function(html) {
                 $button.removeClass('load');
                 $textarea.val('').focus();
-                $commentsList.append(html);
+                $commentsList.append(html).easydate(easydateParams);
             });
         }
     }
