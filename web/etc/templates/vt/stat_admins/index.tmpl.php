@@ -7,6 +7,7 @@
 </form>
 
 <?
+
     $time_start = Request::getDateTime('from');
     $time_start = $time_start ? $time_start->getTimestamp() : 0 ;
     $time_stop = Request::getDateTime('to');
