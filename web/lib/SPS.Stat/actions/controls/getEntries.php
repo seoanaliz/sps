@@ -102,8 +102,8 @@ class getEntries {
 
             $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
-            if (isset($userId)) {
-                $groups = $this->get_groups($row['vk_id'], $userId);
+            if ( isset($userId) ) {
+                $groups = $this->get_groups( $userId );
             }
 
             $resul[] =  array(
@@ -118,7 +118,7 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
-
+        PRINT_R($resul);
         echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
@@ -159,14 +159,13 @@ class getEntries {
         return $resul;
     }
 
-    private function get_groups($publId, $userId)
+    private function get_groups($userId)
     {
         $groups = array();
 
-        $sql = "select group_id from publ_rels_names where publ_id=@publ_id AND user_id=@user_id";
+        $sql = "select group_id from " . TABLE_STAT_GROUP_USER_REL . " where user_id=@user_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetInteger('@user_id',  $userId);
-        $cmd->SetInteger('@publ_id',   $publId);
         $ds = $cmd->Execute();
         while ( $ds->next() ) {
             $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
