@@ -41,6 +41,7 @@
             Response::setParameter( 'articleRecord', $articleRecord );
             Response::setParameter( 'sourceFeed', $sourceFeed );
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo(array($sourceFeed)) );
+            Response::setArray( 'commentsData', CommentUtility::GetLastComments(array($object->articleId)));
         }
     }
 

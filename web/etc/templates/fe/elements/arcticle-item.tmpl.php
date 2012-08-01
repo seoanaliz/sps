@@ -13,7 +13,7 @@
         }
 ?>
 
-<div class="post bb <?= ($sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
+<div class="post bb <?= (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
