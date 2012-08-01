@@ -9,7 +9,7 @@
 
         const LAST_COUNT = 3;
 
-        public static function GetLastComments($articleIds) {
+        public static function GetLastComments($articleIds, $limit = true) {
             $result = array();
 
             $sql = <<<eof
@@ -21,12 +21,16 @@
                         PARTITION BY "articleId"
                         ORDER BY "createdAt" DESC, "articleId" DESC
                     )
-                ) foo WHERE "num" < 4;
+                    ORDER BY "createdAt" ASC
+                ) foo
 eof;
+
+            if ($limit) {
+                $sql .= ' WHERE "num" < ' . (self::LAST_COUNT + 1);
+            }
 
             $cmd = new SqlCommand($sql, ConnectionFactory::Get());
             $cmd->SetList('@articleIds', $articleIds, TYPE_INTEGER);
-            $cmd->SetInt('@count', self::LAST_COUNT + 1);
 
             $ds = $cmd->Execute();
 

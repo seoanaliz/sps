@@ -462,6 +462,10 @@
                 <page uri="appControls://comment-save/">
                     <actions>SPS.Site.SaveCommentAppControl</actions>
                 </page>
+                <page uri="appControls://comments-load/">
+                    <actions>SPS.Site.LoadCommentsAppControl</actions>
+                    <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

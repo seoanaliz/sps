@@ -28,6 +28,12 @@
                 return false;
             }
 
+            if (!in_array($article->targetFeedId, Session::getArray('targetFeedIds'))) {
+                $result['message'] = 'accessError';
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
             $comment = new Comment();
             $comment->text = Request::getString('text');
             $comment->articleId = $article->articleId;

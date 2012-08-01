@@ -133,6 +133,9 @@
             <action name="SaveCommentAppControl">
                 <path>app/controls/comments/SaveCommentAppControl</path>
             </action>
+            <action name="LoadCommentsAppControl">
+                <path>app/controls/comments/LoadCommentsAppControl</path>
+            </action>
         </group>
     </group>
 </actions>
