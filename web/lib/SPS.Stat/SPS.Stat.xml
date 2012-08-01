@@ -3,6 +3,7 @@
 
     <action name="AdminsWork" />
         <path>AdminsWork</path>
+
     <group name="Daemons">
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
