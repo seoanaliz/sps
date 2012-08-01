@@ -30,7 +30,6 @@
                 if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
                     return;
                 }
-                return;
             } else {
                 /** @var $author Author */
                 $author = Session::getObject('Author');
