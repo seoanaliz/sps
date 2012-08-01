@@ -136,6 +136,12 @@
             <action name="LoadCommentsAppControl">
                 <path>app/controls/comments/LoadCommentsAppControl</path>
             </action>
+            <action name="DeleteCommentAppControl">
+                <path>app/controls/comments/DeleteCommentAppControl</path>
+            </action>
+            <action name="RestoreCommentAppControl">
+                <path>app/controls/comments/RestoreCommentAppControl</path>
+            </action>
         </group>
     </group>
 </actions>

@@ -470,6 +470,12 @@
                     <actions>SPS.Site.LoadCommentsAppControl</actions>
                     <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
                 </page>
+                <page uri="appControls://comment-delete/">
+                    <actions>SPS.Site.DeleteCommentAppControl</actions>
+                </page>
+                <page uri="appControls://comment-restore/">
+                    <actions>SPS.Site.RestoreCommentAppControl</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

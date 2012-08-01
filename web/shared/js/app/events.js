@@ -114,10 +114,26 @@ var Eventlist = {
         });
     },
     comment_delete: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-delete/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
     comment_restore: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-restore/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
