@@ -316,7 +316,7 @@
         // нужно учитывать это время
         //если повезет, возвращает  текст капчи,
         // false в случае неправильной разгадки/недоступности работников распознавания
-        public function captcha($url, $vk_sid)
+        private function captcha($url, $vk_sid)
         {
             //не требующие пока изменений настройки
             $domain="antigate.com";
@@ -412,6 +412,32 @@
             }
             return false;
         }
+
+        //$post_id  = idпаблика_idпоста
+        public function delete_post($post_id)
+        {
+
+            $post_id = trim($post_id, '-');
+            $id = explode('_', $post_id);
+            $params = array(
+                'owner_id'      =>  '-' . $id[0],
+                'post_id'       =>  $id[1],
+                'access_token'  =>  $this->vk_access_token
+            );
+
+            $url = self::METH . 'wall.delete';
+            $fwd = $this->qurl_request($url, $params);
+            $fwd = json_decode($fwd);
+
+            if (!empty ($fwd->error)) {
+                $fwd3 = $fwd->error;
+                throw new exception("Error in wall.delete : $fwd->error_msg");
+            }
+
+            return true;
+        }
+
+
     }
 
 ?>

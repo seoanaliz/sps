@@ -56,11 +56,22 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
+                    self::Login($cookie_data['mid']);
+
                     return $cookie_data['mid'];
                 }
             }
 
             return false;
+        }
+
+        private static function Login($vkId) {
+            $editor = EditorFactory::GetOne(
+                array('vkId' => $vkId)
+            );
+
+            Session::setObject('Editor', $editor);
+            Response::setObject('__Editor', $editor);
         }
 
         /**

@@ -87,8 +87,8 @@
                 <page uri="controls://deleteGroup/">
                     <actions>SPS.Stat.deleteGroup</actions>
                 </page>
-                <page uri="controls://selectSAdmin/">
-                    <actions>SPS.Stat.selectSAdmin</actions>
+                <page uri="controls://selectGroupAdmin/">
+                    <actions>SPS.Stat.selectGroupAdmin</actions>
                 </page>
                 <page uri="controls://getGroupList/">
                     <actions>SPS.Stat.getGroupList</actions>
@@ -96,14 +96,23 @@
                 <page uri="controls://getEntries/">
                     <actions>SPS.Stat.getEntries</actions>
                 </page>
-                <page uri="controls://implGroup/">
-                    <actions>SPS.Stat.implGroup</actions>
+                <page uri="controls://implPublic/">
+                    <actions>SPS.Stat.implPublic</actions>
                 </page>
                 <page uri="controls://exGroup/">
                     <actions>SPS.Stat.exGroup</actions>
                 </page>
                 <page uri="controls://togglePublVisibil/">
                     <actions>SPS.Stat.togglePublVisibil</actions>
+                </page>
+                <page uri="controls://addUser/">
+                    <actions>SPS.Stat.addUser</actions>
+                </page>
+                <page uri="controls://setUserRank/">
+                    <actions>SPS.Stat.setUserRank</actions>
+                </page>
+                <page uri="controls://shareGroup/">
+                    <actions>SPS.Stat.shareGroup</actions>
                 </page>
             </pageGroup>
 
@@ -124,6 +133,10 @@
                     <page uri="vt://stat/">
                         <actions>Sps.Stat.GraphGrow</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
+                    </page>
+                    <page uri="vt://oadmins/">
+                        <actions>Sps.Stat.AdminsWork</actions>
+                        <template>tmpl://vt/stat_admins/index.tmpl.php</template>
                     </page>
 
                     <pageGroup name="siteParam">
@@ -316,6 +329,23 @@
                             <template>tmpl://vt/publishers/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+                    <pageGroup name="editor">
+                        <page uri="vt://editors/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Articles.GetEditorList, SPS.Common.SetEditorsMenu</actions>
+                            <template>tmpl://vt/editors/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://editors/add">
+                            <actions>SPS.Articles.SaveEditor</actions>
+                            <template>tmpl://vt/editors/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://editors/delete/([0-9]+)">
+                            <actions>SPS.Articles.DeleteEditor</actions>
+                        </page>
+                        <page uri="vt://editors/edit/([0-9]+)">
+                            <actions>SPS.Articles.SaveEditor</actions>
+                            <template>tmpl://vt/editors/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
                 </pageGroup>
 
                 <pageGroup name="SPS.App">
@@ -398,6 +428,12 @@
                 <page uri="daemons://wr-unix/">
                     <actions>SPS.Stat.WrUnix</actions>
                 </page>
+                <page uri="daemons://wr-cleaner/">
+                    <actions>SPS.Stat.WrCleaner</actions>
+                </page>
+                <page uri="daemons://wr-oadmins/">
+                    <actions>SPS.Stat.OurAdminsStat</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">
@@ -429,6 +465,26 @@
                 </page>
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>
+                </page>
+                <page uri="appControls://(editor/)?comment-save/">
+                    <actions>SPS.Site.SaveCommentAppControl</actions>
+                    <template>tmpl://app/elements/wall-comment.tmpl.php</template>
+                </page>
+                <page uri="appControls://(editor/)?comments-load/">
+                    <actions>SPS.Site.LoadCommentsAppControl</actions>
+                    <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://(editor/)?comment-delete/">
+                    <actions>SPS.Site.DeleteCommentAppControl</actions>
+                </page>
+                <page uri="appControls://(editor/)?comment-restore/">
+                    <actions>SPS.Site.RestoreCommentAppControl</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="tools">
+                <page uri="tools://init-editors/">
+                    <actions>SPS.Common.InitEditorsTool</actions>
                 </page>
             </pageGroup>
 

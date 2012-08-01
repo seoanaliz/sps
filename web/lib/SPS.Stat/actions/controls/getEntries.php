@@ -1,6 +1,6 @@
 <?php
-Package::Load( 'SPS.Stat' );
-Package::Load( 'SPS.Site' );
+//Package::Load( 'SPS.Stat' );
+//Package::Load( 'SPS.Site' );
 /**
  * addPrice Action
  * @package    SPS
@@ -14,44 +14,54 @@ class getEntries {
      * Entry Point
      */
 
-    const T_PUBLICS_POINTS = 'gr50k';
-    const T_PUBLICS_LIST   = 'publs50k';
-    const T_PUBLICS_RELS   = 'publ_rels_names';
-
     public function Execute() {
         error_reporting( 0 );
+        echo microtime(true) . '<br>';
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
+        $quant_max  =   Request::getInteger( 'max' );
+        $quant_min  =   Request::getInteger( 'min' );
+        $period     =   Request::getInteger( 'period' );
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
+
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
 
-
-        $offset     =   $offset ? $offset : 0;
-        $limit      =   $limit  ?  $limit  :   25;
-        $sortBy     =   $sortBy ? $sortBy  : ' diff_abs ';
-        $sortReverse = $sortReverse? '' : ' DESC ';
+        $quant_max      =   $quant_max ? $quant_max : 100000000;
+        $quant_min      =   $quant_min ? $quant_min : 0;
+        $offset         =   $offset ? $offset : 0;
+        $limit          =   $limit  ?  $limit  :   25;
+        $sortBy         =   $sortBy ? $sortBy  : ' diff_abs ';
+        $sortReverse    =   $sortReverse? '' : ' DESC ';
         $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
-        if (isset($groupId) && isset($userId)) {
-            $search = $search ? " AND a.name ILIKE '%" . $search . "%' " : '';
 
-            $sql = 'SELECT
-                        a.vk_id,a.ava,a.name,a.price,a.diff_abs,a.diff_rel,a.quantity,b.selected_admin
-                    FROM
-                        ' . self::T_PUBLICS_LIST . ' as a,' . self::T_PUBLICS_RELS . ' as b
-                    WHERE
-                        b.group_id=@group_id AND b.publ_id=a.vk_id AND b.user_id=@user_id '. $search . $show_in_mainlist . '
-                    ORDER BY '
-                        . $sortBy . $sortReverse .
-                  ' OFFSET '
-                        . $offset .
-                  ' LIMIT '
-                        . $limit;
+        if (isset($groupId )) {
+            $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
+
+
+        $sql = 'SELECT
+                publ.vk_id, publ.ava, publ.name, publ.price, publ.diff_abs,
+                publ.diff_rel, publ.quantity, gprel.main_admin
+        FROM
+                ' . TABLE_STAT_PUBLICS . ' as publ,
+                ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
+        WHERE
+              publ.vk_id=gprel.public_id
+              AND gprel.group_id=@group_id
+              AND publ.quantity > @min_quantity
+              AND publ.quantity < @max_quantity
+        ORDER BY '
+            . $sortBy . $sortReverse .
+      ' OFFSET '
+            . $offset .
+      ' LIMIT '
+            . $limit;
+
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@group_id', $groupId);
             $cmd->SetInteger('@user_id', $userId);
@@ -60,10 +70,11 @@ class getEntries {
             $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
             $sql = 'SELECT
-                        vk_id,ava,name,price,diff_abs,diff_rel,quantity
+                        vk_id, ava, name, price, diff_abs, diff_rel, quantity
                     FROM '
-                        . self::T_PUBLICS_LIST .
-                  ' WHERE 1=1 '.
+                        . TABLE_STAT_PUBLICS .
+                  ' WHERE   quantity > @min_quantity
+                        AND quantity < @max_quantity '.
                         $search . $show_in_mainlist .
                   ' ORDER BY '
                         . $sortBy . $sortReverse .
@@ -75,13 +86,20 @@ class getEntries {
 
             $cmd->SetString('@sortBy', $sortBy);
         }
-
+        $cmd->SetInteger('@min_quantity', $quant_min);
+        $cmd->SetInteger('@max_quantity', $quant_max);
         $ds = $cmd->Execute();
         $structure = BaseFactory::getObjectTree( $ds->Columns );
         $resul = array();
 
         while ($ds->next()) {
             $row = $this->get_row($ds, $structure);
+            if ($period) {
+                $diff = $this->get_difference( $row['quantity'], $period, $row['vk_id'] );
+                $row['diff_abs'] = $diff['diff_abs'];
+                $row['diff_rel'] = $diff['diff_rel'];
+
+            }
 
             $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
@@ -101,6 +119,9 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
+        echo microtime(true) . '<br>';
+
+        die();
         echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
@@ -119,7 +140,7 @@ class getEntries {
     private function get_admins($publ, $sadmin)
     {
         $resul = array();
-        $sql = "select vk_id,role,name,ava,comments from admins where publ_id=@publ_id";
+        $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetInteger('@publ_id',   $publ);
         $ds = $cmd->Execute();
@@ -155,6 +176,27 @@ class getEntries {
         }
         return $groups;
     }
+
+    private function get_difference($current_quantity, $period, $public_id ) {
+        $time_b = wrapper::morning(time()) - $period * 24 * 60 * 60;
+        $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS . ' WHERE id=@public_id AND time=@time';
+
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
+        $cmd->SetString('@time', $time_b);
+        $cmd->SetInteger('@public_id', $public_id);
+
+        $ds = $cmd->Execute();
+        $ds->Next();
+        $quantity = $ds->getValue('quantity', TYPE_INTEGER);
+
+        return array (
+                        'diff_rel'  =>    round(($current_quantity / $quantity - 1) * 100, 2),
+                        'diff_abs'  =>  $current_quantity - $quantity
+                     );
+
+
+    }
+
 
 
 

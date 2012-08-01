@@ -23,7 +23,7 @@
             }
 
             //todo права юзеров
-            $query = 'UPDATE publs50k SET sh_in_main = NOT sh_in_main where vk_id=@vk_id';
+            $query = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET sh_in_main = NOT sh_in_main where vk_id=@vk_id';
             $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@vk_id', $publId);
             $cmd->Execute();

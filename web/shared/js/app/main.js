@@ -26,6 +26,20 @@ var app = (function () {
     var $loadMore;
     var $menu;
     var $newPost;
+    var easydateParams = {
+        live: true,
+        date_parse: function(date) {
+            if (!date) return;
+            var d = date.split('.');
+            var i = d[1];
+            d[1] = d[0];
+            d[0] = i;
+            return Date.parse(d.join('/'));
+        },
+        uneasy_format: function(date) {
+            return date.toLocaleDateString();
+        }
+    };
 
     function init() {
         if (isInitialized) return;
@@ -48,20 +62,7 @@ var app = (function () {
 
         $wall.find('.comment textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
-        $wallList.find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                if (!date) return;
-                var d = date.split('.');
-                var i = d[1];
-                d[1] = d[0];
-                d[0] = i;
-                return Date.parse(d.join('/'));
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
-        });
+        $wallList.find('.date').easydate(easydateParams);
     }
 
     function _initEvents() {
@@ -198,7 +199,7 @@ var app = (function () {
         });
         $wall.delegate('.comment.deleted > .restore', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.post');
+            var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
             Events.fire('comment_restore', commentId, function() {
                 $comment.removeClass('deleted').html($comment.data('html'));
@@ -206,22 +207,26 @@ var app = (function () {
         });
         $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.comment');
-            var commentId = $comment.data('id');
+            var $post = $target.closest('.post');
+            var $commentsList = $('.comments > .list', $post);
+            var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {}, function() {
+            Events.fire('comment_load', {postId: postId, all: true}, function(html) {
                 $target.removeClass('load').html(tmpText);
+                $commentsList.html(html).find('.date').easydate(easydateParams);
             });
         });
         $wall.delegate('.comments .show-more.hide:not(.load)', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.comment');
-            var commentId = $comment.data('id');
+            var $post = $target.closest('.post');
+            var $commentsList = $('.comments > .list', $post);
+            var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {}, function() {
+            Events.fire('comment_load', {postId: postId, all: false}, function(html) {
                 $target.removeClass('load').html(tmpText);
+                $commentsList.html(html).find('.date').easydate(easydateParams);
             });
         });
 
@@ -302,15 +307,16 @@ var app = (function () {
         var $textarea = $comment.find('textarea');
         var $button = $comment.find('.send:not(.load)');
         var $post = $comment.closest('.post');
+        var $commentsList = $('.comments > .list', $post);
         var postId = $post.data('id');
         if (!$textarea.val()) {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('comment_post', postId, $textarea.val(), function(data) {
+            Events.fire('comment_post', postId, $textarea.val(), function(html) {
                 $button.removeClass('load');
                 $textarea.val('').focus();
-                //todo: data должна быть последними комментами
+                $commentsList.append(html).find('.date').easydate(easydateParams);
             });
         }
     }
@@ -359,6 +365,51 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
+
+// Кроссбраузерные плейсхолдеры
+(function($) {
+    $.fn.placeholder = function(para) {
+        return this.each(function(parameters) {
+            var defaults = {
+                el: this,
+                color: '#CCC',
+                text: false,
+                helperClass: 'placeholder'
+            };
+            var t = this;
+            var p = t.p = $.extend(defaults, parameters);
+            var $input = $(p.el);
+            var placeholderText = p.text || $input.attr('placeholder');
+            var $wrapper = $('<div/>');
+            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
+                padding: $input.css('padding')
+            });
+
+            $input
+                .wrap($wrapper)
+                .data('placeholder', $placeholder)
+                .removeAttr('placeholder')
+                .parent().prepend($placeholder)
+            ;
+
+            $placeholder.bind('mousedown', function() {
+                $placeholder.hide();
+                $input.focus();
+            });
+            $placeholder.bind('mouseup', function() {
+                $input.focus();
+            });
+            $input.bind('blur', function() {
+                if (!$input.val()) {
+                    $placeholder.fadeIn(100);
+                }
+            });
+            $input.bind('focus', function() {
+                $placeholder.hide();
+            });
+        });
+    };
+})(jQuery);
 
 // Дропдауны
 (function($) {

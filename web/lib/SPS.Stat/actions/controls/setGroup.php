@@ -6,56 +6,54 @@
      * @package    SPS
      * @subpackage Stat
      */
+
+//создает новую группу
     class setGroup {
 
         /**
          * Entry Point
          */
         public function Execute() {
+//            error_reporting( 0 );
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
-            if (!$groupName || !$userId) {
+            $ava        =   Request::getString ( 'ava' );
+            $comments   =   Request::getString ( 'comments' );
+            $general    =   Request::getInteger ( 'general' );
+
+            $general = $general ? $general : 0;
+            $groupId = $groupId ? $groupId : 0;
+
+            $ava        = $ava      ? $ava     : NULL;
+            $comments   = $comments ? comments : NULL;
+
+            if ( !$groupName || !$userId || !StatGroups::check_group_name_free( $userId, $groupName ) ) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-
-//            if ($id = $this->exist_check($groupName, $userId)) {
-//                echo ObjectHelper::ToJSON(array('response' => array('id'    =>  (int)$id)));
-//                die();
-//            }
-
-            //rename
-            if ($groupId) {
-                $query = 'UPDATE groups SET "name"=@name WHERE group_id=@group_id';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@group_id',   $groupId);
-                $cmd->SetString('@name',        $groupName);
-                $cmd->Execute();
-                echo ObjectHelper::ToJSON(array('response' => true));
-                die();
-            //new
-            } elseif($groupName) {
-                $query = 'INSERT INTO groups("name",user_id) VALUES(@name, @user_id) RETURNING group_id';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@user_id', $userId);
-                $cmd->SetString('@name',     $groupName);
-                $ds = $cmd->Execute();
-                $ds->next();
-                $id = $ds->getValue('group_id', TYPE_INTEGER);
-                if (!$id || $id == NULL) {
-                    echo ObjectHelper::ToJSON(array('response' => false));
-                    die();
-                }
-
-                echo ObjectHelper::ToJSON( array('response' => array('id'    => $id)));
+            if ($general && !StatUsers::is_Sadmin($userId)) {
+                echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-            echo ObjectHelper::ToJSON(array('response' => false));
-            die();
-        }
+            //если мы создаем general группу, ее надо применить ко всем юзерам, посему
+            //вместо id текущего юзера мы посылаем массив всех
+              elseif ($general && !$groupId)
+                  $userId = StatUsers::get_users();
 
+            $newGroupId = StatGroups::setGroup($ava, $groupName, $comments, $groupId);
+            if (!$newGroupId) {
+                echo ObjectHelper::ToJSON(array('response' => false));
+                die();
+            }
+
+            if (!$groupId)
+                StatGroups::implement_group($newGroupId, $userId);
+
+            echo ObjectHelper::ToJSON(array('response' => $newGroupId));
+
+        }
 
     }
 

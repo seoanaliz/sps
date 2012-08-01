@@ -14,7 +14,7 @@
         public function Execute() {
             error_reporting( 0 );
 
-            $publId = Request::getInteger( 'publId' );
+            $publicId = Request::getInteger( 'publId' );
             $price  = Request::getInteger( 'price' );
 
             if (empty($publId)) {
@@ -23,9 +23,9 @@
             }
             $price = $price ? $price : 0;
 
-            $query = 'UPDATE publs50k SET price=@price WHERE vk_id=@publ_id';
+            $query = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET price=@price WHERE vk_id=@publ_id';
             $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@publ_id',    $publId);
+            $cmd->SetInteger('@publ_id',    $publicId);
             $cmd->SetInteger('@price',   $price);
             $cmd->Execute();
 

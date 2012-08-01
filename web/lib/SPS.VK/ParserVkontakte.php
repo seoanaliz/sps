@@ -10,8 +10,8 @@
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
         const PAGE_SIZE = 20;
-        const PROCENT_OTSEVA = 30;//порог отсева постов по лайкам, в процентах
-        const POROG_LIKOV = 20;//ниже этого порога лайков всем постам выставляется "-"
+        const LIMIT_BREAK = 30;//порог отсева постов по лайкам, в процентах
+        const LIKES_LIMIT = 20;//ниже этого порога лайков всем постам выставляется "-"
         const WALL_URL = 'http://vk.com/wall-';
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
@@ -159,11 +159,6 @@
                 throw new Exception('Не удалось скачать страницу '.$this->page_adr."?offset=$offset");
             }
 
-            //чистим HTML TODO
-            //            if (extension_loaded('tidy')){
-            //
-            //            }
-
             $document = phpQuery::newDocument($a);
             $hentry = $document->find('div.post_info');
 
@@ -210,17 +205,13 @@
 
                 //время
                 $time = $pq->find('div.replies > div.reply_link_wrap');
-                $time =  $time->find('span')->text();
-
-                //                iconv( "windows-1251", "utf-8", $time->find('span')->text());
+                $time = $time->find('span')->text();
                 $time = $this->get_time($time);
 
                 if (!$time)
                     throw new Exception(__CLASS__.'::' .__FUNCTION__.
                         " не удалось получить time поста $id со стены " . $this->page_adr);
                 $posts[$t]['time'] = $time;
-                //                echo $time.'<br>';
-
 
                 //ретвит
                 $retweet = $pq->find('a.published_by')->attr('href');
@@ -228,7 +219,6 @@
 
                     $posts[$t]['retweet'] = $this->get_info(self::VK_URL.$retweet);
                 } else $posts[$t]['retweet'] = array();
-
 
 
                 //текст
@@ -272,6 +262,7 @@
 
                         $img_arr[$image]['id'] = $match[1];
                         $img_arr[$image]['desc'] = '';
+
                         //продгоняем инфу о фото под формат json
                         preg_match("/temp:({.*?})/", $oncl, $match);
                         if (isset($match[1])){
@@ -299,7 +290,8 @@
                             }
                             $image++;
                         }
-                        //видео
+
+                    //видео
                     }elseif (substr_count($oncl, "act: 'graffiti'") > 0){
                         $img_arr[$image]['id'] = pq($link)->attr('href');
                         $img_arr[$image]['desc'] = '';
@@ -316,13 +308,15 @@
                         if (!isset($match[1])) continue;
                         $vid_arr[$video]['id'] = $match[1];
                         $video++;
-                        //музыка
+
+                    //музыка
                     }elseif(substr_count($oncl, 'playAudio') > 0){
                         preg_match("/playAudioNew\('(.*?)'/", $oncl, $match);
                         if (!isset($match[1])) continue;
                         $mus_arr[$music]['id'] = $match[1];
                         $music++;
-                        //линки и документы
+
+                    //линки и документы
                     }elseif (pq($link)->attr('class') == 'lnk') {
                         $link = pq($link)->attr('href');
 
@@ -376,7 +370,7 @@
             }
 
             if (count($posts) > 0){
-                $posts = $this->otsev($posts);
+                $posts = $this->kill_attritions($posts);
                 return $posts;
             } else{
                 //                echo '<br>zero<br>';
@@ -384,7 +378,7 @@
             }
         }
 
-        private function srednee(array &$a)
+        private function get_average(array &$a)
         {
             $q = count($a);
             $sum = 0;
@@ -403,10 +397,10 @@
         }
 
 
-        private function otsev($array)
+        private function kill_attritions($array)
         {
             $res = array();
-            $sr =  $this->srednee($array);
+            $sr =  $this->get_average($array);
 
             $i = 0;
             $t = 0;
@@ -415,7 +409,6 @@
                 if ($array[$i]['likes'] > ($sr * 2) ){
                     if ($sr > 1){
                         $array[$i]['likes'] = '+' ;
-                        //                        $array[$i]['likes'] = round(($array[$i]['likes'] * 100) / $ed ) . '%';
 
                     }else
                         $array[$i]['likes'] = '-';
@@ -425,10 +418,11 @@
                 $i++;
             }
 
-            $sr =  $this->srednee($array);
+            $sr =  $this->get_average($array);
 
             $i = 0;
             $t = 0;
+
             //отсев мелких
             while(isset($array[$i]['likes'])){
 
@@ -445,11 +439,12 @@
                 $i++;
             }
 
-            $sr = $this->srednee($array);
+            $sr = $this->get_average($array);
             $ed = $sr * 2;
             unset($t);
 
             $t = 0;
+
             //отсев значений ниже порога, оценка оставшихся в %
             while (isset($array[$t]['likes'])){
                 #
@@ -461,7 +456,7 @@
                     continue;
 
                 }
-                if ($array[$t]['likes_tr'] >= (self::PROCENT_OTSEVA / 100) * $ed)
+                if ($array[$t]['likes_tr'] >= (self::LIMIT_BREAK / 100) * $ed)
                 {
                     if ($ed < 1)
                         $array[$t]['likes'] = '-';
@@ -482,7 +477,7 @@
 //                        $array[$i] = $array[$i]['id'];
 //                    else
 //                         unset($array[$i]);
-                elseif ($array[$i]['likes_tr'] < 20)
+                elseif ($array[$i]['likes_tr'] < LIKES_LIMIT)
                     $array[$i]['likes'] = '-';
             }
 
@@ -712,5 +707,32 @@
             }
             return $month;
         }
+
+        //$post_id  = idпаблика_idпоста
+        public function get_post_likes($post_id)
+        {
+            $post_id = trim($post_id, '-');
+
+            $params = array(
+                'posts'   =>   '-' . $post_id,
+                'access_token'  =>  $this->vk_access_token
+            );
+
+            $url = self::METH . 'wall.getById';
+            $fwd = $this->qurl_request($url, $params);
+            $fwd = json_decode($fwd);
+            if (!empty ($fwd->error)) {
+                $fwd = $fwd->error;
+                throw new exception("Error in wall.delete : $fwd->error_msg");
+            }
+
+            $res = array(
+                'likes'     =>  $fwd->response[0]->likes->count,
+                'reposts'   =>  $fwd->response[0]->reposts->count,
+            );
+            return $res;
+
+        }
+
     }
 ?>

@@ -15,6 +15,7 @@ class wrapper
     public $id; // id паблика
     public $q_result;
 
+
     public function __construct()
     {
         /*require_once 'config.inc.php';*/
@@ -25,9 +26,10 @@ class wrapper
 
     public function vk_api_wrap($method, array $params, $ex = 1)
     {
-        $params['access_token']  =  self::ACC_TOK_WRK;
+        if (!isset($params['access_token']))
+            $params['access_token']  =  self::ACC_TOK_WRK;
         $url = self::VK_API_URL . $method;
-        $res = json_decode($this->qurl_request($url, $params));
+        $res = json_decode(self::qurl_request($url, $params));
 
         if (isset($res->error))
             if ($ex)
@@ -36,6 +38,7 @@ class wrapper
                 return $res->error;
         return $res->response;
     }
+
 
     //return morning timesamp
     public function morning($timestamp)
@@ -100,7 +103,6 @@ class wrapper
     {
         switch ($meth){
             case 'connect':
-                print_r($data);
                 $this->db = new mysqli(
                                             $data['host'],
                                             $data['user'],

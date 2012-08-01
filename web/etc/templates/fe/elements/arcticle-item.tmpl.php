@@ -13,7 +13,7 @@
         }
 ?>
 
-<div class="post bb <?= ($sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
+<div class="post bb <?= (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
@@ -27,15 +27,14 @@
     <? } ?>
     <div class="content">
         <?
-        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
-        $contentPart1 = mb_substr($content, 0, 300);
-        $contentPart2 = mb_substr($content, 300);
+        $contentPart1 = mb_substr($articleRecord->content, 0, 300);
+        $contentPart2 = mb_substr($articleRecord->content, 300);
         $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
         ?>
-        <div class="shortcut">{$contentPart1}</div>
+        <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>
         <? if($contentPart2) { ?>
         <a href="javascript:;" class="show-cut">Показать полностью...</a>
-        <div class="cut">{$contentPart2}</div>
+        <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
         <? } ?>
 
         <?
@@ -73,7 +72,11 @@
         ?>
     </div>
     <div class="bottom d-hide">
-        <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a> | <a class="clear-text" href="javascript:;">Очистить текст</a></div>
+        <div class="l">
+            <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
+            <a class="edit" href="javascript:;">Редактировать</a> |
+            <a class="clear-text" href="javascript:;">Очистить текст</a>
+        </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
                 <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
@@ -95,6 +98,27 @@
         </div>
     </div>
     <div class="delete spr"></div>
+    <div class="clear"></div>
+
+    <? if (!empty($article->authorId)) { ?>
+    <div class="comments">
+        <div class="list">
+            {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+        </div>
+        <div class="new-comment">
+            <div class="photo">
+                <img src="{$__Editor->avatar}" alt="" />
+            </div>
+            <div class="textarea-wrap">
+                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+            </div>
+            <div class="actions">
+                <button class="button send">Отправить</button>
+                <span class="text">Ctrl+Enter</span>
+            </div>
+        </div>
+    </div>
+    <? } ?>
     <div class="clear"></div>
 </div>
 <? } ?>

@@ -68,6 +68,7 @@ sql;
             ArticleFactory::$mapping['view'] = ArticleFactory::$mapping['table'];
             $article = ArticleFactory::GetById($articleQueue->articleId, array(), array(BaseFactory::WithoutDisabled => false));
             $sourceFeed = SourceFeedFactory::GetOne(array('sourceFeedId' => $article->sourceFeedId));
+            $sourceFeed = !empty($sourceFeed) ? $sourceFeed : new SourceFeed();
 
             if ($targetFeed->type == TargetFeedUtility::FB) {
                 if (empty($targetFeed) || empty($articleRecord)) {

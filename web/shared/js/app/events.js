@@ -35,7 +35,7 @@ var Eventlist = {
         }, options);
 
         $.ajax({
-            url: controlsRoot + 'articles-list/',
+            url: appControlsRoot + 'articles-list/',
             dataType : "html",
             data: params,
             success: function (data) {
@@ -51,7 +51,7 @@ var Eventlist = {
         }, options);
 
         $.ajax({
-            url: controlsRoot + 'article-save/',
+            url: appControlsRoot + 'article-save/',
             type: 'POST',
             dataType : "json",
             data: params,
@@ -66,7 +66,7 @@ var Eventlist = {
     },
     wall_delete: function(postId, callback) {
         $.ajax({
-            url: controlsRoot + 'article-delete/',
+            url: appControlsRoot + 'article-delete/',
             data: {
                 id: postId
             },
@@ -77,7 +77,7 @@ var Eventlist = {
     },
     wall_restore: function(postId, callback) {
         $.ajax({
-            url: controlsRoot + 'article-restore/',
+            url: appControlsRoot + 'article-restore/',
             data: {
                 id: postId
             },
@@ -90,20 +90,51 @@ var Eventlist = {
     comment_load: function(options, callback) {
         var params = $.extend({
             postId: null,
-            offset: null,
-            limit: null
+            all: true
         }, options);
 
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'comments-load/',
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     comment_post: function(postId, text, callback) {
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'comment-save/',
+            type: 'POST',
+            data: {
+                id: postId,
+                text: text
+            },
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     comment_delete: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'comment-delete/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
     comment_restore: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'comment-restore/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);

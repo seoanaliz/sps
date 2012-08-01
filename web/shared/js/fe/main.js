@@ -1,4 +1,18 @@
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
+var easydateParams = {
+    date_parse: function(date) {
+        if (!date) return;
+        var d = date.split('.');
+        var i = d[1];
+        d[1] = d[0];
+        d[0] = i;
+        var date = d.join('/');
+        return Date.parse(date);
+    },
+    uneasy_format: function(date) {
+        return date.toLocaleDateString();
+    }
+};
 
 $(document).ready(function(){
     $.mask.definitions['2']='[012]';
@@ -183,7 +197,7 @@ $(document).ready(function(){
 
     // Wall init
     $(".wall")
-        .delegate(".post .delete", "click", function(){
+        .delegate(".post > .delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
                 gid = elem.data('group');
@@ -799,7 +813,7 @@ $(document).ready(function(){
         // Быстрое редактирование поста в левой колонке
         $(".left-panel").delegate(".post .content .shortcut", "click", function(){
             var $post = $(this).closest(".post"),
-                $content = $post.find('.content'),
+                $content = $post.find('> .content'),
                 postId = $post.data("id");
 
             if ($post.editing) return;
@@ -815,8 +829,8 @@ $(document).ready(function(){
         $(".left-panel").delegate(".post .edit", "click", function(){
 
             var $post = $(this).closest(".post"),
-                $content = $post.find('.content'),
-                $buttonPanel = $post.find('.bottom.d-hide'),
+                $content = $post.find('> .content'),
+                $buttonPanel = $post.find('> .bottom.d-hide'),
                 postId = $post.data("id");
 
             if ($post.editing) return;
@@ -1091,6 +1105,98 @@ $(document).ready(function(){
         });
     })();
 
+    // Комментирование записи
+    $('.left-panel').delegate('.post > .bottom .comment', 'click', function(e) {
+        var $target = $(this);
+        var $post = $target.closest('.post');
+        var postId = $post.data('id');
+    });
+    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'focus', function() {
+        $(this).autoResize();
+        var $newComment = $(this).closest('.new-comment');
+        $newComment.addClass('open');
+    });
+    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
+        if (e.ctrlKey && e.keyCode == 13) {
+            var $newComment = $(this).closest('.new-comment');
+            var $sendBtn = $newComment.find('.send');
+            $sendBtn.click();
+        }
+    });
+    $('.left-panel').delegate('.post > .comments .comment > .delete', 'click', function(e) {
+        var $target = $(this);
+        var $comment = $target.closest('.comment');
+        var commentId = $comment.data('id');
+        Events.fire('comment_delete', [commentId, function() {
+            $comment.data('html', $comment.html());
+            $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+        }]);
+    });
+    $('.left-panel').delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
+        var $target = $(this);
+        var $comment = $target.closest('.comment');
+        var commentId = $comment.data('id');
+        Events.fire('comment_restore', [commentId, function() {
+            $comment.removeClass('deleted').html($comment.data('html'));
+        }]);
+    });
+    $('.left-panel').delegate('.post > .comments .new-comment .send', 'click', function() {
+        var $target = $(this);
+        var $comment = $target.closest('.new-comment');
+        var $textarea = $comment.find('textarea');
+        var $button = $comment.find('.send:not(.load)');
+        var $post = $comment.closest('.post');
+        var $commentsList = $('.comments > .list', $post);
+        var postId = $post.data('id');
+        if (!$textarea.val()) {
+            $textarea.focus();
+        } else {
+            $button.addClass('load');
+            Events.fire('comment_post', [postId, $textarea.val(), function(html) {
+                $button.removeClass('load');
+                $textarea.val('').focus();
+                $commentsList.append(html).find('.date').easydate(easydateParams);
+            }]);
+        }
+    });
+    $('.left-panel').delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
+        var $target = $(this);
+        var $post = $target.closest('.post');
+        var $commentsList = $('.comments > .list', $post);
+        var postId = $post.data('id');
+        var tmpText = $target.text();
+        $target.addClass('load').html('&nbsp;');
+        Events.fire('comment_load', [{postId: postId, all: true}, function(html) {
+            $target.removeClass('load').html(tmpText);
+            $commentsList.html(html).find('.date').easydate(easydateParams);
+        }]);
+    });
+    $('.left-panel').delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
+        var $target = $(this);
+        var $post = $target.closest('.post');
+        var $commentsList = $('.comments > .list', $post);
+        var postId = $post.data('id');
+        var tmpText = $target.text();
+        $target.addClass('load').html('&nbsp;');
+        Events.fire('comment_load', [{postId: postId, all: false}, function(html) {
+            $target.removeClass('load').html(tmpText);
+            $commentsList.html(html).find('.date').easydate(easydateParams);
+        }]);
+    });
+    $(document).bind('mousedown', function(e) {
+        var $newComment = $(e.target).closest('.new-comment.open');
+        if (!$newComment.length) {
+            $('.new-comment.open').each(function() {
+                var $comment = $(this);
+                var $textarea = $comment.find('textarea');
+                if (!$textarea.val()) {
+                    $comment.removeClass('open');
+                    $textarea.height('auto');
+                }
+            });
+        }
+    });
+
     // Показать полностью в левом меню
     $(".left-panel").delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
@@ -1171,26 +1277,33 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
             </div>';
 
 var Events = {
-    fire : function(name, args){
+    delay: 0,
+    eventList: Eventlist,
+    fire: function(name, args){
+        var t = this;
         if(typeof args != "undefined") {
             if(!$.isArray(args)) args = [args];
         } else {
             args = [];
         }
-        if($.isFunction(this[name])) {
+        if ($.isFunction(t.eventList[name])) {
             try {
-                this[name].apply(window, args);
+                setTimeout(function() {
+                    if(window.console && console.log) {
+                        console.log(name + ':');
+                        console.log(args.slice(0, -1));
+                        console.log('-------');
+                    }
+                    t.eventList[name].apply(window, args);
+                }, t.delay);
             } catch(e) {
-                if(console && $.isFunction(console.log)) {
+                if (window.console && console.log) {
                     console.log(e);
                 }
             }
         }
     }
 };
-
-$.extend(Events, Eventlist);
-delete(Eventlist);
 
 var Elements = {
     initImages: function(selector){
@@ -1224,20 +1337,9 @@ var Elements = {
             img.src = src;
         });
 
-        $(".left-panel .timestamp").easydate({
-            date_parse: function(date) {
-                if (!date) return;
-                var d = date.split('.');
-                var i = d[1];
-                d[1] = d[0];
-                d[0] = i;
-                var date = d.join('.');
-                return Date.parse(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
-        });
+
+        $(".left-panel .timestamp").easydate(easydateParams);
+        $(".left-panel .date").easydate(easydateParams);
         $('.left-panel .images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
