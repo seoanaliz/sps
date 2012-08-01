@@ -18,7 +18,9 @@
             );
 
             /** @var $author Author */
+            /** @var $editor Editor */
             $author = Session::getObject('Author');
+            $editor = Session::getObject('Editor');
 
             $article = ArticleFactory::GetById(Request::getInteger('id'));
 
@@ -28,7 +30,8 @@
                 return false;
             }
 
-            if (!in_array($article->targetFeedId, Session::getArray('targetFeedIds'))) {
+            $__editorMode = Response::getBoolean('__editorMode');
+            if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
                 $result['message'] = 'accessError';
                 echo ObjectHelper::ToJSON($result);
                 return false;
@@ -38,8 +41,13 @@
             $comment->text = Request::getString('text');
             $comment->articleId = $article->articleId;
             $comment->createdAt = DateTimeWrapper::Now();
-            $comment->authorId = $author->authorId;
             $comment->statusId = 1;
+
+            if ($__editorMode) {
+                $comment->editorId = $editor->editorId;
+            } else {
+                $comment->authorId = $author->authorId;
+            }
 
             $errors = CommentFactory::Validate($comment);
             if (!empty($errors)) {

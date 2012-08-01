@@ -10,6 +10,16 @@
     class VKCheckAppAuth {
 
         public function Execute() {
+            if (!empty(Page::$RequestData[1]) && Page::$RequestData[1] == 'editor/') {
+                $editor = Session::getObject('Editor');
+                if (empty($editor)) {
+                    die();
+                } else {
+                    Response::setBoolean('__editorMode', true);
+                    return true;
+                }
+            }
+
             $silent     = Request::getBoolean('silent');
             $api_id     = Request::getInteger('api_id');
             $viewer_id  = Request::getInteger('viewer_id');

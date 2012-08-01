@@ -493,6 +493,7 @@ var Eventlist = {
     comment_post: function(postId, text, callback) {
         $.ajax({
             url: appControlsRoot + 'comment-save/',
+            type: 'POST',
             data: {
                 id: postId,
                 text: text

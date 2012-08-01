@@ -71,6 +71,7 @@
             );
 
             Session::setObject('Editor', $editor);
+            Response::setObject('__Editor', $editor);
         }
 
         /**

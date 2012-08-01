@@ -24,10 +24,19 @@
                 return;
             }
 
-            /** @var $author Author */
-            $author = Session::getObject('Author');
-            if ($comment->authorId != $author->authorId) {
+            $__editorMode = Response::getBoolean('__editorMode');
+            if ($__editorMode) {
+                $article = ArticleFactory::GetById($comment->articleId);
+                if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
+                    return;
+                }
                 return;
+            } else {
+                /** @var $author Author */
+                $author = Session::getObject('Author');
+                if ($comment->authorId != $author->authorId) {
+                    return;
+                }
             }
 
             $comment->statusId = 3;

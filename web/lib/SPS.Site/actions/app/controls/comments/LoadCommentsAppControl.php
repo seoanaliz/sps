@@ -19,7 +19,10 @@
                 return false;
             }
 
-            if (!in_array($article->targetFeedId, Session::getArray('targetFeedIds'))) {
+            $__editorMode = Response::getBoolean('__editorMode');
+            if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
+                $result['message'] = 'accessError';
+                echo ObjectHelper::ToJSON($result);
                 return false;
             }
 

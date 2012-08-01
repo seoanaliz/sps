@@ -462,18 +462,18 @@
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>
                 </page>
-                <page uri="appControls://comment-save/">
+                <page uri="appControls://(editor/)?comment-save/">
                     <actions>SPS.Site.SaveCommentAppControl</actions>
                     <template>tmpl://app/elements/wall-comment.tmpl.php</template>
                 </page>
-                <page uri="appControls://comments-load/">
+                <page uri="appControls://(editor/)?comments-load/">
                     <actions>SPS.Site.LoadCommentsAppControl</actions>
                     <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
                 </page>
-                <page uri="appControls://comment-delete/">
+                <page uri="appControls://(editor/)?comment-delete/">
                     <actions>SPS.Site.DeleteCommentAppControl</actions>
                 </page>
-                <page uri="appControls://comment-restore/">
+                <page uri="appControls://(editor/)?comment-restore/">
                     <actions>SPS.Site.RestoreCommentAppControl</actions>
                 </page>
             </pageGroup>
