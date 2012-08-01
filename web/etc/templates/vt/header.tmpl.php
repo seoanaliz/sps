@@ -43,6 +43,10 @@
             "title"  => "vt.menu.authors"
             , "link" => "vt://authors/"
         )
+        , "editors" => array(
+            "title"  => "vt.menu.editors"
+            , "link" => "vt://editors/"
+        )
         , "meta-details" => array(
             "title"  => "vt.menu.metaDetails"
             , "link" => "vt://meta-details/"

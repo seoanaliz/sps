@@ -266,5 +266,13 @@
                 </response>
             </parameters>
         </action>
+        <action name="SetEditorsMenu">
+            <path>EmptyAction</path>
+            <parameters>
+                <response>
+                    <param name="__activeElement">"editors"</param>
+                </response>
+            </parameters>
+        </action>
     </group>
 </actions>

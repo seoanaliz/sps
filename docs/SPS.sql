@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		27.07.2012
+Modified		01.08.2012
 Project		
 Model			
 Company		
@@ -325,6 +325,19 @@ Create table "authors"
 ) Without Oids;
 
 
+Create table "editors"
+(
+	"editorId" Serial NOT NULL,
+	"vkId" Integer NOT NULL UNIQUE,
+	"firstName" Varchar(1000),
+	"lastName" Varchar(1000),
+	"avatar" Varchar(1000),
+	"targetFeedIds" Integer[],
+	"statusId" Integer NOT NULL,
+ primary key ("editorId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -367,6 +380,8 @@ Create index "IX_FK_publishersStatusId_publishers" on "publishers" ("statusId");
 Alter table "publishers" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_authorsStatusId_authors" on "authors" ("statusId");
 Alter table "authors" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
+Create index "IX_FK_editorsStatusId_editors" on "editors" ("statusId");
+Alter table "editors" add  foreign key ("statusId") references "statuses" ("statusId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFoldersFolderId_vfsFolders" on "vfsFolders" ("parentFolderId");
 Alter table "vfsFolders" add  foreign key ("parentFolderId") references "vfsFolders" ("folderId") on update restrict on delete restrict;
 Create index "IX_FK_vfsFilesFolderId_vfsFiles" on "vfsFiles" ("folderId");
