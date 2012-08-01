@@ -75,9 +75,15 @@
             return $result;
         }
 
-        public static function HasAccessToTargetFeedId($targetFeedId) {
-            $accessIds = self::GetTargetFeedIds();
-            return empty($accessIds) || array_key_exists($targetFeedId, $accessIds);
+        public static function HasAccessToTargetFeedId($targetFeedId, $__editorMode = true) {
+            if ($__editorMode) {
+                $accessIds = self::GetTargetFeedIds();
+                return empty($accessIds) || array_key_exists($targetFeedId, $accessIds);
+            } else {
+                $accessIds = Session::getArray('targetFeedIds');
+                $accessIds = !empty($accessIds) ? $accessIds : array();
+                return in_array($targetFeedId, $accessIds);
+            }
         }
 
         public static function HasAccessToSourceFeedId($sourceFeedId) {

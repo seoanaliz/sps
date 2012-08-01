@@ -92,6 +92,7 @@
         document.documentElement.id = "js";
         var root = '{web:/}';
         var controlsRoot = '{web:controls://}';
+        var appControlsRoot = '{web:appControls://editor/}';
         var vk_appId = <?= AuthVkontakte::$AppId ?>;
         var hostname = '<?= Site::$Host->GetHostname() ?>';
     </script>

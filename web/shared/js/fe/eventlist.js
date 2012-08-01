@@ -476,6 +476,56 @@ var Eventlist = {
         loadArticles(true);
     },
 
+    comment_load: function(options, callback) {
+        var params = $.extend({
+            postId: null,
+            all: true
+        }, options);
+
+        $.ajax({
+            url: appControlsRoot + 'comments-load/',
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
+    },
+    comment_post: function(postId, text, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-save/',
+            type: 'POST',
+            data: {
+                id: postId,
+                text: text
+            },
+            success: function (data) {
+                callback(data);
+            }
+        });
+    },
+    comment_delete: function(commentId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-delete/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
+    },
+    comment_restore: function(commentId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-restore/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
+    },
+
     eof: null
 };
 

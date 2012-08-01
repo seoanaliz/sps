@@ -73,7 +73,11 @@
         ?>
     </div>
     <div class="bottom d-hide">
-        <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a> | <a class="clear-text" href="javascript:;">Очистить текст</a></div>
+        <div class="l">
+            <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
+            <a class="edit" href="javascript:;">Редактировать</a> |
+            <a class="clear-text" href="javascript:;">Очистить текст</a>
+        </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
                 <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
@@ -95,6 +99,27 @@
         </div>
     </div>
     <div class="delete spr"></div>
+    <div class="clear"></div>
+
+    <? if (!empty($article->authorId)) { ?>
+    <div class="comments">
+        <div class="list">
+            {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+        </div>
+        <div class="new-comment">
+            <div class="photo">
+                <img src="{$__Editor->avatar}" alt="" />
+            </div>
+            <div class="textarea-wrap">
+                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+            </div>
+            <div class="actions">
+                <button class="button send">Отправить</button>
+                <span class="text">Ctrl+Enter</span>
+            </div>
+        </div>
+    </div>
+    <? } ?>
     <div class="clear"></div>
 </div>
 <? } ?>

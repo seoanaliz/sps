@@ -34,7 +34,7 @@ var app = (function () {
             var i = d[1];
             d[1] = d[0];
             d[0] = i;
-            return Date.parse(d.join('.'));
+            return Date.parse(d.join('/'));
         },
         uneasy_format: function(date) {
             return date.toLocaleDateString();
