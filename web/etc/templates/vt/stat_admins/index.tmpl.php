@@ -47,10 +47,10 @@
             <td><?=$posts['rel_likes']?></td>
             <td>
             <?
-                unset ($posts[topics]);
-                unset ($posts[compls]);
-                unset ($posts[reposts]);
-                unset ($posts[rel_likes]);
+//                unset ($posts[topics]);
+//                unset ($posts[compls]);
+//                unset ($posts[reposts]);
+//                unset ($posts[rel_likes]);
 //            foreach($posts as $post) {
 //                ?>
 <!--                    <a href="http://vk.com/wall-"--><?//=$public['id']?><!--_--><?//=$post?><!-->--><?//=$public['id']?><!--_--><?//=$post?><!--</a>-->
