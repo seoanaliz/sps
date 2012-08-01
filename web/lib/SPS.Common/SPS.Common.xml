@@ -182,6 +182,12 @@
         </action>
     </group>
 
+    <group name="tools">
+        <action name="InitEditorsTool">
+            <path>tools/InitEditorsTool</path>
+        </action>
+    </group>
+
     <group name="VFS">
         <action name="GetVFSSmallImage">
             <path>GetResizedImageAction</path>

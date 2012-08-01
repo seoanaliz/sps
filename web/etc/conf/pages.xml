@@ -478,6 +478,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="tools">
+                <page uri="tools://init-editors/">
+                    <actions>SPS.Common.InitEditorsTool</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

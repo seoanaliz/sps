@@ -19,6 +19,7 @@
 				<path name="daemons" value="/int/daemons" />
 				<path name="app" value="/app" />
 				<path name="appControls" value="/app/controls" />
+				<path name="tools" value="/tools" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
