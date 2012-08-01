@@ -44,6 +44,11 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
+    get_user: function(userId, callback) {
+        simpleAjax('addUser', function(dirtyData) {
+            callback(true);
+        });
+    },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
@@ -149,7 +154,7 @@ var Eventlist = {
         });
     },
     add_to_list: function(public_id, list_id, callback) {
-        simpleAjax('implGroup', {
+        simpleAjax('implPublic', {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
@@ -157,7 +162,7 @@ var Eventlist = {
         });
     },
     remove_from_list: function(public_id, list_id, callback) {
-        simpleAjax('exGroup', {
+        simpleAjax('exPublic', {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
@@ -165,7 +170,7 @@ var Eventlist = {
         });
     },
     change_user: function(user_id, list_id, public_id, callback) {
-        simpleAjax('selectSAdmin', {
+        simpleAjax('selectGroupAdmin', {
             adminId: user_id,
             groupId: list_id,
             publId: public_id
