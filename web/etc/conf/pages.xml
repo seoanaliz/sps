@@ -136,7 +136,7 @@
                         <template>tmpl://vt/stat/index.tmpl.php</template>
                     </page>
                     <page uri="vt://oadmins/">
-                        <actions>Sps.Stat.AdminsWork</actions>
+                        <actions>SPS.Stat.AdminsWork</actions>
                         <template>tmpl://vt/stat_admins/index.tmpl.php</template>
                     </page>
 
