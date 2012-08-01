@@ -93,7 +93,13 @@ var Eventlist = {
             all: true
         }, options);
 
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comments-load/',
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     comment_post: function(postId, text, callback) {
         $.ajax({

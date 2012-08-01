@@ -13,10 +13,7 @@
          * Entry Point
          */
         public function Execute() {
-            /** @var $author Author */
-            $author = Session::getObject('Author');
-
-            $article = ArticleFactory::GetById(Request::getInteger('id'));
+            $article = ArticleFactory::GetById(Request::getInteger('postId'));
 
             if (empty($article)) {
                 return false;
