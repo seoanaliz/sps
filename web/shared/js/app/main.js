@@ -198,7 +198,7 @@ var app = (function () {
         });
         $wall.delegate('.comment.deleted > .restore', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.post');
+            var $comment = $target.closest('.comment');
             var commentId = $comment.data('id');
             Events.fire('comment_restore', commentId, function() {
                 $comment.removeClass('deleted').html($comment.data('html'));
