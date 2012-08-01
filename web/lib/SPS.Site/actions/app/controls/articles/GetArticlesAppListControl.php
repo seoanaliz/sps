@@ -30,6 +30,11 @@
         private $authors = array();
 
         /**
+         * @var array
+         */
+        private $commentsData = array();
+
+        /**
          * @var int
          */
         private $pageSize = 20;
@@ -154,6 +159,8 @@
                         array(BaseFactory::WithoutPages => true)
                     );
                 }
+
+                $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
             }
         }
 
@@ -165,6 +172,7 @@
             Response::setArray( 'authors', $this->authors );
             Response::setArray( 'targetFeeds', $this->targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
+            Response::setArray( 'commentsData', $this->commentsData );
         }
 
         /**

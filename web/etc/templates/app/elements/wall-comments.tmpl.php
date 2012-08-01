@@ -1,19 +1,17 @@
-<? if (true || !empty($comments)) { ?>
 <div class="comments">
     <div class="list">
         {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
     </div>
     <div class="new-comment">
         <div class="photo">
-            <img src="http://vk.cc/Q2PuP" alt="" />
+            <img src="{$__Author->avatar}" alt="" />
         </div>
         <div class="textarea-wrap">
-            <textarea placeholder="Reply..." rows="1"></textarea>
+            <textarea placeholder="Ваш текст..." rows="1"></textarea>
         </div>
         <div class="actions">
-            <button class="button send">Send</button>
+            <button class="button send">Отправить</button>
             <span class="text">Ctrl+Enter</span>
         </div>
     </div>
 </div>
-<? } ?>

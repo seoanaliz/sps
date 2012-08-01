@@ -134,3 +134,14 @@ SELECT "public"."gridLineItems"."gridLineItemId"
 	, "public"."gridLineItems"."date"
 	, "public"."gridLineItems"."gridLineId"
  FROM "public"."gridLineItems";
+ 
+CREATE OR REPLACE VIEW "getEditors" AS
+SELECT "public"."editors"."editorId"
+	, "public"."editors"."vkId"
+	, "public"."editors"."firstName"
+	, "public"."editors"."lastName"
+	, "public"."editors"."avatar"
+	, "public"."editors"."targetFeedIds"
+	, "public"."editors"."statusId"
+ FROM "public"."editors"
+	WHERE "public"."editors"."statusId" != 3;

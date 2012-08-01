@@ -93,16 +93,47 @@ var Eventlist = {
             all: true
         }, options);
 
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comments-load/',
+            data: params,
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     comment_post: function(postId, text, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-save/',
+            data: {
+                id: postId,
+                text: text
+            },
+            success: function (data) {
+                callback(data);
+            }
+        });
     },
     comment_delete: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-delete/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
     comment_restore: function(commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-restore/',
+            data: {
+                id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);

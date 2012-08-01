@@ -24,5 +24,26 @@
       </Flags>
       <Lists />
     </Entity>
+    <Entity Name="Comment" PackageName="SPS.App" Table="comments" View="getComments" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="commentId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="commentId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="text" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="1000" DbName="text" FieldType="TYPE_STRING" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="createdAt" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="createdAt" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="authorId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="editorId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="editor" ForeignKey="Editor" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="statusId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="status" ForeignKey="Status" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="page" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="page" DefaultValue="0" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="pageSize" Key="false" Addable="false" Updatable="false" MinValue="0" MaxValue="0" DbName="pageSize" DefaultValue="25" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+      </Search>
+      <Flags>
+        <EFlag>CanPages</EFlag>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
   </Entities>
 </Package>
