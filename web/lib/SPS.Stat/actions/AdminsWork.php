@@ -8,7 +8,7 @@
 
         public function execute()
         {
-
+            error_reporting( 0 );
             $publics = StatPublics::get_our_publics_list();
             $result = array();
 //            foreach ($publics as $public) {
