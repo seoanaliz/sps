@@ -35,5 +35,9 @@
 
         /** @var Status */
         public $status;
+
+        public function FullName() {
+            return trim(FormHelper::RenderToForm($this->firstName . ' ' . $this->lastName));
+        }
     }
 ?>
