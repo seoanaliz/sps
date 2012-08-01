@@ -5,10 +5,6 @@
     set_time_limit(600);
     class WrTopics extends wrapper
     {
-        const TESTING = false;
-        const T_PUBLICS_POINTS = 'gr50k';
-        const T_PUBLICS_LIST   = 'publs50k';
-
         private $ids;
 
         public function Execute()
@@ -24,7 +20,7 @@
 
         public function get_id_arr()
         {
-            $sql = "select vk_id FROM ". self::T_PUBLICS_LIST ." ORDER BY vk_id";
+            $sql = "select vk_id FROM ". TABLE_STAT_PUBLICS ." ORDER BY vk_id";
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $ds = $cmd->Execute();
             $res = array();
@@ -36,7 +32,7 @@
 
         public function check_time()
         {
-            $sql = 'SELECT MAX(time) FROM ' . self::T_PUBLICS_POINTS . ' LIMIT 1';
+            $sql = 'SELECT MAX(time) FROM ' . TABLE_STAT_PUBLICS_POINTS . ' LIMIT 1';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $ds = $cmd->Execute();
             $ds->Next();
@@ -46,35 +42,10 @@
             if ($diff < 86400 )
                 return false;
             if ($diff > 86400 * 2 )
-                return ($diff/86400);
+                return ($diff / 86400);
             return 1;
 
         }
-
-//        public function tut()
-//        {
-//            $sql = 'select "name", vk_id from publs50k where vk_id=28045060';
-//            $k = $this->db_wrap('query', $sql);
-//            $row = $this->db_wrap('get_row', $k);
-//            var_dump($row);
-//            die ();
-//
-//
-//            while ($row = $this->db_wrap('get_row', $k)) {
-//                print_r($row);
-//                print_r($row['name']);
-//
-//                echo '<br>';
-//                $row['name'] = iconv ('windows-1251', 'utf-8', $row['name']);
-//                print_r($row['name']);
-//                $sql = 'UPDATE publs50k set "name"=\'' . $row['name'] . '\' where vk_id = 28045060' ;#. $row['30'];
-//                print_r($sql);
-//                die();
-//                $this->db_wrap('query', $sql);
-//                die();
-//            }
-//
-//        }
 
         //проверяет изменения в пабликах(название и ава)
         public function update_public_info()
@@ -93,7 +64,7 @@
 
                     $res = $this->vk_api_wrap('groups.getById', $params);
                     foreach($res as $public) {
-                        $sql = 'UPDATE ' . self::T_PUBLICS_LIST . ' SET
+                        $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET
                                                 name=@name,
                                                 ava=@photo
                                 WHERE
@@ -118,7 +89,7 @@
         //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем)
         public function set_public_grow($publ_id, $quantity, $period=1)
         {
-                $sql = 'UPDATE ' . self::T_PUBLICS_LIST . '
+                $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
                 SET diff_abs=(@new_quantity - quantity),
                     quantity=@new_quantity,
                     diff_rel=round((@new_quantity/quantity - 1)*100, 2)
@@ -154,7 +125,7 @@
                     foreach($res as $key => $entry) {
 
                         $key = str_replace('a', '', $key);
-                        $sql = "INSERT INTO " . self::T_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
+                        $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
                         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                         $cmd->SetInteger( '@id',        $key );
                         $cmd->SetInteger( '@time',      $time );

@@ -23,11 +23,16 @@
             return false;
         }
 
-        public static function get_vk_user_info($userId)
+        public static function get_vk_user_info($url)
         {
+
+            $url = trim($url, '/');
+            $url = explode('/', $url);
+            $url = end($url);
             $wr = new wrapper;
+
             $params = array(
-                'uids'   =>  $userId,
+                'uids'   =>  $url,
                 'fields' =>  'photo',
             );
 

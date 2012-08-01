@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
 
-    <action name="GraphGrow" />
-        <path>GraphGrow</path>
+    <action name="AdminsWork" />
+        <path>AdminsWork</path>
     <group name="Daemons">
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
