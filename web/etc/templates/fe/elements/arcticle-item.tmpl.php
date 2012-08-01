@@ -100,6 +100,8 @@
     </div>
     <div class="delete spr"></div>
     <div class="clear"></div>
+
+    <? if (!empty($article->authorId)) { ?>
     <div class="comments">
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
@@ -117,6 +119,7 @@
             </div>
         </div>
     </div>
+    <? } ?>
     <div class="clear"></div>
 </div>
 <? } ?>
