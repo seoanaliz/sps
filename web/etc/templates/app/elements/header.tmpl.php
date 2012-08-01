@@ -67,7 +67,8 @@ if(!empty($jsFilesAdds)) {
     <meta http-equiv="Content-Type" content="text/html; charset=<?= LocaleLoader::$HtmlEncoding ?>" />
     <script type="text/javascript">
         var root = '{web:/}';
-        var controlsRoot = '{web:appControls://}';
+        var controlsRoot = '{web:controls://}';
+        var appControlsRoot = '{web:appControls://}';
     </script>
     <title><?=$__pageTitle?></title>
     <meta name="keywords" content="{form:$__metaKeywords}" />
