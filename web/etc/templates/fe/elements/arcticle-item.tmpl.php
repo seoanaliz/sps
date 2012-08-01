@@ -73,7 +73,11 @@
         ?>
     </div>
     <div class="bottom d-hide">
-        <div class="l"><span class="timestamp">{$article->createdAt->defaultFormat()}</span> | <a class="edit" href="javascript:;">Редактировать</a> | <a class="clear-text" href="javascript:;">Очистить текст</a></div>
+        <div class="l">
+            <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
+            <a class="edit" href="javascript:;">Редактировать</a> |
+            <a class="clear-text" href="javascript:;">Очистить текст</a>
+        </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
                 <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
@@ -95,6 +99,35 @@
         </div>
     </div>
     <div class="delete spr"></div>
+    <div class="clear"></div>
+    <div class="comments">
+        <div class="list">
+            <div class="show-more hide">Скрыть комментарии</div>
+            <div class="comment" data-id="1">
+                <div class="delete"></div>
+                <div class="photo">
+                    <img src="http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg" alt="" />
+                </div>
+                <div class="content">
+                    <div class="title"><a href="http://vk.com/id" target="_blank">Vova Pupkin</a></div>
+                    <div class="text">asdasd</div>
+                    <div class="date">01.08.2012 15:00</div>
+                </div>
+            </div>
+        </div>
+        <div class="new-comment">
+            <div class="photo">
+                <img src="http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg" alt="" />
+            </div>
+            <div class="textarea-wrap">
+                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+            </div>
+            <div class="actions">
+                <button class="button send">Отправить</button>
+                <span class="text">Ctrl+Enter</span>
+            </div>
+        </div>
+    </div>
     <div class="clear"></div>
 </div>
 <? } ?>
