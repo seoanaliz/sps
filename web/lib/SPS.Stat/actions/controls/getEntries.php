@@ -118,7 +118,7 @@ class getEntries {
                                 'diff_rel'  =>  $row['diff_rel']
                             );
         }
-        PRINT_R($resul);
+
         echo ObjectHelper::ToJSON(array('response' => $resul));
     }
 
