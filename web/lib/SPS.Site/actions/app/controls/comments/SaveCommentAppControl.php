@@ -20,7 +20,7 @@
             /** @var $author Author */
             $author = Session::getObject('Author');
 
-            $article = ArticleFactory::GetById(Request::getInteger('id'));
+            $article = ArticleFactory::GetById(Request::getInteger('id'), array(), array(BaseFactory::WithoutDisabled => false));
 
             if (empty($article) || $article->sourceFeedId != -1) {
                 $result['message'] = 'accessError';

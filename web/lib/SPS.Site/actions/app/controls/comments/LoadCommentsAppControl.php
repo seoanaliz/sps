@@ -13,7 +13,7 @@
          * Entry Point
          */
         public function Execute() {
-            $article = ArticleFactory::GetById(Request::getInteger('postId'));
+            $article = ArticleFactory::GetById(Request::getInteger('postId'), array(), array(BaseFactory::WithoutDisabled => false));
 
             if (empty($article)) {
                 return false;
