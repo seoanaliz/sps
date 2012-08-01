@@ -9,3 +9,14 @@ SELECT "public"."authors"."authorId"
  FROM "public"."authors"
 	WHERE "public"."authors"."statusId" != 3
 ORDER BY "firstName", "lastName";
+
+CREATE OR REPLACE VIEW "getComments" AS
+SELECT "public"."comments"."commentId"
+	, "public"."comments"."text"
+	, "public"."comments"."createdAt"
+	, "public"."comments"."articleId"
+	, "public"."comments"."authorId"
+	, "public"."comments"."editorId"
+	, "public"."comments"."statusId"
+ FROM "public"."comments"
+	WHERE "public"."comments"."statusId" != 3;

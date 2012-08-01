@@ -129,5 +129,10 @@
                 <path>app/controls/articles/RestoreArticleAppControl</path>
             </action>
         </group>
+        <group name="Comments">
+            <action name="SaveCommentAppControl">
+                <path>app/controls/comments/SaveCommentAppControl</path>
+            </action>
+        </group>
     </group>
 </actions>

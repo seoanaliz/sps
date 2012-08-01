@@ -459,6 +459,9 @@
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>
                 </page>
+                <page uri="appControls://comment-save/">
+                    <actions>SPS.Site.SaveCommentAppControl</actions>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

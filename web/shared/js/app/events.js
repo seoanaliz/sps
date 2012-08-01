@@ -97,7 +97,16 @@ var Eventlist = {
         callback(true);
     },
     comment_post: function(postId, text, callback) {
-        callback(true);
+        $.ajax({
+            url: controlsRoot + 'comment-save/',
+            data: {
+                id: postId,
+                text: text
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
     comment_delete: function(commentId, callback) {
         callback(true);
