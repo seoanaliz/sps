@@ -4,7 +4,9 @@
         $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
 ?>
 <div class="comment" data-id="{$comment->commentId}">
-    <div class="delete"></div>
+    <? if (!empty($comment->authorId) && $comment->authorId == $__Author->authorId) { ?>
+        <div class="delete"></div>
+    <? } ?>
     <div class="photo">
         <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">
             <img src="{$commentAuthor->avatar}" alt="" />

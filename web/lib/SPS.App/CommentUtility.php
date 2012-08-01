@@ -13,8 +13,8 @@
             $result = array();
 
             $sql = <<<eof
-                SELECT * FROM (
-                    SELECT *, row_number() OVER w as "num", count(*) OVER()
+                SELECT *, 1 / "cume_dist" * "num" as "count" FROM (
+                    SELECT *, row_number() OVER w as "num", cume_dist() OVER w as "cume_dist"
                     FROM "getComments"
                     WHERE "statusId" = 1 AND "articleId" IN @articleIds
                     WINDOW w AS (
