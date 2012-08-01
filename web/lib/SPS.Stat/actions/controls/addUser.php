@@ -6,6 +6,9 @@
      * @package    SPS
      * @subpackage Stat
      */
+
+    //добавляет юзера в бд (если его там нет)
+    //и возвращает данные о нем
     class addUser {
 
         /**

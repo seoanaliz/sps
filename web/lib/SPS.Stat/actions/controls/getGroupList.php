@@ -6,6 +6,7 @@
     * @package    SPS
     * @subpackage Stat
     */
+
     class getGroupList
     {
 

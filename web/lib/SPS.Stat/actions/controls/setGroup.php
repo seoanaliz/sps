@@ -14,7 +14,7 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
+//            error_reporting( 0 );
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
@@ -28,8 +28,7 @@
             $ava        = $ava      ? $ava     : NULL;
             $comments   = $comments ? comments : NULL;
 
-            //todo одинаковые группы убить
-            if (!$groupName || !$userId) {
+            if ( !$groupName || !$userId || !StatGroups::check_group_name_free( $userId, $groupName ) ) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
@@ -38,8 +37,8 @@
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-                    //если мы создаем general группу, ее надо применить ко всем юзерам, посему
-                    //вместо id текущего юзера мы посылаем массив всех
+            //если мы создаем general группу, ее надо применить ко всем юзерам, посему
+            //вместо id текущего юзера мы посылаем массив всех
               elseif ($general && !$groupId)
                   $userId = StatUsers::get_users();
 

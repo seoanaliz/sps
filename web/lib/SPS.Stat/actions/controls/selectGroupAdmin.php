@@ -1,11 +1,13 @@
 <?php
     Package::Load( 'SPS.Stat' );
-    Package::Load( 'SPS.Site' );
+//    Package::Load( 'SPS.Site' );
     /**
      * addPrice Action
      * @package    SPS
      * @subpackage Stat
      */
+
+
     class selectGroupAdmin {
 
 
@@ -13,8 +15,8 @@
             error_reporting( 0 );
             $adminId    = Request::getInteger( 'adminId' );
             $groupId    = Request::getInteger( 'groupId' );
-            $userId     = Request::getInteger( 'userId' );
-            $general    = Request::getInteger ( 'general' );
+            $userId     = Request::getInteger( 'userId'  );
+            $general    = Request::getInteger( 'general' );
 
             $general = $general ? $general : 0;
 
@@ -23,8 +25,8 @@
                 die();
             }
 
-            if ( !$general || ($general && StatUsers::is_Sadmin($userId) ) ) {
-                StatGroups::select_main_admin($groupId, $adminId);
+            if ( !$general || ( $general && StatUsers::is_Sadmin( $userId ) ) ) {
+                StatGroups::select_main_admin( $groupId, $adminId );
                 echo ObjectHelper::ToJSON(array('response' => true));
                 die();
             }

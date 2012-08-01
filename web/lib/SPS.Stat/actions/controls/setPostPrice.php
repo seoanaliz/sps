@@ -25,7 +25,7 @@
 
             $query = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET price=@price WHERE vk_id=@publ_id';
             $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@publ_id',    publicId);
+            $cmd->SetInteger('@publ_id',    $publicId);
             $cmd->SetInteger('@price',   $price);
             $cmd->Execute();
 
