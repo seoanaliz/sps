@@ -37,6 +37,7 @@
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
+            
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
               elseif ($general && !$groupId)
