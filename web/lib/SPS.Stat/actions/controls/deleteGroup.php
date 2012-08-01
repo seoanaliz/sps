@@ -6,7 +6,8 @@
      * @package    SPS
      * @subpackage Stat
      */
-//удалить группу, обычную - для юзера, general - для всех юзеров
+
+    //удалить группу, обычную - для юзера, general - для всех юзеров
     class deleteGroup {
 
         /**
@@ -16,23 +17,23 @@
         public function Execute() {
 
             error_reporting( 0 );
-            $userId   = Request::getInteger( 'userId' );
+            $userId   = Request::getInteger ( 'userId'  );
             $groupId  = Request::getInteger ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
 
             $general = $general ? $general : 0;
 
-            if (!$groupId || !$userId) {
+            if ( !$groupId || !$userId ) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            if ($general AND statUsers::is_Sadmin($userId)) {
+            if ( $general AND statUsers::is_Sadmin( $userId ) ) {
                 $query = 'DELETE FROM
                             ' . TABLE_STAT_GROUP_USER_REL . '
                          WHERE
                                 group_id=@group_id';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                $cmd = new SqlCommand( $query, ConnectionFactory::Get( 'tst' ) );
             } elseif (!$general) {
                 $query = 'DELETE FROM '
                                     . TABLE_STAT_GROUP_USER_REL . '

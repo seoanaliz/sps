@@ -3,13 +3,6 @@
     Package::Load( 'SPS.Site' );*/
 //    Package::Load( 'SPS.Stat' );
 
-    define( 'TABLE_PUBLICS_POINTS', 'gr50k');
-    define( 'T_PUBLICS_LIST',       'publs50k');
-    define( 'T_PUBLICS_RELS',       'publ_rels_names');
-
-    define('TABLE_STAT_USERS', 'stat_users');
-
-    define('ADMIN_RANK', 2);
 
     class StatUsers
     {
@@ -103,8 +96,6 @@
             return $usersIds;
 
         }
-
-
 
     }
 ?>

@@ -90,8 +90,7 @@ var Eventlist = {
     comment_load: function(options, callback) {
         var params = $.extend({
             postId: null,
-            offset: null,
-            limit: null
+            all: true
         }, options);
 
         callback(true);

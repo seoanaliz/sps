@@ -206,22 +206,26 @@ var app = (function () {
         });
         $wall.delegate('.comments .show-more:not(.hide):not(.load)', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.comment');
-            var commentId = $comment.data('id');
+            var $post = $target.closest('.post');
+            var $comments = $('.comments', $post);
+            var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {}, function() {
+            Events.fire('comment_load', {postId: postId, all: true}, function(html) {
                 $target.removeClass('load').html(tmpText);
+                $comments.html(html);
             });
         });
         $wall.delegate('.comments .show-more.hide:not(.load)', 'click', function() {
             var $target = $(this);
-            var $comment = $target.closest('.comment');
-            var commentId = $comment.data('id');
+            var $post = $target.closest('.post');
+            var $comments = $('.comments', $post);
+            var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {}, function() {
+            Events.fire('comment_load', {postId: postId, all: false}, function(html) {
                 $target.removeClass('load').html(tmpText);
+                $comments.html(html);
             });
         });
 
@@ -302,15 +306,16 @@ var app = (function () {
         var $textarea = $comment.find('textarea');
         var $button = $comment.find('.send:not(.load)');
         var $post = $comment.closest('.post');
+        var $commentsList = $('.comments > .list', $post);
         var postId = $post.data('id');
         if (!$textarea.val()) {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('comment_post', postId, $textarea.val(), function(data) {
+            Events.fire('comment_post', postId, $textarea.val(), function(html) {
                 $button.removeClass('load');
                 $textarea.val('').focus();
-                //todo: data должна быть последними комментами
+                $commentsList.append(html);
             });
         }
     }
