@@ -109,7 +109,7 @@ var Eventlist = {
                 text: text
             },
             success: function (data) {
-                callback(true);
+                callback(data);
             }
         });
     },

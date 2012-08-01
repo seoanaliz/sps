@@ -1,7 +1,7 @@
 <?
     /** @var $comment Comment */
-
-    $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
+    if (!empty($comment)) {
+        $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
 ?>
 <div class="comment" data-id="{$comment->commentId}">
     <div class="delete"></div>
@@ -18,3 +18,4 @@
         <span class="date">{$comment->createdAt->defaultFormat()}</span>
     </div>
 </div>
+<? } ?>

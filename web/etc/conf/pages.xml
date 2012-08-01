@@ -464,6 +464,7 @@
                 </page>
                 <page uri="appControls://comment-save/">
                     <actions>SPS.Site.SaveCommentAppControl</actions>
+                    <template>tmpl://app/elements/wall-comment.tmpl.php</template>
                 </page>
                 <page uri="appControls://comments-load/">
                     <actions>SPS.Site.LoadCommentsAppControl</actions>

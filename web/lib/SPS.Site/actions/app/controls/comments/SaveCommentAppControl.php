@@ -48,7 +48,10 @@
                 return false;
             }
 
-            CommentFactory::Add($comment);
+            CommentFactory::Add($comment, array(BaseFactory::WithReturningKeys => true));
+
+            $comment = CommentFactory::GetById($comment->commentId);
+            Response::setParameter( 'comment', $comment );
         }
     }
 ?>
