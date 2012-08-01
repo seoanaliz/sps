@@ -27,15 +27,14 @@
     <? } ?>
     <div class="content">
         <?
-        $content = nl2br(HtmlHelper::RenderToForm($articleRecord->content));
-        $contentPart1 = mb_substr($content, 0, 300);
-        $contentPart2 = mb_substr($content, 300);
+        $contentPart1 = mb_substr($articleRecord->content, 0, 300);
+        $contentPart2 = mb_substr($articleRecord->content, 300);
         $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
         ?>
-        <div class="shortcut">{$contentPart1}</div>
+        <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>
         <? if($contentPart2) { ?>
         <a href="javascript:;" class="show-cut">Показать полностью...</a>
-        <div class="cut">{$contentPart2}</div>
+        <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
         <? } ?>
 
         <?
