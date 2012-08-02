@@ -341,8 +341,7 @@ var Box = (function() {
 
         var $box = $(tmpl(BOX_WRAP, {
             title: params.title,
-            body: params.html,
-            buttons: params.buttons,
+            body: '',
             closeBtn: params.closeBtn
         })).appendTo($layout);
 
@@ -352,6 +351,7 @@ var Box = (function() {
             });
         }
 
+        setHTML(params.html);
         setButtons(params.buttons);
 
         box.$box = $box;
@@ -372,7 +372,11 @@ var Box = (function() {
             ;
             $box.show();
             $body.data('overflow-y', $body.css('overflow-y')).css({overflowY: 'hidden', paddingRight: 17});
-            params.onshow.call(box, $box);
+            try {
+                params.onshow.call(box, $box);
+            } catch(e) {
+                console.log(e);
+            }
             refreshTop();
             return box;
         }
@@ -411,7 +415,7 @@ var Box = (function() {
             return box;
         }
         function refreshTop() {
-            var top = ($(window).height() / 3) - ($box.outerHeight() / 2);
+            var top = ($(window).height() / 3) - ($box.height() / 2);
             $box.css({
                 marginTop: top < 20 ? 20 : top
             });

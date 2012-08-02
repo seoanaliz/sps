@@ -42,8 +42,8 @@ var LIST =
     '<div class="tab selected" data-id="null">Все записи</div>' +
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
-        //'<a href="javascript:;" class="share">Поделиться</a> |' +
-        //'<a href="javascript:;" class="edit">Редактировать</a> |' +
+        '<a href="javascript:;" class="share">Поделиться</a> |' +
+        '<a href="javascript:;" class="edit">Редактировать</a> |' +
         '<a href="javascript:;" class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';
@@ -181,6 +181,9 @@ var BOX_WRAP =
 
 var BOX_ACTION =
 '<button class="action button<?=isset("isWhite") ? " white" : ""?>"><?=label?></button>';
+
+var BOX_LOADING =
+'<div class="box-loading"></div>';
 
 var BOX_SHARE =
 '<div class="box-share">' +

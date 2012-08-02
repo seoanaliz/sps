@@ -84,17 +84,15 @@ var List = (function() {
             var box = new Box({
                 id: 'share' + listId,
                 title: 'Поделиться',
-                html: tmpl(BOX_SHARE),
+                html: tmpl(BOX_LOADING),
                 buttons: [
                     {label: 'Отправить', onclick: share},
                     {label: 'Отменить', isWhite: true}
                 ],
                 onshow: function($box) {
                     var box = this;
-                    var $users = $box.find('.users');
-                    var $lists = $box.find('.lists');
-                    var $comment = $box.find('.comment');
                     if (isFirstShow) {
+                        isFirstShow = false;
                         VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(data) {
                             if (data.error) {
                                 box
@@ -110,65 +108,71 @@ var List = (function() {
                                     ])
                                 ;
                             } else {
-                                //todo: friends
                                 var res = data.response;
-                                var html = '';
+                                var friends = [];
+                                var lists = [];
                                 for (var i in res) {
                                     var user = res[i];
-                                    html += user.first_name + ' ' + user.last_name + ', ';
+                                    friends.push({
+                                        id: user.uid,
+                                        name: user.first_name + ' ' + user.last_name
+                                    });
                                 }
-                                box.setHTML(html).setButtons();
+                                box.setHTML(tmpl(BOX_SHARE));
+                                var $users = $box.find('.users');
+                                var $lists = $box.find('.lists');
+                                var $comment = $box.find('.comment');
+
+                                $comment.autoResize();
+                                $users
+                                    .textext({
+                                        plugins : 'tags autocomplete filter',
+                                        ext: {
+                                            itemManager: {
+                                                stringToItem: function(str) { return {name: str}; },
+                                                itemToString: function(item) { return item.name; },
+                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                            }
+                                        }
+                                    })
+                                    .bind('getSuggestions', function(e, data) {
+                                        var list = friends,
+                                            textext = $(e.target).textext()[0],
+                                            query = (data ? data.query : '') || '';
+                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                                    })
+                                    .bind('setFormData', function(e, data) {
+                                        $(e.target).data('tags', data);
+                                    })
+                                ;
+                                $users.textext()[0].getFormData();
+                                $lists
+                                    .textext({
+                                        plugins : 'tags autocomplete filter',
+                                        tagsItems: [{name: 'asadfdsgdfhretq'}],
+                                        ext: {
+                                            itemManager: {
+                                                stringToItem: function(str) { return {name: str}; },
+                                                itemToString: function(item) { return item.name; },
+                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                            }
+                                        }
+                                    })
+                                    .bind('getSuggestions', function(e, data) {
+                                        var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
+                                            textext = $(e.target).textext()[0],
+                                            query = (data ? data.query : '') || '';
+                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                                    })
+                                    .bind('setFormData', function(e, data) {
+                                        $(e.target).data('tags', data);
+                                    })
+                                ;
+                                $lists.textext()[0].getFormData();
+                                $box.find('textarea[value=""]:first').focus();
                             }
                         });
-                        isFirstShow = false;
-                        $comment.autoResize();
-                        $users
-                            .textext({
-                                plugins : 'tags autocomplete filter',
-                                ext: {
-                                    itemManager: {
-                                        stringToItem: function(str) { return {name: str}; },
-                                        itemToString: function(item) { return item.name; },
-                                        compareItems: function(item1, item2) { return item1.name == item2.name; }
-                                    }
-                                }
-                            })
-                            .bind('getSuggestions', function(e, data) {
-                                var list = [{id: 1, name: 'Артем'}, {id: 2, name: 'Вова'}],
-                                    textext = $(e.target).textext()[0],
-                                    query = (data ? data.query : '') || '';
-                                $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                            })
-                            .bind('setFormData', function(e, data) {
-                                $(e.target).data('tags', data);
-                            })
-                        ;
-                        $users.textext()[0].getFormData();
-                        $lists
-                            .textext({
-                                plugins : 'tags autocomplete filter',
-                                tagsItems: [{name: 'asadfdsgdfhretq'}],
-                                ext: {
-                                    itemManager: {
-                                        stringToItem: function(str) { return {name: str}; },
-                                        itemToString: function(item) { return item.name; },
-                                        compareItems: function(item1, item2) { return item1.name == item2.name; }
-                                    }
-                                }
-                            })
-                            .bind('getSuggestions', function(e, data) {
-                                var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
-                                    textext = $(e.target).textext()[0],
-                                    query = (data ? data.query : '') || '';
-                                $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                            })
-                            .bind('setFormData', function(e, data) {
-                                $(e.target).data('tags', data);
-                            })
-                        ;
-                        $lists.textext()[0].getFormData();
                     }
-                    $box.find('textarea[value=""]:first').focus();
                 }
             }).show();
 
