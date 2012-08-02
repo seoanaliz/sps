@@ -69,9 +69,7 @@ var List = (function() {
         $container = $('.header');
 
         refresh(function() {
-            $actions = $('.actions', $container);
             _initEvents();
-
             if ($.isFunction(callback)) callback();
         });
     }
@@ -80,8 +78,7 @@ var List = (function() {
             var $item = $(this);
             select($item.data('id'));
         });
-
-        $actions.delegate('.share', 'click', function() {
+        $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var isFirstShow = true;
             var box = new Box({
@@ -113,13 +110,14 @@ var List = (function() {
                                     ])
                                 ;
                             } else {
+                                //todo: friends
                                 var res = data.response;
                                 var html = '';
                                 for (var i in res) {
                                     var user = res[i];
                                     html += user.first_name + ' ' + user.last_name + ', ';
                                 }
-                                //box.setHTML(html).setButtons();
+                                box.setHTML(html).setButtons();
                             }
                         });
                         isFirstShow = false;
@@ -179,12 +177,10 @@ var List = (function() {
                 console.log($box.find('.lists').data('tags'));
             }
         });
-        $actions.delegate('.edit', 'click', function() {
-            var listId = $('.filter > .list > .item.selected').data('id');
-            //Table.editMode(true);
-            $('.table').toggleClass('edit-mode');
+        $container.delegate('.actions .edit', 'click', function() {
+            Table.toggleEditMode();
         });
-        $actions.delegate('.delete', 'click', function() {
+        $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
                 id: 'deleteList' + listId,
@@ -214,18 +210,25 @@ var List = (function() {
         var id = $selectedItem.data('id');
         Events.fire('load_bookmarks', function(data) {
             $container.html(tmpl(LIST, {items: data}));
-            if (id) {
-                select(id, function() {
-                    if ($.isFunction(callback)) callback();
-                });
-            } else if ($.isFunction(callback)) callback();
+            $actions = $('.actions', $container);
+            select(id, function() {
+                if ($.isFunction(callback)) callback();
+            });
         });
     }
 
     function select(id, callback) {
+        if (!id) {
+            id = null;
+            $actions.hide();
+        }
+        else {
+            $actions.show();
+        }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
         $item.addClass('selected');
+
         if ($.isFunction(callback)) callback();
         else {
             Filter.listSelect($item.data('id'));
@@ -262,9 +265,9 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 100,
+                max: 3000000,
                 animate: 100,
-                values: [0, 100],
+                values: [0, 3000000],
                 create: function(event, ui) {
                     renderRange();
                 },
@@ -293,7 +296,21 @@ var Filter = (function() {
         })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
-            Table.setPeriod($input.val());
+            var period;
+            switch($input.val()) {
+                case 'day':
+                    period = 1;
+                    break;
+                case 'week':
+                    period = 7;
+                    break;
+                case 'month':
+                    period = 30;
+                    break;
+                default:
+                    period = 1;
+            }
+            Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
             var $item = $(this);
@@ -307,13 +324,17 @@ var Filter = (function() {
             if (!$icon.hasClass('selected')) {
                 Events.fire('add_to_bookmark', listId, function() {
                     $icon.addClass('selected');
-                    List.refresh();
+                    List.refresh(function() {
+                        List.select($list.find('.item.selected').data('id'), false);
+                    });
                 });
             } else {
                 $icon.removeClass('selected');
                 Events.fire('remove_from_bookmark', listId, function() {
                     $icon.removeClass('selected');
-                    List.refresh();
+                    List.refresh(function() {
+                        List.select($list.find('.item.selected').data('id'), false);
+                    });
                 });
             }
         });
@@ -334,6 +355,7 @@ var Filter = (function() {
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
+
         if ($.isFunction(callback)) callback();
         else {
             List.select($item.data('id'), function() {
@@ -351,13 +373,14 @@ var Filter = (function() {
 
 var Table = (function() {
     var $container;
+    var idEditMode = false;
     var dataTable = {};
     var pagesLoaded = 0;
     var currentListId = 0;
     var currentSearch = '';
     var currentSortBy = '';
     var currentSortReverse = false;
-    var currentPeriod = 'day';
+    var currentPeriod = 1;
     var currentAudience = [];
 
     function init(callback) {
@@ -765,6 +788,20 @@ var Table = (function() {
         }
     }
 
+    function toggleEditMode() {
+        editMode(!idEditMode);
+    }
+
+    function editMode(on) {
+        idEditMode = on;
+        var $list = $container.find('.list-body');
+        if (on) {
+            $list.addClass('edit-mode');
+        } else {
+            $list.removeClass('edit-mode');
+        }
+    }
+
     return {
         init: init,
         changeList: changeList,
@@ -772,6 +809,8 @@ var Table = (function() {
         sort: sort,
         search: search,
         setPeriod: setPeriod,
-        setAudience: setAudience
+        setAudience: setAudience,
+        editMode: editMode,
+        toggleEditMode: toggleEditMode
     };
 })();

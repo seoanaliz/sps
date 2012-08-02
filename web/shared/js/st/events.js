@@ -100,6 +100,8 @@ var Eventlist = {
             sortReverse: params.sortReverse ? 1 : 0,
             search: params.search,
             period: params.period,
+            min: params.audienceMin,
+            max: params.audienceMax,
             show: 1
         }, function(dirtyData) {
             var clearData = [];

@@ -371,7 +371,7 @@ var Box = (function() {
                 })
             ;
             $box.show();
-            $body.css({overflow: 'hidden', paddingRight: 17});
+            $body.data('overflow-y', $body.css('overflow-y')).css({overflowY: 'hidden', paddingRight: 17});
             params.onshow.call(box, $box);
             refreshTop();
             return box;
@@ -379,7 +379,7 @@ var Box = (function() {
         function hide() {
             $layout.hide();
             $box.hide();
-            $body.css({overflow: 'auto', paddingRight: 0});
+            $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
             params.onhide.call(box, $box);
             return box;
         }
