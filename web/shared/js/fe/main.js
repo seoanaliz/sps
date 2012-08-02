@@ -95,7 +95,7 @@ $(document).ready(function(){
     $("#right-drop-down").dropdown({
         data: rightPanelData,
         type: 'checkbox',
-        dataKey: 'menu',
+        menuDataKey: 'menu',
         addClass: 'right',
         onchange: function(item) {
             $(this)
@@ -147,20 +147,16 @@ $(document).ready(function(){
     $('.wall-title a').dropdown({
         width: 'auto',
         addClass: 'wall-title-menu',
-        dataKey: 'menu',
+        menuDataKey: 'menu',
         position: 'right',
         data: [
             {title: 'новые записи', type : 'new'},
             {title: 'старые записи', type : 'old'},
             {title: 'лучшие записи', type : 'best'}
         ],
-        oncreate: function() {
-
-        },
-        onopen: function() {
-        },
-        onclose: function() {
-        },
+        oncreate: function() {},
+        onopen: function() {},
+        onclose: function() {},
         onchange: function(item) {
             $('.wall-title a').text(item.title).data('type', item.type);
             Events.fire('leftcolumn_sort_type_change', []);
@@ -1500,148 +1496,3 @@ $.fn.dd_sel = function(id){
     }
     $(this).trigger("change");
 };
-
-// Дропдауны
-(function($) {
-    var CLASS_ACTIVE = 'active';
-    var CLASS_MENU = 'ui-dropdown-menu';
-    var CLASS_MENU_ITEM = 'ui-dropdown-menu-item';
-    var CLASS_MENU_ITEM_ACTIVE = 'active';
-    var CLASS_MENU_ICON = 'icon';
-    var CLASS_MENU_ICON_LEFT = 'icon-left';
-    var CLASS_MENU_ICON_RIGHT = 'icon-right';
-    var CLASS_MENU_ITEM_WITH_ICON_LEFT = 'icon-left';
-    var CLASS_MENU_ITEM_WITH_ICON_RIGHT = 'icon-right';
-    var TRIGGER_OPEN = 'open';
-    var TRIGGER_CLOSE = 'close';
-    var TRIGGER_CHANGE = 'change';
-    var TRIGGER_CREATE = 'create';
-    var ITEM_DATA_KEY = 'item';
-
-    var methods = {
-        init: function(parameters) {
-            return this.each(function() {
-                var defaults = {
-                    el: $(this),
-                    type: 'normal',
-                    width: '',
-                    addClass: '',
-                    position: 'left',
-                    iconPosition: 'left',
-                    openEvent: 'mousedown',
-                    dataKey: 'dropdown',
-                    data: [{}],
-                    onchange: function() {},
-                    oncreate: function() {},
-                    onopen: function() {},
-                    onclose: function() {}
-                };
-                var t = this;
-                var p = t.p = $.extend(defaults, parameters);
-                var $el = p.el;
-
-                if ($el.data(p.dataKey) || !p.data) return false;
-
-                $el.data(p.dataKey, $('<div></div>').attr({class: CLASS_MENU + ' ' + p.addClass}).appendTo('body'));
-                $(p.data).each(function(i, item) {
-                    var $item = $('<div data-id="' + item.id + '">' + item.title + '</div>').attr({class: CLASS_MENU_ITEM});
-
-                    if (item.icon) {
-                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
-                        $item.append($icon);
-                        if (p.iconPosition == 'left') {
-                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_LEFT});
-                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_LEFT);
-                        } else {
-                            $icon.attr({class: CLASS_MENU_ICON + ' ' + CLASS_MENU_ICON_RIGHT});
-                            $item.addClass(CLASS_MENU_ITEM_WITH_ICON_RIGHT);
-                        }
-                    }
-                    if (item.isActive) {
-                        $item.addClass(CLASS_MENU_ITEM_ACTIVE);
-                    }
-                    $item.mouseup(function() {
-                        if (p.type == 'checkbox') {
-                            $el.data(p.dataKey).find('.' + CLASS_MENU_ITEM).removeClass(CLASS_MENU_ITEM_ACTIVE);
-                            $item.addClass(CLASS_MENU_ITEM_ACTIVE);
-                        }
-                        close();
-                        run(p.onchange, $el, item);
-                    });
-                    $el.data(p.dataKey).append($item);
-                });
-
-                $el.bind(p.openEvent, function(e) {
-                    e.stopPropagation();
-                    if (!$el.data(p.dataKey).is(':visible')) {
-                        $('html, body').trigger(p.openEvent);
-                        open();
-                    } else {
-                        close();
-                    }
-                });
-
-                $el.data(p.dataKey).bind(p.openEvent, function(e) {
-                    e.stopPropagation();
-                });
-
-                $('html, body').bind(p.openEvent, function(e) {
-                    close();
-                    run(p.onclose, $el, $el.data(p.dataKey));
-                });
-
-                function open() {
-                    $el.addClass(CLASS_ACTIVE);
-                    $el.data(p.dataKey).css({
-                        width: p.width || $el.width()
-                    });
-
-                    var $menu = $el.data(p.dataKey);
-                    var isFixed = !!($menu.css('position') == 'fixed');
-                    var offset = $el.offset();
-                    var offsetTop = offset.top;
-                    var offsetLeft = offset.left
-                        + parseFloat($menu.css('margin-left'))
-                        - parseFloat($menu.css('margin-right'));
-                    if (p.position == 'right') {
-                        offsetLeft += ($el.width() - $menu.width())
-                    }
-                    if (isFixed) {
-                        offsetTop -= $(document).scrollTop();
-                        offsetLeft -= $(document).scrollLeft();
-                    }
-
-                    $menu.css({
-                        top: offsetTop + $el.outerHeight(),
-                        left: offsetLeft
-                    }).show();
-                    run(p.onopen, $el, $el.data(p.dataKey));
-                }
-
-                function close() {
-                    $el.removeClass(CLASS_ACTIVE);
-                    $el.data(p.dataKey).hide();
-                    run(p.onclose, $el, $el.data(p.dataKey));
-                }
-
-                run(p.oncreate, $el);
-            });
-
-            function run(f, context, argument) {
-                if ($.isFunction(f)) {
-                    f.call(context, argument);
-                }
-            }
-        }
-    };
-
-    $.fn.dropdown = function(method) {
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || ! method) {
-            return methods.init.apply(this, arguments);
-        } else {
-            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
-        }
-    };
-})(jQuery);

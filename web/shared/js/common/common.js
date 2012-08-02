@@ -78,7 +78,7 @@ function getURLParameter(name) {
     };
 })(jQuery);
 
-// Image composition
+// Композиция картинок
 (function($) {
     $.fn.imageComposition = function(hardPosition) {
         return this.each(function() {
@@ -289,7 +289,7 @@ function getURLParameter(name) {
     };
 })(jQuery);
 
-// Popup
+// Попап
 var Box = (function() {
     var $body;
     var $layout;
@@ -427,3 +427,233 @@ var Box = (function() {
         return box;
     };
 })();
+
+// Дропдауны
+(function($) {
+    var CLASS_ACTIVE = 'active';
+    var CLASS_MENU = 'ui-dropdown-menu';
+    var CLASS_ITEM = 'ui-dropdown-menu-item';
+    var CLASS_ITEM_ACTIVE = 'active';
+    var CLASS_ITEM_WITH_ICON_LEFT = 'icon-left';
+    var CLASS_ITEM_WITH_ICON_RIGHT = 'icon-right';
+    var CLASS_ICON = 'icon';
+    var CLASS_ICON_LEFT = 'icon-left';
+    var CLASS_ICON_RIGHT = 'icon-right';
+    var TRIGGER_OPEN = 'open';
+    var TRIGGER_CLOSE = 'close';
+    var TRIGGER_CHANGE = 'change';
+    var TRIGGER_CREATE = 'create';
+    var TRIGGER_UPDATE = 'update';
+
+    var methods = {
+        init: function(parameters) {
+            return this.each(function() {
+                var defaults = {
+                    el: $(this),
+                    type: 'normal', // normal, checkbox
+                    width: '',
+                    isShow: false,
+                    addClass: '', // Добавить уникальный класс к меню
+                    position: 'left', // Выравнивание: left, right
+                    iconPosition: 'left',
+                    openEvent: 'mousedown', // Собитие элемента, при котором открывается меню. click, mousedown
+                    closeEvent: 'mousedown', // Собитие 'html, body' при котором закрывается меню. click, mousedown
+                    menuDataKey: 'dropdown', // Ключ записи jQuery.data привязки меню к элементу
+                    itemDataKey: 'item',
+                    data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
+                    // На все события можно подписаться по имени события. Пример: $dropdown.bind('change', callback)
+                    oncreate: function() {},
+                    onupdate: function() {},
+                    onchange: function() {},
+                    onopen: function() {},
+                    onclose: function() {}
+                };
+                var t = this;
+                var p = t.p = $.extend(defaults, parameters);
+                var $el = p.el;
+                var $menu = $('<div/>').addClass(CLASS_MENU + ' ' + p.addClass).appendTo('body');
+                var isUpdate = false;
+
+                if ($el.data(p.menuDataKey)) {
+                    $el.data(p.menuDataKey).remove();
+                    isUpdate = true;
+                } else {
+                    $('html, body').bind(p.closeEvent, function(e) {
+                        var $menu = $el.data(p.menuDataKey);
+                        close($menu);
+                        run(p.onclose, $el, $menu);
+                    });
+                    $el.bind(p.openEvent, function(e) {
+                        if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
+                        e.stopPropagation();
+                        var $menu = $el.data(p.menuDataKey);
+                        if (!$menu.is(':visible')) {
+                            $('html, body').trigger(p.closeEvent);
+                            open($menu);
+                        } else if (e.button != undefined) {
+                            close($menu);
+                        }
+                    });
+                }
+                $el.data(p.menuDataKey, $menu);
+
+                if (!$.isArray(p.data)) p.data = [];
+                $(p.data).each(function(i, item) {
+                    var $item = $('<div/>')
+                        .text(item.title)
+                        .addClass(CLASS_ITEM)
+                        .attr('data-id', item.id)
+                        .data(p.itemDataKey, item)
+                        .appendTo($menu)
+                    ;
+                    if (item.icon) {
+                        var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                        $item.append($icon);
+                        if (p.iconPosition == 'left') {
+                            $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_LEFT});
+                            $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
+                        } else {
+                            $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
+                            $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
+                        }
+                    }
+                    if (item.isActive) {
+                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    }
+                });
+
+                $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
+                    if (e.originalEvent && e.button != 0) return;
+                    close($menu);
+                    select($(this));
+                });
+                $menu.bind(p.openEvent, function(e) {
+                    e.stopPropagation();
+                });
+
+                function open($menu, notTrigger) {
+                    $el.addClass(CLASS_ACTIVE);
+                    $menu.css({
+                        width: p.width || $el.outerWidth() - 2
+                    });
+
+                    var isFixed = !!($menu.css('position') == 'fixed');
+                    var offset = $el.offset();
+                    var offsetTop = offset.top;
+                    var offsetLeft = offset.left
+                        + parseFloat($menu.css('margin-left'))
+                        - parseFloat($menu.css('margin-right'));
+                    if (p.position == 'right') {
+                        offsetLeft += ($el.width() - $menu.width())
+                    }
+                    if (isFixed) {
+                        offsetTop -= $(document).scrollTop();
+                        offsetLeft -= $(document).scrollLeft();
+                    }
+
+                    $menu.css({
+                        top: offsetTop + $el.outerHeight(),
+                        left: offsetLeft
+                    }).show();
+
+                    if (notTrigger) {
+                        run(p.onopen, $el, $menu);
+                        $el.trigger(TRIGGER_OPEN);
+                    }
+                }
+
+                function close($menu, notTrigger) {
+                    $el.removeClass(CLASS_ACTIVE);
+                    $menu.hide();
+
+                    if (notTrigger) {
+                        run(p.onclose, $el, $menu);
+                        $el.trigger(TRIGGER_CLOSE);
+                    }
+                }
+
+                function select($item) {
+                    var data = $item.data(p.itemDataKey);
+                    if (p.type == 'checkbox') {
+                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    }
+                    run(p.onchange, $el, data);
+                    $el.trigger(TRIGGER_CHANGE);
+                }
+
+                if (isUpdate) {
+                    run(p.onupdate, $el);
+                    $el.trigger(TRIGGER_UPDATE);
+                } else {
+                    run(p.oncreate, $el);
+                    $el.trigger(TRIGGER_CREATE);
+                }
+
+                if (p.isShow) {
+                    open($menu, true);
+                } else {
+                    close($menu, true);
+                }
+            });
+
+            function run(f, context, argument) {
+                if ($.isFunction(f)) {
+                    f.call(context, argument);
+                }
+            }
+        }
+    };
+
+    $.fn.dropdown = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || ! method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' +  method + ' does not exist on jQuery.dropdown');
+        }
+    };
+})(jQuery);
+
+(function($) {
+    var methods = {
+        init: function(parameters) {
+            return this.each(function() {
+                var defaults = {
+                    el: $(this),
+                    openEvent: 'mousedown',
+                    menuDataKey: 'autocomplete'
+                };
+                var t = this;
+                var p = t.p = $.extend(defaults, parameters);
+                var $el = p.el;
+                var defData = p.data.slice(0);
+
+                if (!$el.data(p.menuDataKey)) {
+                    $el.bind('keyup', function(e) {
+                        p.isShow = true;
+                        var newParams = $.extend(p, {
+                            data: $.grep(defData, function(n, i) {
+                                return !n.title.toLowerCase().search($el.val().toLowerCase());
+                            })
+                        });
+                        $el.dropdown(newParams);
+                    });
+                }
+
+                $el.dropdown(p);
+            });
+        }
+    };
+
+    $.fn.autocomplete = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || ! method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' +  method + ' does not exist on jQuery.autocomplete');
+        }
+    };
+})(jQuery);
