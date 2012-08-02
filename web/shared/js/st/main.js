@@ -265,7 +265,7 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3000000,
+                max: 3200000,
                 animate: 100,
                 values: [0, 3000000],
                 create: function(event, ui) {
@@ -276,7 +276,7 @@ var Filter = (function() {
                 },
                 change: function(event, ui) {
                     renderRange();
-                    changeRange();
+                    changeRange(event);
                 }
             });
             function renderRange() {
@@ -286,12 +286,14 @@ var Filter = (function() {
                 ];
                 $sliderRange.html(audience[0] + ' - ' + audience[1]);
             }
-            function changeRange() {
+            function changeRange(e) {
                 var audience = [
                     $slider.slider('values', 0),
                     $slider.slider('values', 1)
                 ];
-                Table.setAudience(audience);
+                if (e.originalEvent) {
+                    Table.setAudience(audience);
+                }
             }
         })();
         $period.delegate('input', 'change', function() {
@@ -363,11 +365,17 @@ var Filter = (function() {
             });
         }
     }
+    function setSliderMax(max) {
+        var $slider = $audience.find('> .slider-wrap');
+        $slider.slider('option', 'max', parseInt(max) + 1);
+        $slider.slider("value", $slider.slider("value"));
+    }
 
     return {
         init: init,
         listRefresh: listRefresh,
-        listSelect: listSelect
+        listSelect: listSelect,
+        setSliderMax: setSliderMax
     };
 })();
 
@@ -527,7 +535,7 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data) {
+            function(data, period) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentListId = listId;
@@ -547,6 +555,7 @@ var Table = (function() {
                 } else {
                     $('#load-more-table').show();
                 }
+                Filter.setSliderMax(period[1]);
             }
         );
     }

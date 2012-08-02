@@ -42,14 +42,16 @@ var LIST =
     '<div class="tab selected" data-id="null">Все записи</div>' +
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
-        '<a href="javascript:;" class="share">Поделиться</a> |' +
-        '<a href="javascript:;" class="edit">Редактировать</a> |' +
+        //'<a href="javascript:;" class="share">Поделиться</a> |' +
+        //'<a href="javascript:;" class="edit">Редактировать</a> |' +
         '<a href="javascript:;" class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';
 
 var LIST_ITEM =
-'<span class="tab"data-id="<?=itemId?>"><?=itemTitle?></span>';
+'<? if (isset("itemFave")) { ?>' +
+    '<span class="tab"data-id="<?=itemId?>"><?=itemTitle?></span>' +
+'<? } ?>';
 
 var TABLE =
 '<div class="list-head clear-fix">' +
@@ -153,7 +155,7 @@ var FILTER_LIST =
 var FILTER_LIST_ITEM =
 '<div class="item" data-id="<?=itemId?>">' +
     '<?=itemTitle?>' +
-    '<div class="icon bookmark"></div>' +
+    '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
 '</div>';
 
 var BOX_LAYOUT =

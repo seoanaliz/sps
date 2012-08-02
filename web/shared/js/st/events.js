@@ -56,7 +56,8 @@ var Eventlist = {
                 $.each(dirtyData, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
-                        itemTitle: data.name
+                        itemTitle: data.name,
+                        itemFave: data.fave
                     });
                 });
             callback(clearData);
@@ -69,7 +70,8 @@ var Eventlist = {
                 $.each(dirtyData, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
-                        itemTitle: data.name
+                        itemTitle: data.name,
+                        itemFave: data.fave
                     });
                 });
             }
@@ -104,11 +106,11 @@ var Eventlist = {
             max: params.audienceMax,
             show: 1
         }, function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData)) {
-                $.each(dirtyData, function(i, data) {
+            var clearList = [];
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
                     var users = [];
-                    $.each(data.admins, function(i, data) {
+                    $.each(publicItem.admins, function(i, data) {
                         users.push({
                             userId: data.vk_id,
                             userName: data.name,
@@ -116,20 +118,27 @@ var Eventlist = {
                             userDescription: data.role || '&nbsp;'
                         });
                     });
-                    //var users = DataUsers;
-                    clearData.push({
-                        publicId: data.id,
-                        publicImg: data.ava,
-                        publicName: data.name,
-                        publicFollowers: data.quantity,
-                        publicGrowthNum: data.diff_abs,
-                        publicGrowthPer: data.diff_rel,
-                        lists: ($.isArray(data.group_id) && data.group_id.length) ? data.group_id : [],
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                         users: users
                     });
                 });
             }
-            callback(clearData);
+            var clearPeriod = [];
+            if (dirtyData.min_max) {
+                clearPeriod = [
+                    dirtyData.min_max.min,
+                    dirtyData.min_max.max
+                ];
+            }
+
+            callback(clearList, clearPeriod);
         });
     },
     add_list: function(title, callback) {
@@ -188,10 +197,18 @@ var Eventlist = {
         });
     },
     add_to_bookmark: function(listId, callback) {
-        callback(true);
+        simpleAjax('toggleGroupFave', {
+            groupId: listId
+        }, function(dirtyData) {
+            callback(true);
+        });
     },
     remove_from_bookmark: function(listId, callback) {
-        callback(true);
+        simpleAjax('toggleGroupFave', {
+            groupId: listId
+        }, function(dirtyData) {
+            callback(true);
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
