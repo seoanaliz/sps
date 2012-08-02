@@ -25,8 +25,8 @@ class OurAdminsStat
                 $public->externalId ==  35807078 )
                 continue;
 
-            $this->get_posts( $public->externalId );
-
+            $this->get_posts( 35806721 );
+            die();
 
         }
     }
@@ -168,7 +168,7 @@ class OurAdminsStat
         $cmd->SetString ('@admin_photo', $admin['ava']);
         $cmd->SetString ('@admin_name',  $admin['name']);
 
-        print_r($sql);
+
         $cmd->Execute();
         return $admin['userId'];
     }
