@@ -34,7 +34,7 @@
 
         public static function get_groups($userId)
         {
-            $sql = 'SELECT c.group_id, c.name, c.comments, c.general, c.group_admin
+            $sql = 'SELECT c.group_id, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
@@ -54,7 +54,8 @@
                     'group_id'  =>  $ds->getValue('group_id', TYPE_INTEGER),
                     'general'   =>  $ds->getValue('general',  TYPE_INTEGER),
                     'name'      =>  $ds->getValue('name'),
-                    'comments'  =>  $ds->getValue('comments')
+                    'comments'  =>  $ds->getValue('comments'),
+                    'fave'      =>  $ds->GetBoolean('fave'),
                 );
             }
 
