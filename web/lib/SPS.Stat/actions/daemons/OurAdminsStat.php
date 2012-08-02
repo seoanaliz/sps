@@ -18,11 +18,11 @@ class OurAdminsStat
         foreach ($publics as $public) {
 
             if( $public->type != 'vk'             ||
-                $public->externalId <   35806186  ||
-                $public->externalId >   36959733  ||
                 $public->externalId ==  25678227  ||
                 $public->externalId ==  26776509  ||
-                $public->externalId ==  27421965 )
+                $public->externalId ==  27421965  ||
+                $public->externalId ==  34010064  ||
+                $public->externalId ==  35807078 )
                 continue;
 
             $this->get_posts( $public->externalId );
@@ -56,7 +56,6 @@ class OurAdminsStat
                     echo 'proc<br>';
                     return true;
                 }
-
             }
         }
     }
@@ -177,7 +176,7 @@ class OurAdminsStat
     private function get_last_post($public_id)
     {
         $sql = 'SELECT MAX(vk_post_id) FROM ' . TABLE_OADMINS_POSTS . ' WHERE public_id=@public_id';
-        print_r($sql);
+
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetInteger('@public_id', $public_id);
         $ds = $cmd->Execute();

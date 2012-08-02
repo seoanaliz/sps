@@ -15,7 +15,7 @@
          */
 
           public function Execute() {
-            error_reporting( 0 );
+//            error_reporting( 0 );
 
             $userId   = Request::getInteger ( 'userId'  );
             $groupId  = Request::getInteger ( 'groupId' );
@@ -44,11 +44,14 @@
 
                 $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@group_id', $groupId);
-                $cmd->SetInteger('@public_id', $publicId);
+                $cmd->SetInteger('@publ_id', $publicId);
                 $cmd->Execute();
 
                 echo  ObjectHelper::ToJSON(array('response' => true));
 
+            } else {
+                echo  ObjectHelper::ToJSON(array('response' => false));
+                die();
             }
 
 

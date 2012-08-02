@@ -102,8 +102,8 @@ class getEntries {
 
             $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
-            if (isset($userId)) {
-                $groups = $this->get_groups($row['vk_id'], $userId);
+            if ( isset($userId) ) {
+                $groups = $this->get_groups( $userId );
             }
 
             $resul[] =  array(
@@ -119,7 +119,14 @@ class getEntries {
                             );
         }
 
-        echo ObjectHelper::ToJSON(array('response' => $resul));
+        #echo ObjectHelper::ToJSON
+        print_r(array(
+                                        'response' => array(
+                                                            'list'      =>  $resul,
+                                                            'min_max'   =>  $this->get_min_max()
+                                                            )
+                                        )
+                                    );
     }
 
 
@@ -159,14 +166,13 @@ class getEntries {
         return $resul;
     }
 
-    private function get_groups($publId, $userId)
+    private function get_groups($userId)
     {
         $groups = array();
 
-        $sql = "select group_id from publ_rels_names where publ_id=@publ_id AND user_id=@user_id";
+        $sql = "select group_id from " . TABLE_STAT_GROUP_USER_REL . " where user_id=@user_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetInteger('@user_id',  $userId);
-        $cmd->SetInteger('@publ_id',   $publId);
         $ds = $cmd->Execute();
         while ( $ds->next() ) {
             $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
@@ -175,26 +181,51 @@ class getEntries {
     }
 
     private function get_difference($current_quantity, $period, $public_id ) {
-        $time_b = wrapper::morning(time()) - $period * 24 * 60 * 60;
+
+        $sql = 'SELECT MAX(time) FROM ' . TABLE_STAT_PUBLICS_POINTS;
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
+        $ds = $cmd->Execute();
+        $ds->Next();
+        $time_max = $ds->getValue('max', TYPE_INTEGER);
+
+        $time_b = $time_max - $period * 24 * 60 * 60;
         $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS . ' WHERE id=@public_id AND time=@time';
 
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
         $cmd->SetString('@time', $time_b);
         $cmd->SetInteger('@public_id', $public_id);
-
         $ds = $cmd->Execute();
         $ds->Next();
-        $quantity = $ds->getValue('quantity', TYPE_INTEGER);
 
+        $quantity = $ds->getValue('quantity', TYPE_INTEGER);
+        if (!$quantity)
+            return array (
+                'diff_rel'  =>  '-',
+                'diff_abs'  =>  '-'
+            );
+
+
+        echo 'quantity = ' . $quantity . '<br>'.'old quantity = ' . $current_quantity . '<br>';
         return array (
-                        'diff_rel'  =>    round(($current_quantity / $quantity - 1) * 100, 2),
+                        'diff_rel'  =>  round( ($current_quantity / $quantity - 1) * 100, 2 ),
                         'diff_abs'  =>  $current_quantity - $quantity
                      );
 
 
     }
 
+    private function get_min_max()
+    {
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS_POINTS ;
 
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
+        $ds = $cmd->Execute();
+        $ds->Next();
+        return array(
+                        'min'  =>   $ds->getValue('min'),
+                        'max'  =>   $ds->getValue('max')
+        );
+    }
 
 
 }
