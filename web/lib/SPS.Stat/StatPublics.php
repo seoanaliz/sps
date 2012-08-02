@@ -13,11 +13,12 @@
             foreach ($publics as $public) {
 
                 if( $public->type != 'vk'             ||
-                    $public->externalId <   35806186  ||
-                    $public->externalId >   36959733  ||
                     $public->externalId ==  25678227  ||
                     $public->externalId ==  26776509  ||
-                    $public->externalId ==  27421965 )
+                    $public->externalId ==  27421965  ||
+                    $public->externalId ==  34010064  ||
+                    $public->externalId ==  35807078 )
+
                     continue;
 
                 $a['id'] = $public->externalId;

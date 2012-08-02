@@ -49,8 +49,11 @@
             <action name="implPublic">
                 <path>controls/implPublic</path>
             </action>
-            <action name="exGroup">
-                <path>controls/exGroup</path>
+            <action name="exPublic">
+                <path>controls/exPublic</path>
+            </action>
+            <action name="toggleGroupFave">
+                <path>controls/toggleGroupFave</path>
             </action>
             <action name="togglePublVisibil">
                 <path>controls/togglePublVisibil</path>
