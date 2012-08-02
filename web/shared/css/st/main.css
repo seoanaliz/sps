@@ -50,15 +50,12 @@ table,tr,td{vertical-align:top;}
 #load-more-table.loading:after{position:absolute;top:0;left:0;width:100%;height:100%;background:#e1e7ed url('../../images/common/upload.gif') no-repeat center;content:'';}
 .plus{color:#7EA65A;}
 .minus{color:#D44F30;}
-.dropdown{position:absolute;border:1px solid #597DA3;background-color:#fff;min-width:150px;display:none;box-shadow:0 2px 4px rgba(0, 0, 0, 0.25);}
-.dropdown>.add-item,.dropdown>.item{color:#45688E;padding:.4em 1.6em .4em .6em;cursor:pointer;position:relative;border:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:150px;}
+.dropdown{position:absolute;border:1px solid #597DA3;background-color:#fff;min-width:150px;display:none;box-shadow:0 2px 4px rgba(0, 0, 0, 0.25);}.dropdown>.add-item,.dropdown>.item{color:#45688E;padding:.4em 1.6em .4em .6em;cursor:pointer;position:relative;border:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:150px;}
 .dropdown>.add-item{cursor:text;display:none;}
 .dropdown>.show-input{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}
 .dropdown>.item>.icon{opacity:0;position:absolute;right:.4em;top:50%;margin-top:-6px;width:12px;height:12px;}
-.dropdown>.item:hover{background-color:#EDF1F5;}
-.dropdown>.item:hover>.icon{opacity:.3;}
-.dropdown>.item.selected{color:#fff;background-color:#597DA3;font-weight:bold;}
-.dropdown>.item.selected>.icon{opacity:1;background-image:url('../../images/st/select-white.png');}
+.dropdown>.item:hover{background-color:#EDF1F5;}.dropdown>.item:hover>.icon{opacity:.3;}
+.dropdown>.item.selected{color:#fff;background-color:#597DA3;font-weight:bold;}.dropdown>.item.selected>.icon{opacity:1;background-image:url('../../images/st/select-white.png');}
 .contact-dropdown{position:absolute;border:1px solid #597DA3;border-top-color:#C4CDE0;background-color:#fff;display:none;box-shadow:0 2px 4px rgba(0, 0, 0, 0.25);}
 .contact-dropdown>.item{position:relative;cursor:pointer;}
 .contact-dropdown>.item:hover{background-color:#EDF1F5;}
