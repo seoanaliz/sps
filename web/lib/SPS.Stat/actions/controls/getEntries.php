@@ -128,7 +128,7 @@ class getEntries {
                                     );
     }
 
-
+    
     private function get_row($ds, $structure)
     {
 
@@ -204,7 +204,7 @@ class getEntries {
             );
 
 
-        echo 'quantity = ' . $quantity . '<br>'.'old quantity = ' . $current_quantity . '<br>';
+
         return array (
                         'diff_rel'  =>  round( ($current_quantity / $quantity - 1) * 100, 2 ),
                         'diff_abs'  =>  $current_quantity - $quantity
