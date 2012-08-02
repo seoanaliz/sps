@@ -92,7 +92,7 @@ class getEntries {
         $resul = array();
 
         while ($ds->next()) {
-            $row = $this->get_row($ds, $structure);
+            $row = $this->get_row( $ds, $structure );
             if ($period) {
                 $diff = $this->get_difference( $row['quantity'], $period, $row['vk_id'] );
                 $row['diff_abs'] = $diff['diff_abs'];
@@ -103,7 +103,7 @@ class getEntries {
             $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
             $groups = array();
             if ( isset($userId) ) {
-                $groups = $this->get_groups( $userId );
+                $groups = $this->get_groups( $userId, $row['vk_id'] );
             }
 
             $resul[] =  array(
@@ -119,7 +119,8 @@ class getEntries {
                             );
         }
 
-        echo ObjectHelper::ToJSON(array(
+        #echo ObjectHelper::ToJSON
+        print_r(array(
                                         'response' => array(
                                                             'list'      =>  $resul,
                                                             'min_max'   =>  $this->get_min_max()
@@ -128,7 +129,7 @@ class getEntries {
                                     );
     }
 
-    
+
     private function get_row($ds, $structure)
     {
 
@@ -165,13 +166,20 @@ class getEntries {
         return $resul;
     }
 
-    private function get_groups($userId)
+    private function get_groups( $userId, $public_id )
     {
         $groups = array();
 
-        $sql = "select group_id from " . TABLE_STAT_GROUP_USER_REL . " where user_id=@user_id";
+        $sql = "SELECT a.group_id from "
+                . TABLE_STAT_GROUP_USER_REL . " AS a,
+                 " . TABLE_STAT_GROUP_PUBLIC_REL. " AS b
+                 WHERE
+                        a.group_id=b.group_id
+                    AND user_id=@user_id
+                    AND b.public_id=@public_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $cmd->SetInteger('@user_id',  $userId);
+        $cmd->SetInteger( '@user_id',  $userId );
+        $cmd->SetInteger( '@public_id',  $public_id );
         $ds = $cmd->Execute();
         while ( $ds->next() ) {
             $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
