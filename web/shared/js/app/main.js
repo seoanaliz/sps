@@ -123,14 +123,26 @@ var app = (function () {
 //        $newPost.find('textarea').autocomplete({
 //            data: [
 //                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Вова'},
-//                {title: 'Петя'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
+//                {title: 'Сашка'},
 //                {title: 'Саня'},
+//                {title: 'Петя'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
+//                {title: 'Александр'},
+//                {title: 'Петя'},
 //                {title: 'Александр'},
 //                {title: 'Сашка'},
-//                {title: 'Саша'}
+//                {title: 'Саня'},
+//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саша'}
 //            ],
 //            onchange: function(item) {
-//                $(this).val(item.title);
+//                $(this).val(item.title).focus();
 //            }
 //        });
 
@@ -379,49 +391,3 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
-
-// Кроссбраузерные плейсхолдеры
-(function($) {
-    $.fn.placeholder = function(para) {
-        return this.each(function(parameters) {
-            var defaults = {
-                el: this,
-                color: '#CCC',
-                text: false,
-                helperClass: 'placeholder'
-            };
-            var t = this;
-            var p = t.p = $.extend(defaults, parameters);
-            var $input = $(p.el);
-            var placeholderText = p.text || $input.attr('placeholder');
-            var $wrapper = $('<div/>');
-            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
-                padding: $input.css('padding')
-            });
-
-            $input
-                .wrap($wrapper)
-                .data('placeholder', $placeholder)
-                .removeAttr('placeholder')
-                .parent().prepend($placeholder)
-            ;
-
-            $placeholder.bind('mousedown', function() {
-                $placeholder.hide();
-                $input.focus();
-            });
-            $placeholder.bind('mouseup', function() {
-                $input.focus();
-            });
-            $input.bind('blur', function() {
-                if (!$input.val()) {
-                    $placeholder.fadeIn(100);
-                }
-            });
-            $input.bind('focus', function() {
-                $placeholder.hide();
-            });
-        });
-    };
-})(jQuery);
-

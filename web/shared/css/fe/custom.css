@@ -182,57 +182,13 @@ div.type-selector a:hover {
 
 .ui-dropdown-menu {
     position: absolute;
-    display: none;
-    padding: 0;
-    z-index: 99;
     background-color: #fff;
     max-width: 250px;
-    margin-top: -1px;
     border: 1px solid #97A4C4;
     border-top: 1px solid #C4CDE0;
     max-height: 500px;
-    overflow-y: auto;
 }
-.ui-dropdown-menu-item {
-    cursor: default;
-    color: #45688E;
-    padding: 4px 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    position: relative;
-}
-.ui-dropdown-menu-item:hover {
-    background-color: #DEE5EB;
-}
-.ui-dropdown-menu-item.active {
-    background-color: #45688E;
-    color: #fff;
-    font-weight: bold;
-}
-.ui-dropdown-menu-item .icon img {
-    width: 100%;
-}
-.ui-dropdown-menu-item .icon {
-    position: absolute;
-    top: 3px;
-    width: 19px;
-    height: 19px;
-    background-color: #ccc;
-    overflow: hidden;
-}
-.ui-dropdown-menu-item .icon-left {
-    left: 5px;
-}
-.ui-dropdown-menu-item.icon-left {
-    padding-left: 30px;
-}
-.ui-dropdown-menu-item .icon-right {
-    right: 5px;
-}
-.ui-dropdown-menu-item.icon-right {
-    padding-right: 30px;
-}
+
 /* Custom */
 .ui-dropdown-menu.wall-title-menu {
     background-color: #DEE5EB;

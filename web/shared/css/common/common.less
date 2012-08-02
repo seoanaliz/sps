@@ -107,15 +107,45 @@ input {
     max-height: 300px;
     border: 1px solid #C4CDE0;
     margin-top: -1px;
+    z-index: 99;
+    overflow-y: auto;
 
     .ui-dropdown-menu-item {
-        padding: 5px 10px;
+        padding: .5em 1em;
         cursor: pointer;
         color: @link_color;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        line-height: 150%;
 
+        &.active,
         &:hover {
             color: #fff;
-            background-color: @link_color;
+            background-color: #587DA1;
+        }
+
+        &.icon-left {
+            padding-left: 2.5em;
+        }
+        &.icon-right {
+            padding-right: 2.5em;
+        }
+
+        &>.icon {
+            position: absolute;
+            overflow: hidden;
+            width: 1.5em;
+            height: 1.5em;
+            img {
+                max-width: 100%;
+            }
+            &.icon-left {
+                left: .5em;
+            }
+            &.icon-left {
+                right: .5em;
+            }
         }
     }
 }

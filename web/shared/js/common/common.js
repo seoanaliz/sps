@@ -36,12 +36,12 @@ function getURLParameter(name) {
             $placeholder.bind('mouseup', function() {
                 $input.focus();
             });
-            $input.bind('blur', function() {
+            $input.bind('blur change', function() {
                 if (!$input.val()) {
                     $placeholder.fadeIn(100);
                 }
             });
-            $input.bind('focus', function() {
+            $input.bind('focus change', function() {
                 $placeholder.hide();
             });
         });
