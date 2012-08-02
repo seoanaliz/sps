@@ -119,8 +119,7 @@ class getEntries {
                             );
         }
 
-        #echo ObjectHelper::ToJSON
-        print_r(array(
+        echo ObjectHelper::ToJSON(array(
                                         'response' => array(
                                                             'list'      =>  $resul,
                                                             'min_max'   =>  $this->get_min_max()
