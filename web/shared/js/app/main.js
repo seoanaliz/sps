@@ -286,17 +286,19 @@ var app = (function () {
                     width: 'auto',
                     addClass: 'wall-dropdown-menu',
                     data: dropdownItems,
-                    oncreate: function() {
-                        var $defItem = $(this).data('dropdown').find('div:first');
-                        var itemData = $defItem.data('item');
-                        $(this).text(itemData.title);
-                        pageLoad(itemId, itemData.type);
-                    },
+                    oncreate: filterWall,
+                    onupdate: filterWall,
                     onchange: function(item) {
                         $(this).text(item.title);
                         pageLoad($menu.find('.item.selected').data('id'), item.type);
                     }
                 });
+                function filterWall() {
+                    var $defItem = $(this).data('dropdown').find('div:first');
+                    var itemData = $defItem.data('item');
+                    $(this).text(itemData.title);
+                    pageLoad(itemId, itemData.type);
+                }
             })();
         });
     }
