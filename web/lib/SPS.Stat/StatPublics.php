@@ -25,6 +25,8 @@
                 $a['title'] = $public->title;
                 $res[] = $a;
             }
+            $res[] = array('id'     =>  38000341,
+                           'title'  =>  'Мода и Красота');
             return $res;
         }
 

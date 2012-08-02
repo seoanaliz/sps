@@ -10,6 +10,7 @@
         {
 //            error_reporting( 0 );
             $publics = StatPublics::get_our_publics_list();
+
             $result = array();
 //            foreach ($publics as $public) {
 //                echo 'public ' . $public . '<br>';
@@ -35,34 +36,37 @@
             $date_max = $date_max ? $date_max : 1543395811;
             $date_min = $date_min ? $date_min : 0;
 
-           $public_line = $public_id ? 'AND a.public_id=@public_id' : '';
+            $public_line = $public_id ? ' AND a.public_id=@public_id ' : '';
+
             {
                 $sql = 'SELECT DISTINCT a.author_id, b.name, b.ava
                         FROM ' . TABLE_OADMINS_POSTS . ' as a, ' . TABLE_OADMINS . ' as b
                         WHERE a.author_id = b.vk_id
                             AND a.post_time > @date_min
-                            AND a.post_time < @date_max'
-                            . $public_line
+                            AND a.post_time < @date_max '
+                            . $public_line . '
+                        ORDER BY b.name'
                         ;
-
             }
-
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             if ( $public_id )
-                $cmd->SetInteger( '@public_id', $public_id['id'] );
+            $cmd->SetInteger( '@public_id', $public_id['id'] );
             $cmd->SetInteger( '@date_min',  $date_min );
             $cmd->SetInteger( '@date_max',  $date_max );
 
             $ds = $cmd->Execute();
             $res = array();
             while ($ds->Next()) {
+
                 $a['id']    = $ds->getValue('author_id', TYPE_INTEGER);
                 $a['name']  = $ds->getValue('name', TYPE_STRING);
                 $a['ava']   = $ds->getValue('ava', TYPE_STRING);
+
                 $res[] = $a;
                 $a = array();
             }
+
             if (count($res) == 0)
                 return false;
             return $res;
