@@ -119,8 +119,7 @@ class getEntries {
                             );
         }
 
-        #echo ObjectHelper::ToJSON
-        print_r(array(
+        echo ObjectHelper::ToJSON(array(
                                         'response' => array(
                                                             'list'      =>  $resul,
                                                             'min_max'   =>  $this->get_min_max()
@@ -129,7 +128,7 @@ class getEntries {
                                     );
     }
 
-
+    
     private function get_row($ds, $structure)
     {
 
@@ -205,7 +204,7 @@ class getEntries {
             );
 
 
-        echo 'quantity = ' . $quantity . '<br>'.'old quantity = ' . $current_quantity . '<br>';
+
         return array (
                         'diff_rel'  =>  round( ($current_quantity / $quantity - 1) * 100, 2 ),
                         'diff_abs'  =>  $current_quantity - $quantity
