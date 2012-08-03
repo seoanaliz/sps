@@ -209,9 +209,10 @@ table, tr, td {
                     height: 32px;
                     overflow: hidden;
                     margin: 3px 10px;
-                }
-                .photo img {
-                    max-width: 32px;
+
+                    img {
+                        max-width: 100%;
+                    }
                 }
             }
 
@@ -226,6 +227,9 @@ table, tr, td {
                     padding: 4px;
                     margin: 8px 0;
 
+                    &.delete-public {
+                        display: none;
+                    }
                     .icon.plus {
                         opacity: .3;
                     }
@@ -250,6 +254,9 @@ table, tr, td {
                         &.select {
                             background-image: url('../../images/st/select-white.png');
                         }
+                        &.delete {
+                            background-image: url('../../images/st/delete.png');
+                        }
                     }
                 }
             }
@@ -270,15 +277,42 @@ table, tr, td {
         }
 
         .list-body.edit-mode {
-            opacity: .5;
+            .public {
+                padding: 0;
+            }
+            .public-info {
+                .photo {
+                    width: 22px;
+                    height: 22px;
+                    overflow: hidden;
+                    margin: 8px 10px;
+                }
+            }
             .public-actions {
                 &>.action {
-                    .icon {
-                        opacity: .3;
+                    &.add-to-list {
+                        display: none;
                     }
-                    &:hover .icon,
-                    &.selected .icon {
-                        opacity: 1;
+                    &.delete-public {
+                        display: block;
+                    }
+                }
+            }
+            .public-contacts {
+                margin: 5px 0;
+
+                .contact {
+                    .content {
+                        height: 22px;
+                        min-height: 22px;
+                        line-height: 22px;
+                        padding: 3px 25px 3px 30px;
+                    }
+                    .photo {
+                        max-width: 22px;
+                    }
+                    .description {
+                        display: none;
                     }
                 }
             }
@@ -526,9 +560,10 @@ table, tr, td {
             overflow: hidden;
             width: 32px;
             height: 32px;
-        }
-        &>.item img {
-            width: 32px;
+
+            img {
+                width: 100%;
+            }
         }
         &>.content {
             margin-left: 0px;

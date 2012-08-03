@@ -43,7 +43,7 @@ var LIST =
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
         '<a href="javascript:;" class="share">Поделиться</a> |' +
-        //'<a href="javascript:;" class="edit">Редактировать</a> |' +
+        '<a href="javascript:;" class="edit">Редактировать</a> |' +
         '<a href="javascript:;" class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';
@@ -97,6 +97,9 @@ var TABLE_ROW =
     '<div class="public-actions">' +
         '<span class="action add-to-list">' +
             '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
+        '</span>' +
+        '<span class="action delete-public">' +
+            '<span class="icon delete"></span>' +
         '</span>' +
     '</div>' +
 '</div>';

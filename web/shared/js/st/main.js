@@ -604,6 +604,15 @@ var Table = (function() {
             _createDropdownList(e, publicData);
         });
 
+        $container.delegate('.action.delete-public', 'click', function(e) {
+            var $el = $(this);
+            var $public = $el.closest('.public');
+            var publicId = $public.data('id');
+            Events.fire('remove_from_list', publicId, currentListId, function() {
+                $public.slideUp(200);
+            });
+        });
+
         $container.delegate('.followers', 'click', function(e) {
             var $target = $(this);
             $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
