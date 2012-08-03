@@ -43,7 +43,7 @@ var LIST =
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
         '<a href="javascript:;" class="share">Поделиться</a> |' +
-        '<a href="javascript:;" class="edit">Редактировать</a> |' +
+        //'<a href="javascript:;" class="edit">Редактировать</a> |' +
         '<a href="javascript:;" class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';

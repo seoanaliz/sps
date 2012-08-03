@@ -81,6 +81,8 @@ var List = (function() {
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var isFirstShow = true;
+            var shareUsers = [];
+            var shareLists = [];
             var box = new Box({
                 id: 'share' + listId,
                 title: 'Поделиться',
@@ -135,7 +137,13 @@ var List = (function() {
                                     $users
                                         .autocomplete({
                                             data: friends,
+                                            onclose: function() {
+                                                if (shareUsers.length) {
+                                                    $(this).val(shareUsers[0].title);
+                                                }
+                                            },
                                             onchange: function(item) {
+                                                shareUsers = [item];
                                                 $(this).val(item.title).focus();
                                             }
                                         })
@@ -143,7 +151,13 @@ var List = (function() {
                                     $lists
                                         .autocomplete({
                                             data: lists,
+                                            onclose: function() {
+                                                if (shareLists.length) {
+                                                    $(this).val(shareLists[0].title);
+                                                }
+                                            },
                                             onchange: function(item) {
+                                                shareLists = [item];
                                                 $(this).val(item.title).focus();
                                             }
                                         })
@@ -157,7 +171,31 @@ var List = (function() {
             }).show();
 
             function share($button, $box) {
-                this.setHTML('Не работает').setButtons([{label: 'Закрыть'}]);
+                var box = this;
+                if (shareUsers.length && shareLists.length) {
+                    var user = shareUsers[0];
+                    var list = shareLists[0];
+                    Events.fire('share_list', list.id, user.id, function() {
+                        box.hide();
+                        new Box({
+                            id: 'shareSuccess',
+                            title: 'Поделиться',
+                            html: '<b>' + user.title + '</b> успешно получил доступ к списку «' + list.title + '»!',
+                            buttons: [
+                                {label: 'Закрыть'}
+                            ]
+                        }).show();
+                    });
+                } else {
+                    new Box({
+                        id: 'shareError',
+                        title: 'Ошибка',
+                        html: 'Не выбран пользователь или список',
+                        buttons: [
+                            {label: 'Закрыть'}
+                        ]
+                    }).show();
+                }
             }
         });
         $container.delegate('.actions .edit', 'click', function() {

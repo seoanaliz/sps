@@ -294,6 +294,7 @@ var Box = (function() {
     var $body;
     var $layout;
     var boxesCollection = {};
+    var boxesHistory = [];
 
     return function(options) {
         if (typeof options != 'object') {
@@ -378,13 +379,24 @@ var Box = (function() {
                 console.log(e);
             }
             refreshTop();
+
+            if (boxesHistory.length) {
+                boxesHistory[boxesHistory.length - 1].hide();
+            }
+            boxesHistory.push($box);
             return box;
         }
         function hide() {
-            $layout.hide();
             $box.hide();
-            $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
             params.onhide.call(box, $box);
+
+            boxesHistory.pop();
+            if (boxesHistory.length) {
+                boxesHistory[boxesHistory.length - 1].show();
+            } else {
+                $layout.hide();
+                $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
+            }
             return box;
         }
         function setHTML(html) {
@@ -719,17 +731,16 @@ var Box = (function() {
                                 return true;
                             break;
                         }
-                        p.isShow = true;
-                        var newParams = $.extend(p, {
-                            data: $.grep(defData, function(n, i) {
-                                var str = $.trim(n.title).toLowerCase().split('ё').join('е');
-                                var searchStr = $.trim($el.val()).toLowerCase().split('ё').join('е');
-                                return !!(str.indexOf(searchStr) !== -1);
-                            })
-                        });
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            $el.dropdown(newParams);
+                            $el.dropdown($.extend(p, {
+                                isShow: $el.is(':focus'),
+                                data: $.grep(defData, function(n, i) {
+                                    var str = $.trim(n.title).toLowerCase().split('ё').join('е');
+                                    var searchStr = $.trim($el.val()).toLowerCase().split('ё').join('е');
+                                    return !!(str.indexOf(searchStr) !== -1);
+                                })
+                            }));
                         }, 200);
                     });
                 }
@@ -753,7 +764,7 @@ var Box = (function() {
 (function($) {
     var methods = {
         init: function(parameters) {
-
+            //some code...
         }
     };
 

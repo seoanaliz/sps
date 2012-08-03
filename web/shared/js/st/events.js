@@ -209,6 +209,14 @@ var Eventlist = {
         }, function(dirtyData) {
             callback(true);
         });
+    },
+    share_list: function(listId, userId, callback) {
+        simpleAjax('shareGroup', {
+            groupId: listId,
+            recId: userId
+        }, function() {
+            callback(true);
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
