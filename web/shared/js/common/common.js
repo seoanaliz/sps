@@ -319,9 +319,19 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
+            $body.data('overflow-y', $body.css('overflow-y'));
             $layout = $('<div/>')
                 .addClass('box-layout')
                 .appendTo($body)
+                .click(function(e) {
+                    if (e.target == e.currentTarget) {
+                        boxesHistory[boxesHistory.length-1].hide();
+                        if (!boxesHistory.length) {
+                            $(this).hide();
+                            $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
+                        }
+                    }
+                })
             ;
             $(document).keydown(function(e) {
                 if (e.keyCode == 27) {
@@ -364,39 +374,40 @@ var Box = (function() {
         box.refreshTop = refreshTop;
 
         function show() {
-            $layout
-                .show()
-                .unbind()
-                .click(function(e) {
-                    if (e.target == e.currentTarget) box.hide();
-                })
-            ;
+            if (boxesHistory.length) {
+                boxesHistory[boxesHistory.length-1].$box.hide();
+            }
+
             $box.show();
-            $body.data('overflow-y', $body.css('overflow-y')).css({overflowY: 'hidden', paddingRight: 17});
+            $layout.show();
+            $body.css({overflowY: 'hidden', paddingRight: 17});
+            refreshTop();
+
             try {
                 params.onshow.call(box, $box);
             } catch(e) {
                 console.log(e);
             }
-            refreshTop();
 
-            if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length - 1].hide();
-            }
-            boxesHistory.push($box);
+            boxesHistory.push(box);
             return box;
         }
         function hide() {
             $box.hide();
-            params.onhide.call(box, $box);
+
+            try {
+                params.onhide.call(box, $box);
+            } catch(e) {
+                console.log(e);
+            }
 
             boxesHistory.pop();
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length - 1].show();
+                boxesHistory[boxesHistory.length-1].$box.show();
             } else {
                 $layout.hide();
-                $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
             }
+
             return box;
         }
         function setHTML(html) {
