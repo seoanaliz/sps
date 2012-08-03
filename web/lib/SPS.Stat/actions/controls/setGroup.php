@@ -14,45 +14,46 @@
          * Entry Point
          */
         public function Execute() {
-//            error_reporting( 0 );
+            error_reporting( 0 );
+
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
             $groupName  =   Request::getString ( 'groupName' );
             $ava        =   Request::getString ( 'ava' );
             $comments   =   Request::getString ( 'comments' );
-            $general    =   Request::getInteger ( 'general' );
+            $general    =   Request::getInteger( 'general' );
 
-            $general = $general ? $general : 0;
-            $groupId = $groupId ? $groupId : 0;
+            $general    = $general ? $general : 0;
+            $groupId    = $groupId ? $groupId : 0;
 
             $ava        = $ava      ? $ava     : NULL;
             $comments   = $comments ? comments : NULL;
 
             if ( !$groupName || !$userId || !StatGroups::check_group_name_free( $userId, $groupName ) ) {
-                echo ObjectHelper::ToJSON(array('response' => false));
+                echo ObjectHelper::ToJSON( array( 'response' => false ) );
                 die();
             }
 
-            if ($general && !StatUsers::is_Sadmin($userId)) {
+            if ( $general && !StatUsers::is_Sadmin( $userId ) ) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
-              elseif ($general && !$groupId)
+              elseif ( $general && !$groupId )
                   $userId = StatUsers::get_users();
 
-            $newGroupId = StatGroups::setGroup($ava, $groupName, $comments, $groupId);
-            if (!$newGroupId) {
-                echo ObjectHelper::ToJSON(array('response' => false));
+            $newGroupId = StatGroups::setGroup( $ava, $groupName, $comments, $groupId );
+            if ( !$newGroupId ) {
+                echo ObjectHelper::ToJSON(array( 'response' => false ) );
                 die();
             }
 
-            if (!$groupId)
-                StatGroups::implement_group($newGroupId, $userId);
+            if ( !$groupId )
+                StatGroups::implement_group( $newGroupId, $userId );
 
-            echo ObjectHelper::ToJSON(array('response' => $newGroupId));
+            echo ObjectHelper::ToJSON( array( 'response' => $newGroupId ) );
 
         }
 
