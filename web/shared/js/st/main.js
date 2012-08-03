@@ -97,7 +97,7 @@ var List = (function() {
                         isFirstShow = false;
                         VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
                             Events.fire('load_list', function(dataLists) {
-                                if (dataVK.error) {
+                                if (dataVK && dataVK.error) {
                                     box
                                         .setTitle('Ошибка')
                                         .setHTML('Вы не предоставили доступ к друзьям.')
@@ -111,10 +111,10 @@ var List = (function() {
                                         ])
                                     ;
                                 } else {
-                                    var dataVK = dataVK.response;
+                                    var dataVKfriends = dataVK.response;
                                     var friends = [];
-                                    for (var i in dataVK) {
-                                        var user = dataVK[i];
+                                    for (var i in dataVKfriends) {
+                                        var user = dataVKfriends[i];
                                         friends.push({
                                             id: user.uid,
                                             icon: user.photo,
