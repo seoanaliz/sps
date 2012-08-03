@@ -9,8 +9,8 @@
 
         public function Execute()
         {
-            if (! $this->check_time())
-                die('Не сейчас');
+//            if (! $this->check_time())
+//                die('Не сейчас');
 
             $this->get_id_arr();
 
@@ -87,18 +87,65 @@
         }
 
         //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем)
-        public function set_public_grow($publ_id, $quantity, $period=1)
+        public function set_public_grow( $publ_id, $quantity, $last_up_time )
         {
-                $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
-                SET diff_abs=(@new_quantity - quantity),
-                    quantity=@new_quantity,
-                    diff_rel=round((@new_quantity/quantity - 1)*100, 2)
-                WHERE vk_id=@publ_id';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@publ_id',   $publ_id);
-                $cmd->SetFloat('@new_quantity',  $quantity + 0.1);
-                $cmd->Execute();
+            $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS .
+                   ' WHERE
+                        id=@publ_id
+                        AND (
+                                time = @time - 86400 * 7
+                            OR  time = @time - 86400 * 30
+                            )
+                   ORDER BY time DESC';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger( '@time',     $last_up_time );
+            $cmd->SetInteger( '@publ_id',  $publ_id );
+            $ds = $cmd->Execute();
+            $time = array();
+            while( $ds->Next() ) {
+                $quan_arr[] = $ds->getValue('quantity', TYPE_INTEGER);
+            }
+            print_r($quan_arr);
+            if ($quan_arr[1]) {
+                $diff_rel_mon = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
+                $diff_abs_mon = $quantity - $quan_arr[1];
+            } else {
+                $diff_rel_mon = 0;
+                $diff_abs_mon = 0;
+            }
+
+            if ($quan_arr[0]) {
+                $diff_rel_week = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
+                $diff_abs_week = $quantity - $quan_arr[0];
+            } else {
+                $diff_rel_week = 0;
+                $diff_abs_week = 0;
+            }
+
+            $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
+            SET
+                quantity=@new_quantity,
+                diff_abs=(@new_quantity - quantity),
+                diff_rel=round( ( @new_quantity/quantity - 1 ) * 100, 2 ),
+                diff_abs_week   =   @diff_abs_week,
+                diff_rel_week   =   @diff_rel_week,
+                diff_abs_month  =   @diff_abs_month,
+                diff_rel_month  =   @diff_rel_month
+            WHERE vk_id=@publ_id';
+            echo '<br>' . $sql;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger( '@publ_id',          $publ_id );
+            $cmd->SetInteger( '@diff_abs_week',    $diff_abs_week );
+            $cmd->SetInteger( '@diff_abs_month',   $diff_abs_mon );
+            $cmd->SetFloat( '@diff_rel_week',      $diff_rel_week );
+            $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
+            $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
+            $cmd->Execute();
+
         }
+
+
 
         //собирает количество поситителей в пабликах
         public function update_quantity()
@@ -107,7 +154,7 @@
             $i = 0;
             $return = "return{";
             $code = '';
-
+            $time = StatPublics::get_last_update_time();
             foreach($this->ids as $b) {
 
                 if ($i == 25 or !next($this->ids)) {
@@ -132,7 +179,8 @@
                         $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
 
-                        $this->set_public_grow($key, $entry->count);
+                        $this->set_public_grow( $key, $entry->count, $time );
+
 
                     }
 
