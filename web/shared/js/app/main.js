@@ -120,31 +120,6 @@ var app = (function () {
 
         /*Left column*/
         $newPost.find('textarea').placeholder();
-//        $newPost.find('textarea').autocomplete({
-//            data: [
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Вова'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
-//                {title: 'Сашка'},
-//                {title: 'Саня'},
-//                {title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
-//                {title: 'Александр'},
-//                {title: 'Петя'},
-//                {title: 'Александр'},
-//                {title: 'Сашка'},
-//                {title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саша'}
-//            ],
-//            onchange: function(item) {
-//                $(this).val(item.title).focus();
-//            }
-//        });
 
         $newPost.find('textarea').bind('focus', function() {
             $(this).autoResize();

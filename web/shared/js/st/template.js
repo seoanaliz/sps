@@ -190,9 +190,9 @@ var BOX_SHARE =
     '<div class="title">Поделитесь с друзьями</div>' +
     '<input type="text" value="http://socialboard.ru/stat" />' +
     '<div class="title">Выберите друзей</div>' +
-    '<textarea rows="1" cols="" class="users"></textarea>' +
+    '<input type="text" class="users"></textarea>' +
 //    '<div class="title">Ваш комментарий</div>' +
 //    '<textarea rows="2" cols="" class="comment"></textarea>' +
     '<div class="title">Выберите списки</div>' +
-    '<textarea rows="1" cols="" class="lists"></textarea>' +
+    '<input type="text" class="lists"></textarea>' +
 '</div>';

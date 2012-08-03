@@ -110,6 +110,11 @@ input {
     z-index: 99;
     overflow-y: auto;
 
+    .ui-dropdown-menu-empty {
+        color: #777;
+        padding: .5em 1em;
+        background-color: #f7f7f7;
+    }
     .ui-dropdown-menu-item {
         padding: .5em 1em;
         cursor: pointer;
@@ -119,8 +124,10 @@ input {
         overflow: hidden;
         line-height: 150%;
 
-        &.active,
-        &:hover {
+        &.hover {
+            background-color: @hover_bg;
+        }
+        &.active {
             color: #fff;
             background-color: #587DA1;
         }
@@ -430,7 +437,7 @@ input {
 
 /* Box */
 .box-layout {
-    z-index: 999;
+    z-index: 99;
     display: none;
     background: #333;
     background: rgba(0,0,0,.2);

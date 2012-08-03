@@ -93,92 +93,71 @@ var List = (function() {
                     var box = this;
                     if (isFirstShow) {
                         isFirstShow = false;
-                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(data) {
-                            if (data.error) {
-                                box
-                                    .setTitle('Ошибка')
-                                    .setHTML('Вы не предоставили доступ к друзьям.')
-                                    .setButtons([
-                                        {label: 'Перелогиниться', onclick: function() {
-                                            VK.Auth.logout(function() {
-                                                location.replace('login/');
-                                            });
-                                        }},
-                                        {label: 'Отмена', isWhite: true}
-                                    ])
-                                ;
-                            } else {
-                                var res = data.response;
-                                var friends = [];
-                                var lists = [];
-                                for (var i in res) {
-                                    var user = res[i];
-                                    friends.push({
-                                        id: user.uid,
-                                        name: user.first_name + ' ' + user.last_name
-                                    });
-                                }
-                                box.setHTML(tmpl(BOX_SHARE));
-                                var $users = $box.find('.users');
-                                var $lists = $box.find('.lists');
-                                var $comment = $box.find('.comment');
+                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
+                            var dataVK = dataVK.response;
+                            Events.fire('load_list', function(dataLists) {
+                                if (dataVK.error) {
+                                    box
+                                        .setTitle('Ошибка')
+                                        .setHTML('Вы не предоставили доступ к друзьям.')
+                                        .setButtons([
+                                            {label: 'Перелогиниться', onclick: function() {
+                                                VK.Auth.logout(function() {
+                                                    location.replace('login/');
+                                                });
+                                            }},
+                                            {label: 'Отмена', isWhite: true}
+                                        ])
+                                    ;
+                                } else {
+                                    var friends = [];
+                                    for (var i in dataVK) {
+                                        var user = dataVK[i];
+                                        friends.push({
+                                            id: user.uid,
+                                            icon: user.photo,
+                                            title: user.first_name + ' ' + user.last_name
+                                        });
+                                    }
+                                    var lists = [];
+                                    for (var i in dataLists) {
+                                        var list = dataLists[i];
+                                        lists.push({
+                                            id: list.itemId,
+                                            title: list.itemTitle
+                                        });
+                                    }
 
-                                $comment.autoResize();
-                                $users
-                                    .textext({
-                                        plugins : 'tags autocomplete filter',
-                                        ext: {
-                                            itemManager: {
-                                                stringToItem: function(str) { return {name: str}; },
-                                                itemToString: function(item) { return item.name; },
-                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                    box.setHTML(tmpl(BOX_SHARE));
+
+                                    var $users = $box.find('.users');
+                                    var $lists = $box.find('.lists');
+                                    $users
+                                        .autocomplete({
+                                            data: friends,
+                                            onchange: function(item) {
+                                                $(this).val(item.title).focus();
                                             }
-                                        }
-                                    })
-                                    .bind('getSuggestions', function(e, data) {
-                                        var list = friends,
-                                            textext = $(e.target).textext()[0],
-                                            query = (data ? data.query : '') || '';
-                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                                    })
-                                    .bind('setFormData', function(e, data) {
-                                        $(e.target).data('tags', data);
-                                    })
-                                ;
-                                $users.textext()[0].getFormData();
-                                $lists
-                                    .textext({
-                                        plugins : 'tags autocomplete filter',
-                                        tagsItems: [{name: 'asadfdsgdfhretq'}],
-                                        ext: {
-                                            itemManager: {
-                                                stringToItem: function(str) { return {name: str}; },
-                                                itemToString: function(item) { return item.name; },
-                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                        })
+                                    ;
+                                    $lists
+                                        .autocomplete({
+                                            data: lists,
+                                            onchange: function(item) {
+                                                $(this).val(item.title).focus();
                                             }
-                                        }
-                                    })
-                                    .bind('getSuggestions', function(e, data) {
-                                        var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
-                                            textext = $(e.target).textext()[0],
-                                            query = (data ? data.query : '') || '';
-                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                                    })
-                                    .bind('setFormData', function(e, data) {
-                                        $(e.target).data('tags', data);
-                                    })
-                                ;
-                                $lists.textext()[0].getFormData();
-                                $box.find('textarea[value=""]:first').focus();
-                            }
+                                        })
+                                    ;
+                                    $box.find('input[value=""]:first').focus();
+                                }
+                            });
                         });
                     }
                 }
             }).show();
 
             function share($button, $box) {
-                console.log($box.find('.users').data('tags'));
-                console.log($box.find('.lists').data('tags'));
+                this.setHTML('Не работает').setButtons([{label: 'Закрыть'}]);
             }
         });
         $container.delegate('.actions .edit', 'click', function() {
@@ -269,9 +248,9 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3200000,
+                max: 3500000,
                 animate: 100,
-                values: [0, 3000000],
+                values: [0, 3500000],
                 create: function(event, ui) {
                     renderRange();
                 },
