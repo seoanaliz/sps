@@ -388,7 +388,8 @@ var Filter = (function() {
     }
     function setSliderMax(max) {
         var $slider = $audience.find('> .slider-wrap');
-        $slider.slider('option', 'max', parseInt(max) + 1);
+        //todo: не обновляется
+        $slider.slider('option', 'max', parseInt(max) + 1 + 10000);
         $slider.slider("value", $slider.slider("value"));
     }
 
