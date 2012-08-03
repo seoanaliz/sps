@@ -336,6 +336,7 @@ table, tr, td {
         position: relative;
         cursor: pointer;
         max-width: 10em;
+        min-height: 32px;
 
         .icon {
             position: absolute;
@@ -507,45 +508,47 @@ table, tr, td {
     background-color: #fff;
     display: none;
     box-shadow: 0 2px 4px rgba(0,0,0,.25);
-}
-.contact-dropdown > .item {
-    position: relative;
-    cursor: pointer;
-}
-.contact-dropdown > .item:hover {
-    background-color: #EDF1F5;
-}
-.contact-dropdown > .item > .photo {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    bottom: 0;
-    overflow: hidden;
-    width: 32px;
-    height: 32px;
-}
-.contact-dropdown > .item img {
-    width: 32px;
-}
-.contact-dropdown > .item > .content {
-    margin-left: 0px;
-    line-height: 16px;
-    padding: 3px 3px 3px 40px;
-    position: relative;
-    cursor: pointer;
-    -webkit-transition: all .2s;
-    overflow: hidden;
-}
-.contact-dropdown > .item > .content > .name {
 
-}
-.contact-dropdown > .item > .content > .description {
-    color: #808080;
-    font-size: 90%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 150px;
+    &>.item {
+        position: relative;
+        cursor: pointer;
+        min-height: 38px;
+
+        &:hover {
+            background-color: #EDF1F5;
+        }
+
+        &>.photo {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            bottom: 0;
+            overflow: hidden;
+            width: 32px;
+            height: 32px;
+        }
+        &>.item img {
+            width: 32px;
+        }
+        &>.content {
+            margin-left: 0px;
+            line-height: 16px;
+            padding: 3px 3px 3px 40px;
+            position: relative;
+            cursor: pointer;
+            -webkit-transition: all .2s;
+            overflow: hidden;
+        }
+        &>.content > .name {}
+        &>.content > .description {
+            color: #808080;
+            font-size: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 150px;
+        }
+    }
 }
 
 .tab-bar {
