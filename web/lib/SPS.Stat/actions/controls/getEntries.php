@@ -16,6 +16,7 @@ class getEntries {
 
     public function Execute() {
         error_reporting( 0 );
+
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
@@ -34,45 +35,65 @@ class getEntries {
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
-        $sortBy         =   $sortBy ? $sortBy  : ' diff_abs ';
+        $sortBy         =   $sortBy ? $sortBy  : 'diff_abs';
         $sortReverse    =   $sortReverse? '' : ' DESC ';
         $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
 
-        if (isset($groupId )) {
+        if ( $period == 7 ) {
+            if ( $sortBy == 'diff_abs' )
+                $sortBy = 'diff_abs_week';
+            if ( $sortBy == 'diff_rel' )
+                $sortBy = 'diff_rel_week';
+            $diff_rel = 'diff_rel_week';
+            $diff_abs = 'diff_abs_week';
+        } else if( $period == 30 ) {
+            if ( $sortBy == 'diff_abs' )
+                $sortBy = 'diff_abs_month';
+            if ( $sortBy == 'diff_rel' )
+                $sortBy = 'diff_rel_month';
+            $diff_rel = 'diff_rel_month';
+            $diff_abs = 'diff_abs_month';
+        } else {
+            $diff_rel = 'diff_rel';
+            $diff_abs = 'diff_abs';
+        }
+
+        if ( isset( $groupId ) ) {
             $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
 
         $sql = 'SELECT
-                publ.vk_id, publ.ava, publ.name, publ.price, publ.diff_abs,
-                publ.diff_rel, publ.quantity, gprel.main_admin
-        FROM
-                ' . TABLE_STAT_PUBLICS . ' as publ,
-                ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
-        WHERE
-              publ.vk_id=gprel.public_id
-              AND gprel.group_id=@group_id
-              AND publ.quantity > @min_quantity
-              AND publ.quantity < @max_quantity
-        ORDER BY '
-            . $sortBy . $sortReverse .
-      ' OFFSET '
-            . $offset .
-      ' LIMIT '
-            . $limit;
+                    publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
+                    publ.' . $diff_rel . ', publ.quantity, gprel.main_admin
+                FROM
+                        ' . TABLE_STAT_PUBLICS . ' as publ,
+                        ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
+                WHERE
+                      publ.vk_id=gprel.public_id
+                      AND gprel.group_id=@group_id
+                      AND publ.quantity > @min_quantity
+                      AND publ.quantity < @max_quantity
+                ORDER BY '
+                    . $sortBy . $sortReverse .
+              ' OFFSET '
+                    . $offset .
+              ' LIMIT '
+                    . $limit;
 
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@group_id', $groupId);
-            $cmd->SetInteger('@user_id', $userId);
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@group_id', $groupId);
+                $cmd->SetInteger('@user_id',  $userId);
 
         } else {
             $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
             $sql = 'SELECT
-                        vk_id, ava, name, price, diff_abs, diff_rel, quantity
+                        vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ', quantity
                     FROM '
-                        . TABLE_STAT_PUBLICS .
-                  ' WHERE   quantity > @min_quantity
+                        . TABLE_STAT_PUBLICS . ' as publ
+                    WHERE   quantity > @min_quantity
+
                         AND quantity < @max_quantity '.
                         $search . $show_in_mainlist .
                   ' ORDER BY '
@@ -93,19 +114,12 @@ class getEntries {
 
         while ($ds->next()) {
             $row = $this->get_row( $ds, $structure );
-            if ($period) {
-                $diff = $this->get_difference( $row['quantity'], $period, $row['vk_id'] );
-                $row['diff_abs'] = $diff['diff_abs'];
-                $row['diff_rel'] = $diff['diff_rel'];
 
-            }
-
-            $admins = $this->get_admins($row['vk_id'], $row['selected_admin']);
+            $admins = $this->get_admins($row['vk_id'], $row['main_admin'] );
             $groups = array();
-            if ( isset($userId) ) {
+            if ( isset( $userId ) ) {
                 $groups = $this->get_groups( $userId, $row['vk_id'] );
             }
-
             $resul[] =  array(
                                 'id'        =>  $row['vk_id'],
                                 'quantity'  =>  $row['quantity'],
@@ -114,8 +128,8 @@ class getEntries {
                                 'price'     =>  $row['price'],
                                 'group_id'  =>  $groups,
                                 'admins'    =>  $admins,
-                                'diff_abs'  =>  $row['diff_abs'],
-                                'diff_rel'  =>  $row['diff_rel']
+                                'diff_abs'  =>  $row[$diff_abs],
+                                'diff_rel'  =>  $row[$diff_rel]
                             );
         }
 
@@ -145,13 +159,13 @@ class getEntries {
         $resul = array();
         $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $cmd->SetInteger('@publ_id',   $publ);
+        $cmd->SetInteger( '@publ_id',  $publ );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
         while ( $ds->next() ) {
-            $vk_id = $ds->getValue('vk_id', TYPE_INTEGER);
-            if ($vk_id == $sadmin){
-                if (isset($resul[0]))
+            $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
+            if ( $vk_id == $sadmin ) {
+                if ( isset( $resul[0] ) )
                     $k = $resul[0];
 
                 $resul[0] = $this->get_row($ds, $structure);
@@ -168,14 +182,15 @@ class getEntries {
     private function get_groups( $userId, $public_id )
     {
         $groups = array();
-
         $sql = "SELECT a.group_id from "
-                . TABLE_STAT_GROUP_USER_REL . " AS a,
-                 " . TABLE_STAT_GROUP_PUBLIC_REL. " AS b
+                   . TABLE_STAT_GROUP_USER_REL   . " AS a,
+                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b
                  WHERE
                         a.group_id=b.group_id
                     AND user_id=@user_id
                     AND b.public_id=@public_id";
+
+
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetInteger( '@user_id',  $userId );
         $cmd->SetInteger( '@public_id',  $public_id );

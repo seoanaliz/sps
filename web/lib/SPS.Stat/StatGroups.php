@@ -132,18 +132,19 @@
             }
         }
 
-        public static function select_main_admin($groupId, $adminId)
+        public static function select_main_admin($groupId, $public_id, $adminId)
         {
             $sql = 'UPDATE
-                        ' . TABLE_STAT_GROUPS . '
+                        ' . TABLE_STAT_GROUP_PUBLIC_REL . '
                     SET
-                        group_admin=@admin_id
+                        main_admin=@admin_id
                     WHERE
-                        group_id=@group_id';
+                        group_id=@group_id AND public_id=@public_id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@group_id',   $groupId);
-            $cmd->SetInteger('@admin_id',   $adminId);
+            $cmd->SetInteger('@group_id',    $groupId);
+            $cmd->SetInteger('@public_id',   $public_id);
+            $cmd->SetInteger('@admin_id',    $adminId);
             $cmd->Execute();
         }
 

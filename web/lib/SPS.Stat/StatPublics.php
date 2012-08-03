@@ -30,5 +30,16 @@
             return $res;
         }
 
+        public static function get_last_update_time()
+        {
+            $sql = 'SELECT MAX(time) FROM ' . TABLE_STAT_PUBLICS_POINTS;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            return $ds->getValue('max', TYPE_INTEGER);
+
+        }
+
     }
 ?>
