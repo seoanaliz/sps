@@ -96,7 +96,6 @@ var List = (function() {
                     if (isFirstShow) {
                         isFirstShow = false;
                         VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
-                            var dataVK = dataVK.response;
                             Events.fire('load_list', function(dataLists) {
                                 if (dataVK.error) {
                                     box
@@ -112,6 +111,7 @@ var List = (function() {
                                         ])
                                     ;
                                 } else {
+                                    var dataVK = dataVK.response;
                                     var friends = [];
                                     for (var i in dataVK) {
                                         var user = dataVK[i];
