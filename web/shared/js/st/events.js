@@ -44,6 +44,11 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
+    get_user: function(userId, callback) {
+        simpleAjax('addUser', function(dirtyData) {
+            callback(true);
+        });
+    },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
@@ -51,20 +56,37 @@ var Eventlist = {
                 $.each(dirtyData, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
-                        itemTitle: data.name
+                        itemTitle: data.name,
+                        itemFave: data.fave
                     });
                 });
+            callback(clearData);
+        });
+    },
+    load_bookmarks: function(callback) {
+        simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
+            var clearData = [];
+            if ($.isArray(dirtyData)) {
+                $.each(dirtyData, function(i, data) {
+                    clearData.push({
+                        itemId: data.group_id,
+                        itemTitle: data.name,
+                        itemFave: data.fave
+                    });
+                });
+            }
             callback(clearData);
         });
     },
     load_table: function(options, callback) {
         var params = $.extend({
             listId: null,
-            offset: null,
             limit: null,
+            offset: null,
+            search: '',
             sortBy: '',
             sortReverse: false,
-            search: ''
+            period: ''
         }, options);
 
         var sortByClear = {
@@ -79,13 +101,16 @@ var Eventlist = {
             sortBy: sortByClear[params.sortBy],
             sortReverse: params.sortReverse ? 1 : 0,
             search: params.search,
+            period: params.period,
+            min: params.audienceMin,
+            max: params.audienceMax,
             show: 1
         }, function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData))
-                $.each(dirtyData, function(i, data) {
+            var clearList = [];
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
                     var users = [];
-                    $.each(data.admins, function(i, data) {
+                    $.each(publicItem.admins, function(i, data) {
                         users.push({
                             userId: data.vk_id,
                             userName: data.name,
@@ -93,19 +118,27 @@ var Eventlist = {
                             userDescription: data.role || '&nbsp;'
                         });
                     });
-                    //var users = DataUsers;
-                    clearData.push({
-                        publicId: data.id,
-                        publicImg: data.ava,
-                        publicName: data.name,
-                        publicFollowers: data.quantity,
-                        publicGrowthNum: data.diff_abs,
-                        publicGrowthPer: data.diff_rel,
-                        lists: ($.isArray(data.group_id) && data.group_id.length) ? data.group_id : [],
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                         users: users
                     });
                 });
-            callback(clearData);
+            }
+            var clearPeriod = [];
+            if (dirtyData.min_max) {
+                clearPeriod = [
+                    dirtyData.min_max.min,
+                    dirtyData.min_max.max
+                ];
+            }
+
+            callback(clearList, clearPeriod);
         });
     },
     add_list: function(title, callback) {
@@ -132,7 +165,7 @@ var Eventlist = {
         });
     },
     add_to_list: function(public_id, list_id, callback) {
-        simpleAjax('implGroup', {
+        simpleAjax('implPublic', {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
@@ -140,7 +173,7 @@ var Eventlist = {
         });
     },
     remove_from_list: function(public_id, list_id, callback) {
-        simpleAjax('exGroup', {
+        simpleAjax('exPublic', {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
@@ -148,7 +181,7 @@ var Eventlist = {
         });
     },
     change_user: function(user_id, list_id, public_id, callback) {
-        simpleAjax('selectSAdmin', {
+        simpleAjax('selectGroupAdmin', {
             adminId: user_id,
             groupId: list_id,
             publId: public_id
@@ -159,6 +192,20 @@ var Eventlist = {
     hide_public: function(public_id, callback) {
         simpleAjax('togglePublVisibil', {
             publId: public_id
+        }, function(dirtyData) {
+            callback(true);
+        });
+    },
+    add_to_bookmark: function(listId, callback) {
+        simpleAjax('toggleGroupFave', {
+            groupId: listId
+        }, function(dirtyData) {
+            callback(true);
+        });
+    },
+    remove_from_bookmark: function(listId, callback) {
+        simpleAjax('toggleGroupFave', {
+            groupId: listId
         }, function(dirtyData) {
             callback(true);
         });

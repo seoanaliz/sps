@@ -3,6 +3,51 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
 }
 
+// Кроссбраузерные плейсхолдеры
+(function($) {
+    $.fn.placeholder = function(para) {
+        return this.each(function(parameters) {
+            var defaults = {
+                el: this,
+                color: '#CCC',
+                text: false,
+                helperClass: 'placeholder'
+            };
+            var t = this;
+            var p = t.p = $.extend(defaults, parameters);
+            var $input = $(p.el);
+            var placeholderText = p.text || $input.attr('placeholder');
+            var $wrapper = $('<div/>');
+            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
+                padding: $input.css('padding')
+            });
+
+            $input
+                .wrap($wrapper)
+                .data('placeholder', $placeholder)
+                .removeAttr('placeholder')
+                .parent().prepend($placeholder)
+            ;
+
+            $placeholder.bind('mousedown', function() {
+                $placeholder.hide();
+                $input.focus();
+            });
+            $placeholder.bind('mouseup', function() {
+                $input.focus();
+            });
+            $input.bind('blur', function() {
+                if (!$input.val()) {
+                    $placeholder.fadeIn(100);
+                }
+            });
+            $input.bind('focus', function() {
+                $placeholder.hide();
+            });
+        });
+    };
+})(jQuery);
+
 // Автовысота у textarea
 (function($) {
     $.fn.autoResize = function() {
@@ -243,3 +288,138 @@ function getURLParameter(name) {
         });
     };
 })(jQuery);
+
+// Popup
+var Box = (function() {
+    var $body;
+    var $layout;
+    var boxesCollection = {};
+
+    return function(options) {
+        if (typeof options != 'object') {
+            if (boxesCollection[options]) {
+                return boxesCollection[options];
+            } else {
+                return false;
+            }
+        }
+
+        var box = {};
+        var params = $.extend({
+            id: false,
+            title: '',
+            html: '',
+            closeBtn: true,
+            buttons: [],
+            onshow: function() {},
+            onhide: function() {},
+            oncreate: function() {}
+        }, options);
+
+        if (!$layout) {
+            $body = $('body');
+            $layout = $('<div/>')
+                .addClass('box-layout')
+                .appendTo($body)
+            ;
+            $(document).keydown(function(e) {
+                if (e.keyCode == 27) {
+                    $layout.click();
+                }
+            });
+        } else {
+            $layout = $('body > .box-layout');
+        }
+
+        if (params.id) {
+            if (boxesCollection[params.id]) {
+                return boxesCollection[params.id];
+            } else {
+                boxesCollection[params.id] = box;
+            }
+        }
+
+        var $box = $(tmpl(BOX_WRAP, {
+            title: params.title,
+            body: params.html,
+            buttons: params.buttons,
+            closeBtn: params.closeBtn
+        })).appendTo($layout);
+
+        if (params.closeBtn) {
+            $box.find('> .title').click(function() {
+                box.hide();
+            });
+        }
+
+        setButtons(params.buttons);
+
+        box.$box = $box;
+        box.show = show;
+        box.hide = hide;
+        box.setHTML = setHTML;
+        box.setTitle = setTitle;
+        box.setButtons = setButtons;
+        box.refreshTop = refreshTop;
+
+        function show() {
+            $layout
+                .show()
+                .unbind()
+                .click(function(e) {
+                    if (e.target == e.currentTarget) box.hide();
+                })
+            ;
+            $box.show();
+            $body.data('overflow-y', $body.css('overflow-y')).css({overflowY: 'hidden', paddingRight: 17});
+            params.onshow.call(box, $box);
+            refreshTop();
+            return box;
+        }
+        function hide() {
+            $layout.hide();
+            $box.hide();
+            $body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
+            params.onhide.call(box, $box);
+            return box;
+        }
+        function setHTML(html) {
+            $box.find('> .body').html(html);
+            refreshTop();
+            return box;
+        }
+        function setTitle(title) {
+            $box.find('> .title .text').text(title);
+            return box;
+        }
+        function setButtons(buttons) {
+            if (!buttons || !buttons.length) {
+                $box.find('> .actions-wrap').remove();
+            } else {
+                if (!$box.find('> .actions-wrap').length) {
+                    $box.append('<div class="actions-wrap"><div class="actions"></div></div>');
+                }
+                $box.find('> .actions-wrap .actions').empty();
+                $.each(buttons, function(i, button) {
+                    var $button = $(tmpl(BOX_ACTION, button))
+                        .appendTo($box.find('> .actions-wrap .actions'))
+                        .click(function() {
+                            button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
+                        });
+                });
+            }
+            return box;
+        }
+        function refreshTop() {
+            var top = ($(window).height() / 3) - ($box.outerHeight() / 2);
+            $box.css({
+                marginTop: top < 20 ? 20 : top
+            });
+            return box;
+        }
+
+        params.oncreate.call(box, $box);
+
+        return box;
+    };
+})();

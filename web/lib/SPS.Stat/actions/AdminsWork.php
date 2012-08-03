@@ -8,7 +8,7 @@
 
         public function execute()
         {
-
+//            error_reporting( 0 );
             $publics = StatPublics::get_our_publics_list();
             $result = array();
 //            foreach ($publics as $public) {
@@ -31,20 +31,28 @@
             Response::setArray( 'our_publics', $publics );
         }
 
-        public function get_public_admins($public_id, $date_min = 0, $date_max = 0 ) {
+        public function get_public_admins($date_min, $date_max, $public_id = 0 ) {
             $date_max = $date_max ? $date_max : 1543395811;
-            $date_mmin = $date_min ? $date_min : 0;
-            $sql = 'SELECT DISTINCT a.author_id, b.name, b.ava
-                    FROM ' . TABLE_OADMINS_POSTS . ' as a, ' . TABLE_OADMINS . ' as b
-                    WHERE a.public_id=@public_id
-                        AND a.author_id = b.vk_id
-                        AND a.post_time > @date_min
-                        AND a.post_time < @date_max';
+            $date_min = $date_min ? $date_min : 0;
 
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@public_id', $public_id['id']);
-            $cmd->SetInteger('@date_min',  $date_min);
-            $cmd->SetInteger('@date_max',  $date_max);
+           $public_line = $public_id ? 'AND a.public_id=@public_id' : '';
+            {
+                $sql = 'SELECT DISTINCT a.author_id, b.name, b.ava
+                        FROM ' . TABLE_OADMINS_POSTS . ' as a, ' . TABLE_OADMINS . ' as b
+                        WHERE a.author_id = b.vk_id
+                            AND a.post_time > @date_min
+                            AND a.post_time < @date_max'
+                            . $public_line
+                        ;
+
+            }
+
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            if ( $public_id )
+                $cmd->SetInteger( '@public_id', $public_id['id'] );
+            $cmd->SetInteger( '@date_min',  $date_min );
+            $cmd->SetInteger( '@date_max',  $date_max );
 
             $ds = $cmd->Execute();
             $res = array();

@@ -99,11 +99,14 @@
                 <page uri="controls://implPublic/">
                     <actions>SPS.Stat.implPublic</actions>
                 </page>
-                <page uri="controls://exGroup/">
-                    <actions>SPS.Stat.exGroup</actions>
+                <page uri="controls://exPublic/">
+                    <actions>SPS.Stat.exPublic</actions>
                 </page>
                 <page uri="controls://togglePublVisibil/">
                     <actions>SPS.Stat.togglePublVisibil</actions>
+                </page>
+                <page uri="controls://toggleGroupFave/">
+                    <actions>SPS.Stat.toggleGroupFave</actions>
                 </page>
                 <page uri="controls://addUser/">
                     <actions>SPS.Stat.addUser</actions>
