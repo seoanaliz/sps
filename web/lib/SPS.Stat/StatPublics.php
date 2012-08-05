@@ -17,6 +17,7 @@
                     $public->externalId ==  26776509  ||
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
+                    $public->externalId ==  25749497  ||
                     $public->externalId ==  35807078 )
 
                     continue;
@@ -25,8 +26,7 @@
                 $a['title'] = $public->title;
                 $res[] = $a;
             }
-            $res[] = array('id'     =>  38000341,
-                           'title'  =>  'Мода и Красота');
+
             return $res;
         }
 
