@@ -15,21 +15,30 @@
          */
         public function Execute() {
             error_reporting( 0 );
-            $userId         =   Request::getInteger( 'userId' );
-            $groupId        =   Request::getInteger( 'groupId' );
-            $recipientId    =   Request::getInteger( 'recId' );
+            $user_id        =   Request::getInteger( 'userId' );
+            $group_ids      =   Request::getString( 'groupId' );
+            $recipients_id  =   Request::getString( 'recId' );
+            $general        =   Request::getInteger( 'general' );
 
-            if (!$groupId || !$userId || !$recipientId) {
+            $general        =   $general ? $general : 0;
+
+            if ( !$group_ids || !$user_id || !$recipients_id ) {
+                die( ERR_MISSING_PARAMS );
+            }
+
+            $recipients_id  = explode( ',', $recipients_id );
+            $group_ids      = explode( ',', $group_ids );
+
+            if ( $general && !StatUsers::is_Sadmin( $user_id ) ) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            //todo проверка на наличие группы у юзера, хз, надо ли
+            if ( StatGroups::implement_group($group_ids, $recipients_id) )
+                die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
+            else
+                die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
 
-            StatGroups::implement_group($groupId, $userId);
-
-            echo ObjectHelper::ToJSON(array('response' => true));
-            die();
         }
 
 

@@ -3,6 +3,7 @@
     Package::Load( 'SPS.Stat' );
 
     set_time_limit(600);
+    error_reporting( 0 );
     class WrTopics extends wrapper
     {
         private $ids;
@@ -133,7 +134,7 @@
                 diff_abs_month  =   @diff_abs_month,
                 diff_rel_month  =   @diff_rel_month
             WHERE vk_id=@publ_id';
-            echo '<br>' . $sql;
+
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@publ_id',          $publ_id );
             $cmd->SetInteger( '@diff_abs_week',    $diff_abs_week );
@@ -152,16 +153,16 @@
             $i = 0;
             $return = "return{";
             $code = '';
-            $time = StatPublics::get_last_update_time();
+            $timeTo = StatPublics::get_last_update_time();
             foreach($this->ids as $b) {
 
-                if ($i == 25 or !next($this->ids)) {
-                    if (!next($this->ids)) {
+                if ( $i == 25 or !next( $this->ids ) ) {
+                    if ( !next( $this->ids ) ) {
                         $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                         $return .= "\" a$b\":a$b,";
                     }
 
-                    $code .= trim($return, ',') . "};";
+                    $code .= trim( $return, ',' ) . "};";
 
                     if (self::TESTING)
                         echo '<br>' . $code;
@@ -169,7 +170,7 @@
 
                     foreach($res as $key => $entry) {
 
-                        $key = str_replace('a', '', $key);
+                        $key = str_replace( 'a', '', $key );
                         $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
                         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                         $cmd->SetInteger( '@id',        $key );
@@ -177,7 +178,7 @@
                         $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
 
-                        $this->set_public_grow( $key, $entry->count, $time );
+                        $this->set_public_grow( $key, $entry->count, $timeTo );
 
 
                     }

@@ -22,14 +22,19 @@
             $ava        =   Request::getString ( 'ava' );
             $comments   =   Request::getString ( 'comments' );
             $general    =   Request::getInteger( 'general' );
+            $type       =   Request::getString ( 'general' );
+            $type_array = array( 'Stat', 'Mes');
+            if ( !$type || !in_array( $type, $type_array, 1 ) )
+                $type = 'Stat';
 
             $general    = $general ? $general : 0;
             $groupId    = $groupId ? $groupId : 0;
 
             $ava        = $ava      ? $ava     : NULL;
             $comments   = $comments ? comments : NULL;
+            $m_class = $type . 'Groups';
 
-            if ( !$groupName || !$userId || !StatGroups::check_group_name_free( $userId, $groupName ) ) {
+            if ( !$groupName || !$userId || !$m_class::check_group_name_free( $userId, $groupName ) ) {
                 echo ObjectHelper::ToJSON( array( 'response' => false ) );
                 die();
             }
@@ -44,14 +49,14 @@
               elseif ( $general && !$groupId )
                   $userId = StatUsers::get_users();
 
-            $newGroupId = StatGroups::setGroup( $ava, $groupName, $comments, $groupId );
+            $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
             if ( !$newGroupId ) {
                 echo ObjectHelper::ToJSON(array( 'response' => false ) );
                 die();
             }
 
             if ( !$groupId )
-                StatGroups::implement_group( $newGroupId, $userId );
+                $m_class::implement_group( $newGroupId, $userId );
 
             echo ObjectHelper::ToJSON( array( 'response' => $newGroupId ) );
 
