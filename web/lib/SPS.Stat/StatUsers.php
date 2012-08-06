@@ -42,14 +42,15 @@
             return array(
                 'userId'    =>  $result->uid,
                 'ava'       =>  $result->photo,
-                'name'      =>  $result->first_name . ' ' .$result->last_name
-
+                'name'      =>  $result->first_name . ' ' . $result->last_name
             );
 
         }
 
-        public static function add_user($user)
+        public static function add_user( $user )
         {
+            if ( !is_array($user) )
+                $user = self::get_vk_user_info($user);
 
             $sql = 'INSERT INTO ' . TABLE_STAT_USERS .
                 '( user_id, name, ava, rank, comments )
@@ -69,12 +70,12 @@
                 return $user;
         }
 
-        public static function get_user($userId)
+        public static function get_user($user_id)
         {
             $sql = 'SELECT user_id,name,rank,ava,comments FROM ' . TABLE_STAT_USERS
                  . ' WHERE user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id', $userId);
+            $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
             $ds->Next();
 
@@ -102,5 +103,16 @@
 
         }
 
+        public static function get_access_token($user_id)
+        {
+            $sql = 'SELECT access_token FROM ' . TABLE_STAT_USERS . ' WHERE user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger('@user_id', $user_id);
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING);
+            return $acc_tok ? $acc_tok : false;
+        }
     }
 ?>
