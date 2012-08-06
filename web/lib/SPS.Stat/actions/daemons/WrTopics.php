@@ -3,14 +3,15 @@
     Package::Load( 'SPS.Stat' );
 
     set_time_limit(600);
+    error_reporting( 0 );
     class WrTopics extends wrapper
     {
         private $ids;
 
         public function Execute()
         {
-//            if (! $this->check_time())
-//                die('Не сейчас');
+            if (! $this->check_time())
+                die('Не сейчас');
 
             $this->get_id_arr();
 
@@ -106,8 +107,8 @@
             while( $ds->Next() ) {
                 $quan_arr[] = $ds->getValue('quantity', TYPE_INTEGER);
             }
-            print_r($quan_arr);
-            if ($quan_arr[1]) {
+
+            if ( isset ( $quan_arr[1] ) ) {
                 $diff_rel_mon = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
                 $diff_abs_mon = $quantity - $quan_arr[1];
             } else {
@@ -115,7 +116,7 @@
                 $diff_abs_mon = 0;
             }
 
-            if ($quan_arr[0]) {
+            if ( isset ( $quan_arr[0] ) ) {
                 $diff_rel_week = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
                 $diff_abs_week = $quantity - $quan_arr[0];
             } else {
@@ -133,7 +134,7 @@
                 diff_abs_month  =   @diff_abs_month,
                 diff_rel_month  =   @diff_rel_month
             WHERE vk_id=@publ_id';
-            echo '<br>' . $sql;
+
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@publ_id',          $publ_id );
             $cmd->SetInteger( '@diff_abs_week',    $diff_abs_week );
@@ -145,8 +146,6 @@
 
         }
 
-
-
         //собирает количество поситителей в пабликах
         public function update_quantity()
         {
@@ -154,16 +153,16 @@
             $i = 0;
             $return = "return{";
             $code = '';
-            $time = StatPublics::get_last_update_time();
+            $timeTo = StatPublics::get_last_update_time();
             foreach($this->ids as $b) {
 
-                if ($i == 25 or !next($this->ids)) {
-                    if (!next($this->ids)) {
+                if ( $i == 25 or !next( $this->ids ) ) {
+                    if ( !next( $this->ids ) ) {
                         $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                         $return .= "\" a$b\":a$b,";
                     }
 
-                    $code .= trim($return, ',') . "};";
+                    $code .= trim( $return, ',' ) . "};";
 
                     if (self::TESTING)
                         echo '<br>' . $code;
@@ -171,7 +170,7 @@
 
                     foreach($res as $key => $entry) {
 
-                        $key = str_replace('a', '', $key);
+                        $key = str_replace( 'a', '', $key );
                         $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
                         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                         $cmd->SetInteger( '@id',        $key );
@@ -179,7 +178,7 @@
                         $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
 
-                        $this->set_public_grow( $key, $entry->count, $time );
+                        $this->set_public_grow( $key, $entry->count, $timeTo );
 
 
                     }

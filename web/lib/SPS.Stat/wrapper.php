@@ -7,10 +7,6 @@ class wrapper
     const VK_API_URL = 'https://api.vk.com/method/';
     const TESTING = false;
 
-    const T_PUBLICS_POINTS = 'gr50k';
-    const T_PUBLICS_LIST   = 'publs50k';
-    const T_PUBLICS_RELS   = 'publ_rels_names';
-
     public $db;
     public $id; // id паблика
     public $q_result;
