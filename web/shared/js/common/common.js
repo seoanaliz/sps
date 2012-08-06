@@ -1,3 +1,18 @@
+var KEY = window.KEY = {
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    DEL: 8,
+    TAB: 9,
+    RETURN: 13,
+    ENTER: 13,
+    ESC: 27,
+    PAGEUP: 33,
+    PAGEDOWN: 34,
+    SPACE: 32
+};
+
 // Парсинг URL
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
@@ -476,18 +491,17 @@ var Box = (function() {
         init: function(parameters) {
             return this.each(function() {
                 var defaults = {
-                    el: $(this), // на какой элемент навесить меню
+                    el: $(this), // На какой элемент навесить меню
                     type: 'normal', // normal, checkbox
-                    width: '',
-                    isShow: false,
+                    width: '', // Ширина меню
+                    isShow: false, // Показать при создании
                     addClass: '', // Добавить уникальный класс к меню
                     position: 'left', // Выравнивание: left, right
-                    iconPosition: 'left',
+                    iconPosition: 'left', // Сторона расположения иконки
                     openEvent: 'mousedown', // Собитие элемента, при котором открывается меню. click, mousedown
                     closeEvent: 'mousedown', // Собитие document при котором закрывается меню. click, mousedown
-                    menuDataKey: DATA_KEY, // Ключ записи jQuery.data привязки меню к элементу
-                    itemDataKey: 'item',
-                    emptyMenuText: '',
+                    itemDataKey: 'item', // Ключ привязки данных к пункту меню
+                    emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
                     // На все события можно подписаться по имени события. Пример: $dropdown.bind('change', callback)
                     oncreate: function() {},
@@ -501,39 +515,39 @@ var Box = (function() {
                 var $menu = $('<div/>').addClass(CLASS_MENU + ' ' + options.addClass).appendTo('body');
                 var isUpdate = false;
 
-                if ($el.data(options.menuDataKey)) {
-                    $el.data(options.menuDataKey).remove();
+                if ($el.data(DATA_KEY)) {
+                    $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
                     $(window).resize(function() {
-                        var $menu = $el.data(options.menuDataKey);
+                        var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             refreshPosition($menu);
                         }
                     });
                     $(document).bind(options.closeEvent, function(e) {
-                        var $menu = $el.data(options.menuDataKey);
+                        var $menu = $el.dropdown('getMenu');
                         close($menu);
                         run(options.onclose, $el, $menu);
                     });
                     $(document).bind('keydown', function(e) {
-                        var $menu = $el.data(options.menuDataKey);
+                        var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
 
                             switch(e.keyCode) {
-                                case 38: //up
-                                case 40: //down
+                                case KEY.UP:
+                                case KEY.DOWN:
                                     var $hoverItem;
-                                    if (e.keyCode == 38) {
+                                    if (e.keyCode == KEY.UP) {
                                         $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
-                                    } else if (e.keyCode == 40) {
+                                    } else if (e.keyCode == KEY.DOWN) {
                                         $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
                                     }
                                     if (!$hoveringItem.length || !$hoverItem.length) {
-                                        if (e.keyCode == 38) {
+                                        if (e.keyCode == KEY.UP) {
                                             $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
-                                        } else if (e.keyCode == 40) {
+                                        } else if (e.keyCode == KEY.DOWN) {
                                             $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
                                         }
                                     }
@@ -551,18 +565,18 @@ var Box = (function() {
                                         return false;
                                     }
                                 break;
-                                case 9: //tab
+                                case KEY.TAB:
                                     close($menu);
                                     return true;
                                 break;
-                                case 13: //enter
+                                case KEY.ENTER:
                                     if ($hoveringItem.length) {
                                         select($hoveringItem);
                                     }
                                     close($menu);
                                     return false;
                                 break;
-                                case 27: //esc
+                                case KEY.ESC:
                                     close($menu);
                                     return false;
                                 break;
@@ -572,7 +586,7 @@ var Box = (function() {
                     $el.bind(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
-                        var $menu = $el.data(options.menuDataKey);
+                        var $menu = $el.dropdown('getMenu');
                         if (!$menu.is(':visible')) {
                             $(document).trigger(options.closeEvent);
                             open($menu);
@@ -581,7 +595,6 @@ var Box = (function() {
                         }
                     });
                 }
-                $el.data(options.menuDataKey, $menu);
 
                 if (!$.isArray(options.data)) options.data = [];
                 if (options.data.length || !options.emptyMenuText) {
@@ -689,6 +702,16 @@ var Box = (function() {
                     $el.trigger(TRIGGER_CHANGE);
                 }
 
+                if (options.isShow && $el.is(':visible')) {
+                    open($menu, true);
+                } else {
+                    close($menu, true);
+                }
+
+                $el.data(DATA_KEY, {
+                    $menu: $menu
+                });
+
                 if (isUpdate) {
                     run(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
@@ -696,17 +719,13 @@ var Box = (function() {
                     run(options.oncreate, $el);
                     $el.trigger(TRIGGER_CREATE);
                 }
-
-                if (options.isShow && $el.is(':visible')) {
-                    open($menu, true);
-                } else {
-                    close($menu, true);
-                }
             });
         },
-
         getMenu: function() {
-            return this.data(DATA_KEY);
+            return this.data(DATA_KEY).$menu;
+        },
+        open: function() {
+
         }
     };
 
@@ -748,16 +767,16 @@ var Box = (function() {
                 if (!$el.data(DATA_KEY)) {
                     $el.bind('keyup', function(e) {
                         switch(e.keyCode) {
-                            case 38: //up
-                            case 40: //down
+                            case KEY.UP:
+                            case KEY.DOWN:
                                 if ($el.dropdown('getMenu').is(':visible')) {
                                     return true;
                                 }
                             break;
-                            case 9: //tab
-                            case 16: //shift
-                            case 27: //esc
-                            case 13: //enter
+                            case KEY.ESC:
+                            case KEY.TAB:
+                            case KEY.SHIFT:
+                            case KEY.ENTER:
                                 return true;
                             break;
                         }

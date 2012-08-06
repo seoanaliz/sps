@@ -153,7 +153,7 @@ var List = (function() {
                                             }
                                         })
                                         .keydown(function(e) {
-                                            if (e.keyCode == 8 && !$users.val()) {
+                                            if (e.keyCode == KEY.DEL && !$users.val()) {
                                                 $users.tags('removeLastTag');
                                             }
                                         })
@@ -177,7 +177,7 @@ var List = (function() {
                                             }
                                         })
                                         .keydown(function(e) {
-                                            if (e.keyCode == 8 && !$users.val()) {
+                                            if (e.keyCode == KEY.DEL && !$users.val()) {
                                                 $lists.tags('removeLastTag');
                                             }
                                         })
@@ -798,9 +798,9 @@ var Table = (function() {
                     });
                     $dropdown.delegate('input', 'keyup blur', function(e) {
                         var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != 13) return false;
+                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
                         if (!text) return false;
-                        if (e.keyCode == 13) return $input.blur();
+                        if (e.keyCode == KEY.ENTER) return $input.blur();
                         return onSave(text);
                     });
                     $dropdown.bind('mousedown', function(e) {
