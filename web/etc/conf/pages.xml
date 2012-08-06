@@ -138,6 +138,9 @@
                 <page uri="controls://getOnline/">
                     <actions>SPS.Stat.getOnline</actions>
                 </page>
+                <page uri="controls://setStatus/">
+                    <actions>SPS.Stat.setStatus</actions>
+                </page>
 
             </pageGroup>
 

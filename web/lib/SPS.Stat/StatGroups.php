@@ -5,7 +5,6 @@
 
     class StatGroups
     {
-
         public static function is_general( $groupId )
         {
             $group = self::get_group( $groupId );
@@ -181,6 +180,33 @@
 
             return true;
 
+        }
+
+        public static function delete_group( $group_id )
+        {
+            $sql = 'DELETE FROM
+                            ' . TABLE_STAT_GROUP_USER_REL . '
+                         WHERE
+                                group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger('@group_id', $group_id);
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
+        }
+
+        public static function unsign_user_from_group( $group_id, $user_id )
+        {
+            $query = 'DELETE FROM '
+                . TABLE_STAT_GROUP_USER_REL . '
+                                WHERE
+                                      group_id=@group_id AND user_id=@user_id';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id);
+            $cmd->SetInteger('@group_id', $group_id);
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
         }
 
     }

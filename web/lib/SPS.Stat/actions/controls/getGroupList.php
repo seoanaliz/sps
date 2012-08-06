@@ -23,7 +23,7 @@
                 die();
             }
 
-            $res = StatGroups::get_groups($userId);
+            $res = StatGroups::get_groups( $userId );
 
             echo ObjectHelper::ToJSON(array('response' => $res));
         }
