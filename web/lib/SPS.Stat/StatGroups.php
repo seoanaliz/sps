@@ -24,7 +24,7 @@
             $ds->Next();
 
             return array (
-                'groupId'    =>  $ds->getValue('group_id', TYPE_INTEGER),
+                'groupId'   =>  $ds->getValue('group_id', TYPE_INTEGER),
                 'general'   =>  $ds->getValue('general', TYPE_INTEGER),
                 'name'      =>  $ds->getValue('name', TYPE_STRING),
                 'comments'  =>  $ds->getValue('comments', TYPE_STRING)

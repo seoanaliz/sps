@@ -105,7 +105,7 @@
 
             $params = array (
 
-                    'access_token'  =>  StatUsers::get_access_token($user_id),
+                    'access_token'  =>  StatUsers::get_access_token( $user_id ),
                     'mid'           =>  $mess_ids,
             );
 

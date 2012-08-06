@@ -8,10 +8,10 @@ class markMes
     public function execute()
     {
         error_reporting( 0 );
+
         $user_id        =   Request::getInteger( 'userId' );
         $mess_id        =   Request::getInteger( 'mids' );
         $unread         =   Request::getInteger( 'unread' );
-
 
         $unread    =   $unread ? 1 : 0;
 
