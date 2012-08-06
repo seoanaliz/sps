@@ -3,6 +3,7 @@
     Package::Load( 'SPS.Stat' );
 
     set_time_limit(600);
+    error_reporting( 0 );
     class WrTopics extends wrapper
     {
         private $ids;

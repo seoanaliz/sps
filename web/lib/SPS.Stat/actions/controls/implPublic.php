@@ -17,18 +17,18 @@
             error_reporting( 0 );
             $userId   = Request::getInteger ( 'userId' );
             $groupId  = Request::getInteger ( 'groupId' );
-            $publicId   = Request::getInteger ( 'publId' );
+            $publicId = Request::getInteger ( 'publId' );
             $general  = Request::getInteger ( 'general' );
 
             $general = $general ? $general : 0;
 
-            if (!$groupId || !$publicId || !$userId) {
+            if ( !$groupId || !$publicId || !$userId ) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            if (!$general || ( $general && StatUsers::is_Sadmin($userId))) {
-                StatGroups::implement_public($groupId, $publicId);
+            if ( !$general || ( $general && StatUsers::is_Sadmin( $userId ) ) ) {
+                StatGroups::implement_public( $groupId, $publicId );
                 echo  ObjectHelper::ToJSON(array('response' => true));
                 die();
             }

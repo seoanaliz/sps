@@ -6,33 +6,33 @@
     class StatGroups
     {
 
-        public static function is_general($groupId)
+        public static function is_general( $groupId )
         {
-            $group = self::get_group($groupId);
-            if ($group['general'] == 1 )
+            $group = self::get_group( $groupId );
+            if ( $group['general'] == 1 )
                 return true;
             return false;
         }
 
-        private static function get_group($groupId)
+        private static function get_group( $groupId )
         {
             $sql = 'SELECT group_id, name, general, name, comments, group_admin FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger('@group_id', $groupId);
             $ds = $cmd->Execute();
             $ds->Next();
 
             return array (
-                'groupId'   =>  $ds->getValue('group_id', TYPE_INTEGER),
-                'general'   =>  $ds->getValue('general', TYPE_INTEGER),
-                'name'      =>  $ds->getValue('name', TYPE_STRING),
-                'comments'  =>  $ds->getValue('comments', TYPE_STRING)
+                'groupId'   =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
+                'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
+                'name'      =>  $ds->getValue( 'name',     TYPE_STRING  ),
+                'comments'  =>  $ds->getValue( 'comments', TYPE_STRING  ),
             );
 
         }
 
-        public static function get_groups($userId)
+        public static function get_groups( $userId )
         {
             $sql = 'SELECT c.group_id, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
@@ -45,25 +45,25 @@
                         AND a.user_id = @user_id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id', $userId);
+            $cmd->SetInteger( '@user_id', $userId );
             $ds = $cmd->Execute();
             $res = array();
 
             while($ds->Next()) {
                 $res[] = array(
-                    'group_id'  =>  $ds->getValue('group_id', TYPE_INTEGER),
-                    'general'   =>  $ds->getValue('general',  TYPE_INTEGER),
-                    'name'      =>  $ds->getValue('name'),
-                    'comments'  =>  $ds->getValue('comments'),
-                    'fave'      =>  $ds->GetBoolean('fave'),
+                    'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
+                    'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
+                    'name'      =>  $ds->getValue( 'name' ),
+                    'comments'  =>  $ds->getValue( 'comments' ),
+                    'fave'      =>  $ds->GetBoolean( 'fave' ),
                 );
             }
 
-            ksort($res);
+            ksort( $res );
             return $res;
         }
 
-        public static function implement_group($groupId, $userIds)
+        public static function implement_group( $groupId, $userIds )
         {
             if ( !is_array( $userIds ) )
                 $userIds = array ( $userIds );
@@ -83,7 +83,7 @@
 
         }
 
-        public static function implement_public($groupId, $publicId)
+        public static function implement_public( $groupId, $publicId )
         {
             $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(public_id,group_id)
                        VALUES (@public_id,@group_id)';
@@ -93,7 +93,7 @@
             $cmd->Execute();
         }
 
-        public static function setGroup($ava, $groupName, $comments, $groupId = false)
+        public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
             //update
             if ($groupId) {
@@ -135,7 +135,7 @@
             }
         }
 
-        public static function select_main_admin($groupId, $public_id, $adminId)
+        public static function select_main_admin( $groupId, $public_id, $adminId )
         {
             $sql = 'UPDATE
                         ' . TABLE_STAT_GROUP_PUBLIC_REL . '
@@ -151,7 +151,8 @@
             $cmd->Execute();
         }
 
-        public static function check_group_name_free($user_id, $group_name) {
+        public static function check_group_name_free( $user_id, $group_name )
+        {
             $sql = 'SELECT a.group_id
                     FROM
                     ' . TABLE_STAT_GROUP_USER_REL . ' as a

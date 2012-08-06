@@ -7,7 +7,7 @@ class markMes
     //строка номеров сообщений через запятую
     public function execute()
     {
-        error_reporting( 0 );
+//        error_reporting( 0 );
 
         $user_id        =   Request::getInteger( 'userId' );
         $mess_id        =   Request::getInteger( 'mids' );
@@ -19,7 +19,7 @@ class markMes
             die(ERR_MISSING_PARAMS);
         }
 
-        if ( MesDialogs::toggle_read_unread( $user_id, '41934,41935', $unread ) )
+        if ( MesDialogs::toggle_read_unread( $user_id, $mess_id, $unread ) )
             die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
         else
             die( ObjectHelper::ToJSON( array( 'response' => false ) ) );

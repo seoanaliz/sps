@@ -35,7 +35,8 @@
             return( $dialogs_array );
         }
 
-        public static function AddDialog( $user_id, $rec_id, $status_id ) {
+        public static function addDialog( $user_id, $rec_id, $status_id )
+        {
             $sql = 'INSERT INTO '
                                 . TABLE_MES_DIALOGS . '( user_id, rec_id, status_id )
                             VALUES
@@ -52,7 +53,8 @@
             return $ds->GetValue( 'id', TYPE_INTEGER ) ;
         }
 
-        public static function get_opponent( $user_id, $dialog_id ) {
+        public static function get_opponent( $user_id, $dialog_id )
+        {
             $sql = 'SELECT rec_id FROM ' . TABLE_MES_DIALOGS
                 . ' WHERE id = @dialog_id AND user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
@@ -64,7 +66,8 @@
             return $ds->GetValue( 'rec_id', TYPE_INTEGER ) ;
         }
 
-        public static function writeMessage( $user_id, $rec_id, $text ) {
+        public static function writeMessage( $user_id, $rec_id, $text )
+        {
             $params = array (
                 'access_token'  =>  StatUsers::get_access_token($user_id),
                 'uid'           =>  $rec_id,
@@ -78,7 +81,8 @@
             return true;
         }
 
-        public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit ) {
+        public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
+        {
 
             $params = array (
 
@@ -98,7 +102,7 @@
 
         public static function toggle_read_unread( $user_id, $mess_ids, $unread )
         {
-            $method = $unread ? 'markAsRead' : 'markAsNew';
+            $method = $unread ? 'markAsNew' : 'markAsRead';
 
             if ( is_array( $mess_ids ) )
                 $mess_ids = implode( ',', $mess_ids );
@@ -106,11 +110,10 @@
             $params = array (
 
                     'access_token'  =>  StatUsers::get_access_token( $user_id ),
-                    'mid'           =>  $mess_ids,
+                    'mids'           =>  $mess_ids,
             );
 
             $res = VkHelper::api_request('messages.' . $method, $params, 0);
-
             if ( isset( $res->error ) )
                 return false;
             return true;
@@ -130,6 +133,25 @@
             return (array) $res;
         }
 
+        public static function set_status( $dialog_id, $status_id )
+        {
+
+        }
+
+        public static function get_status_list()
+        {
+            $sql = 'SELECT * FROM ' . TABLE_MES_DIALOG_STATUSES;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $ds = $cmd->Execute();
+            $res = array();
+            while ( $ds->Next() ) {
+                $res[] = array(
+                            'status'    =>  $ds->GetValue( 'status_name' ),
+                            'status_id' =>  $ds->GetValue( 'status_id', TYPE_INTEGER)
+                );
+            return $res;
+            }
+        }
 
     }
 ?>
