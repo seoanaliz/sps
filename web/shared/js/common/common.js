@@ -491,7 +491,7 @@ var Box = (function() {
         init: function(parameters) {
             return this.each(function() {
                 var defaults = {
-                    el: $(this), // На какой элемент навесить меню
+                    target: $(this), // На какой элемент навесить меню
                     type: 'normal', // normal, checkbox
                     width: '', // Ширина меню
                     isShow: false, // Показать при создании
@@ -513,6 +513,7 @@ var Box = (function() {
                 var options = $.extend(defaults, parameters);
                 var $el = $(this);
                 var $menu = $('<div/>').addClass(CLASS_MENU + ' ' + options.addClass).appendTo('body');
+                var $target = options.target;
                 var isUpdate = false;
 
                 if ($el.data(DATA_KEY)) {
@@ -522,12 +523,12 @@ var Box = (function() {
                     $(window).resize(function() {
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
-                            refreshPosition($menu);
+                            $el.dropdown('refreshPosition');
                         }
                     });
                     $(document).bind(options.closeEvent, function(e) {
                         var $menu = $el.dropdown('getMenu');
-                        close($menu);
+                        $el.dropdown('close');
                         run(options.onclose, $el, $menu);
                     });
                     $(document).bind('keydown', function(e) {
@@ -566,18 +567,18 @@ var Box = (function() {
                                     }
                                 break;
                                 case KEY.TAB:
-                                    close($menu);
+                                    $el.dropdown('close');
                                     return true;
                                 break;
                                 case KEY.ENTER:
                                     if ($hoveringItem.length) {
                                         select($hoveringItem);
                                     }
-                                    close($menu);
+                                    $el.dropdown('close');
                                     return false;
                                 break;
                                 case KEY.ESC:
-                                    close($menu);
+                                    $el.dropdown('close');
                                     return false;
                                 break;
                             }
@@ -589,9 +590,9 @@ var Box = (function() {
                         var $menu = $el.dropdown('getMenu');
                         if (!$menu.is(':visible')) {
                             $(document).trigger(options.closeEvent);
-                            open($menu);
+                            $el.dropdown('open');
                         } else if (e.button != undefined) {
-                            close($menu);
+                            $el.dropdown('close');
                         }
                     });
                 }
@@ -640,57 +641,12 @@ var Box = (function() {
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    close($menu);
+                    $el.dropdown('close');
                     select($(this));
                 });
                 $menu.bind(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
-
-                function refreshPosition($menu) {
-                    var isFixed = !!($menu.css('position') == 'fixed');
-                    var offset = options.el.offset();
-                    var offsetTop = offset.top;
-                    var offsetLeft = offset.left
-                        + parseFloat($menu.css('margin-left'))
-                        - parseFloat($menu.css('margin-right'));
-                    if (options.position == 'right') {
-                        offsetLeft += (options.el.width() - $menu.width())
-                    }
-                    if (isFixed) {
-                        offsetTop -= $(document).scrollTop();
-                        offsetLeft -= $(document).scrollLeft();
-                    }
-
-                    $menu.css({
-                        top: offsetTop + options.el.outerHeight(),
-                        left: offsetLeft
-                    });
-                }
-                function open($menu, notTrigger) {
-                    options.el.addClass(CLASS_ACTIVE);
-                    $menu.css({
-                        width: options.width || options.el.outerWidth() - 2
-                    });
-
-                    refreshPosition($menu);
-                    $menu.show();
-
-                    if (notTrigger) {
-                        run(options.onopen, $el, $menu);
-                        $el.trigger(TRIGGER_OPEN);
-                    }
-                }
-
-                function close($menu, notTrigger) {
-                    options.el.removeClass(CLASS_ACTIVE);
-                    $menu.hide();
-
-                    if (notTrigger) {
-                        run(options.onclose, $el, $menu);
-                        $el.trigger(TRIGGER_CLOSE);
-                    }
-                }
 
                 function select($item) {
                     var data = $item.data(options.itemDataKey);
@@ -702,15 +658,18 @@ var Box = (function() {
                     $el.trigger(TRIGGER_CHANGE);
                 }
 
-                if (options.isShow && $el.is(':visible')) {
-                    open($menu, true);
-                } else {
-                    close($menu, true);
-                }
-
                 $el.data(DATA_KEY, {
-                    $menu: $menu
+                    $el: $el,
+                    $menu: $menu,
+                    $target: $target,
+                    options: options
                 });
+
+                if (options.isShow && $el.is(':visible')) {
+                    $el.dropdown('open', true);
+                } else {
+                    $el.dropdown('close', true);
+                }
 
                 if (isUpdate) {
                     run(options.onupdate, $el);
@@ -724,8 +683,71 @@ var Box = (function() {
         getMenu: function() {
             return this.data(DATA_KEY).$menu;
         },
-        open: function() {
+        getTarget: function() {
+            return this.data(DATA_KEY).$target;
+        },
+        refreshPosition: function() {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $target = data.$target;
+                var isFixed = !!($menu.css('position') == 'fixed');
+                var offset = $target.offset();
+                var offsetTop = offset.top;
+                var offsetLeft = offset.left
+                    + parseFloat($menu.css('margin-left'))
+                    - parseFloat($menu.css('margin-right'));
+                if (options.position == 'right') {
+                    offsetLeft += ($target.width() - $menu.width())
+                }
+                if (isFixed) {
+                    offsetTop -= $(document).scrollTop();
+                    offsetLeft -= $(document).scrollLeft();
+                }
 
+                $menu.css({
+                    top: offsetTop + $target.outerHeight(),
+                    left: offsetLeft
+                });
+            });
+        },
+        open: function(notTrigger) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $target = data.$target;
+
+                $menu.css({
+                    width: options.width || $target.outerWidth() - 2
+                });
+
+                $el.dropdown('refreshPosition');
+                $menu.show();
+
+                if (notTrigger) {
+                    run(options.onopen, $el, $menu);
+                    $el.trigger(TRIGGER_OPEN);
+                }
+            });
+        },
+        close: function(notTrigger) {
+            var $el = $(this);
+            var data = $el.data(DATA_KEY);
+            var options = data.options;
+            var $menu = data.$menu;
+            var $target = data.$target;
+
+            $target.removeClass(CLASS_ACTIVE);
+            $menu.hide();
+
+            if (notTrigger) {
+                run(options.onclose, $el, $menu);
+                $el.trigger(TRIGGER_CLOSE);
+            }
         }
     };
 

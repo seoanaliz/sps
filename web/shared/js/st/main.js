@@ -146,15 +146,15 @@ var List = (function() {
                                             }
                                         })
                                         .autocomplete({
-                                            el: $users.closest('.ui-tags'),
                                             data: friends,
+                                            target: $users.closest('.ui-tags'),
                                             onchange: function(item) {
                                                 $(this).tags('addTag', item.id, item).val('').focus();
                                             }
                                         })
                                         .keydown(function(e) {
-                                            if (e.keyCode == KEY.DEL && !$users.val()) {
-                                                $users.tags('removeLastTag');
+                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                                $(this).tags('removeLastTag');
                                             }
                                         })
                                     ;
@@ -170,15 +170,15 @@ var List = (function() {
                                             }
                                         })
                                         .autocomplete({
-                                            el: $lists.closest('.ui-tags'),
                                             data: lists,
+                                            target: $lists.closest('.ui-tags'),
                                             onchange: function(item) {
                                                 $(this).tags('addTag', item.id, item).val('').focus();
                                             }
                                         })
                                         .keydown(function(e) {
-                                            if (e.keyCode == KEY.DEL && !$users.val()) {
-                                                $lists.tags('removeLastTag');
+                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                                $(this).tags('removeLastTag');
                                             }
                                         })
                                     ;
