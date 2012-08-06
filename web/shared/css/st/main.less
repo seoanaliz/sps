@@ -181,6 +181,9 @@ table, tr, td {
                 line-height: 37px;
                 padding: 6px 0;
 
+                &.not-editable {
+                    display: none;
+                }
                 &:hover {
                     background-color: #edf1f5;
                 }
@@ -230,6 +233,10 @@ table, tr, td {
                     &.delete-public {
                         display: none;
                     }
+                    &.restore-public {
+                        display: none;
+                    }
+
                     .icon.plus {
                         opacity: .3;
                     }
@@ -313,6 +320,21 @@ table, tr, td {
                     }
                     .description {
                         display: none;
+                    }
+                }
+            }
+
+            .public.not-editable {
+                display: block;
+
+                .public-actions {
+                    &>.action {
+                        &.delete-public {
+                            display: none;
+                        }
+                        &.restore-public {
+                            display: block;
+                        }
                     }
                 }
             }

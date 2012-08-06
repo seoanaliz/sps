@@ -609,7 +609,16 @@ var Table = (function() {
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
             Events.fire('remove_from_list', publicId, currentListId, function() {
-                $public.slideUp(200);
+                $public.addClass('not-editable');
+            });
+        });
+
+        $container.delegate('.action.restore-public', 'click', function(e) {
+            var $el = $(this);
+            var $public = $el.closest('.public');
+            var publicId = $public.data('id');
+            Events.fire('add_to_list', publicId, currentListId, function() {
+                $public.removeClass('not-editable');
             });
         });
 

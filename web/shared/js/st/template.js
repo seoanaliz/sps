@@ -101,6 +101,9 @@ var TABLE_ROW =
         '<span class="action delete-public">' +
             '<span class="icon delete"></span>' +
         '</span>' +
+        '<span class="action restore-public">' +
+            '<span class="icon plus"></span>' +
+        '</span>' +
     '</div>' +
 '</div>';
 
