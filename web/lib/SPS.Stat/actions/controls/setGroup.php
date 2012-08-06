@@ -14,7 +14,7 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
+//            error_reporting( 0 );
 
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
@@ -22,7 +22,8 @@
             $ava        =   Request::getString ( 'ava' );
             $comments   =   Request::getString ( 'comments' );
             $general    =   Request::getInteger( 'general' );
-            $type       =   Request::getString ( 'general' );
+            $type       =   Request::getString ( 'type' );
+
             $type_array = array( 'Stat', 'Mes');
             if ( !$type || !in_array( $type, $type_array, 1 ) )
                 $type = 'Stat';
@@ -32,9 +33,12 @@
 
             $ava        = $ava      ? $ava     : NULL;
             $comments   = $comments ? comments : NULL;
-            $m_class = $type . 'Groups';
+            $m_class    = $type . 'Groups';
 
-            if ( !$groupName || !$userId || !$m_class::check_group_name_free( $userId, $groupName ) ) {
+            if (       !$groupName
+                    || !$userId
+                    || !$m_class::check_group_name_free( $userId, $groupName )
+            ) {
                 echo ObjectHelper::ToJSON( array( 'response' => false ) );
                 die();
             }
@@ -46,7 +50,7 @@
 
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
-              elseif ( $general && !$groupId )
+             elseif ( $general && !$groupId )
                   $userId = StatUsers::get_users();
 
             $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
