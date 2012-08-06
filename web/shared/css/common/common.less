@@ -157,6 +157,34 @@ input {
     }
 }
 
+.ui-tags {
+    position: relative;
+
+    .tag {
+        background-color: @hover_bg;
+        display: inline-block;
+        padding: 2px 4px;
+        margin-top: 3px;
+        margin-left: 3px;
+        position: relative;
+        font-size: .9em;
+        vertical-align: top;
+
+        &>.text {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        &>.delete {
+            display: inline-block;
+            vertical-align: middle;
+            width: 1em;
+            height: 1em;
+            cursor: pointer;
+            background: url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;
+        }
+    }
+}
+
 .button {
     position: relative;
     display: inline-block;

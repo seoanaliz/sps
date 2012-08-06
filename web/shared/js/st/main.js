@@ -135,30 +135,50 @@ var List = (function() {
                                     var $users = $box.find('.users');
                                     var $lists = $box.find('.lists');
                                     $users
-                                        .autocomplete({
-                                            data: friends,
-                                            onclose: function() {
-                                                if (shareUsers.length) {
-                                                    $(this).val(shareUsers[0].title);
-                                                }
+                                        .tags({
+                                            onadd: function(tag) {
+                                                shareUsers.push(parseInt(tag.id));
                                             },
+                                            onremove: function(tagId) {
+                                                shareUsers = jQuery.grep(shareUsers, function(value) {
+                                                    return value != tagId;
+                                                });
+                                            }
+                                        })
+                                        .autocomplete({
+                                            el: $users.closest('.ui-tags'),
+                                            data: friends,
                                             onchange: function(item) {
-                                                shareUsers = [item];
-                                                $(this).val(item.title).focus();
+                                                $(this).tags('addTag', item.id, item).val('').focus();
+                                            }
+                                        })
+                                        .keydown(function(e) {
+                                            if (e.keyCode == 8 && !$users.val()) {
+                                                $users.tags('removeLastTag');
                                             }
                                         })
                                     ;
                                     $lists
-                                        .autocomplete({
-                                            data: lists,
-                                            onclose: function() {
-                                                if (shareLists.length) {
-                                                    $(this).val(shareLists[0].title);
-                                                }
+                                        .tags({
+                                            onadd: function(tag) {
+                                                shareLists.push(tag.id);
                                             },
+                                            onremove: function(tagId) {
+                                                shareLists = jQuery.grep(shareLists, function(value) {
+                                                    return value != tagId;
+                                                });
+                                            }
+                                        })
+                                        .autocomplete({
+                                            el: $lists.closest('.ui-tags'),
+                                            data: lists,
                                             onchange: function(item) {
-                                                shareLists = [item];
-                                                $(this).val(item.title).focus();
+                                                $(this).tags('addTag', item.id, item).val('').focus();
+                                            }
+                                        })
+                                        .keydown(function(e) {
+                                            if (e.keyCode == 8 && !$users.val()) {
+                                                $lists.tags('removeLastTag');
                                             }
                                         })
                                     ;
@@ -166,21 +186,22 @@ var List = (function() {
                                 }
                             });
                         });
+                    } else {
+                        $box.find('input[value=""]:first').focus();
                     }
                 }
             }).show();
 
             function share($button, $box) {
                 var box = this;
-                if (shareUsers.length && shareLists.length) {
-                    var user = shareUsers[0];
-                    var list = shareLists[0];
-                    Events.fire('share_list', list.id, user.id, function() {
+
+                if (!shareLists.length || !shareUsers.length) {
+                    Events.fire('share_list', shareLists.join(','), shareUsers.join(','), function() {
                         box.hide();
                         new Box({
                             id: 'shareSuccess',
                             title: 'Поделиться',
-                            html: '<b>' + user.title + '</b> успешно получил доступ к списку «' + list.title + '»!',
+                            html: 'Выбранные друзья успешно получили доступ к спискам',
                             buttons: [
                                 {label: 'Закрыть'}
                             ]
