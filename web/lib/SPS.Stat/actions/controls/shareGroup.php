@@ -18,18 +18,25 @@
             $userId         =   Request::getInteger( 'userId' );
             $groupId        =   Request::getInteger( 'groupId' );
             $recipientId    =   Request::getInteger( 'recId' );
+            $general        =   Request::getInteger( 'general' );
 
-            if (!$groupId || !$userId || !$recipientId) {
+            $general        =   $general ? $general : 0;
+
+            if ( !$groupId || !$userId || !$recipientId ) {
+                die( ERR_MISSING_PARAMS );
+            }
+
+            if ( $general && !StatUsers::is_Sadmin( $userId ) ) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            //todo проверка на наличие группы у юзера, хз, надо ли
 
-            StatGroups::implement_group($groupId, $userId);
+            if ( StatGroups::implement_group($groupId, $recipientId) )
+                die( ObjectHelper::ToJSON(  array( 'response' => true ) ) );
+            else
+                die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
 
-            echo ObjectHelper::ToJSON(array('response' => true));
-            die();
         }
 
 

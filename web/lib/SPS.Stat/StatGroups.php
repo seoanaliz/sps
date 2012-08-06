@@ -65,16 +65,19 @@
 
         public static function implement_group($groupId, $userIds)
         {
-            if ( !is_array($userIds))
+            if ( !is_array( $userIds ) )
                 $userIds = array ( $userIds );
 
-            foreach ($userIds as $id) {
+            foreach ( $userIds as $id ) {
                 $query = 'INSERT INTO ' . TABLE_STAT_GROUP_USER_REL . '(user_id,group_id)
                       VALUES (@user_id,@group_id)';
                 $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@group_id', $groupId);
                 $cmd->SetInteger('@user_id', $id);
-                $cmd->Execute();
+                if ( $cmd->ExecuteNonQuery() )
+                    return true;
+                else
+                    return false;
 
             }
 
