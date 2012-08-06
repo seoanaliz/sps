@@ -9,8 +9,8 @@
 
         public function Execute()
         {
-//            if (! $this->check_time())
-//                die('Не сейчас');
+            if (! $this->check_time())
+                die('Не сейчас');
 
             $this->get_id_arr();
 
@@ -106,8 +106,8 @@
             while( $ds->Next() ) {
                 $quan_arr[] = $ds->getValue('quantity', TYPE_INTEGER);
             }
-            print_r($quan_arr);
-            if ($quan_arr[1]) {
+
+            if ( isset ( $quan_arr[1] ) ) {
                 $diff_rel_mon = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
                 $diff_abs_mon = $quantity - $quan_arr[1];
             } else {
@@ -115,7 +115,7 @@
                 $diff_abs_mon = 0;
             }
 
-            if ($quan_arr[0]) {
+            if ( isset ( $quan_arr[0] ) ) {
                 $diff_rel_week = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
                 $diff_abs_week = $quantity - $quan_arr[0];
             } else {
@@ -144,8 +144,6 @@
             $cmd->Execute();
 
         }
-
-
 
         //собирает количество поситителей в пабликах
         public function update_quantity()

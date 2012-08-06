@@ -1,22 +1,36 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
+
+
+###constants
+
+define('ADMIN_RANK', 2);
+
+define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, 'err_mes'    =>  'parameters missing ' ) ));
+
+###tables
+
+    define( 'TABLE_STAT_USERS',       'stat_users');   #таблица юзеров
+
 //статистика по крупным пабликам
-    define( 'TABLE_STAT_PUBLICS_POINTS', 'stat_publics_50k_points');
+    define( 'TABLE_STAT_PUBLICS_POINTS', 'stat_publics_50k_points'); #посуточные чек-ауты
+    define( 'TABLE_STAT_PUBLICS',     'stat_publics_50k');          #таблица пабликов
+    define( 'TABLE_STAT_GROUPS',      'stat_groups');               #группы(листы) пабликов
+    define( 'TABLE_STAT_ADMINS',      'stat_admins');               #админы этих пабликов
 
-    define( 'TABLE_STAT_PUBLICS',     'stat_publics_50k');
-    define( 'TABLE_STAT_USERS',       'stat_users');
-    define( 'TABLE_STAT_GROUPS',      'stat_groups');
-    define( 'TABLE_STAT_ADMINS',      'stat_admins');
-
-    define( 'TABLE_STAT_GROUP_PUBLIC_REL', 'stat_group_public_relation');
-    define( 'TABLE_STAT_GROUP_USER_REL',   'stat_group_user_relation');
+    define( 'TABLE_STAT_GROUP_PUBLIC_REL', 'stat_group_public_relation');  #принадлежность пабликов группам
+    define( 'TABLE_STAT_GROUP_USER_REL',   'stat_group_user_relation');    #принадлежность групп юзерам
 
 //статистика по нашим админам
-    define('TABLE_OADMINS_POSTS', 'oadmins_posts');
-    define('TABLE_OADMINS', 'oadmins');
+    define( 'TABLE_OADMINS_POSTS', 'oadmins_posts' );  #посты на
+    define( 'TABLE_OADMINS', 'oadmins' );              #на
 
-
-    define('ADMIN_RANK', 2);
+//messeger
+    define ( 'TABLE_MES_DIALOGS', 'mes_dialogs' ); #список диалогов, статус для каждого
+    define ( 'TABLE_MES_DIALOG_STATUSES', 'mes_dialog_statuses' );  #таблица статусов диалогов
+    define ( 'TABLE_MES_GROUPS', 'mes_dialogs_groups' );  #группы диалогов
+    define ( 'TABLE_MES_GROUP_USER_REL', 'mes_group_user_relation' );  #принадлежность группы диалогов юзерам
+    define ( 'TABLE_MES_GROUP_DIALOG_REL', 'mes_group_dialog_relation' );  #принадлежность даилога группам
 
 ?>

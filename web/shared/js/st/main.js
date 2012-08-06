@@ -51,57 +51,355 @@ function initVK(data) {
         var r = data.response;
         cur.dataUser = r.me;
 
-        List.init(function() {
-            Table.init();
+        Events.fire('get_user', cur.dataUser.uid, function() {
+            Filter.init(function() {
+                List.init(function() {
+                    Table.init();
+                });
+            });
         });
     }
 }
 
 var List = (function() {
     var $container;
+    var $actions;
 
     function init(callback) {
         $container = $('.header');
-        _initEvents();
-        refresh(callback);
-    }
-    function refresh(callback) {
-        Events.fire('load_list', function(data) {
-            $container.html(tmpl(LIST, {items: data}));
+
+        refresh(function() {
+            _initEvents();
             if ($.isFunction(callback)) callback();
         });
     }
-
     function _initEvents() {
         $container.delegate('.tab', 'click', function() {
             var $item = $(this);
-
-            $container.find('.tab').removeClass('selected');
-            $item.addClass('selected');
-
-            Table.changeList($item.data('id'));
+            select($item.data('id'));
         });
+        $container.delegate('.actions .share', 'click', function() {
+            var listId = $('.filter > .list > .item.selected').data('id');
+            var isFirstShow = true;
+            var box = new Box({
+                id: 'share' + listId,
+                title: 'Поделиться',
+                html: tmpl(BOX_LOADING),
+                buttons: [
+                    {label: 'Отправить', onclick: share},
+                    {label: 'Отменить', isWhite: true}
+                ],
+                onshow: function($box) {
+                    var box = this;
+                    if (isFirstShow) {
+                        isFirstShow = false;
+                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(data) {
+                            if (data.error) {
+                                box
+                                    .setTitle('Ошибка')
+                                    .setHTML('Вы не предоставили доступ к друзьям.')
+                                    .setButtons([
+                                        {label: 'Перелогиниться', onclick: function() {
+                                            VK.Auth.logout(function() {
+                                                location.replace('login/');
+                                            });
+                                        }},
+                                        {label: 'Отмена', isWhite: true}
+                                    ])
+                                ;
+                            } else {
+                                var res = data.response;
+                                var friends = [];
+                                var lists = [];
+                                for (var i in res) {
+                                    var user = res[i];
+                                    friends.push({
+                                        id: user.uid,
+                                        name: user.first_name + ' ' + user.last_name
+                                    });
+                                }
+                                box.setHTML(tmpl(BOX_SHARE));
+                                var $users = $box.find('.users');
+                                var $lists = $box.find('.lists');
+                                var $comment = $box.find('.comment');
+
+                                $comment.autoResize();
+                                $users
+                                    .textext({
+                                        plugins : 'tags autocomplete filter',
+                                        ext: {
+                                            itemManager: {
+                                                stringToItem: function(str) { return {name: str}; },
+                                                itemToString: function(item) { return item.name; },
+                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                            }
+                                        }
+                                    })
+                                    .bind('getSuggestions', function(e, data) {
+                                        var list = friends,
+                                            textext = $(e.target).textext()[0],
+                                            query = (data ? data.query : '') || '';
+                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                                    })
+                                    .bind('setFormData', function(e, data) {
+                                        $(e.target).data('tags', data);
+                                    })
+                                ;
+                                $users.textext()[0].getFormData();
+                                $lists
+                                    .textext({
+                                        plugins : 'tags autocomplete filter',
+                                        tagsItems: [{name: 'asadfdsgdfhretq'}],
+                                        ext: {
+                                            itemManager: {
+                                                stringToItem: function(str) { return {name: str}; },
+                                                itemToString: function(item) { return item.name; },
+                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                            }
+                                        }
+                                    })
+                                    .bind('getSuggestions', function(e, data) {
+                                        var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
+                                            textext = $(e.target).textext()[0],
+                                            query = (data ? data.query : '') || '';
+                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
+                                    })
+                                    .bind('setFormData', function(e, data) {
+                                        $(e.target).data('tags', data);
+                                    })
+                                ;
+                                $lists.textext()[0].getFormData();
+                                $box.find('textarea[value=""]:first').focus();
+                            }
+                        });
+                    }
+                }
+            }).show();
+
+            function share($button, $box) {
+                console.log($box.find('.users').data('tags'));
+                console.log($box.find('.lists').data('tags'));
+            }
+        });
+        $container.delegate('.actions .edit', 'click', function() {
+            Table.toggleEditMode();
+        });
+        $container.delegate('.actions .delete', 'click', function() {
+            var listId = $('.filter > .list > .item.selected').data('id');
+            var box = new Box({
+                id: 'deleteList' + listId,
+                title: 'Удаление',
+                html: 'Вы уверены, что хотите удалить список?',
+                buttons: [
+                    {label: 'Удалить', onclick: deleteList},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function deleteList() {
+                this.hide();
+                Events.fire('remove_list', listId, function() {
+                    List.refresh(function() {
+                        Filter.listRefresh(function() {
+                            $('.filter > .list > .item[data-id="null"]').click();
+                        });
+                    });
+                });
+            }
+        });
+    }
+
+    function refresh(callback) {
+        var $selectedItem = $container.find('.tab.selected');
+        var id = $selectedItem.data('id');
+        Events.fire('load_bookmarks', function(data) {
+            $container.html(tmpl(LIST, {items: data}));
+            $actions = $('.actions', $container);
+            select(id, function() {
+                if ($.isFunction(callback)) callback();
+            });
+        });
+    }
+
+    function select(id, callback) {
+        if (!id) {
+            id = null;
+            $actions.hide();
+        }
+        else {
+            $actions.show();
+        }
+        var $item = $container.find('.tab[data-id=' + id + ']');
+        $container.find('.tab.selected').removeClass('selected');
+        $item.addClass('selected');
+
+        if ($.isFunction(callback)) callback();
+        else {
+            Filter.listSelect($item.data('id'));
+        }
     }
 
     return {
         init: init,
-        refresh: refresh
+        refresh: refresh,
+        select: select
     };
 })();
 
-var Table = (function(callback) {
+var Filter = (function() {
     var $container;
+    var $audience;
+    var $period;
+    var $list;
+
+    function init(callback) {
+        $container = $('td.filter');
+        $audience = $('> .audience', $container);
+        $period = $('> .period', $container);
+        $list = $('> .list', $container);
+
+        _initEvents();
+        listRefresh(callback);
+    }
+
+    function _initEvents() {
+        (function() {
+            var $slider = $audience.find('> .slider-wrap');
+            var $sliderRange = $audience.find('> .slider-range');
+            $slider.slider({
+                range: true,
+                min: 0,
+                max: 3200000,
+                animate: 100,
+                values: [0, 3000000],
+                create: function(event, ui) {
+                    renderRange();
+                },
+                slide: function(event, ui) {
+                    renderRange();
+                },
+                change: function(event, ui) {
+                    renderRange();
+                    changeRange(event);
+                }
+            });
+            function renderRange() {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                $sliderRange.html(audience[0] + ' - ' + audience[1]);
+            }
+            function changeRange(e) {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                if (e.originalEvent) {
+                    Table.setAudience(audience);
+                }
+            }
+        })();
+        $period.delegate('input', 'change', function() {
+            var $input = $(this);
+            var period;
+            switch($input.val()) {
+                case 'day':
+                    period = 1;
+                    break;
+                case 'week':
+                    period = 7;
+                    break;
+                case 'month':
+                    period = 30;
+                    break;
+                default:
+                    period = 1;
+            }
+            Table.setPeriod(period);
+        });
+        $list.delegate('.item', 'click', function() {
+            var $item = $(this);
+            listSelect($item.data('id'));
+        });
+        $list.delegate('.item > .bookmark', 'click', function(e) {
+            e.stopPropagation();
+            var $icon = $(this);
+            var $item = $icon.closest('.item');
+            var listId = $item.data('id');
+            if (!$icon.hasClass('selected')) {
+                Events.fire('add_to_bookmark', listId, function() {
+                    $icon.addClass('selected');
+                    List.refresh(function() {
+                        List.select($list.find('.item.selected').data('id'), false);
+                    });
+                });
+            } else {
+                $icon.removeClass('selected');
+                Events.fire('remove_from_bookmark', listId, function() {
+                    $icon.removeClass('selected');
+                    List.refresh(function() {
+                        List.select($list.find('.item.selected').data('id'), false);
+                    });
+                });
+            }
+        });
+    }
+    function listRefresh(callback) {
+        var $selectedItem = $list.find('.item.selected');
+        var id = $selectedItem.data('id');
+        Events.fire('load_list', function(data) {
+            $list.html(tmpl(FILTER_LIST, {items: data}));
+            if (id) {
+                listSelect(id, function() {
+                    if ($.isFunction(callback)) callback();
+                });
+            } else if ($.isFunction(callback)) callback();
+        });
+    }
+    function listSelect(id, callback) {
+        var $item = $list.find('.item[data-id=' + id + ']');
+        $list.find('.item.selected').removeClass('selected');
+        $item.addClass('selected');
+
+        if ($.isFunction(callback)) callback();
+        else {
+            List.select($item.data('id'), function() {
+                Table.changeList($item.data('id'));
+            });
+        }
+    }
+    function setSliderMax(max) {
+        var $slider = $audience.find('> .slider-wrap');
+        $slider.slider('option', 'max', parseInt(max) + 1);
+        $slider.slider("value", $slider.slider("value"));
+    }
+
+    return {
+        init: init,
+        listRefresh: listRefresh,
+        listSelect: listSelect,
+        setSliderMax: setSliderMax
+    };
+})();
+
+var Table = (function() {
+    var $container;
+    var idEditMode = false;
     var dataTable = {};
+    var pagesLoaded = 0;
     var currentListId = 0;
     var currentSearch = '';
     var currentSortBy = '';
-    var currentSortReverse = '';
-    var pagesLoaded = 0;
+    var currentSortReverse = false;
+    var currentPeriod = 1;
+    var currentAudience = [];
 
-    function init() {
+    function init(callback) {
         $container = $('#table');
         _initEvents();
         changeList();
+        if ($.isFunction(callback)) callback();
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -111,11 +409,14 @@ var Table = (function(callback) {
         $el.addClass('loading');
         Events.fire('load_table', {
                 listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                offset: pagesLoaded * Configs.tableLoadOffset,
                 search: currentSearch,
                 sortBy: currentSortBy,
                 sortReverse: currentSortReverse,
-                offset: pagesLoaded * Configs.tableLoadOffset,
-                limit: Configs.tableLoadOffset
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded += 1;
@@ -126,7 +427,6 @@ var Table = (function(callback) {
                 } else {
                     $el.removeClass('loading');
                 }
-                if ($.isFunction(callback)) callback();
             }
         );
     }
@@ -135,10 +435,13 @@ var Table = (function(callback) {
 
         Events.fire('load_table', {
                 listId: currentListId,
-                search: currentSearch,
                 limit: Configs.tableLoadOffset,
+                search: currentSearch,
                 sortBy: field,
-                sortReverse: reverse
+                sortReverse: reverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
@@ -155,10 +458,13 @@ var Table = (function(callback) {
 
         Events.fire('load_table', {
                 listId: currentListId,
-                search: text,
                 limit: Configs.tableLoadOffset,
+                search: text,
                 sortBy: currentSortBy,
-                sortReverse: currentSortReverse
+                sortReverse: currentSortReverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
@@ -174,17 +480,74 @@ var Table = (function(callback) {
             }
         );
     }
-    function changeList(listId) {
+    function setPeriod(period, callback) {
+        var $tableBody = $('.list-body');
+
         Events.fire('load_table', {
-                listId: listId,
-                limit: Configs.tableLoadOffset
+                listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                search: currentSearch,
+                sortBy: currentSortBy,
+                sortReverse: currentSortReverse,
+                period: period,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
             },
             function(data) {
                 pagesLoaded = 1;
                 dataTable = data;
+                currentPeriod = period;
+                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
+    function setAudience(audience, callback) {
+        var $tableBody = $('.list-body');
+
+        Events.fire('load_table', {
+                listId: currentListId,
+                limit: Configs.tableLoadOffset,
+                search: currentSearch,
+                sortBy: currentSortBy,
+                sortReverse: currentSortReverse,
+                period: currentPeriod,
+                audienceMin: audience[0],
+                audienceMax: audience[1]
+            },
+            function(data) {
+                pagesLoaded = 1;
+                dataTable = data;
+                currentAudience = audience;
+                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
+    function changeList(listId) {
+        var newSearch = '';
+        var newSortBy = 'growth';
+        var newSortReverse = false;
+
+        Events.fire('load_table', {
+                listId: listId,
+                limit: Configs.tableLoadOffset,
+                search: newSearch,
+                sortBy: newSortBy,
+                sortReverse: newSortReverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
+            },
+            function(data, period) {
+                pagesLoaded = 1;
+                dataTable = data;
                 currentListId = listId;
+                currentSearch = newSearch;
+                currentSortBy = newSortBy;
+                currentSortReverse = newSortReverse;
                 $container.html(tmpl(TABLE, {rows: data}));
-                $container.find('.growth').addClass('active');
+                $container.find('.' + currentSortBy).addClass('active');
                 $('#global-loader').fadeOut(200);
                 if (!currentListId) {
                     $container.removeClass('no-list-id');
@@ -196,12 +559,13 @@ var Table = (function(callback) {
                 } else {
                     $('#load-more-table').show();
                 }
+                Filter.setSliderMax(period[1]);
             }
         );
     }
 
     function _initEvents() {
-        $container.delegate('.contact .content', 'click', function(e) {
+        $container.delegate('.contact', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
@@ -248,22 +612,6 @@ var Table = (function(callback) {
             }
         });
 
-        $container.delegate('.contacts', 'click', function(e) {
-            //todo: sort by contacts
-            /*
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('contacts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('contacts', false);
-            }
-            */
-        });
-
         (function() {
             var timeout;
 
@@ -274,7 +622,6 @@ var Table = (function(callback) {
                     $filter.addClass('loading');
                     search($.trim($filter.val()), function() {
                         $filter.removeClass('loading');
-                        $filter.closest('.list-head').find('.item').removeClass('reverse active');
                     });
                 }, 500);
             });
@@ -415,7 +762,7 @@ var Table = (function(callback) {
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
                                 $dropdown.html($tmpDropdown.html());
                                 $input = $dropdown.find('input');
-                                List.refresh();
+                                Filter.listRefresh();
                             });
                         });
                     }
@@ -454,12 +801,29 @@ var Table = (function(callback) {
         }
     }
 
+    function toggleEditMode() {
+        editMode(!idEditMode);
+    }
+
+    function editMode(on) {
+        idEditMode = on;
+        var $list = $container.find('.list-body');
+        if (on) {
+            $list.addClass('edit-mode');
+        } else {
+            $list.removeClass('edit-mode');
+        }
+    }
+
     return {
         init: init,
         changeList: changeList,
         loadMore: loadMore,
         sort: sort,
-        search: search
+        search: search,
+        setPeriod: setPeriod,
+        setAudience: setAudience,
+        editMode: editMode,
+        toggleEditMode: toggleEditMode
     };
 })();
-

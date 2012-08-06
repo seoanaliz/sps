@@ -119,6 +119,29 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://getDialogsList/">
+                    <actions>SPS.Stat.getDialogsList</actions>
+                </page>
+                <page uri="controls://getDialog/">
+                    <actions>SPS.Stat.getDialog</actions>
+                </page>
+                <page uri="controls://addDialog/">
+                    <actions>SPS.Stat.addDialog</actions>
+                </page>
+                <page uri="controls://writeMes/">
+                    <actions>SPS.Stat.writeMes</actions>
+                </page>
+                <page uri="controls://markMes/">
+                    <actions>SPS.Stat.markMes</actions>
+                </page>
+                <page uri="controls://getOnline/">
+                    <actions>SPS.Stat.getOnline</actions>
+                </page>
+
+            </pageGroup>
+
+
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
                     <template>tmpl://vt/login.tmpl.php</template>

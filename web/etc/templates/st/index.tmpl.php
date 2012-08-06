@@ -4,10 +4,33 @@
     <div class="header">
         <div class="tab-bar"></div>
     </div>
-    <div class="content">
-        <div class="table" id="table"></div>
-        <div id="load-more-table">Показать больше</div>
-    </div>
+    <table>
+        <tbody>
+            <tr>
+                <td class="content">
+                    <div class="table" id="table"></div>
+                    <div id="load-more-table">Показать больше</div>
+                </td>
+                <td class="filter">
+                    <div class="title">Аудитория</div>
+                    <div class="audience">
+                        <div class="slider-range"></div>
+                        <div class="slider-wrap"></div>
+                    </div>
+                    <div class="title">Период</div>
+                    <div class="period">
+                        <label><input name="period" type="radio" value="day" checked="checked"><span>День</span></label>
+                        <label><input name="period" type="radio" value="week"><span>Неделя</span></label>
+                        <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
+                    </div>
+                    <div class="list">
+                        <div class="item selected">List1</div>
+                        <div class="item">List1</div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
     <div id="go-to-top">Наверх</div>
 </div>
 {increal:tmpl://st/elements/footer.tmpl.php}

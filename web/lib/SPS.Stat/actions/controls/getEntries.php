@@ -72,8 +72,8 @@ class getEntries {
                 WHERE
                       publ.vk_id=gprel.public_id
                       AND gprel.group_id=@group_id
-                      AND publ.quantity > @min_quantity
-                      AND publ.quantity < @max_quantity
+                      AND publ.quantity >= @min_quantity
+                      AND publ.quantity <= @max_quantity
                 ORDER BY '
                     . $sortBy . $sortReverse .
               ' OFFSET '

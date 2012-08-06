@@ -69,6 +69,26 @@
             </action>
 
         </group>
+        <group name="Messenger">
+            <action name="getDialogsList">
+                <path>controls/messager/getDialogsList</path>
+            </action>
+            <action name="getDialog">
+                <path>controls/messager/getDialog</path>
+            </action>
+            <action name="addDialog">
+                <path>controls/messager/addDialog</path>
+            </action>
+            <action name="writeMes">
+                <path>controls/messager/writeMes</path>
+            </action>
+            <action name="markMes">
+                <path>controls/messager/markMes</path>
+            </action>
+            <action name="getOnline">
+                <path>controls/messager/getOnline</path>
+            </action>
+        </group>
     </group>
 
 </actions>
