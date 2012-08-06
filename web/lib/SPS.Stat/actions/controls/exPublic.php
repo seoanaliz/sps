@@ -32,10 +32,7 @@
             //todo не уверен, нужна ли проверка на "главность"
             if (    !$general
                     ||
-                    ($general
-                        && StatUsers::is_Sadmin($userId)
-                        && StatGroups::is_general($groupId) )
-
+                    ( $general && StatUsers::is_Sadmin( $userId ) )
                     ) {
                 $query =  'DELETE FROM '
                                 . TABLE_STAT_GROUP_PUBLIC_REL . '

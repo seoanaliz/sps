@@ -25,6 +25,8 @@ class getEntries {
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );
 
+
+
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
 
@@ -35,7 +37,10 @@ class getEntries {
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
-        $sortBy         =   $sortBy ? $sortBy  : 'diff_abs';
+
+        $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel' );
+        $sortBy  = $sortBy && in_array($sortBy, $allowed_sort_values, 1)  ? $sortBy  : 'diff_abs';
+
         $sortReverse    =   $sortReverse? '' : ' DESC ';
         $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
