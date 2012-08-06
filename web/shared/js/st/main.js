@@ -195,7 +195,7 @@ var List = (function() {
             function share($button, $box) {
                 var box = this;
 
-                if (!shareLists.length || !shareUsers.length) {
+                if (shareLists.length && shareUsers.length) {
                     Events.fire('share_list', shareLists.join(','), shareUsers.join(','), function() {
                         box.hide();
                         new Box({
