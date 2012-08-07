@@ -80,6 +80,7 @@ var List = (function() {
         });
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
+            var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
             var shareUsers = [];
             var shareLists = [];
@@ -181,6 +182,7 @@ var List = (function() {
                                                 $(this).tags('removeLastTag');
                                             }
                                         })
+                                        .tags('addTag', listId, {id: listId, title: listTitle})
                                     ;
                                     $box.find('input[value=""]:first').focus();
                                 }
@@ -404,7 +406,7 @@ var Filter = (function() {
                 Events.fire('add_to_bookmark', listId, function() {
                     $icon.addClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), false);
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             } else {
@@ -412,7 +414,7 @@ var Filter = (function() {
                 Events.fire('remove_from_bookmark', listId, function() {
                     $icon.removeClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), false);
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             }

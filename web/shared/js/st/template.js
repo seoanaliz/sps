@@ -193,12 +193,12 @@ var BOX_LOADING =
 
 var BOX_SHARE =
 '<div class="box-share">' +
-    '<div class="title">Поделитесь с друзьями</div>' +
-    '<input type="text" value="http://socialboard.ru/stat" />' +
+//    '<div class="title">Поделитесь с друзьями</div>' +
+//    '<input type="text" value="http://socialboard.ru/stat" />' +
+    '<div class="title">Выберите списки</div>' +
+    '<input type="text" class="lists"></textarea>' +
     '<div class="title">Выберите друзей</div>' +
     '<input type="text" class="users"></textarea>' +
 //    '<div class="title">Ваш комментарий</div>' +
 //    '<textarea rows="2" cols="" class="comment"></textarea>' +
-    '<div class="title">Выберите списки</div>' +
-    '<input type="text" class="lists"></textarea>' +
 '</div>';
