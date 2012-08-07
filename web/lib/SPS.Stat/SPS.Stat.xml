@@ -88,6 +88,9 @@
             <action name="getOnline">
                 <path>controls/messager/getOnline</path>
             </action>
+            <action name="setStatus">
+                <path>controls/messager/setStatus</path>
+            </action>
         </group>
     </group>
 

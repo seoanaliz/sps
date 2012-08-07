@@ -17,46 +17,41 @@
         public function Execute() {
 
             error_reporting( 0 );
-            $userId   = Request::getInteger ( 'userId'  );
-            $groupId  = Request::getInteger ( 'groupId' );
+            $user_id  = Request::getInteger ( 'userId'  );
+            $group_id  = Request::getInteger ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
+            $type     =   Request::getString ( 'type' );
+
+            $type_array = array( 'Stat', 'Mes');
+            if ( !$type || !in_array( $type, $type_array, 1 ) )
+                $type = 'Stat';
+            $m_class    = $type . 'Groups';
 
             $general = $general ? $general : 0;
 
-            if ( !$groupId || !$userId ) {
+            if ( !$group_id || !$user_id ) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
+
             }
 
-            if ( $general AND statUsers::is_Sadmin( $userId ) ) {
-                $query = 'DELETE FROM
-                            ' . TABLE_STAT_GROUP_USER_REL . '
-                         WHERE
-                                group_id=@group_id';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get( 'tst' ) );
+            if ( $general AND statUsers::is_Sadmin( $user_id ) ) {
+                $res = $m_class::delete_group( $group_id );
+
             } elseif (!$general) {
-                $query = 'DELETE FROM '
-                                    . TABLE_STAT_GROUP_USER_REL . '
-                                WHERE
-                                      group_id=@group_id AND user_id=@user_id';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@user_id', $userId);
+                $res = $m_class::unsign_user_from_group( $group_id, $user_id );
+
             } else {
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
 
-            $cmd->SetInteger('@group_id', $groupId);
-            $cmd->Execute();
+            if ( $res ) {
+                echo  ObjectHelper::ToJSON(array('response' => true));
+                die();
+            }
 
-            //вообще спорно, зачем их удалять
-//            if ($affectAllUsers) {
-//                $query = 'DELETE FROM groups WHERE group_id=@group_id';
-//                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-//                $cmd->SetInteger('@group_id', $groupId);
-//                $cmd->Execute();
-//            }
-            echo  ObjectHelper::ToJSON(array('response' => true));
+            echo  ObjectHelper::ToJSON(array('response' => false));
         }
     }
 ?>

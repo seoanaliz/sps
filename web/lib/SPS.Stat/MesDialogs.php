@@ -35,8 +35,9 @@
             return( $dialogs_array );
         }
 
-        public static function addDialog( $user_id, $rec_id, $status_id )
+        public static function addDialog( $user_id, $rec_id, $status )
         {
+
             $sql = 'INSERT INTO '
                                 . TABLE_MES_DIALOGS . '( user_id, rec_id, status_id )
                             VALUES
@@ -46,7 +47,7 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetInteger( '@rec_id', $rec_id );
-            $cmd->SetInteger( '@status_id', $status_id );
+            $cmd->SetString ( '@status_id', $status );
             $ds = $cmd->Execute();
             $ds->Next();
 
@@ -133,25 +134,19 @@
             return (array) $res;
         }
 
-        public static function set_status( $dialog_id, $status_id )
+        public static function set_status( $dialog_id, $status )
         {
-
-        }
-
-        public static function get_status_list()
-        {
-            $sql = 'SELECT * FROM ' . TABLE_MES_DIALOG_STATUSES;
+            $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET status=@status WHERE id=@dialog_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
-            $ds = $cmd->Execute();
-            $res = array();
-            while ( $ds->Next() ) {
-                $res[] = array(
-                            'status'    =>  $ds->GetValue( 'status_name' ),
-                            'status_id' =>  $ds->GetValue( 'status_id', TYPE_INTEGER)
-                );
-            return $res;
-            }
+            $cmd->SetInteger( '@dialog_id', $dialog_id );
+            $cmd->SetString ( '@status', $status );
+            if ( $cmd->ExecuteNonQuery() )
+                return true;
+            return false;
+
+
         }
+
 
     }
 ?>

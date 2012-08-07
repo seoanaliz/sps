@@ -90,20 +90,24 @@
             $cmd->Execute();
         }
 
-        public static function setGroup( $groupName, $groupId = false )
+        public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
+
+
             //update
+//            print_r(array( $ava, $groupName, $comments, $groupId = 0 ));
             if ( $groupId ) {
                 $sql = 'UPDATE
                             ' . TABLE_MES_GROUPS .
                     ' SET
-                                "name"=@name, comments=@comments, ava=@ava
-                          WHERE group_id=@group_id';
+                        "name"=@name
+                      WHERE
+                        group_id=@group_id';
 
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@group_id',   $groupId);
                 $cmd->SetString('@name',        $groupName);
-                $cmd->Execute();
+                $cmd->ExecuteNonQuery();
 
             //create new
             } elseif( $groupName ) {
@@ -114,6 +118,7 @@
                             ( @name )
                         RETURNING
                             group_id';
+//                print_r($sql);
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetString('@name',        $groupName);
                 $ds = $cmd->Execute();
@@ -123,10 +128,11 @@
                     return false;
                 }
 
+
                 return $groupId;
             }
+            return false;
         }
-
 
         public static function check_group_name_free( $user_id, $group_name )
         {
@@ -143,12 +149,38 @@
             $cmd->SetString ('@group_name',   $group_name);
             $ds = $cmd->Execute();
             $ds->Next();
-
             if ($a = $ds->getValue( 'group_id' , TYPE_INTEGER ))
                 return false;
 
             return true;
 
+        }
+
+        public static function delete_group( $group_id )
+        {
+            $sql = 'DELETE FROM
+                            ' . TABLE_MES_GROUP_USER_REL . '
+                         WHERE
+                                group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger('@group_id', $group_id);
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
+        }
+
+        public static function unsign_user_from_group( $group_id, $user_id )
+        {
+            $query = 'DELETE FROM '
+                . TABLE_MES_GROUP_USER_REL . '
+                                WHERE
+                                      group_id=@group_id AND user_id=@user_id';
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id);
+            $cmd->SetInteger('@group_id', $group_id);
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
         }
 
     }

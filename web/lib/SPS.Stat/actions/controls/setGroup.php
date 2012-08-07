@@ -14,7 +14,7 @@
          * Entry Point
          */
         public function Execute() {
-//            error_reporting( 0 );
+            error_reporting( 0 );
 
             $userId     =   Request::getInteger( 'userId' );
             $groupId    =   Request::getInteger( 'groupId' );
@@ -37,9 +37,12 @@
 
             if (       !$groupName
                     || !$userId
-                    || !$m_class::check_group_name_free( $userId, $groupName )
+
             ) {
-                echo ObjectHelper::ToJSON( array( 'response' => false ) );
+                die(ERR_MISSING_PARAMS);
+            }
+            if ( !$m_class::check_group_name_free( $userId, $groupName ) )  {
+                echo ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist') );
                 die();
             }
 
@@ -54,6 +57,7 @@
                   $userId = StatUsers::get_users();
 
             $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
+
             if ( !$newGroupId ) {
                 echo ObjectHelper::ToJSON(array( 'response' => false ) );
                 die();
