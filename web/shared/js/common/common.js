@@ -13,6 +13,10 @@ var KEY = window.KEY = {
     SPACE: 32
 };
 
+function intval(str) {
+    return isNaN(parseInt(str)) ? 0 : parseInt(str);
+}
+
 // Парсинг URL
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
@@ -369,7 +373,7 @@ var Box = (function() {
             title: params.title,
             body: '',
             closeBtn: params.closeBtn
-        })).appendTo($layout);
+        })).appendTo($layout).hide();
 
         if (params.closeBtn) {
             $box.find('> .title').click(function() {

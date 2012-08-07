@@ -304,6 +304,37 @@ var Filter = (function() {
         (function() {
             var $slider = $audience.find('> .slider-wrap');
             var $sliderRange = $audience.find('> .slider-range');
+            var $valMin = $sliderRange.find('> .value-min');
+            var $valMax = $sliderRange.find('> .value-max');
+            var notRender = false;
+            $sliderRange.find('.value-min, .value-max').click(function() {
+                var $val = $(this);
+                $val.attr('contenteditable', true).focus();
+            });
+            $sliderRange.find('.value-min, .value-max').blur(function() {
+                var $val = $(this);
+                $val.removeAttr('contenteditable');
+            });
+            $sliderRange.find('.value-min, .value-max').bind('keyup keydown', function(e) {
+                switch(e.keyCode) {
+                    case KEY.ENTER:
+                    case KEY.ESC:
+                        $(this).blur();
+                        notRender = false;
+                        changeRange({originalEvent: true});
+                        return false;
+                }
+                var intText = intval($(this).html());
+                if ($(this).html() != intText) {
+                    $(this).text(intText);
+                }
+                notRender = true;
+                if ($(this).hasClass('value-min')) {
+                    $slider.slider('values', 0, intText);
+                } else {
+                    $slider.slider('values', 1, intText);
+                }
+            });
             $slider.slider({
                 range: true,
                 min: 0,
@@ -317,7 +348,10 @@ var Filter = (function() {
                     renderRange();
                 },
                 change: function(event, ui) {
-                    renderRange();
+                    if (!notRender) {
+                        renderRange();
+                    }
+                    notRender = false;
                     changeRange(event);
                 }
             });
@@ -326,7 +360,8 @@ var Filter = (function() {
                     $slider.slider('values', 0),
                     $slider.slider('values', 1)
                 ];
-                $sliderRange.html(audience[0] + ' - ' + audience[1]);
+                $valMin.html(audience[0]);
+                $valMax.html(audience[1]);
             }
             function changeRange(e) {
                 var audience = [
@@ -407,17 +442,23 @@ var Filter = (function() {
             });
         }
     }
+    function setSliderMin(min) {
+        var $slider = $audience.find('> .slider-wrap');
+        $slider.slider('option', 'min', parseInt(min) - 1);
+        $slider.slider('value', $slider.slider('value'));
+    }
+
     function setSliderMax(max) {
         var $slider = $audience.find('> .slider-wrap');
-        //todo: не обновляется
-        $slider.slider('option', 'max', parseInt(max) + 1 + 10000);
-        $slider.slider("value", $slider.slider("value"));
+        $slider.slider('option', 'max', parseInt(max) + 1);
+        $slider.slider('value', $slider.slider('value'));
     }
 
     return {
         init: init,
         listRefresh: listRefresh,
         listSelect: listSelect,
+        setSliderMin: setSliderMin,
         setSliderMax: setSliderMax
     };
 })();
@@ -598,6 +639,7 @@ var Table = (function() {
                 } else {
                     $('#load-more-table').show();
                 }
+                Filter.setSliderMin(period[0]);
                 Filter.setSliderMax(period[1]);
             }
         );

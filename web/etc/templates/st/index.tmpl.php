@@ -14,7 +14,10 @@
                 <td class="filter">
                     <div class="title">Аудитория</div>
                     <div class="audience">
-                        <div class="slider-range"></div>
+                        <div class="slider-range clear-fix">
+                            <div class="value-min"></div>
+                            <div class="value-max"></div>
+                        </div>
                         <div class="slider-wrap"></div>
                     </div>
                     <div class="title">Период</div>

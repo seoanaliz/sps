@@ -1,3 +1,7 @@
+@link_color: #2B587A;
+@light_blue: #99ADC2;
+@hover_bg: #E1E7ED;
+
 body {
     overflow-y: scroll;
 }
@@ -44,6 +48,30 @@ table, tr, td {
                 padding: 0 10px 10px;
                 text-align: center;
                 color: #999;
+
+                &>.value-max,
+                &>.value-min {
+                    cursor: pointer;
+                    text-align: center;
+                    padding: 2%;
+                    width: 45%;
+                    overflow: hidden;
+
+                    &:hover {
+                        background-color: @hover_bg;
+                    }
+                    &[contenteditable] {
+                        background: #fff;
+                        color: #000;
+                        outline: 1px solid #A2B3C6;
+                    }
+                }
+                &>.value-min {
+                    float: left;
+                }
+                &>.value-max {
+                    float: right;
+                }
             }
         }
         &>.period {
