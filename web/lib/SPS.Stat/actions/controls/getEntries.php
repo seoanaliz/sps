@@ -25,8 +25,6 @@ class getEntries {
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );
 
-
-
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
 
@@ -79,6 +77,7 @@ class getEntries {
                       AND gprel.group_id=@group_id
                       AND publ.quantity >= @min_quantity
                       AND publ.quantity <= @max_quantity
+                      ' . $search . '
                 ORDER BY '
                     . $sortBy . $sortReverse .
               ' OFFSET '
@@ -97,8 +96,8 @@ class getEntries {
                         vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ', quantity
                     FROM '
                         . TABLE_STAT_PUBLICS . ' as publ
-                    WHERE   quantity > @min_quantity
-
+                    WHERE
+                        quantity > @min_quantity
                         AND quantity < @max_quantity '.
                         $search . $show_in_mainlist .
                   ' ORDER BY '
