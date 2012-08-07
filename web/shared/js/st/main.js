@@ -291,7 +291,7 @@ var Filter = (function() {
     var $list;
 
     function init(callback) {
-        $container = $('td.filter');
+        $container = $('td > .filter');
         $audience = $('> .audience', $container);
         $period = $('> .period', $container);
         $list = $('> .list', $container);

@@ -269,7 +269,7 @@ var app = (function () {
                     }
                 });
                 function filterWall() {
-                    var $defItem = $(this).data('dropdown').find('div:first');
+                    var $defItem = $(this).dropdown('getMenu').find('div:first');
                     var itemData = $defItem.data('item');
                     $(this).text(itemData.title);
                     pageLoad(itemId, itemData.type);

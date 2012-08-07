@@ -30,9 +30,11 @@ table, tr, td {
         border-bottom: 1px solid #D8DFEA;
     }
 
-    td.filter {
+    .right-column {
         background-color: #f7f7f7;
         border-left: 1px solid #D8DFEA;
+    }
+    .right-column > .filter {
         width: 169px;
         padding-bottom: 10px;
 
@@ -48,6 +50,11 @@ table, tr, td {
                 padding: 0 10px 10px;
                 text-align: center;
                 color: #999;
+
+                &:after {
+                    text-align: center;
+                    line-height: 30px;
+                }
 
                 &>.value-max,
                 &>.value-min {
@@ -90,9 +97,13 @@ table, tr, td {
             border-top: 1px solid #D8DFEA;
 
             &>.item {
-                padding: 4px 4px 4px 9px;
+                padding: 4px 1.5em 4px 9px;
                 cursor: pointer;
                 color: #2B587A;
+                overflow: hidden;
+                position: relative;
+                white-space: nowrap;
+                text-overflow: ellipsis;
 
                 &:hover {
                     background-color: #E1E7ED;
@@ -104,10 +115,13 @@ table, tr, td {
                 }
 
                 .icon {
-                    float: right;
-                    background-image: url('../../images/st/star.png');
+                    position: absolute;
+                    margin-top: -.66em;
+                    top: 50%;
+                    right: 4px;
                     display: none;
                     padding: 1px;
+                    background-image: url('../../images/st/star.png');
 
                     &:hover,
                     &.selected {
@@ -129,7 +143,7 @@ table, tr, td {
         }
     }
 
-    td.content {
+    .left-column > .content {
         width: 700px;
 
         .list-head {
@@ -639,7 +653,7 @@ table, tr, td {
 .tab-bar {
     &>.actions {
         float: right;
-        padding: 12px 8px;
+        padding: 12px 8px 0;
         color: #999;
 
         &> a {

@@ -38,8 +38,8 @@ var tmpl = (function($) {
 })(jQuery);
 
 var LIST =
-'<div class="tab-bar">' +
-    '<div class="tab selected" data-id="null">Все записи</div>' +
+'<div class="tab-bar clear-fix">' +
+    '<div class="tab selected" data-id="null">Популярные</div>' +
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
         '<a href="javascript:;" class="share">Поделиться</a> |' +
@@ -155,12 +155,12 @@ var CONTACT_DROPDOWN_ITEM =
 '</div>';
 
 var FILTER_LIST =
-'<div class="item selected" data-id="null">Все записи</div>' +
+'<div class="item selected" data-id="null">Популярные</div>' +
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
 '<div class="item" data-id="<?=itemId?>">' +
-    '<?=itemTitle?>' +
+    '<span class="text"><?=itemTitle?></span>' +
     '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
 '</div>';
 
