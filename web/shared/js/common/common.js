@@ -315,17 +315,17 @@ var Box = (function() {
     var boxesCollection = {};
     var boxesHistory = [];
 
-    return function(options) {
-        if (typeof options != 'object') {
-            if (boxesCollection[options]) {
-                return boxesCollection[options];
+    return function(params) {
+        if (typeof params != 'object') {
+            if (boxesCollection[params]) {
+                return boxesCollection[params];
             } else {
                 return false;
             }
         }
 
         var box = {};
-        var params = $.extend({
+        var options = $.extend({
             id: false,
             title: '',
             html: '',
@@ -334,7 +334,7 @@ var Box = (function() {
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
-        }, options);
+        }, params);
 
         if (!$layout) {
             $body = $('body');
@@ -353,7 +353,7 @@ var Box = (function() {
                 })
             ;
             $(document).keydown(function(e) {
-                if (e.keyCode == 27) {
+                if (e.keyCode == KEY.ESC) {
                     $layout.click();
                 }
             });
@@ -361,28 +361,28 @@ var Box = (function() {
             $layout = $('body > .box-layout');
         }
 
-        if (params.id) {
-            if (boxesCollection[params.id]) {
-                return boxesCollection[params.id];
+        if (options.id) {
+            if (boxesCollection[options.id]) {
+                return boxesCollection[options.id];
             } else {
-                boxesCollection[params.id] = box;
+                boxesCollection[options.id] = box;
             }
         }
 
         var $box = $(tmpl(BOX_WRAP, {
-            title: params.title,
+            title: options.title,
             body: '',
-            closeBtn: params.closeBtn
+            closeBtn: options.closeBtn
         })).appendTo($layout).hide();
 
-        if (params.closeBtn) {
+        if (options.closeBtn) {
             $box.find('> .title').click(function() {
                 box.hide();
             });
         }
 
-        setHTML(params.html);
-        setButtons(params.buttons);
+        setHTML(options.html);
+        setButtons(options.buttons);
 
         box.$box = $box;
         box.show = show;
@@ -403,7 +403,7 @@ var Box = (function() {
             refreshTop();
 
             try {
-                params.onshow.call(box, $box);
+                options.onshow.call(box, $box);
             } catch(e) {
                 console.log(e);
             }
@@ -414,11 +414,7 @@ var Box = (function() {
         function hide() {
             $box.hide();
 
-            try {
-                params.onhide.call(box, $box);
-            } catch(e) {
-                console.log(e);
-            }
+            options.onhide.call(box, $box);
 
             boxesHistory.pop();
             if (boxesHistory.length) {
@@ -464,7 +460,7 @@ var Box = (function() {
             return box;
         }
 
-        params.oncreate.call(box, $box);
+        options.oncreate.call(box, $box);
 
         return box;
     };
@@ -533,7 +529,7 @@ var Box = (function() {
                     $(document).bind(options.closeEvent, function(e) {
                         var $menu = $el.dropdown('getMenu');
                         $el.dropdown('close');
-                        run(options.onclose, $el, $menu);
+                        runCallback(options.onclose, $el, $menu);
                     });
                     $(document).bind('keydown', function(e) {
                         var $menu = $el.dropdown('getMenu');
@@ -658,7 +654,7 @@ var Box = (function() {
                         $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
                         $item.addClass(CLASS_ITEM_ACTIVE);
                     }
-                    run(options.onchange, $el, data);
+                    runCallback(options.onchange, $el, data);
                     $el.trigger(TRIGGER_CHANGE);
                 }
 
@@ -676,10 +672,10 @@ var Box = (function() {
                 }
 
                 if (isUpdate) {
-                    run(options.onupdate, $el);
+                    runCallback(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
                 } else {
-                    run(options.oncreate, $el);
+                    runCallback(options.oncreate, $el);
                     $el.trigger(TRIGGER_CREATE);
                 }
             });
@@ -733,7 +729,7 @@ var Box = (function() {
                 $menu.show();
 
                 if (notTrigger) {
-                    run(options.onopen, $el, $menu);
+                    runCallback(options.onopen, $el, $menu);
                     $el.trigger(TRIGGER_OPEN);
                 }
             });
@@ -749,13 +745,13 @@ var Box = (function() {
             $menu.hide();
 
             if (notTrigger) {
-                run(options.onclose, $el, $menu);
+                runCallback(options.onclose, $el, $menu);
                 $el.trigger(TRIGGER_CLOSE);
             }
         }
     };
 
-    function run(f, context, argument) {
+    function runCallback(f, context, argument) {
         if ($.isFunction(f)) {
             f.call(context, argument);
         }
@@ -879,7 +875,7 @@ var Box = (function() {
                     tags: {}
                 });
 
-                run(options.oncreate, $el);
+                runCallback(options.oncreate, $el);
             });
         },
         addTag: function(id, params) {
@@ -905,7 +901,7 @@ var Box = (function() {
                         $tag.remove();
                         refreshPadding($el);
 
-                        run(options.onremove, $el, id);
+                        runCallback(options.onremove, $el, id);
                     })
                 ;
 
@@ -913,7 +909,7 @@ var Box = (function() {
                 $el.data(DATA_KEY, data);
                 refreshPadding($el);
 
-                run(options.onadd, $el, params);
+                runCallback(options.onadd, $el, params);
             });
         },
         removeTag: function(id) {
@@ -926,7 +922,7 @@ var Box = (function() {
                 $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']').remove();
                 refreshPadding($el);
 
-                run(options.onremove, $el, id);
+                runCallback(options.onremove, $el, id);
             });
         },
         removeLastTag: function() {
@@ -939,7 +935,7 @@ var Box = (function() {
             $tag.remove();
             refreshPadding($el);
 
-            run(options.onremove, $el, $tag.data('id'));
+            runCallback(options.onremove, $el, $tag.data('id'));
         }
     };
 
@@ -956,7 +952,7 @@ var Box = (function() {
         });
     }
 
-    function run(f, context, argument) {
+    function runCallback(f, context, argument) {
         if ($.isFunction(f)) {
             f.call(context, argument);
         }
