@@ -144,9 +144,32 @@
                 return true;
             return false;
 
-
         }
 
+        private static function get_long_poll_server( $token )
+        {
+            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 1 );
+            if ( isset( $res->error ) )
+                return false;
+            return (array)$res;
+        }
+
+        public static function watch_dog( $ts = 0 )
+        {
+            print_r( AuthUtility::GetCurrentUser( 'user' ) );
+
+            $a = self::get_long_poll_server( StatUsers::get_access_token( AuthUtility::GetCurrentUser( 'user' ) ) );
+            if ( !$a )
+                return false;
+
+            $ts  = $ts ? $ts : $a['ts'];
+            $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
+
+//            $res = VkHelper::qurl_request( $url, 0);
+            $res = json_decode( file_get_contents( $url ) );
+
+            return $res;
+        }
 
     }
 ?>

@@ -97,10 +97,10 @@
                     <actions>SPS.Stat.getEntries</actions>
                 </page>
                 <page uri="controls://implPublic/">
-                    <actions>SPS.Stat.implPublic</actions>
+                    <actions>SPS.Stat.implEntryToGroup</actions>
                 </page>
                 <page uri="controls://exPublic/">
-                    <actions>SPS.Stat.exPublic</actions>
+                    <actions>SPS.Stat.exEntryFromGroup</actions>
                 </page>
                 <page uri="controls://togglePublVisibil/">
                     <actions>SPS.Stat.togglePublVisibil</actions>
@@ -117,6 +117,7 @@
                 <page uri="controls://shareGroup/">
                     <actions>SPS.Stat.shareGroup</actions>
                 </page>
+
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -129,7 +130,7 @@
                 <page uri="controls://addDialog/">
                     <actions>SPS.Stat.addDialog</actions>
                 </page>
-                <page uri="controls://writeMes/">
+                <page uri="controls://messages.send/">
                     <actions>SPS.Stat.writeMes</actions>
                 </page>
                 <page uri="controls://markMes/">
@@ -140,6 +141,15 @@
                 </page>
                 <page uri="controls://setStatus/">
                     <actions>SPS.Stat.setStatus</actions>
+                </page>
+                <page uri="controls://implEntryToGroup/">
+                    <actions>SPS.Stat.implEntryToGroup</actions>
+                </page>
+                <page uri="controls://exlEntryFromGroup/">
+                    <actions>SPS.Stat.exEntryFromGroup</actions>
+                </page>
+                <page uri="controls://saveAt/">
+                    <actions>SPS.Stat.saveAt</actions>
                 </page>
             </pageGroup>
 

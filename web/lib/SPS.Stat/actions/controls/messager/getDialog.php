@@ -27,7 +27,6 @@ class getDialog
 
         if ( !$dialog_array )
             $dialog_array = array();
-        print_r($dialog_array);
         die( ObjectHelper::ToJSON( array( 'response' => $dialog_array ) ) );
 
     }

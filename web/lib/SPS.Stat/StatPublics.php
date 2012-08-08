@@ -21,7 +21,7 @@
                     $public->externalId ==  35807078 )
 
                     continue;
-
+                echo $public->externalId . ',<br>';
                 $a['id'] = $public->externalId;
                 $a['title'] = $public->title;
                 $res[] = $a;
