@@ -91,13 +91,43 @@
 
         }
 
-        public static function implement_public( $groupId, $publicId )
+        public static function extricate_group( $group_id, $user_id )
+        {
+            $sql = 'DELETE FROM
+                            ' . TABLE_STAT_GROUP_USER_REL . '
+                         WHERE
+                                group_id=@group_id
+                                AND user_id=@user_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger('@group_id', $group_id);
+            $cmd->SetInteger('@user_id', $user_id);
+
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
+        }
+
+        public static function implement_entry( $groupId, $publicId )
         {
             $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(public_id,group_id)
                        VALUES (@public_id,@group_id)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@group_id', $groupId);
             $cmd->SetInteger('@public_id', $publicId);
+            $cmd->Execute();
+        }
+
+        public static function extricate_entry( $group_id, $entry_id )
+        {
+            $query =  'DELETE FROM '
+                . TABLE_STAT_GROUP_PUBLIC_REL . '
+                           WHERE
+                                group_id=@group_id AND public_id=@publ_id';
+
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@group_id', $group_id);
+            $cmd->SetInteger('@publ_id', $entry_id);
             $cmd->Execute();
         }
 
@@ -189,25 +219,13 @@
                          WHERE
                                 group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
-            $cmd->SetInteger('@group_id', $group_id);
+            $cmd->SetInteger( '@group_id', $group_id );
             if ($cmd->ExecuteNonQuery())
                 return true;
             return false;
         }
 
-        public static function unsign_user_from_group( $group_id, $user_id )
-        {
-            $query = 'DELETE FROM '
-                . TABLE_STAT_GROUP_USER_REL . '
-                                WHERE
-                                      group_id=@group_id AND user_id=@user_id';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id', $user_id);
-            $cmd->SetInteger('@group_id', $group_id);
-            if ($cmd->ExecuteNonQuery())
-                return true;
-            return false;
-        }
+
 
     }
 ?>

@@ -33,7 +33,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.comments, c.general
+            $sql = 'SELECT c.group_id, c.name, c.general
                     FROM '
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
@@ -51,8 +51,6 @@
                     'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
-                    'comments'  =>  $ds->getValue( 'comments' ),
-                    'fave'      =>  $ds->GetBoolean( 'fave' ),
                 );
             }
 
@@ -60,33 +58,69 @@
             return $res;
         }
 
-        public static function implement_group( $groupId, $userIds )
+        public static function implement_group( $groupIds, $userIds )
         {
             if ( !is_array( $userIds ) )
                 $userIds = array ( $userIds );
+            if ( !is_array( $groupIds ) )
+                $groupIds = array ( $groupIds );
 
-            foreach ( $userIds as $id ) {
-                $query = 'INSERT INTO ' . TABLE_MES_GROUP_USER_REL . '(user_id,group_id)
-                      VALUES (@user_id,@group_id)';
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@group_id', $groupId);
-                $cmd->SetInteger('@user_id', $id);
-                if ( $cmd->ExecuteNonQuery() )
-                    return true;
-                else
-                    return false;
+            $i = 0;
+            foreach( $groupIds as $gr_id ) {
+                foreach ( $userIds as $id ) {
 
+                    $query = 'INSERT INTO ' . TABLE_MES_GROUP_USER_REL . '(user_id,group_id)
+                          VALUES (@user_id,@group_id)';
+                    $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
+                    $cmd->SetInteger('@group_id', $gr_id);
+                    $cmd->SetInteger('@user_id', $id);
+                    if ($cmd->ExecuteNonQuery())
+                        $i++;
+                }
             }
+
+            if ($i > 0)
+                return true;
+            else
+                return false;
 
         }
 
-        public static function implement_dialog( $group_id, $dialog_id )
+        public static function extricate_group( $group_id, $user_id )
         {
-            $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(dialog_id,group_id)
+            $sql = 'DELETE FROM
+                            ' . TABLE_MES_GROUP_USER_REL . '
+                         WHERE
+                                group_id=@group_id
+                                AND user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger('@group_id', $group_id);
+            $cmd->SetInteger('@user_id', $user_id);
+            if ($cmd->ExecuteNonQuery())
+                return true;
+            return false;
+        }
+
+        public static function implement_entry( $groupId, $entry_id )
+        {
+            $sql = 'INSERT INTO ' . TABLE_MES_GROUP_DIALOG_REL . '(dialog_id,group_id)
                        VALUES (@dialog_id,@group_id)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@group_id', $group_id);
-            $cmd->SetInteger('@dialog_id', $dialog_id);
+            $cmd->SetInteger('@group_id', $groupId);
+            $cmd->SetInteger('@dialog_id', $entry_id);
+            $cmd->Execute();
+        }
+
+        public static function extricate_entry( $group_id, $entry_id )
+        {
+            $sql =  'DELETE FROM '
+                . TABLE_MES_GROUP_DIALOG_REL . '
+                       WHERE
+                            group_id=@group_id AND dialog_id=@dialog_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id', $group_id  );
+            $cmd->SetInteger( '@dialog_id', $entry_id );
             $cmd->Execute();
         }
 
@@ -118,7 +152,6 @@
                             ( @name )
                         RETURNING
                             group_id';
-//                print_r($sql);
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetString('@name',        $groupName);
                 $ds = $cmd->Execute();
@@ -138,7 +171,7 @@
         {
             $sql = 'SELECT a.group_id
                     FROM
-                    ' . TABLE_MES_GROUP_USER_REL . ' as a
+                    ' . prin . ' as a
                     , ' . TABLE_MES_GROUPS . ' as b
                     WHERE
                         a.group_id = b.group_id
@@ -169,19 +202,9 @@
             return false;
         }
 
-        public static function unsign_user_from_group( $group_id, $user_id )
-        {
-            $query = 'DELETE FROM '
-                . TABLE_MES_GROUP_USER_REL . '
-                                WHERE
-                                      group_id=@group_id AND user_id=@user_id';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id', $user_id);
-            $cmd->SetInteger('@group_id', $group_id);
-            if ($cmd->ExecuteNonQuery())
-                return true;
-            return false;
-        }
+
+
+
 
     }
 ?>

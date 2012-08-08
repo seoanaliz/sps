@@ -37,7 +37,7 @@ class wrapper
 
 
     //return morning timesamp
-    public function morning($timestamp)
+    public static function morning($timestamp)
     {
         $date = date('m d Y', $timestamp);
         $date = explode(' ', $date);
