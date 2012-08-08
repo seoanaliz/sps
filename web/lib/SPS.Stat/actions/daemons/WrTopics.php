@@ -14,7 +14,6 @@
                 die('Не сейчас');
 
             $this->get_id_arr();
-
             $this->update_quantity();
             $this->update_public_info();
         }
@@ -142,6 +141,8 @@
             $cmd->SetFloat( '@diff_rel_week',      $diff_rel_week );
             $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
             $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
+//            echo $cmd->GetQuery();
+//            die();
             $cmd->Execute();
 
         }
@@ -178,8 +179,9 @@
                         $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
 
-                        $this->set_public_grow( $key, $entry->count, $timeTo );
 
+                        $this->set_public_grow( $key, $entry->count, $timeTo );
+//
 
                     }
 

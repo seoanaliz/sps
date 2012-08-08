@@ -8,25 +8,32 @@
      */
 
     //subtract public from group
-    class exPublic {
+    class exEntryFromGroup {
 
         /**
          * Entry Point
          */
 
-          public function Execute() {
+        public function Execute() {
             error_reporting( 0 );
 
             $userId   = Request::getInteger ( 'userId'  );
             $groupId  = Request::getInteger ( 'groupId' );
-            $publicId = Request::getInteger ( 'publId'  );
+            $entry_id = Request::getInteger ( 'publId'  );
+            if ( !$entry_id )
+                $entry_id = Request::getInteger ( 'entryId'  );
             $general  = Request::getInteger ( 'general' );
+            $type     = Request::getString ( 'type' );
 
+            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
+            if ( !$type || !in_array( $type, $type_array, 1 ) )
+            $type = 'Stat';
+            $m_class    = $type . 'Groups';
             $general = $general ? $general : 0;
 
-            if (!$groupId || !$userId || !$publicId) {
-                echo  ObjectHelper::ToJSON(array('response' => false));
-                die();
+            if (!$groupId || !$userId || !$entry_id) {
+
+                die(ERR_MISSING_PARAMS);
             }
 
             //todo не уверен, нужна ли проверка на "главность"
@@ -34,15 +41,8 @@
                     ||
                     ( $general && StatUsers::is_Sadmin( $userId ) )
                     ) {
-                $query =  'DELETE FROM '
-                                . TABLE_STAT_GROUP_PUBLIC_REL . '
-                           WHERE
-                                group_id=@group_id AND public_id=@publ_id';
 
-                $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@group_id', $groupId);
-                $cmd->SetInteger('@publ_id', $publicId);
-                $cmd->Execute();
+                $m_class::extricate_entry( $groupId, $entry_id);
 
                 echo  ObjectHelper::ToJSON(array('response' => true));
 

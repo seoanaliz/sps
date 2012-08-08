@@ -29,15 +29,16 @@
                 die(ERR_MISSING_PARAMS);
 
             $user = StatUsers::is_our_user( $user_id );
-            if ($user) {
+            if ( $user ) {
                 echo  ObjectHelper::ToJSON(array('response' => $user));
                 die();
             }
 
             $user = StatUsers::get_vk_user_info( $user_id );
+            $user = $user[0];
             $user['rank']     = $rank;
             $user['comments'] = $comments;
-            $user = StatUsers::add_user($user);
+            $user = StatUsers::add_user( $user );
             if ($user)
                 echo  ObjectHelper::ToJSON(array('response' => $user));
             else

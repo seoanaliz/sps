@@ -19,8 +19,14 @@
             $group_ids      =   Request::getString( 'groupId' );
             $recipients_id  =   Request::getString( 'recId' );
             $general        =   Request::getInteger( 'general' );
+            $type           =   Request::getString ( 'type' );
 
-            $general        =   $general ? $general : 0;
+            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
+            if ( !$type || !in_array( $type, $type_array, 1 ) )
+                $type = 'Stat';
+            $m_class    = $type . 'Groups';
+            print_r($m_class);
+            $general    =   $general ? $general : 0;
 
             if ( !$group_ids || !$user_id || !$recipients_id ) {
                 die( ERR_MISSING_PARAMS );
@@ -34,7 +40,7 @@
                 die();
             }
 
-            if ( StatGroups::implement_group($group_ids, $recipients_id) )
+            if ( $m_class::implement_group($group_ids, $recipients_id) )
                 die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
             else
                 die( ObjectHelper::ToJSON( array( 'response' => false ) ) );

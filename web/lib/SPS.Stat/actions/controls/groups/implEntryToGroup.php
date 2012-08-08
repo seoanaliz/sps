@@ -8,7 +8,7 @@
      */
 
     //добовляет паблик в группу
-    class implPublic {
+    class implEntryToGroup {
 
         /**
          * Entry Point
@@ -17,18 +17,25 @@
             error_reporting( 0 );
             $userId   = Request::getInteger ( 'userId' );
             $groupId  = Request::getInteger ( 'groupId' );
-            $publicId = Request::getInteger ( 'publId' );
+            $entry_id = Request::getInteger ( 'publId'  );
+            if ( !$entry_id )
+                $entry_id = Request::getInteger ( 'entryId'  );
             $general  = Request::getInteger ( 'general' );
+            $type     = Request::getString ( 'type' );
 
+            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
+            if ( !$type || !in_array( $type, $type_array, 1 ) )
+                $type = 'Stat';
+
+            $m_class    = $type . 'Groups';
             $general = $general ? $general : 0;
 
-            if ( !$groupId || !$publicId || !$userId ) {
-                echo  ObjectHelper::ToJSON(array('response' => false));
-                die();
+            if ( !$groupId || !$entry_id || !$userId ) {
+                die(ERR_MISSING_PARAMS);
             }
 
             if ( !$general || ( $general && StatUsers::is_Sadmin( $userId ) ) ) {
-                StatGroups::implement_public( $groupId, $publicId );
+                $m_class::implement_entry( $groupId, $entry_id );
                 echo  ObjectHelper::ToJSON(array('response' => true));
                 die();
             }

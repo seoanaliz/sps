@@ -15,8 +15,8 @@ class getEntries {
      */
 
     public function Execute() {
-        error_reporting( 0 );
 
+        error_reporting( 0 );
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
@@ -137,6 +137,7 @@ class getEntries {
                             );
         }
 
+
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(
                                                             'list'      =>  $resul,
@@ -241,8 +242,7 @@ class getEntries {
 
     private function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS_POINTS ;
-
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
         $ds = $cmd->Execute();
         $ds->Next();
