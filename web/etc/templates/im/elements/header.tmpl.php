@@ -33,6 +33,7 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.css',
+        'css://im/login.css',
         'css://im/main.css',
    ),
     AssetHelper::IE7 => array(),
@@ -41,6 +42,9 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
+    'js://im/events.js',
+    'js://im/login.js',
+    'js://im/main.js',
 );
 
 CssHelper::Init(false);

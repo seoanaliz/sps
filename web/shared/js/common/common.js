@@ -18,8 +18,9 @@ function intval(str) {
 }
 
 // Парсинг URL
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+function getURLParameter(name, search) {
+    search = search || location.search;
+    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
 // Кроссбраузерные плейсхолдеры
