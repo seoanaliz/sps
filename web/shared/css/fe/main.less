@@ -1,18 +1,4 @@
-@link_color: #2B587A;
-@light_blue: #99ADC2;
-@hover_bg: #E1E7ED;
-
-.transition(@params) {
-    -webkit-transition: @params;
-    -moz-transition: @params;
-    -o-transition: @params;
-    transition: @params;
-}
-.opacity(@opacity) {
-    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
-    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
-    opacity: @opacity;
-}
+@import "../common/mixins.less";
 
 body {
     font-size: 11px;

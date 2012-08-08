@@ -141,9 +141,7 @@
                 <page uri="controls://setStatus/">
                     <actions>SPS.Stat.setStatus</actions>
                 </page>
-
             </pageGroup>
-
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
@@ -514,6 +512,12 @@
             <pageGroup name="tools">
                 <page uri="tools://init-editors/">
                     <actions>SPS.Common.InitEditorsTool</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="im" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="im://">
+                    <template>tmpl://im/index.tmpl.php</template>
                 </page>
             </pageGroup>
 

@@ -1,0 +1,26 @@
+@import "../common/mixins.less";
+
+#main {
+    width: 1100px;
+    margin: 10px auto;
+
+    .left-column {
+        float: left;
+        width: 800px;
+        border: 1px solid @main_border;
+
+        .border-radius(3px);
+
+        &>.header {
+            background: @title_bg;
+        }
+    }
+    .right-column {
+        float: left;
+        width: 286px;
+        border: 1px solid @main_border;
+        margin-left: 10px;
+
+        .border-radius(3px);
+    }
+}

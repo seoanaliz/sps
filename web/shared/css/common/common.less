@@ -1,41 +1,4 @@
-@link_color: #2B587A;
-@light_blue: #99ADC2;
-@hover_bg: #E1E7ED;
-
-.user-select(@select: text) {
-    -webkit-touch-callout: @select;
-    -webkit-user-select: @select;
-    -khtml-user-select: @select;
-    -moz-user-select: @select;
-    -ms-user-select: @select;
-    -o-user-select: @select;
-    user-select: @select;
-}
-.transition(@params) {
-    -webkit-transition: @params;
-    -moz-transition: @params;
-    -o-transition: @params;
-    transition: @params;
-}
-.background-gradient(@top-color: #fff, @bottom-color: #eee) {
-    background-color: @top-color;
-    background-image: -webkit-linear-gradient(top,@top-color,@bottom-color);
-    background-image: -moz-linear-gradient(top,@top-color,@bottom-color);
-    background-image: -ms-linear-gradient(top,@top-color,@bottom-color);
-    background-image: -o-linear-gradient(top,@top-color,@bottom-color);
-    background-image: linear-gradient(top,@top-color,@bottom-color);
-}
-.border-radius(@params) {
-    -webkit-border-radius: @params;
-    -moz-border-radius: @params;
-    border-radius: @params;
-}
-.opacity(@opacity) {
-    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
-    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
-    opacity: @opacity;
-}
-
+@import "../common/mixins.less";
 
 html, body, input, textarea {
     margin: 0;
@@ -99,8 +62,7 @@ input {
     }
 }
 
-/* --- */
-
+/* Dropdowns */
 .ui-dropdown-menu {
     position: absolute;
     background-color: #fff;
@@ -185,6 +147,7 @@ input {
     }
 }
 
+/* Buttons */
 .button {
     position: relative;
     display: inline-block;
@@ -250,6 +213,7 @@ input {
     }
 }
 
+/* Tabs */
 .tab-bar {
     padding: .7em;
     padding-top: 0;
@@ -283,6 +247,7 @@ input {
     }
 }
 
+/* Icons */
 .icon {
     width: 1em;
     height: 1em;
@@ -313,112 +278,11 @@ input {
     }
 }
 
+/* Placeholder */
 .placeholder {
     position: absolute;
     color: #999;
-
     .user-select(none);
-}
-
-/* --------- */
-/* jQuery UI */
-/* --------- */
-
-/* Corner radius */
-.ui-corner-all,
-.ui-corner-top,
-.ui-corner-left,
-.ui-corner-tl {
-    -moz-border-radius-topleft: 0;
-    -webkit-border-top-left-radius: 0;
-    -khtml-border-top-left-radius: 0;
-    border-top-left-radius: 0;
-}
-.ui-corner-all,
-.ui-corner-top,
-.ui-corner-right,
-.ui-corner-tr {
-    -moz-border-radius-topright: 0;
-    -webkit-border-top-right-radius: 0;
-    -khtml-border-top-right-radius: 0;
-    border-top-right-radius: 0;
-}
-.ui-corner-all,
-.ui-corner-bottom,
-.ui-corner-left,
-.ui-corner-bl {
-    -moz-border-radius-bottomleft: 0;
-    -webkit-border-bottom-left-radius: 0;
-    -khtml-border-bottom-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-.ui-corner-all,
-.ui-corner-bottom,
-.ui-corner-right,
-.ui-corner-br {
-    -moz-border-radius-bottomright: 0;
-    -webkit-border-bottom-right-radius: 0;
-    -khtml-border-bottom-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-/* Component containers */
-.ui-widget {
-    font-size: 1.1em;
-}
-.ui-widget .ui-widget {
-    font-size: 1em;
-}
-.ui-widget input,
-.ui-widget select,
-.ui-widget textarea,
-.ui-widget button {
-    font-size: 1em;
-}
-.ui-widget-content {
-    border: 1px solid #aaaaaa;
-    background: #ffffff;
-}
-.ui-widget-content a {}
-.ui-widget-header {
-    border: 1px solid #aaaaaa;
-    background: #cccccc;
-    font-weight: bold;
-}
-.ui-widget-header a {
-    color: #222222;
-}
-
-/* Interaction states */
-.ui-state-default,
-.ui-widget-content .ui-state-default,
-.ui-widget-header .ui-state-default {
-    border: 1px solid #d3d3d3;
-    background: #fff;
-}
-.ui-state-default a,
-.ui-state-default a:link,
-.ui-state-default a:visited {}
-.ui-state-hover,
-.ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
-.ui-state-focus,
-.ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus {}
-.ui-state-hover a,
-.ui-state-hover a:hover {
-    text-decoration: none;
-}
-.ui-state-active,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-active {}
-.ui-state-active a,
-.ui-state-active a:link,
-.ui-state-active a:visited {
-    text-decoration: none;
-}
-.ui-widget:active {
-    outline: none;
 }
 
 /* Slider */
@@ -538,4 +402,105 @@ input {
             }
         }
     }
+}
+
+/* --------- */
+/* jQuery UI */
+/* --------- */
+
+/* Corner radius */
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-left,
+.ui-corner-tl {
+    -moz-border-radius-topleft: 0;
+    -webkit-border-top-left-radius: 0;
+    -khtml-border-top-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-right,
+.ui-corner-tr {
+    -moz-border-radius-topright: 0;
+    -webkit-border-top-right-radius: 0;
+    -khtml-border-top-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-left,
+.ui-corner-bl {
+    -moz-border-radius-bottomleft: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -khtml-border-bottom-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-right,
+.ui-corner-br {
+    -moz-border-radius-bottomright: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -khtml-border-bottom-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Component containers */
+.ui-widget {
+    font-size: 1.1em;
+}
+.ui-widget .ui-widget {
+    font-size: 1em;
+}
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+    font-size: 1em;
+}
+.ui-widget-content {
+    border: 1px solid #aaaaaa;
+    background: #ffffff;
+}
+.ui-widget-content a {}
+.ui-widget-header {
+    border: 1px solid #aaaaaa;
+    background: #cccccc;
+    font-weight: bold;
+}
+.ui-widget-header a {
+    color: #222222;
+}
+
+/* Interaction states */
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    border: 1px solid #d3d3d3;
+    background: #fff;
+}
+.ui-state-default a,
+.ui-state-default a:link,
+.ui-state-default a:visited {}
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {}
+.ui-state-hover a,
+.ui-state-hover a:hover {
+    text-decoration: none;
+}
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {}
+.ui-state-active a,
+.ui-state-active a:link,
+.ui-state-active a:visited {
+    text-decoration: none;
+}
+.ui-widget:active {
+    outline: none;
 }
