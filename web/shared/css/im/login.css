@@ -1,1 +1,4 @@
-
+#login{width:400px;margin:100px auto;text-align:center;}#login .button{font-size:14px;}
+#login input{font-size:14px;width:378px;padding:5px 10px;margin:10px auto;display:none;}
+#login .hint{color:#777;font-size:11px;}
+#login .result{font-size:14px;display:none;padding:10px;margin:10px 0;}#login .result.success{background:#d9ffcf;border:1px solid #cbeec1;}
