@@ -2,7 +2,7 @@ html,body,input,textarea{margin:0;font-family:arial, verdana, Lucida Sans, serif
 html,body{padding:0;}
 textarea{resize:none;}
 input[type="text"],textarea{padding:4px;border:1px solid #C4CDE0;background-color:#fff;}
-input:focus,textarea:focus,[contenteditable]:focus{outline:none;border-color:#97A4C4 !important;}
+input:focus,textarea:focus,[contenteditable]:focus{outline:none;}
 table,tr,td,th{margin:0;padding:0;border-spacing:0;text-align:left;}
 a{color:#2B587A;text-decoration:none;}a:focus,a:hover{outline:none;text-decoration:underline;}
 input[type="checkbox"]:after{content:'';background:url('../../images/common/check.gif') 0 0 no-repeat;width:14px;height:14px;position:absolute;}
