@@ -172,7 +172,6 @@ var app = (function () {
             var $post = $comment.closest('.post');
             Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
                 $comment.removeClass('new');
-                $hightLight.removeClass('new');
                 var $counter = $menu.find('.item.selected .counter');
                 if (!$counter.data('counter')) {
                     $counter.counter({prefix: '+'});
@@ -409,57 +408,3 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
-
-(function($) {
-    var PLUGIN_NAME = 'counter';
-    var DATA_KEY = PLUGIN_NAME;
-
-    var methods = {
-        init: function(params) {
-            return this.each(function() {
-                var defaults = {
-                    prefix: ''
-                };
-                var options = $.extend(defaults, params);
-                var $el = $(this);
-
-                $el.data(DATA_KEY, {
-                    $el: $el,
-                    options: options
-                });
-            });
-        },
-        increment: function(num) {
-            return this.each(function() {
-                var $el = $(this);
-                var data = $el.data(DATA_KEY);
-                var options = data.options;
-                num = num || 1;
-                var newNum = intval($el.html()) + num;
-
-                $el.html(newNum ? (options.prefix + newNum) : '');
-            });
-        },
-        decrement: function(num) {
-            return this.each(function() {
-                var $el = $(this);
-                var data = $el.data(DATA_KEY);
-                var options = data.options;
-                num = num || 1;
-                var newNum = intval($el.html()) - num;
-
-                $el.html(newNum ? (options.prefix + newNum) : '');
-            });
-        }
-    };
-
-    $.fn[PLUGIN_NAME] = function(method) {
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, arguments);
-        } else {
-            $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
-        }
-    };
-})(jQuery);
