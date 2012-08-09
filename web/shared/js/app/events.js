@@ -87,7 +87,15 @@ var Eventlist = {
         });
     },
     wall_mark_as_read: function(postId, callback) {
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'article-mark/',
+            data: {
+                id: postId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
 
     comment_load: function(options, callback) {
@@ -140,7 +148,16 @@ var Eventlist = {
         });
     },
     comment_mark_as_read: function(postId, commentId, callback) {
-        callback(true);
+        $.ajax({
+            url: appControlsRoot + 'comment-mark/',
+            data: {
+                articleId: postId,
+                commentId: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);

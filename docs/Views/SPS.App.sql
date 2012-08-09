@@ -42,3 +42,9 @@ SELECT "public"."authorEvents"."articleId"
 	, "public"."authorEvents"."commentIds"
 	, "public"."authorEvents"."isSent"
  FROM "public"."authorEvents";
+ 
+CREATE OR REPLACE VIEW "getAuthorFeedViews" AS
+SELECT "public"."authorFeedViews"."targetFeedId"
+	, "public"."authorFeedViews"."authorId"
+	, "public"."authorFeedViews"."lastViewDate"
+ FROM "public"."authorFeedViews";

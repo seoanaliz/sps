@@ -6,7 +6,12 @@
     /** @var $targetInfo array */
 
     if (!empty($article)) {
-        $asNew = ($article->articleId % 2) ? 'new' : '';
+        $asNew = '';
+        if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId = $__Author->authorId) {
+            if ($authorEvents[$article->articleId]->isSent) {
+                $asNew = 'new';
+            }
+        }
         $hasComments = !empty($commentsData[$article->articleId]);
 ?>
 
@@ -26,7 +31,22 @@
             <div class="title">
                 <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
             </div>
-            <div class="text"><?= nl2br(HtmlHelper::RenderToForm($articleRecord->content)) ?></div>
+            <div class="text">
+                <?
+                $contentPart1 = mb_substr($articleRecord->content, 0, 300);
+                $contentPart2 = mb_substr($articleRecord->content, 300);
+                $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
+                ?>
+                <div class="shortcut">
+                    <?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?>
+                    <? if($contentPart2) { ?>
+                        ...<a href="javascript:;" class="show-cut">Показать полностью...</a>
+                    <? } ?>
+                </div>
+                <? if($contentPart2) { ?>
+                <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
+                <? } ?>
+            </div>
 
             <? if (!empty($articleRecord->photos)) { ?>
                 <div class="attachments">

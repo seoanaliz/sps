@@ -30,6 +30,11 @@
         private $authors = array();
 
         /**
+         * @var AuthorEvent[]
+         */
+        private $authorEvents = array();
+
+        /**
          * @var array
          */
         private $commentsData = array();
@@ -118,7 +123,9 @@
                     break;
                 case 'my':
                 default:
-                    $this->search['authorId'] = $author->authorId;
+                    if (empty($this->search['targetFeedId'])) {
+                        $this->search['authorId'] = $author->authorId;
+                    }
                     break;
 
             }
@@ -161,6 +168,10 @@
                 }
 
                 $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
+
+                if (!empty($this->search['authorId'])) {
+                    $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
+                }
             }
         }
 
@@ -173,6 +184,7 @@
             Response::setArray( 'targetFeeds', $this->targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
             Response::setArray( 'commentsData', $this->commentsData );
+            Response::setArray( 'authorEvents', $this->authorEvents );
         }
 
         /**
@@ -182,6 +194,12 @@
             $this->processRequest();
             $this->getObjects();
             $this->setData();
+
+            //обновляем дату, когда пользователь последний раз смотрел паблик
+            if (!empty($this->search['targetFeedId'])) {
+                $author = Session::getObject('Author');
+                AuthorFeedViewUtility::UpdateLastView($author->authorId, $this->search['targetFeedId']);
+            }
         }
     }
 ?>

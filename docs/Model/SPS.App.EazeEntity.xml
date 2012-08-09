@@ -336,4 +336,89 @@
       </TemplateAttribute>
     </Attributes>
   </EazeEntity>
+  <EazeEntity Name="AuthorFeedView">
+    <TerminalPath>authorFeedViews</TerminalPath>
+    <CacheTime>0</CacheTime>
+    <CacheDependencies>targetFeedGrids authors</CacheDependencies>
+    <Search>
+      <TemplateAttribute Name="targetFeedGridId" TitleKey="vt.authorFeedView.targetFeedGridId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedGridId" />
+          <AttributeParameter Key="value" Value="targetFeedGridId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedGridId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.authorFeedView.authorId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="lastViewDate" TitleKey="vt.authorFeedView.lastViewDate" Type="HTML_DATETIME" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="lastViewDate" />
+          <AttributeParameter Key="value" Value="lastViewDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.authorFeedView.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Search>
+    <Attributes>
+      <TemplateAttribute Name="targetFeedGridId" TitleKey="vt.authorFeedView.targetFeedGridId" TitleValue="targetFeedGridId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedGridId" />
+          <AttributeParameter Key="value" Value="targetFeedGridId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="targetFeedGridId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="authorId" TitleKey="vt.authorFeedView.authorId" TitleValue="authorId" Type="HTML_INPUT" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="authorId" />
+          <AttributeParameter Key="value" Value="authorId" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="authorId" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="lastViewDate" TitleKey="vt.authorFeedView.lastViewDate" TitleValue="lastViewDate" Type="HTML_DATETIME" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="lastViewDate" />
+          <AttributeParameter Key="value" Value="lastViewDate" />
+          <AttributeParameter Key="format" Value="d.m.Y G:i" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeedId" TitleKey="vt.authorFeedView.targetFeedId" Type="HTML_SELECT" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="targetFeed.title" TitleKey="vt.authorFeedView.targetFeedId" TitleValue="" Type="HTML_INPUT" CanEdit="false" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="targetFeedId" />
+          <AttributeParameter Key="values" Value="$targetFeeds" />
+          <AttributeParameter Key="dataKey" Value="targetFeedId" />
+          <AttributeParameter Key="dataValue" Value="title" />
+          <AttributeParameter Key="value" Value="targetFeedId" />
+          <AttributeParameter Key="nullValue" Value="false" />
+        </Parameters>
+      </TemplateAttribute>
+    </Attributes>
+  </EazeEntity>
 </ArrayOfEazeEntity>

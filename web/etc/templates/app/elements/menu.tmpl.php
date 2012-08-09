@@ -2,7 +2,7 @@
     <div class="item my selected" data-id="my">
         <div class="content">
             Мои публикации
-            <? if(!empty($authorCounter) && false) { ?>
+            <? if(!empty($authorCounter)) { ?>
                 <span class="counter">+{$authorCounter}</span>
             <? } ?>
         </div>
