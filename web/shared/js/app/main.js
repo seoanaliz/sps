@@ -63,6 +63,7 @@ var app = (function () {
         $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
         $wallList.find('.date').easydate(easydateParams);
+        $wallList.find('.comment.new:first').closest('.comments').find('textarea').focus();
     }
 
     function _initEvents() {

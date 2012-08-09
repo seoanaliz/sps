@@ -72,6 +72,7 @@ function getURLParameter(name) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
+                $input.css({overflow: 'hidden'});
                 $autoResize
                     .css({
                         width: $input.width(),
@@ -85,14 +86,24 @@ function getURLParameter(name) {
                         top: -100000
                     })
                 ;
-                $input.bind('keyup focus', function(e) {
-                    $autoResize.html($input.val().split('\n').join('<br/>.') + '<br/>.');
-                    $input.css('height', $autoResize.height());
+
+                $input.bind('keyup keydown focus blur', function(e) {
+                    var minHeight = intval($input.css('min-height'));
+                    var maxHeight = intval($input.css('max-height'));
+                    var val = $input.val().split('\n').join('<br/>.');
+                    if (e.type == 'keydown' && e.keyCode == KEY.ENTER && !e.ctrlKey) {
+                        val += '<br/>.'
+                    }
+                    $autoResize.html(val);
+                    $input.css({
+                        height: Math.max(
+                            minHeight,
+                            maxHeight ? Math.min(maxHeight, $autoResize.height()) : $autoResize.height()
+                         )
+                    });
                 });
-                $input.bind('blur', function(e) {
-                    $autoResize.html($input.val().split('\n').join('<br/>.'));
-                    $input.css('height', $autoResize.height());
-                });
+
+                $input.keyup();
             }
         });
     };
