@@ -1,4 +1,5 @@
 var Configs = {
+    vkId: 4718705,
     appId: vk_appId,
     controlsRoot: controlsRoot
 };
@@ -8,23 +9,6 @@ var cur = {
 };
 
 $(document).ready(function() {
-    VK.init({
-        apiId: Configs.appId,
-        nameTransportPath: '/xd_receiver.htm'
-    });
-
-    var code =
-        'return {' +
-            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-        '};';
-
-    VK.Api.call('execute', {code: code}, function(data) {
-        if (data.response) {
-            var r = data.response;
-            cur.dataUser = r.me;
-        }
-    });
-
     new IM({
         el: '#main',
         template: MAIN
@@ -48,6 +32,9 @@ var IM = Widget.extend({
         t.leftColumn.on('delete', function() {
             t.rightColumn.go();
         });
+        t.rightColumn.on('selectDialog', function() {
+
+        });
     },
 
     initLeftColumn: function() {
@@ -56,7 +43,7 @@ var IM = Widget.extend({
         return new Messages({
             el: '.left-column > .list',
             data: {
-                list: [1,2,3]
+                list: Data.dialogs
             }
         });
     },
@@ -67,7 +54,7 @@ var IM = Widget.extend({
         return new List({
             el: '.right-column > .list',
             data: {
-                list: [1,2,3,4,5,6]
+                list: Data.lists
             }
         });
     }
@@ -100,6 +87,14 @@ var Messages = Widget.extend({
  */
 var List = Widget.extend({
     template: LIST,
+
+    events: {
+        'click: .item': 'selectItem'
+    },
+
+    selectItem: function(e) {
+        console.log(e);
+    },
 
     go: function() {
         alert('go!');

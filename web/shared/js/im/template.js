@@ -62,15 +62,17 @@ var MESSAGES_ITEM =
 '<div class="message clear-fix">' +
     '<div class="user">' +
         '<div class="photo">' +
-            '<img src="http://vk.com/images/camera_c.gif" alt="" />' +
+            '<img src="<?=user.photo?>" alt="" />' +
         '</div>' +
         '<div class="info clear-fix">' +
-            '<div class="name"><a href="#">Artyom Kohver</a></div>' +
-            '<div class="status">Online</div>' +
-            '<div class="date">Today</div>' +
+            '<div class="name"><a href="http://vk.com/id<?=user.id?>" target="_blank"><?=user.name?></a></div>' +
+            '<? if (user.isOnline) { ?>' +
+                '<div class="status">Online</div>' +
+            '<? } ?>' +
+            '<div class="date"><?=lastMessage.timestamp?></div>' +
         '</div>' +
     '</div>' +
-    '<div class="history">text</div>' +
+    '<div class="history"><?=lastMessage.text?></div>' +
     '<div class="actions">' +
         '<div class="action icon plus"></div>' +
     '</div>' +
@@ -80,9 +82,9 @@ var LIST =
 '<? each(LIST_ITEM, list); ?>';
 
 var LIST_ITEM =
-'<div class="item">' +
+'<div class="item" data-id="<?=id?>">' +
     '<div class="icon">' +
-        '<img src="http://vk.com/images/camera_c.gif" alt="" />' +
+        '<img src="<?=icon?>" alt="" />' +
     '</div>' +
-    '<div class="title">Item</div>' +
+    '<div class="title"><?=title?></div>' +
 '</div>';
