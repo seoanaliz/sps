@@ -164,7 +164,8 @@ var app = (function () {
         });
         $wall.delegate('.comment.new', 'hover', function() {
             var $comment = $(this);
-            Events.fire('comment_mark_as_read', $comment.data('id'), function() {
+            var $post = $comment.closest('.post');
+            Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
                 $comment.removeClass('new');
             });
         });
