@@ -42,6 +42,11 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
+    'js://common/class.js',
+    'js://im/data.js',
+    'js://im/template.js',
+    'js://im/event.js',
+    'js://im/widget.js',
     'js://im/events.js',
     'js://im/login.js',
     'js://im/main.js',

@@ -36,3 +36,53 @@ var tmpl = (function($) {
 
     return tmpl;
 })(jQuery);
+
+var MAIN =
+'<div class="left-column">' +
+    '<div class="header">' +
+        '<div class="tab-bar">' +
+            '<div class="tab selected">Диалоги</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="list"></div>' +
+'</div>' +
+'<div class="right-column">' +
+    '<div class="header">' +
+        '<div class="tab-bar">' +
+            '<div class="tab selected">Контакты</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="list"></div>' +
+'</div>';
+
+var MESSAGES =
+'<? each(MESSAGES_ITEM, list); ?>';
+
+var MESSAGES_ITEM =
+'<div class="message clear-fix">' +
+    '<div class="user">' +
+        '<div class="photo">' +
+            '<img src="http://vk.com/images/camera_c.gif" alt="" />' +
+        '</div>' +
+        '<div class="info clear-fix">' +
+            '<div class="name"><a href="#">Artyom Kohver</a></div>' +
+            '<div class="status">Online</div>' +
+            '<div class="date">Today</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="history">text</div>' +
+    '<div class="actions">' +
+        '<div class="action icon plus"></div>' +
+    '</div>' +
+'</div>';
+
+var LIST =
+'<? each(LIST_ITEM, list); ?>';
+
+var LIST_ITEM =
+'<div class="item">' +
+    '<div class="icon">' +
+        '<img src="http://vk.com/images/camera_c.gif" alt="" />' +
+    '</div>' +
+    '<div class="title">Item</div>' +
+'</div>';

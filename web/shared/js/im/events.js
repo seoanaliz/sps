@@ -26,5 +26,28 @@ var Events = {
     }
 };
 
-var Eventlist = {};
+var simpleAjax = function(method, data, callback) {
+    $.ajax({
+        url: Events.url + method + '/',
+        dataType: 'json',
+        data: $.extend({
+            userId: cur.dataUser.uid,
+            type: 'mes'
+        }, data),
+        success: function (result) {
+            if (result && result.response) {
+                if ($.isFunction(data)) callback = data;
+                callback(result.response);
+            }
+        }
+    });
+};
+
+var Eventlist = {
+    get_lists: function(callback) {
+        simpleAjax('addUser', function(dirtyData) {
+            callback(true);
+        });
+    }
+};
 $.extend(Events.eventList, Eventlist);
