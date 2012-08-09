@@ -6,7 +6,12 @@
     /** @var $targetInfo array */
 
     if (!empty($article)) {
-        $asNew = ($article->articleId % 2) ? 'new' : '';
+        $asNew = '';
+        if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId = $__Author->authorId) {
+            if ($authorEvents[$article->articleId]->isSent) {
+                $asNew = 'new';
+            }
+        }
         $hasComments = !empty($commentsData[$article->articleId]);
 ?>
 

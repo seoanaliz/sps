@@ -30,6 +30,11 @@
         private $authors = array();
 
         /**
+         * @var AuthorEvent[]
+         */
+        private $authorEvents = array();
+
+        /**
          * @var array
          */
         private $commentsData = array();
@@ -161,6 +166,10 @@
                 }
 
                 $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
+
+                if (!empty($this->search['authorId'])) {
+                    $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
+                }
             }
         }
 
@@ -173,6 +182,7 @@
             Response::setArray( 'targetFeeds', $this->targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
             Response::setArray( 'commentsData', $this->commentsData );
+            Response::setArray( 'authorEvents', $this->authorEvents );
         }
 
         /**

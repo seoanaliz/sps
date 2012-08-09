@@ -52,7 +52,9 @@
         <Attribute Name="commentIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="commentIds" FieldType="TYPE_ARRAY" ComplexType="int[]" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="isSent" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="isSent" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
-      <Search />
+      <Search>
+        <Attribute Name="_articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
       <Flags>
         <EFlag>CanCache</EFlag>
         <EFlag>WithoutTemplates</EFlag>

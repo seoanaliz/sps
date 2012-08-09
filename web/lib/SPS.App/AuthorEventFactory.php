@@ -49,7 +49,12 @@
                     , 'nullable'    => 'No'
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                '_articleId' => array(
+                    'name'         => 'articleId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                ))
         );
         
         /** @return array */

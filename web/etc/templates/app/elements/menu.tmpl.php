@@ -1,11 +1,8 @@
-<?
-    $Editor = Session::getObject('Editor');
-?>
 <div class="menu" id="menu">
     <div class="item my selected" data-id="my">
         <div class="content">
             Мои публикации
-            <? if(!empty($authorCounter) && !empty($Editor)) { ?>
+            <? if(!empty($authorCounter)) { ?>
                 <span class="counter">+{$authorCounter}</span>
             <? } ?>
         </div>
