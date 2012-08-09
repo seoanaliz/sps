@@ -6,7 +6,7 @@
     <? if (!empty($targetFeeds)) { ?>
     <div class="new-post">
         <div class="textarea-wrap">
-            <textarea placeholder="Ваш текст..." rows="2"></textarea>
+            <textarea placeholder="Есть чем поделиться?" rows="2"></textarea>
             <div class="add-photo"></div>
         </div>
         <div class="attachments">

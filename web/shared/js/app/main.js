@@ -60,7 +60,7 @@ var app = (function () {
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
 
-        $wall.find('.comment textarea').placeholder();
+        $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
         $wallList.find('.date').easydate(easydateParams);
     }
@@ -120,7 +120,6 @@ var app = (function () {
 
         /*Left column*/
         $newPost.find('textarea').placeholder();
-
         $newPost.find('textarea').bind('focus', function() {
             if (!$(this).data('autoResize')) $(this).autoResize();
             $newPost.addClass('open');

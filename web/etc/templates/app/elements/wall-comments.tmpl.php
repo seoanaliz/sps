@@ -7,7 +7,7 @@
             <img src="{$__Author->avatar}" alt="" />
         </div>
         <div class="textarea-wrap">
-            <textarea placeholder="Ваш текст..." rows="1"></textarea>
+            <textarea placeholder="Оставить комментарий..." rows="1"></textarea>
         </div>
         <div class="actions">
             <button class="button send">Отправить</button>

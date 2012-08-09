@@ -48,16 +48,13 @@ function getURLParameter(name) {
                 .parent().prepend($placeholder)
             ;
 
-            $placeholder.bind('mousedown', function() {
-                $placeholder.hide();
-                $input.focus();
-            });
             $placeholder.bind('mouseup', function() {
+                $placeholder.hide();
                 $input.focus();
             });
             $input.bind('blur change', function() {
                 if (!$input.val()) {
-                    $placeholder.fadeIn(100);
+                    $placeholder.show();
                 }
             });
             $input.bind('focus change', function() {
@@ -88,8 +85,12 @@ function getURLParameter(name) {
                         top: -100000
                     })
                 ;
-                $input.bind('keyup focus blur', function(e) {
+                $input.bind('keyup focus', function(e) {
                     $autoResize.html($input.val().split('\n').join('<br/>.') + '<br/>.');
+                    $input.css('height', $autoResize.height());
+                });
+                $input.bind('blur', function(e) {
+                    $autoResize.html($input.val().split('\n').join('<br/>.'));
                     $input.css('height', $autoResize.height());
                 });
             }
