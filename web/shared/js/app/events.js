@@ -86,6 +86,9 @@ var Eventlist = {
             }
         });
     },
+    wall_mark_as_read: function(postId, callback) {
+        callback(true);
+    },
 
     comment_load: function(options, callback) {
         var params = $.extend({
@@ -135,6 +138,9 @@ var Eventlist = {
                 callback(true);
             }
         });
+    },
+    comment_mark_as_read: function(commentId, callback) {
+        callback(true);
     }
 };
 $.extend(Events.eventList, Eventlist);
