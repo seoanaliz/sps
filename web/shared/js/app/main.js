@@ -390,3 +390,37 @@ var app = (function () {
         refreshSize: refreshSize
     };
 })();
+
+(function($) {
+    var PLUGIN_NAME = 'counter';
+    var DATA_KEY = PLUGIN_NAME;
+
+    var methods = {
+        init: function(params) {
+            return this.each(function() {
+                var defaults = {
+                    prefix: ''
+                };
+                var options = $.extend(defaults, params);
+                var $el = $(this);
+                var defData = options.data.slice(0);
+            });
+        },
+        increment: function() {
+
+        },
+        decrement: function() {
+
+        }
+    };
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
+        }
+    };
+})(jQuery);
