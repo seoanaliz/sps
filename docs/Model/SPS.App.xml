@@ -45,5 +45,20 @@
       </Flags>
       <Lists />
     </Entity>
+    <Entity Name="AuthorEvent" PackageName="SPS.App" Table="authorEvents" View="getAuthorEvents" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="articleId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="authorId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="commentIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="commentIds" FieldType="TYPE_ARRAY" ComplexType="int[]" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="isSent" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="isSent" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+        <EFlag>AddablePK</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
   </Entities>
 </Package>

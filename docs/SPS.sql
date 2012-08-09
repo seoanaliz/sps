@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		01.08.2012
+Modified		09.08.2012
 Project		
 Model			
 Company		
@@ -351,6 +351,16 @@ Create table "comments"
 ) Without Oids;
 
 
+Create table "authorEvents"
+(
+	"articleId" Integer NOT NULL,
+	"authorId" Integer NOT NULL,
+	"commentIds" Integer[],
+	"isSent" Boolean NOT NULL Default false,
+ primary key ("articleId")
+) Without Oids;
+
+
 /* Create Tab 'Others' for Selected Tables */
 
 
@@ -417,6 +427,8 @@ Create index "IX_FK_articleRecordsArticleId_articleRecords" on "articleRecords" 
 Alter table "articleRecords" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
 Create index "IX_FK_commentsArticleId_comments" on "comments" ("articleId");
 Alter table "comments" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
+Create index "IX_FK_authorEventsArticleId_authorEvents" on "authorEvents" ("articleId");
+Alter table "authorEvents" add  foreign key ("articleId") references "articles" ("articleId") on update restrict on delete restrict;
 Create index "IX_FK_articleRecordsArticleQueueId_articleRecords" on "articleRecords" ("articleQueueId");
 Alter table "articleRecords" add  foreign key ("articleQueueId") references "articleQueues" ("articleQueueId") on update restrict on delete restrict;
 Create index "IX_FK_articleQueuesTargetFeedId_articleQueues" on "articleQueues" ("targetFeedId");
@@ -441,6 +453,8 @@ Create index "IX_FK_articlesAuthorId_articles" on "articles" ("authorId");
 Alter table "articles" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
 Create index "IX_FK_commentsAuthorId_comments" on "comments" ("authorId");
 Alter table "comments" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
+Create index "IX_FK_authorEventsAuthorId_authorEvents" on "authorEvents" ("authorId");
+Alter table "authorEvents" add  foreign key ("authorId") references "authors" ("authorId") on update restrict on delete restrict;
 Create index "IX_FK_commentsEditorId_comments" on "comments" ("editorId");
 Alter table "comments" add  foreign key ("editorId") references "editors" ("editorId") on update restrict on delete restrict;
 

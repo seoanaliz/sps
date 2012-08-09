@@ -25,8 +25,8 @@
             }
 
             $__editorMode = Response::getBoolean('__editorMode');
+            $article = ArticleFactory::GetById($comment->articleId, array(), array(BaseFactory::WithoutDisabled => false));
             if ($__editorMode) {
-                $article = ArticleFactory::GetById($comment->articleId);
                 if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
                     return;
                 }
@@ -40,6 +40,8 @@
 
             $comment->statusId = 3;
             CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
+
+            AuthorEventUtility::EventCommentRemove($article, $comment->commentId);
         }
     }
 ?>

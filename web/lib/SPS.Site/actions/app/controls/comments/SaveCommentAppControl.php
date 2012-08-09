@@ -58,6 +58,10 @@
 
             CommentFactory::Add($comment, array(BaseFactory::WithReturningKeys => true));
 
+            if ($__editorMode || $author->authorId != $article->authorId) {
+                AuthorEventUtility::EventComment($article, $comment->commentId);
+            }
+
             $comment = CommentFactory::GetById($comment->commentId);
             Response::setParameter( 'comment', $comment );
         }

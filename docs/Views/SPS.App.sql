@@ -35,3 +35,10 @@ SELECT "public"."comments"."commentId"
 		"editor"."editorId" = "public"."comments"."editorId"
 	WHERE "public"."comments"."statusId" != 3
 ORDER BY "public"."comments"."createdAt" DESC;
+
+CREATE OR REPLACE VIEW "getAuthorEvents" AS
+SELECT "public"."authorEvents"."articleId"
+	, "public"."authorEvents"."authorId"
+	, "public"."authorEvents"."commentIds"
+	, "public"."authorEvents"."isSent"
+ FROM "public"."authorEvents";

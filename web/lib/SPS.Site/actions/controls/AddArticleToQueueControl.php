@@ -107,6 +107,11 @@
             ConnectionFactory::CommitTransaction($sqlResult);
 
             if ($sqlResult) {
+                if (!empty($article->authorId)) {
+                    //author event
+                    AuthorEventUtility::EventQueue($article);
+                }
+
                 $result = array(
                     'success' => true,
                     'id' => $articleQueueRecord->articleQueueId
