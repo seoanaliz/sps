@@ -123,7 +123,9 @@
                     break;
                 case 'my':
                 default:
-                    $this->search['authorId'] = $author->authorId;
+                    if (empty($this->search['targetFeedId'])) {
+                        $this->search['authorId'] = $author->authorId;
+                    }
                     break;
 
             }
