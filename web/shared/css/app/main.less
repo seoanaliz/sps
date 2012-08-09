@@ -52,56 +52,7 @@ html, body {
         width: 420px;
         margin-right: 10px;
 
-        &>.header {
-            .user-info {
-                position: relative;
-                min-height: 40px;
-
-                &>.photo {
-                    position: absolute;
-                    overflow: hidden;
-                    top: 0;
-                    left: 0;
-                    width: 40px;
-                    height: 40px;
-
-                    img {
-                        max-width: 100%;
-                    }
-                }
-                &>.info {
-                    margin-left: 50px;
-
-                    &>.title {
-                        font-size: 1.1em;
-                        font-weight: bold;
-                    }
-                    &>.other {
-                        margin-top: 9px;
-                        font-weight: bold;
-                        color: @link_color;
-
-                        .icon {
-                            height: .9em;
-                        }
-                        &>.rating {
-                            margin-right: .5em;
-                            .icon {
-                                background: #ccc;
-                            }
-                        }
-                        &>.likes {}
-                        &>.diff {
-                            font-size: .9em;
-                            .opacity(.5);
-                        }
-                    }
-                }
-            }
-        }
         &>.wall {
-            margin-top: 10px;
-
             &>.title {
                 font-weight: bold;
                 color: @link_color;
@@ -115,7 +66,7 @@ html, body {
                     float: right;
                     cursor: pointer;
                     color: @link_color;
-                    padding-right: 12px;
+                    padding-right: 10px;
                     background: url('../../images/common/darr_dd_out.gif') right center no-repeat;
 
                     .opacity(.5);
@@ -255,87 +206,98 @@ html, body {
                         }
                     }
                     &>.content {
-                        margin-left: 60px;
+                        &>.hight-light {
+                            padding-bottom: 10px;
+                            padding-left: 60px;
 
-                        &>.title {
-                            font-weight: bold;
-                        }
-                        &>.text {
-                            margin: .5em 0;
-                        }
-                        &>.attachments {
-                            margin: .5em 0;
-                            width: 360px;
-                            height: 300px;
-
-                            img {
-                                position: relative;
-                                outline: 3px solid #fff;
-                                float: left;
+                            &>.title {
+                                font-weight: bold;
                             }
-                            img:first-child {
-                                z-index: 1;
+                            &>.text {
+                                margin: .5em 0;
                             }
-                        }
-                        &>.sign {
-                            &>.user-info {
-                                float: left;
-                                margin-top: 5px;
+                            &>.attachments {
+                                margin: .5em 0;
+                                width: 360px;
+                                height: 300px;
 
-                                &>.photo {
-                                    overflow: hidden;
-                                    width: 20px;
-                                    height: 20px;
-                                    display: inline-block;
-                                    vertical-align: middle;
-                                    margin-right: 5px;
+                                img {
+                                    position: relative;
+                                    outline: 3px solid #fff;
+                                    float: left;
+                                }
+                                img:first-child {
+                                    z-index: 1;
+                                }
+                            }
+                            &>.sign {
+                                color: #999;
 
-                                    img {
-                                        max-width: 100%;
+                                &>.user-info {
+                                    float: left;
+                                    margin-top: 5px;
+
+                                    &>.photo {
+                                        overflow: hidden;
+                                        width: 20px;
+                                        height: 20px;
+                                        display: inline-block;
+                                        vertical-align: middle;
+                                        margin-right: 5px;
+
+                                        img {
+                                            max-width: 100%;
+                                        }
+                                    }
+                                    &>.name {
+                                        font-weight: bold;
+                                    }
+                                    &>.date {
+                                        color: #999;
+                                        font-size: .9em;
+                                    }
+                                    &>.action {
+                                        font-size: .9em;
                                     }
                                 }
-                                &>.name {
-                                    font-weight: bold;
-                                }
-                                &>.date {
-                                    color: #999;
-                                    font-size: .9em;
+                                &>.likes {
+                                    float: right;
+                                    border-radius: 3px;
+                                    padding: 3px;
+
+                                    .opacity(.5);
+                                    .transition(.2s opacity);
+                                    .user-select(none);
+
+                                    &>.icon,
+                                    &>.counter {
+                                        vertical-align: middle;
+                                        display: inline-block;
+                                    }
+                                    &>.icon {
+                                        width: 1.2em;
+                                        height: 1.2em;
+                                        background: url('../../images/common/like.gif') center no-repeat;
+                                    }
+                                    &>.counter {
+                                        color: @link_color;
+                                        font-weight: bold;
+                                        height: 1.2em;
+                                    }
+
+                                    &:hover {
+                                        background-color: @hover_bg;
+
+                                        .opacity(1);
+                                    }
                                 }
                             }
-                            &>.likes {
-                                float: right;
-                                border-radius: 3px;
-                                padding: 3px;
-
-                                .opacity(.5);
-                                .transition(.2s opacity);
-                                .user-select(none);
-
-                                &>.icon,
-                                &>.counter {
-                                    vertical-align: middle;
-                                    display: inline-block;
-                                }
-                                &>.icon {
-                                    width: 1.2em;
-                                    height: 1.2em;
-                                    background: url('../../images/common/like.gif') center no-repeat;
-                                }
-                                &>.counter {
-                                    color: @link_color;
-                                    font-weight: bold;
-                                    height: 1.2em;
-                                }
-
-                                &:hover {
-                                    background-color: @hover_bg;
-
-                                    .opacity(1);
-                                }
+                            &.new {
+                                background-color: #EDF1F5;
                             }
                         }
                         &>.comments {
-                            margin-top: 10px;
+                            margin-left: 60px;
 
                             &>.list {
                                 &>.show-more {
@@ -366,7 +328,6 @@ html, body {
                                     &>.photo {
                                         position: absolute;
                                         overflow: hidden;
-                                        left: 0;
                                         width: 32px;
                                         height: 32px;
 
@@ -406,6 +367,9 @@ html, body {
                                             .opacity(1);
                                         }
                                     }
+                                    &.new {
+                                        background-color: #EDF1F5;
+                                    }
                                 }
                             }
 
@@ -419,7 +383,7 @@ html, body {
                                     display: none;
                                 }
                                 &>.textarea-wrap {
-                                    padding-right: 12px;
+                                    padding-right: 10px;
 
                                     textarea {
                                         width: 100%;
@@ -494,6 +458,12 @@ html, body {
                             .opacity(1);
                         }
                     }
+
+                    &.no-comments {
+                        .new-comment {
+                            display: none !important;
+                        }
+                    }
                 }
                 &>.show-more {
                     text-align: center;
@@ -516,6 +486,56 @@ html, body {
     .right-column {
         float: left;
         width: 200px;
+
+        &>.header {
+            margin-bottom: 10px;
+
+            .user-info {
+                position: relative;
+                min-height: 40px;
+
+                &>.photo {
+                    position: absolute;
+                    overflow: hidden;
+                    top: 0;
+                    left: 0;
+                    width: 40px;
+                    height: 40px;
+
+                    img {
+                        max-width: 100%;
+                    }
+                }
+                &>.info {
+                    margin-left: 50px;
+
+                    &>.title {
+                        font-size: 1.1em;
+                        font-weight: bold;
+                    }
+                    &>.other {
+                        margin-top: 9px;
+                        font-weight: bold;
+                        color: @link_color;
+
+                        .icon {
+                            height: .9em;
+                        }
+                        &>.rating {
+                            margin-right: .5em;
+                            .icon {
+                                background: #ccc;
+                            }
+                        }
+                        &>.likes {}
+                        &>.diff {
+                            font-size: .9em;
+                            .opacity(.5);
+                        }
+                    }
+                }
+            }
+        }
 
         &>.menu {
             .list {

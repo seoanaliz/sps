@@ -9,8 +9,9 @@
         } else if (!empty($__Editor)) {
             $showDelete = true;
         }
+        $asNew = ($comment->commentId % 2) ? 'new' : '';
 ?>
-<div class="comment" data-id="{$comment->commentId}">
+<div class="comment {$asNew}" data-id="{$comment->commentId}">
     <? if ($showDelete) { ?>
         <div class="delete"></div>
     <? } ?>

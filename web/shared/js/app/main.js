@@ -122,7 +122,7 @@ var app = (function () {
         $newPost.find('textarea').placeholder();
 
         $newPost.find('textarea').bind('focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             $newPost.addClass('open');
         });
         $newPost.find('textarea').bind('keyup', function(e) {
@@ -155,6 +155,27 @@ var app = (function () {
             }
         });
 
+        $wall.delegate('.post .hight-light.new', 'hover', function() {
+            var $hightLight = $(this);
+            var $post = $hightLight.closest('.post');
+            Events.fire('wall_mark_as_read', $post.data('id'), function() {
+                $hightLight.removeClass('new');
+            });
+        });
+        $wall.delegate('.comment.new', 'hover', function() {
+            var $comment = $(this);
+            Events.fire('comment_mark_as_read', $comment.data('id'), function() {
+                $comment.removeClass('new');
+            });
+        });
+        $wall.delegate('.show-new-comment', 'click', function() {
+            var $post = $(this).closest('.post');
+            var $newComment = $post.find('.new-comment');
+            $post.toggleClass('no-comments');
+            if (!$post.hasClass('no-comments')) {
+                $newComment.find('textarea').focus();
+            }
+        });
         $wall.delegate('.post > .delete', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
@@ -176,7 +197,7 @@ var app = (function () {
             showMore();
         });
         $wall.delegate('.new-comment textarea', 'focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             var $newComment = $(this).closest('.new-comment');
             $newComment.addClass('open');
         });
