@@ -33,6 +33,7 @@
 
                 $comment->statusId = 1;
                 CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
+                AuthorEventUtility::EventComment($article, $comment->commentId);
             } else {
                 /** @var $author Author */
                 $author = Session::getObject('Author');

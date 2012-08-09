@@ -20,6 +20,12 @@
             }
         }
 
+        public static function EventQueueRemove($articleId) {
+            $event = new AuthorEvent();
+            $event->isSent = false;
+            AuthorEventFactory::UpdateByMask($event, array('isSent'), array('articleId' => $articleId));
+        }
+
         public static function EventComment(Article $article, $commentId) {
             $event = new AuthorEvent();
             $event->articleId = $article->articleId;
@@ -38,6 +44,20 @@ sql;
                 $cmd->SetInt('@articleId', $article->articleId);
                 $cmd->ExecuteNonQuery();
             }
+        }
+
+        public static function EventCommentRemove(Article $article, $commentId) {
+            $event = new AuthorEvent();
+            $event->articleId = $article->articleId;
+
+            $sql = <<<sql
+              UPDATE "authorEvents" SET "commentIds" = array_remove_sql(CAST("commentIds" as int8[]), CAST('{@commentId}' as int8[]))
+              WHERE "articleId" = @articleId
+sql;
+            $cmd = new SqlCommand($sql, ConnectionFactory::Get());
+            $cmd->SetInt('@commentId', $commentId);
+            $cmd->SetInt('@articleId', $article->articleId);
+            $cmd->ExecuteNonQuery();
         }
 
         public static function GetAuthorCounter($authorId) {
