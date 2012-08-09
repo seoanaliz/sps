@@ -403,14 +403,32 @@ var app = (function () {
                 };
                 var options = $.extend(defaults, params);
                 var $el = $(this);
-                var defData = options.data.slice(0);
+
+                $el.data(DATA_KEY, {
+                    $el: $el,
+                    options: options
+                });
             });
         },
-        increment: function() {
+        increment: function(num) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                num = num || 1;
 
+                $el.html(options.prefix + intval($el.html()) + num);
+            });
         },
-        decrement: function() {
+        decrement: function(num) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                num = num || 1;
 
+                $el.html(options.prefix + intval($el.html()) - num);
+            });
         }
     };
 
