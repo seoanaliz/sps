@@ -66,7 +66,9 @@
         <Attribute Name="authorId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
         <Attribute Name="lastViewDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="lastViewDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
       </Attributes>
-      <Search />
+      <Search>
+        <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
       <Flags>
         <EFlag>CanCache</EFlag>
         <EFlag>WithoutTemplates</EFlag>
