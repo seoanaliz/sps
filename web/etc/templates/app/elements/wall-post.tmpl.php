@@ -38,9 +38,11 @@
                 $contentPart = ($contentPart != $content) ? $contentPart . '...' : '';
                 ?>
                 <div class="shortcut">
-                    <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
                     <? if ($contentPart) { ?>
+                        <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
                         <a href="javascript:;" class="show-cut">Показать полностью...</a>
+                    <? } else { ?>
+                        <?= nl2br(HtmlHelper::RenderToForm($content)) ?>
                     <? } ?>
                 </div>
                 <? if ($contentPart) { ?>
