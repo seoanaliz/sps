@@ -160,6 +160,11 @@ var app = (function () {
             var $post = $hightLight.closest('.post');
             Events.fire('wall_mark_as_read', $post.data('id'), function() {
                 $hightLight.removeClass('new');
+                var $counter = $menu.find('.item.selected .counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                }
+                $counter.counter('decrement');
             });
         });
         $wall.delegate('.comment.new', 'hover', function() {
@@ -167,6 +172,12 @@ var app = (function () {
             var $post = $comment.closest('.post');
             Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
                 $comment.removeClass('new');
+                $hightLight.removeClass('new');
+                var $counter = $menu.find('.item.selected .counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                }
+                $counter.counter('decrement');
             });
         });
         $wall.delegate('.show-new-comment', 'click', function() {
@@ -176,6 +187,14 @@ var app = (function () {
             if (!$post.hasClass('no-comments')) {
                 $newComment.find('textarea').focus();
             }
+        });
+        $wall.delegate('.show-cut', 'click', function() {
+            $text = $(this).closest('.text');
+            $shortcut = $text.find('.shortcut');
+            $cut = $text.find('.cut');
+
+            $shortcut.hide();
+            $cut.show();
         });
         $wall.delegate('.post > .delete', 'click', function() {
             var $target = $(this);
@@ -416,8 +435,9 @@ var app = (function () {
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 num = num || 1;
+                var newNum = intval($el.html()) + num;
 
-                $el.html(options.prefix + intval($el.html()) + num);
+                $el.html(newNum ? (options.prefix + newNum) : '');
             });
         },
         decrement: function(num) {
@@ -426,8 +446,9 @@ var app = (function () {
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 num = num || 1;
+                var newNum = intval($el.html()) - num;
 
-                $el.html(options.prefix + intval($el.html()) - num);
+                $el.html(newNum ? (options.prefix + newNum) : '');
             });
         }
     };

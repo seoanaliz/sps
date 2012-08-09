@@ -33,18 +33,18 @@
             </div>
             <div class="text">
                 <?
-                $contentPart1 = mb_substr($articleRecord->content, 0, 300);
-                $contentPart2 = mb_substr($articleRecord->content, 300);
-                $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
+                $content = $articleRecord->content;
+                $contentPart = mb_substr($content, 0, 300);
+                $contentPart = ($contentPart != $content) ? $contentPart . '...' : '';
                 ?>
                 <div class="shortcut">
-                    <?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?>
-                    <? if($contentPart2) { ?>
-                        ...<a href="javascript:;" class="show-cut">Показать полностью...</a>
+                    <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
+                    <? if ($contentPart) { ?>
+                        <a href="javascript:;" class="show-cut">Показать полностью...</a>
                     <? } ?>
                 </div>
-                <? if($contentPart2) { ?>
-                <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
+                <? if ($contentPart) { ?>
+                <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($content)) ?></div>
                 <? } ?>
             </div>
 
