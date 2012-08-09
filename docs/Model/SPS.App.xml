@@ -60,5 +60,18 @@
       </Flags>
       <Lists />
     </Entity>
+    <Entity Name="AuthorFeedView" PackageName="SPS.App" Table="authorFeedViews" View="getAuthorFeedViews" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="targetFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeed" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="authorId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="lastViewDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="lastViewDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search />
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
   </Entities>
 </Package>

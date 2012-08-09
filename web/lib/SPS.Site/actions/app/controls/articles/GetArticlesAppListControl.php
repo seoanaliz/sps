@@ -182,6 +182,12 @@
             $this->processRequest();
             $this->getObjects();
             $this->setData();
+
+            //обновляем дату, когда пользователь последний раз смотрел паблик
+            if (!empty($this->search['targetFeedId'])) {
+                $author = Session::getObject('Author');
+                AuthorFeedViewUtility::UpdateLastView($author->authorId, $this->search['targetFeedId']);
+            }
         }
     }
 ?>
