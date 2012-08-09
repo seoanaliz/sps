@@ -139,7 +139,7 @@ var Eventlist = {
             }
         });
     },
-    comment_mark_as_read: function(commentId, callback) {
+    comment_mark_as_read: function(postId, commentId, callback) {
         callback(true);
     }
 };
