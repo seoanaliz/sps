@@ -994,6 +994,7 @@ var Box = (function() {
         init: function(params) {
             return this.each(function() {
                 var defaults = {
+                    nonNegative: true,
                     prefix: ''
                 };
                 var options = $.extend(defaults, params);
@@ -1017,10 +1018,10 @@ var Box = (function() {
 
                 $el.html(options.prefix + intval(num));
 
-                if (num) {
-                    $el.css('visibility', 'visible');
-                } else {
+                if (!num || (num < 0 && options.nonNegative)) {
                     $el.css('visibility', 'hidden');
+                } else {
+                    $el.css('visibility', 'visible');
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {

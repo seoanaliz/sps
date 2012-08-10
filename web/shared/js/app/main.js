@@ -155,7 +155,8 @@ var app = (function () {
             }
         });
 
-        $wall.delegate('.post .hight-light.new', 'hover', function() {
+        $wall.delegate('.post .hight-light.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
             var $hightLight = $(this);
             var $post = $hightLight.closest('.post');
             Events.fire('wall_mark_as_read', $post.data('id'), function() {
@@ -167,7 +168,8 @@ var app = (function () {
                 $counter.counter('decrement');
             });
         });
-        $wall.delegate('.comment.new', 'hover', function() {
+        $wall.delegate('.comment.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
             var $comment = $(this);
             var $post = $comment.closest('.post');
             Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
@@ -288,6 +290,8 @@ var app = (function () {
                         {title: 'мои записи', type: 'my'},
                         {title: 'лучшие записи', type: 'best'}
                     ];
+                } else {
+                    $item.find('.counter').fadeOut(200);
                 }
                 if (isEmpty) {
                     dropdownItems = [
