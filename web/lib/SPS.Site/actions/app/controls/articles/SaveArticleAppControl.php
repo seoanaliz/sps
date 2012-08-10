@@ -68,7 +68,7 @@
                 $result['success'] = true;
             }
 
-            //echo ObjectHelper::ToJSON($result);
+            echo ObjectHelper::ToJSON($result);
         }
 
         private function getPhotos() {
