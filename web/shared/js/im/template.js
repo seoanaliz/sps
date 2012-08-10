@@ -83,8 +83,5 @@ var LIST =
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>">' +
-    '<div class="icon">' +
-        '<img src="<?=icon?>" alt="" />' +
-    '</div>' +
     '<div class="title"><?=title?></div>' +
 '</div>';
