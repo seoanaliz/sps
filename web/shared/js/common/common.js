@@ -1014,8 +1014,9 @@ var Box = (function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
+                num = intval(num);
 
-                $el.html(options.prefix + intval(num));
+                $el.html(options.prefix + num);
 
                 if (num) {
                     $el.css('visibility', 'visible');
