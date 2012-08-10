@@ -29,11 +29,11 @@ var IM = Widget.extend({
         t.leftColumn = t.initLeftColumn();
         t.rightColumn = t.initRightColumn();
 
-        t.leftColumn.on('delete', function() {
-            t.rightColumn.go();
+        t.rightColumn.on('selectList', function() {
+            t.leftColumn.showDialog();
         });
         t.rightColumn.on('selectDialog', function() {
-
+            t.leftColumn.showDialogList();
         });
     },
 
@@ -70,15 +70,15 @@ var Messages = Widget.extend({
         'click: .message': 'deleteMessage'
     },
 
-    showList: function() {
-
+    showDialog: function() {
+        alert(1);
     },
 
-    showDialog: function(id) {
+    showDialogList: function() {
+        alert(2);
     },
 
     deleteMessage: function(id) {
-        this.trigger('delete');
     }
 });
 
@@ -89,14 +89,15 @@ var List = Widget.extend({
     template: LIST,
 
     events: {
-        'click: .item': 'selectItem'
+        'click: .item > .title': 'selectList',
+        'click: .public': 'selectDialog'
     },
 
-    selectItem: function(e) {
-        console.log(e);
+    selectList: function(e) {
+        this.trigger('selectList');
     },
 
-    go: function() {
-        alert('go!');
+    selectDialog: function(e) {
+        this.trigger('selectDialog');
     }
 });

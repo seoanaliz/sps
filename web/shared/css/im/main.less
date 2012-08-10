@@ -100,36 +100,50 @@
             .border-radius(3px 3px 0 0);
         }
         &>.list {
-            padding: 5px 0;
+            color: @color_link;
 
             &>.item {
-                padding: 2px;
-                cursor: pointer;
+                margin-bottom: 4px;
 
-                &:hover {
-                    background-color: @bg_light_hover;
-                }
-
-                &>div {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-                &>.icon {
-                    margin-left: 5px;
-                    width: 30px;
-                    height: 30px;
-                    overflow: hidden;
-
-                    img {
-                        max-width: 100%;
-                    }
-                }
                 &>.title {
-                    padding: 5px;
-                    margin-left: 5px;
+                    padding: 4px 8px;
+                    cursor: pointer;
+                    font-weight: bold;
                 }
-                &>.counter {
 
+                &>.list {
+                    &>.public {
+                        margin: 4px 0;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: @bg_light_hover;
+                        }
+
+                        &>div {
+                            display: inline-block;
+                            vertical-align: middle;
+                        }
+                        &>.icon {
+                            margin-left: 5px;
+                            width: 30px;
+                            height: 30px;
+                            overflow: hidden;
+                            .border-radius(2px);
+
+                            img {
+                                max-width: 100%;
+                                .border-radius(2px);
+                            }
+                        }
+                        &>.title {
+                            padding: 5px;
+                            margin-left: 5px;
+                        }
+                        &>.counter {
+
+                        }
+                    }
                 }
             }
         }

@@ -84,4 +84,15 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>">' +
     '<div class="title"><?=title?></div>' +
+    '<div class="list">' +
+        '<? if (dialogs.length) { ?>' +
+            '<? each(PUBLIC_LIST_ITEM, dialogs); ?>' +
+        '<? } ?>' +
+    '</div>' +
+'</div>';
+
+var PUBLIC_LIST_ITEM =
+'<div class="public">' +
+    '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
+    '<div class="title"><?=user.name?></div>' +
 '</div>';

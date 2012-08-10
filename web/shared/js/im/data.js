@@ -4,27 +4,27 @@ Data.users = [
     {
         id: 1,
         name: 'Vanya',
-        photo: 'http://vk.com/images/camera_c.gif',
+        photo: 'http://vk.cc/S6Zn1',
         isOnline: true
     }, {
         id: 2,
         name: 'Zhenya',
-        photo: 'http://vk.com/images/camera_c.gif',
+        photo: 'http://vk.cc/S6ZWT',
         isOnline: true
     }, {
         id: 3,
         name: 'Petya',
-        photo: 'http://vk.com/images/camera_c.gif',
+        photo: 'http://vk.cc/S6ZDq',
         isOnline: true
     }, {
         id: 4,
         name: 'Vova',
-        photo: 'http://vk.com/images/camera_c.gif',
+        photo: 'http://vk.cc/S6ZM3',
         isOnline: true
     }, {
         id: 4718705,
         name: 'Artyom Kohver',
-        photo: 'http://vk.com/images/camera_c.gif',
+        photo: 'http://vk.cc/S6ZsO',
         isOnline: true
     }
 ];
@@ -66,12 +66,10 @@ Data.lists = [
     {
         id: 1,
         title: 'Друзья',
-        icon: 'http://vk.com/images/camera_c.gif',
         dialogs: Data.dialogs
     }, {
         id: 2,
         title: 'Коллеги',
-        icon: 'http://vk.com/images/camera_c.gif',
         dialogs: Data.dialogs
     }
 ];
