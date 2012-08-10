@@ -14,7 +14,7 @@ html,body{background-color:#f1f1f1;}
 .main .left-column>.wall>.list{min-height:400px;}.main .left-column>.wall>.list:empty{text-align:center;line-height:60px;}.main .left-column>.wall>.list:empty:after{color:gray;font-size:14px;content:'На стене пока нет ни одной записи.';}
 .main .left-column>.wall>.list>.post{position:relative;overflow:hidden;padding:10px 0;border-bottom:1px solid #DEE5EB;}.main .left-column>.wall>.list>.post>.photo{position:absolute;overflow:hidden;width:50px;height:50px;}.main .left-column>.wall>.list>.post>.photo img{max-width:100%;}
 .main .left-column>.wall>.list>.post>.content>.hight-light{padding-bottom:10px;padding-left:60px;}.main .left-column>.wall>.list>.post>.content>.hight-light>.title{font-weight:bold;}
-.main .left-column>.wall>.list>.post>.content>.hight-light>.text{margin:.5em 0;}.main .left-column>.wall>.list>.post>.content>.hight-light>.text .show-cut{display:block;}
+.main .left-column>.wall>.list>.post>.content>.hight-light>.text{margin:.5em 0;}.main .left-column>.wall>.list>.post>.content>.hight-light>.text .show-cut{display:block;font-weight:bold;margin-top:5px;}
 .main .left-column>.wall>.list>.post>.content>.hight-light>.text>.cut{display:none;}
 .main .left-column>.wall>.list>.post>.content>.hight-light>.attachments{margin:.5em 0;width:360px;height:300px;}.main .left-column>.wall>.list>.post>.content>.hight-light>.attachments img{position:relative;outline:3px solid #fff;float:left;}
 .main .left-column>.wall>.list>.post>.content>.hight-light>.attachments img:first-child{z-index:1;}
