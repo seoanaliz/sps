@@ -22,3 +22,12 @@
 <script type="text/javascript">
     $('#wall > .title .text').text('{$articlesCountText}');
 </script>
+<? if (isset($__authorCounter) && ($__authorCounter != -1)) {?>
+<script type="text/javascript">
+    var counter = $('.menu .item.selected .counter');
+    if (!counter.data('counter')) {
+        counter.counter({prefix: '+'});
+    }
+    counter.counter('setCounter', '{$__authorCounter}');
+</script>
+<? } ?>
