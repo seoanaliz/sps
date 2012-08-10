@@ -1020,9 +1020,9 @@ var Box = (function() {
                 $el.html(options.prefix + num);
 
                 if (num) {
-                    $el.css('visibility', 'visible');
+                    $el.show();
                 } else {
-                    $el.css('visibility', 'hidden');
+                    $el.show();
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {
