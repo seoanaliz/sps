@@ -138,11 +138,12 @@
             if (empty($tabType) || $tabType == 'null') {
                 $tabType = Session::getString('gaal_tabType');
             }
+            Session::setString('gaal_tabType', $tabType);
+            Response::setString('tabType', $tabType);
+
             if (empty($this->search['authorId'])) {
                 $tabType = 'all';
             }
-            Session::setString('gaal_tabType', $tabType);
-            Response::setString('tabType', $tabType);
 
             switch ($tabType) {
                 case 'queued':
