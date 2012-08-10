@@ -55,6 +55,11 @@
         private $hasMore = false;
 
         /**
+         * @var int
+         */
+        private $authorCounter = -1;
+
+        /**
          * @var array
          */
         private $search = array();
@@ -172,6 +177,10 @@
                 }
                 $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
             }
+
+            if (!empty($this->search['authorId'])) {
+                $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
+            }
         }
 
         private function setData() {
@@ -184,6 +193,7 @@
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
             Response::setArray( 'commentsData', $this->commentsData );
             Response::setArray( 'authorEvents', $this->authorEvents );
+            Response::setInteger( '__authorCounter', $this->authorCounter );
         }
 
         /**
