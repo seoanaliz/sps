@@ -180,6 +180,12 @@ var Tabs = Widget.extend({
         $(e.currentTarget).addClass('selected');
     },
 
+    getSelectedTab: function() {
+        var t = this;
+
+        return $()
+    },
+
     addTab: function() {
 
     }
