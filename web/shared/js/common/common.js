@@ -1020,10 +1020,10 @@ var Box = (function() {
 
                 $el.html(options.prefix + num);
 
-                if (!num || (num < 0 && options.nonNegative)) {
-                    $el.css('visibility', 'hidden');
-                } else {
+                if (num) {
                     $el.css('visibility', 'visible');
+                } else {
+                    $el.css('visibility', 'hidden');
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {

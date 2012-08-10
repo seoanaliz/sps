@@ -22,7 +22,7 @@
             $__editorMode = Response::getBoolean('__editorMode');
             if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
                 $result['message'] = 'accessError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
