@@ -1022,7 +1022,7 @@ var Box = (function() {
                 if (num) {
                     $el.show();
                 } else {
-                    $el.show();
+                    $el.hide();
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {
