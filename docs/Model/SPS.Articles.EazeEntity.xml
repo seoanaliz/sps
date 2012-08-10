@@ -393,6 +393,22 @@
           <AttributeParameter Key="nullValue" Value="true" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="queuedAt" TitleKey="vt.article.queuedAt" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="queuedAt" />
+          <AttributeParameter Key="value" Value="queuedAt" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="queuedAt" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sentAt" TitleKey="vt.article.sentAt" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="true">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sentAt" />
+          <AttributeParameter Key="value" Value="sentAt" />
+          <AttributeParameter Key="size" Value="80" />
+          <AttributeParameter Key="controlId" Value="sentAt" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="articleId" TitleKey="vt.article.articleId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -489,6 +505,24 @@
           <AttributeParameter Key="dataValue" Value="title" />
           <AttributeParameter Key="value" Value="targetFeedId" />
           <AttributeParameter Key="nullValue" Value="true" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="queuedAt" TitleKey="vt.article.queuedAt" TitleValue="queuedAt" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="queuedAt" />
+          <AttributeParameter Key="value" Value="queuedAt" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="queuedAt" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="sentAt" TitleKey="vt.article.sentAt" TitleValue="sentAt" Type="HTML_EDITOR" CanEdit="true" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="sentAt" />
+          <AttributeParameter Key="value" Value="sentAt" />
+          <AttributeParameter Key="rows" Value="5" />
+          <AttributeParameter Key="cols" Value="80" />
+          <AttributeParameter Key="controlId" Value="sentAt" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

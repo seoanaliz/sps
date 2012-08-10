@@ -345,6 +345,8 @@
       <header><![CDATA[статьи]]></header>
       <importedAt><![CDATA[Дата импорта]]></importedAt>
       <createdAt><![CDATA[Дата публикации]]></createdAt>
+      <queuedAt><![CDATA[Дата планирования]]></queuedAt>
+      <sentAt><![CDATA[Дата отправки]]></sentAt>
       <sourceFeedId><![CDATA[Источник]]></sourceFeedId>
       <recordInfo><![CDATA[Данные статьи]]></recordInfo>
       <statusId><![CDATA[Статус]]></statusId>

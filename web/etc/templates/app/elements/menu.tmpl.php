@@ -3,8 +3,8 @@
         <div class="content">
             Мои публикации
             <span class="counter">
-                <? if(!empty($authorCounter)) { ?>
-                    +{$authorCounter}
+                <? if(!empty($authorCounter['total'])) { ?>
+                    +{$authorCounter[total]}
                 <? } ?>
             </span>
         </div>

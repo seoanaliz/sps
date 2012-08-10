@@ -21,6 +21,12 @@
         /** @var DateTimeWrapper */
         public $createdAt;
 
+        /** @var DateTimeWrapper */
+        public $queuedAt;
+
+        /** @var DateTimeWrapper */
+        public $sentAt;
+
         /** @var string */
         public $externalId;
 

@@ -39,6 +39,14 @@
                     'name'          => 'createdAt'
                     , 'type'        => TYPE_DATETIME
                 )
+                ,'queuedAt' => array(
+                    'name'          => 'queuedAt'
+                    , 'type'        => TYPE_DATETIME
+                )
+                ,'sentAt' => array(
+                    'name'          => 'sentAt'
+                    , 'type'        => TYPE_DATETIME
+                )
                 ,'externalId' => array(
                     'name'          => 'externalId'
                     , 'type'        => TYPE_STRING

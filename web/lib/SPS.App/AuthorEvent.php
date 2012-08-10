@@ -28,6 +28,9 @@
         public $commentIds;
 
         /** @var bool */
+        public $isQueued;
+
+        /** @var bool */
         public $isSent;
     }
 ?>

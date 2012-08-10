@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		09.08.2012
+Modified		10.08.2012
 Project		
 Model			
 Company		
@@ -159,6 +159,8 @@ Create table "articles"
 	"articleId" Serial NOT NULL,
 	"importedAt" Timestamp NOT NULL,
 	"createdAt" Timestamp,
+	"queuedAt" Timestamp,
+	"sentAt" Timestamp,
 	"externalId" Varchar(100) NOT NULL,
 	"rate" Integer NOT NULL Default 0,
 	"sourceFeedId" Integer NOT NULL,
@@ -356,6 +358,7 @@ Create table "authorEvents"
 	"articleId" Integer NOT NULL,
 	"authorId" Integer NOT NULL,
 	"commentIds" Integer[],
+	"isQueued" Boolean NOT NULL Default false,
 	"isSent" Boolean NOT NULL Default false,
  primary key ("articleId")
 ) Without Oids;
@@ -381,6 +384,9 @@ Create unique index "IX_daemonLock" on "daemonLocks" using btree ("title","packa
 Create index "IX_vfsFoldersTreeTreePath" on "vfsFoldersTree" using gist ("path");
 Create index "IX_vfsFoldersTreeTreeRKey" on "vfsFoldersTree" using btree ("rKey");
 Create index "IX_vfsFoldersTreeTreeLKey" on "vfsFoldersTree" using btree ("lKey");
+Create index "IX_feedByRate" on "articles" using btree ("sourceFeedId","rate") where (("statusId" <> 2) AND ("statusId" <> 3));
+Create index "IX_queuedAt" on "articles" using btree ("queuedAt") where ('queuedAt' IS NOT NULL);
+Create index "IX_sentAt" on "articles" using btree ("sentAt") where ('sentAt' IS NOT NULL);
 
 
 /* Create Foreign Keys */

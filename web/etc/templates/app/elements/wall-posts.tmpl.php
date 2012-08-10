@@ -5,11 +5,9 @@
     </div>
     <div class="tabs">
         <div class="tab-bar">
-            <div class="tab all selected">Все записи</div>
-            <div class="tab planned">Запланированные</div>
-            <div class="tab posted">Отправленные
-                <spen class="counter">+1</spen>
-            </div>
+            <div class="tab all selected" data-type="all">Все записи</div>
+            <div class="tab planned" data-type="queued">Запланированные<span class="counter"></span></div>
+            <div class="tab posted" data-type="sent">Отправленные<span class="counter"></span></div>
         </div>
     </div>
     <? if (!empty($targetFeeds)) { ?>

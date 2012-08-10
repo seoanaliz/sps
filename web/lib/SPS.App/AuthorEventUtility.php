@@ -11,26 +11,27 @@
             $event = new AuthorEvent();
             $event->articleId = $article->articleId;
             $event->authorId = $article->authorId;
-            $event->isSent = true;
+            $event->isQueued = true;
 
             //плохо, но у нас не отлавливается duplicate PK, а upsert не хочется писать
             $result = @AuthorEventFactory::Add($event);
             if (!$result) {
-                AuthorEventFactory::UpdateByMask($event, array('isSent'), array('articleId' => $event->articleId));
+                AuthorEventFactory::UpdateByMask($event, array('isQueued'), array('articleId' => $event->articleId));
             }
         }
 
         public static function EventQueueRemove($articleId) {
             $event = new AuthorEvent();
-            $event->isSent = false;
-            AuthorEventFactory::UpdateByMask($event, array('isSent'), array('articleId' => $articleId));
+            $event->isQueued = false;
+            AuthorEventFactory::UpdateByMask($event, array('isQueued'), array('articleId' => $articleId));
         }
 
         public static function EventComment(Article $article, $commentId) {
             $event = new AuthorEvent();
-            $event->articleId = $article->articleId;
-            $event->authorId = $article->authorId;
-            $event->isSent = false;
+            $event->articleId   = $article->articleId;
+            $event->authorId    = $article->authorId;
+            $event->isQueued    = false;
+            $event->isSent      = false;
             $event->commentIds[] = $commentId;
 
             $result = @AuthorEventFactory::Add($event);
@@ -61,11 +62,13 @@ sql;
         }
 
         public static function GetAuthorCounter($authorId) {
-            $result = 0;
+            $result = array();
 
             $sql = <<<sql
                 SELECT
-                    SUM((CASE WHEN "isSent" = true THEN 1 ELSE 0 END + coalesce(array_length("commentIds", 1), 0))) as "counter"
+                    SUM(coalesce(array_length("commentIds", 1), 0)) as "newComments",
+                    SUM(CASE WHEN "isQueued" = true THEN 1 ELSE 0 END) as "newQueued",
+                    SUM(CASE WHEN "isSent" = true THEN 1 ELSE 0 END) as "newSent"
                 FROM "authorEvents"
                 WHERE "authorId" = @authorId
 sql;
@@ -75,7 +78,10 @@ sql;
             $ds = $cmd->Execute();
 
             while ($ds->Next()) {
-                $result = $ds->GetInteger('counter');
+                $result['newComments'] = $ds->GetInteger('newComments');
+                $result['newQueued'] = $ds->GetInteger('newQueued');
+                $result['newSent'] = $ds->GetInteger('newSent');
+                $result['total'] = $result['newComments'] + $result['newQueued'] + $result['newSent'];
             }
 
             return $result;
