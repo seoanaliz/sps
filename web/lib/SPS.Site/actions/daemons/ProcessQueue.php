@@ -216,7 +216,7 @@ sql;
             $object = ArticleFactory::GetById($articleQueue->articleId, array(), array(BaseFactory::WithoutDisabled => false));
 
             if (!empty($object->authorId)) {
-                $object->queuedAt = DateTimeWrapper::Now();
+                $object->queuedAt = null;
                 $object->sentAt = DateTimeWrapper::Now();
                 ArticleFactory::UpdateByMask($object, array('sentAt', 'queuedAt'), array('articleId' => $object->articleId));
                 AuthorEventUtility::EventSent($object);
