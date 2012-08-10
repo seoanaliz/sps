@@ -1015,13 +1015,14 @@ var Box = (function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
+                num = intval(num);
 
-                $el.html(options.prefix + intval(num));
+                $el.html(options.prefix + num);
 
-                if (!num || (num < 0 && options.nonNegative)) {
-                    $el.css('visibility', 'hidden');
-                } else {
+                if (num) {
                     $el.css('visibility', 'visible');
+                } else {
+                    $el.css('visibility', 'hidden');
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {
