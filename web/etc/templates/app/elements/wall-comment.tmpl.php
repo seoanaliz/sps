@@ -17,7 +17,7 @@
             }
         }
 ?>
-<div class="comment {$asNew}" data-id="{$comment->commentId}">
+<div class="comment new" data-id="{$comment->commentId}">
     <? if ($showDelete) { ?>
         <div class="delete"></div>
     <? } ?>
