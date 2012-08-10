@@ -7,7 +7,7 @@
 
     if (!empty($article)) {
         $asNew = '';
-        if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId = $__Author->authorId) {
+        if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
             if ($authorEvents[$article->articleId]->isSent) {
                 $asNew = 'new';
             }
