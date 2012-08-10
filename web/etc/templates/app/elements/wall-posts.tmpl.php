@@ -1,12 +1,12 @@
 <div class="wall" id="wall">
     <div class="title clear-fix">
         <div class="text"></div>
-        <div class="dropdown">мои записи</div>
+        <div class="dropdown" style="visibility: hidden;">мои записи</div>
     </div>
     <? if (!empty($targetFeeds)) { ?>
     <div class="new-post">
         <div class="textarea-wrap">
-            <textarea placeholder="Ваш текст..." rows="2"></textarea>
+            <textarea placeholder="Есть чем поделиться?" rows="2"></textarea>
             <div class="add-photo"></div>
         </div>
         <div class="attachments">

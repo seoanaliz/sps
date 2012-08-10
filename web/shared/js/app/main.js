@@ -60,9 +60,10 @@ var app = (function () {
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
 
-        $wall.find('.comment textarea').placeholder();
+        $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
         $wallList.find('.date').easydate(easydateParams);
+        $wallList.find('.comment.new:first').closest('.comments').find('textarea').focus();
     }
 
     function _initEvents() {
@@ -120,9 +121,8 @@ var app = (function () {
 
         /*Left column*/
         $newPost.find('textarea').placeholder();
-
         $newPost.find('textarea').bind('focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             $newPost.addClass('open');
         });
         $newPost.find('textarea').bind('keyup', function(e) {
@@ -155,6 +155,48 @@ var app = (function () {
             }
         });
 
+        $wall.delegate('.post .hight-light.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
+            var $hightLight = $(this);
+            var $post = $hightLight.closest('.post');
+            Events.fire('wall_mark_as_read', $post.data('id'), function() {
+                $hightLight.removeClass('new');
+                var $counter = $menu.find('.item.selected .counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                }
+                $counter.counter('decrement');
+            });
+        });
+        $wall.delegate('.comment.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
+            var $comment = $(this);
+            var $post = $comment.closest('.post');
+            Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
+                $comment.removeClass('new');
+                var $counter = $menu.find('.item.selected .counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                }
+                $counter.counter('decrement');
+            });
+        });
+        $wall.delegate('.show-new-comment', 'click', function() {
+            var $post = $(this).closest('.post');
+            var $newComment = $post.find('.new-comment');
+            $post.toggleClass('no-comments');
+            if (!$post.hasClass('no-comments')) {
+                $newComment.find('textarea').focus();
+            }
+        });
+        $wall.delegate('.show-cut', 'click', function() {
+            $text = $(this).closest('.text');
+            $shortcut = $text.find('.shortcut');
+            $cut = $text.find('.cut');
+
+            $shortcut.hide();
+            $cut.show();
+        });
         $wall.delegate('.post > .delete', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
@@ -176,7 +218,7 @@ var app = (function () {
             showMore();
         });
         $wall.delegate('.new-comment textarea', 'focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             var $newComment = $(this).closest('.new-comment');
             $newComment.addClass('open');
         });
@@ -248,6 +290,8 @@ var app = (function () {
                         {title: 'мои записи', type: 'my'},
                         {title: 'лучшие записи', type: 'best'}
                     ];
+                } else {
+                    $item.find('.counter').fadeOut(200);
                 }
                 if (isEmpty) {
                     dropdownItems = [

@@ -9,8 +9,15 @@
         } else if (!empty($__Editor)) {
             $showDelete = true;
         }
+
+        $asNew = '';
+        if (!empty($article) && !empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId = $__Author->authorId) {
+            if (!empty($authorEvents[$article->articleId]->commentIds) && in_array($comment->commentId, $authorEvents[$article->articleId]->commentIds)) {
+                $asNew = 'new';
+            }
+        }
 ?>
-<div class="comment" data-id="{$comment->commentId}">
+<div class="comment {$asNew}" data-id="{$comment->commentId}">
     <? if ($showDelete) { ?>
         <div class="delete"></div>
     <? } ?>

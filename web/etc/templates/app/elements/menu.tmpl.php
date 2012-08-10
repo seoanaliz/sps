@@ -2,9 +2,11 @@
     <div class="item my selected" data-id="my">
         <div class="content">
             Мои публикации
-            <? if(!empty($authorCounter) && false) { ?>
-                <span class="counter">+{$authorCounter}</span>
-            <? } ?>
+            <span class="counter">
+                <? if(!empty($authorCounter)) { ?>
+                    +{$authorCounter}
+                <? } ?>
+            </span>
         </div>
     </div>
     <? foreach($targetFeeds as $targetFeed) { ?>

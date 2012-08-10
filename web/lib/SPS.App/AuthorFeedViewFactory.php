@@ -7,51 +7,47 @@
     Package::Load( 'SPS.App' );
 
     /**
-     * AuthorEvent Factory
+     * AuthorFeedView Factory
      *
      * @package SPS
      * @subpackage App
      */
-    class AuthorEventFactory implements IFactory {
+    class AuthorFeedViewFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = null;
 
-        /** AuthorEvent instance mapping  */
+        /** AuthorFeedView instance mapping  */
         public static $mapping = array (
-            'class'       => 'AuthorEvent'
-            , 'table'     => 'authorEvents'
-            , 'view'      => 'getAuthorEvents'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates', 'AddablePK' => 'AddablePK' )
-            , 'cacheDeps' => array( 'authors', 'articles' )
+            'class'       => 'AuthorFeedView'
+            , 'table'     => 'authorFeedViews'
+            , 'view'      => 'getAuthorFeedViews'
+            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'cacheDeps' => array( 'targetFeedGrids', 'authors' )
             , 'fields'    => array(
-                'articleId' => array(
-                    'name'          => 'articleId'
+                'targetFeedId' => array(
+                    'name'          => 'targetFeedId'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'key'         => true
-                    , 'foreignKey'  => 'Article'
+                    , 'foreignKey'  => 'TargetFeed'
                 )
                 ,'authorId' => array(
                     'name'          => 'authorId'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
+                    , 'key'         => true
                     , 'foreignKey'  => 'Author'
                 )
-                ,'commentIds' => array(
-                    'name'          => 'commentIds'
-                    , 'type'        => TYPE_ARRAY
-                    , 'complexType' => 'int[]'
-                )
-                ,'isSent' => array(
-                    'name'          => 'isSent'
-                    , 'type'        => TYPE_BOOLEAN
+                ,'lastViewDate' => array(
+                    'name'          => 'lastViewDate'
+                    , 'type'        => TYPE_DATETIME
                     , 'nullable'    => 'No'
                 ))
             , 'lists'     => array()
             , 'search'    => array(
-                '_articleId' => array(
-                    'name'         => 'articleId'
+                '_targetFeedId' => array(
+                    'name'         => 'targetFeedId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 ))
@@ -104,17 +100,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return AuthorEvent[] */
+        /** @return AuthorFeedView[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return AuthorEvent */
+        /** @return AuthorFeedView */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return AuthorEvent */
+        /** @return AuthorFeedView */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -139,7 +135,7 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return AuthorEvent */
+        /** @return AuthorFeedView */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }

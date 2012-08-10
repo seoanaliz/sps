@@ -27,10 +27,12 @@
             }
 
             $all = Request::getBoolean( 'all' );
-            $commentsData = CommentUtility::GetLastComments(array($article->articleId), !$all);
+            $authorEvents = AuthorEventFactory::Get(array('articleId' => $article->articleId));
+            $commentsData = CommentUtility::GetLastComments(array($article->articleId), !$all, $authorEvents);
 
             Response::setParameter( 'article', $article );
             Response::setArray( 'commentsData', $commentsData );
+            Response::setArray( 'authorEvents', $authorEvents );
 
             if (!empty($all)) {
                 Response::setBoolean( 'showHideBtn', true );

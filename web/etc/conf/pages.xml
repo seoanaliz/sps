@@ -503,6 +503,9 @@
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>
                 </page>
+                <page uri="appControls://article-mark/">
+                    <actions>SPS.Site.MarkArticleAppControl</actions>
+                </page>
                 <page uri="appControls://(editor/)?comment-save/">
                     <actions>SPS.Site.SaveCommentAppControl</actions>
                     <template>tmpl://app/elements/wall-comment.tmpl.php</template>
@@ -516,6 +519,9 @@
                 </page>
                 <page uri="appControls://(editor/)?comment-restore/">
                     <actions>SPS.Site.RestoreCommentAppControl</actions>
+                </page>
+                <page uri="appControls://comment-mark/">
+                    <actions>SPS.Site.MarkCommentAppControl</actions>
                 </page>
             </pageGroup>
 
