@@ -9,6 +9,5 @@
         <? if(!empty($targetCounters[$targetFeed->targetFeedId])) { ?>
             <span class="counter">+<?= $targetCounters[$targetFeed->targetFeedId] ?></span>
         <? } ?>
-        <span class="counter">+6</span>
     </div>
 </div>
