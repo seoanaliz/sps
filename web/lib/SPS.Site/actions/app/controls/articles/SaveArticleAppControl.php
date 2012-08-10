@@ -35,7 +35,7 @@
 
             if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
                 $result['message'] = 'emptyTargetFeedId';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
@@ -56,7 +56,7 @@
 
             if (empty($articleRecord->content) && empty($articleRecord->photos)) {
                 $result['message'] = 'emptyArticle';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
@@ -68,7 +68,7 @@
                 $result['success'] = true;
             }
 
-            echo ObjectHelper::ToJSON($result);
+            //echo ObjectHelper::ToJSON($result);
         }
 
         private function getPhotos() {
