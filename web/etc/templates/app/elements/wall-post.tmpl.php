@@ -76,7 +76,13 @@
                         <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                     </span>
                     <? } ?>
-                    <span class="date">{$article->createdAt->defaultFormat()}</span>
+                    <? if ($tabType == 'sent' && !empty($article->sentAt)) { ?>
+                        Отправлен <span class="date">{$article->sentAt->defaultFormat()}</span>
+                    <? } else if ($tabType == 'queued' && !empty($article->queuedAt)) { ?>
+                        Запланирован <span class="date">{$article->queuedAt->defaultFormat()}</span>
+                    <? } else { ?>
+                        <span class="date">{$article->createdAt->defaultFormat()}</span>
+                    <? } ?>
                     <? if (empty($commentsData[$article->articleId])) { ?>
                         | <a class="action show-new-comment" href="javascript:;">Комментировать</a>
                     <? } ?>
