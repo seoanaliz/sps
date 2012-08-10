@@ -259,7 +259,7 @@ input {
         margin-right: .4em;
         color: #45688E;
         font-weight: bold;
-        padding: .4em .6em;
+        padding: .3em .6em;
         cursor: pointer;
         display: inline-block;
         overflow: hidden;
@@ -268,6 +268,15 @@ input {
         max-width: 150px;
 
         .border-radius(0.3em);
+
+        &>.counter {
+            font-weight: bold;
+            padding: .3em .6em;
+            background: #D5DDE5;
+            margin-right: -.6em;
+
+            .border-radius(2px);
+        }
 
         &:focus,
         &:hover {
@@ -279,6 +288,11 @@ input {
         &.selected {
             background-color: #597DA3;
             color: #fff;
+
+            &>.counter {
+                background: none;
+                color: #fff;
+            }
         }
     }
 }
