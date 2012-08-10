@@ -139,11 +139,44 @@ var RightColumn = Widget.extend({
 });
 
 var Dialogs = Widget.extend({
-    template: DIALOGS
+    template: DIALOGS,
+
+    renderTemplate: function() {
+        var t = this;
+
+        t._super();
+        $(t.el).find('.date').easydate({
+            live: true,
+            date_parse: function(date) {
+                date = intval(date) * 1000;
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    }
 });
 
 var Messages = Widget.extend({
-    template: MESSAGES
+    template: MESSAGES,
+
+    renderTemplate: function() {
+        var t = this;
+
+        t._super();
+        $(t.el).find('.date').easydate({
+            live: true,
+            date_parse: function(date) {
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    }
 });
 
 var List = Widget.extend({
