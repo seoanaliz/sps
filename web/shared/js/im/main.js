@@ -10,81 +10,142 @@ var cur = {
 
 $(document).ready(function() {
     new IM({
-        el: '#main',
-        template: MAIN
+        el: '#main'
     });
 });
 
-/*
-* Instant Messenger
-*/
+/* Instant Messenger */
 var IM = Widget.extend({
+    template: MAIN,
     leftColumn: null,
     rightColumn: null,
 
     run: function() {
         var t = this;
-        t._super();
 
+        t._super();
         t.leftColumn = t.initLeftColumn();
         t.rightColumn = t.initRightColumn();
 
+        t.initEvents();
+    },
+
+    initEvents: function() {
+        var t = this;
+
         t.rightColumn.on('selectList', function() {
-            t.leftColumn.showDialog();
+            t.leftColumn.showDialogs();
         });
-        t.rightColumn.on('selectDialog', function() {
-            t.leftColumn.showDialogList();
+        t.rightColumn.on('selectDialog', function(a) {
+            t.leftColumn.showMessages();
         });
     },
-
     initLeftColumn: function() {
-        var t = this;
-
-        return new Messages({
-            el: '.left-column > .list',
-            data: {
-                list: Data.dialogs
-            }
+        return new LeftColumn({
+            el: '.left-column'
         });
     },
-
     initRightColumn: function() {
-        var t = this;
-
-        return new List({
-            el: '.right-column > .list',
-            data: {
-                list: Data.lists
-            }
+        return new RightColumn({
+            el: '.right-column'
         });
     }
 });
 
-/*
-* List of messages
-*/
-var Messages = Widget.extend({
-    template: MESSAGES,
+var LeftColumn = Widget.extend({
+    template: LEFT_COLUMN,
+    dialogs: null,
+    messages: null,
+    tabs: null,
 
     events: {
-        'click: .message': 'deleteMessage'
+        'click: .list .dialog': 'showMessages',
+        'click: .list .message': 'showDialogs'
     },
 
-    showDialog: function() {
-        alert(1);
+    run: function() {
+        var t = this;
+
+        t._super();
+        t.tabs = t.initTabs();
+        t.dialogs = t.initDialogs();
+        t.messages = t.initMessages();
+        t.showDialogs();
     },
 
-    showDialogList: function() {
-        alert(2);
+    initTabs: function() {
+        return new Tabs({
+            el: $(this.el).find('.header'),
+            data: {tabs: [{id: 1, title: 'Диалоги', isSelected: true}]}
+        });
+    },
+    initDialogs: function() {
+        return new Dialogs({
+            el: $(this.el).find('.list'),
+            data: {list: Data.dialogs},
+            run: function() {}
+        });
+    },
+    initMessages: function() {
+        return new Messages({
+            el: $(this.el).find('.list'),
+            data: {list: Data.dialogs},
+            run: function() {}
+        });
     },
 
-    deleteMessage: function(id) {
+    showDialogs: function(listId) {
+        var t = this;
+
+        t.dialogs.renderTemplate();
+    },
+    showMessages: function(dialogId) {
+        var t = this;
+
+        t.messages.renderTemplate();
+    },
+
+    addTab: function(id, title) {
+        var t = this;
+    },
+    removeTab: function(id) {
+        var t = this;
+    },
+    selectTab: function(id) {
+        var t = this;
     }
 });
 
-/*
- * List of dialogs
- */
+var RightColumn = Widget.extend({
+    template: RIGHT_COLUMN,
+    list: null,
+
+    run: function() {
+        var t = this;
+
+        t._super();
+        t.list = t.initList();
+    },
+
+    initList: function() {
+        return new List({
+            el: $(this.el).find('.list'),
+            data: {list: Data.lists}
+        });
+    },
+
+    selectList: function(e) {},
+    selectDialog: function(e) {}
+});
+
+var Dialogs = Widget.extend({
+    template: DIALOGS
+});
+
+var Messages = Widget.extend({
+    template: MESSAGES
+});
+
 var List = Widget.extend({
     template: LIST,
 
@@ -94,10 +155,32 @@ var List = Widget.extend({
     },
 
     selectList: function(e) {
-        this.trigger('selectList');
+        var t = this;
+
+        t.trigger('selectList');
+    },
+    selectDialog: function(e) {
+        var t = this;
+
+        t.trigger('selectDialog');
+    }
+});
+
+var Tabs = Widget.extend({
+    template: TABS,
+
+    events: {
+        'click: .tab': 'selectTab'
     },
 
-    selectDialog: function(e) {
-        this.trigger('selectDialog');
+    selectTab: function(e) {
+        var t = this;
+
+        $(t.el).find('.tab.selected').removeClass('selected');
+        $(e.currentTarget).addClass('selected');
+    },
+
+    addTab: function() {
+
     }
 });

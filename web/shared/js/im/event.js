@@ -20,7 +20,7 @@ var Event = Class.extend({
 
     trigger: function(eventName) {
         for (var i in this._callbacks[eventName]) {
-            if (this._callbacks[eventName][i]) this._callbacks[eventName][i]();
+            if (this._callbacks[eventName][i]) this._callbacks[eventName][i].apply(this, Array.prototype.slice.call(arguments, 1));
         }
 
         return this;

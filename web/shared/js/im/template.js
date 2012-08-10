@@ -38,28 +38,34 @@ var tmpl = (function($) {
 })(jQuery);
 
 var MAIN =
-'<div class="left-column">' +
-    '<div class="header">' +
-        '<div class="tab-bar">' +
-            '<div class="tab selected">Диалоги</div>' +
-        '</div>' +
-    '</div>' +
-    '<div class="list"></div>' +
-'</div>' +
-'<div class="right-column">' +
-    '<div class="header">' +
-        '<div class="tab-bar">' +
-            '<div class="tab selected">Контакты</div>' +
-        '</div>' +
-    '</div>' +
-    '<div class="list"></div>' +
+'<div class="left-column"></div>' +
+'<div class="right-column"></div>';
+
+var TABS =
+'<div class="tab-bar">' +
+    '<? each(TABS_ITEM, tabs); ?>' +
 '</div>';
 
-var MESSAGES =
-'<? each(MESSAGES_ITEM, list); ?>';
+var TABS_ITEM =
+'<div class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>"><?=title?></div>';
 
-var MESSAGES_ITEM =
-'<div class="message clear-fix">' +
+var LEFT_COLUMN =
+'<div class="header"></div>' +
+'<div class="list"></div>';
+
+var RIGHT_COLUMN =
+'<div class="header">' +
+    '<div class="tab-bar">' +
+        '<div class="tab selected">Контакты</div>' +
+    '</div>' +
+'</div>' +
+'<div class="list"></div>';
+
+var DIALOGS =
+'<? each(DIALOGS_ITEM, list); ?>';
+
+var DIALOGS_ITEM =
+'<div class="dialog clear-fix">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<img src="<?=user.photo?>" alt="" />' +
@@ -76,6 +82,14 @@ var MESSAGES_ITEM =
     '<div class="actions">' +
         '<div class="action icon plus"></div>' +
     '</div>' +
+'</div>';
+
+var MESSAGES =
+'<? each(MESSAGES_ITEM, list); ?>';
+
+var MESSAGES_ITEM =
+'<div class="message clear-fix">' +
+    'message' +
 '</div>';
 
 var LIST =
