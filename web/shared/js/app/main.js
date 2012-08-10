@@ -173,11 +173,14 @@ var app = (function () {
             var $post = $hightLight.closest('.post');
             Events.fire('wall_mark_as_read', $post.data('id'), function() {
                 $hightLight.removeClass('new');
-                var $counter = $menu.find('.item.selected .counter');
-                if (!$counter.data('counter')) {
-                    $counter.counter({prefix: '+'});
+                function decCounter($counter) {
+                    if (!$counter.data('counter')) {
+                        $counter.counter({prefix: '+'});
+                    }
+                    $counter.counter('decrement');
                 }
-                $counter.counter('decrement');
+                decCounter($menu.find('.item.selected .counter'));
+                decCounter($wall.find('.tabs .tab.selected .counter'));
             });
         });
         $wall.delegate('.comment.new', 'hover', function(e) {

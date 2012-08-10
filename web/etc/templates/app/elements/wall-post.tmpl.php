@@ -29,7 +29,7 @@
     </div>
     <? } ?>
     <div class="content">
-        <div class="hight-light {$asNew}">
+        <div class="hight-light new">
             <div class="title">
                 <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
             </div>

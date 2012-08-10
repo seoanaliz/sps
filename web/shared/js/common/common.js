@@ -1016,6 +1016,9 @@ var Box = (function() {
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 num = intval(num);
+                if (options.nonNegative && num < 0) {
+                    num = 0;
+                }
 
                 $el.html(options.prefix + num);
 
