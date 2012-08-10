@@ -1,5 +1,5 @@
 <div class="menu" id="menu">
-    <div class="item my selected" data-id="my">
+    <div class="item my" data-id="my">
         <div class="content">
             Мои публикации
             <span class="counter">
@@ -9,7 +9,11 @@
             </span>
         </div>
     </div>
-    <? foreach($targetFeeds as $targetFeed) { ?>
-        {increal:tmpl://app/elements/menu-item.tmpl.php}
-    <? } ?>
+    <?
+        $i = 0;
+        foreach($targetFeeds as $targetFeed) {
+            $i++;
+            ?>{increal:tmpl://app/elements/menu-item.tmpl.php}<?
+        }
+    ?>
 </div>
