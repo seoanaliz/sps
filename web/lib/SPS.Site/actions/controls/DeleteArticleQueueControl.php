@@ -39,6 +39,8 @@
                 $o = new Article();
                 $o->statusId = 1;
                 ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $object->articleId, 'statusId' => 2));
+
+                AuthorEventUtility::EventQueueRemove($object->articleId);
             }
         }
     }

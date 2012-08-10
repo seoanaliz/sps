@@ -48,16 +48,13 @@ function getURLParameter(name) {
                 .parent().prepend($placeholder)
             ;
 
-            $placeholder.bind('mousedown', function() {
-                $placeholder.hide();
-                $input.focus();
-            });
             $placeholder.bind('mouseup', function() {
+                $placeholder.hide();
                 $input.focus();
             });
             $input.bind('blur change', function() {
                 if (!$input.val()) {
-                    $placeholder.fadeIn(100);
+                    $placeholder.show();
                 }
             });
             $input.bind('focus change', function() {
@@ -75,6 +72,7 @@ function getURLParameter(name) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
+                $input.css({overflow: 'hidden'});
                 $autoResize
                     .css({
                         width: $input.width(),
@@ -88,10 +86,24 @@ function getURLParameter(name) {
                         top: -100000
                     })
                 ;
-                $input.bind('keyup focus blur', function(e) {
-                    $autoResize.html($input.val().split('\n').join('<br/>.') + '<br/>.');
-                    $input.css('height', $autoResize.height());
+
+                $input.bind('keyup keydown focus blur', function(e) {
+                    var minHeight = intval($input.css('min-height'));
+                    var maxHeight = intval($input.css('max-height'));
+                    var val = $input.val().split('\n').join('<br/>.');
+                    if (e.type == 'keydown' && e.keyCode == KEY.ENTER && !e.ctrlKey) {
+                        val += '<br/>.'
+                    }
+                    $autoResize.html(val);
+                    $input.css({
+                        height: Math.max(
+                            minHeight,
+                            maxHeight ? Math.min(maxHeight, $autoResize.height()) : $autoResize.height()
+                         )
+                    });
                 });
+
+                $input.keyup();
             }
         });
     };
@@ -957,6 +969,78 @@ var Box = (function() {
             f.call(context, argument);
         }
     }
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
+        }
+    };
+})(jQuery);
+
+/* Счетчики */
+(function($) {
+    var PLUGIN_NAME = 'counter';
+    var DATA_KEY = PLUGIN_NAME;
+
+    var methods = {
+        init: function(params) {
+            return this.each(function() {
+                var defaults = {
+                    nonNegative: true,
+                    prefix: ''
+                };
+                var options = $.extend(defaults, params);
+                var $el = $(this);
+
+                $el.data(DATA_KEY, {
+                    $el: $el,
+                    counter: intval($el.html()),
+                    options: options
+                });
+            });
+        },
+        getCounter: function() {
+            return this.data(DATA_KEY).counter;
+        },
+        setCounter: function(num) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                num = intval(num);
+
+                $el.html(options.prefix + num);
+
+                if (!num || (num < 0 && options.nonNegative)) {
+                    $el.css('visibility', 'hidden');
+                } else {
+                    $el.css('visibility', 'visible');
+                }
+
+                $el.data(DATA_KEY, $.extend(data, {
+                    counter: num
+                }));
+            });
+        },
+        increment: function(num) {
+            return this.each(function() {
+                var $el = $(this);
+                num = num || 1;
+                $el.counter('setCounter', $el.counter('getCounter') + num);
+            });
+        },
+        decrement: function(num) {
+            return this.each(function() {
+                var $el = $(this);
+                num = num || 1;
+                $el.counter('setCounter', $el.counter('getCounter') - num);
+            });
+        }
+    };
 
     $.fn[PLUGIN_NAME] = function(method) {
         if (methods[method]) {

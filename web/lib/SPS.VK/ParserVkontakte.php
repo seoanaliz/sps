@@ -98,7 +98,7 @@
                     'type'       =>     $type,
                     'id'         =>     $gid[1],
                     'avatara'    =>     $ava,
-                    'name'       =>     $name[1],
+                    'name'       =>     !empty($name[1]) ? $name[1] : '',
                     'short_name' =>     $short_name,
                     'population' =>     $population
                 );

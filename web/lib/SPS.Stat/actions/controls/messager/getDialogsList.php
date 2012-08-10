@@ -33,7 +33,7 @@ class getDialogsList
         $row_dialog_array =  MesDialogs::get_dialogs( $user_id );
 
         $i = 0;
-
+        $user_ids = '';
         foreach ( $row_dialog_array as $dialog ) {
             if (   ( $dialog->read_state == 1 && $only_unread)
                 || ( $dialog->date > $date_end || $dialog->date < $date_start )
@@ -44,14 +44,23 @@ class getDialogsList
                 if ( $i < $offset )
                     continue;
                 $dialogs_array[] = $dialog;
-
+                $user_ids .= $dialog->uid . ',';
                 if ( $i == $offset + $limit )
                     break;
             }
+
+
+        }
+        unset($dialog);
+
+        $users_array = StatUsers::get_vk_user_info( $user_ids );
+
+        foreach( $dialogs_array as &$dialog ) {
+             $dialog->uid = $users_array[ $dialog->uid ];
         }
 
-        #print_r($dialog_array);
-        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
+        print_r($dialogs_array);
+//        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
 
     }
 }

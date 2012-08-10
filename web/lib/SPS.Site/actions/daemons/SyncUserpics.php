@@ -27,6 +27,7 @@
             foreach ($externalIds as $externalId) {
                 if (in_array($externalId, SourceFeedUtility::$Tops)) continue;
                 SourceFeedUtility::SaveRemoteImage($externalId);
+                sleep(1);
             }
         }
     }

@@ -64,11 +64,12 @@
                 $parser = new ParserVkontakte();
                 $info = $parser->get_info(ParserVkontakte::VK_URL . '/public' . $externalId);
 
-                if (!empty($info['avatarа'])) {
-                    $avatarPath = $info['avatarа'];
+                if (!empty($info['avatara'])) {
+                    $avatarPath = $info['avatara'];
                     $content = file_get_contents($avatarPath);
                     if (!empty($content)) {
                         file_put_contents($filePath, $content);
+                        Logger::Debug($avatarPath . ' -> ' . Site::GetWebPath($path));
                     }
                 }
             } catch (Exception $Ex) {}
