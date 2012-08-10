@@ -167,11 +167,10 @@
                     );
                 }
 
-                $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
-
                 if (!empty($this->search['authorId'])) {
                     $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
                 }
+                $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
             }
         }
 

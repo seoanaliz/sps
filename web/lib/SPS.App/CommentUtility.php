@@ -9,7 +9,7 @@
 
         const LAST_COUNT = 3;
 
-        public static function GetLastComments($articleIds, $limit = true) {
+        public static function GetLastComments($articleIds, $limit = true, $authorEvents = array()) {
             $result = array();
 
             $sql = <<<eof
@@ -41,6 +41,22 @@ eof;
                 $object = BaseFactory::getObject($ds, CommentFactory::$mapping, $structure);
                 $result[$object->articleId]['comments'][] = $object;
                 $result[$object->articleId]['count'] = $ds->GetInteger('count');
+            }
+
+            if ($limit) {
+                foreach ($result as $articleId => $commentsData) {
+                    if (!empty($authorEvents[$articleId]) && !empty($authorEvents[$articleId]->commentIds)) {
+                        $newCommentIds = $authorEvents[$articleId]->commentIds;
+                        $showCommentIds = ArrayHelper::GetObjectsFieldValues($commentsData['comments'], array('commentId'));
+
+                        $countNewCollapsed = 0;
+                        foreach (array_unique($newCommentIds) as $newCommentId) {
+                            if (!in_array($newCommentId, $showCommentIds)) $countNewCollapsed++;
+                        }
+
+                        $result[$articleId]['countNewCollapsed'] = $countNewCollapsed;
+                    }
+                }
             }
 
             return $result;
