@@ -53,6 +53,31 @@ html, body {
         margin-right: 10px;
 
         &>.wall {
+            &.not-textarea {
+                &>.new-post {
+                    display: none;
+                }
+                &>.tabs {
+                    display: block;
+                }
+            }
+
+            &>.tabs {
+                display: none;
+                padding: 6px;
+                background: #f1f1f1;
+
+                .tab-bar {
+                    text-align: center;
+                    .tab {
+                        margin-right: 1.5em;
+                        &:last-child {
+                            margin-right: 0;
+                        }
+                    }
+                }
+            }
+
             &>.title {
                 font-weight: bold;
                 color: @link_color;
@@ -330,7 +355,6 @@ html, body {
                                     }
                                     &>.counter {
                                         font-weight: bold;
-                                        display: inline-block;
                                         padding: 2px 4px;
                                         background: #D5DDE5;
 

@@ -3,6 +3,15 @@
         <div class="text"></div>
         <div class="dropdown" style="visibility: hidden;">мои записи</div>
     </div>
+    <div class="tabs">
+        <div class="tab-bar">
+            <div class="tab all selected">Все записи</div>
+            <div class="tab planned">Запланированные</div>
+            <div class="tab posted">Отправленные
+                <spen class="counter">+1</spen>
+            </div>
+        </div>
+    </div>
     <? if (!empty($targetFeeds)) { ?>
     <div class="new-post">
         <div class="textarea-wrap">
