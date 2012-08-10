@@ -8,7 +8,9 @@
     if (!empty($article)) {
         $asNew = '';
         if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
-            if ($authorEvents[$article->articleId]->isQueued || $authorEvents[$article->articleId]->isSent) {
+            if ($authorEvents[$article->articleId]->isQueued && $tabType == 'queued') {
+                $asNew = 'new';
+            } else if ($authorEvents[$article->articleId]->isSent && $tabType == 'sent') {
                 $asNew = 'new';
             }
         }

@@ -135,6 +135,12 @@
             }
 
             $tabType = Request::getString( 'tabType' );
+            if (empty($tabType) || $tabType == 'null') {
+                $tabType = Session::getString('gaal_tabType');
+            }
+            Session::setString('gaal_tabType', $tabType);
+            Response::setString('tabType', $tabType);
+
             switch ($tabType) {
                 case 'queued':
                     $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';

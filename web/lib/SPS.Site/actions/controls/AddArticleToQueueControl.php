@@ -121,7 +121,8 @@
                     //блокируем статью, чтобы ее больше никто не пытался отправить
                     $o = new Article();
                     $o->statusId = 2;
-                    ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $article->articleId));
+                    $o->queuedAt = DateTimeWrapper::Now();
+                    ArticleFactory::UpdateByMask($o, array('statusId', 'queuedAt'), array('articleId' => $article->articleId));
 
                     $result['moved'] = true;
                 } else {

@@ -12,6 +12,7 @@
             $event->articleId = $article->articleId;
             $event->authorId = $article->authorId;
             $event->isQueued = true;
+            $event->isSent = false;
 
             //плохо, но у нас не отлавливается duplicate PK, а upsert не хочется писать
             $result = @AuthorEventFactory::Add($event);
@@ -24,6 +25,26 @@
             $event = new AuthorEvent();
             $event->isQueued = false;
             AuthorEventFactory::UpdateByMask($event, array('isQueued'), array('articleId' => $articleId));
+        }
+
+        public static function EventSent(Article $article) {
+            $event = new AuthorEvent();
+            $event->articleId = $article->articleId;
+            $event->authorId = $article->authorId;
+            $event->isQueued = false;
+            $event->isSent = true;
+
+            //плохо, но у нас не отлавливается duplicate PK, а upsert не хочется писать
+            $result = @AuthorEventFactory::Add($event);
+            if (!$result) {
+                AuthorEventFactory::UpdateByMask($event, array('isQueued', 'isSent'), array('articleId' => $event->articleId));
+            }
+        }
+
+        public static function EventSentRemove($articleId) {
+            $event = new AuthorEvent();
+            $event->isSent = false;
+            AuthorEventFactory::UpdateByMask($event, array('isSent'), array('articleId' => $articleId));
         }
 
         public static function EventComment(Article $article, $commentId) {

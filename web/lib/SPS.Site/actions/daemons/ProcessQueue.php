@@ -212,6 +212,14 @@ sql;
             $articleQueue->statusId = StatusUtility::Finished;
             $articleQueue->sentAt = DateTimeWrapper::Now();
             ArticleQueueFactory::UpdateByMask($articleQueue, array('statusId', 'sentAt', 'externalId'), array('articleQueueId' => $articleQueue->articleQueueId) );
+
+            $object = ArticleFactory::GetById($articleQueue->articleId, array(), array(BaseFactory::WithoutDisabled => false));
+
+            if (!empty($object->authorId)) {
+                $object->sentAt = DateTimeWrapper::Now();
+                ArticleFactory::UpdateByMask($object, array('sentAt'), array('articleId' => $object->articleId));
+                AuthorEventUtility::EventSent($object);
+            }
         }
 
         private function restartArticleQueue($articleQueue) {

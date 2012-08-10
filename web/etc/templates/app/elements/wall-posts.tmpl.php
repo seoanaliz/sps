@@ -5,9 +5,9 @@
     </div>
     <div class="tabs">
         <div class="tab-bar">
-            <div class="tab all selected" data-type="all">Все записи</div>
-            <div class="tab planned" data-type="queued">Запланированные<span class="counter"></span></div>
-            <div class="tab posted" data-type="sent">Отправленные<span class="counter"></span></div>
+            <div class="tab all <?= (empty($tabType) || ($tabType == 'all')) ? 'selected' : '' ?>" data-type="all">Все записи</div>
+            <div class="tab planned <?= (!empty($tabType) && ($tabType == 'queued')) ? 'selected' : '' ?>" data-type="queued">Запланированные<span class="counter"></span></div>
+            <div class="tab posted <?= (!empty($tabType) && ($tabType == 'sent')) ? 'selected' : '' ?>" data-type="sent">Отправленные<span class="counter"></span></div>
         </div>
     </div>
     <? if (!empty($targetFeeds)) { ?>

@@ -44,6 +44,7 @@ eof;
             Response::setArray( 'targetFeedIdsWithPosts', $targetFeedIdsWithPosts );
             Response::setArray( 'authorCounter', $authorCounter );
             Response::setArray( 'targetCounters', $targetCounters );
+            Response::setString('tabType', Session::getString( 'gaal_tabType' ));
         }
     }
 ?>
