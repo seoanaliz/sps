@@ -138,6 +138,9 @@
             if (empty($tabType) || $tabType == 'null') {
                 $tabType = Session::getString('gaal_tabType');
             }
+            if (empty($this->search['authorId'])) {
+                $tabType = 'all';
+            }
             Session::setString('gaal_tabType', $tabType);
             Response::setString('tabType', $tabType);
 
