@@ -77,9 +77,9 @@
                     </span>
                     <? } ?>
                     <? if ($tabType == 'sent' && !empty($article->sentAt)) { ?>
-                        Отправлен <span class="date">{$article->sentAt->defaultFormat()}</span>
+                        Отправлено <span class="date">{$article->sentAt->defaultFormat()}</span>
                     <? } else if ($tabType == 'queued' && !empty($article->queuedAt)) { ?>
-                        Запланирован <span class="date">{$article->queuedAt->defaultFormat()}</span>
+                        Запланировано <span class="date">{$article->queuedAt->defaultFormat()}</span>
                     <? } else { ?>
                         <span class="date">{$article->createdAt->defaultFormat()}</span>
                     <? } ?>
