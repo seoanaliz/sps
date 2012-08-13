@@ -26,6 +26,7 @@ var app = (function () {
     var $loadMore;
     var $menu;
     var $newPost;
+    var $wallTabs;
     var easydateParams = {
         live: true,
         date_parse: function(date) {
@@ -59,6 +60,7 @@ var app = (function () {
         $loadMore = $('> .show-more', $wallList);
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
+        $wallTabs = $('.tabs', $wall);
 
         $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
@@ -120,6 +122,16 @@ var app = (function () {
         });
 
         /*Left column*/
+        $wallTabs.delegate('.tab', 'click', function() {
+            var $tab = $(this);
+            $wallTabs.find('.tab.selected').removeClass('selected');
+            $tab.addClass('selected');
+            Events.fire('wall_load', {clear: true, tabType: $tab.data('type')}, function(data) {
+                $wallList.html(data);
+                _updateItems();
+            });
+        });
+
         $newPost.find('textarea').placeholder();
         $newPost.find('textarea').bind('focus', function() {
             if (!$(this).data('autoResize')) $(this).autoResize();
@@ -161,11 +173,14 @@ var app = (function () {
             var $post = $hightLight.closest('.post');
             Events.fire('wall_mark_as_read', $post.data('id'), function() {
                 $hightLight.removeClass('new');
-                var $counter = $menu.find('.item.selected .counter');
-                if (!$counter.data('counter')) {
-                    $counter.counter({prefix: '+'});
+                function decCounter($counter) {
+                    if (!$counter.data('counter')) {
+                        $counter.counter({prefix: '+'});
+                    }
+                    $counter.counter('decrement');
                 }
-                $counter.counter('decrement');
+                decCounter($menu.find('.item.selected .counter'));
+                decCounter($wall.find('.tabs .tab.selected .counter'));
             });
         });
         $wall.delegate('.comment.new', 'hover', function(e) {
@@ -290,8 +305,10 @@ var app = (function () {
                         {title: 'мои записи', type: 'my'},
                         {title: 'лучшие записи', type: 'best'}
                     ];
+                    $wall.addClass('not-textarea');
                 } else {
                     $item.find('.counter').fadeOut(200);
+                    $wall.removeClass('not-textarea');
                 }
                 if (isEmpty) {
                     dropdownItems = [

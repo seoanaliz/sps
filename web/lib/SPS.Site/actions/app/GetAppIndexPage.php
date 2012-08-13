@@ -42,8 +42,9 @@ eof;
             Response::setArray( 'targetFeeds', $targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
             Response::setArray( 'targetFeedIdsWithPosts', $targetFeedIdsWithPosts );
-            Response::setInteger( 'authorCounter', $authorCounter );
+            Response::setArray( 'authorCounter', $authorCounter );
             Response::setArray( 'targetCounters', $targetCounters );
+            Response::setString('tabType', Session::getString( 'gaal_tabType' ));
         }
     }
 ?>

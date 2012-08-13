@@ -7,9 +7,14 @@
 
     if (!empty($article)) {
         $asNew = '';
+        $newPostType = '';
         if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
-            if ($authorEvents[$article->articleId]->isSent) {
+            if ($authorEvents[$article->articleId]->isQueued && $tabType == 'queued') {
                 $asNew = 'new';
+                $newPostType = 'queued';
+            } else if ($authorEvents[$article->articleId]->isSent && $tabType == 'sent') {
+                $asNew = 'new';
+                $newPostType = 'sent';
             }
         }
         $hasComments = !empty($commentsData[$article->articleId]);
@@ -27,7 +32,7 @@
     </div>
     <? } ?>
     <div class="content">
-        <div class="hight-light {$asNew}">
+        <div class="hight-light {$asNew}" data-type="{$newPostType}">
             <div class="title">
                 <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
             </div>
@@ -71,7 +76,13 @@
                         <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                     </span>
                     <? } ?>
-                    <span class="date">{$article->createdAt->defaultFormat()}</span>
+                    <? if ($tabType == 'sent' && !empty($article->sentAt)) { ?>
+                        Отправлено <span class="date">{$article->sentAt->defaultFormat()}</span>
+                    <? } else if ($tabType == 'queued' && !empty($article->queuedAt)) { ?>
+                        Запланировано <span class="date">{$article->queuedAt->defaultFormat()}</span>
+                    <? } else { ?>
+                        <span class="date">{$article->createdAt->defaultFormat()}</span>
+                    <? } ?>
                     <? if (empty($commentsData[$article->articleId])) { ?>
                         | <a class="action show-new-comment" href="javascript:;">Комментировать</a>
                     <? } ?>

@@ -55,9 +55,9 @@
         private $hasMore = false;
 
         /**
-         * @var int
+         * @var array
          */
-        private $authorCounter = -1;
+        private $authorCounter = array();
 
         /**
          * @var array
@@ -132,7 +132,32 @@
                         $this->search['authorId'] = $author->authorId;
                     }
                     break;
+            }
 
+            $tabType = Request::getString( 'tabType' );
+            if (empty($tabType) || $tabType == 'null') {
+                $tabType = Session::getString('gaal_tabType');
+            }
+            Session::setString('gaal_tabType', $tabType);
+            Response::setString('tabType', $tabType);
+
+            if (empty($this->search['authorId'])) {
+                $tabType = 'all';
+            }
+
+            switch ($tabType) {
+                case 'queued':
+                    $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
+                    $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
+                    break;
+                case 'sent':
+                    $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
+                    $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
+                    break;
+                case 'all':
+                default:
+                    // дефолтная сортировка
+                    break;
             }
         }
 
@@ -193,7 +218,7 @@
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
             Response::setArray( 'commentsData', $this->commentsData );
             Response::setArray( 'authorEvents', $this->authorEvents );
-            Response::setInteger( '__authorCounter', $this->authorCounter );
+            Response::setArray( '__authorCounter', $this->authorCounter );
         }
 
         /**

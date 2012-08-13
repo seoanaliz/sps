@@ -43,6 +43,11 @@
                     , 'type'        => TYPE_ARRAY
                     , 'complexType' => 'int[]'
                 )
+                ,'isQueued' => array(
+                    'name'          => 'isQueued'
+                    , 'type'        => TYPE_BOOLEAN
+                    , 'nullable'    => 'No'
+                )
                 ,'isSent' => array(
                     'name'          => 'isSent'
                     , 'type'        => TYPE_BOOLEAN
