@@ -18,8 +18,9 @@ function intval(str) {
 }
 
 // Парсинг URL
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+function getURLParameter(name, search) {
+    search = search || location.search;
+    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
 // Кроссбраузерные плейсхолдеры
@@ -111,212 +112,197 @@ function getURLParameter(name) {
 
 // Композиция картинок
 (function($) {
-    $.fn.imageComposition = function(hardPosition) {
-        return this.each(function() {
-            var CLASS_LOADING = 'image-compositing';
-            var VER = 'ver', HOR = 'hor';
-            hardPosition == 'right' ? VER : (hardPosition == 'bottom' ? HOR : false);
+    var PLUGIN_NAME = 'imageComposition';
+    var DATA_KEY = PLUGIN_NAME;
+    var CLASS_LOADING = 'image-compositing';
+    var VER = 'ver';
+    var HOR = 'hor';
 
-            var position = hardPosition;
-            var $wrap = $(this);
-            var $images = $wrap.find('img');
-            var num = $images.length;
-            var imagesPerColumn = 5;
-            var wrap = {
-                el: $wrap,
-                width: 0,
-                height: 0,
-                maxWidth: $wrap.width(),
-                maxHeight: $wrap.height(),
-                type: ''
-            };
-
-            if ($wrap.data('image-compositing')) return;
-
-            $wrap.data('image-compositing', true);
-            $wrap.addClass(CLASS_LOADING);
-            $images.each(function(i, image) {
-                var $img = $(image);
-
-                var img = new Image();
-                img.onload = function() {
-                    if (i == num - 1) {
-                        return onLoadImages();
-                    }
+    var methods = {
+        init: function(hardPosition) {
+            return this.each(function() {
+                var position = (hardPosition == 'right') ? VER : (hardPosition == 'bottom' ? HOR : false);
+                var $wrap = $(this);
+                var $images = $wrap.find('img');
+                var imagesNum = $images.length;
+                var imagesSizes = [];
+                var imagesPerColumn = 5;
+                var wrap = {
+                    width: 0,
+                    height: 0,
+                    maxWidth: $wrap.width(),
+                    maxHeight: $wrap.height()
                 };
-                img.src = $img.attr('src');
-            });
 
-            // ======================== //
-            function isHor($image) {
-                var w = $image.width();
-                var h = $image.height();
-                return !!(w / h > 1.1);
-            }
+                if ($wrap.data(DATA_KEY)) return;
 
-            function isVer($image) {
-                return !isHor($image);
-            }
+                $wrap.data(DATA_KEY, true);
 
-            function relativeResize(size, type, width) {
-                var w = (type == 'width') ? 'width' : 'height';
-                var h = (type == 'height') ? 'width' : 'height';
-                var coef = size[w] / size[h];
+                (function loadImage(i) {
+                    var img = new Image();
+                    var src = $($images[i]).attr('src');
 
-                size[w] = width;
-                size[h] = size[w] / coef;
+                    img.onload = function() {
+                        imagesSizes.push([img.width, img.height]);
+                        if (i == imagesNum - 1) {
+                            return onLoadImages();
+                        } else {
+                            loadImage(i + 1);
+                        }
+                    };
+                    img.src = src;
+                })(0);
 
-                return size;
-            }
+                function onLoadImages() {
+                    $wrap.addClass(CLASS_LOADING);
 
-            function onLoadImages() {
-                var $firstImage;
-                var columns = [];
+                    var $firstImage;
+                    var firstImageWidth;
+                    var firstImageHeight;
+                    var columns = [];
 
-                if ((num - 1) % imagesPerColumn == 1) {
-                    imagesPerColumn++;
-                } else if ((num - 1) % imagesPerColumn == 2) {
-                    imagesPerColumn--;
-                }
-                if (num == 2 && !hardPosition) {
-                    position = VER;
-                    wrap.width = wrap.maxWidth;
-                    $firstImage = $wrap;
-                }
+                    if ((imagesNum - 1) % imagesPerColumn == 1) {
+                        imagesPerColumn++;
+                    } else if ((imagesNum - 1) % imagesPerColumn == 2) {
+                        imagesPerColumn--;
+                    }
+                    if (imagesNum == 2 && !position) {
+                        position = VER;
+                    }
 
-                $images.each(function(i) {
-                    var $image = $(this);
+                    (function() {
+                        var imageIndex = 0;
+                        var $image = $($images[imageIndex]);
+                        var imageWidth = imagesSizes[imageIndex][0];
+                        var imageHeight = imagesSizes[imageIndex][1];
 
-                    if (i == 0) {
                         $firstImage = $image;
-                        if (!position && isHor($firstImage)) {
-                            position = HOR;
-                            $firstImage.width(Math.min(wrap.maxWidth, $firstImage.width()));
-                            wrap.width = $firstImage.width();
-                            $wrap.width(wrap.width);
-                        } else {
-                            position = VER;
-                            $firstImage.height(Math.min(wrap.maxHeight, $firstImage.height()));
-                            wrap.height = $firstImage.height();
-                            $wrap.height(wrap.height);
-                        }
-                    } else {
-                        var columnIndex = Math.floor((i - 1) / (position == HOR ? imagesPerColumn : 99));
-                        if (!columns[columnIndex]) columns[columnIndex] = {};
+                        firstImageWidth = Math.min(imageWidth, wrap.maxWidth);
+                        firstImageHeight = Math.min(imageHeight, wrap.maxHeight);
 
-                        var column = columns[columnIndex];
-                        if (!column.images) column.images = [];
-                        if (!column.columnHeight) column.columnHeight = 99999;
+                        if (!position) {
+                            position = isHor([firstImageWidth, firstImageHeight]) ? HOR : VER;
+                        }
+
                         if (position == HOR) {
-                            column.columnHeight = Math.min(column.columnHeight, $image.height());
+                            wrap.width = firstImageWidth;
+                            $wrap.width(firstImageWidth);
+                            $firstImage.width(firstImageWidth);
                         } else {
-                            column.columnHeight = Math.min(column.columnHeight, $image.width());
+                            wrap.height = firstImageHeight;
+                            $wrap.height(firstImageHeight);
+                            $firstImage.height(firstImageHeight);
                         }
-                        column.images.push($image);
-                    }
-                });
+                    })();
 
-                $(columns).each(function(columnIndex, column) {
-                    $(column.images).each(function(imageIndex, $image) {
-                        if (!column.columnWidth) column.columnWidth = 0;
-                        if (position == HOR) {
-                            $image.height(column.columnHeight);
-                            column.columnWidth += $image.width();
-                        } else {
-                            $image.width(column.columnHeight);
-                            column.columnWidth += $image.height();
+                    (function() {
+                        for (var imageIndex = 1; imageIndex < imagesNum; imageIndex++) {
+                            var $image = $($images[imageIndex]);
+                            var imageSize = imagesSizes[imageIndex];
+                            var imageWidth = imageSize[0];
+                            var imageHeight = imageSize[1];
+                            var columnIndex = Math.floor((imageIndex - 1) / (position == HOR ? imagesPerColumn : 99));
+                            var column = columns[columnIndex];
+
+                            if (!columns[columnIndex]) {
+                                column = columns[columnIndex] = {
+                                    images: [],
+                                    width: 0,
+                                    height: 0
+                                };
+                            }
+
+                            if (position == HOR) {
+                                imageSize = relativeResize(imageSize, 'height', 100);
+                                imageWidth = imageSize[0];
+                                imageHeight = imageSize[1];
+                                column.width += imageWidth;
+                                column.height = imageHeight;
+                            } else {
+                                imageSize = relativeResize(imageSize, 'width', 100);
+                                imageWidth = imageSize[0];
+                                imageHeight = imageSize[1];
+                                column.width = imageWidth;
+                                column.height += imageHeight;
+                            }
+                            column.images.push({
+                                el: $image,
+                                width: imageWidth,
+                                height: imageHeight
+                            });
                         }
-                    });
-                });
+                    })();
 
-                var columnsHeight = 0;
-                $(columns).each(function(columnIndex, column) {
-                    var coef = 0;
-                    var columnHeight = 0;
+                    (function() {
+                        for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                            var column = columns[columnIndex];
+                            var columnSize = [column.width, column.height];
+                            var images = column.images;
 
-                    if (position == HOR) {
-                        coef = wrap.width / column.columnWidth;
-                    } else {
-                        coef = wrap.height / column.columnWidth;
-                    }
+                            if (position == HOR) {
+                                columnSize = relativeResize(columnSize, 'width', wrap.width);
+                            } else {
+                                columnSize = relativeResize(columnSize, 'height', wrap.height);
+                            }
+                            column.width = columnSize[0];
+                            column.height = columnSize[1];
 
-                    $(column.images).each(function(imageIndex, $image) {
-                        var s = {};
-                        if (position == HOR) {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
+                            for (var imageIndex = 0; imageIndex < images.length; imageIndex++) {
+                                var image = images[imageIndex];
+                                var imageSize = [image.width, image.height];
 
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['height'];
-                        } else {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
+                                if (position == HOR) {
+                                    imageSize = relativeResize(imageSize, 'height', column.height);
+                                } else {
+                                    imageSize = relativeResize(imageSize, 'width', column.width);
+                                }
+                                image.width = imageSize[0];
+                                image.height = imageSize[1];
 
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['width'];
+                                var $image = image.el;
+                                $image.width(image.width);
+                                $image.height(image.height);
+
+                                onComposeImages();
+                            }
                         }
-                    });
-                    columnsHeight += columnHeight;
-                });
-
-                var coef;
-                if (position == HOR) {
-                    wrap.height = $firstImage.height() + columnsHeight;
-
-                    if (wrap.height > wrap.maxHeight) {
-                        coef = wrap.maxHeight / wrap.height;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
-                    }
-                } else {
-                    wrap.width = $firstImage.width() + columnsHeight;
-
-                    if (wrap.width > wrap.maxWidth) {
-                        coef = wrap.maxWidth / wrap.width;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
-                    }
+                    })();
                 }
 
-                $wrap.width(wrap.width + 2);
-                $wrap.height(wrap.height + 2);
-                $wrap.removeClass(CLASS_LOADING);
-            }
-        });
+                function onComposeImages() {
+                    $wrap.removeClass(CLASS_LOADING);
+                }
+            });
+        }
+    };
+
+    function relativeResize(size, type, width) {
+        var w = (type == 'width') ? 0 : 1;
+        var h = (type == 'height') ? 0 : 1;
+        var coef = size[w] / size[h];
+
+        size[w] = width;
+        size[h] = size[w] / coef;
+
+        return size;
+    }
+
+    function isHor(sizes) {
+        return !!(sizes[0] / sizes[1] > 1.1);
+    }
+
+    function isVer($image) {
+        return !isHor($image);
+    }
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
+        }
     };
 })(jQuery);
 

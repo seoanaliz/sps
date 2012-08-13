@@ -4,7 +4,7 @@ if (!isset($__activeElement)) $__activeElement = NULL;
 /**
  * Manual set meta or reset of meta
  */
-$__sitePageTitle    = 'Stat';
+$__sitePageTitle    = 'Instant Messenger';
 $__pageTitle        = !empty($__pageTitle) ? $__pageTitle : '';
 $__metaDescription  = !empty($__metaDescription) ? $__metaDescription : '';
 $__metaKeywords     = !empty($__metaKeywords) ? $__metaKeywords : '';
@@ -33,7 +33,8 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.css',
-        'css://st/main.css',
+        'css://im/login.css',
+        'css://im/main.css',
    ),
     AssetHelper::IE7 => array(),
 );
@@ -41,12 +42,15 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
-    'js://fe/jquery-ui-1.8.18.custom.min.js',
-    'js://fe/jquery.ui.slider.js',
-    'js://st/main.js',
-    'js://st/data.js',
-    'js://st/events.js',
-    'js://st/template.js',
+    'js://common/class.js',
+    'js://common/jquery.easydate-0.2.4.js',
+    'js://im/event.js',
+    'js://im/widget.js',
+    'js://im/data.js',
+    'js://im/template.js',
+    'js://im/events.js',
+    'js://im/login.js',
+    'js://im/main.js',
 );
 
 CssHelper::Init(false);

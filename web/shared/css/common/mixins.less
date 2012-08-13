@@ -1,0 +1,44 @@
+@color_link: #2B587A;
+@color_light_blue: #99ADC2;
+@color_blue: #5E82A8;
+@bg_hover: #E1E7ED;
+@bg_light_hover: #EDF1F5;
+@bg_gray: #F1F1F1;
+@bg_light_gray: #F7F7F7;
+@bg_title: #DEE5EB;
+@border_main: #C4CDE0;
+@border_inside: #DAE1E8;
+
+.user-select(@select: text) {
+    -webkit-touch-callout: @select;
+    -webkit-user-select: @select;
+    -khtml-user-select: @select;
+    -moz-user-select: @select;
+    -ms-user-select: @select;
+    -o-user-select: @select;
+    user-select: @select;
+}
+.transition(@params) {
+    -webkit-transition: @params;
+    -moz-transition: @params;
+    -o-transition: @params;
+    transition: @params;
+}
+.background-gradient(@top-color: #fff, @bottom-color: #eee) {
+    background-color: @top-color;
+    background-image: -webkit-linear-gradient(top,@top-color,@bottom-color);
+    background-image: -moz-linear-gradient(top,@top-color,@bottom-color);
+    background-image: -ms-linear-gradient(top,@top-color,@bottom-color);
+    background-image: -o-linear-gradient(top,@top-color,@bottom-color);
+    background-image: linear-gradient(top,@top-color,@bottom-color);
+}
+.border-radius(@params) {
+    -webkit-border-radius: @params;
+    -moz-border-radius: @params;
+    border-radius: @params;
+}
+.opacity(@opacity) {
+    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
+    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
+    opacity: @opacity;
+}
