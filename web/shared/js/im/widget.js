@@ -3,15 +3,15 @@ var Widget = Event.extend({
         var t = this;
 
         t
-            .configure(options)
-            .bindEvents()
+            ._configure(options)
+            ._bindEvents()
             .run()
         ;
 
         return this;
     },
 
-    configure: function(options) {
+    _configure: function(options) {
         var t = this;
 
         t.options =      options          || t.options      || $.error('options not found');
@@ -26,7 +26,7 @@ var Widget = Event.extend({
         return this;
     },
 
-    bindEvents: function() {
+    _bindEvents: function() {
         var t = this;
 
         $.each(t.events, function(event, methodName) {

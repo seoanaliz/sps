@@ -19,15 +19,81 @@
             .border-radius(3px 3px 0 0);
         }
         &>.list {
-            &>.message {
+            .border-radius(0 0 3px 3px);
+
+            &:empty {
+                text-align: center;
+                color: @color_gray;
+                font-size: 16px;
+                height: 400px;
+                background: url('http://dribbble.s3.amazonaws.com/users/4826/screenshots/423457/404_bulb.jpg') no-repeat center;
+            }
+
+            &>.messages {
+                padding: 5px 0;
+
+                &>.message {
+                    padding: 5px 10px;
+
+                    &>.left-column {
+                        width: 15%;
+                        float: left;
+                        text-align: right;
+
+                        &>.photo {
+                            width: 50px;
+                            height: 50px;
+                            display: inline-block;
+                            overflow: hidden;
+                            .border-radius(2px);
+
+                            img {
+                                max-width: 100%;
+                                .border-radius(2px);
+                            }
+                        }
+                    }
+                    &>.center-column {
+                        width: 70%;
+                        float: left;
+
+                        &>.content {
+                            margin: 0 10px;
+                        }
+                    }
+                    &>.right-column {
+                        width: 15%;
+                        float: left;
+
+                        &>.date {
+                            color: @color_gray;
+                        }
+                    }
+                }
+            }
+            &>.post-message {
+                background-color: @bg_gray;
+                border-top: 1px solid @border_inside;
                 padding: 10px;
+
+                .border-radius(0 0 3px 3px);
 
                 &>.left-column {
                     width: 15%;
                     float: left;
+                    text-align: right;
 
                     &>.photo {
-                        text-align: right;
+                        width: 50px;
+                        height: 50px;
+                        display: inline-block;
+                        overflow: hidden;
+                        .border-radius(2px);
+
+                        img {
+                            max-width: 100%;
+                            .border-radius(2px);
+                        }
                     }
                 }
                 &>.center-column {
@@ -36,76 +102,102 @@
 
                     &>.content {
                         margin: 0 10px;
+                        margin-right: 20px;
+
+                        textarea {
+                            width: 100%;
+                            min-height: 40px;
+                            max-height: 100px;
+                            .border-radius(2px);
+                        }
+
+                        .actions {
+                            margin-top: 10px;
+                        }
                     }
                 }
                 &>.right-column {
                     width: 15%;
                     float: left;
 
-                    &>.date {
-                        color: #999;
-                    }
-                }
-            }
-            &>.dialog {
-                border-bottom: 1px solid @border_inside;
-                padding: 10px;
-                cursor: pointer;
-
-                &:last-child {
-                    border-bottom: none;
-                }
-                &:hover {
-                    background: @bg_light_hover;
-                }
-
-                &>.user {
-                    width: 20%;
-                    float: left;
-                    overflow: hidden;
-                    position: relative;
-                    min-height: 50px;
-
                     &>.photo {
-                        position: absolute;
                         width: 50px;
                         height: 50px;
+                        display: inline-block;
                         overflow: hidden;
+                        .border-radius(2px);
 
                         img {
                             max-width: 100%;
-                        }
-                    }
-                    &>.info {
-                        margin-left: 60px;
-
-                        &>.name {}
-                        &>.date,
-                        &>.status {
-                            font-size: .9em;
-                            color: #999;
+                            .border-radius(2px);
                         }
                     }
                 }
-                &>.history {
-                    width: 75%;
-                    float: left;
-                    overflow: hidden;
-                }
-                &>.actions {
-                    width: 5%;
-                    float: left;
-                    overflow: hidden;
-                    position: relative;
-                    min-height: 50px;
+            }
 
-                    &>.action.icon {
-                        position: absolute;
-                        top: 50%;
-                        right: 50%;
-                        margin-top: -.5em;
-                        margin-right: -.5em;
-                        opacity: .5;
+            &>.dialogs {
+                &>.dialog {
+                    border-bottom: 1px solid @border_inside;
+                    padding: 10px;
+                    cursor: pointer;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                    &:hover {
+                        background: @bg_light_hover;
+                    }
+
+                    &>.user {
+                        width: 20%;
+                        float: left;
+                        overflow: hidden;
+                        position: relative;
+                        min-height: 50px;
+
+                        &>.photo {
+                            position: absolute;
+                            width: 50px;
+                            height: 50px;
+                            overflow: hidden;
+                            .border-radius(2px);
+
+                            img {
+                                max-width: 100%;
+                                .border-radius(2px);
+                            }
+                        }
+                        &>.info {
+                            margin-left: 60px;
+
+                            &>.name {}
+                            &>.date,
+                            &>.status {
+                                font-size: .9em;
+                                color: @color_gray;
+                            }
+                        }
+                    }
+                    &>.history {
+                        width: 75%;
+                        float: left;
+                        overflow: hidden;
+                    }
+                    &>.actions {
+                        width: 5%;
+                        float: left;
+                        overflow: hidden;
+                        position: relative;
+                        min-height: 50px;
+
+                        &>.action.icon {
+                            position: absolute;
+                            top: 50%;
+                            right: 50%;
+                            margin-top: -.5em;
+                            margin-right: -.5em;
+                            opacity: .5;
+                        }
                     }
                 }
             }
@@ -129,6 +221,7 @@
         }
         &>.list {
             color: @color_link;
+            padding: 5px 0;
 
             &>.item {
                 margin-bottom: 4px;
@@ -137,6 +230,9 @@
                     padding: 4px 8px;
                     cursor: pointer;
                     font-weight: bold;
+                   &:hover {
+                       text-decoration: underline;
+                   }
                 }
 
                 &>.list {

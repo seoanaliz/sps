@@ -23,6 +23,34 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+
+(function($) {
+    // Выделение текста в инпутах
+    $.fn.selectRange = function(start, end) {
+        return this.each(function() {
+            if (this.setSelectionRange) {
+                this.focus();
+                this.setSelectionRange(start, end);
+            } else if (this.createTextRange) {
+                var range = this.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', end);
+                range.moveStart('character', start);
+                range.select();
+            }
+        });
+    };
+
+    // Добавляет триггер destroyed
+    var oldClean = jQuery.cleanData;
+    $.cleanData = function(elems) {
+        for (var i = 0, elem; (elem = elems[i]) !== undefined; i++) {
+            $(elem).triggerHandler('destroyed');
+        }
+        oldClean(elems);
+    };
+})(jQuery);
+
 // Кроссбраузерные плейсхолдеры
 (function($) {
     $.fn.placeholder = function(para) {
@@ -39,7 +67,10 @@ function getURLParameter(name, search) {
             var placeholderText = p.text || $input.attr('placeholder');
             var $wrapper = $('<div/>');
             var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
-                padding: $input.css('padding')
+                paddingTop: $input.css('padding-top'),
+                paddingLeft: $input.css('padding-left'),
+                paddingRight: $input.css('padding-right'),
+                paddingBottom: $input.css('padding-bottom')
             });
 
             $input
@@ -48,7 +79,6 @@ function getURLParameter(name, search) {
                 .removeAttr('placeholder')
                 .parent().prepend($placeholder)
             ;
-
             $placeholder.bind('mouseup', function() {
                 $placeholder.hide();
                 $input.focus();
@@ -61,6 +91,9 @@ function getURLParameter(name, search) {
             $input.bind('focus change', function() {
                 $placeholder.hide();
             });
+            $input.bind('destroyed', function() {
+                $placeholder.remove();
+            })
         });
     };
 })(jQuery);
@@ -73,15 +106,15 @@ function getURLParameter(name, search) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $input.css({overflow: 'hidden'});
                 $autoResize
                     .css({
                         width: $input.width(),
                         minHeight: $input.height(),
-                        padding: $input.css('padding'),
-                        lineHeight: $input.css('line-height'),
                         font: $input.css('font'),
+                        padding: $input.css('padding'),
                         fontSize: $input.css('font-size'),
+                        overflow: $input.css('overflow'),
+                        lineHeight: $input.css('line-height'),
                         position: 'absolute',
                         wordWrap: 'break-word',
                         top: -100000
@@ -93,7 +126,7 @@ function getURLParameter(name, search) {
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
                     if (e.type == 'keydown' && e.keyCode == KEY.ENTER && !e.ctrlKey) {
-                        val += '<br/>.'
+                        val += '<br/>.';
                     }
                     $autoResize.html(val);
                     $input.css({
@@ -102,6 +135,9 @@ function getURLParameter(name, search) {
                             maxHeight ? Math.min(maxHeight, $autoResize.height()) : $autoResize.height()
                          )
                     });
+                });
+                $input.bind('destroyed', function() {
+                    $autoResize.remove();
                 });
 
                 $input.keyup();
@@ -1077,5 +1113,40 @@ var Box = (function() {
         } else {
             $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
         }
+    };
+})(jQuery);
+
+// Запоминает введенный текст и вставляет при обновлении страницы
+(function($) {
+    var PLUGIN_NAME = 'inputMemory';
+
+    var methods = {
+        init: function(memoryKey) {
+            return this.each(function() {
+                if (!window.localStorage) return;
+
+                var $input = $(this);
+                var inputValue = $input.val();
+                var storageValue = localStorage.getItem(memoryKey);
+
+                if (storageValue) {
+                    $input.val(storageValue);
+                    $input.selectRange(storageValue.length, storageValue.length);
+                } else {
+                    localStorage.setItem(memoryKey, inputValue);
+                }
+
+                $input.bind('keydown keyup change', function() {
+                    if (inputValue != $input.val()) {
+                        inputValue = $input.val();
+                        localStorage.setItem(memoryKey, inputValue);
+                    }
+                });
+            });
+        }
+    };
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        return methods.init.apply(this, arguments);
     };
 })(jQuery);

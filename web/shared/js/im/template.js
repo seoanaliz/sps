@@ -47,7 +47,7 @@ var TABS =
 '</div>';
 
 var TABS_ITEM =
-'<div class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>"><?=title?></div>';
+'<div data-id="<?=id?>" class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>"><?=title?></div>';
 
 var LEFT_COLUMN =
 '<div class="header"></div>' +
@@ -62,10 +62,16 @@ var RIGHT_COLUMN =
 '<div class="list"></div>';
 
 var DIALOGS =
-'<? each(DIALOGS_ITEM, list); ?>';
+'<div class="dialogs">' +
+    '<? if (list.length) { ?>' +
+        '<? each(DIALOGS_ITEM, list); ?>' +
+    '<? } else { ?>' +
+        'empty' +
+    '<? } ?>' +
+'</div>';
 
 var DIALOGS_ITEM =
-'<div class="dialog clear-fix">' +
+'<div class="dialog clear-fix" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<img src="<?=user.photo?>" alt="" />' +
@@ -85,13 +91,39 @@ var DIALOGS_ITEM =
 '</div>';
 
 var MESSAGES =
-'<? each(MESSAGES_ITEM, list); ?>';
-
-var MESSAGES_ITEM =
-'<div class="message clear-fix">' +
+'<div class="messages">' +
+    '<? each(MESSAGES_ITEM, list); ?>' +
+'</div>' +
+'<div class="post-message clear-fix">' +
     '<div class="left-column">' +
         '<div class="photo">' +
-            '<img src="<?=user.photo?>" alt="">' +
+            '<img src="http://vk.cc/S6ZsO" alt="" />' +
+        '</div>' +
+    '</div>' +
+    '<div class="center-column">' +
+        '<div class="content">' +
+            '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '<div class="actions">' +
+                '<button class="button send">Отправить</button>' +
+            '</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="right-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id1">' +
+                '<img src="http://vk.cc/S6ZDq" alt="" />' +
+            '</a>' +
+        '</div>' +
+    '</div>' +
+'</div>';
+
+var MESSAGES_ITEM =
+'<div class="message clear-fix" data-id="<?=id?>">' +
+    '<div class="left-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+                '<img src="<?=user.photo?>" alt="">' +
+            '</a>' +
         '</div>' +
     '</div>' +
     '<div class="center-column">' +
@@ -111,7 +143,7 @@ var LIST =
 '<? each(LIST_ITEM, list); ?>';
 
 var LIST_ITEM =
-'<div class="item" data-id="<?=id?>">' +
+'<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title"><?=title?></div>' +
     '<div class="list">' +
         '<? if (dialogs.length) { ?>' +
@@ -121,7 +153,7 @@ var LIST_ITEM =
 '</div>';
 
 var PUBLIC_LIST_ITEM =
-'<div class="public">' +
+'<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
     '<div class="title"><?=user.name?></div>' +
 '</div>';
