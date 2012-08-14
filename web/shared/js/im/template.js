@@ -89,7 +89,22 @@ var MESSAGES =
 
 var MESSAGES_ITEM =
 '<div class="message clear-fix">' +
-    'message' +
+    '<div class="left-column">' +
+        '<div class="photo">' +
+            '<img src="<?=user.photo?>" alt="">' +
+        '</div>' +
+    '</div>' +
+    '<div class="center-column">' +
+        '<div class="content">' +
+            '<div class="title">' +
+                '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
+            '</div>' +
+            '<div class="text"><?=text?></div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="right-column">' +
+        '<div class="date"><?=timestamp?></div>' +
+    '</div>' +
 '</div>';
 
 var LIST =

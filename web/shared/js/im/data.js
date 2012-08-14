@@ -33,7 +33,17 @@ Data.messages = [
     {
         id: 1,
         text: 'Hello!!!',
-        user: Data.users[0],
+        user: Data.users[3],
+        timestamp: 1234567890
+    }, {
+        id: 2,
+        text: 'Hello!!!',
+        user: Data.users[2],
+        timestamp: 1234567890
+    }, {
+        id: 3,
+        text: 'Hello!!!',
+        user: Data.users[4],
         timestamp: 1234567890
     }
 ];

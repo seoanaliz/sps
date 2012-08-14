@@ -96,7 +96,7 @@ var LeftColumn = Widget.extend({
         var t = this;
         var messages = new Messages({
             el: $(this.el).find('.list'),
-            data: {list: Data.dialogs},
+            data: {list: Data.messages},
             run: function() {}
         });
 
@@ -206,6 +206,7 @@ var Messages = Widget.extend({
         $(t.el).find('.date').easydate({
             live: true,
             date_parse: function(date) {
+                date = intval(date) * 1000;
                 if (!date) return;
                 return new Date(date);
             },
@@ -277,60 +278,3 @@ var Tabs = Widget.extend({
         t.getTab(id).remove();
     }
 });
-
-function test(i) {
-    var $0 = window.$0 || document.getElementsByTagName('html')[0];
-    var height = 1500 + i;
-    var ver = new Date().getTime();
-    var src = 'http://placehold.it/5000x' + height + '?' + ver;
-
-    $0.innerHTML = '<img src="' + src + '" />';
-    var img = new Image();
-    img.onload = function() {
-        var newImg = $('img');//document.getElementsByTagName('img')[0];
-        console.log(newImg.width() + 'x' + newImg.height());
-        //alert(newImg.width + 'x' + newImg.height);
-        test(i + 1);
-    };
-    img.src = src;
-}
-function test2() {
-    var $0 = window.$0 || document.getElementsByTagName('body')[0];
-    var ver = new Date().getTime();
-    var html = '';
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ee/eeac12954cbfeccd3973a9a2fc6aa711.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ee/eeac12954cbfeccd3973a9a2fc6aa711.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/c/c2/c2072e4a7bcb7e4fd91724c8153ad44a.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/3/35/35ceef02404566ebdaccc807a46e9558.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/1/17/175f3f8c61b46e2bc9357ddecd0230f7.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/e5/e568f3aaf2747b035439abc3ebcf799a.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/7/75/75b051072085e1f70c64ff18aad6df50.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/7/75/75b051072085e1f70c64ff18aad6df50.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/1/19/19312d9ec14003c869e7e41196959a85.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-    '</div>';
-
-    $0.innerHTML = html;
-    $('.attachments').imageComposition();
-}
