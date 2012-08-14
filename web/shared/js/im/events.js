@@ -2,7 +2,7 @@
  * Events
  */
 var Events = {
-    delay: 0,
+    delay: 200,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -45,9 +45,19 @@ var simpleAjax = function(method, data, callback) {
 
 var Eventlist = {
     get_lists: function(callback) {
-        simpleAjax('addUser', function(dirtyData) {
-            callback(true);
-        });
+        callback(Data.lists);
+    },
+    get_dialogs: function(listId, callback) {
+        callback(Data.dialogs);
+    },
+    get_messages: function(dialogId, callback) {
+        callback(Data.messages);
+    },
+    send_message: function(text, callback) {
+        callback($.extend(Data.messages[0], {
+            text: text.split('\n').join('<br/>'),
+            timestamp: Math.floor(new Date().getTime() / 1000)
+        }));
     }
 };
 $.extend(Events.eventList, Eventlist);

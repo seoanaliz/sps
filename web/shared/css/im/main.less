@@ -19,6 +19,7 @@
             .border-radius(3px 3px 0 0);
         }
         &>.list {
+            position: relative;
             .border-radius(0 0 3px 3px);
 
             &:empty {
@@ -31,9 +32,10 @@
 
             &>.messages {
                 padding: 5px 0;
+                padding-bottom: 110px;
 
                 &>.message {
-                    padding: 5px 10px;
+                    padding: 5px 0;
 
                     &>.left-column {
                         width: 15%;
@@ -74,9 +76,18 @@
             &>.post-message {
                 background-color: @bg_gray;
                 border-top: 1px solid @border_inside;
-                padding: 10px;
+                padding: 10px 0;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
 
                 .border-radius(0 0 3px 3px);
+
+                &.fixed {
+                    position: fixed;
+                    width: 800px;
+                    box-shadow: 0 -2px 1px rgba(0,0,0,.1);
+                }
 
                 &>.left-column {
                     width: 15%;

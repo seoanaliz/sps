@@ -4,19 +4,17 @@ var Configs = {
     controlsRoot: controlsRoot
 };
 
-var cur = {
-    dataUser: {}
-};
-
 $(document).ready(function() {
     new IM({
-        el: '#main'
+        el: '#main',
+        viewer: Data.users[0]
     });
 });
 
 /* Instant Messenger */
 var IM = Widget.extend({
     template: MAIN,
+    viewer: null,
     leftColumn: null,
     rightColumn: null,
 
@@ -36,13 +34,15 @@ var IM = Widget.extend({
     },
 
     initLeftColumn: function() {
+        var t = this;
         return new LeftColumn({
-            el: '.left-column'
+            el: $(t.el).find('> .left-column')
         });
     },
     initRightColumn: function() {
+        var t = this;
         return new RightColumn({
-            el: '.right-column'
+            el: $(t.el).find('> .right-column')
         });
     }
 });
@@ -56,20 +56,38 @@ var LeftColumn = Widget.extend({
     tabPrefixMessages: 'messages',
     curListId: null,
     curDialogId: null,
+    keyListId: 'keyListId',
+    keyDialogId: 'keyDialogId',
 
     run: function() {
         this._super();
 
         var t = this;
-        t.messages = t.initMessages();
-        t.dialogs = t.initDialogs();
+        var tab;
+        var tabId;
+        var tabTitle;
         t.tabs = t.initTabs();
+        t.dialogs = t.initDialogs();
+        t.messages = t.initMessages();
+
+        if (localStorage.getItem(t.keyListId)) {
+            tab = localStorage.getItem(t.keyListId);
+            tabId = tab.split(':')[0];
+            tabTitle = tab.split(':')[1];
+            t.showDialogs(tabId, tabTitle);
+        }
+        if (localStorage.getItem(t.keyDialogId)) {
+            tab = localStorage.getItem(t.keyDialogId);
+            tabId = tab.split(':')[0];
+            tabTitle = tab.split(':')[1];
+            t.showMessages(tabId, tabTitle);
+        }
     },
 
     initTabs: function() {
         var t = this;
         var tabs = new Tabs({
-            el: $(this.el).find('.header'),
+            el: $(t.el).find('.header'),
             data: {tabs: []}
         });
         tabs.on('select', function(id, title) {
@@ -85,9 +103,7 @@ var LeftColumn = Widget.extend({
     initDialogs: function() {
         var t = this;
         var dialogs = new Dialogs({
-            el: $(this.el).find('.list'),
-            data: {list: Data.dialogs},
-            run: function() {}
+            el: $(t.el).find('.list')
         });
         dialogs.on('select', function(id, title) {
             t.showMessages(id, title);
@@ -98,9 +114,7 @@ var LeftColumn = Widget.extend({
     initMessages: function() {
         var t = this;
         var messages = new Messages({
-            el: $(this.el).find('.list'),
-            data: {list: Data.messages},
-            run: function() {}
+            el: $(t.el).find('.list')
         });
 
         return messages;
@@ -110,28 +124,34 @@ var LeftColumn = Widget.extend({
         var t = this;
         var tabPrefix = t.tabPrefixDialogs;
 
-        t.dialogs.renderTemplate(listId);
+        t.dialogs.run(listId);
         if (t.curListId && t.curListId != listId) {
             t.tabs.removeTab(tabPrefix + t.curListId);
         }
         if (!t.tabs.getTab(tabPrefix + listId).length) {
             t.tabs.prependTab(tabPrefix + listId, title);
+            localStorage.setItem(t.keyListId, listId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + listId);
+        $(window).unbind('resize scroll', $.proxy(t.messages.updateInputBox, t));
+
         t.curListId = listId;
     },
     showMessages: function(dialogId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
 
-        t.messages.renderTemplate(dialogId);
+        t.messages.run(dialogId);
         if (t.curDialogId && t.curDialogId != dialogId) {
             t.tabs.removeTab(tabPrefix + t.curDialogId);
         }
         if (!t.tabs.getTab(tabPrefix + dialogId).length) {
             t.tabs.appendTab(tabPrefix + dialogId, title);
+            localStorage.setItem(t.keyDialogId, dialogId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + dialogId);
+        $(window).bind('resize scroll', $.proxy(t.messages.updateInputBox, t));
+
         t.curDialogId = dialogId;
     }
 });
@@ -150,8 +170,7 @@ var RightColumn = Widget.extend({
     initList: function() {
         var t = this;
         var list = new List({
-            el: $(this.el).find('.list'),
-            data: {list: Data.lists}
+            el: $(t.el).find('.list')
         });
         list.on('selectDialogs', function(id, title) {
             t.trigger('selectDialogs', id, title);
@@ -172,21 +191,24 @@ var Dialogs = Widget.extend({
         'click: .dialog': 'clickDialog'
     },
 
-    renderTemplate: function(listId) {
-        this._super();
+    run: function(listId) {
         var t = this;
-        t.listId = listId;
 
-        $(t.el).find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                date = intval(date) * 1000;
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
+        Events.fire('get_dialogs', listId, function(data) {
+            t.templateData = {list: data};
+            t.listId = listId;
+            t.renderTemplate();
+            $(t.el).find('.date').easydate({
+                live: true,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
         });
     },
 
@@ -209,30 +231,37 @@ var Messages = Widget.extend({
     templateMessage: MESSAGES_ITEM,
     dialogId: null,
 
-    renderTemplate: function(dialogId) {
-        this._super();
+    run: function(dialogId) {
         var t = this;
-        var $el = $(t.el);
-        var $textarea = $el.find('textarea');
-        t.dialogId = dialogId;
 
-        $el.find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                date = intval(date) * 1000;
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
+        Events.fire('get_messages', dialogId, function(data) {
+            t.templateData = {list: data};
+            t.dialogId = dialogId;
+            t.renderTemplate();
+            var $el = $(t.el);
+            var $textarea = $el.find('textarea');
+
+            $el.find('.date').easydate({
+                live: true,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            $textarea.placeholder();
+            $textarea.autoResize();
+            $textarea.inputMemory('message' + dialogId);
+            $textarea.focus();
+            t.bindEvents();
+            t.scrollBottom();
+            t.updateInputBox();
         });
-        $textarea.placeholder();
-        $textarea.autoResize();
-        $textarea.inputMemory('message' + dialogId);
-        $textarea.focus();
-        t.bindEvents();
     },
+
 
     bindEvents: function() {
         var t = this;
@@ -250,16 +279,51 @@ var Messages = Widget.extend({
         });
     },
 
+    updateInputBox: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $inputBox = $el.find('.post-message');
+
+        if ($(window).scrollTop() + $(window).height() < $(document).height() - 14) {
+            $inputBox.addClass('fixed');
+        } else {
+            $inputBox.removeClass('fixed');
+        }
+    },
+
+    scrollBottom: function() {
+        $(window).scrollTop($(document).height());
+    },
+
     sendMessage: function() {
         var t = this;
         var $el = $(t.el);
         var $textarea = $el.find('textarea');
         var text = $.trim($textarea.val());
+        var isScroll = true;
 
         if (text) {
-            $textarea.val('');
-            //$el.find('.messages').append(tmpl(t.templateMessage, {}));
-            $el.find('.messages').append('<div class="message">' + text + '</div>');
+            Events.fire('send_message', text, function(data) {
+                $textarea.val('');
+                var $newMessage = $(tmpl(MESSAGES_ITEM, data));
+                $el.find('.messages').append($newMessage);
+                $newMessage.find('.date').easydate({
+                    live: true,
+                    date_parse: function(date) {
+                        date = intval(date) * 1000;
+                        if (!date) return;
+                        return new Date(date);
+                    },
+                    uneasy_format: function(date) {
+                        return date.toLocaleDateString();
+                    }
+                });
+                if (isScroll) {
+                    t.scrollBottom();
+                }
+                t.updateInputBox();
+                $textarea.focus();
+            });
         } else {
             $textarea.focus();
         }
@@ -272,6 +336,15 @@ var List = Widget.extend({
     events: {
         'click: .item > .title': 'selectDialogs',
         'click: .public': 'selectMessages'
+    },
+
+    run: function() {
+        var t = this;
+
+        Events.fire('get_lists', function(data) {
+            t.templateData = {list: data};
+            t.renderTemplate();
+        });
     },
 
     selectDialogs: function(e) {

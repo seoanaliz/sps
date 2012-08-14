@@ -2,6 +2,11 @@ var Data = {};
 
 Data.users = [
     {
+        id: 4718705,
+        name: 'Artyom Kohver',
+        photo: 'http://vk.cc/S6ZsO',
+        isOnline: true
+    }, {
         id: 1,
         name: 'Vanya',
         photo: 'http://vk.cc/S6Zn1',
@@ -21,11 +26,6 @@ Data.users = [
         name: 'Vova',
         photo: 'http://vk.cc/S6ZM3',
         isOnline: true
-    }, {
-        id: 4718705,
-        name: 'Artyom Kohver',
-        photo: 'http://vk.cc/S6ZsO',
-        isOnline: true
     }
 ];
 
@@ -33,7 +33,7 @@ Data.messages = [
     {
         id: 1,
         text: 'Hello!!!',
-        user: Data.users[3],
+        user: Data.users[0],
         timestamp: 1234567890
     }, {
         id: 2,
@@ -47,6 +47,41 @@ Data.messages = [
         timestamp: 1234567890
     }, {
         id: 5,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 6,
+        text: 'Hello!!!',
+        user: Data.users[3],
+        timestamp: 1234567890
+    }, {
+        id: 7,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 8,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 9,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 10,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 11,
+        text: 'Hello!!!',
+        user: Data.users[1],
+        timestamp: 1234567890
+    }, {
+        id: 12,
         text: 'Hello!!!',
         user: Data.users[1],
         timestamp: 1234567890

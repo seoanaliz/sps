@@ -13,6 +13,13 @@ var KEY = window.KEY = {
     SPACE: 32
 };
 
+if (!window.localStorage) {
+    window.localStorage = {
+        getItem: function(key) {},
+        setItem: function(key, value) {}
+    };
+}
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
