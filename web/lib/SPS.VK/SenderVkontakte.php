@@ -29,15 +29,15 @@
 
         public function __construct($post_data)
         {
-            $this->post_photo_array = $post_data['photo_array']; //массив вида array('photoXXXX_YYYYYYY','...')
-            $this->post_text = $post_data['text'];
-            $this->vk_group_id = $post_data['group_id'];
-            $this->vk_app_seckey = $post_data['vk_app_seckey'];
-            $this->vk_access_token = $post_data['vk_access_token'];
-            $this->audio_id = $post_data['audio_id'];//массив вида array('videoXXXX_YYYYYYY','...')
-            $this->video_id = $post_data['video_id'];//массив вида array('audioXXXX_YYYYYYY','...')
-            $this->link = $post_data['link'];
-            $this->header = $post_data['header'];
+            $this->post_photo_array =   $post_data['photo_array']; //массив вида array('photoXXXX_YYYYYYY','...')
+            $this->post_text        =   str_replace( '@', '&#64;', $post_data['text'] );
+            $this->vk_group_id      =   $post_data['group_id'];
+            $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
+            $this->vk_access_token  =   $post_data['vk_access_token'];
+            $this->audio_id         =   $post_data['audio_id'];//массив вида array('videoXXXX_YYYYYYY','...')
+            $this->video_id         =   $post_data['video_id'];//массив вида array('audioXXXX_YYYYYYY','...')
+            $this->link             =   $post_data['link'];
+            $this->header           =   $post_data['header'];
         }
 
         private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
