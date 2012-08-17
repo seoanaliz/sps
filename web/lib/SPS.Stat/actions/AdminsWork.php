@@ -83,28 +83,33 @@
                     WHERE   author_id=@author_id
                             AND public_id=@public_id
                             AND post_time > @date_min
-                            AND post_time < @date_max';
+                            AND post_time < @date_max
+                    ORDER BY post_time';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@author_id', $author_id);
-            $cmd->SetInteger('@public_id', $public_id);
-            $cmd->SetInteger('@date_min',  $date_min);
-            $cmd->SetInteger('@date_max',  $date_max);
+            $cmd->SetInteger( '@author_id', $author_id );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetInteger( '@date_min',  $date_min );
+            $cmd->SetInteger( '@date_max',  $date_max );
             $ds = $cmd->Execute();
-            $res = array();
-            $diff = 0;
-            $topics = 0;
-            $compls = 0;
-            $reposts = 0;
+            $res        = array();
+            $diff       = 0;
+            $topics     = 0;
+            $compls     = 0;
+            $reposts    = 0;
+            $overposts  = 0;
 
+            $time_prev = 0;
             while ( $ds->Next() ) {
-                $res[]       = $ds->getValue('vk_post_id', TYPE_INTEGER);
-                $reposts    += $ds->getValue('reposts', TYPE_INTEGER);
-                $diff       += $ds->getValue('likes', TYPE_INTEGER);
+                $res['posts'][]     =   $ds->getValue('vk_post_id', TYPE_INTEGER);
+                $reposts            +=  $ds->getValue('reposts',    TYPE_INTEGER);
+                $diff               +=  $ds->getValue('likes',      TYPE_INTEGER);
+                $post_time          =   $ds->getValue( 'post_time', TYPE_INTEGER );
 
+                if (  $post_time - $time_prev  < 1200 )
+                    $overposts++;
 
-                if($ds->getValue('is_topic', TYPE_BOOLEAN))
-
+                if( $ds->getValue( 'is_topic', TYPE_BOOLEAN ) )
                     $topics += 1;
 
                 if($ds->getValue('complicate', TYPE_BOOLEAN))
@@ -113,13 +118,14 @@
             }
 
             $q = count($res);
-//            echo '<br>кол-во<br>'. $q . '<br>';
+
             if ($q < 1)
                 return false;
-            $res['rel_likes']   = round( $diff / $q);
-            $res['reposts']     = round( $reposts / $q);
-            $res['topics']      = $topics;
-            $res['compls']      = $compls;
+            $res['rel_likes']   =   round( $diff / $q );
+            $res['reposts']     =   round( $reposts / $q );
+            $res['topics']      =   $topics;
+            $res['compls']      =   $compls;
+            $res['overposts']    =   $overposts;
 
             return $res;
         }
