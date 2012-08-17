@@ -54,7 +54,7 @@
 
         public static function add_user( $users )
         {
-            if ( !isset( $user['userId'] ) )
+            if ( !isset( $users['userId'] ) )
                 $users = self::get_vk_user_info( $users );
             foreach( $users as $user ) {
                 $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
