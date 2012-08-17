@@ -1,7 +1,7 @@
 <?php
     /* Don't Forget to turn on mod_rewrite!  */
 
-    define( 'WITH_PACKAGE_COMPILE', true  );
+    define( 'WITH_PACKAGE_COMPILE', false  );
 
     if ( !WITH_PACKAGE_COMPILE ) {
         include_once 'lib/Eaze.Core/Logger.php';
