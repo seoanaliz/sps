@@ -5,8 +5,8 @@
      * @subpackage Stat
      */
 
-//    define ( 'ACC_TOK_WRK', 'b03d241fb0371ee7b0371ee7b6b01c4063bb037b0222679cb604e99dfff088b' );
-    define ( 'ACC_TOK_WRK', '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a' );
+    define ( 'ACC_TOK_WRK', 'b03d241fb0371ee7b0371ee7b6b01c4063bb037b0222679cb604e99dfff088b' );
+//    define ( 'ACC_TOK_WRK', '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a' );
     define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
     class VkHelper {
@@ -31,7 +31,7 @@
             if ( isset( $res->error ) )
                 if ( $throw_exc_on_errors ) {
                    // print_r('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
-                    throw new Exception( 'Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
+                    throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
                 }
                 else
                     return $res;
@@ -86,20 +86,7 @@
             return $result;
         }
 
-        public static function get_stripped_text( $text ) {
 
-            $text = preg_replace('/<.?span.*?>/', '', $text);
-            $text = preg_replace('/<a.*?>/', '', $text);
-            $text = str_replace('<br>', ' ', $text);
-
-            $text = strip_tags( $text );
-            $text = pg_escape_string( $text );
-            $text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
-            $text = html_entity_decode( $text, ENT_QUOTES, 'cp1251' );
-            $text = htmlspecialchars_decode( $text );
-
-            return $text;
-        }
 
     }
 

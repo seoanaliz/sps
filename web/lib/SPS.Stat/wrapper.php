@@ -151,7 +151,7 @@ class wrapper
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             }
 
-            if (!empty( $uagent ) ) { // если задан UserAgent
+            if (!empty($uagent)) { // если задан UserAgent
                 curl_setopt($ch, CURLOPT_USERAGENT, $uagent);
             } else{
                 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1)');
@@ -276,7 +276,7 @@ class wrapper
         return false;
     }
 
-    public function get_page($page = '')
+    private function get_page($page = '')
     {
 
             if ($page == '')
