@@ -39,8 +39,9 @@
             <td>Постов</td>
             <td>Топиков</td>
             <td>Сложных</td>
-            <td>Лайк/пост</td>
-            <td>Репост/пост</td>
+            <td>Оверпостов</td>
+            <td>Лайк / пост</td>
+            <td>Репост / пост</td>
 
             <td>Список постов</td>
         </tr>
@@ -49,23 +50,27 @@
 
         foreach( $admins as $admin ) {
             $q++;
-            $posts = AdminsWork::get_posts($admin['id'], $public['id'], $time_start, $time_stop);
-            if(!$posts)
+            $posts = AdminsWork::get_posts( $admin['id'], $public['id'], $time_start, $time_stop );
+            if( !$posts )
                 continue;
             $total['posts']     += count($posts)-4;
             $total['topics']    += $posts['topics'];
             $total['compls']    += $posts['compls'];
             $total['rel_likes'] += $posts['rel_likes'];
             $total['reposts']   += $posts['reposts'];
-            $quan = count($posts)-4;
+            $total['overposts'] += $posts['overposts'];
+
+            $quan = count( $posts ) - 4;
+
             ?>
             <tr>
             <td><a href="http://vk.com/id<?=$admin['id'];?>"><img src="<?=$admin['ava']?>"/><br><?=$admin['name']?> </a></td>
-            <td><?=$quan?></td>
-            <td><?=round($posts['topics'] / $quan * 100,1)?>%</td>
-            <td><?=round($posts['compls'] / $quan * 100,1)?>%</td>
+            <td><?= $quan ?></td>
+            <td><?=round( $posts['topics'] / $quan * 100, 1 )?>%</td>
+            <td><?=round( $posts['compls'] / $quan * 100, 1 )?>%</td>
+            <td><?=round( $posts['overposts'] / $quan * 100, 1 )?>%</td>
             <td><?=$posts['rel_likes']?></td>
-            <td><?=round($posts['reposts'] / $posts['rel_likes'] * 100)?>%</td>
+            <td><?=round( $posts['reposts'] / $posts['rel_likes'] * 100 )?>%</td>
 
 
 
@@ -94,6 +99,7 @@
             <td><?=$total['posts'];?></td>
             <td><?=$total['topics'] ?></td>
             <td><?=$total['compls']?></td>
+            <td><?=$total['overposts']?></td>
             <td><?=round($total['rel_likes'] / $q)?></td>
             <td><?=round($total['reposts'] / $total['rel_likes'] * 100)?>%</td>
 
@@ -107,10 +113,12 @@
     echo '<font color="red" size="22">++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</font>';
 
     $admins = AdminsWork::get_public_admins($time_start, $time_stop);
-    if (!$admins)
+    if ( !$admins )
         die('Нету постов!');
+
     foreach( $admins as $admin )
     {
+        ob_start();
         ?>
         <h3><a href="http://vk.com/id<?=$admin['id'];?>"><img src="<?=$admin['ava']?>"/><br><?=$admin['name']?> </a></h3>
         <table width="70%"  bordercolor="black" >
@@ -120,9 +128,9 @@
                 <td>Постов</td>
                 <td>Топиков</td>
                 <td>Сложных</td>
-                <td>Лайк/пост</td>
-                <td>Репост/пост</td>
-
+                <td>оверпостов</td>
+                <td>Лайк / пост</td>
+                <td>Репост / пост</td>
                 <td>Список постов</td>
             </tr>
             </thead>
@@ -132,20 +140,22 @@
         $q = 0;
         foreach( $our_publics as $public ) {
 
-            $posts = AdminsWork::get_posts($admin['id'], $public['id'], $time_start, $time_stop);
-            if(!$posts)
+            $posts = AdminsWork::get_posts( $admin['id'], $public['id'], $time_start, $time_stop );
+            if( !$posts )
                 continue;
-            $quan = count($posts)-4;
+            $quan = count( $posts ) - 4;
+
             $q++;
             ?>
             <tbody>
             <tr >
                 <td><a href="http://vk.com/public<?=$public['id']?>"> <?=$public['title']?></a></td>
                 <td><?=$quan?></td>
-                <td><?=round($posts['topics'] / $quan * 100,1)?>%</td>
-                <td><?=round($posts['compls'] / $quan * 100,1)?>%</td>
+                <td><?=round( $posts['topics'] / $quan * 100, 1 )?>%</td>
+                <td><?=round( $posts['compls'] / $quan * 100, 1 )?>%</td>
+                <td><?=round( $posts['overposts'] / $quan * 100, 1 )?>%</td>
                 <td><?=$posts['rel_likes']?></td>
-                <td><?=round($posts['reposts'] / $posts['rel_likes'] * 100)?>%</td>
+                <td><?=round( $posts['reposts'] / $posts['rel_likes'] * 100 )?>%</td>
 
                 <td>
                     <?
@@ -166,6 +176,7 @@
             $total['posts']     += $quan;
             $total['topics']    += $posts['topics'];
             $total['compls']    += $posts['compls'];
+            $total['overposts'] += $posts['overposts'];
             $total['reposts']   += $posts['reposts'];
             $total['rel_likes'] += $posts['rel_likes'];
 
@@ -179,7 +190,8 @@
             <td><?=$total['posts'];?></td>
             <td><?=$total['topics']?></td>
             <td><?=$total['compls']?></td>
-            <td><?=$total['rel_likes']/$q?></td>
+            <td><?=$total['overposts']?></td>
+            <td><?=$total['rel_likes'] / $q?></td>
             <td><?=round($total['reposts'] / $total['rel_likes'] * 100)?>%</td>
 
             <td>
@@ -187,6 +199,11 @@
             </tbody>
         </table><br><br>
 <?
+        if ( $q )
+            ob_end_flush();
+        else
+            ob_end_clean();
+
     }
 
 ?>
