@@ -10,6 +10,8 @@ class OurAdminsStat
 {
     private $admins_list = array();
 
+
+
     public function execute() {
         set_time_limit(0);
         $this->admins_list = $this->get_admins_list();
@@ -25,13 +27,14 @@ class OurAdminsStat
                 $public->externalId ==  35807078 )
                 continue;
 
-            $this->get_posts( 35806721 );
+
+            $this->get_posts( $public->externalId );
             die();
 
         }
     }
 
-    public function get_posts($public_id)
+    public function get_posts( $public_id )
     {
 
         $stop_post = $this->get_last_post( $public_id );
@@ -67,13 +70,9 @@ class OurAdminsStat
 
         if (isset($post->signer_id))
         {
-//                if  (substr_count($post->text, 'topic') > 0)
-//                {
-//                    print_r($post);
-//                    die();
-//                }
+
             $new_post = array();
-            $author = $this->add_admin($post->signer_id);
+            $author = $this->add_admin( $post->signer_id );
             echo '<a href="vk.com/wall' . $post->to_id . '_' . $post->id . '"> ' .$post->to_id . '_' . $post->id. '</a><br>';
             if(isset($post->copy_post_id))
                 $new_post['tweet_from'] = $post->copy_owner_id . '_' .$post->copy_post_id;
@@ -87,6 +86,7 @@ class OurAdminsStat
             if( count( $post->attachments  ) > 1 || strlen( $post->text ) > 200 )
                 $complicate = "'true'";
 
+            print_r($post);
 
             $new_post['vk_post_id'] =   $post->id;
             $new_post['public_id']  =   trim( $post->to_id, '-' );
@@ -96,7 +96,7 @@ class OurAdminsStat
             $new_post['likes']      =   $post->likes->count;
             $new_post['reposts']    =   $post->reposts->count;
             $new_post['rel_likes']  =   0;
-            $this->save_post($new_post);
+            $this->save_post( $new_post );
 
         }
         return true;
@@ -143,7 +143,7 @@ class OurAdminsStat
 
     public function add_admin($id)
     {
-        $admin = StatUsers::get_vk_user_info($id);
+        $admin = StatUsers::get_vk_user_info( $id );
 
         foreach($this->admins_list as $ad)
         {
@@ -173,6 +173,17 @@ class OurAdminsStat
         return $admin['userId'];
     }
 
+    public function check_in_base( $admin_id )
+    {
+
+        $sql = 'select vk_id from ' . TABLE_OADMINS . ' where vk_id=@vk_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd->SetInteger('@vk_id', $admin_id);
+        $ds = $cmd->Execute();
+        $ds->next();
+
+    }
+
     private function get_last_post($public_id)
     {
         $sql = 'SELECT MAX(vk_post_id) FROM ' . TABLE_OADMINS_POSTS . ' WHERE public_id=@public_id';
@@ -185,16 +196,16 @@ class OurAdminsStat
         return $offset ? $offset : 0;
     }
 
-    public function save_post($post)
+    public function save_post( $post )
     {
-
-        $keys   = implode(',', array_keys($post));
+        $keys   = implode(',', array_keys( $post ) );
         $values = implode(',', $post);
 
         $sql = "INSERT INTO oadmins_posts( $keys )
                     VALUES( $values )";
 
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        echo $cmd->GetQuery();
         $cmd->Execute();
     }
 }

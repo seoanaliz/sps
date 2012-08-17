@@ -28,6 +28,7 @@
 
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
+
             $users  =   array();
             $params = array(
                 'uids'   =>  $ids,
@@ -36,10 +37,9 @@
 
             $result = VkHelper::api_request( 'users.get', $params );
 
-
             foreach( $result as $user )
             {
-                $users[$user->uid] = array(
+                $users[ $user->uid ] = array(
                                     'userId'    =>  $user->uid,
                                     'ava'       =>  $user->photo,
                                     'name'      =>  $user->first_name . ' ' . $user->last_name,
@@ -52,21 +52,17 @@
 
 
 
-        public static function add_user( $user )
+        public static function add_user( $users )
         {
-
-
-            if ( !is_array( $user ) )
-                $users = self::get_vk_user_info( $user );
-
-            foreach($users as $user) {
-            $sql = 'INSERT INTO ' . TABLE_STAT_USERS .
-                    '( user_id, name, ava,  comments )
-                        VALUES
+            if ( !isset( $user['userId'] ) )
+                $users = self::get_vk_user_info( $users );
+            foreach( $users as $user ) {
+                $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
+                        '    ( user_id, name, ava,  comments )
+                         VALUES
                              ( @userId, @name, @ava, @comments )';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger( '@userId',      $user['userId']);
-
                 $cmd->SetString ( '@name',        $user['name'] );
                 $cmd->SetString ( '@ava',         $user['ava'] );
                 $cmd->SetString ( '@comments',    $user['comments'] );
@@ -78,7 +74,7 @@
                 return $user;
         }
 
-        public static function get_user($user_id)
+        public static function get_user( $user_id )
         {
             $sql = 'SELECT user_id,name,rank,ava,comments FROM ' . TABLE_STAT_USERS
                  . ' WHERE user_id=@user_id';
