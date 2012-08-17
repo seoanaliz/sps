@@ -35,7 +35,7 @@
             $params['filter']   =  'copies';
         }
         $offset = 0;
-        while (1) {
+        while ( 1 ) {
             $params['offset'] = $offset;
             $res = $this->vk_api_wrap('likes.getList', $params);
             sleep(0.3);

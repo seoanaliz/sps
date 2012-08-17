@@ -10,8 +10,6 @@ class OurAdminsStat
 {
     private $admins_list = array();
 
-
-
     public function execute() {
         set_time_limit(0);
         $this->admins_list = $this->get_admins_list();
@@ -36,7 +34,6 @@ class OurAdminsStat
 
     public function get_posts( $public_id )
     {
-
         $stop_post = $this->get_last_post( $public_id );
         $offset = 0;
         while (1) {
@@ -65,7 +62,6 @@ class OurAdminsStat
 
     public function post_analize($post)
     {
-        ;
         unset($post->attachment);
 
         if (isset($post->signer_id))
@@ -86,7 +82,7 @@ class OurAdminsStat
             if( count( $post->attachments  ) > 1 || strlen( $post->text ) > 200 )
                 $complicate = "'true'";
 
-            print_r($post);
+//            print_r($post);
 
             $new_post['vk_post_id'] =   $post->id;
             $new_post['public_id']  =   trim( $post->to_id, '-' );
@@ -209,3 +205,4 @@ class OurAdminsStat
         $cmd->Execute();
     }
 }
+?>
