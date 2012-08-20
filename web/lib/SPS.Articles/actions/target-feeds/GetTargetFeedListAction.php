@@ -14,7 +14,7 @@
         public function __construct() {
             $this->options = array(
                 BaseFactory::WithoutDisabled => false
-                , BaseFactory::WithLists     => false
+                , BaseFactory::WithLists     => true
             );
 
             parent::$factory = new TargetFeedFactory();
