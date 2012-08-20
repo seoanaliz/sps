@@ -33,7 +33,7 @@ class SenderVkontakte {
     const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
     const TESTING       =   false;
     const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
-    const ALBUM_NAME    =   'Фотографии со стены';
+    const ALBUM_NAME    =   'Записи со стены';
 
     //(например, получение разгаданной капчи)
 
