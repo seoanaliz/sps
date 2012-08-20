@@ -108,6 +108,9 @@ class SenderVkontakte {
 
         $meth = $this->link ? 'album' : 'wall';
         foreach( $this->post_photo_array as $photo_adr ) {
+
+
+
             $photo_array[] = $this->load_photo( $photo_adr, $meth );
         }
 
@@ -398,7 +401,6 @@ class SenderVkontakte {
 
     }
 
-    //todo описания фоток матьматьмать
     public function load_photo( $path, $destination = 'wall', $caption = '' )
     {
         $aid = '';
@@ -430,22 +432,31 @@ class SenderVkontakte {
             'access_token'  =>  $this->vk_access_token,
             'aid'           =>  $aid
         );
+
         //первый запрос, получение адреса для заливки фото
         $res = VkHelper::api_request( $method_get_server, $params, false );
-        sleep(0.3);
+        sleep( 0.3 );
         $upload_url = $res->upload_url;
 
         if ( !$upload_url )
-            throw new exception(" Error uploading photo. Response : " . $res->error->error_msg);
+            throw new exception( " Error uploading photo. Response : " . $res->error->error_msg );
+
+        $photo_size = ImageHelper::GetImageSizes( $path );
+//            echo $destination;
+        if ( $photo_size['width'] > 2000 || $photo_size['heigh'] > 2000 ) {
+            ImageHelper::Resize( $path, $path, 2000, 2000, 80 );
+
+        }
 
         //заливка фото
         $content = $this->qurl_request( $upload_url, array('file1' => '@' . $path ) );
         $content = json_decode( $content );
+
         if (empty( $content->$photo_list ) ) {
             throw new exception(" Error uploading photo. Response : $content");
         }
 
-        sleep(0.3);
+        sleep( 1 );
 
         //"закрепляем" фотку
         $url2 = self::METH .$method_save_photo;
@@ -455,11 +466,14 @@ class SenderVkontakte {
             $photo_list     =>  $content->$photo_list,
             'access_token'  =>  $this->vk_access_token,
             'aid'           =>  $aid,
-            'caption'      =>  $caption
+            'caption'       =>  $caption
         );
 
-        $res = VkHelper::api_request( $method_save_photo, $params, false );
+        $res = VkHelper::api_request( $method_save_photo, $params );
+        if( isset( $res->error ) )
+            ;
         $res = $res[0];
+
         if( $destination == 'wall' )
             return $res->id;
         return "photo" . $res->owner_id . "_" . $res->pid;
