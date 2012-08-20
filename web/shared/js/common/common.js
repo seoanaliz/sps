@@ -30,7 +30,6 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
-
 (function($) {
     // Выделение текста в инпутах
     $.fn.selectRange = function(start, end) {
@@ -64,7 +63,6 @@ function getURLParameter(name, search) {
         return this.each(function(parameters) {
             var defaults = {
                 el: this,
-                color: '#CCC',
                 text: false,
                 helperClass: 'placeholder'
             };
@@ -690,10 +688,10 @@ var Box = (function() {
                             var $icon = $('<div><img src="' + item.icon + '" /></div>');
                             $item.append($icon);
                             if (options.iconPosition == 'left') {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_LEFT});
+                                $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_LEFT});
                                 $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
                             } else {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
+                                $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
                                 $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
                             }
                         }
@@ -1048,7 +1046,7 @@ var Box = (function() {
     };
 })(jQuery);
 
-/* Счетчики */
+// Счетчики
 (function($) {
     var PLUGIN_NAME = 'counter';
     var DATA_KEY = PLUGIN_NAME;
