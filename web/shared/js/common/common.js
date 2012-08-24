@@ -588,6 +588,8 @@ var Box = (function() {
                     oncreate: function() {},
                     onupdate: function() {},
                     onchange: function() {},
+                    onselect: function() {},
+                    onunselect: function() {},
                     onopen: function() {},
                     onclose: function() {}
                 };
@@ -737,16 +739,14 @@ var Box = (function() {
                         case TYPE_RADIO:
                             $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
                             $item.addClass(CLASS_ITEM_ACTIVE);
-                            $el.dropdown('close');
                         break;
                         case TYPE_CHECKBOX:
                             $item.toggleClass(CLASS_ITEM_ACTIVE);
                         break;
-                        default:
-                            $el.dropdown('close');
-                        break;
                     }
+                    $el.dropdown('close');
                     run(options.onchange, $el, data);
+                    run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, data);
                     $el.trigger(TRIGGER_CHANGE);
                 }
 
@@ -758,11 +758,8 @@ var Box = (function() {
                 });
 
                 if (options.isShow && $el.is(':visible')) {
-                    $el.dropdown('open', true);
-                } else {
-                    $el.dropdown('close', true);
+                    $el.dropdown('open');
                 }
-
                 if (isUpdate) {
                     run(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
@@ -770,39 +767,6 @@ var Box = (function() {
                     run(options.oncreate, $el);
                     $el.trigger(TRIGGER_CREATE);
                 }
-            });
-        },
-        getMenu: function() {
-            return this.data(DATA_KEY).$menu;
-        },
-        getTarget: function() {
-            return this.data(DATA_KEY).$target;
-        },
-        refreshPosition: function() {
-            return this.each(function() {
-                var $el = $(this);
-                var data = $el.data(DATA_KEY);
-                var options = data.options;
-                var $menu = data.$menu;
-                var $target = data.$target;
-                var isFixed = !!($menu.css('position') == 'fixed');
-                var offset = $target.offset();
-                var offsetTop = offset.top;
-                var offsetLeft = offset.left
-                    + parseFloat($menu.css('margin-left'))
-                    - parseFloat($menu.css('margin-right'));
-                if (options.position == 'right') {
-                    offsetLeft += ($target.width() - $menu.width())
-                }
-                if (isFixed) {
-                    offsetTop -= $(document).scrollTop();
-                    offsetLeft -= $(document).scrollLeft();
-                }
-
-                $menu.css({
-                    top: offsetTop + $target.outerHeight(),
-                    left: offsetLeft
-                });
             });
         },
         open: function(notTrigger) {
@@ -840,6 +804,42 @@ var Box = (function() {
                 run(options.onclose, $el, $menu);
                 $el.trigger(TRIGGER_CLOSE);
             }
+        },
+        refreshPosition: function() {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $target = data.$target;
+                var isFixed = !!($menu.css('position') == 'fixed');
+                var offset = $target.offset();
+                var offsetTop = offset.top;
+                var offsetLeft = offset.left
+                    + parseFloat($menu.css('margin-left'))
+                    - parseFloat($menu.css('margin-right'));
+                if (options.position == 'right') {
+                    offsetLeft += ($target.width() - $menu.width())
+                }
+                if (isFixed) {
+                    offsetTop -= $(document).scrollTop();
+                    offsetLeft -= $(document).scrollLeft();
+                }
+
+                $menu.css({
+                    top: offsetTop + $target.outerHeight(),
+                    left: offsetLeft
+                });
+            });
+        },
+        getMenu: function() {
+            return this.data(DATA_KEY).$menu;
+        },
+        getTarget: function() {
+            return this.data(DATA_KEY).$target;
+        },
+        appendItem: function() {
+
         }
     };
 

@@ -203,11 +203,20 @@
 
                         &>.action.icon {
                             position: absolute;
+                            padding: .4em;
                             top: 50%;
                             right: 50%;
-                            margin-top: -.5em;
-                            margin-right: -.5em;
+                            margin-top: -.7em;
+                            margin-right: -.7em;
                             opacity: .5;
+
+                            &:hover {
+                                opacity: 1;
+                            }
+                            &.active {
+                                opacity: 1;
+                                background-color: @bg_active;
+                            }
                         }
                     }
                 }
@@ -282,5 +291,15 @@
                 }
             }
         }
+    }
+}
+
+.ui-dropdown-add-to-list {
+    margin-top: 0;
+    margin-right: -0.6em;
+    border-color: @bg_active;
+
+    .ui-dropdown-menu-item {
+        padding: 2px 6px;
     }
 }

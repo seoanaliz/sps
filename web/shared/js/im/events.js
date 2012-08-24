@@ -58,6 +58,12 @@ var Eventlist = {
             text: text.split('\n').join('<br/>'),
             timestamp: Math.floor(new Date().getTime() / 1000)
         }));
+    },
+    add_to_list: function(dialogId, callback) {
+        callback(true);
+    },
+    remove_from_list: function(dialogId, callback) {
+        callback(true);
     }
 };
 $.extend(Events.eventList, Eventlist);

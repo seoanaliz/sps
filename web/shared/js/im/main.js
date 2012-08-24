@@ -213,22 +213,33 @@ var Dialogs = Widget.extend({
     showDropdown: function() {
         var $target = $(this);
         if (!$target.data('dropdown')) {
-            $target.dropdown({
-                isShow: true,
-                position: 'right',
-                width: 'auto',
-                type: 'checkbox',
-                onshow: function() {
-
-                },
-                onchange: function() {
-                    $(this).dropdown('open');
-                },
-                data: [
-                    {id: 1, title: 'asdasd'},
-                    {id: 2, title: 'asdasd'},
-                    {id: 3, title: 'asdasd'}
-                ]
+            Events.fire('get_lists', function(lists) {
+                $target.dropdown({
+                    isShow: true,
+                    position: 'right',
+                    width: 'auto',
+                    type: 'checkbox',
+                    addClass: 'ui-dropdown-add-to-list',
+                    onopen: function() {
+                        $target.addClass('active');
+                    },
+                    onclose: function() {
+                        $target.removeClass('active');
+                    },
+                    onselect: function(item) {
+                        $(this).dropdown('open');
+                        Events.fire('add_to_list', item.id, function() {
+                            console.log('!!!');
+                        });
+                    },
+                    onunselect: function(item) {
+                        $(this).dropdown('open');
+                        Events.fire('remove_from_list', item.id, function() {
+                            console.log('!!!');
+                        });
+                    },
+                    data: lists
+                });
             });
         }
         return false;
