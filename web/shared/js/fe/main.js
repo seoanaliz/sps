@@ -94,7 +94,7 @@ $(document).ready(function(){
     // right dropdown
     $("#right-drop-down").dropdown({
         data: rightPanelData,
-        type: 'checkbox',
+        type: 'radio',
         addClass: 'right',
         onchange: function(item) {
             $(this)

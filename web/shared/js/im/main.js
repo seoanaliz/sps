@@ -187,6 +187,7 @@ var Dialogs = Widget.extend({
 
     run: function(listId) {
         var t = this;
+        var $el = $(t.el);
 
         Events.fire('get_dialogs', listId, function(data) {
             t.templateData = {list: data};
@@ -204,6 +205,33 @@ var Dialogs = Widget.extend({
                 }
             });
         });
+
+        $el.undelegate('.action.icon.plus', 'click', t.showDropdown);
+        $el.delegate('.action.icon.plus', 'click', t.showDropdown);
+    },
+
+    showDropdown: function() {
+        var $target = $(this);
+        if (!$target.data('dropdown')) {
+            $target.dropdown({
+                isShow: true,
+                position: 'right',
+                width: 'auto',
+                type: 'checkbox',
+                onshow: function() {
+
+                },
+                onchange: function() {
+                    $(this).dropdown('open');
+                },
+                data: [
+                    {id: 1, title: 'asdasd'},
+                    {id: 2, title: 'asdasd'},
+                    {id: 3, title: 'asdasd'}
+                ]
+            });
+        }
+        return false;
     },
 
     clickDialog: function(e) {

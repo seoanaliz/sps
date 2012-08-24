@@ -84,19 +84,19 @@ function getURLParameter(name, search) {
                 .removeAttr('placeholder')
                 .parent().prepend($placeholder)
             ;
-            $placeholder.bind('mouseup', function() {
+            $placeholder.on('mouseup', function() {
                 $placeholder.hide();
                 $input.focus();
             });
-            $input.bind('blur change', function() {
+            $input.on('blur change', function() {
                 if (!$input.val()) {
                     $placeholder.show();
                 }
             });
-            $input.bind('focus change', function() {
+            $input.on('focus change', function() {
                 $placeholder.hide();
             });
-            $input.bind('destroyed', function() {
+            $input.on('destroyed', function() {
                 $placeholder.remove();
             })
         });
@@ -126,7 +126,7 @@ function getURLParameter(name, search) {
                     })
                 ;
 
-                $input.bind('keyup keydown focus blur', function(e) {
+                $input.on('keyup keydown focus blur', function(e) {
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
@@ -141,7 +141,7 @@ function getURLParameter(name, search) {
                          )
                     });
                 });
-                $input.bind('destroyed', function() {
+                $input.on('destroyed', function() {
                     $autoResize.remove();
                 });
 
@@ -547,6 +547,10 @@ var Box = (function() {
 (function($) {
     var PLUGIN_NAME = 'dropdown';
     var DATA_KEY = PLUGIN_NAME;
+    var EVENTS_NAMESPACE = PLUGIN_NAME;
+    var TYPE_NORMAL = 'normal';
+    var TYPE_RADIO = 'readio';
+    var TYPE_CHECKBOX = 'checkbox';
     var CLASS_ACTIVE = 'active';
     var CLASS_MENU = 'ui-dropdown-menu';
     var CLASS_EMPTY_MENU = 'ui-dropdown-menu-empty';
@@ -569,7 +573,7 @@ var Box = (function() {
             return this.each(function() {
                 var defaults = {
                     target: $(this), // На какой элемент навесить меню
-                    type: 'normal', // normal, checkbox
+                    type: 'normal', // normal, checkbox, radio
                     width: '', // Ширина меню
                     isShow: false, // Показать при создании
                     addClass: '', // Добавить уникальный класс к меню
@@ -580,7 +584,7 @@ var Box = (function() {
                     itemDataKey: 'item', // Ключ привязки данных к пункту меню
                     emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
-                    // На все события можно подписаться по имени события. Пример: $dropdown.bind('change', callback)
+                    // На все события можно подписаться по имени события. Пример: $dropdown.on('change', callback)
                     oncreate: function() {},
                     onupdate: function() {},
                     onchange: function() {},
@@ -597,18 +601,21 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).resize(function() {
+                    $(window).on('resize.' + EVENTS_NAMESPACE, function() {
+                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             $el.dropdown('refreshPosition');
                         }
                     });
-                    $(document).bind(options.closeEvent, function(e) {
+                    $(document).on(options.closeEvent + '.' + EVENTS_NAMESPACE, function(e) {
+                        if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         $el.dropdown('close');
                         run(options.onclose, $el, $menu);
                     });
-                    $(document).bind('keydown', function(e) {
+                    $(document).on('keydown.' + EVENTS_NAMESPACE, function(e) {
+                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
@@ -651,7 +658,6 @@ var Box = (function() {
                                     if ($hoveringItem.length) {
                                         select($hoveringItem);
                                     }
-                                    $el.dropdown('close');
                                     return false;
                                 break;
                                 case KEY.ESC:
@@ -661,7 +667,7 @@ var Box = (function() {
                             }
                         }
                     });
-                    $el.bind(options.openEvent, function(e) {
+                    $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
                         var $menu = $el.dropdown('getMenu');
@@ -718,18 +724,27 @@ var Box = (function() {
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    $el.dropdown('close');
                     select($(this));
                 });
-                $menu.bind(options.openEvent, function(e) {
+                $menu.on(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
+                $menu.hide();
 
                 function select($item) {
                     var data = $item.data(options.itemDataKey);
-                    if (options.type == 'checkbox') {
-                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
-                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    switch(options.type) {
+                        case TYPE_RADIO:
+                            $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                            $item.addClass(CLASS_ITEM_ACTIVE);
+                            $el.dropdown('close');
+                        break;
+                        case TYPE_CHECKBOX:
+                            $item.toggleClass(CLASS_ITEM_ACTIVE);
+                        break;
+                        default:
+                            $el.dropdown('close');
+                        break;
                     }
                     run(options.onchange, $el, data);
                     $el.trigger(TRIGGER_CHANGE);
@@ -805,7 +820,7 @@ var Box = (function() {
                 $el.dropdown('refreshPosition');
                 $menu.show();
 
-                if (notTrigger) {
+                if (!notTrigger) {
                     run(options.onopen, $el, $menu);
                     $el.trigger(TRIGGER_OPEN);
                 }
@@ -821,7 +836,7 @@ var Box = (function() {
             $target.removeClass(CLASS_ACTIVE);
             $menu.hide();
 
-            if (notTrigger) {
+            if (!notTrigger) {
                 run(options.onclose, $el, $menu);
                 $el.trigger(TRIGGER_CLOSE);
             }
@@ -864,7 +879,7 @@ var Box = (function() {
                 $el.dropdown(options);
 
                 if (!$el.data(DATA_KEY)) {
-                    $el.bind('keyup', function(e) {
+                    $el.on('keyup', function(e) {
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -1141,7 +1156,7 @@ var Box = (function() {
                     localStorage.setItem(memoryKey, inputValue);
                 }
 
-                $input.bind('keydown keyup keypress change blur', function() {
+                $input.on('keydown keyup keypress change blur', function() {
                     if (inputValue != $input.val()) {
                         inputValue = $input.val();
                         localStorage.setItem(memoryKey, inputValue);
