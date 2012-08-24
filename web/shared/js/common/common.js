@@ -1141,7 +1141,7 @@ var Box = (function() {
                     localStorage.setItem(memoryKey, inputValue);
                 }
 
-                $input.bind('keydown keyup change', function() {
+                $input.bind('keydown keyup keypress change blur', function() {
                     if (inputValue != $input.val()) {
                         inputValue = $input.val();
                         localStorage.setItem(memoryKey, inputValue);
