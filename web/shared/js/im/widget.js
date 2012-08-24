@@ -2,11 +2,9 @@ var Widget = Event.extend({
     init: function(options) {
         var t = this;
 
-        t
-            ._configure(options)
-            ._bindEvents()
-            .run()
-        ;
+        t._configure(options);
+        t._bindEvents();
+        t.run();
 
         return this;
     },

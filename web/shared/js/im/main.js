@@ -66,9 +66,9 @@ var LeftColumn = Widget.extend({
         var tab;
         var tabId;
         var tabTitle;
-        t.tabs = t.initTabs();
-        t.dialogs = t.initDialogs();
-        t.messages = t.initMessages();
+        t.initTabs();
+        t.initDialogs();
+        t.initMessages();
 
         if (localStorage.getItem(t.keyListId)) {
             tab = localStorage.getItem(t.keyListId);
@@ -86,38 +86,32 @@ var LeftColumn = Widget.extend({
 
     initTabs: function() {
         var t = this;
-        var tabs = new Tabs({
+        t.tabs = new Tabs({
             el: $(t.el).find('.header'),
             data: {tabs: []}
         });
-        tabs.on('select', function(id, title) {
+        t.tabs.on('select', function(id, title) {
             if (id.indexOf('messages') == 0) {
                 t.showMessages(id.substring(t.tabPrefixMessages.length), title);
             } else {
                 t.showDialogs(id.substring(t.tabPrefixDialogs.length), title);
             }
         });
-
-        return tabs;
     },
     initDialogs: function() {
         var t = this;
-        var dialogs = new Dialogs({
+        t.dialogs = new Dialogs({
             el: $(t.el).find('.list')
         });
-        dialogs.on('select', function(id, title) {
+        t.dialogs.on('select', function(id, title) {
             t.showMessages(id, title);
         });
-
-        return dialogs;
     },
     initMessages: function() {
         var t = this;
-        var messages = new Messages({
+        t.messages = new Messages({
             el: $(t.el).find('.list')
         });
-
-        return messages;
     },
 
     showDialogs: function(listId, title) {
