@@ -289,6 +289,7 @@ var Messages = Widget.extend({
             $textarea.autoResize();
             $textarea.inputMemory('message' + dialogId);
             $textarea.focus();
+            $textarea[0].scrollTop = $textarea[0].scrollHeight;
             t.bindEvents();
             t.scrollBottom();
             t.updateInputBox();
