@@ -548,7 +548,7 @@ var Box = (function() {
     var DATA_KEY = PLUGIN_NAME;
     var EVENTS_NAMESPACE = PLUGIN_NAME;
     var TYPE_NORMAL = 'normal';
-    var TYPE_RADIO = 'readio';
+    var TYPE_RADIO = 'radio';
     var TYPE_CHECKBOX = 'checkbox';
     var CLASS_ACTIVE = 'active';
     var CLASS_MENU = 'ui-dropdown-menu';
@@ -602,7 +602,7 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).on('resize.' + EVENTS_NAMESPACE, function() {
+                    $(window).on('resize.' + EVENTS_NAMESPACE, function(e) {
                         if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
@@ -678,6 +678,9 @@ var Box = (function() {
                         } else if (e.button != undefined) {
                             $el.dropdown('close');
                         }
+                    });
+                    $el.on('destroyed', function() {
+                        $el.dropdown('getMenu').remove();
                     });
                 }
 
@@ -836,6 +839,9 @@ var Box = (function() {
         },
         getTarget: function() {
             return this.data(DATA_KEY).$target;
+        },
+        getItem: function(id) {
+            return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
         },
         appendItem: function() {
 
