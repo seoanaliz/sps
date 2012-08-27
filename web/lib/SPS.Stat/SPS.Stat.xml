@@ -29,34 +29,19 @@
     <group name="Controls">
         <group name="Prices">
             <action name="setPostPrice">
-                <path>controls/setPostPrice</path>
-            </action>
-            <action name="setGroup">
-                <path>controls/setGroup</path>
-            </action>
-            <action name="deleteGroup">
-                <path>controls/deleteGroup</path>
+                <path>controls/stat/setPostPrice</path>
             </action>
             <action name="getEntries">
-                <path>controls/getEntries</path>
+                <path>controls/stat/getEntries</path>
             </action>
             <action name="selectGroupAdmin">
-                <path>controls/selectGroupAdmin</path>
-            </action>
-            <action name="getGroupList">
-                <path>controls/getGroupList</path>
-            </action>.
-            <action name="implPublic">
-                <path>controls/implPublic</path>
-            </action>
-            <action name="exPublic">
-                <path>controls/exPublic</path>
+                <path>controls/stat/selectGroupAdmin</path>
             </action>
             <action name="toggleGroupFave">
-                <path>controls/toggleGroupFave</path>
+                <path>controls/stat/toggleGroupFave</path>
             </action>
             <action name="togglePublVisibil">
-                <path>controls/togglePublVisibil</path>
+                <path>controls/stat/togglePublVisibil</path>
             </action>
             <action name="addUser">
                 <path>controls/addUser</path>
@@ -64,10 +49,31 @@
             <action name="setUserRank">
                 <path>controls/setUserRank</path>
             </action>
-            <action name="shareGroup">
-                <path>controls/shareGroup</path>
-            </action>
 
+
+        </group>
+        <group name="Groups">
+            <action name="shareGroup">
+                <path>controls/groups/shareGroup</path>
+            </action>
+            <action name="setGroup">
+                <path>controls/groups/setGroup</path>
+            </action>
+            <action name="deleteGroup">
+                <path>controls/groups/deleteGroup</path>
+            </action>
+            <action name="getGroupList">
+                <path>controls/groups/getGroupList</path>
+            </action>
+            <action name="implEntryToGroup">
+                <path>controls/groups/implEntryToGroup</path>
+            </action>
+            <action name="exEntryFromGroup">
+                <path>controls/groups/exEntryFromGroup</path>
+            </action>
+            <action name="saveAt">
+                <path>controls/messager/saveAt</path>
+            </action>
         </group>
         <group name="Messenger">
             <action name="getDialogsList">

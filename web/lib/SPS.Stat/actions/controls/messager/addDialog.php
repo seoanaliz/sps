@@ -17,6 +17,7 @@ class addDialog
         if ( !$user_id || !$rec_id) {
             die(ERR_MISSING_PARAMS);
         }
+        $recip = StatUsers::is_our_user( $rec_id );
 
         $dialog = StatUsers::add_user( $rec_id );
 
