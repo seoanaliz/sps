@@ -368,7 +368,6 @@ function getURLParameter(name, search) {
     }
 
     function isHor(sizes) {
-        console.log(sizes);
         return !!(sizes[0] / sizes[1] > 1.1);
     }
 
@@ -478,7 +477,7 @@ var Box = (function() {
             try {
                 params.onshow.call(box, $box);
             } catch(e) {
-                console.log(e);
+                //console.log(e);
             }
 
             boxesHistory.push(box);
@@ -490,7 +489,7 @@ var Box = (function() {
             try {
                 params.onhide.call(box, $box);
             } catch(e) {
-                console.log(e);
+                //console.log(e);
             }
 
             boxesHistory.pop();
