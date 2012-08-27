@@ -70,18 +70,19 @@ var LeftColumn = Widget.extend({
         t.initDialogs();
         t.initMessages();
 
-        if (localStorage.getItem(t.keyListId)) {
-            tab = localStorage.getItem(t.keyListId);
-            tabId = tab.split(':')[0];
-            tabTitle = tab.split(':')[1];
-            t.showDialogs(tabId, tabTitle);
-        }
-        if (localStorage.getItem(t.keyDialogId)) {
-            tab = localStorage.getItem(t.keyDialogId);
-            tabId = tab.split(':')[0];
-            tabTitle = tab.split(':')[1];
-            t.showMessages(tabId, tabTitle);
-        }
+        t.showDialogs(0, 'Не в списке');
+//        if (localStorage.getItem(t.keyListId)) {
+//            tab = localStorage.getItem(t.keyListId);
+//            tabId = tab.split(':')[0];
+//            tabTitle = tab.split(':')[1];
+//            t.showDialogs(tabId, tabTitle);
+//        }
+//        if (localStorage.getItem(t.keyDialogId)) {
+//            tab = localStorage.getItem(t.keyDialogId);
+//            tabId = tab.split(':')[0];
+//            tabTitle = tab.split(':')[1];
+//            t.showMessages(tabId, tabTitle);
+//        }
     },
 
     initTabs: function() {
@@ -182,7 +183,8 @@ var Dialogs = Widget.extend({
     listId: null,
 
     events: {
-        'click: .dialog': 'clickDialog'
+        'click: .dialog': 'clickDialog',
+        'click: .action.icon.plus': 'clickPlus'
     },
 
     run: function(listId) {
@@ -190,7 +192,7 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
 
         Events.fire('get_dialogs', listId, function(data) {
-            t.templateData = {list: data};
+            t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
             $(t.el).find('.date').easydate({
@@ -206,21 +208,23 @@ var Dialogs = Widget.extend({
                 }
             });
         });
-
-        $el.undelegate('.action.icon.plus', 'click', t.showDropdown);
-        $el.delegate('.action.icon.plus', 'click', t.showDropdown);
     },
 
-    showDropdown: function() {
-        var $target = $(this);
+    clickPlus: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
         if (!$target.data('dropdown')) {
             Events.fire('get_lists', function(lists) {
                 $target.dropdown({
                     isShow: true,
                     position: 'right',
                     width: 'auto',
-                    type: 'checkbox',
+                    type: 'radio',
                     addClass: 'ui-dropdown-add-to-list',
+                    oncreate: function() {
+                        var $selectedItem = $(this).dropdown('getItem', $target.closest('.dialogs').data('id'));
+                        $selectedItem.addClass('active');
+                    },
                     onopen: function() {
                         $target.addClass('active');
                     },
@@ -230,13 +234,7 @@ var Dialogs = Widget.extend({
                     onselect: function(item) {
                         $(this).dropdown('open');
                         Events.fire('add_to_list', item.id, function() {
-                            console.log('!!!');
-                        });
-                    },
-                    onunselect: function(item) {
-                        $(this).dropdown('open');
-                        Events.fire('remove_from_list', item.id, function() {
-                            console.log('!!!');
+                            //console.log('!!!');
                         });
                     },
                     data: lists
@@ -247,6 +245,8 @@ var Dialogs = Widget.extend({
     },
 
     clickDialog: function(e) {
+        if ($(e.target).is('a')) return;
+
         var t = this;
         var $target = $(e.currentTarget);
         var listId = $target.data('id');
@@ -269,7 +269,7 @@ var Messages = Widget.extend({
         var t = this;
 
         Events.fire('get_messages', dialogId, function(data) {
-            t.templateData = {list: data};
+            t.templateData = {id: dialogId, list: data};
             t.dialogId = dialogId;
             t.renderTemplate();
             var $el = $(t.el);

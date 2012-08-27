@@ -62,7 +62,7 @@ var RIGHT_COLUMN =
 '<div class="list"></div>';
 
 var DIALOGS =
-'<div class="dialogs">' +
+'<div class="dialogs" data-id="<?=id?>">' +
     '<? if (list.length) { ?>' +
         '<? each(DIALOGS_ITEM, list); ?>' +
     '<? } else { ?>' +
@@ -91,7 +91,7 @@ var DIALOGS_ITEM =
 '</div>';
 
 var MESSAGES =
-'<div class="messages">' +
+'<div class="messages" data-id="<?=id?>">' +
     '<? each(MESSAGES_ITEM, list); ?>' +
 '</div>' +
 '<div class="post-message clear-fix">' +

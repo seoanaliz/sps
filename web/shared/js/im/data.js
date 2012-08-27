@@ -119,12 +119,20 @@ Data.dialogs = [
 
 Data.lists = [
     {
+        id: 0,
+        title: 'Не в списке',
+        dialogs: Data.dialogs
+    }, {
         id: 1,
         title: 'Друзья',
         dialogs: Data.dialogs
     }, {
         id: 2,
         title: 'Коллеги',
+        dialogs: Data.dialogs
+    }, {
+        id: 3,
+        title: 'Одноклассники',
         dialogs: Data.dialogs
     }
 ];
