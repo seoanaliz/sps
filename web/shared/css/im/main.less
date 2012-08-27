@@ -206,8 +206,8 @@
                             padding: .4em;
                             top: 50%;
                             right: 50%;
-                            margin-top: -.7em;
-                            margin-right: -.7em;
+                            margin-top: -0.8em;
+                            margin-right: -0.8em;
                             opacity: .5;
 
                             &:hover {
@@ -216,6 +216,7 @@
                             &.active {
                                 opacity: 1;
                                 background-color: @bg_active;
+                                background-image: url('../../images/common/add-white.png');
                             }
                         }
                     }
@@ -229,6 +230,10 @@
         width: 286px;
         border: 1px solid @border_main;
         margin-left: 10px;
+
+        position: fixed;
+        left: 50%;
+        margin-left: 262px;
 
         .border-radius(3px);
 
@@ -295,8 +300,8 @@
 }
 
 .ui-dropdown-add-to-list {
-    margin-top: 0;
-    margin-right: -0.6em;
+    margin-top: -0.1em;
+    margin-right: -0.7em;
     border-color: @bg_active;
 
     .ui-dropdown-menu-item {

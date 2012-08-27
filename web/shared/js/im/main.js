@@ -195,6 +195,7 @@ var Dialogs = Widget.extend({
             t.renderTemplate();
             $(t.el).find('.date').easydate({
                 live: true,
+                set_title: false,
                 date_parse: function(date) {
                     date = intval(date) * 1000;
                     if (!date) return;
@@ -276,6 +277,7 @@ var Messages = Widget.extend({
 
             $el.find('.date').easydate({
                 live: true,
+                set_title: false,
                 date_parse: function(date) {
                     date = intval(date) * 1000;
                     if (!date) return;
@@ -343,6 +345,7 @@ var Messages = Widget.extend({
                 $el.find('.messages').append($newMessage);
                 $newMessage.find('.date').easydate({
                     live: true,
+                    set_title: false,
                     date_parse: function(date) {
                         date = intval(date) * 1000;
                         if (!date) return;
