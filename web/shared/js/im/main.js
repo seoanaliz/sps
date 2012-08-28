@@ -225,10 +225,10 @@ var Dialogs = Widget.extend({
                     isShow: true,
                     position: 'right',
                     width: 'auto',
-                    type: 'radio',
+                    type: 'checkbox',
                     addClass: 'ui-dropdown-add-to-list',
                     oncreate: function() {
-                        var $selectedItem = $(this).dropdown('getItem', $target.closest('.dialogs').data('id'));
+                        var $selectedItem = $(this).dropdown('getItem', t.listId);
                         $selectedItem.addClass('active');
                     },
                     onopen: function() {
@@ -237,9 +237,16 @@ var Dialogs = Widget.extend({
                     onclose: function() {
                         $target.removeClass('active');
                     },
-                    onselect: function(item) {
+                    onchange: function(item) {
                         $(this).dropdown('open');
-                        Events.fire('add_to_list', item.id, function() {
+                    },
+                    onselect: function(item) {
+                        Events.fire('add_to_list', item.id, t.listId, function() {
+                            //console.log('!!!');
+                        });
+                    },
+                    onunselect: function(item) {
+                        Events.fire('remove_from_list', item.id, t.listId, function() {
                             //console.log('!!!');
                         });
                     },

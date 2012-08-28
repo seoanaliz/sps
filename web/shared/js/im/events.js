@@ -59,10 +59,10 @@ var Eventlist = {
             timestamp: Math.floor(new Date().getTime() / 1000)
         }));
     },
-    add_to_list: function(dialogId, callback) {
+    add_to_list: function(dialogId, listId, callback) {
         callback(true);
     },
-    remove_from_list: function(dialogId, callback) {
+    remove_from_list: function(dialogId, listId, callback) {
         callback(true);
     }
 };
