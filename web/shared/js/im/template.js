@@ -63,10 +63,10 @@ var RIGHT_COLUMN =
 
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
-    '<? if (list.length) { ?>' +
+    '<? if (isset("list") && list.length) { ?>' +
         '<? each(DIALOGS_ITEM, list); ?>' +
     '<? } else { ?>' +
-        'empty' +
+        'Dialogs empty' +
     '<? } ?>' +
 '</div>';
 
@@ -81,10 +81,20 @@ var DIALOGS_ITEM =
             '<? if (user.isOnline) { ?>' +
                 '<div class="status">Online</div>' +
             '<? } ?>' +
-            '<div class="date"><?=lastMessage.timestamp?></div>' +
+            '<div class="date">' +
+                '<? if (isset("lastMessage")) { ?>' +
+                    '<?=lastMessage.timestamp?>' +
+                '<? } ?>' +
+            '</div>' +
         '</div>' +
     '</div>' +
-    '<div class="history"><?=lastMessage.text?></div>' +
+    '<div class="history">' +
+        '<? if (isset("lastMessage")) { ?>' +
+            '<?=lastMessage.text?>' +
+        '<? } else { ?>' +
+            '...' +
+        '<? } ?>' +
+    '</div>' +
     '<div class="actions">' +
         '<div class="action icon plus"></div>' +
     '</div>' +
@@ -92,7 +102,11 @@ var DIALOGS_ITEM =
 
 var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
-    '<? each(MESSAGES_ITEM, list); ?>' +
+    '<? if (isset("list") && list.length) { ?>' +
+        '<? each(MESSAGES_ITEM, list); ?>' +
+    '<? } else { ?>' +
+        'Messages empty' +
+    '<? } ?>' +
 '</div>' +
 '<div class="post-message clear-fix">' +
     '<div class="left-column">' +

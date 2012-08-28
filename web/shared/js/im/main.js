@@ -5,6 +5,10 @@ var Configs = {
 };
 
 $(document).ready(function() {
+    if (!$('#main').length) {
+        return;
+    }
+
     new IM({
         el: '#main',
         viewer: Data.users[0]
@@ -119,7 +123,7 @@ var LeftColumn = Widget.extend({
         var t = this;
         var tabPrefix = t.tabPrefixDialogs;
 
-        t.dialogs.run(listId);
+        t.dialogs.update(listId);
         if (t.curListId && t.curListId != listId) {
             t.tabs.removeTab(tabPrefix + t.curListId);
         }
@@ -136,7 +140,7 @@ var LeftColumn = Widget.extend({
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
 
-        t.messages.run(dialogId);
+        t.messages.update(dialogId);
         if (t.curDialogId && t.curDialogId != dialogId) {
             t.tabs.removeTab(tabPrefix + t.curDialogId);
         }
@@ -187,7 +191,9 @@ var Dialogs = Widget.extend({
         'click: .action.icon.plus': 'clickPlus'
     },
 
-    run: function(listId) {
+    run: function() {},
+
+    update: function(listId) {
         var t = this;
         var $el = $(t.el);
 
@@ -265,7 +271,9 @@ var Messages = Widget.extend({
     templateMessage: MESSAGES_ITEM,
     dialogId: null,
 
-    run: function(dialogId) {
+    run: function() {},
+
+    update: function(dialogId) {
         var t = this;
 
         Events.fire('get_messages', dialogId, function(data) {
@@ -297,7 +305,6 @@ var Messages = Widget.extend({
             t.updateInputBox();
         });
     },
-
 
     bindEvents: function() {
         var t = this;

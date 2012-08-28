@@ -56,5 +56,5 @@ $(document).ready(function() {
 
 function onSuccess(token) {
     console.log(token);
-    location.replace('/im/');
+    //location.replace('/im/');
 }
