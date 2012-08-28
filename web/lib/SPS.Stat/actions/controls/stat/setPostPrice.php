@@ -12,13 +12,14 @@
          * Entry Point
          */
         public function Execute() {
-
-            error_reporting( 0 );
-
+//            error_reporting( 0 );
+            $a = MesGroups::get_dialog_id_array( 670456 );
+            print_r ($a);
+            die();
             $publicId = Request::getInteger( 'publId' );
-            $price    = Request::getInteger( 'price' );
+            $price  = Request::getInteger( 'price' );
 
-            if (empty( $publId ) ) {
+            if (empty($publId)) {
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }

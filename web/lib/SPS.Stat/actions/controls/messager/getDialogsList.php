@@ -31,6 +31,10 @@ class getDialogsList
 
         $dialogs_array = array();
         $row_dialog_array =  MesDialogs::get_dialogs( $user_id );
+        if ( !$row_dialog_array )
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' ) ) );
+        elseif( $row_dialog_array == 'no access_token' )
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
 
         $i = 0;
         $user_ids = '';
@@ -48,19 +52,17 @@ class getDialogsList
                 if ( $i == $offset + $limit )
                     break;
             }
-
-
         }
-        unset($dialog);
+        unset( $dialog );
 
         $users_array = StatUsers::get_vk_user_info( $user_ids );
 
         foreach( $dialogs_array as &$dialog ) {
-             $dialog->uid = $users_array[ $dialog->uid ];
+            $dialog->uid = $users_array[ $dialog->uid ];
         }
 
-        print_r($dialogs_array);
-//        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
+//        print_r( $dialogs_array );
+        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
 
     }
 }

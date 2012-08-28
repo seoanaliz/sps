@@ -25,7 +25,6 @@
                 $type = 'Stat';
 
             $m_class  = $type . 'Groups';
-
             if ( !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }

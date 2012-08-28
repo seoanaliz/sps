@@ -16,8 +16,8 @@
         public function Execute() {
             error_reporting( 0 );
             $user_id        =   Request::getInteger( 'userId' );
-            $group_ids      =   Request::getString( 'groupId' );
-            $recipients_id  =   Request::getString( 'recId' );
+            $group_ids      =   Request::getString(  'groupId' );
+            $recipients_id  =   Request::getString(  'recId' );
             $general        =   Request::getInteger( 'general' );
             $type           =   Request::getString ( 'type' );
 
@@ -25,9 +25,7 @@
             if ( !$type || !in_array( $type, $type_array, 1 ) )
                 $type = 'Stat';
             $m_class    = $type . 'Groups';
-            print_r($m_class);
-            $general    =   $general ? $general : 0;
-
+            $general    = $general ? $general : 0;
             if ( !$group_ids || !$user_id || !$recipients_id ) {
                 die( ERR_MISSING_PARAMS );
             }
@@ -39,8 +37,8 @@
                 echo ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-
-            if ( $m_class::implement_group($group_ids, $recipients_id) )
+	     
+            if ( $m_class::implement_group( $group_ids, $recipients_id ) )
                 die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
             else
                 die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
