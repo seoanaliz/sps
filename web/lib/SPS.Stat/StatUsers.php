@@ -54,18 +54,17 @@
         {
             if ( !isset( $users['userId'] ) )
                 $users = self::get_vk_user_info( $users );
-		$sql =  'INSERT INTO ' . TABLE_STAT_USERS .
+		    $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
                         '    ( user_id, name, ava,  comments )
                          VALUES
                              ( @userId, @name, @ava, @comments )';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger( '@userId',      $users['userId']);
-                $cmd->SetString ( '@name',        $users['name'] );
-                $cmd->SetString ( '@ava',         $users['ava'] );
-                $cmd->SetString ( '@comments',    $users['comments'] );
-	         $res = $cmd->ExecuteNonQuery();
-	
-           
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@userId',      $users['userId']);
+            $cmd->SetString ( '@name',        $users['name'] );
+            $cmd->SetString ( '@ava',         $users['ava'] );
+            $cmd->SetString ( '@comments',    $users['comments'] );
+            $res = $cmd->ExecuteNonQuery();
+
             if ( !$res )
                 return false;
             else
@@ -107,7 +106,7 @@
 
         public static function get_access_token( $id )
         {
-            $id = $id ? $id : AuthVkontakte::IsAuth();;
+            $id = $id ? $id : AuthVkontakte::IsAuth();
             
             $sql = 'SELECT access_token FROM ' . TABLE_STAT_USERS . ' WHERE user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
@@ -130,10 +129,10 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetString(  '@access_token', $access_token );
-            $ds = $cmd->Execute();
-            $ds->Next();
-
-            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
+            $ds = $cmd->ExecuteNonQuery();
+//            $ds->Next();
+//
+//            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
         }
 
 

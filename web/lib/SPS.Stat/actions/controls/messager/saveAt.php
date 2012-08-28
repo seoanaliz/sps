@@ -22,8 +22,8 @@ class saveAt
 
         StatUsers::set_access_token( $user_id, $access_token );
 
-        echo  ObjectHelper::ToJSON(array('response' => true));
-        die();
+        die( ObjectHelper::ToJSON( array( 'response' => true )));
+
 
 
     }

@@ -219,13 +219,11 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
-            echo $cmd->GetQuery() . '<br>';
             $ids = array();
 
             while( $ds->Next() ) {
                 $a  =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER );
-//                echo $id . '<br>';
                 $ids[ $a ] = $id;
             }
             return $ids;
@@ -249,7 +247,6 @@
 
             foreach( $ids as $k => &$v ) {
                 $group_id = self::get_dialog_group( $v );
-                echo $group_id . '<br>';
                 $v = $group_id ? $group_id : '-1';
             }
 
