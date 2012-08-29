@@ -97,6 +97,9 @@
             <action name="setStatus">
                 <path>controls/messager/setStatus</path>
             </action>
+            <action name="watchDog">
+                <path>controls/messager/watchDog</path>
+            </action>
         </group>
     </group>
 

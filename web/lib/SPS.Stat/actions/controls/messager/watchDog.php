@@ -10,8 +10,34 @@ class watchDog
 {
 
     public function Execute() {
-        error_reporting( 0 );
-        $userId     =   Request::getInteger( 'userId' );
+//        error_reporting( 0 );
+
+        $user_id   =   Request::getInteger( 'userId' );
+
+        if ( !$user_id ) {
+            die(ERR_MISSING_PARAMS);
+        }
+//        print_r( $user_id );
+        $events = MesDialogs::watch_dog( $user_id );
+        $result = array();
+
+        foreach( $events['updates'] as $event ) {
+            switch ( $event[0] ) {
+                case 4:
+                    $result[] = array(
+                        'type'    => 'inMessage',
+                        'content' => array(
+                            'body'      =>  $event[6],
+                            'mid'       =>  $event[1],
+                            'from_id'   =>  $event[3],
+                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $event[3] ),
+                            'date'      =>  $event[4],
+                        )
+                    );
+
+            }
+
+        }
 
     }
 }
