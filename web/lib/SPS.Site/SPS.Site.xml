@@ -128,6 +128,9 @@
             <action name="RestoreArticleAppControl">
                 <path>app/controls/articles/RestoreArticleAppControl</path>
             </action>
+            <action name="MarkArticleAppControl">
+                <path>app/controls/articles/MarkArticleAppControl</path>
+            </action>
         </group>
         <group name="Comments">
             <action name="SaveCommentAppControl">
@@ -141,6 +144,9 @@
             </action>
             <action name="RestoreCommentAppControl">
                 <path>app/controls/comments/RestoreCommentAppControl</path>
+            </action>
+            <action name="MarkCommentAppControl">
+                <path>app/controls/comments/MarkCommentAppControl</path>
             </action>
         </group>
     </group>

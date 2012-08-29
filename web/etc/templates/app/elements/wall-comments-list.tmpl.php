@@ -7,7 +7,14 @@
             if (!empty($showHideBtn)) {
                 ?><div class="show-more hide">Скрыть комментарии</div><?
             } else {
-                ?><div class="show-more">Показать все <?= $commentsData[$article->articleId]['count'] ?></div><?
+                ?>
+                    <div class="show-more">
+                        Показать еще <?= ($commentsData[$article->articleId]['count'] - CommentUtility::LAST_COUNT) ?>
+                        <? if (!empty($commentsData[$article->articleId]['countNewCollapsed'])) { ?>
+                            <span class="counter">+<?=$commentsData[$article->articleId]['countNewCollapsed']?></span>
+                        <? } ?>
+                    </div>
+                <?
             }
         }
         foreach ($commentsData[$article->articleId]['comments'] as $comment) {

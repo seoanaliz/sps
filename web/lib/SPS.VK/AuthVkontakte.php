@@ -80,6 +80,7 @@
         public static function Logout() {
             Cookie::setCookie(  'vk_app_' . self::$AppId,    "", time() - 1024, '/' );
             Cookie::setCookie(  'vk_app_trust' . self::$AppId, "", time() - 1024, '/' );
+            Session::setObject('Editor', null);
         }
     }
 ?>

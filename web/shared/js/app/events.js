@@ -86,6 +86,17 @@ var Eventlist = {
             }
         });
     },
+    wall_mark_as_read: function(postId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'article-mark/',
+            data: {
+                id: postId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
+    },
 
     comment_load: function(options, callback) {
         var params = $.extend({
@@ -130,6 +141,18 @@ var Eventlist = {
             url: appControlsRoot + 'comment-restore/',
             data: {
                 id: commentId
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
+    },
+    comment_mark_as_read: function(postId, commentId, callback) {
+        $.ajax({
+            url: appControlsRoot + 'comment-mark/',
+            data: {
+                articleId: postId,
+                commentId: commentId
             },
             success: function (data) {
                 callback(true);

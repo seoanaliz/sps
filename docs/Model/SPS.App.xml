@@ -45,5 +45,38 @@
       </Flags>
       <Lists />
     </Entity>
+    <Entity Name="AuthorEvent" PackageName="SPS.App" Table="authorEvents" View="getAuthorEvents" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="articleId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="article" ForeignKey="Article" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="authorId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="commentIds" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="commentIds" FieldType="TYPE_ARRAY" ComplexType="int[]" Nullable="Yes" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="isQueued" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="isQueued" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="isSent" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="isSent" FieldType="TYPE_BOOLEAN" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="_articleId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="articleId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+        <EFlag>AddablePK</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
+    <Entity Name="AuthorFeedView" PackageName="SPS.App" Table="authorFeedViews" View="getAuthorFeedViews" DefaultConnection="">
+      <Attributes>
+        <Attribute Name="targetFeedId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeed" ForeignKey="TargetFeed" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="authorId" Key="true" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="author" ForeignKey="Author" FieldType="TYPE_INTEGER" Nullable="CheckEmpty" SearchType="SEARCHTYPE_EQUALS" />
+        <Attribute Name="lastViewDate" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="lastViewDate" FieldType="TYPE_DATETIME" Nullable="No" SearchType="SEARCHTYPE_EQUALS" />
+      </Attributes>
+      <Search>
+        <Attribute Name="_targetFeedId" Key="false" Addable="true" Updatable="true" MinValue="0" MaxValue="0" DbName="targetFeedId" FieldType="TYPE_INTEGER" Nullable="Yes" SearchType="SEARCHTYPE_ARRAY" />
+      </Search>
+      <Flags>
+        <EFlag>CanCache</EFlag>
+        <EFlag>WithoutTemplates</EFlag>
+      </Flags>
+      <Lists />
+    </Entity>
   </Entities>
 </Package>

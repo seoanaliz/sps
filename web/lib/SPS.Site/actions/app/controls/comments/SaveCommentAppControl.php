@@ -26,14 +26,14 @@
 
             if (empty($article) || $article->sourceFeedId != -1) {
                 $result['message'] = 'accessError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             $__editorMode = Response::getBoolean('__editorMode');
             if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
                 $result['message'] = 'accessError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
@@ -52,11 +52,15 @@
             $errors = CommentFactory::Validate($comment);
             if (!empty($errors)) {
                 $result['message'] = 'saveError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             CommentFactory::Add($comment, array(BaseFactory::WithReturningKeys => true));
+
+            if ($__editorMode || $author->authorId != $article->authorId) {
+                AuthorEventUtility::EventComment($article, $comment->commentId);
+            }
 
             $comment = CommentFactory::GetById($comment->commentId);
             Response::setParameter( 'comment', $comment );

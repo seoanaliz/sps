@@ -22,3 +22,24 @@
 <script type="text/javascript">
     $('#wall > .title .text').text('{$articlesCountText}');
 </script>
+<script type="text/javascript">
+    function setCounter(selector, value) {
+        var counter = $(selector);
+        if (!counter.data('counter')) {
+            counter.counter({prefix: '+'});
+        }
+        counter.counter('setCounter', value);
+    }
+
+    <? if (isset($__authorCounter)) {?>
+        <? if (isset($__authorCounter['total'])) {?>
+            setCounter('.menu .item.selected .counter', '{$__authorCounter[total]}');
+        <? } ?>
+        <? if (isset($__authorCounter['newQueued'])) {?>
+            setCounter('.tabs .tab.planned .counter', '{$__authorCounter[newQueued]}');
+        <? } ?>
+        <? if (isset($__authorCounter['newSent'])) {?>
+            setCounter('.tabs .tab.posted .counter', '{$__authorCounter[newSent]}');
+        <? } ?>
+    <? } ?>
+</script>

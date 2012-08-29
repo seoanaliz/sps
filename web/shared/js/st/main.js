@@ -80,7 +80,10 @@ var List = (function() {
         });
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
+            var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
+            var shareUsers = [];
+            var shareLists = [];
             var box = new Box({
                 id: 'share' + listId,
                 title: 'Поделиться',
@@ -93,92 +96,129 @@ var List = (function() {
                     var box = this;
                     if (isFirstShow) {
                         isFirstShow = false;
-                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(data) {
-                            if (data.error) {
-                                box
-                                    .setTitle('Ошибка')
-                                    .setHTML('Вы не предоставили доступ к друзьям.')
-                                    .setButtons([
-                                        {label: 'Перелогиниться', onclick: function() {
-                                            VK.Auth.logout(function() {
-                                                location.replace('login/');
-                                            });
-                                        }},
-                                        {label: 'Отмена', isWhite: true}
-                                    ])
-                                ;
-                            } else {
-                                var res = data.response;
-                                var friends = [];
-                                var lists = [];
-                                for (var i in res) {
-                                    var user = res[i];
-                                    friends.push({
-                                        id: user.uid,
-                                        name: user.first_name + ' ' + user.last_name
-                                    });
-                                }
-                                box.setHTML(tmpl(BOX_SHARE));
-                                var $users = $box.find('.users');
-                                var $lists = $box.find('.lists');
-                                var $comment = $box.find('.comment');
+                        VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
+                            Events.fire('load_list', function(dataLists) {
+                                if (dataVK && dataVK.error) {
+                                    box
+                                        .setTitle('Ошибка')
+                                        .setHTML('Вы не предоставили доступ к друзьям.')
+                                        .setButtons([
+                                            {label: 'Перелогиниться', onclick: function() {
+                                                VK.Auth.logout(function() {
+                                                    location.replace('login/');
+                                                });
+                                            }},
+                                            {label: 'Отмена', isWhite: true}
+                                        ])
+                                    ;
+                                } else {
+                                    var dataVKfriends = dataVK.response;
+                                    var friends = [];
+                                    for (var i in dataVKfriends) {
+                                        var user = dataVKfriends[i];
+                                        friends.push({
+                                            id: user.uid,
+                                            icon: user.photo,
+                                            title: user.first_name + ' ' + user.last_name
+                                        });
+                                    }
+                                    var lists = [];
+                                    for (var i in dataLists) {
+                                        var list = dataLists[i];
+                                        lists.push({
+                                            id: list.itemId,
+                                            title: list.itemTitle
+                                        });
+                                    }
 
-                                $comment.autoResize();
-                                $users
-                                    .textext({
-                                        plugins : 'tags autocomplete filter',
-                                        ext: {
-                                            itemManager: {
-                                                stringToItem: function(str) { return {name: str}; },
-                                                itemToString: function(item) { return item.name; },
-                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                    box.setHTML(tmpl(BOX_SHARE));
+
+                                    var $users = $box.find('.users');
+                                    var $lists = $box.find('.lists');
+                                    $users
+                                        .tags({
+                                            onadd: function(tag) {
+                                                shareUsers.push(parseInt(tag.id));
+                                            },
+                                            onremove: function(tagId) {
+                                                shareUsers = jQuery.grep(shareUsers, function(value) {
+                                                    return value != tagId;
+                                                });
                                             }
-                                        }
-                                    })
-                                    .bind('getSuggestions', function(e, data) {
-                                        var list = friends,
-                                            textext = $(e.target).textext()[0],
-                                            query = (data ? data.query : '') || '';
-                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                                    })
-                                    .bind('setFormData', function(e, data) {
-                                        $(e.target).data('tags', data);
-                                    })
-                                ;
-                                $users.textext()[0].getFormData();
-                                $lists
-                                    .textext({
-                                        plugins : 'tags autocomplete filter',
-                                        tagsItems: [{name: 'asadfdsgdfhretq'}],
-                                        ext: {
-                                            itemManager: {
-                                                stringToItem: function(str) { return {name: str}; },
-                                                itemToString: function(item) { return item.name; },
-                                                compareItems: function(item1, item2) { return item1.name == item2.name; }
+                                        })
+                                        .autocomplete({
+                                            data: friends,
+                                            target: $users.closest('.ui-tags'),
+                                            onchange: function(item) {
+                                                $(this).tags('addTag', item.id, item).val('').focus();
                                             }
-                                        }
-                                    })
-                                    .bind('getSuggestions', function(e, data) {
-                                        var list = [{name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}, {name: 'asadfdsgdfhretq'}],
-                                            textext = $(e.target).textext()[0],
-                                            query = (data ? data.query : '') || '';
-                                        $(this).trigger('setSuggestions', {result: textext.itemManager().filter(list, query)});
-                                    })
-                                    .bind('setFormData', function(e, data) {
-                                        $(e.target).data('tags', data);
-                                    })
-                                ;
-                                $lists.textext()[0].getFormData();
-                                $box.find('textarea[value=""]:first').focus();
-                            }
+                                        })
+                                        .keydown(function(e) {
+                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                                $(this).tags('removeLastTag');
+                                            }
+                                        })
+                                    ;
+                                    $lists
+                                        .tags({
+                                            onadd: function(tag) {
+                                                shareLists.push(tag.id);
+                                            },
+                                            onremove: function(tagId) {
+                                                shareLists = jQuery.grep(shareLists, function(value) {
+                                                    return value != tagId;
+                                                });
+                                            }
+                                        })
+                                        .autocomplete({
+                                            data: lists,
+                                            target: $lists.closest('.ui-tags'),
+                                            onchange: function(item) {
+                                                $(this).tags('addTag', item.id, item).val('').focus();
+                                            }
+                                        })
+                                        .keydown(function(e) {
+                                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                                $(this).tags('removeLastTag');
+                                            }
+                                        })
+                                        .tags('addTag', listId, {id: listId, title: listTitle})
+                                    ;
+                                    $box.find('input[value=""]:first').focus();
+                                }
+                            });
                         });
+                    } else {
+                        $box.find('input[value=""]:first').focus();
                     }
                 }
             }).show();
 
             function share($button, $box) {
-                console.log($box.find('.users').data('tags'));
-                console.log($box.find('.lists').data('tags'));
+                var box = this;
+
+                if (shareLists.length && shareUsers.length) {
+                    Events.fire('share_list', shareLists.join(','), shareUsers.join(','), function() {
+                        box.hide();
+                        new Box({
+                            id: 'shareSuccess',
+                            title: 'Поделиться',
+                            html: 'Выбранные друзья успешно получили доступ к спискам',
+                            buttons: [
+                                {label: 'Закрыть'}
+                            ]
+                        }).show();
+                    });
+                } else {
+                    new Box({
+                        id: 'shareError',
+                        title: 'Ошибка',
+                        html: 'Не выбран пользователь или список',
+                        buttons: [
+                            {label: 'Закрыть'}
+                        ]
+                    }).show();
+                }
             }
         });
         $container.delegate('.actions .edit', 'click', function() {
@@ -253,7 +293,7 @@ var Filter = (function() {
     var $list;
 
     function init(callback) {
-        $container = $('td.filter');
+        $container = $('td > .filter');
         $audience = $('> .audience', $container);
         $period = $('> .period', $container);
         $list = $('> .list', $container);
@@ -266,12 +306,43 @@ var Filter = (function() {
         (function() {
             var $slider = $audience.find('> .slider-wrap');
             var $sliderRange = $audience.find('> .slider-range');
+            var $valMin = $sliderRange.find('> .value-min');
+            var $valMax = $sliderRange.find('> .value-max');
+            var notRender = false;
+            $sliderRange.find('.value-min, .value-max').click(function() {
+                var $val = $(this);
+                $val.attr('contenteditable', true).focus();
+            });
+            $sliderRange.find('.value-min, .value-max').blur(function() {
+                var $val = $(this);
+                $val.removeAttr('contenteditable');
+            });
+            $sliderRange.find('.value-min, .value-max').bind('keyup keydown', function(e) {
+                switch(e.keyCode) {
+                    case KEY.ENTER:
+                    case KEY.ESC:
+                        $(this).blur();
+                        notRender = false;
+                        changeRange({originalEvent: true});
+                        return false;
+                }
+                var intText = intval($(this).html());
+                if ($(this).html() != intText) {
+                    $(this).text(intText);
+                }
+                notRender = true;
+                if ($(this).hasClass('value-min')) {
+                    $slider.slider('values', 0, intText);
+                } else {
+                    $slider.slider('values', 1, intText);
+                }
+            });
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3200000,
+                max: 3500000,
                 animate: 100,
-                values: [0, 3000000],
+                values: [0, 3500000],
                 create: function(event, ui) {
                     renderRange();
                 },
@@ -279,7 +350,10 @@ var Filter = (function() {
                     renderRange();
                 },
                 change: function(event, ui) {
-                    renderRange();
+                    if (!notRender) {
+                        renderRange();
+                    }
+                    notRender = false;
                     changeRange(event);
                 }
             });
@@ -288,7 +362,8 @@ var Filter = (function() {
                     $slider.slider('values', 0),
                     $slider.slider('values', 1)
                 ];
-                $sliderRange.html(audience[0] + ' - ' + audience[1]);
+                $valMin.html(audience[0]);
+                $valMax.html(audience[1]);
             }
             function changeRange(e) {
                 var audience = [
@@ -331,7 +406,7 @@ var Filter = (function() {
                 Events.fire('add_to_bookmark', listId, function() {
                     $icon.addClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), false);
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             } else {
@@ -339,7 +414,7 @@ var Filter = (function() {
                 Events.fire('remove_from_bookmark', listId, function() {
                     $icon.removeClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), false);
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             }
@@ -369,16 +444,23 @@ var Filter = (function() {
             });
         }
     }
+    function setSliderMin(min) {
+        var $slider = $audience.find('> .slider-wrap');
+        $slider.slider('option', 'min', parseInt(min) - 1);
+        $slider.slider('value', $slider.slider('value'));
+    }
+
     function setSliderMax(max) {
         var $slider = $audience.find('> .slider-wrap');
         $slider.slider('option', 'max', parseInt(max) + 1);
-        $slider.slider("value", $slider.slider("value"));
+        $slider.slider('value', $slider.slider('value'));
     }
 
     return {
         init: init,
         listRefresh: listRefresh,
         listSelect: listSelect,
+        setSliderMin: setSliderMin,
         setSliderMax: setSliderMax
     };
 })();
@@ -559,6 +641,7 @@ var Table = (function() {
                 } else {
                     $('#load-more-table').show();
                 }
+                Filter.setSliderMin(period[0]);
                 Filter.setSliderMax(period[1]);
             }
         );
@@ -584,6 +667,24 @@ var Table = (function() {
                 if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
             }
             _createDropdownList(e, publicData);
+        });
+
+        $container.delegate('.action.delete-public', 'click', function(e) {
+            var $el = $(this);
+            var $public = $el.closest('.public');
+            var publicId = $public.data('id');
+            Events.fire('remove_from_list', publicId, currentListId, function() {
+                $public.addClass('not-editable');
+            });
+        });
+
+        $container.delegate('.action.restore-public', 'click', function(e) {
+            var $el = $(this);
+            var $public = $el.closest('.public');
+            var publicId = $public.data('id');
+            Events.fire('add_to_list', publicId, currentListId, function() {
+                $public.removeClass('not-editable');
+            });
         });
 
         $container.delegate('.followers', 'click', function(e) {
@@ -741,9 +842,9 @@ var Table = (function() {
                     });
                     $dropdown.delegate('input', 'keyup blur', function(e) {
                         var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != 13) return false;
+                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
                         if (!text) return false;
-                        if (e.keyCode == 13) return $input.blur();
+                        if (e.keyCode == KEY.ENTER) return $input.blur();
                         return onSave(text);
                     });
                     $dropdown.bind('mousedown', function(e) {
