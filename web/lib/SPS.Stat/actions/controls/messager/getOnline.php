@@ -8,7 +8,7 @@ class getOnline
     {
         error_reporting( 0 );
 
-        $user_id        =   Request::getInteger( 'userId' );
+        $user_id       =   Request::getInteger( 'userId' );
         $dialog_id     =   Request::getInteger( 'dialogId' );
 
         if ( !$user_id || !$dialog_id ) {
