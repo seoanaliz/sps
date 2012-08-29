@@ -112,7 +112,7 @@ var MESSAGES =
 '<div class="post-message clear-fix">' +
     '<div class="left-column">' +
         '<div class="photo">' +
-            '<img src="http://vk.cc/S6ZsO" alt="" />' +
+            '<img src="<?=viewer.photo?>" alt="" />' +
         '</div>' +
     '</div>' +
     '<div class="center-column">' +
@@ -125,8 +125,8 @@ var MESSAGES =
     '</div>' +
     '<div class="right-column">' +
         '<div class="photo">' +
-            '<a target="_blank" href="http://vk.com/id1">' +
-                '<img src="http://vk.cc/S6ZDq" alt="" />' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+                '<img src="<?=user.photo?>" alt="" />' +
             '</a>' +
         '</div>' +
     '</div>' +

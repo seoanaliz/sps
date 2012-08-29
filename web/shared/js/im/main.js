@@ -204,7 +204,7 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        Events.fire('get_dialogs', listId, function(data) {
+        Events.fire('get_dialogs', listId == 999999 ? undefined : listId, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
@@ -297,7 +297,7 @@ var Messages = Widget.extend({
         var t = this;
 
         Events.fire('get_messages', dialogId, function(data) {
-            t.templateData = {id: dialogId, list: data};
+            t.templateData = {id: dialogId, list: data, viewer: Data.users[0], user: Data.users[1]};
             t.dialogId = dialogId;
             t.renderTemplate();
             var $el = $(t.el);
@@ -366,7 +366,7 @@ var Messages = Widget.extend({
         var isScroll = true;
 
         if (text) {
-            Events.fire('send_message', text, function(data) {
+            Events.fire('send_message', t.dialogId, text, function(data) {
                 $textarea.val('');
                 var $newMessage = $(tmpl(MESSAGES_ITEM, data));
                 $el.find('.messages').append($newMessage);
