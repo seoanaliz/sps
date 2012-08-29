@@ -10,7 +10,10 @@ $(document).ready(function() {
         return;
     }
 
-    if (!Configs.vkId || !Configs.token) {
+    if (!Configs.vkId) {
+        return location.replace('/login/');
+    }
+    if (!Configs.token) {
         return location.replace('/im/login/');
     }
 
