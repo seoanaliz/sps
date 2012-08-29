@@ -8,9 +8,11 @@
 
         public static function get_our_publics_list()
         {
+
+
             $publics = TargetFeedFactory::Get();
             $res = array();
-            foreach ($publics as $public) {
+            foreach ( $publics as $public ) {
 
                 if( $public->type != 'vk'             ||
                     $public->externalId ==  25678227  ||
@@ -21,8 +23,8 @@
                     $public->externalId ==  35807078 )
 
                     continue;
-                echo $public->externalId . ',<br>';
-                $a['id'] = $public->externalId;
+
+                $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $res[] = $a;
             }

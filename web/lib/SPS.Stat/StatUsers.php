@@ -50,28 +50,25 @@
             return $users;
         }
 
-
-
         public static function add_user( $users )
         {
             if ( !isset( $users['userId'] ) )
                 $users = self::get_vk_user_info( $users );
-            foreach( $users as $user ) {
-                $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
+		    $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
                         '    ( user_id, name, ava,  comments )
                          VALUES
                              ( @userId, @name, @ava, @comments )';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger( '@userId',      $user['userId']);
-                $cmd->SetString ( '@name',        $user['name'] );
-                $cmd->SetString ( '@ava',         $user['ava'] );
-                $cmd->SetString ( '@comments',    $user['comments'] );
-                $res = $cmd->ExecuteNonQuery();
-            }
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@userId',      $users['userId']);
+            $cmd->SetString ( '@name',        $users['name'] );
+            $cmd->SetString ( '@ava',         $users['ava'] );
+            $cmd->SetString ( '@comments',    $users['comments'] );
+            $res = $cmd->ExecuteNonQuery();
+
             if ( !$res )
                 return false;
             else
-                return $user;
+                return $users;
         }
 
         public static function get_user( $user_id )
@@ -109,15 +106,8 @@
 
         public static function get_access_token( $id )
         {
-
-
-            $id = $id ? $id : AuthVkontakte::IsAuth();;
-            //$token = Session::getString( 'access_token' );
-
-//            if ( $token ) {
-//                echo 'from seession';
-//                return $token;
-//            }
+            $id = $id ? $id : AuthVkontakte::IsAuth();
+            
             $sql = 'SELECT access_token FROM ' . TABLE_STAT_USERS . ' WHERE user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $id );
@@ -126,23 +116,25 @@
 
             $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
 
-//            if ( $acc_tok ) {
+            if ( $acc_tok ) {
 //                print_r( Session::setString( 'access_token', $acc_tok ) );
 //                print_r($acc_tok);
-//            }
+            }
             return $acc_tok ? $acc_tok : false;
         }
 
-        public static function set_access_token( $user_id, $acess_token )
+        public static function set_access_token( $user_id, $access_token )
         {
             $sql = 'UPDATE ' . TABLE_STAT_USERS . ' SET access_token=@access_token WHERE user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $user_id );
-            $cmd->SetString(  '@access_token', $acess_token );
-            $ds = $cmd->Execute();
-            $ds->Next();
-
-            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
+            $cmd->SetString(  '@access_token', $access_token );
+            $ds = $cmd->ExecuteNonQuery();
+//            $ds->Next();
+//
+//            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
         }
+
+
     }
 ?>

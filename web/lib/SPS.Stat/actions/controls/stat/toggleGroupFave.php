@@ -17,7 +17,7 @@
             $group_id  =  Request::getInteger( 'groupId' );
             $user_id   =  Request::getInteger( 'userId' );
 
-            if ( !group_id || !$user_id ) {
+            if ( !$group_id || !$user_id ) {
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
             }

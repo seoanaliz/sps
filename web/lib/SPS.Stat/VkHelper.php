@@ -86,7 +86,10 @@
             return $result;
         }
 
-
+        public static function get_vk_time()
+        {
+            return self::api_request('getServerTime', array());
+        }
 
     }
 
