@@ -94,8 +94,7 @@ $(document).ready(function(){
     // right dropdown
     $("#right-drop-down").dropdown({
         data: rightPanelData,
-        type: 'checkbox',
-        menuDataKey: 'menu',
+        type: 'radio',
         addClass: 'right',
         onchange: function(item) {
             $(this)
@@ -136,7 +135,7 @@ $(document).ready(function(){
         },
         oncreate: function() {
             $(this).find('.default').removeClass('default');
-            Elements.rightdd($("#right-drop-down").data('menu').find('.ui-dropdown-menu-item.active').data('id'));
+            Elements.rightdd($("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item.active').data('id'));
         }
     });
 
@@ -147,7 +146,6 @@ $(document).ready(function(){
     $('.wall-title a').dropdown({
         width: 'auto',
         addClass: 'wall-title-menu',
-        menuDataKey: 'menu',
         position: 'right',
         data: [
             {title: 'новые записи', type : 'new'},
@@ -1406,7 +1404,7 @@ var Elements = {
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
-            $("#right-drop-down").data('menu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
+            $("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
     },
     leftType: function(){

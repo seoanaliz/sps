@@ -26,6 +26,7 @@ var app = (function () {
     var $loadMore;
     var $menu;
     var $newPost;
+    var $wallTabs;
     var easydateParams = {
         live: true,
         date_parse: function(date) {
@@ -59,10 +60,12 @@ var app = (function () {
         $loadMore = $('> .show-more', $wallList);
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
+        $wallTabs = $('.tabs', $wall);
 
-        $wall.find('.comment textarea').placeholder();
+        $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
         $wallList.find('.date').easydate(easydateParams);
+        $wallList.find('.comment.new:first').closest('.comments').find('textarea').focus();
     }
 
     function _initEvents() {
@@ -119,35 +122,19 @@ var app = (function () {
         });
 
         /*Left column*/
-        $newPost.find('textarea').placeholder();
-//        $newPost.find('textarea').autocomplete({
-//            data: [
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Вова'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Александр'},
-//                {title: 'Сашка'},
-//                {title: 'Саня'},
-//                {title: 'Петя'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Сашка'},
-//                {title: 'Александр'},
-//                {title: 'Петя'},
-//                {title: 'Александр'},
-//                {title: 'Сашка'},
-//                {title: 'Саня'},
-//                {icon: 'http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg', title: 'Саша'}
-//            ],
-//            onchange: function(item) {
-//                $(this).val(item.title).focus();
-//            }
-//        });
+        $wallTabs.delegate('.tab', 'click', function() {
+            var $tab = $(this);
+            $wallTabs.find('.tab.selected').removeClass('selected');
+            $tab.addClass('selected');
+            Events.fire('wall_load', {clear: true, tabType: $tab.data('type')}, function(data) {
+                $wallList.html(data);
+                _updateItems();
+            });
+        });
 
+        $newPost.find('textarea').placeholder();
         $newPost.find('textarea').bind('focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             $newPost.addClass('open');
         });
         $newPost.find('textarea').bind('keyup', function(e) {
@@ -180,6 +167,51 @@ var app = (function () {
             }
         });
 
+        $wall.delegate('.post .hight-light.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
+            var $hightLight = $(this);
+            var $post = $hightLight.closest('.post');
+            Events.fire('wall_mark_as_read', $post.data('id'), function() {
+                $hightLight.removeClass('new');
+                function decCounter($counter) {
+                    if (!$counter.data('counter')) {
+                        $counter.counter({prefix: '+'});
+                    }
+                    $counter.counter('decrement');
+                }
+                decCounter($menu.find('.item.selected .counter'));
+                decCounter($wall.find('.tabs .tab.selected .counter'));
+            });
+        });
+        $wall.delegate('.comment.new', 'hover', function(e) {
+            if (e.type != 'mouseenter') return;
+            var $comment = $(this);
+            var $post = $comment.closest('.post');
+            Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
+                $comment.removeClass('new');
+                var $counter = $menu.find('.item.selected .counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                }
+                $counter.counter('decrement');
+            });
+        });
+        $wall.delegate('.show-new-comment', 'click', function() {
+            var $post = $(this).closest('.post');
+            var $newComment = $post.find('.new-comment');
+            $post.toggleClass('no-comments');
+            if (!$post.hasClass('no-comments')) {
+                $newComment.find('textarea').focus();
+            }
+        });
+        $wall.delegate('.show-cut', 'click', function() {
+            $text = $(this).closest('.text');
+            $shortcut = $text.find('.shortcut');
+            $cut = $text.find('.cut');
+
+            $shortcut.hide();
+            $cut.show();
+        });
         $wall.delegate('.post > .delete', 'click', function() {
             var $target = $(this);
             var $post = $target.closest('.post');
@@ -201,7 +233,7 @@ var app = (function () {
             showMore();
         });
         $wall.delegate('.new-comment textarea', 'focus', function() {
-            $(this).autoResize();
+            if (!$(this).data('autoResize')) $(this).autoResize();
             var $newComment = $(this).closest('.new-comment');
             $newComment.addClass('open');
         });
@@ -273,6 +305,10 @@ var app = (function () {
                         {title: 'мои записи', type: 'my'},
                         {title: 'лучшие записи', type: 'best'}
                     ];
+                    $wall.addClass('not-textarea');
+                } else {
+                    $item.find('.counter').fadeOut(200);
+                    $wall.removeClass('not-textarea');
                 }
                 if (isEmpty) {
                     dropdownItems = [
@@ -294,7 +330,7 @@ var app = (function () {
                     }
                 });
                 function filterWall() {
-                    var $defItem = $(this).data('dropdown').find('div:first');
+                    var $defItem = $(this).dropdown('getMenu').find('div:first');
                     var itemData = $defItem.data('item');
                     $(this).text(itemData.title);
                     pageLoad(itemId, itemData.type);

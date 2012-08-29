@@ -39,6 +39,8 @@ CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
 	, "public"."articles"."importedAt"
 	, "public"."articles"."createdAt"
+	, "public"."articles"."queuedAt"
+	, "public"."articles"."sentAt"
 	, "public"."articles"."externalId"
 	, "public"."articles"."rate"
 	, "public"."articles"."sourceFeedId"

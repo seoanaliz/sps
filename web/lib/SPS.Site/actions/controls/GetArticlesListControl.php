@@ -106,7 +106,7 @@
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
                 if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                    return;
+                    $this->search['targetFeedId'] = -2;
                 }
 
                 $this->search['rateGE'] = null;

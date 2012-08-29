@@ -98,7 +98,7 @@
                     'type'       =>     $type,
                     'id'         =>     $gid[1],
                     'avatara'    =>     $ava,
-                    'name'       =>     $name[1],
+                    'name'       =>     !empty($name[1]) ? $name[1] : '',
                     'short_name' =>     $short_name,
                     'population' =>     $population
                 );
@@ -562,19 +562,15 @@
 
         private function remove_tags($text)
         {
-            $search  = array('<br>','&#189;','&#188;','&#190;','&#9658;','&#33;','&#9829;','&#8243;');
-            $replace = array("\r\n",     "½",     "¼",     "¾",     "►",    '!',       '',       '');
+            $text = str_replace( '<br>',    "\r\n", $text );
 
-
-            $text = str_replace( $search, $replace, $text );
-//            $text = str_replace( '<br>',    "\r\n", $text );
-//            $text = str_replace( '&#189;',  "½",    $text );
-//            $text = str_replace( '&#188;',  "¼",    $text );
-//            $text = str_replace( '&#190;',  "¾",    $text );
-//            $text = str_replace( '&#9658;', "►",    $text );
-//            $text = str_replace( '&#33;',   "!",    $text );
-//            $text = str_replace( '&#9829;', "",    $text );
-//            $text = str_replace( '&#8243;', "",    $text );
+            $text = str_replace( '&#189;',  "½",    $text );
+            $text = str_replace( '&#188;',  "¼",    $text );
+            $text = str_replace( '&#190;',  "¾",    $text );
+            $text = str_replace( '&#9658;', "►",    $text );
+            $text = str_replace( '&#33;',   "!",    $text );
+            $text = str_replace( '&#9829;', "",    $text );
+            $text = str_replace( '&#8243;', "",    $text );
             $text = htmlspecialchars_decode($text);
             $text = html_entity_decode($text);
             $text = strip_tags( $text );

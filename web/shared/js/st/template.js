@@ -38,8 +38,8 @@ var tmpl = (function($) {
 })(jQuery);
 
 var LIST =
-'<div class="tab-bar">' +
-    '<div class="tab selected" data-id="null">Все записи</div>' +
+'<div class="tab-bar clear-fix">' +
+    '<div class="tab selected" data-id="null">Популярные</div>' +
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
         '<a href="javascript:;" class="share">Поделиться</a> |' +
@@ -98,6 +98,12 @@ var TABLE_ROW =
         '<span class="action add-to-list">' +
             '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
         '</span>' +
+        '<span class="action delete-public">' +
+            '<span class="icon delete"></span>' +
+        '</span>' +
+        '<span class="action restore-public">' +
+            '<span class="icon plus"></span>' +
+        '</span>' +
     '</div>' +
 '</div>';
 
@@ -149,12 +155,12 @@ var CONTACT_DROPDOWN_ITEM =
 '</div>';
 
 var FILTER_LIST =
-'<div class="item selected" data-id="null">Все записи</div>' +
+'<div class="item selected" data-id="null">Популярные</div>' +
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
 '<div class="item" data-id="<?=itemId?>">' +
-    '<?=itemTitle?>' +
+    '<span class="text"><?=itemTitle?></span>' +
     '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
 '</div>';
 
@@ -187,12 +193,12 @@ var BOX_LOADING =
 
 var BOX_SHARE =
 '<div class="box-share">' +
-    '<div class="title">Поделитесь с друзьями</div>' +
-    '<input type="text" value="http://socialboard.ru/stat" />' +
+//    '<div class="title">Поделитесь с друзьями</div>' +
+//    '<input type="text" value="http://socialboard.ru/stat" />' +
+    '<div class="title">Выберите списки</div>' +
+    '<input type="text" class="lists"></textarea>' +
     '<div class="title">Выберите друзей</div>' +
-    '<textarea rows="1" cols="" class="users"></textarea>' +
+    '<input type="text" class="users"></textarea>' +
 //    '<div class="title">Ваш комментарий</div>' +
 //    '<textarea rows="2" cols="" class="comment"></textarea>' +
-    '<div class="title">Выберите списки</div>' +
-    '<textarea rows="1" cols="" class="lists"></textarea>' +
 '</div>';

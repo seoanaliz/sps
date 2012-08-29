@@ -1,17 +1,19 @@
 <div class="menu" id="menu">
-    <div class="item my selected" data-id="my">
+    <div class="item my" data-id="my">
         <div class="content">
             Мои публикации
+            <span class="counter">
+                <? if(!empty($authorCounter['total'])) { ?>
+                    +{$authorCounter[total]}
+                <? } ?>
+            </span>
         </div>
     </div>
-    <? foreach($targetFeeds as $targetFeed) { ?>
-        {increal:tmpl://app/elements/menu-item.tmpl.php}
-    <? } ?>
-    <!--div class="item user">
-        <div class="photo"><img src="http://vk.cc/Q2PuP" alt="" /></div>
-        <div class="content">
-            <div class="text">Artyom Kohver</div>
-            <div class="description">General editor</div>
-        </div>
-    </div -->
+    <?
+        $i = 0;
+        foreach($targetFeeds as $targetFeed) {
+            $i++;
+            ?>{increal:tmpl://app/elements/menu-item.tmpl.php}<?
+        }
+    ?>
 </div>
