@@ -14,8 +14,7 @@ class getEntries {
      * Entry Point
      */
 
-    public function Execute()
-    {
+    public function Execute() {
 
         error_reporting( 0 );
 
@@ -28,7 +27,6 @@ class getEntries {
         $period     =   Request::getInteger( 'period' );
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
-        $search     =   $this->get_public_id( $search );
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
@@ -42,8 +40,8 @@ class getEntries {
         $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel' );
         $sortBy  = $sortBy && in_array($sortBy, $allowed_sort_values, 1)  ? $sortBy  : 'diff_abs';
 
-        $sortReverse        =   $sortReverse? '' : ' DESC ';
-        $show_in_mainlist   =   $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
+        $sortReverse    =   $sortReverse? '' : ' DESC ';
+        $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
 
         if ( $period == 7 ) {
@@ -66,13 +64,11 @@ class getEntries {
         }
 
         if ( isset( $groupId ) ) {
-            $search = $search ? " AND ( publ.name ILIKE '%" . $search . "%'
-                                        OR  publ.vk_id=" . (int)$search . "
-                                        OR  publ.short_name ILIKE '%" . $search . "%' )" : '';
+            $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
 
-            $sql = 'SELECT
-                    publ.vk_id, publ.ava, publ.name, publ.price, publ.short_name, publ.' . $diff_abs . ',
+        $sql = 'SELECT
+                    publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
                     publ.' . $diff_rel . ', publ.quantity, gprel.main_admin
                 FROM
                         ' . TABLE_STAT_PUBLICS . ' as publ,
@@ -95,12 +91,10 @@ class getEntries {
                 $cmd->SetInteger('@user_id',  $userId);
 
         } else {
-            $search   =   $search ? "AND (  name ILIKE '%" . $search . "%'
-                                            OR  publ.vk_id=" . (int)$search . "
-                                            OR  short_name ILIKE '%" . $search . "%' )": '';
+            $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
             $sql = 'SELECT
-                        vk_id, ava, name, price, short_name, ' . $diff_abs . ', ' . $diff_rel . ', quantity
+                        vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ', quantity
                     FROM '
                         . TABLE_STAT_PUBLICS . ' as publ
                     WHERE
@@ -119,7 +113,6 @@ class getEntries {
         }
         $cmd->SetInteger('@min_quantity', $quant_min);
         $cmd->SetInteger('@max_quantity', $quant_max);
-//        echo $cmd->getQuery();
         $ds = $cmd->Execute();
         $structure = BaseFactory::getObjectTree( $ds->Columns );
         $resul = array();
@@ -155,6 +148,7 @@ class getEntries {
                                     );
     }
 
+
     private function get_row($ds, $structure)
     {
 
@@ -163,15 +157,6 @@ class getEntries {
             $res[$field] = $ds->getValue($field);
         }
         return $res;
-    }
-
-    private function get_public_id( $text )
-    {
-        if ( preg_match( '/\/(?:public|club)(\d{1,16})/', $text, $matches ) )
-            return( $matches[1] );
-        if ( preg_match( '/.(?:vk.com|vkontakte.ru)\/(.*)/', $text, $matches ) )
-            return( $matches[1] );
-        return $text;
     }
 
     //выбирает админов, в 0 элемент помещает "главного" для этой выборки
@@ -222,8 +207,7 @@ class getEntries {
         return $groups;
     }
 
-    private function get_difference($current_quantity, $period, $public_id )
-    {
+    private function get_difference($current_quantity, $period, $public_id ) {
 
         $sql = 'SELECT MAX(time) FROM ' . TABLE_STAT_PUBLICS_POINTS;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
@@ -248,10 +232,13 @@ class getEntries {
             );
 
 
-            return array (
+
+        return array (
                         'diff_rel'  =>  round( ($current_quantity / $quantity - 1) * 100, 2 ),
                         'diff_abs'  =>  $current_quantity - $quantity
                      );
+
+
     }
 
     private function get_min_max()
@@ -265,6 +252,7 @@ class getEntries {
                         'max'  =>   $ds->getValue('max')
         );
     }
+
 
 }
 

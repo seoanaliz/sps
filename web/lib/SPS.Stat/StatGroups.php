@@ -68,7 +68,7 @@
                 $userIds = array ( $userIds );
             if ( !is_array( $groupIds ) )
                 $groupIds = array ( $groupIds );
-
+		
             $i = 0;
             foreach( $groupIds as $gr_id ) {
                 foreach ( $userIds as $id ) {
@@ -78,7 +78,7 @@
                     $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $gr_id);
                     $cmd->SetInteger('@user_id', $id);
-                    if ($cmd->ExecuteNonQuery())
+		      if ($cmd->ExecuteNonQuery())
                         $i++;
 
                 }

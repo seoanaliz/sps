@@ -6,14 +6,17 @@
 
     class MesDialogs
     {
-
+        //to do execute добавить
         public static function get_dialogs( $id )
         {
-
+            $access_token = StatUsers::get_access_token( $id );
+            if ( !$access_token )
+                return 'no access_token';
             $params = array(
-                                'access_token'      =>  StatUsers::get_access_token( $id ),
-                                'count'             =>  100,
+                                'access_token'      =>  $access_token,
+                                'count'             =>  200,
                                 'preview_lenght'    =>  50,
+                                'fields'            =>  'has_mobile'
             );
 
             $offset = 0;
@@ -21,23 +24,20 @@
 
             while (1) {
                 $params['offset'] = $offset;
-                $res = VkHelper::api_request('messages.getDialogs', $params);
+                $res = VkHelper::api_request( 'messages.getDialogs', $params );
                 $count = $res[0];
                 unset( $res[0] );
                 $offset += 100;
                 $dialogs_array = array_merge( $dialogs_array, $res );
 
-                if ( $count < $offset)
+                if ( $count < $offset )
                     break;
             }
-
-
             return( $dialogs_array );
         }
 
         public static function addDialog( $user_id, $rec_id, $status )
         {
-
             $sql = 'INSERT INTO '
                                 . TABLE_MES_DIALOGS . '( user_id, rec_id, status_id )
                             VALUES
@@ -70,7 +70,7 @@
         public static function writeMessage( $user_id, $rec_id, $text )
         {
             $params = array (
-                'access_token'  =>  StatUsers::get_access_token($user_id),
+                'access_token'  =>  StatUsers::get_access_token( $user_id ),
                 'uid'           =>  $rec_id,
                 'message'       =>  $text,
                 //todo подумать о guid
@@ -84,16 +84,18 @@
 
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
         {
+            $acess_token = StatUsers::get_access_token( $user_id );
+            if ( !$acess_token )
+                return 'no access_token';
 
             $params = array (
-
-                    'access_token'  =>  StatUsers::get_access_token($user_id),
+                    'access_token'  =>  $acess_token,
                     'uid'           =>  $rec_id,
                     'offset'        =>  $offset,
                     'count'         =>  $limit
             );
 
-            $result = VkHelper::api_request('messages.getHistory', $params);
+            $result = VkHelper::api_request( 'messages.getHistory', $params );
             if ( $result[0] == 0 )
                 return false;
             unset ( $result[0] );
@@ -114,7 +116,7 @@
                     'mids'           =>  $mess_ids,
             );
 
-            $res = VkHelper::api_request('messages.' . $method, $params, 0);
+            $res = VkHelper::api_request('messages.' . $method, $params, 0 );
             if ( isset( $res->error ) )
                 return false;
             return true;
@@ -124,7 +126,7 @@
         {
             $params = array (
 
-                    'access_token'  =>  StatUsers::get_access_token($user_id),
+                    'access_token'  =>  StatUsers::get_access_token( $user_id ),
                     'uid'           =>  $rec_id,
             );
 
@@ -156,7 +158,7 @@
 
         public static function watch_dog( $ts = 0 )
         {
-            print_r( AuthUtility::GetCurrentUser( 'user' ) );
+//            print_r( AuthUtility::GetCurrentUser( 'user' ) );
 
             $a = self::get_long_poll_server( StatUsers::get_access_token( AuthUtility::GetCurrentUser( 'user' ) ) );
             if ( !$a )

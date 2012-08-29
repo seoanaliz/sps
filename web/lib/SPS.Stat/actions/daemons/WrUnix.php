@@ -42,8 +42,6 @@ class WrUnix extends wrapper
                                   );
 
             $result = $this->vk_api_wrap('groups.getMembers',$query_params);
-            print_r($result);
-            die();
             if (count($result->users) == 0) break;
 
             $values = implode('),(', $result->users);

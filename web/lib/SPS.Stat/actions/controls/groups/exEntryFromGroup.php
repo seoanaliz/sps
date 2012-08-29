@@ -50,10 +50,6 @@
                 echo  ObjectHelper::ToJSON(array('response' => false));
                 die();
             }
-
-
-
-
         }
     }
 ?>

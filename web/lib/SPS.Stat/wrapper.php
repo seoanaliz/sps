@@ -22,6 +22,7 @@ class wrapper
 
     public function vk_api_wrap($method, array $params, $ex = 1)
     {
+
         if (!isset($params['access_token']))
             $params['access_token']  =  self::ACC_TOK_WRK;
         $url = self::VK_API_URL . $method;
@@ -52,22 +53,22 @@ class wrapper
 //                $connect_line = "host={$data['host']} user={$data['user']}
 //                    password={$data['pass']} dbname={$data['name']}";
                 $connect_line = "host=localhost user=postgres
-                    password='' dbname=sps";
+                    password='' dbname=postgres";
                 $this->db = pg_connect($connect_line);
                 return true;
 
             case 'query':
-                $res = pg_query($this->db, $data);
+                $res = pg_query( $this->db, $data );
 
-                if(!$res) {
-                    $error = pg_errormessage($this->db);
+                if( !$res ) {
+                    $error = pg_errormessage( $this->db );
                     if (substr_count($error, 'повторяющееся значение ключа нарушает ограничение уникальности') > 0)
                            return false;
                     throw new Exception('Ошибка при работе с бд : '
                         . pg_errormessage($this->db));
                 }
 
-                if($k){
+                if( $k ){
                     $this->q_result = $res;
                     return true;
                 }
@@ -151,7 +152,7 @@ class wrapper
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             }
 
-            if (!empty( $uagent ) ) { // если задан UserAgent
+            if (!empty($uagent)) { // если задан UserAgent
                 curl_setopt($ch, CURLOPT_USERAGENT, $uagent);
             } else{
                 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1)');
@@ -276,7 +277,7 @@ class wrapper
         return false;
     }
 
-    public function get_page($page = '')
+    private function get_page($page = '')
     {
 
             if ($page == '')
