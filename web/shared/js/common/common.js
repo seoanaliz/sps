@@ -64,19 +64,36 @@ function getURLParameter(name, search) {
             var defaults = {
                 el: this,
                 text: false,
+                hide: true,
                 helperClass: 'placeholder'
             };
             var t = this;
-            var p = $.extend(defaults, parameters);
-            var $input = $(p.el);
-            var placeholderText = p.text || $input.attr('placeholder');
+            var settings = $.extend(defaults, parameters);
+            var $input = $(settings.el);
+            var placeholderText = settings.text || $input.attr('placeholder');
             var $wrapper = $('<div/>');
-            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
+            var $placeholder = $('<div/>').addClass(settings.helperClass).text(placeholderText).css({
                 paddingTop: $input.css('padding-top'),
                 paddingLeft: $input.css('padding-left'),
                 paddingRight: $input.css('padding-right'),
                 paddingBottom: $input.css('padding-bottom')
             });
+
+            var placeholderHide = function() {
+                if (settings.hide) {
+                    $placeholder.hide();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 0.5}, 200);
+                }
+            };
+
+            var placeholderShow = function() {
+                if (settings.hide) {
+                    $placeholder.show();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 1}, 200);
+                }
+            };
 
             $input
                 .wrap($wrapper)
@@ -85,20 +102,31 @@ function getURLParameter(name, search) {
                 .parent().prepend($placeholder)
             ;
             $placeholder.on('mouseup', function() {
-                $placeholder.hide();
+                placeholderHide();
                 $input.focus();
             });
             $input.on('blur change', function() {
                 if (!$input.val()) {
-                    $placeholder.show();
+                    placeholderShow();
                 }
             });
             $input.on('focus change', function() {
-                $placeholder.hide();
+                placeholderHide();
             });
             $input.on('destroyed', function() {
                 $placeholder.remove();
-            })
+            });
+            if (!settings.hide) {
+                $input.on('keyup keydown', function() {
+                    setTimeout(function() {
+                        if ($input.val()) {
+                            $placeholder.hide();
+                        } else {
+                            $placeholder.show();
+                        }
+                    }, 0);
+                });
+            }
         });
     };
 })(jQuery);
