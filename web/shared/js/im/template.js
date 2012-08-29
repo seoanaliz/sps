@@ -159,11 +159,11 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title"><?=title?></div>' +
-    '<div class="list">' +
-        '<? if (dialogs.length) { ?>' +
+    '<? if (isset("dialogs") && dialogs.length) { ?>' +
+        '<div class="list">' +
             '<? each(PUBLIC_LIST_ITEM, dialogs); ?>' +
-        '<? } ?>' +
-    '</div>' +
+        '</div>' +
+    '<? } ?>' +
 '</div>';
 
 var PUBLIC_LIST_ITEM =

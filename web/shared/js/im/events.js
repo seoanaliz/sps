@@ -44,6 +44,9 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
+    get_user: function(userId, token, callback) {
+        callback(Data.users[0]);
+    },
     get_lists: function(callback) {
         callback(Data.lists);
     },
