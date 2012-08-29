@@ -1,5 +1,6 @@
 var Configs = {
-    vkId: 4718705,
+    vkId: $.cookie('uid'),
+    token: $.cookie('token'),
     appId: vk_appId,
     controlsRoot: controlsRoot
 };
@@ -9,7 +10,11 @@ $(document).ready(function() {
         return;
     }
 
-    Events.fire('get_user', Configs.vkId, '123', function(viewer) {
+    if (!Configs.vkId || !Configs.token) {
+        return location.replace('/im/login/');
+    }
+
+    Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
         new IM({
             el: '#main',
             viewer: viewer
@@ -282,6 +287,10 @@ var Messages = Widget.extend({
     templateMessage: MESSAGES_ITEM,
     dialogId: null,
 
+    events: {
+        'hover: .message.new': 'hoverMessage'
+    },
+
     run: function() {},
 
     update: function(dialogId) {
@@ -382,6 +391,14 @@ var Messages = Widget.extend({
         } else {
             $textarea.focus();
         }
+    },
+
+    hoverMessage: function(e) {
+        if (e.type != 'mouseenter') return;
+        var $message = $(e.currentTarget);
+        Events.fire('message_mark_as_read', $message.data('id'), function() {
+            $message.removeClass('new');
+        });
     }
 });
 

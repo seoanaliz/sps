@@ -2,7 +2,7 @@
  * Events
  */
 var Events = {
-    delay: 200,
+    delay: 0,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -28,16 +28,19 @@ var Events = {
 
 var simpleAjax = function(method, data, callback) {
     $.ajax({
-        url: Events.url + method + '/',
+        url: Configs.controlsRoot + method + '/',
         dataType: 'json',
         data: $.extend({
-            userId: cur.dataUser.uid,
+            userId: Configs.vkId,
             type: 'mes'
         }, data),
         success: function (result) {
             if (result && result.response) {
                 if ($.isFunction(data)) callback = data;
-                callback(result.response);
+                if ($.isFunction(callback)) callback(result.response);
+            } else {
+                if ($.isFunction(data)) callback = data;
+                if ($.isFunction(callback)) callback(false);
             }
         }
     });
@@ -45,22 +48,37 @@ var simpleAjax = function(method, data, callback) {
 
 var Eventlist = {
     get_user: function(userId, token, callback) {
-        callback(Data.users[0]);
+        simpleAjax('saveAt', {}, function() {
+            callback(Data.users[0]);
+        })
     },
     get_lists: function(callback) {
-        callback(Data.lists);
+        simpleAjax('getGroupList', function() {
+            callback(Data.lists);
+        });
     },
     get_dialogs: function(listId, callback) {
-        callback(Data.dialogs);
+        simpleAjax('getDialogsList', {}, function() {
+            callback(Data.dialogs);
+        });
     },
     get_messages: function(dialogId, callback) {
-        callback(Data.messages);
+        simpleAjax('getDialog', {}, function() {
+            callback(Data.messages);
+        });
     },
     send_message: function(text, callback) {
-        callback($.extend(Data.messages[0], {
-            text: text.split('\n').join('<br/>'),
-            timestamp: Math.floor(new Date().getTime() / 1000)
-        }));
+        simpleAjax('messages.send', {}, function() {
+            callback($.extend(Data.messages[0], {
+                text: text.split('\n').join('<br/>'),
+                timestamp: Math.floor(new Date().getTime() / 1000)
+            }));
+        });
+    },
+    message_mark_as_read: function(messageId, callback) {
+        simpleAjax('markMes', {}, function() {
+            callback(true);
+        });
     },
     add_to_list: function(dialogId, listId, callback) {
         callback(true);

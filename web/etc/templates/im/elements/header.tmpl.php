@@ -44,6 +44,7 @@ $jsFiles = array(
     'js://common/common.js',
     'js://common/class.js',
     'js://common/jquery.easydate-0.2.4.js',
+    'js://ext/jquery.plugins/jquery.cookie.js',
     'js://im/event.js',
     'js://im/widget.js',
     'js://im/data.js',

@@ -71,7 +71,8 @@ var DIALOGS =
 '</div>';
 
 var DIALOGS_ITEM =
-'<div class="dialog clear-fix" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<? var isNew = isset("isNew") && isNew; ?>' +
+'<div class="dialog clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<img src="<?=user.photo?>" alt="" />' +
@@ -132,7 +133,8 @@ var MESSAGES =
 '</div>';
 
 var MESSAGES_ITEM =
-'<div class="message clear-fix" data-id="<?=id?>">' +
+'<? var isNew = isset("isNew") && isNew; ?>' +
+'<div class="message clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>">' +
     '<div class="left-column">' +
         '<div class="photo">' +
             '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +

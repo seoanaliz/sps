@@ -41,6 +41,10 @@ body {
                 &>.message {
                     padding: 5px 0;
 
+                    &.new {
+                        background-color: @bg_light_hover;
+                    }
+
                     &>.left-column {
                         width: 15%;
                         float: left;
@@ -161,6 +165,14 @@ body {
                     }
                     &:hover {
                         background: @bg_light_hover;
+                    }
+
+                    &.new {
+                        background-color: @bg_light_hover;
+
+                        &:hover {
+                            background-color: @bg_hover;
+                        }
                     }
 
                     &>.user {

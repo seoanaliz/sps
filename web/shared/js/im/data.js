@@ -84,12 +84,14 @@ Data.messages = [
         id: 12,
         text: 'Hello!!!',
         user: Data.users[1],
-        timestamp: 1234567890
+        timestamp: 1234567890,
+        isNew: true
     }, {
         id: 3,
         text: 'Hello!!!',
         user: Data.users[4],
-        timestamp: 1234567890
+        timestamp: 1234567890,
+        isNew: true
     }
 ];
 
@@ -97,7 +99,8 @@ Data.dialogs = [
     {
         id: 1,
         user: Data.users[0],
-        lastMessage: Data.messages[0]
+        lastMessage: Data.messages[0],
+        isNew: true
     }, {
         id: 2,
         user: Data.users[1],
