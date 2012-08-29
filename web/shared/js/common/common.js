@@ -59,8 +59,8 @@ function getURLParameter(name, search) {
 
 // Кроссбраузерные плейсхолдеры
 (function($) {
-    $.fn.placeholder = function(para) {
-        return this.each(function(parameters) {
+    $.fn.placeholder = function(parameters) {
+        return this.each(function() {
             var defaults = {
                 el: this,
                 text: false,
@@ -73,6 +73,11 @@ function getURLParameter(name, search) {
             var placeholderText = settings.text || $input.attr('placeholder');
             var $wrapper = $('<div/>');
             var $placeholder = $('<div/>').addClass(settings.helperClass).text(placeholderText).css({
+                position: 'absolute',
+                cursor: 'text',
+                font: $input.css('font'),
+                margin: $input.css('border-width'),
+                lineHeight: $input.css('line-height'),
                 paddingTop: $input.css('padding-top'),
                 paddingLeft: $input.css('padding-left'),
                 paddingRight: $input.css('padding-right'),
@@ -141,15 +146,15 @@ function getURLParameter(name, search) {
                 $input.data('autoResize', $autoResize);
                 $autoResize
                     .css({
+                        position: 'absolute',
                         width: $input.width(),
                         minHeight: $input.height(),
                         font: $input.css('font'),
                         padding: $input.css('padding'),
                         fontSize: $input.css('font-size'),
+                        wordWrap: 'break-word',
                         overflow: $input.css('overflow'),
                         lineHeight: $input.css('line-height'),
-                        position: 'absolute',
-                        wordWrap: 'break-word',
                         top: -100000
                     })
                 ;
