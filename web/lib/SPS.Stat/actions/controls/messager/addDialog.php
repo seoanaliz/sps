@@ -19,7 +19,7 @@ class addDialog
         $recip  = StatUsers::is_our_user( $rec_id );
         $dialog = StatUsers::add_user( $rec_id );
 
-        if (! ($dialog['id'] = MesDialogs::addDialog($user_id, $rec_id, $status_id ) ) ) {
+        if (! ($dialog['id'] = MesDialogs::addDialog($user_id, $rec_id, $status_id ))) {
             echo  ObjectHelper::ToJSON(array('response' => false));
             die();
         }

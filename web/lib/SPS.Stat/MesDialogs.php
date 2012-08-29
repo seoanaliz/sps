@@ -39,19 +39,31 @@
         public static function addDialog( $user_id, $rec_id, $status )
         {
             $sql = 'INSERT INTO '
-                                . TABLE_MES_DIALOGS . '( user_id, rec_id, status_id )
+                                . TABLE_MES_DIALOGS . '( user_id, rec_id, status )
                             VALUES
-                                    ( @user_id,@rec_id,@status_id )
+                                    ( @user_id,@rec_id,@status )
                             RETURNING id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetInteger( '@rec_id', $rec_id );
-            $cmd->SetString ( '@status_id', $status );
+            $cmd->SetString ( '@status', $status );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetValue( 'id', TYPE_INTEGER ) ;
+        }
+
+        public static function get_dialog_id( $user_id, $rec_id )
+        {
+            $sql = 'SELECT id FROM ' . TABLE_MES_DIALOGS . ' WHERE rec_id=@rec_id AND user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@rec_id',  $rec_id  );
+            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
             $ds->Next();
 
-            return $ds->GetValue( 'id', TYPE_INTEGER ) ;
+            $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
+            return $id ? $id : false;
         }
 
         public static function get_opponent( $user_id, $dialog_id )
@@ -156,19 +168,15 @@
             return (array)$res;
         }
 
-        public static function watch_dog( $ts = 0 )
+        public static function watch_dog( $user_id, $ts = 0 )
         {
-//            print_r( AuthUtility::GetCurrentUser( 'user' ) );
-
-            $a = self::get_long_poll_server( StatUsers::get_access_token( AuthUtility::GetCurrentUser( 'user' ) ) );
+            $a = self::get_long_poll_server( StatUsers::get_access_token( $user_id ) );
             if ( !$a )
                 return false;
-
             $ts  = $ts ? $ts : $a['ts'];
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
 
-//            $res = VkHelper::qurl_request( $url, 0);
-            $res = json_decode( file_get_contents( $url ) );
+            $res = json_decode( file_get_contents( $url ));
 
             return $res;
         }

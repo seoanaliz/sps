@@ -9,6 +9,7 @@ class getDialogsList
         error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
+        $ungrouped      =   Request::getInteger( 'ungrouped');
         $only_unread    =   Request::getInteger( 'unread' );
         $date_start     =   Request::getInteger( 'fromDate' );
         $date_end       =   Request::getInteger( 'toDate' );
@@ -16,6 +17,8 @@ class getDialogsList
         $limit          =   Request::getInteger( 'limit' );
         $in_mess        =   Request::getInteger( 'inMess' );
         $out_mess       =   Request::getInteger( 'outMess' );
+
+
 
         $group_id       =   $group_id ? $group_id : 0;
         $offset         =   $offset ? $offset : 0;
@@ -25,6 +28,7 @@ class getDialogsList
         $date_end       =   $date_end ? $date_end : 2000000000;
         $in_mess        =   $in_mess  ? 1 : 0;
         $out_mess       =   $out_mess ? 1 : 0;
+        $ungrouped      =   $ungrouped ? 1 : 0;
 
         if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
@@ -42,18 +46,23 @@ class getDialogsList
         $ids = MesGroups::get_dialog_id_array( $user_id );
 
         foreach ( $row_dialog_array as $dialog ) {
+            $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
+            if( !$dialog->id )
+                $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
             if (   ( $dialog->read_state == 1 && $only_unread)
                 || ( $dialog->date > $date_end || $dialog->date < $date_start )
                 || ( $dialog->out &&  $in_mess && !$out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
-                || ( $group_id && $group_id != $ids[ $dialog->uid ] )
-                || ( $dialog->chat_id)
+                || ( $group_id  &&  $group_id != $ids[ $dialog->uid ] )
+                || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
+                || ( isset( $dialog->chat_id ))
             );
             else {
                 $i ++;
                 if ( $i < $offset )
                     continue;
+
                 $dialogs_array[] = $dialog;
                 $user_ids[] = $dialog->uid;
 

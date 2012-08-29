@@ -55,6 +55,7 @@
             }
 
             ksort( $res );
+            print_r($res);
             return $res;
         }
 
