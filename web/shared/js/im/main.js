@@ -9,9 +9,11 @@ $(document).ready(function() {
         return;
     }
 
-    new IM({
-        el: '#main',
-        viewer: Data.users[0]
+    Events.fire('get_user', Configs.vkId, '123', function(viewer) {
+        new IM({
+            el: '#main',
+            viewer: viewer
+        });
     });
 });
 
@@ -74,7 +76,7 @@ var LeftColumn = Widget.extend({
         t.initDialogs();
         t.initMessages();
 
-        t.showDialogs(0, 'Не в списке');
+        t.showDialogs(999999, 'Не в списке');
 //        if (localStorage.getItem(t.keyListId)) {
 //            tab = localStorage.getItem(t.keyListId);
 //            tabId = tab.split(':')[0];
@@ -219,6 +221,8 @@ var Dialogs = Widget.extend({
     clickPlus: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
+        var $dialog = $target.closest('.dialog');
+        var dialogId = $dialog.data('id');
         if (!$target.data('dropdown')) {
             Events.fire('get_lists', function(lists) {
                 $target.dropdown({
@@ -241,12 +245,12 @@ var Dialogs = Widget.extend({
                         $(this).dropdown('open');
                     },
                     onselect: function(item) {
-                        Events.fire('add_to_list', item.id, t.listId, function() {
+                        Events.fire('add_to_list', dialogId, item.id, function() {
                             //console.log('!!!');
                         });
                     },
                     onunselect: function(item) {
-                        Events.fire('remove_from_list', item.id, t.listId, function() {
+                        Events.fire('remove_from_list', dialogId, item.id, function() {
                             //console.log('!!!');
                         });
                     },
