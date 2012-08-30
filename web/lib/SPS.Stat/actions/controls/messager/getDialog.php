@@ -24,11 +24,22 @@ class getDialog
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' ) ) );
 
         $dialog_array  =  MesDialogs::get_specific_dialog( $user_id, $rec_id, $offset, $limit );
+        $from = $dialog_array[1]->uid;
+        $users = array();
+        foreach( $dialog_array as &$message )
+        {
+            unset( $message->uid );
+            $users[] = $message->from_id;
+        }
+        $users_info = StatUsers::get_vk_user_info( $users );
+        $dialog_array = array_reverse( $dialog_array );
 
         if ( !$dialog_array )
             $dialog_array = array();
         elseif ( $dialog_array == 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'user is not authorized' ) ) );
-        die( ObjectHelper::ToJSON( array( 'response' => $dialog_array ) ) );
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'user is not authorized' )));
+        $res = array( 'messages' =>  $dialog_array, 'dialogers'  =>  $users_info );
+
+        die( ObjectHelper::ToJSON( array( 'response' => $res ) ) );
     }
 }
