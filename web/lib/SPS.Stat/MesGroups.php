@@ -184,7 +184,7 @@
         {
             $sql = 'SELECT a.group_id
                     FROM
-                    ' . prin . ' as a
+                    '  . TABLE_MES_GROUP_USER_REL . ' as a
                     , ' . TABLE_MES_GROUPS . ' as b
                     WHERE
                         a.group_id = b.group_id

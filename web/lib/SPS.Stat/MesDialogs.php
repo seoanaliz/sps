@@ -22,16 +22,15 @@
             $offset = 0;
             $dialogs_array = array();
 
-            while (1) {
-                $params['offset'] = $offset;
-                $res = VkHelper::api_request( 'messages.getDialogs', $params );
+            while ( 1 ) {
+                $params[ 'offset' ] = $offset;
+                $res   = VkHelper::api_request( 'messages.getDialogs', $params );
                 $count = $res[0];
                 unset( $res[0] );
                 $offset += 100;
-                $dialogs_array = array_merge( $dialogs_array, $res );
-
                 if ( $count < $offset )
                     break;
+                $dialogs_array = array_merge( $dialogs_array, $res );
             }
             return( $dialogs_array );
         }
@@ -81,8 +80,12 @@
 
         public static function writeMessage( $user_id, $rec_id, $text )
         {
+            $acess_token = StatUsers::get_access_token( $user_id );
+            if ( !$acess_token )
+                return 'no access_token';
+
             $params = array (
-                'access_token'  =>  StatUsers::get_access_token( $user_id ),
+                'access_token'  =>  $acess_token,
                 'uid'           =>  $rec_id,
                 'message'       =>  $text,
                 //todo подумать о guid
