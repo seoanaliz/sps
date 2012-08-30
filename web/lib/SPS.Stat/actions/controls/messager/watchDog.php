@@ -21,7 +21,7 @@ class watchDog
         $events = MesDialogs::watch_dog( $user_id );
         $result = array();
 
-        foreach( $events['updates'] as $event ) {
+        foreach( $events->updates as $event ) {
             switch ( $event[0] ) {
                 case 4:
                     $result[] = array(
@@ -33,11 +33,21 @@ class watchDog
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $event[3] ),
                             'date'      =>  $event[4],
                         )
+
                     );
+                    break;
+                case 8:
+                    $result[] = array(
+                        'type' =>q
+                    );
+
+                case 9:
+
 
             }
 
         }
 
+        print_r($result);
     }
 }

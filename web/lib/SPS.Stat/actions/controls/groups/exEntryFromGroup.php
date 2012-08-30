@@ -27,8 +27,8 @@
 
             $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
             if ( !$type || !in_array( $type, $type_array, 1 ) )
-            $type = 'Stat';
-            $m_class    = $type . 'Groups';
+            $type    = 'Stat';
+            $m_class = $type . 'Groups';
             $general = $general ? $general : 0;
 
             if (!$groupId || !$userId || !$entry_id) {
