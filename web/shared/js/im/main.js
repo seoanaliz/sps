@@ -300,8 +300,15 @@ var Messages = Widget.extend({
         var t = this;
 
         Events.fire('get_messages', dialogId, 0, 20, function(data) {
-            t.templateData = {id: dialogId, list: data, viewer: Data.users[0], user: Data.users[1]};
+            var users = data.users;
+            var messages = data.messages;
             t.dialogId = dialogId;
+            t.templateData = {
+                id: dialogId,
+                list: messages,
+                viewer: users[Configs.vkId],
+                user: users[0]
+            };
             t.renderTemplate();
             var $el = $(t.el);
             var $textarea = $el.find('textarea');

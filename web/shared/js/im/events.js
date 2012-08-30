@@ -54,8 +54,19 @@ var Eventlist = {
     },
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
-            console.log(dirtyData);
-            callback(Data.lists);
+            var clearData = [];
+            clearData.push({
+                id: 999999,
+                title: 'Не в списке'
+            });
+            $.each(dirtyData, function(i, dirtyList) {
+                clearData.push({
+                    id: dirtyList.group_id,
+                    title: dirtyList.name
+                });
+            });
+
+            callback(clearData);
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
@@ -92,22 +103,30 @@ var Eventlist = {
             limit: limit
         };
         simpleAjax('getDialog', params, function(dirtyData) {
-            var clearData = [];
             var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-            $.each(dirtyData, function(i, dirtyMessage) {
-                clearData.push({
+            var clearData = [];
+            var dirtyUsers = dirtyData.users;
+            var dirtyMessages = dirtyData.messages;
+            var clearUsers = {};
+            var clearMessages = [];
+            $.each(dirtyUsers, function(i, dirtyUser) {
+                clearUsers[dirtyUser.uid] = {
+                    id: dirtyUser.uid,
+                    name: dirtyUser.name,
+                    photo: dirtyUser.ava,
+                    isOnline: false
+                };
+            });
+            $.each(dirtyMessages, function(i, dirtyMessage) {
+                clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     timestamp: dirtyMessage.date,
-                    user: {
-                        id: dirtyMessage.from_id,
-                        name: 'XZ',
-                        photo: 'http://vk.cc/S6ZsO',
-                        isOnline: false
-                    }
+                    users: clearUsers[dirtyMessage.from_id]
                 });
             });
+            clearData = {users: clearUsers, messages: clearMessages};
             callback(clearData);
         });
     },

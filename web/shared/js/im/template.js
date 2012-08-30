@@ -124,11 +124,11 @@ var MESSAGES =
         '</div>' +
     '</div>' +
     '<div class="right-column">' +
-//        '<div class="photo">' +
-//            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
-//                '<img src="<?=user.photo?>" alt="" />' +
-//            '</a>' +
-//        '</div>' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+                '<img src="<?=user.photo?>" alt="" />' +
+            '</a>' +
+        '</div>' +
     '</div>' +
 '</div>';
 
