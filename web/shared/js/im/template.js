@@ -66,7 +66,7 @@ var DIALOGS =
     '<? if (isset("list") && list.length) { ?>' +
         '<? each(DIALOGS_ITEM, list); ?>' +
     '<? } else { ?>' +
-        'Dialogs empty' +
+        '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
 '</div>';
 
@@ -106,7 +106,7 @@ var MESSAGES =
     '<? if (isset("list") && list.length) { ?>' +
         '<? each(MESSAGES_ITEM, list); ?>' +
     '<? } else { ?>' +
-        'Messages empty' +
+        '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
 '</div>' +
 '<div class="post-message clear-fix">' +
@@ -156,7 +156,11 @@ var MESSAGES_ITEM =
 '</div>';
 
 var LIST =
-'<? each(LIST_ITEM, list); ?>';
+'<? if (isset("list") && list.length) { ?>' +
+    '<? each(LIST_ITEM, list); ?>' +
+'<? } else { ?>' +
+    '<div class="empty">Список пуст</div>' +
+'<? } ?>';
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +

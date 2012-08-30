@@ -26,3 +26,4 @@ body{overflow-y:scroll;}
 #main>.right-column>.list>.item>.list>.public>.icon{margin-left:5px;width:30px;height:30px;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}#main>.right-column>.list>.item>.list>.public>.icon img{max-width:100%;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}
 #main>.right-column>.list>.item>.list>.public>.title{padding:5px;margin-left:5px;}
 .ui-dropdown-add-to-list{margin-top:-0.1em;margin-right:-0.7em;border-color:#587da1;}.ui-dropdown-add-to-list .ui-dropdown-menu-item{padding:2px 6px;}
+.empty{color:#777;text-align:center;padding:30% 0;}
