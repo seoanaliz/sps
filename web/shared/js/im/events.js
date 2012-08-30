@@ -54,11 +54,17 @@ var Eventlist = {
     },
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
+            console.log(dirtyData);
             callback(Data.lists);
         });
     },
-    get_dialogs: function(listId, callback) {
-        simpleAjax('getDialogsList', {groupId: listId}, function(dirtyData) {
+    get_dialogs: function(listId, offset, limit, callback) {
+        var params = {
+            groupId: listId,
+            offset: offset,
+            limit: limit
+        };
+        simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
                 clearData.push({
@@ -79,14 +85,20 @@ var Eventlist = {
             callback(clearData);
         });
     },
-    get_messages: function(dialogId, callback) {
-        simpleAjax('getDialog', {dialogId: dialogId}, function(dirtyData) {
+    get_messages: function(dialogId, offset, limit, callback) {
+        var params = {
+            dialogId: dialogId,
+            offset: offset,
+            limit: limit
+        };
+        simpleAjax('getDialog', params, function(dirtyData) {
             var clearData = [];
+            var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             $.each(dirtyData, function(i, dirtyMessage) {
                 clearData.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    text: dirtyMessage.body,
+                    text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     timestamp: dirtyMessage.date,
                     user: {
                         id: dirtyMessage.from_id,
