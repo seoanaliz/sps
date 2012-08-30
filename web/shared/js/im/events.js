@@ -105,25 +105,26 @@ var Eventlist = {
         simpleAjax('getDialog', params, function(dirtyData) {
             var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             var clearData = [];
-            var dirtyUsers = dirtyData.users;
+            var dirtyUsers = dirtyData.dialogers;
             var dirtyMessages = dirtyData.messages;
             var clearUsers = {};
             var clearMessages = [];
             $.each(dirtyUsers, function(i, dirtyUser) {
-                clearUsers[dirtyUser.uid] = {
-                    id: dirtyUser.uid,
+                clearUsers[dirtyUser.userId] = {
+                    id: dirtyUser.userId,
                     name: dirtyUser.name,
                     photo: dirtyUser.ava,
-                    isOnline: false
+                    isOnline: (dirtyUser.online != 0)
                 };
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
+                    isViewer: (dirtyMessage.from_id == Configs.vkId),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     timestamp: dirtyMessage.date,
-                    users: clearUsers[dirtyMessage.from_id]
+                    user: clearUsers[dirtyMessage.from_id]
                 });
             });
             clearData = {users: clearUsers, messages: clearMessages};
@@ -131,8 +132,11 @@ var Eventlist = {
         });
     },
     send_message: function(dialogId, text, callback) {
-        simpleAjax('messages.send', {dialogId: dialogId, text: text}, function() {
+        simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
             callback($.extend(Data.messages[0], {
+                id: 0,
+                isNew: true,
+                isViewer: true,
                 text: text.split('\n').join('<br/>'),
                 timestamp: Math.floor(new Date().getTime() / 1000)
             }));
