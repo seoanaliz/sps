@@ -80,11 +80,25 @@ var LeftColumn = Widget.extend({
         var tab;
         var tabId;
         var tabTitle;
+        var $el = $(t.el);
+        var $header = $('.header');
         t.initTabs();
         t.initDialogs();
         t.initMessages();
 
         t.showDialogs(999999, 'Не в списке');
+
+        $el.css('padding-top', $header.outerHeight());
+        $(window).off('scroll.updateHeader');
+        $(window).on('scroll.updateHeader', function() {
+            $el.css('padding-top', $header.outerHeight());
+            if ($(window).scrollTop() > 10) {
+                $header.addClass('fixed');
+            } else {
+                $header.removeClass('fixed');
+            }
+        });
+
 //        if (localStorage.getItem(t.keyListId)) {
 //            tab = localStorage.getItem(t.keyListId);
 //            tabId = tab.split(':')[0];
@@ -142,7 +156,7 @@ var LeftColumn = Widget.extend({
             localStorage.setItem(t.keyListId, listId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + listId);
-        $(window).unbind('resize scroll', $.proxy(t.messages.updateInputBox, t));
+        $(window).off('scroll.updateInputBox', $.proxy(t.messages.updateInputBox, t));
 
         t.curListId = listId;
     },
@@ -159,7 +173,7 @@ var LeftColumn = Widget.extend({
             localStorage.setItem(t.keyDialogId, dialogId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + dialogId);
-        $(window).bind('resize scroll', $.proxy(t.messages.updateInputBox, t));
+        $(window).on('scroll.updateInputBox', $.proxy(t.messages.updateInputBox, t));
 
         t.curDialogId = dialogId;
     }
@@ -302,12 +316,19 @@ var Messages = Widget.extend({
         Events.fire('get_messages', dialogId, 0, 20, function(data) {
             var users = data.users;
             var messages = data.messages;
+            var user = {};
+            $.each(users, function(i, obj) {
+                if (obj.id != Configs.vkId) {
+                    user = obj;
+                    return false;
+                }
+            });
             t.dialogId = dialogId;
             t.templateData = {
                 id: dialogId,
                 list: messages,
                 viewer: users[Configs.vkId],
-                user: users[0]
+                user: user
             };
             t.renderTemplate();
             var $el = $(t.el);
@@ -406,6 +427,7 @@ var Messages = Widget.extend({
     hoverMessage: function(e) {
         if (e.type != 'mouseenter') return;
         var $message = $(e.currentTarget);
+        if ($message.hasClass('viewer')) return;
         Events.fire('message_mark_as_read', $message.data('id'), function() {
             $message.removeClass('new');
         });

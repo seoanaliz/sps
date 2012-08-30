@@ -112,7 +112,9 @@ var MESSAGES =
 '<div class="post-message clear-fix">' +
     '<div class="left-column">' +
         '<div class="photo">' +
-            '<img src="<?=viewer.photo?>" alt="" />' +
+            '<a target="_blank" href="http://vk.com/id<?=viewer.id?>" title="Это Вы">' +
+                '<img src="<?=viewer.photo?>" alt="" />' +
+            '</a>' +
         '</div>' +
     '</div>' +
     '<div class="center-column">' +
@@ -125,7 +127,7 @@ var MESSAGES =
     '</div>' +
     '<div class="right-column">' +
         '<div class="photo">' +
-            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>" title="<?=user.name?>">' +
                 '<img src="<?=user.photo?>" alt="" />' +
             '</a>' +
         '</div>' +
@@ -134,7 +136,8 @@ var MESSAGES =
 
 var MESSAGES_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
-'<div class="message clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>">' +
+'<? var isViewer = isset("isViewer") && isViewer; ?>' +
+'<div class="message clear-fix<?=isNew ? " new" : ""?><?=isViewer ? " viewer" : ""?>" data-id="<?=id?>">' +
     '<div class="left-column">' +
         '<div class="photo">' +
             '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
