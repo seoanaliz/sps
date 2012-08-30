@@ -28,7 +28,8 @@
 
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
-
+            if ( !trim( $ids ))
+                return array();
             $users  =   array();
             $params = array(
                 'uids'   =>  $ids,

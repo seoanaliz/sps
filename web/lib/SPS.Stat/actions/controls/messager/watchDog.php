@@ -10,18 +10,18 @@ class watchDog
 {
 
     public function Execute() {
-//        error_reporting( 0 );
+        error_reporting( 0 );
 
         $user_id   =   Request::getInteger( 'userId' );
-
         if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
-//        print_r( $user_id );
+
         $events = MesDialogs::watch_dog( $user_id );
         $result = array();
 
         foreach( $events->updates as $event ) {
+            $status = 'offline';
             switch ( $event[0] ) {
                 case 4:
                     $result[] = array(
@@ -33,21 +33,22 @@ class watchDog
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $event[3] ),
                             'date'      =>  $event[4],
                         )
-
                     );
                     break;
                 case 8:
-                    $result[] = array(
-                        'type' =>q
-                    );
-
+                    $status = 'online';
                 case 9:
-
-
+                    $result[] = array(
+                        'type'      =>  $status,
+                        'content'   =>  array(
+                        'userId'    =>  trim( $event[1], '-')
+                        )
+                    );
             }
-
         }
 
-        print_r($result);
+        echo  ObjectHelper::ToJSON( array( 'response' => $result ));
+        die();
+//        print_r($result);
     }
 }

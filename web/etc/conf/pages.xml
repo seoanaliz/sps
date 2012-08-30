@@ -151,6 +151,9 @@
                 <page uri="controls://saveAt/">
                     <actions>SPS.Stat.saveAt</actions>
                 </page>
+                <page uri="controls://watchDog/">
+                    <actions>SPS.Stat.watchDog</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

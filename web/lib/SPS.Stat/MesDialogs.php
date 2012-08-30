@@ -28,9 +28,10 @@
                 $count = $res[0];
                 unset( $res[0] );
                 $offset += 100;
+
+                $dialogs_array = array_merge( $dialogs_array, $res );
                 if ( $count < $offset )
                     break;
-                $dialogs_array = array_merge( $dialogs_array, $res );
             }
             return( $dialogs_array );
         }
@@ -59,9 +60,9 @@
             $cmd->SetInteger( '@rec_id',  $rec_id  );
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-            $ds->Next();
-
-            $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
+            $id = false;
+            if ( $ds->Next() );
+                $id = $ds->GetValue( 'id', TYPE_INTEGER ) ;
             return $id ? $id : false;
         }
 
@@ -180,9 +181,7 @@
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
 
             $res = json_decode( file_get_contents( $url ));
-
             return $res;
         }
-
     }
 ?>
