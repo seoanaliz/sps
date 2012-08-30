@@ -11,13 +11,15 @@ class watchDog
 
     public function Execute() {
         error_reporting( 0 );
-
         $user_id   =   Request::getInteger( 'userId' );
         if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
 
         $events = MesDialogs::watch_dog( $user_id );
+        if ( $events == 'no access_token' )
+            die( ObjectHelper::ToJSON( array( 'response' => false )));
+
         $result = array();
 
         foreach( $events->updates as $event ) {

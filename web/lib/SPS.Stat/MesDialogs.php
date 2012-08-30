@@ -174,7 +174,10 @@
 
         public static function watch_dog( $user_id, $ts = 0 )
         {
-            $a = self::get_long_poll_server( StatUsers::get_access_token( $user_id ) );
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $a = self::get_long_poll_server( $access_token );
             if ( !$a )
                 return false;
             $ts  = $ts ? $ts : $a['ts'];
