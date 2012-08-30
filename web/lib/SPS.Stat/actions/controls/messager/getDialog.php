@@ -21,10 +21,9 @@ class getDialog
 
         $rec_id = MesDialogs::get_opponent( $user_id, $dialog_id );
         if ( !$rec_id )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' ) ) );
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' )));
 
         $dialog_array  =  MesDialogs::get_specific_dialog( $user_id, $rec_id, $offset, $limit );
-        $from = $dialog_array[1]->uid;
         $users = array();
         foreach( $dialog_array as &$message )
         {
@@ -40,6 +39,6 @@ class getDialog
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'user is not authorized' )));
         $res = array( 'messages' =>  $dialog_array, 'dialogers'  =>  $users_info );
 
-        die( ObjectHelper::ToJSON( array( 'response' => $res ) ) );
+        die( ObjectHelper::ToJSON( array( 'response' => $res )));
     }
 }

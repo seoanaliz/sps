@@ -41,7 +41,7 @@ class watchDog
                     $result[] = array(
                         'type'      =>  $status,
                         'content'   =>  array(
-                        'userId'    =>  trim( $event[1], '-')
+                            'userId'    =>  trim( $event[1], '-')
                         )
                     );
             }

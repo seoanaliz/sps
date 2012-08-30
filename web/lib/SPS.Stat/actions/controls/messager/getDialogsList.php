@@ -41,15 +41,16 @@ class getDialogsList
 
         $i = 0;
         $user_ids = array();
-        $ids = MesGroups::get_dialog_id_array( $user_id );
-//        print_r($ids);
+        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
+
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
+            $dialog->groups = $ids[$dialog->uid];
             if( !$dialog->id )
                 $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
-            if (   ( $dialog->read_state == 1 && $only_unread)
+            if (   ( $dialog->read_state == 1 && $only_unread )
                 || ( $dialog->date > $date_end || $dialog->date < $date_start )
-                || ( $dialog->out &&    $in_mess && !$out_mess  )
+                || ( $dialog->out &&    $in_mess && !$out_mess )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( $group_id  &&  $group_id != $ids[ $dialog->uid ] )
@@ -71,7 +72,7 @@ class getDialogsList
         unset( $dialog );
 
         if ( count( $user_ids ) < 1 )
-            die( ObjectHelper::ToJSON(array('response' => array())));
+            die( ObjectHelper::ToJSON( array( 'response' => array())));
 
         $users_array = StatUsers::get_vk_user_info( $user_ids );
 
