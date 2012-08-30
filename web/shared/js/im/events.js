@@ -62,7 +62,7 @@ var Eventlist = {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
                 clearData.push({
-                    id: dirtyDialog.mid,
+                    id: dirtyDialog.id,
                     isNew: (dirtyDialog.read_state != 1),
                     user: {
                         id: dirtyDialog.uid.userId,
@@ -84,10 +84,16 @@ var Eventlist = {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyMessage) {
                 clearData.push({
-                    id: 1,
-                    text: 'Hello!!!',
-                    user: Data.users[0],
-                    timestamp: 1234567890
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    text: dirtyMessage.body,
+                    timestamp: dirtyMessage.date,
+                    user: {
+                        id: dirtyMessage.from_id,
+                        name: 'XZ',
+                        photo: 'http://vk.cc/S6ZsO',
+                        isOnline: false
+                    }
                 });
             });
             callback(clearData);
