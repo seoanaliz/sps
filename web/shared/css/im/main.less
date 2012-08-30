@@ -30,7 +30,9 @@ body {
 
             &.fixed {
                 position: fixed;
-                box-shadow: 0 2px 1px rgba(0,0,0,.1);
+                box-shadow: 0 2px 1px rgba(0,0,0, 0.1);
+
+                .transition(box-shadow 0.5s);
             }
         }
         &>.list {
@@ -108,7 +110,9 @@ body {
 
                 &.fixed {
                     position: fixed;
-                    box-shadow: 0 -2px 1px rgba(0,0,0,.1);
+                    box-shadow: 0 -2px 1px rgba(0,0,0, 0.1);
+
+                    .transition(box-shadow 0.5s);
                 }
 
                 &>.left-column {
@@ -257,14 +261,12 @@ body {
     }
 
     &>.right-column {
-        float: left;
+        position: fixed;
+        top: 10px;
+        bottom: 10px;
         width: 286px;
         border: 1px solid @border_main;
-        margin-left: 10px;
-
-        position: fixed;
-        left: 50%;
-        margin-left: 262px;
+        margin-left: 812px;
 
         .border-radius(3px);
 
@@ -278,6 +280,7 @@ body {
         &>.list {
             color: @color_link;
             padding: 5px 0;
+            overflow-y: auto;
 
             &>.item {
                 &>.title {

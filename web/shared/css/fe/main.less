@@ -994,27 +994,29 @@ i {font-style: italic;}
 }
 
 /* Testing... Scroll like MacOS */
-.right-panel *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-.right-panel *::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-}
-.right-panel *:hover::-webkit-scrollbar-thumb,
-.right-panel *:focus::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.4);
-}
-.right-panel *::-webkit-resizer,
-.right-panel *::-webkit-scrollbar-corner,
-.right-panel *::-webkit-scrollbar-track-piece {
-    background: transparent;
-}
-.right-panel *:hover::-webkit-resizer,
-.right-panel *:hover::-webkit-scrollbar-corner,
-.right-panel *:hover::-webkit-scrollbar-track-piece {
-    background: transparent;
+.right-panel {
+    *::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    *::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+    }
+    *:hover::-webkit-scrollbar-thumb,
+    *:focus::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.4);
+    }
+    *::-webkit-resizer,
+    *::-webkit-scrollbar-corner,
+    *::-webkit-scrollbar-track-piece {
+        background: transparent;
+    }
+    *:hover::-webkit-resizer,
+    *:hover::-webkit-scrollbar-corner,
+    *:hover::-webkit-scrollbar-track-piece {
+        background: transparent;
+    }
 }
 
 .image-compositing {

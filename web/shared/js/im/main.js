@@ -18,9 +18,14 @@ $(document).ready(function() {
     }
 
     Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
-        new IM({
-            el: '#main',
-            viewer: viewer
+        var im = new IM({
+            el: '#main'
+        });
+        $(window).on('scroll', function() {
+            im.trigger('scroll');
+        });
+        $(window).on('resize', function() {
+            im.trigger('resize');
         });
     });
 });
@@ -36,26 +41,34 @@ var IM = Widget.extend({
         this._super();
 
         var t = this;
-        t.leftColumn = t.initLeftColumn();
-        t.rightColumn = t.initRightColumn();
+        t.initLeftColumn();
+        t.initRightColumn();
+        t.bindEvents();
+    },
 
+    bindEvents: function() {
+        var t = this;
+
+        t.on('scroll', function() {
+            t.leftColumn.trigger('scroll');
+        });
         t.rightColumn.on('selectDialogs', function(id, title) {
-            t.leftColumn.showDialogs(id, title);
+            t.leftColumn.initDialogs(id, title);
         });
         t.rightColumn.on('selectMessages', function(id, title) {
-            t.leftColumn.showMessages(id, title);
+            t.leftColumn.initMessages(id, title);
         });
     },
 
     initLeftColumn: function() {
         var t = this;
-        return new LeftColumn({
+        t.leftColumn = new LeftColumn({
             el: $(t.el).find('> .left-column')
         });
     },
     initRightColumn: function() {
         var t = this;
-        return new RightColumn({
+        t.rightColumn = new RightColumn({
             el: $(t.el).find('> .right-column')
         });
     }
@@ -77,20 +90,18 @@ var LeftColumn = Widget.extend({
         this._super();
 
         var t = this;
-        var tab;
-        var tabId;
-        var tabTitle;
-        var $el = $(t.el);
-        var $header = $('.header');
         t.initTabs();
-        t.initDialogs();
-        t.initMessages();
+        t.initDialogs(999999, 'Не в списке');
+        t.bindEvents();
+    },
 
-        t.showDialogs(999999, 'Не в списке');
+    bindEvents: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $header = $el.find('.header');
 
         $el.css('padding-top', $header.outerHeight());
-        $(window).off('scroll.updateHeader');
-        $(window).on('scroll.updateHeader', function() {
+        t.on('scroll', function() {
             $el.css('padding-top', $header.outerHeight());
             if ($(window).scrollTop() > 10) {
                 $header.addClass('fixed');
@@ -98,83 +109,70 @@ var LeftColumn = Widget.extend({
                 $header.removeClass('fixed');
             }
         });
-
-//        if (localStorage.getItem(t.keyListId)) {
-//            tab = localStorage.getItem(t.keyListId);
-//            tabId = tab.split(':')[0];
-//            tabTitle = tab.split(':')[1];
-//            t.showDialogs(tabId, tabTitle);
-//        }
-//        if (localStorage.getItem(t.keyDialogId)) {
-//            tab = localStorage.getItem(t.keyDialogId);
-//            tabId = tab.split(':')[0];
-//            tabTitle = tab.split(':')[1];
-//            t.showMessages(tabId, tabTitle);
-//        }
+        t.on('scroll', function() {
+            if (t.messages) t.messages.trigger('scroll');
+            else if (t.dialogs) t.dialogs.trigger('scroll');
+        });
     },
 
     initTabs: function() {
         var t = this;
+
         t.tabs = new Tabs({
             el: $(t.el).find('.header'),
-            data: {tabs: []}
+            templateData: {tabs: []}
         });
         t.tabs.on('select', function(id, title) {
             if (id.indexOf('messages') == 0) {
-                t.showMessages(id.substring(t.tabPrefixMessages.length), title);
+                t.initMessages(id.substring(t.tabPrefixMessages.length), title);
             } else {
-                t.showDialogs(id.substring(t.tabPrefixDialogs.length), title);
+                t.initDialogs(id.substring(t.tabPrefixDialogs.length), title);
             }
         });
     },
-    initDialogs: function() {
-        var t = this;
-        t.dialogs = new Dialogs({
-            el: $(t.el).find('.list')
-        });
-        t.dialogs.on('select', function(id, title) {
-            t.showMessages(id, title);
-        });
-    },
-    initMessages: function() {
-        var t = this;
-        t.messages = new Messages({
-            el: $(t.el).find('.list')
-        });
-    },
-
-    showDialogs: function(listId, title) {
+    initDialogs: function(listId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixDialogs;
 
-        t.dialogs.update(listId);
+        t.messages = false;
+        t.dialogs = new Dialogs({
+            el: $(t.el).find('.list'),
+            runData: {
+                listId: listId
+            }
+        });
+        t.dialogs.on('select', function(id, title) {
+            t.initMessages(id, title);
+        });
+
         if (t.curListId && t.curListId != listId) {
             t.tabs.removeTab(tabPrefix + t.curListId);
         }
         if (!t.tabs.getTab(tabPrefix + listId).length) {
             t.tabs.prependTab(tabPrefix + listId, title);
-            localStorage.setItem(t.keyListId, listId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + listId);
-        $(window).off('scroll.updateInputBox', $.proxy(t.messages.updateInputBox, t));
-
         t.curListId = listId;
     },
-    showMessages: function(dialogId, title) {
+    initMessages: function(dialogId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
 
-        t.messages.update(dialogId);
+        t.dialogs = false;
+        t.messages = new Messages({
+            el: $(t.el).find('.list'),
+            runData: {
+                dialogId: dialogId
+            }
+        });
+
         if (t.curDialogId && t.curDialogId != dialogId) {
             t.tabs.removeTab(tabPrefix + t.curDialogId);
         }
         if (!t.tabs.getTab(tabPrefix + dialogId).length) {
             t.tabs.appendTab(tabPrefix + dialogId, title);
-            localStorage.setItem(t.keyDialogId, dialogId + ':' + title);
         }
         t.tabs.selectTab(tabPrefix + dialogId);
-        $(window).on('scroll.updateInputBox', $.proxy(t.messages.updateInputBox, t));
-
         t.curDialogId = dialogId;
     }
 });
@@ -187,44 +185,45 @@ var RightColumn = Widget.extend({
         this._super();
 
         var t = this;
-        t.list = t.initList();
+        t.initList();
     },
 
     initList: function() {
         var t = this;
-        var list = new List({
+        t.list = new List({
             el: $(t.el).find('.list')
         });
-        list.on('selectDialogs', function(id, title) {
+        t.list.on('selectDialogs', function(id, title) {
             t.trigger('selectDialogs', id, title);
         });
-        list.on('selectMessages', function(id, title) {
+        t.list.on('selectMessages', function(id, title) {
             t.trigger('selectMessages', id, title);
         });
-
-        return list;
     }
 });
 
 var Dialogs = Widget.extend({
     template: DIALOGS,
     listId: null,
+    itemsLimit: 20,
+    currentPage: 1,
 
     events: {
         'click: .dialog': 'clickDialog',
         'click: .action.icon.plus': 'clickPlus'
     },
 
-    run: function() {},
-
-    update: function(listId) {
+    run: function(params) {
         var t = this;
         var $el = $(t.el);
+        var listId = t.listId = params.listId;
 
-        Events.fire('get_dialogs', listId == 999999 ? undefined : listId, 0, 20, function(data) {
+        Events.fire('get_dialogs', listId == 999999 ? undefined : listId, 0, t.itemsLimit, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
+            t.bindEvents();
+            t.scrollTop();
             $(t.el).find('.date').easydate({
                 live: true,
                 set_title: false,
@@ -237,6 +236,17 @@ var Dialogs = Widget.extend({
                     return date.toLocaleDateString();
                 }
             });
+        });
+    },
+
+    bindEvents: function() {
+        var t = this;
+        var $el = $(t.el);
+
+        t.on('scroll', function() {
+            if ($(window).scrollTop() < 100) {
+                t.showMore();
+            }
         });
     },
 
@@ -267,14 +277,10 @@ var Dialogs = Widget.extend({
                         $(this).dropdown('open');
                     },
                     onselect: function(item) {
-                        Events.fire('add_to_list', dialogId, item.id, function() {
-                            //console.log('!!!');
-                        });
+                        Events.fire('add_to_list', dialogId, item.id, function() {});
                     },
                     onunselect: function(item) {
-                        Events.fire('remove_from_list', dialogId, item.id, function() {
-                            //console.log('!!!');
-                        });
+                        Events.fire('remove_from_list', dialogId, item.id, function() {});
                     },
                     data: lists
                 });
@@ -296,24 +302,39 @@ var Dialogs = Widget.extend({
     selectDialog: function(id, title, isTrigger) {
         var t = this;
         if (isTrigger) t.trigger('select', id, title);
+    },
+
+    scrollTop: function() {
+        $(window).scrollTop(0);
+    },
+
+    showMore: function() {
+        var t = this;
+        var $el = $(t.el);
+
+        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+            console.log(data);
+        });
+        t.currentPage++;
     }
 });
 
 var Messages = Widget.extend({
     template: MESSAGES,
-    templateMessage: MESSAGES_ITEM,
     dialogId: null,
+    itemsLimit: 20,
+    currentPage: 1,
+    tmplMessage: MESSAGES_ITEM,
 
     events: {
         'hover: .message.new': 'hoverMessage'
     },
 
-    run: function() {},
-
-    update: function(dialogId) {
+    run: function(params) {
         var t = this;
+        var dialogId = t.dialogId = params.dialogId;
 
-        Events.fire('get_messages', dialogId, 0, 20, function(data) {
+        Events.fire('get_messages', dialogId, 0, t.itemsLimit, function(data) {
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -323,7 +344,6 @@ var Messages = Widget.extend({
                     return false;
                 }
             });
-            t.dialogId = dialogId;
             t.templateData = {
                 id: dialogId,
                 list: messages,
@@ -353,24 +373,49 @@ var Messages = Widget.extend({
             $textarea[0].scrollTop = $textarea[0].scrollHeight;
             t.bindEvents();
             t.scrollBottom();
-            t.updateInputBox();
         });
     },
 
     bindEvents: function() {
         var t = this;
         var $el = $(t.el);
-        var $textarea = $el.find('textarea');
 
-        $textarea.keydown(function(e) {
-            if (!e.shiftKey && e.keyCode == KEY.ENTER) {
-                t.sendMessage();
-                return false;
+        t.on('scroll', function() {
+            t.updateInputBox();
+
+            if ($(window).scrollTop() < 100) {
+                t.showMore();
             }
         });
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
+        $el.find('textarea').keydown(function(e) {
+            if (!e.shiftKey && e.keyCode == KEY.ENTER) {
+                t.sendMessage();
+                return false;
+            }
+        });
+    },
+
+    hoverMessage: function(e) {
+        if (e.type != 'mouseenter') return;
+        var $message = $(e.currentTarget);
+        if ($message.hasClass('viewer')) return;
+        Events.fire('message_mark_as_read', $message.data('id'), function() {
+            $message.removeClass('new');
+        });
+    },
+
+    showMore: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $messages = $el.find('.messages');
+
+        Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+            console.log(data);
+        });
+        t.currentPage++;
     },
 
     updateInputBox: function() {
@@ -378,7 +423,7 @@ var Messages = Widget.extend({
         var $el = $(t.el);
         var $inputBox = $el.find('.post-message');
 
-        if ($(window).scrollTop() + $(window).height() < $(document).height() - 14) {
+        if ($(window).scrollTop() + $(window).height() < $(document).height() - 10) {
             $inputBox.addClass('fixed');
         } else {
             $inputBox.removeClass('fixed');
@@ -399,7 +444,7 @@ var Messages = Widget.extend({
         if (text) {
             Events.fire('send_message', t.dialogId, text, function(data) {
                 $textarea.val('');
-                var $newMessage = $(tmpl(MESSAGES_ITEM, data));
+                var $newMessage = $(tmpl(t.tmplMessage, data));
                 $el.find('.messages').append($newMessage);
                 $newMessage.find('.date').easydate({
                     live: true,
@@ -416,21 +461,11 @@ var Messages = Widget.extend({
                 if (isScroll) {
                     t.scrollBottom();
                 }
-                t.updateInputBox();
                 $textarea.focus();
             });
         } else {
             $textarea.focus();
         }
-    },
-
-    hoverMessage: function(e) {
-        if (e.type != 'mouseenter') return;
-        var $message = $(e.currentTarget);
-        if ($message.hasClass('viewer')) return;
-        Events.fire('message_mark_as_read', $message.data('id'), function() {
-            $message.removeClass('new');
-        });
     }
 });
 
