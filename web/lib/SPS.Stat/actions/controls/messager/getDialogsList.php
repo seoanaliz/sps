@@ -18,8 +18,6 @@ class getDialogsList
         $in_mess        =   Request::getInteger( 'inMess' );
         $out_mess       =   Request::getInteger( 'outMess' );
 
-
-
         $group_id       =   $group_id ? $group_id : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
@@ -42,8 +40,11 @@ class getDialogsList
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
 
         $i = 0;
-        $user_ids = '';
+        $user_ids = array();
         $ids = MesGroups::get_dialog_id_array( $user_id );
+
+
+//        print_r( $row_dialog_array );
 
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
@@ -51,7 +52,7 @@ class getDialogsList
                 $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
             if (   ( $dialog->read_state == 1 && $only_unread)
                 || ( $dialog->date > $date_end || $dialog->date < $date_start )
-                || ( $dialog->out &&  $in_mess && !$out_mess  )
+                || ( $dialog->out &&    $in_mess && !$out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( $group_id  &&  $group_id != $ids[ $dialog->uid ] )

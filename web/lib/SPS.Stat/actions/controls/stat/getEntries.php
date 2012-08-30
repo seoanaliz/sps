@@ -24,7 +24,7 @@ class getEntries {
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );
+        $period     =   Request::getInteger( 'period' );//
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
