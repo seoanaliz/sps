@@ -55,6 +55,6 @@ $(document).ready(function() {
 });
 
 function onSuccess(token) {
-    $.cookie('token', token, {path: '/'});
+    $.cookie('token', token, {path: '/', expires: 30});
     location.replace('/im/');
 }

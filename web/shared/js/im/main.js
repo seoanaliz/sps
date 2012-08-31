@@ -2,7 +2,8 @@ var Configs = {
     vkId: $.cookie('uid'),
     token: $.cookie('token'),
     appId: vk_appId,
-    controlsRoot: controlsRoot
+    controlsRoot: controlsRoot,
+    viewer: {}
 };
 
 $(document).ready(function() {
@@ -18,6 +19,7 @@ $(document).ready(function() {
     }
 
     Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
+        Configs.viewer = Data.users[0];//viewer;
         var im = new IM({
             el: '#main'
         });
@@ -33,7 +35,6 @@ $(document).ready(function() {
 /* Instant Messenger */
 var IM = Widget.extend({
     template: MAIN,
-    viewer: null,
     leftColumn: null,
     rightColumn: null,
 
@@ -48,6 +49,35 @@ var IM = Widget.extend({
 
     bindEvents: function() {
         var t = this;
+
+        (function poll() {
+            return false;
+            console.log('poll...');
+            $.ajax({
+                url: Configs.controlsRoot + 'watchDog/',
+                data: {
+                    userId: Configs.vkId
+                },
+                dataType: 'json',
+                complete: poll,
+                timeout: 30000,
+                success: function(data) {
+                    var res = data.response[0];
+                    if (!res || !res.type) return;
+                    switch (res.type) {
+                        case 'inMessage':
+                            console.log(['new message: ', res.content, res.content.body]);
+                        break;
+                        case 'online':
+                            console.log(['online: ', res.content]);
+                        break;
+                        case 'offline':
+                            console.log(['online: ', res.content]);
+                        break;
+                    }
+                }
+            });
+        })();
 
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
@@ -347,7 +377,7 @@ var Messages = Widget.extend({
             t.templateData = {
                 id: dialogId,
                 list: messages,
-                viewer: users[Configs.vkId],
+                viewer: Configs.viewer,
                 user: user
             };
             t.renderTemplate();

@@ -166,6 +166,11 @@ var Eventlist = {
         simpleAjax('exlEntryFromGroup', {entryId: dialogId, groupId: listId}, function() {
             callback(true);
         });
+    },
+    long_pull: function(callback) {
+        simpleAjax('watchDog', function(data) {
+            callback(data);
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);

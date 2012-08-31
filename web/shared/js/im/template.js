@@ -151,12 +151,20 @@ var MESSAGES_ITEM =
                 '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
+            '<? if (isset("attachments") && attachments.length) { ?>' +
+                '<div class="attachments">' +
+                    '<? each(MESSAGE_ATTACHMENT, attachments); ?>' +
+                '</div>' +
+            '<? } ?>' +
         '</div>' +
     '</div>' +
     '<div class="right-column">' +
         '<div class="date"><?=timestamp?></div>' +
     '</div>' +
 '</div>';
+
+var MESSAGE_ATTACHMENT =
+'<div class="attachment"></div>';
 
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
