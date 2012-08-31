@@ -48,8 +48,12 @@ var simpleAjax = function(method, data, callback) {
 
 var Eventlist = {
     get_user: function(userId, token, callback) {
-        simpleAjax('saveAt', {userId: userId, access_token: token}, function() {
-            callback(Data.users[0]);
+        simpleAjax('saveAt', {userId: userId, access_token: token}, function(data) {
+            callback({
+                id: data.userId,
+                name: data.name,
+                photo: data.ava
+            });
         })
     },
     get_lists: function(callback) {
@@ -118,11 +122,19 @@ var Eventlist = {
                 };
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
+                var clearAttachments = [];
+                if (dirtyMessage.attachments) $.each(dirtyMessage.attachments, function(i, attachment) {
+                    clearAttachments.push({
+                        type: attachment.type,
+                        content: attachment[attachment.type]
+                    });
+                });
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.from_id == Configs.vkId),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
+                    attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]
                 });

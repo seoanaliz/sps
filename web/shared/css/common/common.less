@@ -399,7 +399,7 @@ input {
     }
 }
 
-/* Placeholder */
+/* Placeholder plugin */
 .placeholder {
     color: #999;
     .user-select(none);
@@ -521,5 +521,25 @@ input {
                 }
             }
         }
+    }
+}
+
+/* imageComposition plugin */
+.image-compositing {
+    position: relative;
+    overflow: hidden;
+
+    &:after {
+        content: '' !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('../../images/common/upload.gif') center no-repeat #fff;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1;
+        visibility: visible !important;
     }
 }

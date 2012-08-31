@@ -19,7 +19,7 @@ $(document).ready(function() {
     }
 
     Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
-        Configs.viewer = Data.users[0];//viewer;
+        Configs.viewer = viewer;
         var im = new IM({
             el: '#main'
         });
@@ -396,6 +396,7 @@ var Messages = Widget.extend({
                     return date.toLocaleDateString();
                 }
             });
+            $el.find('.attachments').imageComposition();
             $textarea.placeholder();
             $textarea.autoResize();
             $textarea.inputMemory('message' + dialogId);

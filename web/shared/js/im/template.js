@@ -152,7 +152,7 @@ var MESSAGES_ITEM =
             '</div>' +
             '<div class="text"><?=text?></div>' +
             '<? if (isset("attachments") && attachments.length) { ?>' +
-                '<div class="attachments">' +
+                '<div class="attachments clear-fix">' +
                     '<? each(MESSAGE_ATTACHMENT, attachments); ?>' +
                 '</div>' +
             '<? } ?>' +
@@ -164,7 +164,13 @@ var MESSAGES_ITEM =
 '</div>';
 
 var MESSAGE_ATTACHMENT =
-'<div class="attachment"></div>';
+'<? if (type == "photo") { ?>' +
+    '<img src="<?=content.src?>" alt="" />' +
+'<? } else { ?>' +
+    '<div class="attachment">' +
+        '[attach: <?=type?>]' +
+    '</div>' +
+'<? } ?>';
 
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
