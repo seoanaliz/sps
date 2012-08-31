@@ -72,7 +72,7 @@
                 . ' WHERE id = @dialog_id AND user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@dialog_id', $dialog_id );
-            $cmd->SetInteger( '@user_id', $user_id );
+            $cmd->SetInteger( '@user_id',   $user_id );
             $ds = $cmd->Execute();
             $ds->Next();
 
@@ -174,9 +174,10 @@
             if ( !$access_token )
                 return 'no access_token';
             $params = array(
-                'count'         =>  100,
+                'count'         =>  25,
                 'filters'       =>  1,
-                'time_offset'   =>  10
+                'time_offset'   =>  10,
+                'access_token'  =>  $access_token
             );
             $res = VkHelper::api_request( 'messages.get', $params );
             array_shift( $res );
