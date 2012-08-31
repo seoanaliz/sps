@@ -176,7 +176,7 @@
             $params = array(
                 'count'         =>  100,
                 'filters'       =>  1,
-                'time_offset'   =>  1000
+                'time_offset'   =>  10
             );
             $res = VkHelper::api_request( 'messages.get', $params );
             array_shift( $res );
