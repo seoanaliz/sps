@@ -51,6 +51,24 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
+            console.log('poll...');
+            setTimeout(function() {
+                $.ajax({
+                    url: Configs.controlsRoot + 'watchDog/',
+                    dataType: 'json',
+                    data: {
+                        userId: Configs.vkId
+                    },
+                    success: function(data) {
+                        $.each(data.response, function(i, event) {
+                            t.newEvent(event);
+                        });
+                    }
+                });
+                poll();
+            }, 5000);
+        })();
+        (function poll() {
             return false;
             console.log('poll...');
             $.ajax({
@@ -101,6 +119,16 @@ var IM = Widget.extend({
         t.rightColumn = new RightColumn({
             el: $(t.el).find('> .right-column')
         });
+    },
+
+    newEvent: function(event) {
+        var t = this;
+
+        switch (event.type) {
+            case 'inMessage':
+                t.leftColumn.trigger('addMessage', event.content);
+            break;
+        }
     }
 });
 
@@ -142,6 +170,15 @@ var LeftColumn = Widget.extend({
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
+        });
+        t.on('addMessage', function(message) {
+            console.log('addMessage: ');
+            console.log(message);
+            if (t.messages) {
+                t.messages.trigger('addMessage', message);
+            } else if (t.dialogs) {
+                t.dialogs.trigger('addMessage', message);
+            }
         });
     },
 
@@ -237,6 +274,9 @@ var Dialogs = Widget.extend({
     listId: null,
     itemsLimit: 20,
     currentPage: 1,
+    tmplDialog: DIALOGS_ITEM,
+
+    isBlock: false,
 
     events: {
         'click: .dialog': 'clickDialog',
@@ -274,9 +314,33 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', function() {
-            if ($(window).scrollTop() < 100) {
+            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
             }
+        });
+        t.on('addMessage', function() {
+            var t = this;
+            var listId = t.listId;
+
+            Events.fire('get_dialogs', listId == 999999 ? undefined : listId, 0, t.itemsLimit, function(data) {
+                t.templateData = {id: listId, list: data};
+                t.listId = listId;
+                t.renderTemplate();
+                t.bindEvents();
+                t.scrollTop();
+                $(t.el).find('.date').easydate({
+                    live: true,
+                    set_title: false,
+                    date_parse: function(date) {
+                        date = intval(date) * 1000;
+                        if (!date) return;
+                        return new Date(date);
+                    },
+                    uneasy_format: function(date) {
+                        return date.toLocaleDateString();
+                    }
+                });
+            });
         });
     },
 
@@ -340,10 +404,33 @@ var Dialogs = Widget.extend({
 
     showMore: function() {
         var t = this;
+        if (t.isBlock) return;
         var $el = $(t.el);
+        var $dialogs = $el.find('.dialogs');
 
-        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            console.log(data);
+        t.isBlock = true;
+        Events.fire('get_dialogs', t.listId == 999999 ? undefined : t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+            var blockId = 'dialogsBlock' + t.currentPage;
+            var html = '<div id="' + blockId + '">';
+            $.each(data, function(i, data) {
+                html += (tmpl(t.tmplDialog, data));
+            });
+            html += '</div>';
+            $dialogs.append(html);
+            $('#' + blockId).find('.dialog').first().remove();
+            $('#' + blockId).find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            t.isBlock = false;
         });
         t.currentPage++;
     }
@@ -355,6 +442,9 @@ var Messages = Widget.extend({
     itemsLimit: 20,
     currentPage: 1,
     tmplMessage: MESSAGES_ITEM,
+
+    user: {},
+    isBlock: false,
 
     events: {
         'hover: .message.new': 'hoverMessage'
@@ -380,6 +470,7 @@ var Messages = Widget.extend({
                 viewer: Configs.viewer,
                 user: user
             };
+            t.user = user;
             t.renderTemplate();
             var $el = $(t.el);
             var $textarea = $el.find('textarea');
@@ -414,9 +505,36 @@ var Messages = Widget.extend({
         t.on('scroll', function() {
             t.updateInputBox();
 
-            if ($(window).scrollTop() < 100) {
+            if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
+        });
+        t.on('addMessage', function(message) {
+            var t = this;
+
+            if (message.dialog_id != t.dialogId) return;
+            var data = {
+                id: message.mid,
+                text: message.body,
+                user: t.user,
+                isNew: true,
+                timestamp: message.date
+            };
+            var $newMessage = $(tmpl(t.tmplMessage, data));
+            $el.find('.messages').append($newMessage);
+            $newMessage.find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            t.scrollBottom();
         });
         $el.find('.button.send').click(function() {
             t.sendMessage();
@@ -440,11 +558,34 @@ var Messages = Widget.extend({
 
     showMore: function() {
         var t = this;
+        if (t.isBlock) return;
         var $el = $(t.el);
         var $messages = $el.find('.messages');
+        //@todo: изменить этот стыд
 
+        t.isBlock = true;
         Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            console.log(data);
+            var blockId = 'messagesBlock' + t.currentPage;
+            var html = '<div id="' + blockId + '">';
+            $.each(data.messages, function(i, data) {
+                html += (tmpl(t.tmplMessage, data));
+            });
+            html += '</div>';
+            $messages.prepend(html);
+            $('#' + blockId).find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            $(window).scrollTop($(window).scrollTop() + $('#' + blockId).outerHeight(true));
+            t.isBlock = false;
         });
         t.currentPage++;
     },

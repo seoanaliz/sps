@@ -176,7 +176,7 @@
             $params = array(
                 'count'         =>  25,
                 'filters'       =>  1,
-                'time_offset'   =>  10,
+                'time_offset'   =>  5,
                 'access_token'  =>  $access_token
             );
             $res = VkHelper::api_request( 'messages.get', $params );

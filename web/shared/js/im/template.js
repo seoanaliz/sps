@@ -165,7 +165,9 @@ var MESSAGES_ITEM =
 
 var MESSAGE_ATTACHMENT =
 '<? if (type == "photo") { ?>' +
-    '<img src="<?=content.src?>" alt="" />' +
+    '<a target="_blank" href="<?=content.src_xxxbig?>">' +
+        '<img src="<?=content.src_big?>" alt="" />' +
+    '</a>' +
 '<? } else { ?>' +
     '<div class="attachment">' +
         '[attach: <?=type?>]' +
