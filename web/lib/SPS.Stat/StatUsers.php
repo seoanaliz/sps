@@ -53,8 +53,12 @@
 
         public static function add_user( $users )
         {
-            if ( !isset( $users['userId'] ) )
+            if ( !isset( $users['userId'] )) {
                 $users = self::get_vk_user_info( $users );
+                $users = reset( $users );
+            }
+
+            $users['comment'] = isset( $users['comment'] ) ? $users['comment'] : '';
 		    $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
                         '    ( user_id, name, ava,  comments )
                          VALUES

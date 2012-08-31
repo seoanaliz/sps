@@ -62,7 +62,7 @@
             $ds = $cmd->Execute();
             $id = false;
             if ( $ds->Next() );
-                $id = $ds->GetValue( 'id', TYPE_INTEGER ) ;
+                $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
             return $id ? $id : false;
         }
 
@@ -123,13 +123,12 @@
         {
             $method = $unread ? 'markAsNew' : 'markAsRead';
 
-            if ( is_array( $mess_ids ) )
+            if ( is_array( $mess_ids ))
                 $mess_ids = implode( ',', $mess_ids );
 
             $params = array (
-
                     'access_token'  =>  StatUsers::get_access_token( $user_id ),
-                    'mids'           =>  $mess_ids,
+                    'mids'          =>  $mess_ids,
             );
 
             $res = VkHelper::api_request('messages.' . $method, $params, 0 );
@@ -141,7 +140,6 @@
         public static function get_last_activity( $user_id, $rec_id )
         {
             $params = array (
-
                     'access_token'  =>  StatUsers::get_access_token( $user_id ),
                     'uid'           =>  $rec_id,
             );
@@ -161,7 +159,6 @@
             if ( $cmd->ExecuteNonQuery() )
                 return true;
             return false;
-
         }
 
         private static function get_long_poll_server( $token )
@@ -172,16 +169,34 @@
             return (array)$res;
         }
 
-        public static function watch_dog( $user_id, $ts = 0 )
+        public static function watch_dog( $user_id ){
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                'count'         =>  100,
+                'filters'       =>  1,
+                'time_offset'   =>  10
+            );
+            $res = VkHelper::api_request( 'messages.get', $params );
+            array_shift( $res );
+            return $res;
+        }
+
+        public static function watch_dog_long_pull( $user_id, $ts = 0 )
         {
-            $a = self::get_long_poll_server( StatUsers::get_access_token( $user_id ) );
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $a = self::get_long_poll_server( $access_token );
             if ( !$a )
                 return false;
             $ts  = $ts ? $ts : $a['ts'];
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
 
             $res = json_decode( file_get_contents( $url ));
-            return $res;
+
+            return $res->updates;
         }
     }
 ?>
