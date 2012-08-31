@@ -52,7 +52,7 @@
 
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
-             elseif ( $general && !$groupId )
+            elseif ( $general && !$groupId )
                   $userId = StatUsers::get_users();
 
             $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
@@ -65,8 +65,7 @@
             if ( !$groupId )
                 $m_class::implement_group( $newGroupId, $userId );
 
-            echo ObjectHelper::ToJSON( array( 'response' => $newGroupId ) );
-
+            echo ObjectHelper::ToJSON( array( 'response' => $newGroupId ));
         }
 
     }

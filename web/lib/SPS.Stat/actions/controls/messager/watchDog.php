@@ -21,19 +21,23 @@ class watchDog
             die( ObjectHelper::ToJSON( array( 'response' => false )));
 
         $result = array();
+        foreach( $events as $event ) {
 
-        foreach( $events->updates as $event ) {
             $status = 'offline';
-            switch ( $event[0] ) {
+            $event =  (array) $event ;
+
+            $stat = isset( $event[0] ) ? $event[0] : 4;
+            switch ( $stat ) {
                 case 4:
+                    $from_id = isset( $event[3] )? $event[3] : $event['uid'];
                     $result[] = array(
                         'type'    => 'inMessage',
                         'content' => array(
-                            'body'      =>  $event[6],
-                            'mid'       =>  $event[1],
-                            'from_id'   =>  $event[3],
-                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $event[3] ),
-                            'date'      =>  $event[4],
+                            'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
+                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
+                            'from_id'   =>  $from_id,
+                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id )
                         )
                     );
                     break;
