@@ -133,17 +133,13 @@
                             group_id=@group_id AND dialog_id=@dialog_id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id', $group_id  );
+            $cmd->SetInteger( '@group_id',  $group_id  );
             $cmd->SetInteger( '@dialog_id', $entry_id );
             $cmd->Execute();
         }
 
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
-
-
-            //update
-//            print_r(array( $ava, $groupName, $comments, $groupId = 0 ));
             if ( $groupId ) {
                 $sql = 'UPDATE
                             ' . TABLE_MES_GROUPS .
@@ -228,20 +224,23 @@
             }
             return $ids;
         }
-
+        //возвращает группы, в которых состоит диалог
         public static function get_dialog_group( $dialog_id )
         {
             $sql = 'SELECT group_id FROM ' . TABLE_MES_GROUP_DIALOG_REL . ' WHERE dialog_id=@dialog_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@dialog_id', $dialog_id);
             $ds = $cmd->Execute();
-            $ds->Next();
+            $res = array();
+            while ( $ds->Next() ) {
+                $res[] = $ds->GetValue( 'group_id', TYPE_INTEGER );
+            }
 
-            return $ds->GetValue( 'group_id', TYPE_INTEGER );
+            return $res;
         }
 
         //возвращает массив, ключи - id юзеров, значения - id групп
-        public static function get_dialog_id_array( $user_id )
+        public static function get_dialog_groups_ids_array( $user_id )
         {
             $ids = self::get_users_dialogs( $user_id );
 
