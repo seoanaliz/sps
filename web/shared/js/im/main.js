@@ -11,6 +11,48 @@ $(document).ready(function() {
         return;
     }
 
+    (function() {
+        return;
+        var code = 'return {' +
+            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
+            'longPoll: API.messages.getLongPollServer()' +
+        '};';
+
+        $.ajax({
+            url: 'https://api.vk.com/method/execute',
+            dataType: 'jsonp',
+            data: {
+                access_token: Configs.token,
+                code: code
+            },
+            success: function(data) {
+                console.log(data);
+                initVK(data.response);
+            }
+        });
+
+        function initVK(data) {
+            (function poll(ts) {
+                console.log('poll...');
+                var longPoll = data.longPoll;
+                var ts = ts || longPoll.ts;
+                var url = longPoll.server;
+                $.ajax({
+                    url: 'http://' + url,
+                    dataType: 'json',
+                    data: {
+                        ts: ts,
+                        key: longPoll.key,
+                        act: 'a_check',
+                        wait: 25,
+                        mode: 2
+                    },
+                    success: function(data) {}
+                });
+            })();
+        }
+    })();
+
     if (!Configs.vkId) {
         return location.replace('/login/');
     }
@@ -51,6 +93,7 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
+            return;
             console.log('poll...');
             setTimeout(function() {
                 $.ajax({
@@ -663,7 +706,15 @@ var List = Widget.extend({
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
         var title = $target.data('title');
-        t.trigger('selectDialogs', listId, title);
+        if ($target.data('dialogs')) {
+            t.showDialogs($target);
+        } else {
+            Events.fire('get_dialogs', listId, 0, 20, function(data) {
+                $target.data('dialogs', data);
+                t.showDialogs($target);
+            });
+        }
+        //t.trigger('selectDialogs', listId, title);
     },
     selectMessages: function(e) {
         var t = this;
@@ -671,6 +722,31 @@ var List = Widget.extend({
         var dialogId = $target.data('id');
         var title = $target.data('title');
         t.trigger('selectMessages', dialogId, title);
+    },
+
+    showDialogs: function($el) {
+        var dialogs = $el.data('dialogs');
+        if (dialogs.length) {
+            var list = $el.find('> .list');
+            if (list.length) {
+                list.slideUp(100, function() {
+                    $(this).remove();
+                });
+            } else {
+                var html = '<div class="list">';
+                $.each(dialogs, function(i, dialog) {
+                    html += tmpl(LIST_ITEM_DIALOG, dialog);
+                });
+                html += '</div>';
+                var $dialogs = $(html);
+                $el.append($dialogs);
+                var cssHeight = $dialogs.css('height');
+                var height = $dialogs.height();
+                $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
+                    $(this).css({height: cssHeight})
+                });
+            }
+        }
     }
 });
 

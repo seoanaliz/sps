@@ -186,12 +186,12 @@ var LIST_ITEM =
     '<div class="title"><?=title?></div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
         '<div class="list">' +
-            '<? each(PUBLIC_LIST_ITEM, dialogs); ?>' +
+            '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
         '</div>' +
     '<? } ?>' +
 '</div>';
 
-var PUBLIC_LIST_ITEM =
+var LIST_ITEM_DIALOG =
 '<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
     '<div class="title"><?=user.name?></div>' +

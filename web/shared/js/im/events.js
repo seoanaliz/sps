@@ -74,6 +74,7 @@ var Eventlist = {
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
+        //return callback(Data.dialogs);
         var params = {
             groupId: listId,
             offset: offset,
@@ -177,11 +178,6 @@ var Eventlist = {
     remove_from_list: function(dialogId, listId, callback) {
         simpleAjax('exlEntryFromGroup', {entryId: dialogId, groupId: listId}, function() {
             callback(true);
-        });
-    },
-    long_pull: function(callback) {
-        simpleAjax('watchDog', function(data) {
-            callback(data);
         });
     }
 };
