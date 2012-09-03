@@ -331,7 +331,7 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
-        Events.fire('get_dialogs', listId == 999999 ? undefined : listId, 0, t.itemsLimit, function(data) {
+        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
@@ -365,7 +365,7 @@ var Dialogs = Widget.extend({
             var t = this;
             var listId = t.listId;
 
-            Events.fire('get_dialogs', listId == 999999 ? undefined : listId, 0, t.itemsLimit, function(data) {
+            Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
                 t.templateData = {id: listId, list: data};
                 t.listId = listId;
                 t.renderTemplate();
@@ -421,6 +421,10 @@ var Dialogs = Widget.extend({
                     },
                     data: lists
                 });
+                $target.dropdown('appendItem', {
+                    id: 999,
+                    title: 'add'
+                });
             });
         }
         return false;
@@ -452,7 +456,7 @@ var Dialogs = Widget.extend({
         var $dialogs = $el.find('.dialogs');
 
         t.isBlock = true;
-        Events.fire('get_dialogs', t.listId == 999999 ? undefined : t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
             var blockId = 'dialogsBlock' + t.currentPage;
             var html = '<div id="' + blockId + '">';
             $.each(data, function(i, data) {
@@ -460,7 +464,6 @@ var Dialogs = Widget.extend({
             });
             html += '</div>';
             $dialogs.append(html);
-            $('#' + blockId).find('.dialog').first().remove();
             $('#' + blockId).find('.date').easydate({
                 live: true,
                 set_title: false,
@@ -686,6 +689,7 @@ var Messages = Widget.extend({
 
 var List = Widget.extend({
     template: LIST,
+    dialogsLimit: 100,
 
     events: {
         'click: .item > .title': 'selectDialogs',
@@ -709,7 +713,7 @@ var List = Widget.extend({
         if ($target.data('dialogs')) {
             t.showDialogs($target);
         } else {
-            Events.fire('get_dialogs', listId, 0, 20, function(data) {
+            Events.fire('get_dialogs', listId, 0, t.dialogsLimit, function(data) {
                 $target.data('dialogs', data);
                 t.showDialogs($target);
             });

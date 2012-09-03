@@ -76,7 +76,7 @@ var Eventlist = {
     get_dialogs: function(listId, offset, limit, callback) {
         //return callback(Data.dialogs);
         var params = {
-            groupId: listId,
+            groupId: listId == 999999 ? undefined : listId,
             offset: offset,
             limit: limit
         };

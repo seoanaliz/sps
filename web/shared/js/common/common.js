@@ -718,46 +718,6 @@ var Box = (function() {
                 }
 
                 if (!$.isArray(options.data)) options.data = [];
-                if (options.data.length || !options.emptyMenuText) {
-                    $(options.data).each(function(i, item) {
-                        var $item = $('<div/>')
-                            .text(item.title)
-                            .addClass(CLASS_ITEM)
-                            .attr('data-id', item.id)
-                            .data(options.itemDataKey, item)
-                            .appendTo($menu)
-                        ;
-                        if (item.icon) {
-                            var $icon = $('<div><img src="' + item.icon + '" /></div>');
-                            $item.append($icon);
-                            if (options.iconPosition == 'left') {
-                                $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_LEFT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
-                            } else {
-                                $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
-                            }
-                        }
-                        if (item.isActive) {
-                            $item.addClass(CLASS_ITEM_ACTIVE);
-                        }
-                        $item.hover(function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).addClass(CLASS_ITEM_HOVER);
-                        }, function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).removeClass(CLASS_ITEM_HOVER);
-                        });
-                    });
-                } else {
-                    $('<div/>')
-                        .text(options.emptyMenuText)
-                        .addClass(CLASS_EMPTY_MENU)
-                        .appendTo($menu)
-                    ;
-                }
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
@@ -791,6 +751,18 @@ var Box = (function() {
                     $target: $target,
                     options: options
                 });
+
+                if (options.data.length || !options.emptyMenuText) {
+                    $.each(options.data, function(i, item) {
+                        $el.dropdown('appendItem', item);
+                    });
+                } else {
+                    $('<div/>')
+                        .text(options.emptyMenuText)
+                        .addClass(CLASS_EMPTY_MENU)
+                        .appendTo($menu)
+                    ;
+                }
 
                 if (options.isShow && $el.is(':visible')) {
                     $el.dropdown('open');
@@ -876,8 +848,43 @@ var Box = (function() {
         getItem: function(id) {
             return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
         },
-        appendItem: function() {
-
+        appendItem: function(item) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $item = $('<div/>')
+                    .text(item.title)
+                    .attr('data-id', item.id)
+                    .addClass(CLASS_ITEM)
+                    .data(options.itemDataKey, item)
+                    .appendTo($menu)
+                ;
+                if (item.icon) {
+                    var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                    $item.append($icon);
+                    if (options.iconPosition == 'left') {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_LEFT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
+                    } else {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
+                    }
+                }
+                if (item.isActive) {
+                    $item.addClass(CLASS_ITEM_ACTIVE);
+                }
+                $item.hover(function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).addClass(CLASS_ITEM_HOVER);
+                }, function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).removeClass(CLASS_ITEM_HOVER);
+                });
+            });
         }
     };
 

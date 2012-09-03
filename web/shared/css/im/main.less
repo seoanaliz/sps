@@ -312,8 +312,14 @@ body {
             color: @color_link;
             padding: 5px 0;
             overflow-y: auto;
+            position: absolute;
+            top: 40px;
+            bottom: 0;
+            width: 100%;
 
             &>.item {
+                .user-select(none);
+
                 &>.title {
                     padding: 5px 10px;
                     cursor: pointer;
