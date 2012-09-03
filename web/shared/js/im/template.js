@@ -165,8 +165,28 @@ var MESSAGES_ITEM =
 
 var MESSAGE_ATTACHMENT =
 '<? if (type == "photo") { ?>' +
-    '<a target="_blank" href="<?=content.src_xxxbig?>">' +
+    '<a target="_blank" href="<?=content.src_xxxbig ? content.src_xxxbig : content.src_big?>">' +
         '<img src="<?=content.src_big?>" alt="" />' +
+    '</a>' +
+'<? } else if (type == "audio") { ?>' +
+    '<div>' +
+        '<a target="_blank" href="http://vk.com/audio?id=<?=content.owner_id?>&audio_id=<?=content.aid?>">' +
+            '♫ <?=content.performer?> - <?=content.title?>' +
+        '</a>' +
+    '</div>' +
+'<? } else if (type == "doc") { ?>' +
+    '<? if (content.thumb) { ?>' +
+        '<a target="_blank" href="<?=content.url?>">' +
+            '<img src="<?=content.thumb?>" alt="" />' +
+        '</a>' +
+    '<? } else { ?>' +
+        '<div>' +
+            'Документ: <a target="_blank" href="<?=content.url?>"><?=content.title?></a>' +
+        '</div>' +
+    '<? } ?>' +
+'<? } else if (type == "video") { ?>' +
+    '<a target="_blank" href="http://vk.com/video<?=content.owner_id?>_<?=content.vid?>">' +
+        '<img src="<?=content.image_big?>" alt="" />' +
     '</a>' +
 '<? } else { ?>' +
     '<div class="attachment">' +

@@ -93,7 +93,7 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
-            return;
+            //return;
             console.log('poll...');
             setTimeout(function() {
                 $.ajax({
@@ -521,6 +521,7 @@ var Messages = Widget.extend({
             var $el = $(t.el);
             var $textarea = $el.find('textarea');
 
+            $el.find('.attachments').imageComposition({width: 500, height: 300});
             $el.find('.date').easydate({
                 live: true,
                 set_title: false,
@@ -533,7 +534,6 @@ var Messages = Widget.extend({
                     return date.toLocaleDateString();
                 }
             });
-            $el.find('.attachments').imageComposition();
             $textarea.placeholder();
             $textarea.autoResize();
             $textarea.inputMemory('message' + dialogId);
@@ -618,7 +618,9 @@ var Messages = Widget.extend({
             });
             html += '</div>';
             $messages.prepend(html);
-            $('#' + blockId).find('.date').easydate({
+            var $block = $('#' + blockId);
+            $block.find('.attachments').imageComposition({width: 500, height: 300});
+            $block.find('.date').easydate({
                 live: true,
                 set_title: false,
                 date_parse: function(date) {
@@ -630,7 +632,7 @@ var Messages = Widget.extend({
                     return date.toLocaleDateString();
                 }
             });
-            $(window).scrollTop($(window).scrollTop() + $('#' + blockId).outerHeight(true));
+            $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
             t.isBlock = false;
         });
         t.currentPage++;

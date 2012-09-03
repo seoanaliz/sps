@@ -20,6 +20,13 @@ if (!window.localStorage) {
     };
 }
 
+if (!window.console) {
+    window.console = {
+        log: function(params) {},
+        dir: function(params) {}
+    };
+}
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
@@ -205,13 +212,21 @@ function getURLParameter(name, search) {
                 var firstImageSize;
                 var firstImageWidth;
                 var firstImageHeight;
+                var options = {};
+
+                if (typeof hardPosition == 'object') {
+                    options = $.extend({
+                        width: $wrap.width(),
+                        height: $wrap.height()
+                    }, hardPosition);
+                }
 
                 var columns = [];
                 var wrap = {
                     width: 0,
                     height: 0,
-                    maxWidth: $wrap.width(),
-                    maxHeight: $wrap.height()
+                    maxWidth: options.width,
+                    maxHeight: options.height
                 };
 
                 if ($wrap.data(DATA_KEY) || !imagesNum) return;
