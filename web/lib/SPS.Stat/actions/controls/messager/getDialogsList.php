@@ -81,8 +81,8 @@ class getDialogsList
             $dialog->uid = $users_array[ $dialog->uid ];
         }
 
-        print_r( $dialogs_array );
-//        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
+//        print_r( $dialogs_array );
+        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
 
     }
 }
