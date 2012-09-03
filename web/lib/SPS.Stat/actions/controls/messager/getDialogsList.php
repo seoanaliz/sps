@@ -53,7 +53,7 @@ class getDialogsList
                 || ( $dialog->out &&    $in_mess && !$out_mess )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
                 || ( !$dialog->out &&  !$in_mess && $out_mess  )
-                || ( $group_id  &&  $group_id != $ids[ $dialog->uid ] )
+                || ( $group_id  && !in_array( $group_id, $dialog->groups ) )
                 || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
                 || ( isset( $dialog->chat_id ))
             );
@@ -82,7 +82,7 @@ class getDialogsList
         }
 
 //        print_r( $dialogs_array );
-        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
+        die( ObjectHelper::ToJSON( array( 'response' => $dialogs_array )));
 
     }
 }
