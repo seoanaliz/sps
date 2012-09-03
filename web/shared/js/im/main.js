@@ -323,7 +323,7 @@ var Dialogs = Widget.extend({
 
     events: {
         'click: .dialog': 'clickDialog',
-        'click: .action.icon.plus': 'clickPlus'
+        'click: .action.icon': 'clickPlus'
     },
 
     run: function(params) {
@@ -393,39 +393,70 @@ var Dialogs = Widget.extend({
         var $dialog = $target.closest('.dialog');
         var dialogId = $dialog.data('id');
         if (!$target.data('dropdown')) {
-            Events.fire('get_lists', function(lists) {
-                $target.dropdown({
-                    isShow: true,
-                    position: 'right',
-                    width: 'auto',
-                    type: 'checkbox',
-                    addClass: 'ui-dropdown-add-to-list',
-                    oncreate: function() {
-                        var $selectedItem = $(this).dropdown('getItem', t.listId);
-                        $selectedItem.addClass('active');
-                    },
-                    onopen: function() {
-                        $target.addClass('active');
-                    },
-                    onclose: function() {
-                        $target.removeClass('active');
-                    },
-                    onchange: function(item) {
-                        $(this).dropdown('open');
-                    },
-                    onselect: function(item) {
-                        Events.fire('add_to_list', dialogId, item.id, function() {});
-                    },
-                    onunselect: function(item) {
-                        Events.fire('remove_from_list', dialogId, item.id, function() {});
-                    },
-                    data: lists
+            (function updateDropdown() {
+                function onCreate() {
+                    $.each(t.templateData.list, function(i, dialog) {
+                        if (dialog.id == dialogId) {
+                            $.each(dialog.lists, function(i, listId) {
+                                $target.dropdown('getItem', listId).addClass('active');
+                            });
+                            return false;
+                        }
+                    });
+                }
+
+                Events.fire('get_lists', function(lists) {
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        oncreate: onCreate,
+                        onupdate: onCreate,
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            Events.fire('add_list', $input.val(), function() {
+                                                updateDropdown();
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                Events.fire('add_to_list', dialogId, item.id, function() {});
+                            }
+                        },
+                        onunselect: function(item) {
+                            Events.fire('remove_from_list', dialogId, item.id, function() {});
+                        },
+                        data: $.merge(lists, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ])
+                    });
                 });
-                $target.dropdown('appendItem', {
-                    id: 999,
-                    title: 'add'
-                });
-            });
+            })();
         }
         return false;
     },
@@ -694,6 +725,7 @@ var List = Widget.extend({
     dialogsLimit: 100,
 
     events: {
+        'click: .item > .title > .icon': 'clickIcon',
         'click: .item > .title': 'selectDialogs',
         'click: .public': 'selectMessages'
     },
@@ -707,11 +739,10 @@ var List = Widget.extend({
         });
     },
 
-    selectDialogs: function(e) {
+    clickIcon: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
-        var title = $target.data('title');
         if ($target.data('dialogs')) {
             t.showDialogs($target);
         } else {
@@ -720,8 +751,17 @@ var List = Widget.extend({
                 t.showDialogs($target);
             });
         }
-        //t.trigger('selectDialogs', listId, title);
+        return false;
     },
+
+    selectDialogs: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget).closest('.item');
+        var title = $target.data('title');
+        var listId = $target.data('id');
+        t.trigger('selectDialogs', listId, title);
+    },
+
     selectMessages: function(e) {
         var t = this;
         var $target = $(e.currentTarget);

@@ -59,10 +59,6 @@ var Eventlist = {
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            clearData.push({
-                id: 999999,
-                title: 'Не в списке'
-            });
             $.each(dirtyData, function(i, dirtyList) {
                 clearData.push({
                     id: dirtyList.group_id,
@@ -74,7 +70,6 @@ var Eventlist = {
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
-        //return callback(Data.dialogs);
         var params = {
             groupId: listId == 999999 ? undefined : listId,
             offset: offset,
@@ -93,9 +88,10 @@ var Eventlist = {
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
                     lastMessage: {
-                        text: dirtyDialog.body || '...',
+                        text: dirtyDialog.body,
                         timestamp: dirtyDialog.date
-                    }
+                    },
+                    lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
             });
             callback(clearData);

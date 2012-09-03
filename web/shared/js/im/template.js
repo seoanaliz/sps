@@ -97,7 +97,11 @@ var DIALOGS_ITEM =
         '<? } ?>' +
     '</div>' +
     '<div class="actions">' +
-        '<div class="action icon plus"></div>' +
+        '<? if (lists.length) { ?>' +
+            '<div class="action icon select"></div>' +
+        '<? } else { ?>' +
+            '<div class="action icon plus"></div>' +
+        '<? } ?>' +
     '</div>' +
 '</div>';
 
@@ -196,6 +200,9 @@ var MESSAGE_ATTACHMENT =
 
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
+    '<div class="item" data-id="999999" data-title="Не в списке">' +
+        '<div class="title">Не в списке</div>' +
+    '</div>' +
     '<? each(LIST_ITEM, list); ?>' +
 '<? } else { ?>' +
     '<div class="empty">Список пуст</div>' +
@@ -203,7 +210,10 @@ var LIST =
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title"><?=title?></div>' +
+    '<div class="title">' +
+        '<?=title?>' +
+        '<div class="icon plus"></div>' +
+    '</div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
         '<div class="list">' +
             '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
