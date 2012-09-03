@@ -39,7 +39,7 @@ class getDialogsList
         elseif( $row_dialog_array == 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
 
-        $i = 0;
+        $i = -1;
         $user_ids = array();
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
 
@@ -65,8 +65,9 @@ class getDialogsList
                 $dialogs_array[] = $dialog;
                 $user_ids[] = $dialog->uid;
 
-                if ( $i == $offset + $limit )
+                if ( $i == $offset + $limit - 1 )
                     break;
+
             }
         }
         unset( $dialog );
@@ -80,8 +81,8 @@ class getDialogsList
             $dialog->uid = $users_array[ $dialog->uid ];
         }
 
-//        print_r( $dialogs_array );
-        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
+        print_r( $dialogs_array );
+//        die( ObjectHelper::ToJSON(array('response' => $dialogs_array ) ) );
 
     }
 }
