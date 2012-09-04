@@ -219,6 +219,11 @@ function getURLParameter(name, search) {
                         width: $wrap.width(),
                         height: $wrap.height()
                     }, hardPosition);
+                } else {
+                    options = {
+                        width: $wrap.width(),
+                        height: $wrap.height()
+                    }
                 }
 
                 var columns = [];
