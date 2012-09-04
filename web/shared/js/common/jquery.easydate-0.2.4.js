@@ -321,7 +321,6 @@
                 date.setTime(time);
                 element.data('easydate.date', date);
                 if (settings.set_title && !element.attr('title')) {
-                    alert(settings.set_title);
                     element.attr('title', timestamp);
                 }
             }

@@ -62,16 +62,17 @@ var RIGHT_COLUMN =
 '<div class="list"></div>';
 
 var DIALOGS =
-'<div class="dialogs">' +
-    '<? if (list.length) { ?>' +
+'<div class="dialogs" data-id="<?=id?>">' +
+    '<? if (isset("list") && list.length) { ?>' +
         '<? each(DIALOGS_ITEM, list); ?>' +
     '<? } else { ?>' +
-        'empty' +
+        '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
 '</div>';
 
 var DIALOGS_ITEM =
-'<div class="dialog clear-fix" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<? var isNew = isset("isNew") && isNew; ?>' +
+'<div class="dialog clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<img src="<?=user.photo?>" alt="" />' +
@@ -81,23 +82,43 @@ var DIALOGS_ITEM =
             '<? if (user.isOnline) { ?>' +
                 '<div class="status">Online</div>' +
             '<? } ?>' +
-            '<div class="date"><?=lastMessage.timestamp?></div>' +
+            '<div class="date">' +
+                '<? if (isset("lastMessage")) { ?>' +
+                    '<?=lastMessage.timestamp?>' +
+                '<? } ?>' +
+            '</div>' +
         '</div>' +
     '</div>' +
-    '<div class="history"><?=lastMessage.text?></div>' +
+    '<div class="history">' +
+        '<? if (isset("lastMessage")) { ?>' +
+            '<?=lastMessage.text?>' +
+        '<? } else { ?>' +
+            '...' +
+        '<? } ?>' +
+    '</div>' +
     '<div class="actions">' +
-        '<div class="action icon plus"></div>' +
+        '<? if (lists.length) { ?>' +
+            '<div class="action icon select"></div>' +
+        '<? } else { ?>' +
+            '<div class="action icon plus"></div>' +
+        '<? } ?>' +
     '</div>' +
 '</div>';
 
 var MESSAGES =
-'<div class="messages">' +
-    '<? each(MESSAGES_ITEM, list); ?>' +
+'<div class="messages" data-id="<?=id?>">' +
+    '<? if (isset("list") && list.length) { ?>' +
+        '<? each(MESSAGES_ITEM, list); ?>' +
+    '<? } else { ?>' +
+        '<div class="empty">История сообщений пуста</div>' +
+    '<? } ?>' +
 '</div>' +
 '<div class="post-message clear-fix">' +
     '<div class="left-column">' +
         '<div class="photo">' +
-            '<img src="http://vk.cc/S6ZsO" alt="" />' +
+            '<a target="_blank" href="http://vk.com/id<?=viewer.id?>" title="Это Вы">' +
+                '<img src="<?=viewer.photo?>" alt="" />' +
+            '</a>' +
         '</div>' +
     '</div>' +
     '<div class="center-column">' +
@@ -110,15 +131,17 @@ var MESSAGES =
     '</div>' +
     '<div class="right-column">' +
         '<div class="photo">' +
-            '<a target="_blank" href="http://vk.com/id1">' +
-                '<img src="http://vk.cc/S6ZDq" alt="" />' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>" title="<?=user.name?>">' +
+                '<img src="<?=user.photo?>" alt="" />' +
             '</a>' +
         '</div>' +
     '</div>' +
 '</div>';
 
 var MESSAGES_ITEM =
-'<div class="message clear-fix" data-id="<?=id?>">' +
+'<? var isNew = isset("isNew") && isNew; ?>' +
+'<? var isViewer = isset("isViewer") && isViewer; ?>' +
+'<div class="message clear-fix<?=isNew ? " new" : ""?><?=isViewer ? " viewer" : ""?>" data-id="<?=id?>">' +
     '<div class="left-column">' +
         '<div class="photo">' +
             '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
@@ -132,6 +155,11 @@ var MESSAGES_ITEM =
                 '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
+            '<? if (isset("attachments") && attachments.length) { ?>' +
+                '<div class="attachments clear-fix">' +
+                    '<? each(MESSAGE_ATTACHMENT, attachments); ?>' +
+                '</div>' +
+            '<? } ?>' +
         '</div>' +
     '</div>' +
     '<div class="right-column">' +
@@ -139,20 +167,61 @@ var MESSAGES_ITEM =
     '</div>' +
 '</div>';
 
+var MESSAGE_ATTACHMENT =
+'<? if (type == "photo") { ?>' +
+    '<a target="_blank" href="<?=content.src_xxxbig ? content.src_xxxbig : content.src_big?>">' +
+        '<img src="<?=content.src_big?>" alt="" />' +
+    '</a>' +
+'<? } else if (type == "audio") { ?>' +
+    '<div>' +
+        '<a target="_blank" href="http://vk.com/audio?id=<?=content.owner_id?>&audio_id=<?=content.aid?>">' +
+            '♫ <?=content.performer?> - <?=content.title?>' +
+        '</a>' +
+    '</div>' +
+'<? } else if (type == "doc") { ?>' +
+    '<? if (content.thumb) { ?>' +
+        '<a target="_blank" href="<?=content.url?>">' +
+            '<img src="<?=content.thumb?>" alt="" />' +
+        '</a>' +
+    '<? } else { ?>' +
+        '<div>' +
+            'Документ: <a target="_blank" href="<?=content.url?>"><?=content.title?></a>' +
+        '</div>' +
+    '<? } ?>' +
+'<? } else if (type == "video") { ?>' +
+    '<a target="_blank" href="http://vk.com/video<?=content.owner_id?>_<?=content.vid?>">' +
+        '<img src="<?=content.image_big?>" alt="" />' +
+    '</a>' +
+'<? } else { ?>' +
+    '<div class="attachment">' +
+        '[attach: <?=type?>]' +
+    '</div>' +
+'<? } ?>';
+
 var LIST =
-'<? each(LIST_ITEM, list); ?>';
+'<? if (isset("list") && list.length) { ?>' +
+    '<div class="item" data-id="999999" data-title="Не в списке">' +
+        '<div class="title">Не в списке</div>' +
+    '</div>' +
+    '<? each(LIST_ITEM, list); ?>' +
+'<? } else { ?>' +
+    '<div class="empty">Список пуст</div>' +
+'<? } ?>';
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title"><?=title?></div>' +
-    '<div class="list">' +
-        '<? if (dialogs.length) { ?>' +
-            '<? each(PUBLIC_LIST_ITEM, dialogs); ?>' +
-        '<? } ?>' +
+    '<div class="title">' +
+        '<?=title?>' +
+        '<div class="icon plus"></div>' +
     '</div>' +
+    '<? if (isset("dialogs") && dialogs.length) { ?>' +
+        '<div class="list">' +
+            '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
+        '</div>' +
+    '<? } ?>' +
 '</div>';
 
-var PUBLIC_LIST_ITEM =
+var LIST_ITEM_DIALOG =
 '<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
     '<div class="title"><?=user.name?></div>' +
