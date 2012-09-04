@@ -29,7 +29,7 @@ class SenderVkontakte {
 
     const METH          =   'https://api.vk.com/method/';
     const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
-    const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
+//    const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
     const TESTING       =   false;
     const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
     const ALBUM_NAME    =   'wall photo';
