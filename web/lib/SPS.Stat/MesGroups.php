@@ -28,7 +28,6 @@
                 'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                 'name'      =>  $ds->getValue( 'name',     TYPE_STRING  ),
             );
-
         }
 
         public static function get_groups( $userId )
@@ -111,7 +110,8 @@
             $cmd->Execute();
         }
 
-        public static function get_group_users( $group_id ) {
+        public static function get_group_users( $group_id )
+        {
             $sql = 'SELECT * FROM ' . TABLE_MES_GROUP_USER_REL . ' WHERE group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@group_id', $group_id  );
@@ -210,7 +210,8 @@
             return false;
         }
 
-        public static function get_users_dialogs( $user_id ) {
+        public static function get_users_dialogs( $user_id )
+        {
             $sql = 'SELECT * FROM ' . TABLE_MES_DIALOGS . ' WHERE user_id=@user_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@user_id', $user_id);
@@ -224,6 +225,7 @@
             }
             return $ids;
         }
+
         //возвращает группы, в которых состоит диалог
         public static function get_dialog_group( $dialog_id )
         {
@@ -250,6 +252,17 @@
             }
 
             return $ids;
+        }
+
+        public static function get_group_dialogs( $group_id )
+        {
+            $sql = 'SELECT * FROM ' . TABLE_MES_GROUPS . ' WHERE group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@group_id', $group_id );
+            $ds = $cmd->Execute();
+            while ( $ds->Next() ) {
+                $ds
+            }
         }
     }
 ?>

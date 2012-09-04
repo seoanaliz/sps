@@ -43,6 +43,10 @@ class getDialogsList
         $user_ids = array();
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
 
+        if ( $group_id ) {
+            MesGroups::get_group_users( $group_id );
+        }
+
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
             $dialog->groups = $ids[$dialog->uid];

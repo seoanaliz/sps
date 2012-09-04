@@ -99,6 +99,7 @@
                    ORDER BY time DESC';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+
             $cmd->SetInteger( '@time',     $last_up_time );
             $cmd->SetInteger( '@publ_id',  $publ_id );
             $ds = $cmd->Execute();
