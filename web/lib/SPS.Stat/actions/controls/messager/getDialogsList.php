@@ -33,11 +33,11 @@ class getDialogsList
         }
 
         $dialogs_array = array();
-        $row_dialog_array =  MesDialogs::get_dialogs( $user_id );
+        $row_dialog_array = MesDialogs::get_dialogs( $user_id, $offset, $limit );
         if ( !$row_dialog_array )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' ) ) );
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' )));
         elseif( $row_dialog_array == 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
 
         $i = -1;
         $user_ids = array();
@@ -48,14 +48,14 @@ class getDialogsList
             $dialog->groups = $ids[$dialog->uid];
             if( !$dialog->id )
                 $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
-            if (   ( $dialog->read_state == 1 && $only_unread )
-                || ( $dialog->date > $date_end || $dialog->date < $date_start )
-                || ( $dialog->out &&    $in_mess && !$out_mess )
-                || ( !$dialog->out &&  !$in_mess && $out_mess  )
-                || ( !$dialog->out &&  !$in_mess && $out_mess  )
-                || ( $group_id  && !in_array( $group_id, $dialog->groups ) )
-                || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
-                || ( isset( $dialog->chat_id ))
+            if (  ( isset( $dialog->chat_id ))
+                  || ( $dialog->read_state == 1 && $only_unread )
+//                || ( $dialog->date > $date_end || $dialog->date < $date_start )
+//                || ( $dialog->out &&    $in_mess && !$out_mess )
+//                || ( !$dialog->out &&  !$in_mess && $out_mess  )
+//                || ( !$dialog->out &&  !$in_mess && $out_mess  )
+//                || ( $group_id  && !in_array( $group_id, $dialog->groups ) )
+//                || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
             );
             else {
                 $i ++;
@@ -64,9 +64,9 @@ class getDialogsList
 
                 $dialogs_array[] = $dialog;
                 $user_ids[] = $dialog->uid;
-
-                if ( $i == $offset + $limit - 1 )
-                    break;
+//
+//                if ( $i == $offset + $limit - 1 )
+//                    break;
 
             }
         }
