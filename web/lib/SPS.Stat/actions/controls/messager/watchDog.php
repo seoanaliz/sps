@@ -52,7 +52,7 @@ class watchDog
                     );
             }
         }
-
+        $result = array_reverse($result);
         echo  ObjectHelper::ToJSON( array( 'response' => $result ));
         die();
 //        print_r($result);
