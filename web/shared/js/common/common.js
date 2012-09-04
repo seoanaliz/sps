@@ -13,6 +13,20 @@ var KEY = window.KEY = {
     SPACE: 32
 };
 
+if (!window.localStorage) {
+    window.localStorage = {
+        getItem: function(key) {},
+        setItem: function(key, value) {}
+    };
+}
+
+if (!window.console) {
+    window.console = {
+        log: function(params) {},
+        dir: function(params) {}
+    };
+}
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
@@ -23,24 +37,75 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+(function($) {
+    // Выделение текста в инпутах
+    $.fn.selectRange = function(start, end) {
+        return this.each(function() {
+            if (this.setSelectionRange) {
+                this.focus();
+                this.setSelectionRange(start, end);
+            } else if (this.createTextRange) {
+                var range = this.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', end);
+                range.moveStart('character', start);
+                range.select();
+            }
+        });
+    };
+
+    // Добавляет триггер destroyed
+    var oldClean = jQuery.cleanData;
+    $.cleanData = function(elems) {
+        for (var i = 0, elem; (elem = elems[i]) !== undefined; i++) {
+            $(elem).triggerHandler('destroyed');
+        }
+        oldClean(elems);
+    };
+})(jQuery);
+
 // Кроссбраузерные плейсхолдеры
 (function($) {
-    $.fn.placeholder = function(para) {
-        return this.each(function(parameters) {
+    $.fn.placeholder = function(parameters) {
+        return this.each(function() {
             var defaults = {
                 el: this,
-                color: '#CCC',
                 text: false,
+                hide: true,
                 helperClass: 'placeholder'
             };
             var t = this;
-            var p = $.extend(defaults, parameters);
-            var $input = $(p.el);
-            var placeholderText = p.text || $input.attr('placeholder');
+            var settings = $.extend(defaults, parameters);
+            var $input = $(settings.el);
+            var placeholderText = settings.text || $input.attr('placeholder');
             var $wrapper = $('<div/>');
-            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
-                padding: $input.css('padding')
+            var $placeholder = $('<div/>').addClass(settings.helperClass).text(placeholderText).css({
+                position: 'absolute',
+                cursor: 'text',
+                font: $input.css('font'),
+                margin: $input.css('border-width'),
+                lineHeight: $input.css('line-height'),
+                paddingTop: $input.css('padding-top'),
+                paddingLeft: $input.css('padding-left'),
+                paddingRight: $input.css('padding-right'),
+                paddingBottom: $input.css('padding-bottom')
             });
+
+            var placeholderHide = function() {
+                if (settings.hide) {
+                    $placeholder.hide();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 0.5}, 200);
+                }
+            };
+
+            var placeholderShow = function() {
+                if (settings.hide) {
+                    $placeholder.show();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 1}, 200);
+                }
+            };
 
             $input
                 .wrap($wrapper)
@@ -48,19 +113,32 @@ function getURLParameter(name, search) {
                 .removeAttr('placeholder')
                 .parent().prepend($placeholder)
             ;
-
-            $placeholder.bind('mouseup', function() {
-                $placeholder.hide();
+            $placeholder.on('mouseup', function() {
+                placeholderHide();
                 $input.focus();
             });
-            $input.bind('blur change', function() {
+            $input.on('blur change', function() {
                 if (!$input.val()) {
-                    $placeholder.show();
+                    placeholderShow();
                 }
             });
-            $input.bind('focus change', function() {
-                $placeholder.hide();
+            $input.on('focus change', function() {
+                placeholderHide();
             });
+            $input.on('destroyed', function() {
+                $placeholder.remove();
+            });
+            if (!settings.hide) {
+                $input.on('keyup keydown', function() {
+                    setTimeout(function() {
+                        if ($input.val()) {
+                            $placeholder.hide();
+                        } else {
+                            $placeholder.show();
+                        }
+                    }, 0);
+                });
+            }
         });
     };
 })(jQuery);
@@ -73,27 +151,27 @@ function getURLParameter(name, search) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $input.css({overflow: 'hidden'});
                 $autoResize
                     .css({
+                        position: 'absolute',
                         width: $input.width(),
                         minHeight: $input.height(),
-                        padding: $input.css('padding'),
-                        lineHeight: $input.css('line-height'),
                         font: $input.css('font'),
+                        padding: $input.css('padding'),
                         fontSize: $input.css('font-size'),
-                        position: 'absolute',
                         wordWrap: 'break-word',
+                        overflow: $input.css('overflow'),
+                        lineHeight: $input.css('line-height'),
                         top: -100000
                     })
                 ;
 
-                $input.bind('keyup keydown focus blur', function(e) {
+                $input.on('keyup keydown focus blur', function(e) {
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
                     if (e.type == 'keydown' && e.keyCode == KEY.ENTER && !e.ctrlKey) {
-                        val += '<br/>.'
+                        val += '<br/>.';
                     }
                     $autoResize.html(val);
                     $input.css({
@@ -102,6 +180,9 @@ function getURLParameter(name, search) {
                             maxHeight ? Math.min(maxHeight, $autoResize.height()) : $autoResize.height()
                          )
                     });
+                });
+                $input.on('destroyed', function() {
+                    $autoResize.remove();
                 });
 
                 $input.keyup();
@@ -131,13 +212,21 @@ function getURLParameter(name, search) {
                 var firstImageSize;
                 var firstImageWidth;
                 var firstImageHeight;
+                var options = {};
+
+                if (typeof hardPosition == 'object') {
+                    options = $.extend({
+                        width: $wrap.width(),
+                        height: $wrap.height()
+                    }, hardPosition);
+                }
 
                 var columns = [];
                 var wrap = {
                     width: 0,
                     height: 0,
-                    maxWidth: $wrap.width(),
-                    maxHeight: $wrap.height()
+                    maxWidth: options.width,
+                    maxHeight: options.height
                 };
 
                 if ($wrap.data(DATA_KEY) || !imagesNum) return;
@@ -327,7 +416,6 @@ function getURLParameter(name, search) {
     }
 
     function isHor(sizes) {
-        console.log(sizes);
         return !!(sizes[0] / sizes[1] > 1.1);
     }
 
@@ -437,7 +525,7 @@ var Box = (function() {
             try {
                 params.onshow.call(box, $box);
             } catch(e) {
-                console.log(e);
+                //console.log(e);
             }
 
             boxesHistory.push(box);
@@ -449,7 +537,7 @@ var Box = (function() {
             try {
                 params.onhide.call(box, $box);
             } catch(e) {
-                console.log(e);
+                //console.log(e);
             }
 
             boxesHistory.pop();
@@ -506,6 +594,10 @@ var Box = (function() {
 (function($) {
     var PLUGIN_NAME = 'dropdown';
     var DATA_KEY = PLUGIN_NAME;
+    var EVENTS_NAMESPACE = PLUGIN_NAME;
+    var TYPE_NORMAL = 'normal';
+    var TYPE_RADIO = 'radio';
+    var TYPE_CHECKBOX = 'checkbox';
     var CLASS_ACTIVE = 'active';
     var CLASS_MENU = 'ui-dropdown-menu';
     var CLASS_EMPTY_MENU = 'ui-dropdown-menu-empty';
@@ -528,7 +620,7 @@ var Box = (function() {
             return this.each(function() {
                 var defaults = {
                     target: $(this), // На какой элемент навесить меню
-                    type: 'normal', // normal, checkbox
+                    type: 'normal', // normal, checkbox, radio
                     width: '', // Ширина меню
                     isShow: false, // Показать при создании
                     addClass: '', // Добавить уникальный класс к меню
@@ -539,10 +631,12 @@ var Box = (function() {
                     itemDataKey: 'item', // Ключ привязки данных к пункту меню
                     emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
-                    // На все события можно подписаться по имени события. Пример: $dropdown.bind('change', callback)
+                    // На все события можно подписаться по имени события. Пример: $dropdown.on('change', callback)
                     oncreate: function() {},
                     onupdate: function() {},
                     onchange: function() {},
+                    onselect: function() {},
+                    onunselect: function() {},
                     onopen: function() {},
                     onclose: function() {}
                 };
@@ -556,18 +650,21 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).resize(function() {
+                    $(window).on('resize.' + EVENTS_NAMESPACE, function(e) {
+                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             $el.dropdown('refreshPosition');
                         }
                     });
-                    $(document).bind(options.closeEvent, function(e) {
+                    $(document).on(options.closeEvent + '.' + EVENTS_NAMESPACE, function(e) {
+                        if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         $el.dropdown('close');
                         run(options.onclose, $el, $menu);
                     });
-                    $(document).bind('keydown', function(e) {
+                    $(document).on('keydown.' + EVENTS_NAMESPACE, function(e) {
+                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
                             var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
@@ -610,7 +707,6 @@ var Box = (function() {
                                     if ($hoveringItem.length) {
                                         select($hoveringItem);
                                     }
-                                    $el.dropdown('close');
                                     return false;
                                 break;
                                 case KEY.ESC:
@@ -620,7 +716,7 @@ var Box = (function() {
                             }
                         }
                     });
-                    $el.bind(options.openEvent, function(e) {
+                    $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
                         var $menu = $el.dropdown('getMenu');
@@ -631,66 +727,36 @@ var Box = (function() {
                             $el.dropdown('close');
                         }
                     });
+                    $el.on('destroyed', function() {
+                        $el.dropdown('getMenu').remove();
+                    });
                 }
 
                 if (!$.isArray(options.data)) options.data = [];
-                if (options.data.length || !options.emptyMenuText) {
-                    $(options.data).each(function(i, item) {
-                        var $item = $('<div/>')
-                            .text(item.title)
-                            .addClass(CLASS_ITEM)
-                            .attr('data-id', item.id)
-                            .data(options.itemDataKey, item)
-                            .appendTo($menu)
-                        ;
-                        if (item.icon) {
-                            var $icon = $('<div><img src="' + item.icon + '" /></div>');
-                            $item.append($icon);
-                            if (options.iconPosition == 'left') {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_LEFT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
-                            } else {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
-                            }
-                        }
-                        if (item.isActive) {
-                            $item.addClass(CLASS_ITEM_ACTIVE);
-                        }
-                        $item.hover(function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).addClass(CLASS_ITEM_HOVER);
-                        }, function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).removeClass(CLASS_ITEM_HOVER);
-                        });
-                    });
-                } else {
-                    $('<div/>')
-                        .text(options.emptyMenuText)
-                        .addClass(CLASS_EMPTY_MENU)
-                        .appendTo($menu)
-                    ;
-                }
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    $el.dropdown('close');
                     select($(this));
                 });
-                $menu.bind(options.openEvent, function(e) {
+                $menu.on(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
+                $menu.hide();
 
                 function select($item) {
                     var data = $item.data(options.itemDataKey);
-                    if (options.type == 'checkbox') {
-                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
-                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    switch(options.type) {
+                        case TYPE_RADIO:
+                            $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                            $item.addClass(CLASS_ITEM_ACTIVE);
+                        break;
+                        case TYPE_CHECKBOX:
+                            $item.toggleClass(CLASS_ITEM_ACTIVE);
+                        break;
                     }
+                    $el.dropdown('close');
                     run(options.onchange, $el, data);
+                    run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, data);
                     $el.trigger(TRIGGER_CHANGE);
                 }
 
@@ -701,12 +767,21 @@ var Box = (function() {
                     options: options
                 });
 
-                if (options.isShow && $el.is(':visible')) {
-                    $el.dropdown('open', true);
+                if (options.data.length || !options.emptyMenuText) {
+                    $.each(options.data, function(i, item) {
+                        $el.dropdown('appendItem', item);
+                    });
                 } else {
-                    $el.dropdown('close', true);
+                    $('<div/>')
+                        .text(options.emptyMenuText)
+                        .addClass(CLASS_EMPTY_MENU)
+                        .appendTo($menu)
+                    ;
                 }
 
+                if (options.isShow && $el.is(':visible')) {
+                    $el.dropdown('open');
+                }
                 if (isUpdate) {
                     run(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
@@ -716,11 +791,41 @@ var Box = (function() {
                 }
             });
         },
-        getMenu: function() {
-            return this.data(DATA_KEY).$menu;
+        open: function(notTrigger) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $target = data.$target;
+
+                $menu.css({
+                    width: options.width || $target.outerWidth() - 2
+                });
+
+                $el.dropdown('refreshPosition');
+                $menu.show();
+
+                if (!notTrigger) {
+                    run(options.onopen, $el, $menu);
+                    $el.trigger(TRIGGER_OPEN);
+                }
+            });
         },
-        getTarget: function() {
-            return this.data(DATA_KEY).$target;
+        close: function(notTrigger) {
+            var $el = $(this);
+            var data = $el.data(DATA_KEY);
+            var options = data.options;
+            var $menu = data.$menu;
+            var $target = data.$target;
+
+            $target.removeClass(CLASS_ACTIVE);
+            $menu.hide();
+
+            if (!notTrigger) {
+                run(options.onclose, $el, $menu);
+                $el.trigger(TRIGGER_CLOSE);
+            }
         },
         refreshPosition: function() {
             return this.each(function() {
@@ -749,41 +854,52 @@ var Box = (function() {
                 });
             });
         },
-        open: function(notTrigger) {
+        getMenu: function() {
+            return this.data(DATA_KEY).$menu;
+        },
+        getTarget: function() {
+            return this.data(DATA_KEY).$target;
+        },
+        getItem: function(id) {
+            return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
+        },
+        appendItem: function(item) {
             return this.each(function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 var $menu = data.$menu;
-                var $target = data.$target;
-
-                $menu.css({
-                    width: options.width || $target.outerWidth() - 2
-                });
-
-                $el.dropdown('refreshPosition');
-                $menu.show();
-
-                if (notTrigger) {
-                    run(options.onopen, $el, $menu);
-                    $el.trigger(TRIGGER_OPEN);
+                var $item = $('<div/>')
+                    .text(item.title)
+                    .attr('data-id', item.id)
+                    .addClass(CLASS_ITEM)
+                    .data(options.itemDataKey, item)
+                    .appendTo($menu)
+                ;
+                if (item.icon) {
+                    var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                    $item.append($icon);
+                    if (options.iconPosition == 'left') {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_LEFT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
+                    } else {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
+                    }
                 }
+                if (item.isActive) {
+                    $item.addClass(CLASS_ITEM_ACTIVE);
+                }
+                $item.hover(function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).addClass(CLASS_ITEM_HOVER);
+                }, function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).removeClass(CLASS_ITEM_HOVER);
+                });
             });
-        },
-        close: function(notTrigger) {
-            var $el = $(this);
-            var data = $el.data(DATA_KEY);
-            var options = data.options;
-            var $menu = data.$menu;
-            var $target = data.$target;
-
-            $target.removeClass(CLASS_ACTIVE);
-            $menu.hide();
-
-            if (notTrigger) {
-                run(options.onclose, $el, $menu);
-                $el.trigger(TRIGGER_CLOSE);
-            }
         }
     };
 
@@ -823,7 +939,7 @@ var Box = (function() {
                 $el.dropdown(options);
 
                 if (!$el.data(DATA_KEY)) {
-                    $el.bind('keyup', function(e) {
+                    $el.on('keyup', function(e) {
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -1005,7 +1121,7 @@ var Box = (function() {
     };
 })(jQuery);
 
-/* Счетчики */
+// Счетчики
 (function($) {
     var PLUGIN_NAME = 'counter';
     var DATA_KEY = PLUGIN_NAME;
@@ -1077,5 +1193,40 @@ var Box = (function() {
         } else {
             $.error('Method ' + method + ' does not exist on jQuery.' + PLUGIN_NAME);
         }
+    };
+})(jQuery);
+
+// Запоминает введенный текст и вставляет при обновлении страницы
+(function($) {
+    var PLUGIN_NAME = 'inputMemory';
+
+    var methods = {
+        init: function(memoryKey) {
+            return this.each(function() {
+                if (!window.localStorage) return;
+
+                var $input = $(this);
+                var inputValue = $input.val();
+                var storageValue = localStorage.getItem(memoryKey);
+
+                if (storageValue) {
+                    $input.val(storageValue);
+                    $input.selectRange(storageValue.length, storageValue.length);
+                } else {
+                    localStorage.setItem(memoryKey, inputValue);
+                }
+
+                $input.on('keydown keyup keypress change blur', function() {
+                    if (inputValue != $input.val()) {
+                        inputValue = $input.val();
+                        localStorage.setItem(memoryKey, inputValue);
+                    }
+                });
+            });
+        }
+    };
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        return methods.init.apply(this, arguments);
     };
 })(jQuery);

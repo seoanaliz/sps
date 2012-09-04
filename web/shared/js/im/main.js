@@ -1,16 +1,76 @@
 var Configs = {
-    vkId: 4718705,
+    vkId: $.cookie('uid'),
+    token: $.cookie('token'),
     appId: vk_appId,
-    controlsRoot: controlsRoot
-};
-
-var cur = {
-    dataUser: {}
+    controlsRoot: controlsRoot,
+    viewer: {}
 };
 
 $(document).ready(function() {
-    new IM({
-        el: '#main'
+    if (!$('#main').length) {
+        return;
+    }
+
+    (function() {
+        return;
+        var code = 'return {' +
+            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
+            'longPoll: API.messages.getLongPollServer()' +
+        '};';
+
+        $.ajax({
+            url: 'https://api.vk.com/method/execute',
+            dataType: 'jsonp',
+            data: {
+                access_token: Configs.token,
+                code: code
+            },
+            success: function(data) {
+                console.log(data);
+                initVK(data.response);
+            }
+        });
+
+        function initVK(data) {
+            (function poll(ts) {
+                console.log('poll...');
+                var longPoll = data.longPoll;
+                var ts = ts || longPoll.ts;
+                var url = longPoll.server;
+                $.ajax({
+                    url: 'http://' + url,
+                    dataType: 'json',
+                    data: {
+                        ts: ts,
+                        key: longPoll.key,
+                        act: 'a_check',
+                        wait: 25,
+                        mode: 2
+                    },
+                    success: function(data) {}
+                });
+            })();
+        }
+    })();
+
+    if (!Configs.vkId) {
+        return location.replace('/login/');
+    }
+    if (!Configs.token) {
+        return location.replace('/im/login/');
+    }
+
+    Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
+        Configs.viewer = viewer;
+        var im = new IM({
+            el: '#main'
+        });
+        $(window).on('scroll', function() {
+            im.trigger('scroll');
+        });
+        $(window).on('resize', function() {
+            im.trigger('resize');
+        });
     });
 });
 
@@ -21,29 +81,97 @@ var IM = Widget.extend({
     rightColumn: null,
 
     run: function() {
+        this._super();
+
+        var t = this;
+        t.initLeftColumn();
+        t.initRightColumn();
+        t.bindEvents();
+    },
+
+    bindEvents: function() {
         var t = this;
 
-        t._super();
-        t.leftColumn = t.initLeftColumn();
-        t.rightColumn = t.initRightColumn();
+        (function poll() {
+            //return;
+            console.log('poll...');
+            setTimeout(function() {
+                $.ajax({
+                    url: Configs.controlsRoot + 'watchDog/',
+                    dataType: 'json',
+                    data: {
+                        userId: Configs.vkId
+                    },
+                    success: function(data) {
+                        $.each(data.response, function(i, event) {
+                            t.newEvent(event);
+                        });
+                    }
+                });
+                poll();
+            }, 5000);
+        })();
+        (function poll() {
+            return false;
+            console.log('poll...');
+            $.ajax({
+                url: Configs.controlsRoot + 'watchDog/',
+                data: {
+                    userId: Configs.vkId
+                },
+                dataType: 'json',
+                complete: poll,
+                timeout: 30000,
+                success: function(data) {
+                    var res = data.response[0];
+                    if (!res || !res.type) return;
+                    switch (res.type) {
+                        case 'inMessage':
+                            console.log(['new message: ', res.content, res.content.body]);
+                        break;
+                        case 'online':
+                            console.log(['online: ', res.content]);
+                        break;
+                        case 'offline':
+                            console.log(['online: ', res.content]);
+                        break;
+                    }
+                }
+            });
+        })();
 
-        t.rightColumn.on('selectDialogs', function(id) {
-            t.leftColumn.showDialogs(id);
+        t.on('scroll', function() {
+            t.leftColumn.trigger('scroll');
         });
-        t.rightColumn.on('selectMessages', function(id) {
-            t.leftColumn.showMessages(id);
+        t.rightColumn.on('selectDialogs', function(id, title) {
+            t.leftColumn.initDialogs(id, title);
+        });
+        t.rightColumn.on('selectMessages', function(id, title) {
+            t.leftColumn.initMessages(id, title);
         });
     },
 
     initLeftColumn: function() {
-        return new LeftColumn({
-            el: '.left-column'
+        var t = this;
+        t.leftColumn = new LeftColumn({
+            el: $(t.el).find('> .left-column')
         });
     },
     initRightColumn: function() {
-        return new RightColumn({
-            el: '.right-column'
+        var t = this;
+        t.rightColumn = new RightColumn({
+            el: $(t.el).find('> .right-column')
         });
+    },
+
+    newEvent: function(event) {
+        var t = this;
+
+        switch (event.type) {
+            case 'inMessage':
+                t.leftColumn.trigger('addMessage', event.content);
+            break;
+        }
     }
 });
 
@@ -52,70 +180,110 @@ var LeftColumn = Widget.extend({
     dialogs: null,
     messages: null,
     tabs: null,
+    tabPrefixDialogs: 'dialogs',
+    tabPrefixMessages: 'messages',
+    curListId: null,
+    curDialogId: null,
+    keyListId: 'keyListId',
+    keyDialogId: 'keyDialogId',
 
     run: function() {
-        var t = this;
+        this._super();
 
-        t._super();
-        t.dialogs = t.initDialogs();
-        t.messages = t.initMessages();
-        t.tabs = t.initTabs();
-        t.showDialogs();
+        var t = this;
+        t.initTabs();
+        t.initDialogs(999999, 'Не в списке');
+        t.bindEvents();
+    },
+
+    bindEvents: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $header = $el.find('.header');
+
+        $el.css('padding-top', $header.outerHeight());
+        t.on('scroll', function() {
+            $el.css('padding-top', $header.outerHeight());
+            if ($(window).scrollTop() > 10) {
+                $header.addClass('fixed');
+            } else {
+                $header.removeClass('fixed');
+            }
+        });
+        t.on('scroll', function() {
+            if (t.messages) t.messages.trigger('scroll');
+            else if (t.dialogs) t.dialogs.trigger('scroll');
+        });
+        t.on('addMessage', function(message) {
+            console.log('addMessage: ');
+            console.log(message);
+            if (t.messages) {
+                t.messages.trigger('addMessage', message);
+            } else if (t.dialogs) {
+                t.dialogs.trigger('addMessage', message);
+            }
+        });
     },
 
     initTabs: function() {
         var t = this;
-        var tabs = new Tabs({
-            el: $(this.el).find('.header'),
-            data: {tabs: []}
+
+        t.tabs = new Tabs({
+            el: $(t.el).find('.header'),
+            templateData: {tabs: []}
         });
-        tabs.on('select', function(id) {
-            if (id == 'messages') {
-                t.showMessages(id);
+        t.tabs.on('select', function(id, title) {
+            if (id.indexOf('messages') == 0) {
+                t.initMessages(id.substring(t.tabPrefixMessages.length), title);
             } else {
-                t.showDialogs(id);
+                t.initDialogs(id.substring(t.tabPrefixDialogs.length), title);
+            }
+        });
+    },
+    initDialogs: function(listId, title) {
+        var t = this;
+        var tabPrefix = t.tabPrefixDialogs;
+
+        t.messages = false;
+        t.dialogs = new Dialogs({
+            el: $(t.el).find('.list'),
+            runData: {
+                listId: listId
+            }
+        });
+        t.dialogs.on('select', function(id, title) {
+            t.initMessages(id, title);
+        });
+
+        if (t.curListId && t.curListId != listId) {
+            t.tabs.removeTab(tabPrefix + t.curListId);
+        }
+        if (!t.tabs.getTab(tabPrefix + listId).length) {
+            t.tabs.prependTab(tabPrefix + listId, title);
+        }
+        t.tabs.selectTab(tabPrefix + listId);
+        t.curListId = listId;
+    },
+    initMessages: function(dialogId, title) {
+        var t = this;
+        var tabPrefix = t.tabPrefixMessages;
+
+        t.dialogs = false;
+        t.messages = new Messages({
+            el: $(t.el).find('.list'),
+            runData: {
+                dialogId: dialogId
             }
         });
 
-        return tabs;
-    },
-    initDialogs: function() {
-        var t = this;
-        var dialogs = new Dialogs({
-            el: $(this.el).find('.list'),
-            data: {list: Data.dialogs},
-            run: function() {}
-        });
-        dialogs.on('select', function(id) {
-            t.showMessages(id);
-        });
-
-        return dialogs;
-    },
-    initMessages: function() {
-        var t = this;
-        var messages = new Messages({
-            el: $(this.el).find('.list'),
-            data: {list: Data.dialogs},
-            run: function() {}
-        });
-
-        return messages;
-    },
-
-    showDialogs: function(listId) {
-        var t = this;
-
-        t.dialogs.renderTemplate();
-        t.tabs.addTab('dialogs', 'Диалоги');
-        t.tabs.selectTab('dialogs');
-    },
-    showMessages: function(dialogId) {
-        var t = this;
-
-        t.messages.renderTemplate();
-        t.tabs.addTab('messages', 'Сообщения');
-        t.tabs.selectTab('messages');
+        if (t.curDialogId && t.curDialogId != dialogId) {
+            t.tabs.removeTab(tabPrefix + t.curDialogId);
+        }
+        if (!t.tabs.getTab(tabPrefix + dialogId).length) {
+            t.tabs.appendTab(tabPrefix + dialogId, title);
+        }
+        t.tabs.selectTab(tabPrefix + dialogId);
+        t.curDialogId = dialogId;
     }
 });
 
@@ -124,113 +292,507 @@ var RightColumn = Widget.extend({
     list: null,
 
     run: function() {
-        var t = this;
+        this._super();
 
-        t._super();
-        t.list = t.initList();
+        var t = this;
+        t.initList();
     },
 
     initList: function() {
         var t = this;
-        var list = new List({
-            el: $(this.el).find('.list'),
-            data: {list: Data.lists}
+        t.list = new List({
+            el: $(t.el).find('.list')
         });
-        list.on('selectDialogs', function(id) {
-            t.trigger('selectDialogs');
+        t.list.on('selectDialogs', function(id, title) {
+            t.trigger('selectDialogs', id, title);
         });
-        list.on('selectMessages', function(id) {
-            t.trigger('selectMessages');
+        t.list.on('selectMessages', function(id, title) {
+            t.trigger('selectMessages', id, title);
         });
-
-        return list;
     }
 });
 
 var Dialogs = Widget.extend({
     template: DIALOGS,
+    listId: null,
+    itemsLimit: 20,
+    currentPage: 1,
+    tmplDialog: DIALOGS_ITEM,
+
+    isBlock: false,
 
     events: {
-        'click: .dialog': 'clickDialog'
+        'click: .dialog': 'clickDialog',
+        'click: .action.icon': 'clickPlus'
+    },
+
+    run: function(params) {
+        var t = this;
+        var $el = $(t.el);
+        var listId = t.listId = params.listId;
+
+        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+            t.templateData = {id: listId, list: data};
+            t.listId = listId;
+            t.renderTemplate();
+            t.bindEvents();
+            t.scrollTop();
+            $(t.el).find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+        });
+    },
+
+    bindEvents: function() {
+        var t = this;
+        var $el = $(t.el);
+
+        t.on('scroll', function() {
+            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
+                t.showMore();
+            }
+        });
+        t.on('addMessage', function() {
+            var t = this;
+            var listId = t.listId;
+
+            Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+                t.templateData = {id: listId, list: data};
+                t.listId = listId;
+                t.renderTemplate();
+                t.bindEvents();
+                t.scrollTop();
+                $(t.el).find('.date').easydate({
+                    live: true,
+                    set_title: false,
+                    date_parse: function(date) {
+                        date = intval(date) * 1000;
+                        if (!date) return;
+                        return new Date(date);
+                    },
+                    uneasy_format: function(date) {
+                        return date.toLocaleDateString();
+                    }
+                });
+            });
+        });
+    },
+
+    clickPlus: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var $dialog = $target.closest('.dialog');
+        var dialogId = $dialog.data('id');
+        if (!$target.data('dropdown')) {
+            (function updateDropdown() {
+                function onCreate() {
+                    $.each(t.templateData.list, function(i, dialog) {
+                        if (dialog.id == dialogId) {
+                            $.each(dialog.lists, function(i, listId) {
+                                $target.dropdown('getItem', listId).addClass('active');
+                            });
+                            return false;
+                        }
+                    });
+                }
+
+                Events.fire('get_lists', function(lists) {
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        oncreate: onCreate,
+                        onupdate: onCreate,
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            Events.fire('add_list', $input.val(), function() {
+                                                updateDropdown();
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                Events.fire('add_to_list', dialogId, item.id, function() {});
+                            }
+                        },
+                        onunselect: function(item) {
+                            Events.fire('remove_from_list', dialogId, item.id, function() {});
+                        },
+                        data: $.merge(lists, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ])
+                    });
+                });
+            })();
+        }
+        return false;
     },
 
     clickDialog: function(e) {
+        if ($(e.target).is('a')) return;
+
         var t = this;
-        t.selectDialog($(e.currentTarget).data('id'), true);
+        var $target = $(e.currentTarget);
+        var listId = $target.data('id');
+        var title = $target.data('title');
+        t.selectDialog(listId, title, true);
     },
 
-    selectDialog: function(id, isTrigger) {
+    selectDialog: function(id, title, isTrigger) {
         var t = this;
-        if (isTrigger) t.trigger('select', id);
+        if (isTrigger) t.trigger('select', id, title);
     },
 
-    renderTemplate: function() {
-        var t = this;
+    scrollTop: function() {
+        $(window).scrollTop(0);
+    },
 
-        t._super();
-        $(t.el).find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                date = intval(date) * 1000;
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
+    showMore: function() {
+        var t = this;
+        if (t.isBlock) return;
+        var $el = $(t.el);
+        var $dialogs = $el.find('.dialogs');
+
+        t.isBlock = true;
+        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+            var blockId = 'dialogsBlock' + t.currentPage;
+            var html = '<div id="' + blockId + '">';
+            $.each(data, function(i, data) {
+                html += (tmpl(t.tmplDialog, data));
+            });
+            html += '</div>';
+            $dialogs.append(html);
+            $('#' + blockId).find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            t.isBlock = false;
         });
+        t.currentPage++;
     }
 });
 
 var Messages = Widget.extend({
     template: MESSAGES,
+    dialogId: null,
+    itemsLimit: 20,
+    currentPage: 1,
+    tmplMessage: MESSAGES_ITEM,
+
+    user: {},
+    isBlock: false,
 
     events: {
-        'click: .message': 'clickMessage'
+        'hover: .message.new': 'hoverMessage'
     },
 
-    clickMessage: function(e) {
+    run: function(params) {
         var t = this;
-        t.selectMessage($(e.currentTarget).data('id'), true);
+        var dialogId = t.dialogId = params.dialogId;
+
+        Events.fire('get_messages', dialogId, 0, t.itemsLimit, function(data) {
+            var users = data.users;
+            var messages = data.messages;
+            var user = {};
+            $.each(users, function(i, obj) {
+                if (obj.id != Configs.vkId) {
+                    user = obj;
+                    return false;
+                }
+            });
+            t.templateData = {
+                id: dialogId,
+                list: messages,
+                viewer: Configs.viewer,
+                user: user
+            };
+            t.user = user;
+            t.renderTemplate();
+            var $el = $(t.el);
+            var $textarea = $el.find('textarea');
+
+            $el.find('.attachments').imageComposition({width: 500, height: 300});
+            $el.find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            $textarea.placeholder();
+            $textarea.autoResize();
+            $textarea.inputMemory('message' + dialogId);
+            $textarea.focus();
+            $textarea[0].scrollTop = $textarea[0].scrollHeight;
+            t.bindEvents();
+            t.scrollBottom();
+        });
     },
 
-    selectMessage: function(id, isTrigger) {
+    bindEvents: function() {
         var t = this;
-        if (isTrigger) t.trigger('select', id);
-    },
+        var $el = $(t.el);
 
-    renderTemplate: function() {
-        var t = this;
+        t.on('scroll', function() {
+            t.updateInputBox();
 
-        t._super();
-        $(t.el).find('.date').easydate({
-            live: true,
-            date_parse: function(date) {
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
+            if ($(window).scrollTop() < 600) {
+                t.showMore();
             }
         });
+        t.on('addMessage', function(message) {
+            var t = this;
+
+            if (message.dialog_id != t.dialogId) return;
+            var data = {
+                id: message.mid,
+                text: message.body,
+                user: t.user,
+                isNew: true,
+                timestamp: message.date
+            };
+            var $newMessage = $(tmpl(t.tmplMessage, data));
+            $el.find('.messages').append($newMessage);
+            $newMessage.find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            t.scrollBottom();
+        });
+        $el.find('.button.send').click(function() {
+            t.sendMessage();
+        });
+        $el.find('textarea').keydown(function(e) {
+            if (!e.shiftKey && e.keyCode == KEY.ENTER) {
+                t.sendMessage();
+                return false;
+            }
+        });
+    },
+
+    hoverMessage: function(e) {
+        if (e.type != 'mouseenter') return;
+        var $message = $(e.currentTarget);
+        if ($message.hasClass('viewer')) return;
+        Events.fire('message_mark_as_read', $message.data('id'), function() {
+            $message.removeClass('new');
+        });
+    },
+
+    showMore: function() {
+        var t = this;
+        if (t.isBlock) return;
+        var $el = $(t.el);
+        var $messages = $el.find('.messages');
+        //@todo: изменить этот стыд
+
+        t.isBlock = true;
+        Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+            var blockId = 'messagesBlock' + t.currentPage;
+            var html = '<div id="' + blockId + '">';
+            $.each(data.messages, function(i, data) {
+                html += (tmpl(t.tmplMessage, data));
+            });
+            html += '</div>';
+            $messages.prepend(html);
+            var $block = $('#' + blockId);
+            $block.find('.attachments').imageComposition({width: 500, height: 300});
+            $block.find('.date').easydate({
+                live: true,
+                set_title: false,
+                date_parse: function(date) {
+                    date = intval(date) * 1000;
+                    if (!date) return;
+                    return new Date(date);
+                },
+                uneasy_format: function(date) {
+                    return date.toLocaleDateString();
+                }
+            });
+            $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
+            t.isBlock = false;
+        });
+        t.currentPage++;
+    },
+
+    updateInputBox: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $inputBox = $el.find('.post-message');
+
+        if ($(window).scrollTop() + $(window).height() < $(document).height() - 10) {
+            $inputBox.addClass('fixed');
+        } else {
+            $inputBox.removeClass('fixed');
+        }
+    },
+
+    scrollBottom: function() {
+        $(window).scrollTop($(document).height());
+    },
+
+    sendMessage: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $textarea = $el.find('textarea');
+        var text = $.trim($textarea.val());
+        var isScroll = true;
+
+        if (text) {
+            Events.fire('send_message', t.dialogId, text, function(data) {
+                $textarea.val('');
+                var $newMessage = $(tmpl(t.tmplMessage, data));
+                $el.find('.messages').append($newMessage);
+                $newMessage.find('.date').easydate({
+                    live: true,
+                    set_title: false,
+                    date_parse: function(date) {
+                        date = intval(date) * 1000;
+                        if (!date) return;
+                        return new Date(date);
+                    },
+                    uneasy_format: function(date) {
+                        return date.toLocaleDateString();
+                    }
+                });
+                if (isScroll) {
+                    t.scrollBottom();
+                }
+                $textarea.focus();
+            });
+        } else {
+            $textarea.focus();
+        }
     }
 });
 
 var List = Widget.extend({
     template: LIST,
+    dialogsLimit: 100,
 
     events: {
+        'click: .item > .title > .icon': 'clickIcon',
         'click: .item > .title': 'selectDialogs',
         'click: .public': 'selectMessages'
     },
 
+    run: function() {
+        var t = this;
+
+        Events.fire('get_lists', function(data) {
+            t.templateData = {list: data};
+            t.renderTemplate();
+        });
+    },
+
+    clickIcon: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget).closest('.item');
+        var listId = $target.data('id');
+        if ($target.data('dialogs')) {
+            t.showDialogs($target);
+        } else {
+            Events.fire('get_dialogs', listId, 0, t.dialogsLimit, function(data) {
+                $target.data('dialogs', data);
+                t.showDialogs($target);
+            });
+        }
+        return false;
+    },
+
     selectDialogs: function(e) {
         var t = this;
-        t.trigger('selectDialogs', $(e.currentTarget).data('id'));
+        var $target = $(e.currentTarget).closest('.item');
+        var title = $target.data('title');
+        var listId = $target.data('id');
+        t.trigger('selectDialogs', listId, title);
     },
+
     selectMessages: function(e) {
         var t = this;
-        t.trigger('selectMessages', $(e.currentTarget).data('id'));
+        var $target = $(e.currentTarget);
+        var dialogId = $target.data('id');
+        var title = $target.data('title');
+        t.trigger('selectMessages', dialogId, title);
+    },
+
+    showDialogs: function($el) {
+        var dialogs = $el.data('dialogs');
+        if (dialogs.length) {
+            var list = $el.find('> .list');
+            if (list.length) {
+                list.slideUp(100, function() {
+                    $(this).remove();
+                });
+            } else {
+                var html = '<div class="list">';
+                $.each(dialogs, function(i, dialog) {
+                    html += tmpl(LIST_ITEM_DIALOG, dialog);
+                });
+                html += '</div>';
+                var $dialogs = $(html);
+                $el.append($dialogs);
+                var cssHeight = $dialogs.css('height');
+                var height = $dialogs.height();
+                $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
+                    $(this).css({height: cssHeight})
+                });
+            }
+        }
     }
 });
 
@@ -244,14 +806,17 @@ var Tabs = Widget.extend({
 
     clickTab: function(e) {
         var t = this;
-        t.selectTab($(e.currentTarget).data('id'), true);
+        var $target = $(e.currentTarget);
+        var tabId = $target.data('id');
+        t.selectTab(tabId, true);
     },
 
     selectTab: function(id, isTrigger) {
         var t = this;
+        var $tab = t.getTab(id);
 
         $(t.el).find('.tab.selected').removeClass('selected');
-        t.getTab(id).addClass('selected');
+        $tab.addClass('selected');
 
         if (isTrigger) t.trigger('select', id);
     },
@@ -265,11 +830,17 @@ var Tabs = Widget.extend({
 
         return $(t.el).find('.tab.selected');
     },
-    addTab: function(id, title) {
+    appendTab: function(id, title) {
         var t = this;
 
         if (t.getTab(id).length) return;
         $(t.el).find('.tab-bar').append(tmpl(t.tabTemplate, {id: id, title: title}));
+    },
+    prependTab: function(id, title) {
+        var t = this;
+
+        if (t.getTab(id).length) return;
+        $(t.el).find('.tab-bar').prepend(tmpl(t.tabTemplate, {id: id, title: title}));
     },
     removeTab: function(id) {
         var t = this;
@@ -277,60 +848,3 @@ var Tabs = Widget.extend({
         t.getTab(id).remove();
     }
 });
-
-function test(i) {
-    var $0 = window.$0 || document.getElementsByTagName('html')[0];
-    var height = 1500 + i;
-    var ver = new Date().getTime();
-    var src = 'http://placehold.it/5000x' + height + '?' + ver;
-
-    $0.innerHTML = '<img src="' + src + '" />';
-    var img = new Image();
-    img.onload = function() {
-        var newImg = $('img');//document.getElementsByTagName('img')[0];
-        console.log(newImg.width() + 'x' + newImg.height());
-        //alert(newImg.width + 'x' + newImg.height);
-        test(i + 1);
-    };
-    img.src = src;
-}
-function test2() {
-    var $0 = window.$0 || document.getElementsByTagName('body')[0];
-    var ver = new Date().getTime();
-    var html = '';
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ee/eeac12954cbfeccd3973a9a2fc6aa711.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-    '</div>';
-
-    html += '<div class="attachments">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/94/9417376956f22ed5dd5789cd52dcb1d8.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ee/eeac12954cbfeccd3973a9a2fc6aa711.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/ed/ed77f5f4d2e169e6455cd79191d6c220.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/c/c2/c2072e4a7bcb7e4fd91724c8153ad44a.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/3/35/35ceef02404566ebdaccc807a46e9558.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/1/17/175f3f8c61b46e2bc9357ddecd0230f7.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/e/e5/e568f3aaf2747b035439abc3ebcf799a.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/7/75/75b051072085e1f70c64ff18aad6df50.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/7/75/75b051072085e1f70c64ff18aad6df50.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/1/19/19312d9ec14003c869e7e41196959a85.jpg?' + ver + '">' +
-        '<img src="http://media.sps.verumnets.ru/article-photos/original/9/90/9029a4c2d4ed4651ef031d148132ffb4.jpg?' + ver + '">' +
-    '</div>';
-
-    $0.innerHTML = html;
-    $('.attachments').imageComposition();
-}

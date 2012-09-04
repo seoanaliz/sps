@@ -111,6 +111,20 @@
             $cmd->Execute();
         }
 
+        public static function get_group_users( $group_id ) {
+            $sql = 'SELECT * FROM ' . TABLE_MES_GROUP_USER_REL . ' WHERE group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id', $group_id  );
+            $ds = $cmd->Execute();
+
+            $group_users = array();
+            while( $ds->Next() ) {
+                $group_users[] = $ds->GetValue( 'group_id', TYPE_INTEGER );
+            }
+
+            return $group_users;
+        }
+
         public static function extricate_entry( $group_id, $entry_id )
         {
             $sql =  'DELETE FROM '
@@ -119,17 +133,13 @@
                             group_id=@group_id AND dialog_id=@dialog_id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id', $group_id  );
+            $cmd->SetInteger( '@group_id',  $group_id  );
             $cmd->SetInteger( '@dialog_id', $entry_id );
             $cmd->Execute();
         }
 
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
-
-
-            //update
-//            print_r(array( $ava, $groupName, $comments, $groupId = 0 ));
             if ( $groupId ) {
                 $sql = 'UPDATE
                             ' . TABLE_MES_GROUPS .
@@ -161,7 +171,6 @@
                     return false;
                 }
 
-
                 return $groupId;
             }
             return false;
@@ -171,7 +180,7 @@
         {
             $sql = 'SELECT a.group_id
                     FROM
-                    ' . prin . ' as a
+                    '  . TABLE_MES_GROUP_USER_REL . ' as a
                     , ' . TABLE_MES_GROUPS . ' as b
                     WHERE
                         a.group_id = b.group_id
@@ -186,7 +195,6 @@
                 return false;
 
             return true;
-
         }
 
         public static function delete_group( $group_id )
@@ -197,14 +205,51 @@
                                 group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger('@group_id', $group_id);
-            if ($cmd->ExecuteNonQuery())
+            if ( $cmd->ExecuteNonQuery() )
                 return true;
             return false;
         }
 
+        public static function get_users_dialogs( $user_id ) {
+            $sql = 'SELECT * FROM ' . TABLE_MES_DIALOGS . ' WHERE user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id);
+            $ds = $cmd->Execute();
+            $ids = array();
 
+            while( $ds->Next() ) {
+                $a  =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
+                $id =  $ds->GetValue( 'id', TYPE_INTEGER );
+                $ids[ $a ] = $id;
+            }
+            return $ids;
+        }
+        //возвращает группы, в которых состоит диалог
+        public static function get_dialog_group( $dialog_id )
+        {
+            $sql = 'SELECT group_id FROM ' . TABLE_MES_GROUP_DIALOG_REL . ' WHERE dialog_id=@dialog_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@dialog_id', $dialog_id);
+            $ds = $cmd->Execute();
+            $res = array();
+            while ( $ds->Next() ) {
+                $res[] = $ds->GetValue( 'group_id', TYPE_INTEGER );
+            }
 
+            return $res;
+        }
 
+        //возвращает массив, ключи - id юзеров, значения - id групп
+        public static function get_dialog_groups_ids_array( $user_id )
+        {
+            $ids = self::get_users_dialogs( $user_id );
 
+            foreach( $ids as $k => &$v ) {
+                $group_id = self::get_dialog_group( $v );
+                $v = $group_id ? $group_id : '-1';
+            }
+
+            return $ids;
+        }
     }
 ?>

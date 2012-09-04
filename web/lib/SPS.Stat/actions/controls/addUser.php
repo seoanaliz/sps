@@ -18,7 +18,7 @@
         public function Execute() {
             error_reporting( 0 );
 
-            $user_id     =   Request::getInteger( 'userId' );
+            $user_id    =   Request::getInteger( 'userId' );
             $rank       =   Request::getInteger( 'rank' );
             $comments   =   Request::getString ( 'uComments' );
 
@@ -33,16 +33,17 @@
                 echo  ObjectHelper::ToJSON(array('response' => $user));
                 die();
             }
-
-            $user = StatUsers::get_vk_user_info( $user_id );
-            $user = $user[0];
-            $user['rank']     = $rank;
-            $user['comments'] = $comments;
-            $user = StatUsers::add_user( $user );
-            if ($user)
+	     
+            $users = StatUsers::get_vk_user_info( $user_id );
+  	     foreach ( $users as $user ) {
+                $user['rank']     = $rank;
+                $user['comments'] = $comments;
+                $user = StatUsers::add_user( $user );
+            }
+            if ( $user )
                 echo  ObjectHelper::ToJSON(array('response' => $user));
             else
-                echo  ObjectHelper::ToJSON(array('response' => false));
+                echo  ObjectHelper::ToJSON( array( 'response' => false ) );
 
         }
     }

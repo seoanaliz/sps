@@ -11,7 +11,50 @@ class watchDog
 
     public function Execute() {
         error_reporting( 0 );
-        $userId     =   Request::getInteger( 'userId' );
+        $user_id   =   Request::getInteger( 'userId' );
+        if ( !$user_id ) {
+            die(ERR_MISSING_PARAMS);
+        }
 
+        $events = MesDialogs::watch_dog( $user_id );
+        if ( $events == 'no access_token' )
+            die( ObjectHelper::ToJSON( array( 'response' => false )));
+
+        $result = array();
+        foreach( $events as $event ) {
+
+            $status = 'offline';
+            $event =  (array) $event ;
+
+            $stat = isset( $event[0] ) ? $event[0] : 4;
+            switch ( $stat ) {
+                case 4:
+                    $from_id = isset( $event[3] )? $event[3] : $event['uid'];
+                    $result[] = array(
+                        'type'    => 'inMessage',
+                        'content' => array(
+                            'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
+                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
+                            'from_id'   =>  $from_id,
+                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id )
+                        )
+                    );
+                    break;
+                case 8:
+                    $status = 'online';
+                case 9:
+                    $result[] = array(
+                        'type'      =>  $status,
+                        'content'   =>  array(
+                            'userId'    =>  trim( $event[1], '-' )
+                        )
+                    );
+            }
+        }
+
+        echo  ObjectHelper::ToJSON( array( 'response' => $result ));
+        die();
+//        print_r($result);
     }
 }

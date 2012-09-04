@@ -1,9 +1,8 @@
-<?php
+    <?php
 
 
 class addDialog
 {
-
     public function execute()
     {
         error_reporting( 0 );
@@ -17,16 +16,14 @@ class addDialog
         if ( !$user_id || !$rec_id) {
             die(ERR_MISSING_PARAMS);
         }
-        $recip = StatUsers::is_our_user( $rec_id );
-
+        $recip  = StatUsers::is_our_user( $rec_id );
         $dialog = StatUsers::add_user( $rec_id );
 
-        if (! ($dialog['id'] = MesDialogs::addDialog($user_id, $rec_id, $status_id ) ) ) {
+        if (! ($dialog['id'] = MesDialogs::addDialog($user_id, $rec_id, $status_id ))) {
             echo  ObjectHelper::ToJSON(array('response' => false));
             die();
         }
 
-        echo ObjectHelper::ToJSON(array('response' => $dialog));
-
+        echo ObjectHelper::ToJSON( array( 'response' => $dialog ));
     }
 }

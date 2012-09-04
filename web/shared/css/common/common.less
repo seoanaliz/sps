@@ -166,6 +166,7 @@ input {
 /* Dropdowns */
 .ui-dropdown-menu {
     position: absolute;
+    display: none;
     background-color: #fff;
     max-height: 300px;
     border: 1px solid #C4CDE0;
@@ -192,7 +193,7 @@ input {
         }
         &.active {
             color: #fff;
-            background-color: #587DA1;
+            background-color: @bg_active;
         }
 
         &.icon-left {
@@ -306,7 +307,7 @@ input {
 .clear-fix {
     display: block;
     &:after {
-        content: '.';
+        content: '';
         display: block;
         height: 0;
         clear: both;
@@ -318,6 +319,7 @@ input {
 .tab-bar {
     padding: .7em;
     padding-top: 0;
+    min-height: 2.5em;
 
     &>.tab {
         margin-top: .7em;
@@ -378,16 +380,16 @@ input {
     .transition(.2s opacity);
 
     &.plus {
-        background-image: url('../../images/st/add.png');
+        background-image: url('../../images/common/add.png');
     }
     &.select {
-        background-image: url('../../images/st/select.png');
+        background-image: url('../../images/common/select.png');
     }
     &.arrow {
-        background-image: url('../../images/st/arrow.png');
+        background-image: url('../../images/common/arrow.png');
     }
     &.arrow-top {
-        background-image: url('../../images/st/arrow-top.png');
+        background-image: url('../../images/common/arrow-top.png');
     }
     &.hart {
         background-image: url('../../images/common/like.gif');
@@ -397,9 +399,8 @@ input {
     }
 }
 
-/* Placeholder */
+/* Placeholder plugin */
 .placeholder {
-    position: absolute;
     color: #999;
     .user-select(none);
 }
@@ -520,5 +521,25 @@ input {
                 }
             }
         }
+    }
+}
+
+/* imageComposition plugin */
+.image-compositing {
+    position: relative;
+    overflow: hidden;
+
+    &:after {
+        content: '' !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('../../images/common/upload.gif') center no-repeat #fff;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1;
+        visibility: visible !important;
     }
 }

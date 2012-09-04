@@ -2,23 +2,22 @@ var Widget = Event.extend({
     init: function(options) {
         var t = this;
 
-        t
-            .configure(options)
-            .bindEvents()
-            .run()
-        ;
+        t._configure(options);
+        t._bindEvents();
+        t.run(t.runData);
 
         return this;
     },
 
-    configure: function(options) {
+    _configure: function(options) {
         var t = this;
 
-        t.options =      options          || t.options      || $.error('options not found');
-        t.el =           options.el       || t.el           || $.error('el not found');
-        t.events =       options.events   || t.events       || {};
-        t.template =     options.template || t.template     || '';
-        t.templateData = options.data     || t.data         || {};
+        t.options =      options                  || t.options              || $.error('options not found');
+        t.el =           options.el               || t.el                   || $.error('el not found');
+        t.events =       options.events           || t.events               || {};
+        t.template =     options.template         || t.template             || '';
+        t.templateData = options.templateData     || t.templateData         || {};
+        t.runData =      options.runData          || t.runData              || {};
 
         t.run = options.run || t.run;
         t.renderTemplate = options.renderTemplate || t.renderTemplate;
@@ -26,7 +25,7 @@ var Widget = Event.extend({
         return this;
     },
 
-    bindEvents: function() {
+    _bindEvents: function() {
         var t = this;
 
         $.each(t.events, function(event, methodName) {
@@ -47,7 +46,7 @@ var Widget = Event.extend({
         return this;
     },
 
-    run: function() {
+    run: function(runData) {
         var t = this;
 
         t.renderTemplate();

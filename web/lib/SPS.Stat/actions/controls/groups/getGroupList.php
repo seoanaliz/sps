@@ -25,14 +25,13 @@
                 $type = 'Stat';
 
             $m_class  = $type . 'Groups';
-
             if ( !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
 
             $res = $m_class::get_groups( $user_id );
 
-            echo ObjectHelper::ToJSON(array('response' => $res));
+            echo ObjectHelper::ToJSON( array( 'response' => $res ));
         }
 
 

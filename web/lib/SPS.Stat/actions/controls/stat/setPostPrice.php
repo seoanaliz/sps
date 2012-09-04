@@ -12,8 +12,10 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
-
+//            error_reporting( 0 );
+            $a = MesDialogs::get_dialog_id( 670456, 12 );
+            print_r ($a);
+            die();
             $publicId = Request::getInteger( 'publId' );
             $price  = Request::getInteger( 'price' );
 

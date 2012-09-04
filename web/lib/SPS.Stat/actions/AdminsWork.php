@@ -32,12 +32,11 @@
             Response::setArray( 'our_publics', $publics );
         }
 
-        public function get_public_admins($date_min, $date_max, $public_id = 0 ) {
-            $date_max = $date_max ? $date_max : 1543395811;
+        public static function get_public_admins($date_min, $date_max, $public_id = 0 ) {
+            $date_max = $date_max ? $date_max : 1445736044;
             $date_min = $date_min ? $date_min : 0;
 
             $public_line = $public_id ? ' AND a.public_id=@public_id ' : '';
-
             {
                 $sql = 'SELECT DISTINCT a.author_id, b.name, b.ava
                         FROM ' . TABLE_OADMINS_POSTS . ' as a, ' . TABLE_OADMINS . ' as b
@@ -51,19 +50,47 @@
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             if ( $public_id )
-            $cmd->SetInteger( '@public_id', $public_id['id'] );
+                $cmd->SetInteger( '@public_id', $public_id['id'] );
             $cmd->SetInteger( '@date_min',  $date_min );
             $cmd->SetInteger( '@date_max',  $date_max );
 
             $ds = $cmd->Execute();
             $res = array();
+
+
             while ($ds->Next()) {
 
                 $a['id']    = $ds->getValue('author_id', TYPE_INTEGER);
                 $a['name']  = $ds->getValue('name', TYPE_STRING);
                 $a['ava']   = $ds->getValue('ava', TYPE_STRING);
 
-                $res[] = $a;
+                $res[$a['id']] = $a;
+                $a = array();
+            }
+            $public_line = $public_id ? ' AND c."externalId"=@publicId ' : '';
+            $sql = 'select a."vkId",a."firstName",a."lastName",a.avatar
+                    from authors as a,articles as b,"targetFeeds" as c
+                    where a."authorId"=b."authorId"
+                        and c."targetFeedId"=b."targetFeedId"
+                        and b."sentAt">@sentFrom
+                        AND b."sentAt"<@sentTo'
+                        . $public_line ;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+
+            $cmd->SetString  ('@sentFrom',    date('Y-m-d 00:00:00', $date_min)  );
+            $cmd->SetString  ('@sentTo',      date('Y-m-d 00:00:00', $date_max)    );
+            if ( $public_id )
+                $cmd->SetString  ('@publicId',   $public_id['id']  );
+//            echo $cmd->GetQuery();
+            $ds = $cmd->Execute();
+
+            while ( $ds->Next() ) {
+
+                $a['id']  = $ds->getValue('vkId', TYPE_INTEGER);
+                $a['name']  = $ds->getValue('firstName', TYPE_STRING) . ' ' . $ds->getValue('lastName', TYPE_STRING);
+                $a['ava']   = $ds->getValue('avatar', TYPE_STRING);
+
+                $res[$a['id']] = $a;
                 $a = array();
             }
 
@@ -72,7 +99,7 @@
             return $res;
         }
 
-        public function get_posts( $author_id, $public_id, $date_min = 0, $date_max = 0 )
+        public static function get_stat( $author_id, $public_id, $date_min = 0, $date_max = 0 )
         {
 
 //            echo '<br>min' . $date_min .'<br>max' . $date_max . '<br>';
@@ -83,7 +110,117 @@
                     WHERE   author_id=@author_id
                             AND public_id=@public_id
                             AND post_time > @date_min
-                            AND post_time < @date_max';
+                            AND post_time < @date_max
+                    ORDER BY post_time ';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@author_id', $author_id);
+            $cmd->SetInteger('@public_id', $public_id);
+            $cmd->SetInteger('@date_min',  $date_min);
+            $cmd->SetInteger('@date_max',  $date_max);
+
+            $query =  $cmd->GetQuery();
+            $ds = $cmd->Execute();
+            $res = array();
+            $diff = 0;
+            $diff_rel = 0;
+            $topics = 0;
+            $compls = 0;
+            $reposts = 0;
+            $overposts = 0;
+            $time_prev = 0;
+//            print_r($query);
+//            echo '<br>AdminsWork::get_public_admins ' . microtime() . '<br>';
+//            $connect_line = "host=localhost user=postgres password='' dbname='sps'";
+//            $db  = pg_connect($connect_line);
+//            $res = pg_query( $db, $query);
+//            $res = pg_fetch_all($res);
+
+//            print_r($res);
+//            die();
+            while ( $ds->Next() ) {
+
+                $post_id     = $ds->getValue( 'vk_post_id', TYPE_INTEGER );
+                $res[]       = $post_id;
+                $reposts    += $ds->getValue( 'reposts', TYPE_INTEGER );
+                $diff       += $ds->getValue( 'likes', TYPE_INTEGER );
+                $diff_rel   += $ds->getValue( 'rel_likes', TYPE_FLOAT );
+
+                $post_time = $ds->GetValue( 'post_time', TYPE_INTEGER );
+                if ( $post_time - $time_prev < 11 * 60 ) {
+                    $overposts++;
+                }
+                $time_prev = $post_time;
+
+                if( $ds->getValue( 'is_topic', TYPE_BOOLEAN ))
+                    $topics++;
+
+                if( $ds->getValue( 'complicate', TYPE_BOOLEAN ))
+                    $compls++;
+            }
+
+//            $sb_posts = self::get_sboard_posts( $author_id, $public_id, date('Y-m-d 00:00:00' ,$date_min), date('Y-m-d 00:00:00' ,$date_max ) );
+//            $sb_posts = self::get_sboard_posts( $author_id, $public_id, date('Y-m-d 00:00:00' ,$date_min), date('Y-m-d 00:00:00' ,$date_max ) );
+
+            $q = count($res);
+            if ( $q < 1)
+                return false;
+            $res['rel_likes']   = round( $diff / $q);
+            $res['reposts']     = round( $reposts / $q);
+            $res['topics']      = $topics;
+            $res['compls']      = $compls;
+            $res['overposts']   = $overposts;
+            $res['diff_rel']    = $diff_rel / $q;
+//            $res['sb_posts']    =  $sb_posts;
+            return $res;
+        }
+
+        private function get_sboard_posts( $author_id, $public_id , $time_from, $time_to )
+        {
+            $sql = 'SELECT b."vkId",c."externalId" FROM "articles" as a
+                    JOIN "authors"     as b ON a."authorId"=b."authorId"
+                    JOIN "targetFeeds" as c ON a."targetFeedId"=c."targetFeedId"
+                    WHERE
+                        b."vkId"=@authorId
+                        AND a."sentAt">@sentFrom
+                        AND a."sentAt"<@sentTo
+                        AND c."externalId"=@publicId';
+
+//                  WHERE b."authorId"=38000555
+//                  and date between @sendFrom::date AND @sendTo::date
+//                  AND a."sentAt"<'2012-08-21 00:00:00'
+//                  AND c."externalId"=110337004
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetInteger ('@authorId',   $author_id  );
+            $cmd->SetString  ('@sentFrom',   $time_from  );
+            $cmd->SetString  ('@sentTo',     $time_to    );
+            $cmd->SetString  ('@publicId',   $public_id  );
+//            echo $cmd->getQuery();
+            $ds = $cmd->Execute();
+
+            $ds->Last();
+            $a = $ds->GetCursor();
+//            echo '<br><br>';
+//            print_r($a);
+//            echo '<br><br>';echo '<br><br>';
+            return ++$a;
+
+        }
+
+        public static function get_posts( $author_id, $public_id, $date_min = 0, $date_max = 0 )
+        {
+
+//            echo '<br>min' . $date_min .'<br>max' . $date_max . '<br>';
+
+            $date_max = $date_max ? $date_max : 1543395811;
+            $date_min = $date_min ? $date_min : 0;
+            $sql = 'SELECT * FROM ' . TABLE_OADMINS_POSTS . '
+                    WHERE   author_id=@author_id
+                            AND public_id=@public_id
+                            AND post_time > @date_min
+                            AND post_time < @date_max
+                    ORDER BY post_time ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@author_id', $author_id);
@@ -93,23 +230,34 @@
             $ds = $cmd->Execute();
             $res = array();
             $diff = 0;
+            $diff_rel = 0;
             $topics = 0;
             $compls = 0;
             $reposts = 0;
+            $overposts = 0;
+            $time_prev = 0;
+
 
             while ( $ds->Next() ) {
-                $res[]       = $ds->getValue('vk_post_id', TYPE_INTEGER);
-                $reposts    += $ds->getValue('reposts', TYPE_INTEGER);
-                $diff       += $ds->getValue('likes', TYPE_INTEGER);
 
+                $post_id     = $ds->getValue( 'vk_post_id', TYPE_INTEGER );
+                $res[]       = $post_id;
+                $reposts    += $ds->getValue( 'reposts', TYPE_INTEGER );
+                $diff       += $ds->getValue( 'likes', TYPE_INTEGER );
+                $diff_rel   += $ds->getValue( 'rel_likes', TYPE_FLOAT );
 
-                if($ds->getValue('is_topic', TYPE_BOOLEAN))
+                $post_time = $ds->GetValue( 'post_time', TYPE_INTEGER );
+                if ( $post_time - $time_prev < 21 * 60 ) {
 
-                    $topics += 1;
+                    $overposts++;
+                }
+                $time_prev = $post_time;
 
-                if($ds->getValue('complicate', TYPE_BOOLEAN))
-                    $compls += 1;
+                if( $ds->getValue( 'is_topic', TYPE_BOOLEAN ))
+                    $topics++;
 
+                if( $ds->getValue( 'complicate', TYPE_BOOLEAN ))
+                    $compls++;
             }
 
             $q = count($res);
@@ -120,8 +268,12 @@
             $res['reposts']     = round( $reposts / $q);
             $res['topics']      = $topics;
             $res['compls']      = $compls;
+            $res['overposts']   = $overposts;
+            $res['diff_rel']    = $diff_rel / $q;
 
             return $res;
         }
+
+
     }
 ?>
