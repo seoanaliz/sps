@@ -241,7 +241,7 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title">' +
-        '<?=title?>' +
+        '<?=title?><span class="counter"></span>' +
         '<div class="icon plus"></div>' +
     '</div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
@@ -254,5 +254,5 @@ var LIST_ITEM =
 var LIST_ITEM_DIALOG =
 '<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
-    '<div class="title"><?=user.name?></div>' +
+    '<div class="title"><?=user.name?><span class="counter"></span></div>' +
 '</div>';

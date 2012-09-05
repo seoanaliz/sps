@@ -163,7 +163,9 @@ var IM = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-                t.leftColumn.addMessage(event.content);
+                var message = event.content;
+                t.leftColumn.addMessage(message);
+                t.rightColumn.addMessage(message);
             break;
         }
     }
@@ -291,6 +293,11 @@ var RightColumn = Widget.extend({
 
         var t = this;
         t.initList();
+    },
+
+    addMessage: function(message) {
+        var t = this;
+        t.list.incrementCounter(message.dialog_id);
     },
 
     initList: function() {
@@ -787,6 +794,26 @@ var List = Widget.extend({
                     $(this).css({height: cssHeight})
                 });
             }
+        }
+    },
+
+    incrementCounter: function(dialogId) {
+        var t = this;
+        var $el = $(t.el);
+        var $item = $el.find('.public[data-id=' + dialogId + ']');
+
+        if ($item.length) {
+            var $counter = $item.find('.counter');
+            if (!$counter.data('counter')) {
+                $counter.counter({
+                    nonNegative: true,
+                    prefix: '+'
+                });
+                $item.click(function() {
+                    $counter.counter('setCounter', 0);
+                });
+            }
+            $counter.counter('increment');
         }
     }
 });
