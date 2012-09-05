@@ -593,18 +593,20 @@ var Messages = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
+        var $el = $(t.el);
 
         if (message.dialog_id != t.dialogId) return;
-        var data = {
+        var clearMessage = {
             id: message.mid,
             text: message.body,
             user: t.user,
             isNew: true,
             timestamp: message.date
         };
-        console.log(data);
-        var $newMessage = t.createMessage(data);
-        $(t.el).find('.messages').append($newMessage);
+        var $oldMessage = $el.find('[data-id=' + clearMessage.id + ']');
+        if ($oldMessage.length) return;
+        var $newMessage = t.createMessage(clearMessage);
+        $el.find('.messages').append($newMessage);
         t.makeMessages($newMessage);
         t.scrollBottom();
     },

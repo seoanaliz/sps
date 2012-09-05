@@ -169,7 +169,7 @@ var Eventlist = {
     send_message: function(dialogId, text, callback) {
         simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
             callback({
-                id: 0,
+                id: data,
                 isNew: false,
                 isViewer: true,
                 text: $.trim(text).split('\n').join('<br/>').replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
