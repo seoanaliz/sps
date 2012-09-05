@@ -12,7 +12,8 @@ class watchDog
     public function Execute() {
         error_reporting( 0 );
         $user_id   =   Request::getInteger( 'userId' );
-        if ( !$user_id ) {
+        $cb        =   Request::getString ( 'callback' );
+        if ( !$user_id || !$cb ) {
             die(ERR_MISSING_PARAMS);
         }
 
@@ -53,7 +54,7 @@ class watchDog
             }
         }
         $result = array_reverse($result);
-        echo  ObjectHelper::ToJSON( array( 'response' => $result ));
+        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' => $result )) . ');';
         die();
 //        print_r($result);
     }
