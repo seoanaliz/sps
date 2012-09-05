@@ -254,15 +254,31 @@
             return $ids;
         }
 
-        public static function get_group_dialogs( $group_id )
+        public static function get_group_dialogs( $group_id, $limit, $offset = 0 )
         {
-            $sql = 'SELECT * FROM ' . TABLE_MES_GROUPS . ' WHERE group_id=@group_id';
+            $limit =  $limit ? $limit : 1000;
+
+            $sql = 'SELECT rec_id FROM '
+                        . TABLE_MES_GROUP_DIALOG_REL . ' as a, '
+                        . TABLE_MES_DIALOGS . ' as b
+                    WHERE
+                        a.group_id=@group_id AND
+                        a.dialog_id=b.id
+                    ORDER BY
+                        rec_id
+                    LIMIT  @limit
+                    OFFSET @offset';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetInteger( '@limit', $limit );
+            $cmd->SetInteger( '@offset', $offset );
             $ds = $cmd->Execute();
+
+            $res = array();
             while ( $ds->Next() ) {
-                $ds
+                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
             }
+            return $res;
         }
     }
 ?>

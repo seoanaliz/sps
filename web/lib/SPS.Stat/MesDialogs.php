@@ -7,7 +7,7 @@
     class MesDialogs
     {
         //to do execute добавить
-        public static function get_dialogs( $id, $offset, $limit )
+        public static function get_last_dialogs( $id, $offset, $limit )
         {
             $access_token = StatUsers::get_access_token( $id );
             if ( !$access_token )
@@ -35,6 +35,28 @@
 //                    break;
 //            }
             return( $dialogs_array );
+        }
+
+        //возвращает лист диалогов отдельной группы
+        public static function get_group_dilogs_list( $rec_ids )
+        {
+            $code   = '';
+            $return = "return{";
+            foreach( $rec_ids as $id ) {
+                $code   .= "var a$id = API.messages.getDialogs({\"uid\":$id }) ;";
+                $return .= "\"a$id\":a$id,";
+            }
+
+            $code .= trim( $return, ',' ) . "};";
+            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code ));
+            $result = array();
+            foreach( $res as $dialog ) {
+                if ( !isset($dialog[1] ))
+                    continue;
+
+                $result[] = $dialog[1];
+            }
+            return $result;
         }
 
         public static function addDialog( $user_id, $rec_id, $status )
@@ -119,6 +141,7 @@
 
             return $result;
         }
+
 
         public static function toggle_read_unread( $user_id, $mess_ids, $unread )
         {
