@@ -151,7 +151,7 @@ var Eventlist = {
                 id: 0,
                 isNew: true,
                 isViewer: true,
-                text: text.split('\n').join('<br/>'),
+                text: $.trim(text.split('\n').join('<br/>').replace(uriExp, '<a target="_blank" href="$1k">$1</a>')),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
