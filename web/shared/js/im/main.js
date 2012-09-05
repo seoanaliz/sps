@@ -297,7 +297,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.list.incrementCounter(message.dialog_id);
+        t.list.incrementCounter(message.groups, message.dialog_id);
     },
 
     initList: function() {
@@ -729,7 +729,7 @@ var List = Widget.extend({
     events: {
         'click: .item > .title > .icon': 'clickIcon',
         'click: .item > .title': 'selectDialogs',
-        'click: .public': 'selectMessages'
+        'click: .dialog': 'selectMessages'
     },
 
     run: function() {
@@ -797,23 +797,29 @@ var List = Widget.extend({
         }
     },
 
-    incrementCounter: function(dialogId) {
+    incrementCounter: function(listIds, dialogId) {
         var t = this;
         var $el = $(t.el);
-        var $item = $el.find('.public[data-id=' + dialogId + ']');
 
-        if ($item.length) {
-            var $counter = $item.find('.counter');
-            if (!$counter.data('counter')) {
-                $counter.counter({
-                    nonNegative: true,
-                    prefix: '+'
-                });
-                $item.click(function() {
-                    $counter.counter('setCounter', 0);
-                });
+        $.each(listIds, function(i, listId) {
+            var $item = $el.find('.item[data-id=' + listId + ']');
+            increment($item.find('> .title'));
+        });
+
+        var $dialog = $el.find('.dialog[data-id=' + dialogId + ']');
+        increment($dialog.find('> .title'));
+
+        function increment($item) {
+            if ($item.length) {
+                var $counter = $item.find('.counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                    $item.click(function() {
+                        $counter.counter('setCounter', 0);
+                    });
+                }
+                $counter.counter('increment');
             }
-            $counter.counter('increment');
         }
     }
 });

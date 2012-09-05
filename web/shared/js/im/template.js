@@ -252,7 +252,7 @@ var LIST_ITEM =
 '</div>';
 
 var LIST_ITEM_DIALOG =
-'<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
     '<div class="title"><?=user.name?><span class="counter"></span></div>' +
 '</div>';
