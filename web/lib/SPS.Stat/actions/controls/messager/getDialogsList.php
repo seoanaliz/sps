@@ -60,9 +60,7 @@ class getDialogsList
 //                || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
             );
             else {
-                $i ++;
-                if ( $i < $offset )
-                    continue;
+
                 unset( $dialog->attachment );
                 if( !isset( $dialog->attachments ))
                     $dialog->attachments = array();
