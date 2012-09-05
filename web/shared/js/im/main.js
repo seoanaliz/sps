@@ -552,7 +552,8 @@ var Messages = Widget.extend({
             var $el = $(t.el);
             var $textarea = $el.find('textarea');
 
-            $el.find('.attachments').imageComposition({width: 500, height: 300});
+            $el.find('.videos').imageComposition({width: 500, height: 240});
+            $el.find('.photos').imageComposition({width: 500, height: 300});
             $el.find('.date').easydate({
                 live: true,
                 set_title: false,
@@ -650,7 +651,8 @@ var Messages = Widget.extend({
             html += '</div>';
             $messages.prepend(html);
             var $block = $('#' + blockId);
-            $block.find('.attachments').imageComposition({width: 500, height: 300});
+            $block.find('.videos').imageComposition({width: 500, height: 240});
+            $block.find('.photos').imageComposition({width: 500, height: 300});
             $block.find('.date').easydate({
                 live: true,
                 set_title: false,
@@ -697,6 +699,8 @@ var Messages = Widget.extend({
                 $textarea.val('');
                 var $newMessage = $(tmpl(t.tmplMessage, data));
                 $el.find('.messages').append($newMessage);
+                $newMessage.find('.videos').imageComposition({width: 500, height: 240});
+                $newMessage.find('.photos').imageComposition({width: 500, height: 300});
                 $newMessage.find('.date').easydate({
                     live: true,
                     set_title: false,
