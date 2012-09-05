@@ -95,6 +95,26 @@ var IM = Widget.extend({
 
         (function poll() {
             console.log('poll...');
+            setTimeout(function() {
+                $.ajax({
+                    url: Configs.controlsRoot + 'watchDog/',
+                    dataType: 'json',
+                    data: {
+                        userId: Configs.vkId
+                    },
+                    success: function(data) {
+                        $.each(data.response, function(i, event) {
+                            t.newEvent(event);
+                        });
+                    }
+                });
+                poll();
+            }, 5000);
+        })();
+
+        (function poll() {
+            return;
+            console.log('poll...');
             $.ajax({
                 url: 'http://im.openapi.lc/int/controls/watchDog/',
                 data: {
@@ -102,15 +122,11 @@ var IM = Widget.extend({
                 },
                 dataType: 'jsonp',
                 //timeout: 30000,
-                complete: function(data) {
-                    console.log(data);
-                    poll();
-                },
-                //complete: poll,
+                complete: poll,
                 success: function(data) {
                     console.log(data);
-                    var res = data.response[0];
-                    if (!res || !res.type) return;
+                    var res = data.response;
+                    if (!res || !res.length) return;
                     $.each(res, function(i, event) {
                         t.newEvent(event);
                     });
@@ -200,7 +216,7 @@ var LeftColumn = Widget.extend({
         if (t.messages) {
             t.messages.addMessage(message);
         } else if (t.dialogs) {
-            t.dialogs.addMessage(message);
+            t.dialogs.addMessage();
         }
     },
 
@@ -586,9 +602,10 @@ var Messages = Widget.extend({
             isNew: true,
             timestamp: message.date
         };
+        console.log(data);
         var $newMessage = t.createMessage(data);
         $(t.el).find('.messages').append($newMessage);
-        t.createMessage($newMessage);
+        t.makeMessages($newMessage);
         t.scrollBottom();
     },
 

@@ -13,7 +13,7 @@ class watchDog
         error_reporting( 0 );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
-        if ( !$user_id || !$cb ) {
+        if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
 
@@ -54,7 +54,11 @@ class watchDog
             }
         }
         $result = array_reverse($result);
-        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' => $result )) . ');';
+        if ($cb) {
+            echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' => $result )) . ');';
+        } else {
+            echo ObjectHelper::ToJSON( array( 'response' => $result ));
+        }
         die();
 //        print_r($result);
     }
