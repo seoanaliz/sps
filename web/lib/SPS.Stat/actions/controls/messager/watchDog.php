@@ -21,12 +21,14 @@ class watchDog
         if ( $events == 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false )));
 
+
+        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
+
         $result = array();
         foreach( $events as $event ) {
 
             $status = 'offline';
             $event =  (array) $event ;
-
             $stat = isset( $event[0] ) ? $event[0] : 4;
             switch ( $stat ) {
                 case 4:
@@ -38,7 +40,8 @@ class watchDog
                             'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
                             'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
                             'from_id'   =>  $from_id,
-                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id )
+                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
+                            'groups'    =>  $ids[$from_id]
                         )
                     );
                     break;
