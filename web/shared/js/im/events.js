@@ -172,7 +172,14 @@ var Eventlist = {
                 id: data,
                 isNew: false,
                 isViewer: true,
-                text: $.trim(text).split('\n').join('<br/>').replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
+                text: $.trim(text)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;")
+                    .split('\n').join('<br/>')
+                    .replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
