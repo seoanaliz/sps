@@ -38,7 +38,7 @@ class getDialogsList
         }
         else {
             $res_ids = MesGroups::get_group_dialogs( $group_id, $limit, $offset );
-            $row_dialog_array  = MesDialogs::get_group_dilogs_list( $res_ids );
+            $row_dialog_array  = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
         }
 
         $i = -1;
