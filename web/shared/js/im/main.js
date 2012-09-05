@@ -1,3 +1,4 @@
+var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 var Configs = {
     vkId: $.cookie('uid'),
     token: $.cookie('token'),
@@ -93,8 +94,6 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
-            //return;
-            console.log('poll...');
             setTimeout(function() {
                 $.ajax({
                     url: Configs.controlsRoot + 'watchDog/',
@@ -215,8 +214,6 @@ var LeftColumn = Widget.extend({
             else if (t.dialogs) t.dialogs.trigger('scroll');
         });
         t.on('addMessage', function(message) {
-            console.log('addMessage: ');
-            console.log(message);
             if (t.messages) {
                 t.messages.trigger('addMessage', message);
             } else if (t.dialogs) {
@@ -314,10 +311,11 @@ var RightColumn = Widget.extend({
 
 var Dialogs = Widget.extend({
     template: DIALOGS,
+    tmplDialog: DIALOGS_ITEM,
+    tmplDialogsBlock: DIALOGS_BLOCK,
     listId: null,
     itemsLimit: 20,
     currentPage: 1,
-    tmplDialog: DIALOGS_ITEM,
 
     isBlock: false,
 
@@ -371,18 +369,7 @@ var Dialogs = Widget.extend({
                 t.renderTemplate();
                 t.bindEvents();
                 t.scrollTop();
-                $(t.el).find('.date').easydate({
-                    live: true,
-                    set_title: false,
-                    date_parse: function(date) {
-                        date = intval(date) * 1000;
-                        if (!date) return;
-                        return new Date(date);
-                    },
-                    uneasy_format: function(date) {
-                        return date.toLocaleDateString();
-                    }
-                });
+                t.makeDialogs($(t.el));
             });
         });
     },
@@ -480,45 +467,65 @@ var Dialogs = Widget.extend({
         $(window).scrollTop(0);
     },
 
+    createBlock: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplDialogsBlock, {id: t.currentPage, list: data}));
+    },
+
+    createDialog: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplDialog, data));
+    },
+
+    makeDialogs: function($el) {
+        $el.find('.date').easydate({
+            live: true,
+            set_title: false,
+            date_parse: function(date) {
+                date = intval(date) * 1000;
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    },
+
     showMore: function() {
         var t = this;
-        if (t.isBlock) return;
+        if (t.isLock()) return;
         var $el = $(t.el);
         var $dialogs = $el.find('.dialogs');
 
-        t.isBlock = true;
+        t.lock();
         Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            var blockId = 'dialogsBlock' + t.currentPage;
-            var html = '<div id="' + blockId + '">';
-            $.each(data, function(i, data) {
-                html += (tmpl(t.tmplDialog, data));
-            });
-            html += '</div>';
-            $dialogs.append(html);
-            $('#' + blockId).find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
-            t.isBlock = false;
+            var $block = t.createBlock(data);
+            $dialogs.append($block);
+            t.makeDialogs($block);
+            t.unlock();
         });
         t.currentPage++;
+    },
+
+    isLock: function() {
+        return this.isBlock;
+    },
+    lock: function() {
+        this.isBlock = true;
+    },
+    unlock: function() {
+        this.isBlock = false;
     }
 });
 
 var Messages = Widget.extend({
     template: MESSAGES,
+    tmplMessage: MESSAGES_ITEM,
+    tmplMessagesBlock: MESSAGES_BLOCK,
     dialogId: null,
     itemsLimit: 20,
     currentPage: 1,
-    tmplMessage: MESSAGES_ITEM,
 
     user: {},
     isBlock: false,
@@ -552,20 +559,7 @@ var Messages = Widget.extend({
             var $el = $(t.el);
             var $textarea = $el.find('textarea');
 
-            $el.find('.videos').imageComposition({width: 500, height: 240});
-            $el.find('.photos').imageComposition({width: 500, height: 300});
-            $el.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+            t.makeMessages($el);
             $textarea.placeholder();
             $textarea.autoResize();
             $textarea.inputMemory('message' + dialogId);
@@ -636,37 +630,18 @@ var Messages = Widget.extend({
 
     showMore: function() {
         var t = this;
-        if (t.isBlock) return;
+        if (t.isLock()) return;
         var $el = $(t.el);
         var $messages = $el.find('.messages');
-        //@todo: изменить этот стыд
 
-        t.isBlock = true;
+        t.lock();
         Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            var blockId = 'messagesBlock' + t.currentPage;
-            var html = '<div id="' + blockId + '">';
-            $.each(data.messages, function(i, data) {
-                html += (tmpl(t.tmplMessage, data));
-            });
-            html += '</div>';
-            $messages.prepend(html);
-            var $block = $('#' + blockId);
-            $block.find('.videos').imageComposition({width: 500, height: 240});
-            $block.find('.photos').imageComposition({width: 500, height: 300});
-            $block.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+            var blockId = t.currentPage;
+            var $block = t.createBlock(data);
+            $messages.prepend($block);
+            t.makeMessages($block);
             $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
-            t.isBlock = false;
+            t.unlock();
         });
         t.currentPage++;
     },
@@ -687,6 +662,33 @@ var Messages = Widget.extend({
         $(window).scrollTop($(document).height());
     },
 
+    createBlock: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplMessagesBlock, {id: t.currentPage, list: data.messages}));
+    },
+
+    createMessage: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplMessage, data));
+    },
+
+    makeMessages: function($el) {
+        $el.find('.videos').imageComposition({width: 500, height: 240});
+        $el.find('.photos').imageComposition({width: 500, height: 300});
+        $el.find('.date').easydate({
+            live: true,
+            set_title: false,
+            date_parse: function(date) {
+                date = intval(date) * 1000;
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    },
+
     sendMessage: function() {
         var t = this;
         var $el = $(t.el);
@@ -697,22 +699,9 @@ var Messages = Widget.extend({
         if (text) {
             Events.fire('send_message', t.dialogId, text, function(data) {
                 $textarea.val('');
-                var $newMessage = $(tmpl(t.tmplMessage, data));
+                var $newMessage = t.createMessage(data);
                 $el.find('.messages').append($newMessage);
-                $newMessage.find('.videos').imageComposition({width: 500, height: 240});
-                $newMessage.find('.photos').imageComposition({width: 500, height: 300});
-                $newMessage.find('.date').easydate({
-                    live: true,
-                    set_title: false,
-                    date_parse: function(date) {
-                        date = intval(date) * 1000;
-                        if (!date) return;
-                        return new Date(date);
-                    },
-                    uneasy_format: function(date) {
-                        return date.toLocaleDateString();
-                    }
-                });
+                t.makeMessages($newMessage);
                 if (isScroll) {
                     t.scrollBottom();
                 }
@@ -721,6 +710,16 @@ var Messages = Widget.extend({
         } else {
             $textarea.focus();
         }
+    },
+
+    isLock: function() {
+        return this.isBlock;
+    },
+    lock: function() {
+        this.isBlock = true;
+    },
+    unlock: function() {
+        this.isBlock = false;
     }
 });
 
@@ -750,7 +749,7 @@ var List = Widget.extend({
         if ($target.data('dialogs')) {
             t.showDialogs($target);
         } else {
-            Events.fire('get_dialogs', listId, 0, t.dialogsLimit, function(data) {
+            Events.fire('get_dialogs_list', listId, 0, t.dialogsLimit, function(data) {
                 $target.data('dialogs', data);
                 t.showDialogs($target);
             });

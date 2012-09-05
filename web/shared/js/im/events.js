@@ -69,6 +69,28 @@ var Eventlist = {
             callback(clearData);
         });
     },
+    get_dialogs_list: function(listId, offset, limit, callback) {
+        var params = {
+            groupId: listId == 999999 ? undefined : listId,
+            offset: offset,
+            limit: limit
+        };
+        simpleAjax('getGroupDialogs', params, function(dirtyData) {
+            var clearData = [];
+            $.each(dirtyData, function(i, dirtyDialog) {
+                clearData.push({
+                    id: dirtyDialog.id,
+                    user: {
+                        id: dirtyDialog.uid.userId,
+                        name: dirtyDialog.uid.name,
+                        photo: dirtyDialog.uid.ava,
+                        isOnline: (dirtyDialog.uid.online != 0)
+                    }
+                });
+            });
+            callback(clearData);
+        });
+    },
     get_dialogs: function(listId, offset, limit, callback) {
         var params = {
             groupId: listId == 999999 ? undefined : listId,
@@ -104,7 +126,6 @@ var Eventlist = {
             limit: limit
         };
         simpleAjax('getDialog', params, function(dirtyData) {
-            var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             var clearData = [];
             var dirtyUsers = dirtyData.dialogers;
             var dirtyMessages = dirtyData.messages;
@@ -149,9 +170,9 @@ var Eventlist = {
         simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
             callback({
                 id: 0,
-                isNew: true,
+                isNew: false,
                 isViewer: true,
-                text: $.trim(text.split('\n').join('<br/>').replace(uriExp, '<a target="_blank" href="$1k">$1</a>')),
+                text: $.trim(text).split('\n').join('<br/>').replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
