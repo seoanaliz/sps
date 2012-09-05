@@ -94,47 +94,26 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
-            setTimeout(function() {
-                $.ajax({
-                    url: Configs.controlsRoot + 'watchDog/',
-                    dataType: 'json',
-                    data: {
-                        userId: Configs.vkId
-                    },
-                    success: function(data) {
-                        $.each(data.response, function(i, event) {
-                            t.newEvent(event);
-                        });
-                    }
-                });
-                poll();
-            }, 5000);
-        })();
-        (function poll() {
-            return false;
             console.log('poll...');
             $.ajax({
-                url: Configs.controlsRoot + 'watchDog/',
+                url: 'http://im.openapi.lc/int/controls/watchDog/',
                 data: {
                     userId: Configs.vkId
                 },
-                dataType: 'json',
-                complete: poll,
-                timeout: 30000,
+                dataType: 'jsonp',
+                //timeout: 30000,
+                complete: function(data) {
+                    console.log(data);
+                    poll();
+                },
+                //complete: poll,
                 success: function(data) {
+                    console.log(data);
                     var res = data.response[0];
                     if (!res || !res.type) return;
-                    switch (res.type) {
-                        case 'inMessage':
-                            console.log(['new message: ', res.content, res.content.body]);
-                        break;
-                        case 'online':
-                            console.log(['online: ', res.content]);
-                        break;
-                        case 'offline':
-                            console.log(['online: ', res.content]);
-                        break;
-                    }
+                    $.each(res, function(i, event) {
+                        t.newEvent(event);
+                    });
                 }
             });
         })();
@@ -168,7 +147,7 @@ var IM = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-                t.leftColumn.trigger('addMessage', event.content);
+                t.leftColumn.addMessage(event.content);
             break;
         }
     }
@@ -213,13 +192,16 @@ var LeftColumn = Widget.extend({
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
         });
-        t.on('addMessage', function(message) {
-            if (t.messages) {
-                t.messages.trigger('addMessage', message);
-            } else if (t.dialogs) {
-                t.dialogs.trigger('addMessage', message);
-            }
-        });
+    },
+
+    addMessage: function(message) {
+        var t = this;
+
+        if (t.messages) {
+            t.messages.addMessage(message);
+        } else if (t.dialogs) {
+            t.dialogs.addMessage(message);
+        }
     },
 
     initTabs: function() {
@@ -359,18 +341,19 @@ var Dialogs = Widget.extend({
                 t.showMore();
             }
         });
-        t.on('addMessage', function() {
-            var t = this;
-            var listId = t.listId;
+    },
 
-            Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
-                t.templateData = {id: listId, list: data};
-                t.listId = listId;
-                t.renderTemplate();
-                t.bindEvents();
-                t.scrollTop();
-                t.makeDialogs($(t.el));
-            });
+    addMessage: function() {
+        var t = this;
+        var listId = t.listId;
+
+        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+            t.templateData = {id: listId, list: data};
+            t.listId = listId;
+            t.renderTemplate();
+            t.bindEvents();
+            t.scrollTop();
+            t.makeDialogs($(t.el));
         });
     },
 
@@ -581,33 +564,6 @@ var Messages = Widget.extend({
                 t.showMore();
             }
         });
-        t.on('addMessage', function(message) {
-            var t = this;
-
-            if (message.dialog_id != t.dialogId) return;
-            var data = {
-                id: message.mid,
-                text: message.body,
-                user: t.user,
-                isNew: true,
-                timestamp: message.date
-            };
-            var $newMessage = $(tmpl(t.tmplMessage, data));
-            $el.find('.messages').append($newMessage);
-            $newMessage.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
-            t.scrollBottom();
-        });
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
@@ -617,6 +573,23 @@ var Messages = Widget.extend({
                 return false;
             }
         });
+    },
+
+    addMessage: function(message) {
+        var t = this;
+
+        if (message.dialog_id != t.dialogId) return;
+        var data = {
+            id: message.mid,
+            text: message.body,
+            user: t.user,
+            isNew: true,
+            timestamp: message.date
+        };
+        var $newMessage = t.createMessage(data);
+        $(t.el).find('.messages').append($newMessage);
+        t.createMessage($newMessage);
+        t.scrollBottom();
     },
 
     hoverMessage: function(e) {
