@@ -9,6 +9,8 @@
         //to do execute добавить
         public static function get_last_dialogs( $id, $offset, $limit )
         {
+            if ( !$limit )
+                $limit = 25;
             $access_token = StatUsers::get_access_token( $id );
             if ( !$access_token )
                 return 'no access_token';
@@ -16,7 +18,6 @@
                                 'access_token'      =>  $access_token,
                                 'count'             =>  $limit,
                                 'preview_lenght'    =>  50,
-                                'fields'            =>  'has_mobile',
                                 'offset'            =>  $offset
             );
 
@@ -38,8 +39,11 @@
         }
 
         //возвращает лист диалогов отдельной группы
-        public static function get_group_dilogs_list( $rec_ids )
+        public static function get_group_dilogs_list( $user_id, $rec_ids )
         {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
             $code   = '';
             $return = "return{";
             foreach( $rec_ids as $id ) {
@@ -48,7 +52,7 @@
             }
 
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code ));
+            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ));
             $result = array();
             foreach( $res as $dialog ) {
                 if ( !isset($dialog[1] ))

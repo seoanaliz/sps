@@ -272,6 +272,7 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
+//            echo $cmd->getQuery();
             $ds = $cmd->Execute();
 
             $res = array();

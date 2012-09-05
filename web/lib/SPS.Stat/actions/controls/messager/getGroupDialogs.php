@@ -12,7 +12,6 @@ class getGroupDialogs
     public function execute()
     {
         error_reporting( 0 );
-//        $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         if ( !$group_id ) {
             die(ERR_MISSING_PARAMS);
@@ -27,6 +26,5 @@ class getGroupDialogs
             $res[] = $dialog;
         }
         die( ObjectHelper::ToJSON( array( 'response' => $res )));
-
     }
 }
