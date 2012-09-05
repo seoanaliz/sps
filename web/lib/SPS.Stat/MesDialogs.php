@@ -7,42 +7,65 @@
     class MesDialogs
     {
         //to do execute добавить
-        public static function get_dialogs( $id )
+        public static function get_last_dialogs( $id, $offset, $limit )
         {
             $access_token = StatUsers::get_access_token( $id );
             if ( !$access_token )
                 return 'no access_token';
             $params = array(
                                 'access_token'      =>  $access_token,
-                                'count'             =>  200,
+                                'count'             =>  $limit,
                                 'preview_lenght'    =>  50,
-                                'fields'            =>  'has_mobile'
+                                'fields'            =>  'has_mobile',
+                                'offset'            =>  $offset
             );
 
             $offset = 0;
             $dialogs_array = array();
 
-            while ( 1 ) {
-                $params[ 'offset' ] = $offset;
+//            while ( 1 ) {
+//                $params[ 'offset' ] = $offset;
                 $res   = VkHelper::api_request( 'messages.getDialogs', $params );
                 $count = $res[0];
                 unset( $res[0] );
-                $offset += 100;
+//                $offset += 100;
 
                 $dialogs_array = array_merge( $dialogs_array, $res );
-                if ( $count < $offset )
-                    break;
-            }
+//                if ( $count < $offset )
+//                    break;
+//            }
             return( $dialogs_array );
+        }
+
+        //возвращает лист диалогов отдельной группы
+        public static function get_group_dilogs_list( $rec_ids )
+        {
+            $code   = '';
+            $return = "return{";
+            foreach( $rec_ids as $id ) {
+                $code   .= "var a$id = API.messages.getDialogs({\"uid\":$id }) ;";
+                $return .= "\"a$id\":a$id,";
+            }
+
+            $code .= trim( $return, ',' ) . "};";
+            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code ));
+            $result = array();
+            foreach( $res as $dialog ) {
+                if ( !isset($dialog[1] ))
+                    continue;
+
+                $result[] = $dialog[1];
+            }
+            return $result;
         }
 
         public static function addDialog( $user_id, $rec_id, $status )
         {
             $sql = 'INSERT INTO '
-                                . TABLE_MES_DIALOGS . '( user_id, rec_id, status )
-                            VALUES
-                                    ( @user_id,@rec_id,@status )
-                            RETURNING id';
+                        . TABLE_MES_DIALOGS . '( user_id, rec_id, status )
+                    VALUES
+                            ( @user_id,@rec_id,@status )
+                    RETURNING id';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger( '@user_id', $user_id );
@@ -118,6 +141,7 @@
 
             return $result;
         }
+
 
         public static function toggle_read_unread( $user_id, $mess_ids, $unread )
         {

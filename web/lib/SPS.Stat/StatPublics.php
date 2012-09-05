@@ -44,7 +44,7 @@
             set_time_limit(1000);
             $err_counter = 0;
             $public_id = +$public_id;
-            $offset = +$offset;
+            $offset    = +$offset;
 
             while (1) {
                 $values = '';
@@ -81,24 +81,43 @@
 
         public static function collect_fave_publics( $users_array )
         {
+            set_time_limit(0);
+            $fave_array = array();
+            $i = 0;
+            $url_array = array();
             foreach( $users_array as $user ) {
-                $matches = array();
-                $public_list = file_get_contents( self::FAVE_PUBLS_URL . $user );
-                $public_list = explode( 'setUpTabbedBox', $public_list );
-                preg_match_all( '/\/g(\d{2,14})\//', $public_list[0], $matches );
+                $url_array[] = self::FAVE_PUBLS_URL . $user;
+                echo self::FAVE_PUBLS_URL . $user . '<br>';
+                $i++;
+                if ( $i == 20 ) {
+                    echo '1 <br>';
+                    $res = array();
+                    VkHelper::multiget( $url_array, $res );
+//                    print_r($res);
+                    foreach( $res as $page ) {
+                        $matches = array();
+//                        $public_list = file_get_contents( self::FAVE_PUBLS_URL . $user );
+                        $page = explode( 'setUpTabbedBox', $page );
+                        preg_match_all( '/\/g(\d{2,14})\//', $page[0], $matches );
+                        $fave_array = array_merge( $fave_array, reset( array_chunk( $matches[1], 7 )));
+                        echo '<br><br>';
 
-                $fave_array = reset( array_chunk( $matches[1], 7 ));
-                $values = implode( '),(', $fave_array );
-                if ( $values ) {
-                    $sql = 'INSERT INTO ' . TABLE_TEMPL_PUBLIC_SHORTNAMES . ' VALUES (' . $values . ')';
-                    $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
-                    $cmd->ExecuteNonQuery();
+                    }
+
+                    $values = implode( '),(', $fave_array );
+                    if ( $values ) {
+                        $sql = 'INSERT INTO ' . TABLE_TEMPL_PUBLIC_SHORTNAMES . ' VALUES (' . $values . ')';
+                        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+                        $cmd->ExecuteNonQuery();
+                    }
+                    $i = 0;
+                    $fave_array = array();
+                    $url_array = array();
                 }
-                sleep(0.3);
+
+                sleep( 0.1 );
             }
         }
-
-
 
          public static function truncate_table( $table ) {
              $sql = 'TRUNCATE TABLE ' .$table ;
