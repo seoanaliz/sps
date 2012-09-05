@@ -88,7 +88,7 @@ var Eventlist = {
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
                     lastMessage: {
-                        text: dirtyDialog.body,
+                        text: dirtyDialog.body || dirtyDialog.title,
                         timestamp: dirtyDialog.date
                     },
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
@@ -119,13 +119,18 @@ var Eventlist = {
                 };
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
-                var clearAttachments = [];
-                if (dirtyMessage.attachments) $.each(dirtyMessage.attachments, function(i, attachment) {
-                    clearAttachments.push({
-                        type: attachment.type,
-                        content: attachment[attachment.type]
+                var clearAttachments = {};
+                if (dirtyMessage.attachments) {
+                    $.each(dirtyMessage.attachments, function (i, attachment) {
+                        if (!clearAttachments[attachment.type]) {
+                            clearAttachments[attachment.type] = {
+                                type: attachment.type,
+                                list: []
+                            };
+                        }
+                        clearAttachments[attachment.type].list.push(attachment[attachment.type]);
                     });
-                });
+                }
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
@@ -142,13 +147,14 @@ var Eventlist = {
     },
     send_message: function(dialogId, text, callback) {
         simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
-            callback($.extend(Data.messages[0], {
+            callback({
                 id: 0,
                 isNew: true,
                 isViewer: true,
                 text: text.split('\n').join('<br/>'),
-                timestamp: Math.floor(new Date().getTime() / 1000)
-            }));
+                timestamp: Math.floor(new Date().getTime() / 1000),
+                user: Configs.viewer
+            });
         });
     },
     message_mark_as_read: function(messageId, callback) {

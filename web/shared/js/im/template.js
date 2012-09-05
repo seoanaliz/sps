@@ -23,7 +23,7 @@ var tmpl = (function($) {
                     'var p=[],' +
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
-                    'each=function(ui,obj){for(var i=0; i<obj.length; i++) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
+                    'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
                 ));
             return (cache[str] = fn(data || {}));
@@ -155,7 +155,7 @@ var MESSAGES_ITEM =
                 '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
-            '<? if (isset("attachments") && attachments.length) { ?>' +
+            '<? if (isset("attachments")) { ?>' +
                 '<div class="attachments clear-fix">' +
                     '<? each(MESSAGE_ATTACHMENT, attachments); ?>' +
                 '</div>' +
@@ -167,33 +167,53 @@ var MESSAGES_ITEM =
     '</div>' +
 '</div>';
 
-var MESSAGE_ATTACHMENT =
-'<? if (type == "photo") { ?>' +
-    '<a target="_blank" href="<?=content.src_xxxbig ? content.src_xxxbig : content.src_big?>">' +
-        '<img src="<?=content.src_big?>" alt="" />' +
+var MESSAGE_ATTACHMENT_PHOTO =
+'<a target="_blank" href="<?=isset("src_xxxbig") ? src_xxxbig : src_big?>" style="height: <?=height?>px">' +
+    '<img src="<?=src_big?>" alt="" />' +
+'</a>';
+
+var MESSAGE_ATTACHMENT_AUDIO =
+'<div>' +
+    '<a target="_blank" href="http://vk.com/audio?id=<?=owner_id?>&audio_id=<?=aid?>">' +
+        '♫ <?=performer?> - <?=title?>' +
     '</a>' +
-'<? } else if (type == "audio") { ?>' +
-    '<div>' +
-        '<a target="_blank" href="http://vk.com/audio?id=<?=content.owner_id?>&audio_id=<?=content.aid?>">' +
-            '♫ <?=content.performer?> - <?=content.title?>' +
-        '</a>' +
-    '</div>' +
-'<? } else if (type == "doc") { ?>' +
-    '<? if (content.thumb) { ?>' +
-        '<a target="_blank" href="<?=content.url?>">' +
-            '<img src="<?=content.thumb?>" alt="" />' +
-        '</a>' +
-    '<? } else { ?>' +
-        '<div>' +
-            'Документ: <a target="_blank" href="<?=content.url?>"><?=content.title?></a>' +
-        '</div>' +
-    '<? } ?>' +
-'<? } else if (type == "video") { ?>' +
-    '<a target="_blank" href="http://vk.com/video<?=content.owner_id?>_<?=content.vid?>">' +
-        '<img src="<?=content.image_big?>" alt="" />' +
+'</div>';
+
+var MESSAGE_ATTACHMENT_VIDEO =
+'<a target="_blank" href="http://vk.com/video<?=owner_id?>_<?=vid?>" style="height: 240px">' +
+    '<img src="<?=image_big?>" alt="" />' +
+'</a>';
+
+var MESSAGE_ATTACHMENT_DOC =
+'<? if (isset("thumb")) { ?>' +
+    '<a target="_blank" href="<?=url?>">' +
+        '<img src="<?=thumb?>" alt="" />' +
     '</a>' +
 '<? } else { ?>' +
-    '<div class="attachment">' +
+    '<div>' +
+        'Документ: <a target="_blank" href="<?=url?>"><?=title?></a>' +
+    '</div>' +
+'<? } ?>';
+
+var MESSAGE_ATTACHMENT =
+'<? if (type == "photo") { ?>' +
+    '<div class="photos">' +
+        '<? each(MESSAGE_ATTACHMENT_PHOTO, list); ?>' +
+    '</div>' +
+'<? } else if (type == "audio") { ?>' +
+    '<div class="audios">' +
+        '<? each(MESSAGE_ATTACHMENT_AUDIO, list); ?>' +
+    '</div>' +
+'<? } else if (type == "doc") { ?>' +
+    '<div class="documents">' +
+        '<? each(MESSAGE_ATTACHMENT_DOC, list); ?>' +
+    '</div>' +
+'<? } else if (type == "video") { ?>' +
+    '<div class="videos">' +
+        '<? each(MESSAGE_ATTACHMENT_VIDEO, list); ?>' +
+    '</div>' +
+'<? } else { ?>' +
+    '<div>' +
         '[attach: <?=type?>]' +
     '</div>' +
 '<? } ?>';
