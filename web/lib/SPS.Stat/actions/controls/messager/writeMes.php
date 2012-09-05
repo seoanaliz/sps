@@ -24,7 +24,7 @@ class writeMes
         if( $res === 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
         elseif ( $res )
-            die( ObjectHelper::ToJSON( array( 'response' => true )));
+            die( ObjectHelper::ToJSON( array( 'response' => $res )));
         else
             //todo обработка ошибок, капча, в частности
             die( ObjectHelper::ToJSON( array( 'response' => false )));

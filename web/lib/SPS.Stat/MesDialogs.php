@@ -120,9 +120,10 @@
             );
 
             $res = VkHelper::api_request( 'messages.send', $params, 0 );
+
             if ( isset( $res->error ) )
                 return false;
-            return true;
+            return $res;
         }
 
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
@@ -222,9 +223,10 @@
                 return false;
             $ts  = $ts ? $ts : $a['ts'];
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
+            echo $url;
 
-            $res = json_decode( file_get_contents( $url ));
-
+//            $res = json_decode( file_get_contents( $url ));
+die();
             return $res->updates;
         }
     }
