@@ -70,7 +70,7 @@ $(document).ready(function() {
             im.trigger('scroll');
         });
         $(window).on('resize', function() {
-            im.trigger('resize');
+            im.trigger('scroll');
         });
     });
 });
