@@ -322,6 +322,7 @@ var Dialogs = Widget.extend({
     itemsLimit: 20,
     currentPage: 1,
 
+    preloadData: {},
     isBlock: false,
 
     events: {
@@ -334,24 +335,14 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
-        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+        t.getBlockData(0, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
             t.bindEvents();
             t.scrollTop();
-            $(t.el).find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+            t.makeDialogs($el);
+            t.preload();
         });
     },
 
@@ -368,15 +359,17 @@ var Dialogs = Widget.extend({
 
     addMessage: function() {
         var t = this;
+        var $el = $(t.el);
         var listId = t.listId;
 
-        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+        t.getBlockData(0, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
             t.bindEvents();
             t.scrollTop();
-            t.makeDialogs($(t.el));
+            t.makeDialogs($el);
+            t.preload();
         });
     },
 
@@ -498,6 +491,26 @@ var Dialogs = Widget.extend({
         });
     },
 
+    preload: function() {
+        var t = this;
+        var page = t.currentPage;
+        t.getBlockData(page, function(data) {
+            t.preloadData[page] = data;
+        });
+    },
+
+    getBlockData: function(page, callback) {
+        var t = this;
+
+        if (t.preloadData[page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        } else {
+            Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+                if ($.isFunction(callback)) callback(data);
+            });
+        }
+    },
+
     showMore: function() {
         var t = this;
         if (t.isLock()) return;
@@ -505,10 +518,11 @@ var Dialogs = Widget.extend({
         var $dialogs = $el.find('.dialogs');
 
         t.lock();
-        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+        t.getBlockData(t.currentPage, function(data) {
             var $block = t.createBlock(data);
             $dialogs.append($block);
             t.makeDialogs($block);
+            t.preload();
             t.unlock();
         });
         t.currentPage++;
@@ -533,6 +547,7 @@ var Messages = Widget.extend({
     itemsLimit: 20,
     currentPage: 1,
 
+    preloadData: {},
     user: {},
     isBlock: false,
 
@@ -544,7 +559,7 @@ var Messages = Widget.extend({
         var t = this;
         var dialogId = t.dialogId = params.dialogId;
 
-        Events.fire('get_messages', dialogId, 0, t.itemsLimit, function(data) {
+        t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -573,6 +588,7 @@ var Messages = Widget.extend({
             $textarea[0].scrollTop = $textarea[0].scrollHeight;
             t.bindEvents();
             t.scrollBottom();
+            t.preload();
         });
     },
 
@@ -627,6 +643,26 @@ var Messages = Widget.extend({
         });
     },
 
+    preload: function() {
+        var t = this;
+        var page = t.currentPage;
+        t.getBlockData(page, function(data) {
+            t.preloadData[page] = data;
+        });
+    },
+
+    getBlockData: function(page, callback) {
+        var t = this;
+
+        if (t.preloadData[page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        } else {
+            Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+                if ($.isFunction(callback)) callback(data);
+            });
+        }
+    },
+
     showMore: function() {
         var t = this;
         if (t.isLock()) return;
@@ -634,13 +670,14 @@ var Messages = Widget.extend({
         var $messages = $el.find('.messages');
 
         t.lock();
-        Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
+        t.getBlockData(t.currentPage, function(data) {
             var blockId = t.currentPage;
             var $block = t.createBlock(data);
             $messages.prepend($block);
             t.makeMessages($block);
-            $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
+            t.preload();
             t.unlock();
+            $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
         });
         t.currentPage++;
     },
