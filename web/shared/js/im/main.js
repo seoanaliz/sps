@@ -850,7 +850,7 @@ var List = Widget.extend({
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
-        var notAnimate = !e.originalEvent;
+        var notAnimate = false;
         if ($target.data('dialogs')) {
             t.toggleDialogs($target, notAnimate);
         } else {
