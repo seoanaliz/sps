@@ -137,6 +137,9 @@ var IM = Widget.extend({
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
         });
+        t.leftColumn.on('addList', function() {
+            t.rightColumn.run();
+        });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
         });
@@ -250,6 +253,9 @@ var LeftColumn = Widget.extend({
         });
         t.dialogs.on('select', function(id, title) {
             t.initMessages(id, title);
+        });
+        t.dialogs.on('addList', function() {
+            t.trigger('addList');
         });
 
         if (t.curListId && t.curListId != listId) {
@@ -425,6 +431,7 @@ var Dialogs = Widget.extend({
                                         if (e.keyCode == KEY.ENTER) {
                                             Events.fire('add_list', $input.val(), function() {
                                                 updateDropdown();
+                                                t.trigger('addList');
                                             });
                                         }
                                     });
