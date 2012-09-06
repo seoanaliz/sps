@@ -103,7 +103,7 @@ var IM = Widget.extend({
                     timeout: timeout
                 },
                 dataType: 'jsonp',
-                timeout: timeout * 1000,
+                //timeout: timeout * 1000,
                 complete: poll,
                 success: function(data) {
                     $.each(data.response, function(i, event) {
