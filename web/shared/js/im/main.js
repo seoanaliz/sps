@@ -495,15 +495,16 @@ var Dialogs = Widget.extend({
         var t = this;
         var page = t.currentPage;
         t.getBlockData(page, function(data) {
-            t.preloadData[page] = data;
+            if (!t.preloadData[t.listId]) t.preloadData[t.listId] = {};
+            t.preloadData[t.listId][page] = data;
         });
     },
 
     getBlockData: function(page, callback) {
         var t = this;
 
-        if (t.preloadData[page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        if (t.preloadData[t.listId] && t.preloadData[t.listId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
                 if ($.isFunction(callback)) callback(data);
@@ -647,15 +648,16 @@ var Messages = Widget.extend({
         var t = this;
         var page = t.currentPage;
         t.getBlockData(page, function(data) {
-            t.preloadData[page] = data;
+            if (!t.preloadData[t.dialogId]) t.preloadData[t.dialogId] = {};
+            t.preloadData[t.dialogId][page] = data;
         });
     },
 
     getBlockData: function(page, callback) {
         var t = this;
 
-        if (t.preloadData[page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        if (t.preloadData[t.dialogId] && t.preloadData[t.dialogId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
                 if ($.isFunction(callback)) callback(data);
