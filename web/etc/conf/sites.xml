@@ -64,6 +64,7 @@
 			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
+				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
                         <mediaServer class="MediaServerManager">

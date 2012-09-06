@@ -154,6 +154,9 @@
                 <page uri="controls://watchDog/">
                     <actions>SPS.Stat.watchDog</actions>
                 </page>
+                <page uri="controls://getGroupDialogs/">
+                    <actions>SPS.Stat.getGroupDialogs</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">

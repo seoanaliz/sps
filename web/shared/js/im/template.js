@@ -64,10 +64,15 @@ var RIGHT_COLUMN =
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<? each(DIALOGS_ITEM, list); ?>' +
+        '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
+'</div>';
+
+var DIALOGS_BLOCK =
+'<div class="dialogs-block<?=id?>">' +
+    '<? each(DIALOGS_ITEM, list); ?>' +
 '</div>';
 
 var DIALOGS_ITEM =
@@ -108,7 +113,7 @@ var DIALOGS_ITEM =
 var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<? each(MESSAGES_ITEM, list); ?>' +
+        '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
     '<? } else { ?>' +
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
@@ -136,6 +141,11 @@ var MESSAGES =
             '</a>' +
         '</div>' +
     '</div>' +
+'</div>';
+
+var MESSAGES_BLOCK =
+'<div class="messages-block<?=id?>">' +
+    '<? each(MESSAGES_ITEM, list); ?>' +
 '</div>';
 
 var MESSAGES_ITEM =
@@ -231,7 +241,7 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title">' +
-        '<?=title?>' +
+        '<?=title?><span class="counter"></span>' +
         '<div class="icon plus"></div>' +
     '</div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
@@ -242,7 +252,7 @@ var LIST_ITEM =
 '</div>';
 
 var LIST_ITEM_DIALOG =
-'<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
-    '<div class="title"><?=user.name?></div>' +
+    '<div class="title"><?=user.name?><span class="counter"></span></div>' +
 '</div>';
