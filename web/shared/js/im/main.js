@@ -341,6 +341,8 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
+        t.templateData = {id: listId, list: [], isLoad: true};
+        t.renderTemplate();
         t.getBlockData(0, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
@@ -570,6 +572,14 @@ var Messages = Widget.extend({
         var t = this;
         var dialogId = t.dialogId = params.dialogId;
 
+        t.templateData = {
+            id: dialogId,
+            list: [],
+            isLoad: true,
+            viewer: Data.users[0],
+            user: Data.users[0]
+        };
+        t.renderTemplate();
         t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;

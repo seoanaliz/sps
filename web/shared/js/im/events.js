@@ -100,6 +100,10 @@ var Eventlist = {
         simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearText = dirtyDialog.body || dirtyDialog.title;
+                if (clearText.length > 250) {
+                    clearText = clearText.substring(0, 200) + '...';
+                }
                 clearData.push({
                     id: dirtyDialog.id,
                     isNew: (dirtyDialog.read_state != 1),
@@ -110,7 +114,7 @@ var Eventlist = {
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
                     lastMessage: {
-                        text: dirtyDialog.body || dirtyDialog.title,
+                        text: clearText,
                         timestamp: dirtyDialog.date
                     },
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups

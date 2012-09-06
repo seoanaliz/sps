@@ -65,6 +65,8 @@ var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
         '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
@@ -116,6 +118,8 @@ var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
         '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +

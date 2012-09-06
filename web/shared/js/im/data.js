@@ -2,10 +2,10 @@ var Data = {};
 
 Data.users = [
     {
-        id: 4718705,
-        name: 'Artyom Kohver',
-        photo: 'http://vk.cc/S6ZsO',
-        isOnline: true
+        id: 0,
+        name: '...',
+        photo: 'http://vk.com/images/camera_c.gif',
+        isOnline: false
     }, {
         id: 1,
         name: 'Vanya',
