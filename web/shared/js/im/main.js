@@ -808,36 +808,75 @@ var List = Widget.extend({
 
     run: function() {
         var t = this;
+        var $el = $(t.el);
 
         Events.fire('get_lists', function(data) {
             t.templateData = {list: data};
             t.renderTemplate();
+
+            var openListsIds = t.getOpenListsIds();
+            $.each(openListsIds, function(i, listId) {
+                if (!listId) return;
+                Events.fire('get_lists', function(data) {
+                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
+                });
+            });
         });
+    },
+
+    getOpenListsIds: function() {
+        var openListsIds = localStorage.getItem('openListsIds');
+        if (!openListsIds) openListsIds = '';
+        return openListsIds.split(',');
+    },
+
+    setOpenListsIds: function(listIds) {
+        localStorage.setItem('openListsIds', listIds.join(','));
+    },
+
+    addOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                return;
+            }
+        }
+
+        listIds.push(listId);
+        t.setOpenListsIds(listIds);
+    },
+
+    removeOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                listIds.splice(i, i);
+            }
+        }
+
+        t.setOpenListsIds(listIds);
     },
 
     update: function() {
         var t = this;
-        var $el = $(t.el);
-        var $list = $el.find('.list');
-        var listId = $list.closest('.item').data('id');
-
-        Events.fire('get_lists', function(data) {
-            t.templateData = {list: data};
-            t.renderTemplate();
-            $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
-        });
+        t.run();
     },
 
     clickIcon: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
+        var notAnimate = !e.originalEvent;
         if ($target.data('dialogs')) {
-            t.showDialogs($target);
+            t.toggleDialogs($target, notAnimate);
         } else {
             Events.fire('get_dialogs_list', listId, 0, t.dialogsLimit, function(data) {
                 $target.data('dialogs', data);
-                t.showDialogs($target);
+                t.toggleDialogs($target, notAnimate);
             });
         }
         return false;
@@ -863,7 +902,9 @@ var List = Widget.extend({
         t.trigger('selectMessages', dialogId, title);
     },
 
-    showDialogs: function($el) {
+    toggleDialogs: function($el, notAnimate) {
+        var t = this;
+        var listId = $el.data('id');
         var dialogs = $el.data('dialogs');
         if (dialogs.length) {
             var list = $el.find('> .list');
@@ -871,6 +912,7 @@ var List = Widget.extend({
                 list.slideUp(100, function() {
                     $(this).remove();
                 });
+                t.removeOpenListId(listId);
             } else {
                 var html = '<div class="list">';
                 $.each(dialogs, function(i, dialog) {
@@ -879,11 +921,15 @@ var List = Widget.extend({
                 html += '</div>';
                 var $dialogs = $(html);
                 $el.append($dialogs);
-                var cssHeight = $dialogs.css('height');
-                var height = $dialogs.height();
-                $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
-                    $(this).css({height: cssHeight})
-                });
+                t.addOpenListId(listId);
+
+                if (!notAnimate) {
+                    var cssHeight = $dialogs.css('height');
+                    var height = $dialogs.height();
+                    $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
+                        $(this).css({height: cssHeight})
+                    });
+                }
             }
         }
     },
