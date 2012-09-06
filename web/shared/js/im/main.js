@@ -95,23 +95,22 @@ var IM = Widget.extend({
 
         (function poll() {
             console.log('poll...');
-            setTimeout(function() {
-                $.ajax({
-                    url: 'http://im.openapi.lc/int/controls/watchDog/',
-                    data: {
-                        userId: Configs.vkId
-                    },
-                    dataType: 'jsonp',
-                    //timeout: 30000,
-                    //complete: poll,
-                    success: function(data) {
-                        $.each(data.response, function(i, event) {
-                            t.newEvent(event);
-                        });
-                    }
-                });
-                poll();
-            }, 5000);
+            var timeout = 15;
+            $.ajax({
+                url: 'http://im.openapi.lc/int/controls/watchDog/',
+                data: {
+                    userId: Configs.vkId,
+                    timeout: timeout
+                },
+                dataType: 'jsonp',
+                timeout: timeout * 1000,
+                complete: poll,
+                success: function(data) {
+                    $.each(data.response, function(i, event) {
+                        t.newEvent(event);
+                    });
+                }
+            });
         })();
 
         t.on('scroll', function() {
