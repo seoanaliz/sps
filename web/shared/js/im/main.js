@@ -200,15 +200,16 @@ var LeftColumn = Widget.extend({
         var $el = $(t.el);
         var $header = $el.find('.header');
 
-        $el.css('padding-top', $header.outerHeight());
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             $el.css('padding-top', $header.outerHeight());
             if ($(window).scrollTop() > 10) {
                 $header.addClass('fixed');
             } else {
                 $header.removeClass('fixed');
             }
-        });
+            return onScroll;
+        })());
+
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
@@ -358,14 +359,12 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
-            t.showMore();
-        }
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
             }
-        });
+            return onScroll;
+        })());
     },
 
     addMessage: function() {
@@ -617,16 +616,14 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if ($(window).scrollTop() < 600) {
-            t.showMore();
-        }
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             t.updateInputBox();
 
             if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
-        });
+            return onScroll;
+        }));
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
