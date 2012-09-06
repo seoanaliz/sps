@@ -14,7 +14,9 @@ class watchDog
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'userId' );
-        if ( !$user_id || !$cb || !$timeout ) {
+        $timeout   =   $timeout ? $timeout : 15;
+
+        if ( !$user_id  ) {
             die(ERR_MISSING_PARAMS);
         }
 
@@ -34,7 +36,7 @@ class watchDog
             $stat = isset( $event[0] ) ? $event[0] : 4;
             switch ( $stat ) {
                 case 4:
-                    $from_id = isset( $event[3] )? $event[3] : $event['uid'];
+                    $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
                     $result[] = array(
                         'type'    => 'inMessage',
                         'content' => array(
@@ -43,7 +45,8 @@ class watchDog
                             'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
                             'from_id'   =>  $from_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  $ids[$from_id]
+                            'groups'    =>  $ids[$from_id],
+                            'attachments'=>  isset( $event[7] ) ? $event[7] : array()
                         )
                     );
                     break;
@@ -59,6 +62,7 @@ class watchDog
             }
         }
         $result = array_reverse($result);
+        header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
         echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' => $result )) . ');';
         die();
 //        print_r($result);
