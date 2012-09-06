@@ -80,10 +80,12 @@ var DIALOGS_ITEM =
 '<div class="dialog clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
-            '<img src="<?=user.photo?>" alt="" />' +
+            '<a href="http://vk.com/id<?=user.id?>" target="_blank"><img src="<?=user.photo?>" alt="" /></a>' +
         '</div>' +
         '<div class="info clear-fix">' +
-            '<div class="name"><a href="http://vk.com/id<?=user.id?>" target="_blank"><?=user.name?></a></div>' +
+            '<div class="name">' +
+                '<a href="http://vk.com/id<?=user.id?>" target="_blank"><?=user.name?></a>' +
+            '</div>' +
             '<? if (user.isOnline) { ?>' +
                 '<div class="status">Online</div>' +
             '<? } ?>' +

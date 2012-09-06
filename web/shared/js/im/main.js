@@ -458,7 +458,7 @@ var Dialogs = Widget.extend({
     },
 
     clickDialog: function(e) {
-        if ($(e.target).is('a')) return;
+        if ($(e.target).closest('a').length) return;
 
         var t = this;
         var $target = $(e.currentTarget);
