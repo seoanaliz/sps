@@ -14,7 +14,7 @@ class watchDog
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'userId' );
-        if ( !$user_id || !$cb ) {
+        if ( !$user_id || !$cb || !$timeout ) {
             die(ERR_MISSING_PARAMS);
         }
 

@@ -198,7 +198,7 @@
             return (array)$res;
         }
 
-        public static function watch_dog( $user_id ){
+        public static function watch_dog_wo_long_pull( $user_id ){
             $access_token = StatUsers::get_access_token( $user_id );
             if ( !$access_token )
                 return 'no access_token';
@@ -213,7 +213,7 @@
             return $res;
         }
 
-        public static function watch_dog_long_pull( $user_id, $ts = 0 )
+        public static function watch_dog( $user_id, $timeout, $ts = 0 )
         {
             $access_token = StatUsers::get_access_token( $user_id );
             if ( !$access_token )
@@ -222,11 +222,10 @@
             if ( !$a )
                 return false;
             $ts  = $ts ? $ts : $a['ts'];
-            $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=25&mode=2";
-            echo $url;
+            $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=" . $timeout . "&mode=2";
+//            echo $url;
 
-//            $res = json_decode( file_get_contents( $url ));
-die();
+            $res = json_decode( file_get_contents( $url ));
             return $res->updates;
         }
     }
