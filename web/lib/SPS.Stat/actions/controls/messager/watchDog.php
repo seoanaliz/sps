@@ -13,8 +13,8 @@ class watchDog
         error_reporting( 0 );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
-        $timeout   =   Request::getInteger( 'userId' );
-        $times     =   Request::getInteger( 'times' );
+        $timeout   =   Request::getInteger( 'timeout' );
+        $times     =   Request::getInteger( 'ts' );
         $timeout   =   $timeout ? $timeout : 15;
 
         if ( !$user_id ) {
