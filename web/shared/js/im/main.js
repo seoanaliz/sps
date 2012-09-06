@@ -137,6 +137,9 @@ var IM = Widget.extend({
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
         });
+        t.leftColumn.on('addList', function() {
+            t.rightColumn.run();
+        });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
         });
@@ -251,6 +254,9 @@ var LeftColumn = Widget.extend({
         t.dialogs.on('select', function(id, title) {
             t.initMessages(id, title);
         });
+        t.dialogs.on('addList', function() {
+            t.trigger('addList');
+        });
 
         if (t.curListId && t.curListId != listId) {
             t.tabs.removeTab(tabPrefix + t.curListId);
@@ -350,6 +356,9 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
+        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
+            t.showMore();
+        }
         t.on('scroll', function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
@@ -425,6 +434,7 @@ var Dialogs = Widget.extend({
                                         if (e.keyCode == KEY.ENTER) {
                                             Events.fire('add_list', $input.val(), function() {
                                                 updateDropdown();
+                                                t.trigger('addList');
                                             });
                                         }
                                     });
@@ -448,7 +458,7 @@ var Dialogs = Widget.extend({
     },
 
     clickDialog: function(e) {
-        if ($(e.target).is('a')) return;
+        if ($(e.target).closest('a').length) return;
 
         var t = this;
         var $target = $(e.currentTarget);
@@ -495,15 +505,16 @@ var Dialogs = Widget.extend({
         var t = this;
         var page = t.currentPage;
         t.getBlockData(page, function(data) {
-            t.preloadData[page] = data;
+            if (!t.preloadData[t.listId]) t.preloadData[t.listId] = {};
+            t.preloadData[t.listId][page] = data;
         });
     },
 
     getBlockData: function(page, callback) {
         var t = this;
 
-        if (t.preloadData[page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        if (t.preloadData[t.listId] && t.preloadData[t.listId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
                 if ($.isFunction(callback)) callback(data);
@@ -596,6 +607,9 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
+        if ($(window).scrollTop() < 600) {
+            t.showMore();
+        }
         t.on('scroll', function() {
             t.updateInputBox();
 
@@ -647,15 +661,16 @@ var Messages = Widget.extend({
         var t = this;
         var page = t.currentPage;
         t.getBlockData(page, function(data) {
-            t.preloadData[page] = data;
+            if (!t.preloadData[t.dialogId]) t.preloadData[t.dialogId] = {};
+            t.preloadData[t.dialogId][page] = data;
         });
     },
 
     getBlockData: function(page, callback) {
         var t = this;
 
-        if (t.preloadData[page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[page]);
+        if (t.preloadData[t.dialogId] && t.preloadData[t.dialogId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
                 if ($.isFunction(callback)) callback(data);

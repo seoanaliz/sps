@@ -52,6 +52,18 @@ body {
                 padding: 5px 0;
                 padding-bottom: 110px;
 
+                .message.viewer + .message.viewer {
+                    &>.left-column {
+                        .photo {
+                            display: none;
+                        }
+                    }
+                    &>.center-column {
+                        .title {
+                            display: none;
+                        }
+                    }
+                }
                 .message {
                     padding: 5px 0;
 
@@ -59,6 +71,9 @@ body {
                         background-color: @bg_light_hover;
                     }
 
+                    &>div {
+                        min-height: 1px;
+                    }
                     &>.left-column {
                         width: 15%;
                         float: left;
