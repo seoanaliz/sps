@@ -111,6 +111,7 @@
             <host name="production">
                 <hostname>sps.verumnets.ru</hostname>
                 <hostname>socialboard.ru</hostname>
+                <hostname>im.socialboard.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
