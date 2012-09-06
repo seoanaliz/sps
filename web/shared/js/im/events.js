@@ -3,6 +3,7 @@
  */
 var Events = {
     delay: 0,
+    isDebug: false,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -10,7 +11,7 @@ var Events = {
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    if(window.console && console.log) {
+                    if (window.console && console.log && t.isDebug) {
                         console.log(name + ':');
                         console.log(args.slice(0, -1));
                         console.log('-------');
@@ -18,7 +19,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if (window.console && console.log) {
+                if (window.console && console.log && t.isDebug) {
                     console.log(e);
                 }
             }
@@ -100,19 +101,23 @@ var Eventlist = {
         simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearText = dirtyDialog.body || dirtyDialog.title;
+                if (clearText.length > 250) {
+                    clearText = clearText.substring(0, 200) + '...';
+                }
                 clearData.push({
                     id: dirtyDialog.id,
                     isNew: (dirtyDialog.read_state != 1),
+                    isViewer: (dirtyDialog.out != 0),
+                    viewer: Configs.viewer,
                     user: {
                         id: dirtyDialog.uid.userId,
                         name: dirtyDialog.uid.name,
                         photo: dirtyDialog.uid.ava,
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
-                    lastMessage: {
-                        text: dirtyDialog.body || dirtyDialog.title,
-                        timestamp: dirtyDialog.date
-                    },
+                    text: clearText,
+                    timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
             });
@@ -155,7 +160,7 @@ var Eventlist = {
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    isViewer: (dirtyMessage.out != 0),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,

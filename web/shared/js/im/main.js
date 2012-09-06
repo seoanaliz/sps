@@ -137,8 +137,8 @@ var IM = Widget.extend({
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
         });
-        t.leftColumn.on('addList', function() {
-            t.rightColumn.run();
+        t.leftColumn.on('updateList', function() {
+            t.rightColumn.update();
         });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
@@ -200,15 +200,16 @@ var LeftColumn = Widget.extend({
         var $el = $(t.el);
         var $header = $el.find('.header');
 
-        $el.css('padding-top', $header.outerHeight());
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             $el.css('padding-top', $header.outerHeight());
             if ($(window).scrollTop() > 10) {
                 $header.addClass('fixed');
             } else {
                 $header.removeClass('fixed');
             }
-        });
+            return onScroll;
+        })());
+
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
@@ -255,7 +256,13 @@ var LeftColumn = Widget.extend({
             t.initMessages(id, title);
         });
         t.dialogs.on('addList', function() {
-            t.trigger('addList');
+            t.trigger('updateList');
+        });
+        t.dialogs.on('addToList', function() {
+            t.trigger('updateList');
+        });
+        t.dialogs.on('removeFromList', function() {
+            t.trigger('updateList');
         });
 
         if (t.curListId && t.curListId != listId) {
@@ -301,6 +308,11 @@ var RightColumn = Widget.extend({
         t.initList();
     },
 
+    update: function() {
+        var t = this;
+        t.list.update();
+    },
+
     addMessage: function(message) {
         var t = this;
         t.list.incrementCounter(message.groups, message.dialog_id);
@@ -341,6 +353,8 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
+        t.templateData = {id: listId, list: [], isLoad: true};
+        t.renderTemplate();
         t.getBlockData(0, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
@@ -356,14 +370,12 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
-            t.showMore();
-        }
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
             }
-        });
+            return onScroll;
+        })());
     },
 
     addMessage: function() {
@@ -441,11 +453,15 @@ var Dialogs = Widget.extend({
                                     $(this).dropdown('refreshPosition');
                                 }
                             } else {
-                                Events.fire('add_to_list', dialogId, item.id, function() {});
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
                             }
                         },
                         onunselect: function(item) {
-                            Events.fire('remove_from_list', dialogId, item.id, function() {});
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
                         },
                         data: $.merge(lists, [
                             {id: 'add_list', title: 'Создать список'}
@@ -570,6 +586,14 @@ var Messages = Widget.extend({
         var t = this;
         var dialogId = t.dialogId = params.dialogId;
 
+        t.templateData = {
+            id: dialogId,
+            list: [],
+            isLoad: true,
+            viewer: Data.users[0],
+            user: Data.users[0]
+        };
+        t.renderTemplate();
         t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;
@@ -607,16 +631,14 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if ($(window).scrollTop() < 600) {
-            t.showMore();
-        }
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             t.updateInputBox();
 
             if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
-        });
+            return onScroll;
+        }));
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
@@ -786,23 +808,75 @@ var List = Widget.extend({
 
     run: function() {
         var t = this;
+        var $el = $(t.el);
 
         Events.fire('get_lists', function(data) {
             t.templateData = {list: data};
             t.renderTemplate();
+
+            var openListsIds = t.getOpenListsIds();
+            $.each(openListsIds, function(i, listId) {
+                if (!listId) return;
+                Events.fire('get_lists', function(data) {
+                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
+                });
+            });
         });
+    },
+
+    getOpenListsIds: function() {
+        var openListsIds = localStorage.getItem('openListsIds');
+        if (!openListsIds) openListsIds = '';
+        return openListsIds.split(',');
+    },
+
+    setOpenListsIds: function(listIds) {
+        localStorage.setItem('openListsIds', listIds.join(','));
+    },
+
+    addOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                return;
+            }
+        }
+
+        listIds.push(listId);
+        t.setOpenListsIds(listIds);
+    },
+
+    removeOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                listIds.splice(i, i);
+            }
+        }
+
+        t.setOpenListsIds(listIds);
+    },
+
+    update: function() {
+        var t = this;
+        t.run();
     },
 
     clickIcon: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
+        var notAnimate = !e.originalEvent;
         if ($target.data('dialogs')) {
-            t.showDialogs($target);
+            t.toggleDialogs($target, notAnimate);
         } else {
             Events.fire('get_dialogs_list', listId, 0, t.dialogsLimit, function(data) {
                 $target.data('dialogs', data);
-                t.showDialogs($target);
+                t.toggleDialogs($target, notAnimate);
             });
         }
         return false;
@@ -813,6 +887,8 @@ var List = Widget.extend({
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
     },
 
@@ -821,10 +897,14 @@ var List = Widget.extend({
         var $target = $(e.currentTarget);
         var dialogId = $target.data('id');
         var title = $target.data('title');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.closest('.dialog').addClass('active');
         t.trigger('selectMessages', dialogId, title);
     },
 
-    showDialogs: function($el) {
+    toggleDialogs: function($el, notAnimate) {
+        var t = this;
+        var listId = $el.data('id');
         var dialogs = $el.data('dialogs');
         if (dialogs.length) {
             var list = $el.find('> .list');
@@ -832,6 +912,7 @@ var List = Widget.extend({
                 list.slideUp(100, function() {
                     $(this).remove();
                 });
+                t.removeOpenListId(listId);
             } else {
                 var html = '<div class="list">';
                 $.each(dialogs, function(i, dialog) {
@@ -840,11 +921,15 @@ var List = Widget.extend({
                 html += '</div>';
                 var $dialogs = $(html);
                 $el.append($dialogs);
-                var cssHeight = $dialogs.css('height');
-                var height = $dialogs.height();
-                $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
-                    $(this).css({height: cssHeight})
-                });
+                t.addOpenListId(listId);
+
+                if (!notAnimate) {
+                    var cssHeight = $dialogs.css('height');
+                    var height = $dialogs.height();
+                    $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
+                        $(this).css({height: cssHeight})
+                    });
+                }
             }
         }
     },

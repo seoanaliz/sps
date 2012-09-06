@@ -65,6 +65,8 @@ var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
         '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
@@ -77,7 +79,7 @@ var DIALOGS_BLOCK =
 
 var DIALOGS_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
-'<div class="dialog clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<a href="http://vk.com/id<?=user.id?>" target="_blank"><img src="<?=user.photo?>" alt="" /></a>' +
@@ -90,15 +92,24 @@ var DIALOGS_ITEM =
                 '<div class="status">Online</div>' +
             '<? } ?>' +
             '<div class="date">' +
-                '<? if (isset("lastMessage")) { ?>' +
-                    '<?=lastMessage.timestamp?>' +
-                '<? } ?>' +
+                '<?=timestamp?>' +
             '</div>' +
         '</div>' +
     '</div>' +
     '<div class="history">' +
-        '<? if (isset("lastMessage")) { ?>' +
-            '<?=lastMessage.text?>' +
+        '<? if (isset("text")) { ?>' +
+            '<? if (isViewer) { ?>' +
+                '<div class="from-me clear-fix<?=isNew ? " new" : ""?>">' +
+                    '<div class="photo">' +
+                        '<img src="<?=viewer.photo?>" alt="" />' +
+                    '</div> ' +
+                    '<div class="body">' +
+                        '<?=text?>' +
+                    '</div> ' +
+                '</div>' +
+            '<? } else { ?>' +
+                '<?=text?>' +
+            '<? } ?>' +
         '<? } else { ?>' +
             '...' +
         '<? } ?>' +
@@ -116,6 +127,8 @@ var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
         '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
@@ -233,7 +246,7 @@ var MESSAGE_ATTACHMENT =
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
     '<div class="item" data-id="999999" data-title="Не в списке">' +
-        '<div class="title">Не в списке</div>' +
+        '<div class="title active">Не в списке</div>' +
     '</div>' +
     '<? each(LIST_ITEM, list); ?>' +
 '<? } else { ?>' +
