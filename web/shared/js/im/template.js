@@ -233,7 +233,7 @@ var MESSAGE_ATTACHMENT =
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
     '<div class="item" data-id="999999" data-title="Не в списке">' +
-        '<div class="title">Не в списке</div>' +
+        '<div class="title active">Не в списке</div>' +
     '</div>' +
     '<? each(LIST_ITEM, list); ?>' +
 '<? } else { ?>' +

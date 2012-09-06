@@ -813,6 +813,8 @@ var List = Widget.extend({
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
     },
 
@@ -821,6 +823,8 @@ var List = Widget.extend({
         var $target = $(e.currentTarget);
         var dialogId = $target.data('id');
         var title = $target.data('title');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.closest('.dialog').addClass('active');
         t.trigger('selectMessages', dialogId, title);
     },
 
