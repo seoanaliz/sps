@@ -221,12 +221,11 @@
             $a = self::get_long_poll_server( $access_token );
             if ( !$a )
                 return false;
-            $ts  = $ts ? $ts : $a['ts'];
+            $ts  = ($ts ? $ts : $a['ts']);
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=" . $timeout . "&mode=2";
-//            echo $url;
 
             $res = json_decode( file_get_contents( $url ));
-            return $res->updates;
+            return $res;
         }
     }
 ?>
