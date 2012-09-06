@@ -14,14 +14,14 @@ class watchDog
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'userId' );
+        $times     =   Request::getInteger( 'times' );
         $timeout   =   $timeout ? $timeout : 15;
 
-        if ( !$user_id  ) {
+        if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
 
-        $events  = MesDialogs::watch_dog( $user_id, $timeout );
-
+        $events  = MesDialogs::watch_dog( $user_id, $timeout, $times );
         if ( $events == 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false )));
 
@@ -29,7 +29,7 @@ class watchDog
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
 
         $result = array();
-        foreach( $events as $event ) {
+        foreach( $events->updates as $event ) {
 
             $status = 'offline';
             $event =  (array) $event ;
@@ -63,7 +63,7 @@ class watchDog
         }
         $result = array_reverse($result);
         header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
-        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' => $result )) . ');';
+        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
         die();
 //        print_r($result);
     }
