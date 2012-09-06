@@ -356,6 +356,9 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
+        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
+            t.showMore();
+        }
         t.on('scroll', function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
@@ -604,6 +607,9 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
+        if ($(window).scrollTop() < 600) {
+            t.showMore();
+        }
         t.on('scroll', function() {
             t.updateInputBox();
 
