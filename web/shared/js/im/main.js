@@ -137,8 +137,8 @@ var IM = Widget.extend({
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
         });
-        t.leftColumn.on('addList', function() {
-            t.rightColumn.run();
+        t.leftColumn.on('updateList', function() {
+            t.rightColumn.update();
         });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
@@ -256,7 +256,13 @@ var LeftColumn = Widget.extend({
             t.initMessages(id, title);
         });
         t.dialogs.on('addList', function() {
-            t.trigger('addList');
+            t.trigger('updateList');
+        });
+        t.dialogs.on('addToList', function() {
+            t.trigger('updateList');
+        });
+        t.dialogs.on('removeFromList', function() {
+            t.trigger('updateList');
         });
 
         if (t.curListId && t.curListId != listId) {
@@ -300,6 +306,11 @@ var RightColumn = Widget.extend({
 
         var t = this;
         t.initList();
+    },
+
+    update: function() {
+        var t = this;
+        t.list.update();
     },
 
     addMessage: function(message) {
@@ -442,11 +453,15 @@ var Dialogs = Widget.extend({
                                     $(this).dropdown('refreshPosition');
                                 }
                             } else {
-                                Events.fire('add_to_list', dialogId, item.id, function() {});
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
                             }
                         },
                         onunselect: function(item) {
-                            Events.fire('remove_from_list', dialogId, item.id, function() {});
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
                         },
                         data: $.merge(lists, [
                             {id: 'add_list', title: 'Создать список'}
@@ -797,6 +812,19 @@ var List = Widget.extend({
         Events.fire('get_lists', function(data) {
             t.templateData = {list: data};
             t.renderTemplate();
+        });
+    },
+
+    update: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $list = $el.find('.list');
+        var listId = $list.closest('.item').data('id');
+
+        Events.fire('get_lists', function(data) {
+            t.templateData = {list: data};
+            t.renderTemplate();
+            $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
         });
     },
 
