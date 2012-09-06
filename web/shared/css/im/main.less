@@ -226,9 +226,6 @@ body {
                     padding: 10px;
                     cursor: pointer;
 
-                    &:last-child {
-                        //border-bottom: none;
-                    }
                     &:hover {
                         background: @bg_light_hover;
                     }
@@ -276,6 +273,31 @@ body {
                         float: left;
                         overflow: hidden;
                         color: @color_link;
+
+                        &>.from-me {
+                            padding: 8px;
+                            min-height: 34px;
+
+                            &.new {
+                                background-color: @bg_light_hover;
+                            }
+
+                            &>.photo {
+                                position: absolute;
+                                width: 34px;
+                                height: 34px;
+                                overflow: hidden;
+                                .border-radius(2px);
+
+                                &>img {
+                                    max-width: 100%;
+                                    .border-radius(2px);
+                                }
+                            }
+                            &>.body {
+                                margin-left: 44px;
+                            }
+                        }
                     }
                     &>.actions {
                         width: 5%;

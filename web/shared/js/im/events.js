@@ -107,16 +107,16 @@ var Eventlist = {
                 clearData.push({
                     id: dirtyDialog.id,
                     isNew: (dirtyDialog.read_state != 1),
+                    isViewer: (dirtyDialog.out != 0),
+                    viewer: Configs.viewer,
                     user: {
                         id: dirtyDialog.uid.userId,
                         name: dirtyDialog.uid.name,
                         photo: dirtyDialog.uid.ava,
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
-                    lastMessage: {
-                        text: clearText,
-                        timestamp: dirtyDialog.date
-                    },
+                    text: clearText,
+                    timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
             });
@@ -159,7 +159,7 @@ var Eventlist = {
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    isViewer: (dirtyMessage.out != 0),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
