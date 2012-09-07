@@ -1,3 +1,42 @@
+function makeMsg(msg) {
+    function clean(str) {
+        return str ? str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
+    }
+
+    function indexOf(arr, value, from) {
+        for (var i = from || 0, l = (arr || []).length; i < l; i++) {
+            if (arr[i] == value) return i;
+        }
+        return -1;
+    }
+
+    return clean(msg).replace(/\n/g, '<br>').replace(/(@)?((https?:\/\/)?)((([A-Za-z0-9][A-Za-z0-9\-\_\.]*[A-Za-z0-9])|(([а-яА-Я0-9\-\_\.]+\.рф)))(\/([A-Za-zА-Яа-я0-9\-\_#%&?+\/\.=;:~]*[^\.\,;\(\)\?\<\&\s:])?)?)/ig, function () {
+        var domain = arguments[5], url = arguments[4], full = arguments[0], protocol = arguments[2] || 'http://';
+        var pre = arguments[1];
+
+        if (domain.indexOf('.') == -1) return full;
+        var topDomain = domain.split('.').pop();
+        if (topDomain.length > 5 || indexOf('aero,asia,biz,com,coop,edu,gov,info,int,jobs,mil,mobi,name,net,org,pro,tel,travel,xxx,ru,ua,su,рф,fi,fr,uk,cn,gr,ie,nl,au,co,gd,im,cc,si,ly,gl,be,eu,tv,to,me,io'.split(','), topDomain) == -1) return full;
+
+        if (pre == '@') {
+            return full;
+        }
+        try {
+            full = decodeURIComponent(full);
+        } catch (e){}
+
+        if (full.length > 55) {
+            full = full.substr(0, 53) + '..';
+        }
+
+        if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
+            url = url.replace(/[^a-zA-Z0-9#%;_\-.\/?&=\[\]]/g, encodeURIComponent);
+            return '<a href="'+ (protocol + url).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" target="_blank">' + full + '</a>';
+        }
+        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank" onclick="return goAway(\''+ clean(protocol + url) + '\', {}, event);">' + full + '</a>';
+    })
+}
+
 /**
  * Events
  */
@@ -167,7 +206,7 @@ var Eventlist = {
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.out != 0),
-                    text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
+                    text: makeMsg(dirtyMessage.body.split('<br>').join('\n')),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]
@@ -183,14 +222,7 @@ var Eventlist = {
                 id: data,
                 isNew: false,
                 isViewer: true,
-                text: $.trim(text)
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;")
-                    .split('\n').join('<br/>')
-                    .replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
+                text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
