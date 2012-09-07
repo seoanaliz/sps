@@ -1,8 +1,16 @@
-var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-
-function makeMsg(msg) {
+function makeMsg(msg, isNotClean) {
     function clean(str) {
-        return str ? str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
+        if (isNotClean) {
+            return str;
+        }
+        else {
+            return str ? str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;') : '';
+        }
     }
 
     function indexOf(arr, value, from) {
@@ -13,7 +21,10 @@ function makeMsg(msg) {
     }
 
     return clean(msg).replace(/\n/g, '<br>').replace(/(@)?((https?:\/\/)?)((([A-Za-z0-9][A-Za-z0-9\-\_\.]*[A-Za-z0-9])|(([а-яА-Я0-9\-\_\.]+\.рф)))(\/([A-Za-zА-Яа-я0-9\-\_#%&?+\/\.=;:~]*[^\.\,;\(\)\?\<\&\s:])?)?)/ig, function () {
-        var domain = arguments[5], url = arguments[4], full = arguments[0], protocol = arguments[2] || 'http://';
+        var domain = arguments[5],
+            url = arguments[4],
+            full = arguments[0],
+            protocol = arguments[2] || 'http://';
         var pre = arguments[1];
 
         if (domain.indexOf('.') == -1) return full;
@@ -35,7 +46,7 @@ function makeMsg(msg) {
             url = url.replace(/[^a-zA-Z0-9#%;_\-.\/?&=\[\]]/g, encodeURIComponent);
             return '<a href="'+ (protocol + url).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" target="_blank">' + full + '</a>';
         }
-        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank" onclick="return goAway(\''+ clean(protocol + url) + '\', {}, event);">' + full + '</a>';
+        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
     })
 }
 

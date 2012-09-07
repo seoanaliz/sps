@@ -167,7 +167,7 @@ var Eventlist = {
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.out != 0),
-                    text: makeMsg(dirtyMessage.body.split('<br>').join('\n')),
+                    text: makeMsg(dirtyMessage.body.split('<br>').join('\n'), true),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]
