@@ -102,6 +102,12 @@ var Eventlist = {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
                 var clearText = dirtyDialog.body || dirtyDialog.title;
+                clearText = clearText.split('<br>');
+                if (clearText.length > 2) {
+                    clearText = clearText.slice(0, 2).join('<br>') + '...';
+                } else {
+                    clearText = clearText.join('<br>');
+                }
                 if (clearText.length > 250) {
                     clearText = clearText.substring(0, 200) + '...';
                 }
