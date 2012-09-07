@@ -10,7 +10,7 @@ class watchDog
 {
 
     public function Execute() {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'timeout' );
