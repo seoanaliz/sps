@@ -512,7 +512,7 @@ var Dialogs = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
+                if ($.isFunction(callback) && data.length) callback(data);
             });
         }
     },
@@ -612,12 +612,13 @@ var Messages = Widget.extend({
 
         t.on('scroll', (function onScroll() {
             t.updateInputBox();
+            t.updateTop();
 
             if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
             return onScroll;
-        }));
+        })());
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
@@ -674,7 +675,7 @@ var Messages = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
+                if ($.isFunction(callback) && data.messages.length) callback(data);
             });
         }
     },
@@ -708,6 +709,14 @@ var Messages = Widget.extend({
         } else {
             $inputBox.removeClass('fixed');
         }
+    },
+
+    updateTop: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $messages = $el.find('.messages');
+
+        $messages.css('padding-top', $(window).height() - $messages.height() - 173);
     },
 
     scrollBottom: function() {

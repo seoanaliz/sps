@@ -1,7 +1,8 @@
 body{overflow-y:scroll;}
 #main{width:1100px;margin:10px auto;}#main>.left-column{float:left;width:800px;border:1px solid #c4cde0;padding-top:50px;position:relative;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;}#main>.left-column>.header{position:absolute;top:0;z-index:2;border:1px solid #fff;border-bottom:1px solid #dae1e8;background:#f1f1f1;width:798px;-webkit-border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;border-radius:3px 3px 0 0;}#main>.left-column>.header.fixed{position:fixed;box-shadow:0 2px 1px rgba(0, 0, 0, 0.1);-webkit-transition:box-shadow 0.5s;-moz-transition:box-shadow 0.5s;-o-transition:box-shadow 0.5s;transition:box-shadow 0.5s;}
 #main>.left-column>.list{position:relative;-webkit-border-radius:0 0 3px 3px;-moz-border-radius:0 0 3px 3px;border-radius:0 0 3px 3px;}#main>.left-column>.list:empty{text-align:center;color:#999999;font-size:16px;height:400px;background:#ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;}
-#main>.left-column>.list>.messages{padding:5px 0;padding-bottom:110px;}#main>.left-column>.list>.messages .message.viewer+.message.viewer>.left-column .photo{display:none;}
+#main>.left-column>.list>.messages{padding:5px 0 110px;}#main>.left-column>.list>.messages.bottom{position:absolute;width:100%;bottom:0;}
+#main>.left-column>.list>.messages .message.viewer+.message.viewer>.left-column .photo{display:none;}
 #main>.left-column>.list>.messages .message.viewer+.message.viewer>.center-column .title{display:none;}
 #main>.left-column>.list>.messages .message{padding:5px 0;}#main>.left-column>.list>.messages .message.new{background-color:#edf1f5;}
 #main>.left-column>.list>.messages .message>div{min-height:1px;}
@@ -44,3 +45,8 @@ body{overflow-y:scroll;}
 .ui-dropdown-add-to-list input{width:100%;border-left:0;border-right:0;}
 .empty{color:#777;text-align:center;padding:30% 0;line-height:0;}
 .load{background:#ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;padding:30% 0;}
+.scroll-like-mac::-webkit-scrollbar{width:6px;height:6px;}
+.scroll-like-mac::-webkit-scrollbar-thumb{background:rgba(0, 0, 0, 0.1);border-radius:3px;}
+.scroll-like-mac:hover::-webkit-scrollbar-thumb,.scroll-like-mac:focus::-webkit-scrollbar-thumb{background:rgba(0, 0, 0, 0.4);}
+.scroll-like-mac::-webkit-resizer,.scroll-like-mac::-webkit-scrollbar-corner,.scroll-like-mac::-webkit-scrollbar-track-piece{background:transparent;}
+.scroll-like-mac:hover::-webkit-resizer,.scroll-like-mac:hover::-webkit-scrollbar-corner,.scroll-like-mac:hover::-webkit-scrollbar-track-piece{background:transparent;}
