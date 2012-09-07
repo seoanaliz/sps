@@ -97,7 +97,7 @@ var IM = Widget.extend({
             console.log('poll...');
             var timeout = 15;
             $.ajax({
-                url: 'http://im.openapi.lc/int/controls/watchDog/',
+                url: 'http://im.' + hostname + '/int/controls/watchDog/',
                 data: {
                     userId: Configs.vkId,
                     timeout: timeout,
