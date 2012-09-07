@@ -93,41 +93,20 @@ var IM = Widget.extend({
     bindEvents: function() {
         var t = this;
 
-        (function poll() {
+        (function poll(ts) {
             console.log('poll...');
-            setTimeout(function() {
-                $.ajax({
-                    url: Configs.controlsRoot + 'watchDog/',
-                    dataType: 'json',
-                    data: {
-                        userId: Configs.vkId
-                    },
-                    success: function(data) {
-                        $.each(data.response, function(i, event) {
-                            t.newEvent(event);
-                        });
-                    }
-                });
-                poll();
-            }, 5000);
-        })();
-
-        (function poll() {
-            return;
-            console.log('poll...');
+            var timeout = 15;
             $.ajax({
                 url: 'http://im.openapi.lc/int/controls/watchDog/',
                 data: {
-                    userId: Configs.vkId
+                    userId: Configs.vkId,
+                    timeout: timeout,
+                    ts: ts
                 },
                 dataType: 'jsonp',
-                //timeout: 30000,
-                complete: poll,
                 success: function(data) {
-                    console.log(data);
-                    var res = data.response;
-                    if (!res || !res.length) return;
-                    $.each(res, function(i, event) {
+                    poll(data.response.ts);
+                    $.each(data.response.events, function(i, event) {
                         t.newEvent(event);
                     });
                 }
@@ -533,7 +512,7 @@ var Dialogs = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
+                if ($.isFunction(callback) && data.length) callback(data);
             });
         }
     },
@@ -633,12 +612,13 @@ var Messages = Widget.extend({
 
         t.on('scroll', (function onScroll() {
             t.updateInputBox();
+            t.updateTop();
 
             if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
             return onScroll;
-        }));
+        })());
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
@@ -695,7 +675,7 @@ var Messages = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
+                if ($.isFunction(callback) && data.messages.length) callback(data);
             });
         }
     },
@@ -729,6 +709,14 @@ var Messages = Widget.extend({
         } else {
             $inputBox.removeClass('fixed');
         }
+    },
+
+    updateTop: function() {
+        var t = this;
+        var $el = $(t.el);
+        var $messages = $el.find('.messages');
+
+        $messages.css('padding-top', $(window).height() - $messages.height() - 173);
     },
 
     scrollBottom: function() {
@@ -870,7 +858,7 @@ var List = Widget.extend({
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
-        var notAnimate = !e.originalEvent;
+        var notAnimate = false;
         if ($target.data('dialogs')) {
             t.toggleDialogs($target, notAnimate);
         } else {

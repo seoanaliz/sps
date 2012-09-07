@@ -49,8 +49,7 @@ body {
             }
 
             &>.messages {
-                padding: 5px 0;
-                padding-bottom: 110px;
+                padding: 5px 0 110px;
 
                 .message.viewer + .message.viewer {
                     &>.left-column {
@@ -475,4 +474,29 @@ body {
 .load {
     background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
     padding: 30% 0;
+}
+
+.scroll-like-mac {
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+    }
+    &:hover::-webkit-scrollbar-thumb,
+    &:focus::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.4);
+    }
+    &::-webkit-resizer,
+    &::-webkit-scrollbar-corner,
+    &::-webkit-scrollbar-track-piece {
+        background: transparent;
+    }
+    &:hover::-webkit-resizer,
+    &:hover::-webkit-scrollbar-corner,
+    &:hover::-webkit-scrollbar-track-piece {
+        background: transparent;
+    }
 }
