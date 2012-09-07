@@ -193,7 +193,7 @@ var MESSAGES_ITEM =
 '</div>';
 
 var MESSAGE_ATTACHMENT_PHOTO =
-'<a target="_blank" href="<?=isset("src_xxxbig") ? src_xxxbig : src_big?>" style="height: <?=height?>px">' +
+'<a target="_blank" href="http://vk.com/photo<?=owner_id?>_<?=pid?>">' +
     '<img src="<?=src_big?>" alt="" />' +
 '</a>';
 
