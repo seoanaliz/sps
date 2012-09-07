@@ -5,8 +5,8 @@
      * @subpackage Stat
      */
 
-    define ( 'ACC_TOK_WRK', 'b03d241fb0371ee7b0371ee7b6b01c4063bb037b0222679cb604e99dfff088b' );
-//    define ( 'ACC_TOK_WRK', '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a' );
+//    define ( 'ACC_TOK_WRK', 'b03d241fb0371ee7b0371ee7b6b01c4063bb037b0222679cb604e99dfff088b' );
+    define ( 'ACC_TOK_WRK', '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a' );
     define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
     class VkHelper {
