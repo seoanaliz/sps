@@ -247,10 +247,9 @@
             $ids = self::get_users_dialogs( $user_id );
 
             foreach( $ids as $k => &$v ) {
-                $group_id = self::get_dialog_group( $v );
+               $group_id = self::get_dialog_group( $v );
                 $v = $group_id ? $group_id : '-1';
             }
-
             return $ids;
         }
 
@@ -272,7 +271,6 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-//            echo $cmd->getQuery();
             $ds = $cmd->Execute();
 
             $res = array();

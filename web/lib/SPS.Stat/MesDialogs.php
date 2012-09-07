@@ -15,26 +15,17 @@
             if ( !$access_token )
                 return 'no access_token';
             $params = array(
-                                'access_token'      =>  $access_token,
-                                'count'             =>  $limit,
-                                'preview_lenght'    =>  50,
-                                'offset'            =>  $offset
+                            'access_token'      =>  $access_token,
+                            'count'             =>  $limit,
+                            'offset'            =>  $offset
             );
 
             $offset = 0;
             $dialogs_array = array();
 
-//            while ( 1 ) {
-//                $params[ 'offset' ] = $offset;
-                $res   = VkHelper::api_request( 'messages.getDialogs', $params );
-                $count = $res[0];
-                unset( $res[0] );
-//                $offset += 100;
+            $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
+                unset( $dialogs_array[0] );
 
-                $dialogs_array = array_merge( $dialogs_array, $res );
-//                if ( $count < $offset )
-//                    break;
-//            }
             return( $dialogs_array );
         }
 
@@ -225,6 +216,28 @@
             $url = "http://{$a['server']}?act=a_check&key={$a['key']}&ts=$ts&wait=" . $timeout . "&mode=2";
 
             $res = json_decode( file_get_contents( $url ));
+            return $res;
+        }
+
+        public static function get_rec_groups( $user_id, $rec_id )
+        {
+            $sql = "SELECT DISTINCT(a.group_id) FROM "
+                      . TABLE_MES_GROUP_USER_REL   . " as a, "
+                      . TABLE_MES_GROUP_DIALOG_REL . " as b, "
+                      . TABLE_MES_DIALOGS          . " as c
+                    WHERE
+                        c.id=b.dialog_id
+                        AND a.group_id = b.group_id
+                        AND a.user_id=@user_id and rec_id=@rec_id";
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id', $user_id );
+            $cmd->SetInteger( '@rec_id', $rec_id );
+
+            $ds =  $cmd->Execute();
+            $res = array();
+            while ( $ds->Next()) {
+                $res[] = $ds->GetValue( 'group_id', TYPE_INTEGER );
+            }
             return $res;
         }
     }
