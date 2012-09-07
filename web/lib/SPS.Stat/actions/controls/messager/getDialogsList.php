@@ -41,13 +41,12 @@ class getDialogsList
             $row_dialog_array  = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
         }
 
-        $i = -1;
         $user_ids = array();
-        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
+//        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
 
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
-            $dialog->groups = $ids[$dialog->uid];
+            $dialog->groups = MesDialogs::get_rec_groups( $user_id, $dialog->uid );
             if( !$dialog->id )
                 $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
             if ( isset( $dialog->chat_id )
@@ -60,15 +59,11 @@ class getDialogsList
 //                || ( $ungrouped &&  $ids[ $dialog->uid ] != -1 )
             );
             else {
-
                 unset( $dialog->attachment );
                 if( !isset( $dialog->attachments ))
                     $dialog->attachments = array();
                 $dialogs_array[] = $dialog;
                 $user_ids[] = $dialog->uid;
-//
-//                if ( $i == $offset + $limit - 1 )
-//                    break;
             }
         }
         unset( $dialog );
