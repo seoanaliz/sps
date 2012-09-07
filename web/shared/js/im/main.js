@@ -1,3 +1,4 @@
+var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 var Configs = {
     vkId: $.cookie('uid'),
     token: $.cookie('token'),
@@ -69,7 +70,7 @@ $(document).ready(function() {
             im.trigger('scroll');
         });
         $(window).on('resize', function() {
-            im.trigger('resize');
+            im.trigger('scroll');
         });
     });
 });
@@ -93,7 +94,6 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll() {
-            //return;
             console.log('poll...');
             setTimeout(function() {
                 $.ajax({
@@ -111,37 +111,34 @@ var IM = Widget.extend({
                 poll();
             }, 5000);
         })();
+
         (function poll() {
-            return false;
+            return;
             console.log('poll...');
             $.ajax({
-                url: Configs.controlsRoot + 'watchDog/',
+                url: 'http://im.openapi.lc/int/controls/watchDog/',
                 data: {
                     userId: Configs.vkId
                 },
-                dataType: 'json',
+                dataType: 'jsonp',
+                //timeout: 30000,
                 complete: poll,
-                timeout: 30000,
                 success: function(data) {
-                    var res = data.response[0];
-                    if (!res || !res.type) return;
-                    switch (res.type) {
-                        case 'inMessage':
-                            console.log(['new message: ', res.content, res.content.body]);
-                        break;
-                        case 'online':
-                            console.log(['online: ', res.content]);
-                        break;
-                        case 'offline':
-                            console.log(['online: ', res.content]);
-                        break;
-                    }
+                    console.log(data);
+                    var res = data.response;
+                    if (!res || !res.length) return;
+                    $.each(res, function(i, event) {
+                        t.newEvent(event);
+                    });
                 }
             });
         })();
 
         t.on('scroll', function() {
             t.leftColumn.trigger('scroll');
+        });
+        t.leftColumn.on('updateList', function() {
+            t.rightColumn.update();
         });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
@@ -169,7 +166,9 @@ var IM = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-                t.leftColumn.trigger('addMessage', event.content);
+                var message = event.content;
+                t.leftColumn.addMessage(message);
+                t.rightColumn.addMessage(message);
             break;
         }
     }
@@ -201,28 +200,30 @@ var LeftColumn = Widget.extend({
         var $el = $(t.el);
         var $header = $el.find('.header');
 
-        $el.css('padding-top', $header.outerHeight());
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             $el.css('padding-top', $header.outerHeight());
             if ($(window).scrollTop() > 10) {
                 $header.addClass('fixed');
             } else {
                 $header.removeClass('fixed');
             }
-        });
+            return onScroll;
+        })());
+
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
         });
-        t.on('addMessage', function(message) {
-            console.log('addMessage: ');
-            console.log(message);
-            if (t.messages) {
-                t.messages.trigger('addMessage', message);
-            } else if (t.dialogs) {
-                t.dialogs.trigger('addMessage', message);
-            }
-        });
+    },
+
+    addMessage: function(message) {
+        var t = this;
+
+        if (t.messages) {
+            t.messages.addMessage(message);
+        } else if (t.dialogs) {
+            t.dialogs.addMessage();
+        }
     },
 
     initTabs: function() {
@@ -253,6 +254,15 @@ var LeftColumn = Widget.extend({
         });
         t.dialogs.on('select', function(id, title) {
             t.initMessages(id, title);
+        });
+        t.dialogs.on('addList', function() {
+            t.trigger('updateList');
+        });
+        t.dialogs.on('addToList', function() {
+            t.trigger('updateList');
+        });
+        t.dialogs.on('removeFromList', function() {
+            t.trigger('updateList');
         });
 
         if (t.curListId && t.curListId != listId) {
@@ -298,6 +308,16 @@ var RightColumn = Widget.extend({
         t.initList();
     },
 
+    update: function() {
+        var t = this;
+        t.list.update();
+    },
+
+    addMessage: function(message) {
+        var t = this;
+        t.list.incrementCounter(message.groups, message.dialog_id);
+    },
+
     initList: function() {
         var t = this;
         t.list = new List({
@@ -314,11 +334,13 @@ var RightColumn = Widget.extend({
 
 var Dialogs = Widget.extend({
     template: DIALOGS,
+    tmplDialog: DIALOGS_ITEM,
+    tmplDialogsBlock: DIALOGS_BLOCK,
     listId: null,
     itemsLimit: 20,
     currentPage: 1,
-    tmplDialog: DIALOGS_ITEM,
 
+    preloadData: {},
     isBlock: false,
 
     events: {
@@ -331,24 +353,16 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
-        Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
+        t.templateData = {id: listId, list: [], isLoad: true};
+        t.renderTemplate();
+        t.getBlockData(0, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
             t.bindEvents();
             t.scrollTop();
-            $(t.el).find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+            t.makeDialogs($el);
+            t.preload();
         });
     },
 
@@ -356,34 +370,27 @@ var Dialogs = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
                 t.showMore();
             }
-        });
-        t.on('addMessage', function() {
-            var t = this;
-            var listId = t.listId;
+            return onScroll;
+        })());
+    },
 
-            Events.fire('get_dialogs', listId, 0, t.itemsLimit, function(data) {
-                t.templateData = {id: listId, list: data};
-                t.listId = listId;
-                t.renderTemplate();
-                t.bindEvents();
-                t.scrollTop();
-                $(t.el).find('.date').easydate({
-                    live: true,
-                    set_title: false,
-                    date_parse: function(date) {
-                        date = intval(date) * 1000;
-                        if (!date) return;
-                        return new Date(date);
-                    },
-                    uneasy_format: function(date) {
-                        return date.toLocaleDateString();
-                    }
-                });
-            });
+    addMessage: function() {
+        var t = this;
+        var $el = $(t.el);
+        var listId = t.listId;
+
+        t.getBlockData(0, function(data) {
+            t.templateData = {id: listId, list: data};
+            t.listId = listId;
+            t.renderTemplate();
+            t.bindEvents();
+            t.scrollTop();
+            t.makeDialogs($el);
+            t.preload();
         });
     },
 
@@ -439,17 +446,22 @@ var Dialogs = Widget.extend({
                                         if (e.keyCode == KEY.ENTER) {
                                             Events.fire('add_list', $input.val(), function() {
                                                 updateDropdown();
+                                                t.trigger('addList');
                                             });
                                         }
                                     });
                                     $(this).dropdown('refreshPosition');
                                 }
                             } else {
-                                Events.fire('add_to_list', dialogId, item.id, function() {});
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
                             }
                         },
                         onunselect: function(item) {
-                            Events.fire('remove_from_list', dialogId, item.id, function() {});
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
                         },
                         data: $.merge(lists, [
                             {id: 'add_list', title: 'Создать список'}
@@ -462,7 +474,7 @@ var Dialogs = Widget.extend({
     },
 
     clickDialog: function(e) {
-        if ($(e.target).is('a')) return;
+        if ($(e.target).closest('a').length) return;
 
         var t = this;
         var $target = $(e.currentTarget);
@@ -480,46 +492,89 @@ var Dialogs = Widget.extend({
         $(window).scrollTop(0);
     },
 
+    createBlock: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplDialogsBlock, {id: t.currentPage, list: data}));
+    },
+
+    createDialog: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplDialog, data));
+    },
+
+    makeDialogs: function($el) {
+        $el.find('.date').easydate({
+            live: true,
+            set_title: false,
+            date_parse: function(date) {
+                date = intval(date) * 1000;
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    },
+
+    preload: function() {
+        var t = this;
+        var page = t.currentPage;
+        t.getBlockData(page, function(data) {
+            if (!t.preloadData[t.listId]) t.preloadData[t.listId] = {};
+            t.preloadData[t.listId][page] = data;
+        });
+    },
+
+    getBlockData: function(page, callback) {
+        var t = this;
+
+        if (t.preloadData[t.listId] && t.preloadData[t.listId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
+        } else {
+            Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+                if ($.isFunction(callback)) callback(data);
+            });
+        }
+    },
+
     showMore: function() {
         var t = this;
-        if (t.isBlock) return;
+        if (t.isLock()) return;
         var $el = $(t.el);
         var $dialogs = $el.find('.dialogs');
 
-        t.isBlock = true;
-        Events.fire('get_dialogs', t.listId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            var blockId = 'dialogsBlock' + t.currentPage;
-            var html = '<div id="' + blockId + '">';
-            $.each(data, function(i, data) {
-                html += (tmpl(t.tmplDialog, data));
-            });
-            html += '</div>';
-            $dialogs.append(html);
-            $('#' + blockId).find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
-            t.isBlock = false;
+        t.lock();
+        t.getBlockData(t.currentPage, function(data) {
+            var $block = t.createBlock(data);
+            $dialogs.append($block);
+            t.makeDialogs($block);
+            t.preload();
+            t.unlock();
         });
         t.currentPage++;
+    },
+
+    isLock: function() {
+        return this.isBlock;
+    },
+    lock: function() {
+        this.isBlock = true;
+    },
+    unlock: function() {
+        this.isBlock = false;
     }
 });
 
 var Messages = Widget.extend({
     template: MESSAGES,
+    tmplMessage: MESSAGES_ITEM,
+    tmplMessagesBlock: MESSAGES_BLOCK,
     dialogId: null,
     itemsLimit: 20,
     currentPage: 1,
-    tmplMessage: MESSAGES_ITEM,
 
+    preloadData: {},
     user: {},
     isBlock: false,
 
@@ -531,7 +586,15 @@ var Messages = Widget.extend({
         var t = this;
         var dialogId = t.dialogId = params.dialogId;
 
-        Events.fire('get_messages', dialogId, 0, t.itemsLimit, function(data) {
+        t.templateData = {
+            id: dialogId,
+            list: [],
+            isLoad: true,
+            viewer: Data.users[0],
+            user: Data.users[0]
+        };
+        t.renderTemplate();
+        t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -552,20 +615,7 @@ var Messages = Widget.extend({
             var $el = $(t.el);
             var $textarea = $el.find('textarea');
 
-            $el.find('.videos').imageComposition({width: 500, height: 240});
-            $el.find('.photos').imageComposition({width: 500, height: 300});
-            $el.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+            t.makeMessages($el);
             $textarea.placeholder();
             $textarea.autoResize();
             $textarea.inputMemory('message' + dialogId);
@@ -573,6 +623,7 @@ var Messages = Widget.extend({
             $textarea[0].scrollTop = $textarea[0].scrollHeight;
             t.bindEvents();
             t.scrollBottom();
+            t.preload();
         });
     },
 
@@ -580,40 +631,14 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        t.on('scroll', function() {
+        t.on('scroll', (function onScroll() {
             t.updateInputBox();
 
             if ($(window).scrollTop() < 600) {
                 t.showMore();
             }
-        });
-        t.on('addMessage', function(message) {
-            var t = this;
-
-            if (message.dialog_id != t.dialogId) return;
-            var data = {
-                id: message.mid,
-                text: message.body,
-                user: t.user,
-                isNew: true,
-                timestamp: message.date
-            };
-            var $newMessage = $(tmpl(t.tmplMessage, data));
-            $el.find('.messages').append($newMessage);
-            $newMessage.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
-            t.scrollBottom();
-        });
+            return onScroll;
+        }));
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
@@ -625,6 +650,26 @@ var Messages = Widget.extend({
         });
     },
 
+    addMessage: function(message) {
+        var t = this;
+        var $el = $(t.el);
+
+        if (message.dialog_id != t.dialogId) return;
+        var clearMessage = {
+            id: message.mid,
+            text: message.body,
+            user: t.user,
+            isNew: true,
+            timestamp: message.date
+        };
+        var $oldMessage = $el.find('[data-id=' + clearMessage.id + ']');
+        if ($oldMessage.length) return;
+        var $newMessage = t.createMessage(clearMessage);
+        $el.find('.messages').append($newMessage);
+        t.makeMessages($newMessage);
+        t.scrollBottom();
+    },
+
     hoverMessage: function(e) {
         if (e.type != 'mouseenter') return;
         var $message = $(e.currentTarget);
@@ -634,39 +679,42 @@ var Messages = Widget.extend({
         });
     },
 
+    preload: function() {
+        var t = this;
+        var page = t.currentPage;
+        t.getBlockData(page, function(data) {
+            if (!t.preloadData[t.dialogId]) t.preloadData[t.dialogId] = {};
+            t.preloadData[t.dialogId][page] = data;
+        });
+    },
+
+    getBlockData: function(page, callback) {
+        var t = this;
+
+        if (t.preloadData[t.dialogId] && t.preloadData[t.dialogId][page]) {
+            if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
+        } else {
+            Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+                if ($.isFunction(callback)) callback(data);
+            });
+        }
+    },
+
     showMore: function() {
         var t = this;
-        if (t.isBlock) return;
+        if (t.isLock()) return;
         var $el = $(t.el);
         var $messages = $el.find('.messages');
-        //@todo: изменить этот стыд
 
-        t.isBlock = true;
-        Events.fire('get_messages', t.dialogId, (t.currentPage * t.itemsLimit), t.itemsLimit, function(data) {
-            var blockId = 'messagesBlock' + t.currentPage;
-            var html = '<div id="' + blockId + '">';
-            $.each(data.messages, function(i, data) {
-                html += (tmpl(t.tmplMessage, data));
-            });
-            html += '</div>';
-            $messages.prepend(html);
-            var $block = $('#' + blockId);
-            $block.find('.videos').imageComposition({width: 500, height: 240});
-            $block.find('.photos').imageComposition({width: 500, height: 300});
-            $block.find('.date').easydate({
-                live: true,
-                set_title: false,
-                date_parse: function(date) {
-                    date = intval(date) * 1000;
-                    if (!date) return;
-                    return new Date(date);
-                },
-                uneasy_format: function(date) {
-                    return date.toLocaleDateString();
-                }
-            });
+        t.lock();
+        t.getBlockData(t.currentPage, function(data) {
+            var blockId = t.currentPage;
+            var $block = t.createBlock(data);
+            $messages.prepend($block);
+            t.makeMessages($block);
+            t.preload();
+            t.unlock();
             $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
-            t.isBlock = false;
         });
         t.currentPage++;
     },
@@ -687,6 +735,33 @@ var Messages = Widget.extend({
         $(window).scrollTop($(document).height());
     },
 
+    createBlock: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplMessagesBlock, {id: t.currentPage, list: data.messages}));
+    },
+
+    createMessage: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplMessage, data));
+    },
+
+    makeMessages: function($el) {
+        $el.find('.videos').imageComposition({width: 500, height: 240});
+        $el.find('.photos').imageComposition({width: 500, height: 300});
+        $el.find('.date').easydate({
+            live: true,
+            set_title: false,
+            date_parse: function(date) {
+                date = intval(date) * 1000;
+                if (!date) return;
+                return new Date(date);
+            },
+            uneasy_format: function(date) {
+                return date.toLocaleDateString();
+            }
+        });
+    },
+
     sendMessage: function() {
         var t = this;
         var $el = $(t.el);
@@ -697,22 +772,9 @@ var Messages = Widget.extend({
         if (text) {
             Events.fire('send_message', t.dialogId, text, function(data) {
                 $textarea.val('');
-                var $newMessage = $(tmpl(t.tmplMessage, data));
+                var $newMessage = t.createMessage(data);
                 $el.find('.messages').append($newMessage);
-                $newMessage.find('.videos').imageComposition({width: 500, height: 240});
-                $newMessage.find('.photos').imageComposition({width: 500, height: 300});
-                $newMessage.find('.date').easydate({
-                    live: true,
-                    set_title: false,
-                    date_parse: function(date) {
-                        date = intval(date) * 1000;
-                        if (!date) return;
-                        return new Date(date);
-                    },
-                    uneasy_format: function(date) {
-                        return date.toLocaleDateString();
-                    }
-                });
+                t.makeMessages($newMessage);
                 if (isScroll) {
                     t.scrollBottom();
                 }
@@ -721,6 +783,16 @@ var Messages = Widget.extend({
         } else {
             $textarea.focus();
         }
+    },
+
+    isLock: function() {
+        return this.isBlock;
+    },
+    lock: function() {
+        this.isBlock = true;
+    },
+    unlock: function() {
+        this.isBlock = false;
     }
 });
 
@@ -731,28 +803,80 @@ var List = Widget.extend({
     events: {
         'click: .item > .title > .icon': 'clickIcon',
         'click: .item > .title': 'selectDialogs',
-        'click: .public': 'selectMessages'
+        'click: .dialog': 'selectMessages'
     },
 
     run: function() {
         var t = this;
+        var $el = $(t.el);
 
         Events.fire('get_lists', function(data) {
             t.templateData = {list: data};
             t.renderTemplate();
+
+            var openListsIds = t.getOpenListsIds();
+            $.each(openListsIds, function(i, listId) {
+                if (!listId) return;
+                Events.fire('get_lists', function(data) {
+                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
+                });
+            });
         });
+    },
+
+    getOpenListsIds: function() {
+        var openListsIds = localStorage.getItem('openListsIds');
+        if (!openListsIds) openListsIds = '';
+        return openListsIds.split(',');
+    },
+
+    setOpenListsIds: function(listIds) {
+        localStorage.setItem('openListsIds', listIds.join(','));
+    },
+
+    addOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                return;
+            }
+        }
+
+        listIds.push(listId);
+        t.setOpenListsIds(listIds);
+    },
+
+    removeOpenListId: function(listId) {
+        var t = this;
+        var listIds = t.getOpenListsIds();
+
+        for (var i = 0; i < listIds.length; i++) {
+            if (listId == listIds[i]) {
+                listIds.splice(i, i);
+            }
+        }
+
+        t.setOpenListsIds(listIds);
+    },
+
+    update: function() {
+        var t = this;
+        t.run();
     },
 
     clickIcon: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var listId = $target.data('id');
+        var notAnimate = !e.originalEvent;
         if ($target.data('dialogs')) {
-            t.showDialogs($target);
+            t.toggleDialogs($target, notAnimate);
         } else {
-            Events.fire('get_dialogs', listId, 0, t.dialogsLimit, function(data) {
+            Events.fire('get_dialogs_list', listId, 0, t.dialogsLimit, function(data) {
                 $target.data('dialogs', data);
-                t.showDialogs($target);
+                t.toggleDialogs($target, notAnimate);
             });
         }
         return false;
@@ -763,6 +887,8 @@ var List = Widget.extend({
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
     },
 
@@ -771,10 +897,14 @@ var List = Widget.extend({
         var $target = $(e.currentTarget);
         var dialogId = $target.data('id');
         var title = $target.data('title');
+        $(t.el).find('.title.active, .dialog.active').removeClass('active');
+        $target.closest('.dialog').addClass('active');
         t.trigger('selectMessages', dialogId, title);
     },
 
-    showDialogs: function($el) {
+    toggleDialogs: function($el, notAnimate) {
+        var t = this;
+        var listId = $el.data('id');
         var dialogs = $el.data('dialogs');
         if (dialogs.length) {
             var list = $el.find('> .list');
@@ -782,6 +912,7 @@ var List = Widget.extend({
                 list.slideUp(100, function() {
                     $(this).remove();
                 });
+                t.removeOpenListId(listId);
             } else {
                 var html = '<div class="list">';
                 $.each(dialogs, function(i, dialog) {
@@ -790,11 +921,41 @@ var List = Widget.extend({
                 html += '</div>';
                 var $dialogs = $(html);
                 $el.append($dialogs);
-                var cssHeight = $dialogs.css('height');
-                var height = $dialogs.height();
-                $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
-                    $(this).css({height: cssHeight})
-                });
+                t.addOpenListId(listId);
+
+                if (!notAnimate) {
+                    var cssHeight = $dialogs.css('height');
+                    var height = $dialogs.height();
+                    $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
+                        $(this).css({height: cssHeight})
+                    });
+                }
+            }
+        }
+    },
+
+    incrementCounter: function(listIds, dialogId) {
+        var t = this;
+        var $el = $(t.el);
+
+        $.each(listIds, function(i, listId) {
+            var $item = $el.find('.item[data-id=' + listId + ']');
+            increment($item.find('> .title'));
+        });
+
+        var $dialog = $el.find('.dialog[data-id=' + dialogId + ']');
+        increment($dialog.find('> .title'));
+
+        function increment($item) {
+            if ($item.length) {
+                var $counter = $item.find('.counter');
+                if (!$counter.data('counter')) {
+                    $counter.counter({prefix: '+'});
+                    $item.click(function() {
+                        $counter.counter('setCounter', 0);
+                    });
+                }
+                $counter.counter('increment');
             }
         }
     }

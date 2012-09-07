@@ -64,34 +64,52 @@ var RIGHT_COLUMN =
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<? each(DIALOGS_ITEM, list); ?>' +
+        '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
 '</div>';
 
+var DIALOGS_BLOCK =
+'<div class="dialogs-block<?=id?>">' +
+    '<? each(DIALOGS_ITEM, list); ?>' +
+'</div>';
+
 var DIALOGS_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
-'<div class="dialog clear-fix<?=isNew ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="user">' +
         '<div class="photo">' +
-            '<img src="<?=user.photo?>" alt="" />' +
+            '<a href="http://vk.com/id<?=user.id?>" target="_blank"><img src="<?=user.photo?>" alt="" /></a>' +
         '</div>' +
         '<div class="info clear-fix">' +
-            '<div class="name"><a href="http://vk.com/id<?=user.id?>" target="_blank"><?=user.name?></a></div>' +
+            '<div class="name">' +
+                '<a href="http://vk.com/id<?=user.id?>" target="_blank"><?=user.name?></a>' +
+            '</div>' +
             '<? if (user.isOnline) { ?>' +
                 '<div class="status">Online</div>' +
             '<? } ?>' +
             '<div class="date">' +
-                '<? if (isset("lastMessage")) { ?>' +
-                    '<?=lastMessage.timestamp?>' +
-                '<? } ?>' +
+                '<?=timestamp?>' +
             '</div>' +
         '</div>' +
     '</div>' +
     '<div class="history">' +
-        '<? if (isset("lastMessage")) { ?>' +
-            '<?=lastMessage.text?>' +
+        '<? if (isset("text")) { ?>' +
+            '<? if (isViewer) { ?>' +
+                '<div class="from-me clear-fix<?=isNew ? " new" : ""?>">' +
+                    '<div class="photo">' +
+                        '<img src="<?=viewer.photo?>" alt="" />' +
+                    '</div> ' +
+                    '<div class="body">' +
+                        '<?=text?>' +
+                    '</div> ' +
+                '</div>' +
+            '<? } else { ?>' +
+                '<?=text?>' +
+            '<? } ?>' +
         '<? } else { ?>' +
             '...' +
         '<? } ?>' +
@@ -108,7 +126,9 @@ var DIALOGS_ITEM =
 var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<? each(MESSAGES_ITEM, list); ?>' +
+        '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
+    '<? } else if (isset("isLoad") && isLoad) { ?>' +
+        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
@@ -136,6 +156,11 @@ var MESSAGES =
             '</a>' +
         '</div>' +
     '</div>' +
+'</div>';
+
+var MESSAGES_BLOCK =
+'<div class="messages-block<?=id?>">' +
+    '<? each(MESSAGES_ITEM, list); ?>' +
 '</div>';
 
 var MESSAGES_ITEM =
@@ -221,7 +246,7 @@ var MESSAGE_ATTACHMENT =
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
     '<div class="item" data-id="999999" data-title="Не в списке">' +
-        '<div class="title">Не в списке</div>' +
+        '<div class="title active">Не в списке</div>' +
     '</div>' +
     '<? each(LIST_ITEM, list); ?>' +
 '<? } else { ?>' +
@@ -231,7 +256,7 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title">' +
-        '<?=title?>' +
+        '<?=title?><span class="counter"></span>' +
         '<div class="icon plus"></div>' +
     '</div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
@@ -242,7 +267,7 @@ var LIST_ITEM =
 '</div>';
 
 var LIST_ITEM_DIALOG =
-'<div class="public" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog" data-id="<?=id?>" data-title="<?=user.name?>">' +
     '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
-    '<div class="title"><?=user.name?></div>' +
+    '<div class="title"><?=user.name?><span class="counter"></span></div>' +
 '</div>';

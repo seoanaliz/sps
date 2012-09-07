@@ -52,6 +52,18 @@ body {
                 padding: 5px 0;
                 padding-bottom: 110px;
 
+                .message.viewer + .message.viewer {
+                    &>.left-column {
+                        .photo {
+                            display: none;
+                        }
+                    }
+                    &>.center-column {
+                        .title {
+                            display: none;
+                        }
+                    }
+                }
                 .message {
                     padding: 5px 0;
 
@@ -59,14 +71,17 @@ body {
                         background-color: @bg_light_hover;
                     }
 
+                    &>div {
+                        min-height: 1px;
+                    }
                     &>.left-column {
                         width: 15%;
                         float: left;
                         text-align: right;
 
                         &>.photo {
-                            width: 50px;
-                            height: 50px;
+                            width: 40px;
+                            height: 40px;
                             display: inline-block;
                             overflow: hidden;
                             .border-radius(2px);
@@ -86,6 +101,7 @@ body {
 
                             .title {
                                 font-weight: bold;
+                                margin-bottom: 0.4em;
                             }
                             .text {
                                 overflow: hidden;
@@ -210,9 +226,6 @@ body {
                     padding: 10px;
                     cursor: pointer;
 
-                    &:last-child {
-                        //border-bottom: none;
-                    }
                     &:hover {
                         background: @bg_light_hover;
                     }
@@ -260,6 +273,31 @@ body {
                         float: left;
                         overflow: hidden;
                         color: @color_link;
+
+                        &>.from-me {
+                            padding: 8px;
+                            min-height: 34px;
+
+                            &.new {
+                                background-color: @bg_light_hover;
+                            }
+
+                            &>.photo {
+                                position: absolute;
+                                width: 34px;
+                                height: 34px;
+                                overflow: hidden;
+                                .border-radius(2px);
+
+                                &>img {
+                                    max-width: 100%;
+                                    .border-radius(2px);
+                                }
+                            }
+                            &>.body {
+                                margin-left: 44px;
+                            }
+                        }
                     }
                     &>.actions {
                         width: 5%;
@@ -331,8 +369,17 @@ body {
                     position: relative;
 
                     &:hover {
-                       background-color: @bg_light_hover;
-                   }
+                        background-color: @bg_light_hover;
+                    }
+
+                    &.active {
+                        background-color: @bg_hover;
+                    }
+
+                    &>.counter {
+                        margin-left: 1em;
+                        font-weight: bold;
+                    }
 
                     &>.icon {
                         position: absolute;
@@ -353,14 +400,18 @@ body {
                 &>.list {
                     margin: 4px 0;
 
-                    &>.public + .public {
+                    &>.dialog + .dialog {
                         margin-top: 4px;
                     }
-                    &>.public {
+                    &>.dialog {
                         cursor: pointer;
 
                         &:hover {
                             background-color: @bg_light_hover;
+                        }
+
+                        &.active {
+                            background-color: @bg_hover;
                         }
 
                         &>div {
@@ -382,9 +433,11 @@ body {
                         &>.title {
                             padding: 5px;
                             margin-left: 5px;
-                        }
-                        &>.counter {
 
+                            &>.counter {
+                                margin-left: 1em;
+                                font-weight: bold;
+                            }
                         }
                     }
                 }
@@ -415,5 +468,11 @@ body {
 .empty {
     color: #777;
     text-align: center;
+    padding: 30% 0;
+    line-height: 0;
+}
+
+.load {
+    background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
     padding: 30% 0;
 }

@@ -3,6 +3,7 @@
  */
 var Events = {
     delay: 0,
+    isDebug: false,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -10,7 +11,7 @@ var Events = {
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    if(window.console && console.log) {
+                    if (window.console && console.log && t.isDebug) {
                         console.log(name + ':');
                         console.log(args.slice(0, -1));
                         console.log('-------');
@@ -18,7 +19,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if (window.console && console.log) {
+                if (window.console && console.log && t.isDebug) {
                     console.log(e);
                 }
             }
@@ -69,6 +70,28 @@ var Eventlist = {
             callback(clearData);
         });
     },
+    get_dialogs_list: function(listId, offset, limit, callback) {
+        var params = {
+            groupId: listId == 999999 ? undefined : listId,
+            offset: offset,
+            limit: limit
+        };
+        simpleAjax('getGroupDialogs', params, function(dirtyData) {
+            var clearData = [];
+            $.each(dirtyData, function(i, dirtyDialog) {
+                clearData.push({
+                    id: dirtyDialog.id,
+                    user: {
+                        id: dirtyDialog.uid.userId,
+                        name: dirtyDialog.uid.name,
+                        photo: dirtyDialog.uid.ava,
+                        isOnline: (dirtyDialog.uid.online != 0)
+                    }
+                });
+            });
+            callback(clearData);
+        });
+    },
     get_dialogs: function(listId, offset, limit, callback) {
         var params = {
             groupId: listId == 999999 ? undefined : listId,
@@ -78,19 +101,23 @@ var Eventlist = {
         simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearText = dirtyDialog.body || dirtyDialog.title;
+                if (clearText.length > 250) {
+                    clearText = clearText.substring(0, 200) + '...';
+                }
                 clearData.push({
                     id: dirtyDialog.id,
                     isNew: (dirtyDialog.read_state != 1),
+                    isViewer: (dirtyDialog.out != 0),
+                    viewer: Configs.viewer,
                     user: {
                         id: dirtyDialog.uid.userId,
                         name: dirtyDialog.uid.name,
                         photo: dirtyDialog.uid.ava,
                         isOnline: (dirtyDialog.uid.online != 0)
                     },
-                    lastMessage: {
-                        text: dirtyDialog.body || dirtyDialog.title,
-                        timestamp: dirtyDialog.date
-                    },
+                    text: clearText,
+                    timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
             });
@@ -104,7 +131,6 @@ var Eventlist = {
             limit: limit
         };
         simpleAjax('getDialog', params, function(dirtyData) {
-            var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             var clearData = [];
             var dirtyUsers = dirtyData.dialogers;
             var dirtyMessages = dirtyData.messages;
@@ -134,7 +160,7 @@ var Eventlist = {
                 clearMessages.push({
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    isViewer: (dirtyMessage.out != 0),
                     text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
@@ -148,10 +174,17 @@ var Eventlist = {
     send_message: function(dialogId, text, callback) {
         simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
             callback({
-                id: 0,
-                isNew: true,
+                id: data,
+                isNew: false,
                 isViewer: true,
-                text: text.split('\n').join('<br/>'),
+                text: $.trim(text)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;")
+                    .split('\n').join('<br/>')
+                    .replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
