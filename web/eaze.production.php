@@ -35,6 +35,7 @@
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
+    ini_set('display_errors', '0');
 
     BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
 

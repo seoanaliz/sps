@@ -59,7 +59,7 @@ var RIGHT_COLUMN =
         '<div class="tab selected">Контакты</div>' +
     '</div>' +
 '</div>' +
-'<div class="list"></div>';
+'<div class="list scroll-like-mac"></div>';
 
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
