@@ -253,8 +253,13 @@
             return $ids;
         }
 
-        public static function get_group_dialogs( $group_id, $limit, $offset = 0 )
+        public static function get_group_dialogs( $user_id, $group_id, $limit, $offset = 0, $only_unr_out = 0 )
         {
+            $where = '';
+            if ( $only_unr_out ) {
+                $where = ' AND read=false AND in_message=false ';
+            }
+
             $limit =  $limit ? $limit : 1000;
 
             $sql = 'SELECT rec_id FROM '
@@ -262,17 +267,21 @@
                         . TABLE_MES_DIALOGS . ' as b
                     WHERE
                         a.group_id=@group_id AND
-                        a.dialog_id=b.id
-                    ORDER BY
-                        rec_id
+                        a.dialog_id=b.id AND
+                        b.user_id=@user_id '
+                        . $where .
+                    ' ORDER BY
+                        last_update DESC
                     LIMIT  @limit
                     OFFSET @offset';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+
+
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
+            $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
-
             $res = array();
             while ( $ds->Next() ) {
                 $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
