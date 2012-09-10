@@ -10,7 +10,7 @@ class MesCheckUpdates
 {
     public function execute() {
 
-        set_time_limit( 140 );
+        set_time_limit( 300 );
         $im_users = StatUsers::get_im_users();
 
         foreach( $im_users as $user ) {
@@ -23,7 +23,7 @@ class MesCheckUpdates
                     continue;
                 MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, $dialog->out, $dialog->read_state );
             }
-
+            sleep(0.4);
         }
     }
 }
