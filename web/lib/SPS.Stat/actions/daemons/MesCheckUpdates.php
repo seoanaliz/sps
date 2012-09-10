@@ -21,7 +21,7 @@ class MesCheckUpdates
             foreach( $dialogs as $dialog ) {
                 if (isset($dialog->chat_id) )
                     continue;
-                MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, $dialog->out, $dialog->read_state );
+                MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, !$dialog->out, $dialog->read_state );
             }
             sleep(0.4);
         }

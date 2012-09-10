@@ -5,7 +5,7 @@ class getDialogsList
 {
     public function execute()
     {
-        error_reporting( 0 );
+//        error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         $only_unr_out   =   Request::getInteger( 'unreadOut' );
@@ -30,11 +30,13 @@ class getDialogsList
 
         $dialogs_array = array();
         if ( !$group_id ) {
-            $row_dialog_array = MesDialogs::get_last_dialogs( $user_id, $offset, $limit );
-            if ( !$row_dialog_array )
-                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' )));
-            elseif( $row_dialog_array == 'no access_token' )
-                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
+//            $row_dialog_array = MesDialogs::get_last_dialogs( $user_id, $offset, $limit );
+            $res_ids            = MesGroups::get_ungroup_dialogs( $user_id, $limit, $offset );
+            $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
+//            if ( !$row_dialog_array )
+//                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' )));
+//            elseif( $row_dialog_array == 'no access_token' )
+//                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
         }
         else {
             $res_ids = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_unr_out );

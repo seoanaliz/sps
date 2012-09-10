@@ -56,7 +56,7 @@
 
                 if ( count ( $res->a24 ) < 200 || $offset > $max_offset )
                     break;
-//                if ($t > 15);
+                sleep(0.4);
             }
             return $dialog_array;
         }
@@ -70,6 +70,7 @@
             $code   = '';
             $return = "return{";
             foreach( $rec_ids as $id ) {
+                $id = abs( $id );
                 $code   .= "var a$id = API.messages.getDialogs({\"uid\":$id }) ;";
                 $return .= "\"a$id\":a$id,";
             }
@@ -277,20 +278,19 @@
 
         public static function set_dialog_ts( $user_id, $rec_id, $time, $in, $read )
         {
-            $time = $time ? $time : time();
-            $in = $in ? TRUE: FALSE;
-            $read = $read ? TRUE: FALSE;
+            $state = 0;
+            if ( $in && !$read )
+                $state = 4;
             $sql = 'UPDATE ' . TABLE_MES_DIALOGS . '
                     SET
-                        last_update = @time, in_message = @in_message, read = @read
+                        last_update = @time, state = @state
                     WHERE
                         user_id = @user_id AND rec_id = @rec_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInt( '@user_id', $user_id );
             $cmd->SetInt( '@rec_id',  $rec_id  );
             $cmd->SetInt( '@time', $time );
-            $cmd->SetBoolean( '@in_message', $in );
-            $cmd->SetBoolean( '@read', $read );
+            $cmd->SetInt( '@state', $state);
             $ds = $cmd->Execute();
 
             $ds->Next();
