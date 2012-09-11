@@ -354,7 +354,7 @@ var Dialogs = Widget.extend({
     tmplDialogsBlock: DIALOGS_BLOCK,
     listId: null,
     itemsLimit: 20,
-    currentPage: 1,
+    currentPage: 0,
 
     preloadData: {},
     isBlock: false,
@@ -371,15 +371,16 @@ var Dialogs = Widget.extend({
 
         t.templateData = {id: listId, list: [], isLoad: true};
         t.renderTemplate();
-        t.getBlockData(0, function(data) {
+        t.getBlockData(t.currentPage, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
-            t.bindEvents();
             t.scrollTop();
+            t.bindEvents();
             t.makeDialogs($el);
-            t.preload();
         });
+        t.currentPage++;
+        t.preload();
     },
 
     bindEvents: function() {
@@ -387,7 +388,7 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', (function onScroll() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
+            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
                 t.showMore();
             }
             return onScroll;
@@ -574,10 +575,10 @@ var Dialogs = Widget.extend({
             var $block = t.createBlock(data);
             $dialogs.append($block);
             t.makeDialogs($block);
-            t.preload();
             t.unlock();
         });
         t.currentPage++;
+        t.preload();
     },
 
     isLock: function() {
@@ -596,8 +597,8 @@ var Messages = Widget.extend({
     tmplMessage: MESSAGES_ITEM,
     tmplMessagesBlock: MESSAGES_BLOCK,
     dialogId: null,
-    itemsLimit: 20,
-    currentPage: 1,
+    itemsLimit: 30,
+    currentPage: 0,
 
     preloadData: {},
     user: {},
@@ -620,7 +621,7 @@ var Messages = Widget.extend({
         };
         t.renderTemplate();
         t.updateTop();
-        t.getBlockData(0, function(data) {
+        t.getBlockData(t.currentPage, function(data) {
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -647,10 +648,11 @@ var Messages = Widget.extend({
             $textarea.inputMemory('message' + dialogId);
             $textarea.focus();
             $textarea[0].scrollTop = $textarea[0].scrollHeight;
-            t.bindEvents();
             t.scrollBottom();
-            t.preload();
+            t.bindEvents();
         });
+        t.currentPage++;
+        t.preload();
     },
 
     bindEvents: function() {
@@ -660,7 +662,7 @@ var Messages = Widget.extend({
         t.on('scroll', (function onScroll() {
             t.updateTop();
 
-            if ($(window).scrollTop() < 600) {
+            if ($(window).scrollTop() < 300) {
                 t.showMore();
             }
             return onScroll;
@@ -733,11 +735,11 @@ var Messages = Widget.extend({
             var $block = t.createBlock(data);
             $messages.prepend($block);
             t.makeMessages($block);
-            t.preload();
             t.unlock();
             $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
         });
         t.currentPage++;
+        t.preload();
     },
 
     updateTop: function() {

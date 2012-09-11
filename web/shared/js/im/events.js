@@ -65,14 +65,19 @@ var Eventlist = {
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
+            var unread = 0;
             $.each(dirtyData, function(i, dirtyList) {
-                clearData.push({
-                    id: dirtyList.group_id,
-                    title: dirtyList.name
-                });
+                if (typeof dirtyList == 'number') {
+                    unread = dirtyList;
+                } else {
+                    clearData.push({
+                        id: dirtyList.group_id,
+                        title: dirtyList.name
+                    });
+                }
             });
 
-            callback(clearData);
+            callback(clearData, unread);
         });
     },
     get_dialogs_list: function(listId, offset, limit, callback) {
