@@ -38,8 +38,8 @@ function makeMsg(msg, isNotClean) {
             full = decodeURIComponent(full);
         } catch (e){}
 
-        if (full.length > 55) {
-            full = full.substr(0, 53) + '..';
+        if (full.length > 255) {
+            full = full.substr(0, 253) + '..';
         }
 
         if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
@@ -62,48 +62,6 @@ $(document).ready(function() {
     if (!$('#main').length) {
         return;
     }
-
-    (function() {
-        return;
-        var code = 'return {' +
-            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
-            'longPoll: API.messages.getLongPollServer()' +
-        '};';
-
-        $.ajax({
-            url: 'https://api.vk.com/method/execute',
-            dataType: 'jsonp',
-            data: {
-                access_token: Configs.token,
-                code: code
-            },
-            success: function(data) {
-                console.log(data);
-                initVK(data.response);
-            }
-        });
-
-        function initVK(data) {
-            (function poll(ts) {
-                console.log('poll...');
-                var longPoll = data.longPoll;
-                var ts = ts || longPoll.ts;
-                var url = longPoll.server;
-                $.ajax({
-                    url: 'http://' + url,
-                    dataType: 'json',
-                    data: {
-                        ts: ts,
-                        key: longPoll.key,
-                        act: 'a_check',
-                        wait: 25,
-                        mode: 2
-                    },
-                    success: function(data) {}
-                });
-            })();
-        }
-    })();
 
     if (!Configs.vkId) {
         return location.replace('/login/');
@@ -145,7 +103,6 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll(ts) {
-            console.log('poll...');
             var timeout = 15;
             $.ajax({
                 url: 'http://im.' + hostname + '/int/controls/watchDog/',
@@ -230,16 +187,6 @@ var LeftColumn = Widget.extend({
         var $el = $(t.el);
         var $header = $el.find('.header');
 
-        t.on('scroll', (function onScroll() {
-            $el.css('padding-top', $header.outerHeight());
-            if ($(window).scrollTop() > 10) {
-                $header.addClass('fixed');
-            } else {
-                $header.removeClass('fixed');
-            }
-            return onScroll;
-        })());
-
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
             else if (t.dialogs) t.dialogs.trigger('scroll');
@@ -307,12 +254,17 @@ var LeftColumn = Widget.extend({
     initMessages: function(dialogId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
+        title = $.trim(title) || '...';
 
         t.dialogs = false;
         t.messages = new Messages({
             el: $(t.el).find('.list'),
             runData: {
-                dialogId: dialogId
+                dialogId: dialogId,
+                user: {
+                    id: 0,
+                    name: title
+                }
             }
         });
 
@@ -459,6 +411,14 @@ var Dialogs = Widget.extend({
                         },
                         onchange: function(item) {
                             $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
                         },
                         onselect: function(item) {
                             if (item.id == 'add_list') {
@@ -620,10 +580,11 @@ var Messages = Widget.extend({
             id: dialogId,
             list: [],
             isLoad: true,
-            viewer: Data.users[0],
+            viewer: Configs.viewer,
             user: Data.users[0]
         };
         t.renderTemplate();
+        t.updateTop();
         t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;
@@ -662,7 +623,6 @@ var Messages = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', (function onScroll() {
-            t.updateInputBox();
             t.updateTop();
 
             if ($(window).scrollTop() < 600) {
@@ -750,24 +710,12 @@ var Messages = Widget.extend({
         t.currentPage++;
     },
 
-    updateInputBox: function() {
-        var t = this;
-        var $el = $(t.el);
-        var $inputBox = $el.find('.post-message');
-
-        if ($(window).scrollTop() + $(window).height() < $(document).height() - 10) {
-            $inputBox.addClass('fixed');
-        } else {
-            $inputBox.removeClass('fixed');
-        }
-    },
-
     updateTop: function() {
         var t = this;
         var $el = $(t.el);
         var $messages = $el.find('.messages');
 
-        $messages.css('padding-top', $(window).height() - $messages.height() - 173);
+        $messages.css('padding-top', $(window).height() - $messages.height() - 162);
     },
 
     scrollBottom: function() {

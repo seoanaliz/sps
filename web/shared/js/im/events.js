@@ -3,7 +3,7 @@
  */
 var Events = {
     delay: 0,
-    isDebug: false,
+    isDebug: true,
     eventList: {},
     fire: function(name, args){
         var t = this;
