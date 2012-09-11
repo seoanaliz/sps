@@ -70,7 +70,7 @@ $(document).ready(function() {
         return location.replace('/im/login/');
     }
 
-    Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
+    Events.fire('get_user', function(viewer) {
         Configs.viewer = viewer;
         var im = new IM({
             el: '#main'
@@ -523,7 +523,7 @@ var Dialogs = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },
@@ -686,7 +686,7 @@ var Messages = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.messages.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },

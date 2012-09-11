@@ -48,14 +48,19 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-    get_user: function(userId, token, callback) {
-        simpleAjax('saveAt', {userId: userId, access_token: token}, function(data) {
+    add_user: function(token, callback) {
+        simpleAjax('saveAt', {access_token: token}, function() {
+            callback(true);
+        })
+    },
+    get_user: function(callback) {
+        simpleAjax('addUser', function(data) {
             callback({
                 id: data.userId,
                 name: data.name,
                 photo: data.ava
             });
-        })
+        });
     },
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
