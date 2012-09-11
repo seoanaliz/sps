@@ -89,7 +89,7 @@
             Session::setString('gaal_type', $type);
 
             //все авторские посты
-            $this->search['sourceFeedId'] = -1;
+            $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
 
             if (substr($type, 0, 1) == 'p') {
                 $targetFeedId   = substr($type, 1, strlen($type) - 1);

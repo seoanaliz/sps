@@ -22,7 +22,7 @@
                 SELECT afv."targetFeedId", count(a."articleId") as "count"
                 FROM "authorFeedViews" afv
                 LEFT JOIN "articles" a ON (
-                    "sourceFeedId" = -1
+                    "sourceFeedId" = @sourceFeedId
                     AND "createdAt" > "lastViewDate"
                     AND a."authorId" != @authorId
                     AND "statusId" != 3
@@ -34,6 +34,7 @@ sql;
 
             $cmd = new SqlCommand($sql, ConnectionFactory::Get());
             $cmd->SetInt('@authorId', $authorId);
+            $cmd->SetInt('@sourceFeedId', SourceFeedUtility::FakeSourceAuthors);
 
             $ds = $cmd->Execute();
 

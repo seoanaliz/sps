@@ -59,7 +59,7 @@
             }
 
             if (empty($object->sourceFeedId)) {
-                $object->sourceFeedId = -1;
+                $object->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
             }
 
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
