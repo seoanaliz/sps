@@ -35,17 +35,18 @@ class watchDog
 
             switch ( $stat ) {
                 case 3:
-                    $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
-                    $result[] = array(
+                    $from_id   = isset( $event[3] )? $event[3] : $event['uid'];
+                    $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
+                    $result[]  = array(
                         'type'    => 'read',
                         'content' => array(
-                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'mid'       =>  isset( $event[1] ) ? $event[1] : $event['mid'],
                             'from_id'   =>  $from_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  $ids[$from_id],
+                            'groups'    =>  $ids[ $from_id ],
                         )
                     );
-
+                    MesDialogs::set_state( $dialog_id, 0 );
                     break;
                 case 4:
                     $from_id  = isset( $event[3] ) ? $event[3] : $event['uid'];

@@ -30,7 +30,7 @@
 
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
-                echo  ObjectHelper::ToJSON(array('response' => $user));
+                echo  ObjectHelper::ToJSON( array( 'response' => $user ));
                 die();
             }
 	     

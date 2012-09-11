@@ -5,7 +5,7 @@ class getDialogsList
 {
     public function execute()
     {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         $only_unr_out   =   Request::getInteger( 'unreadOut' );
@@ -49,8 +49,10 @@ class getDialogsList
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
             $dialog->groups = MesDialogs::get_rec_groups( $user_id, $dialog->uid );
-            if( !$dialog->id )
-                $dialog->id = MesDialogs::addDialog( $user_id, $dialog->uid, '');
+            if( !$dialog->id ) {
+                $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
+                MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '');
+            }
             if ( isset( $dialog->chat_id )
                   || ( $dialog->read_state == 1 && $only_unr_out )
 //                || ( $dialog->date > $date_end || $dialog->date < $date_start )
