@@ -150,12 +150,46 @@ var IM = Widget.extend({
 
     newEvent: function(event) {
         var t = this;
+        var dirtyMessage;
+        var message;
 
         switch (event.type) {
-            case 'inMessage':
-                var message = event.content;
+            //@todo: объеденить
+            case 'outMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: true,
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
                 t.leftColumn.addMessage(message);
-                t.rightColumn.addMessage(message);
+            break;
+            case 'inMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
+                t.leftColumn.addMessage(message);
+
+                if (!message.isViewer) {
+                    t.rightColumn.addMessage(message);
+                }
             break;
         }
     }
@@ -297,7 +331,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.list.incrementCounter(message.groups, message.dialog_id);
+        t.list.incrementCounter(message.groups, message.dialogId);
     },
 
     initList: function() {
@@ -383,6 +417,7 @@ var Dialogs = Widget.extend({
         var dialogId = $dialog.data('id');
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
+
                 function onCreate() {
                     $.each(t.templateData.list, function(i, dialog) {
                         if (dialog.id == dialogId) {
@@ -645,17 +680,12 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if (message.dialog_id != t.dialogId) return;
-        var clearMessage = {
-            id: message.mid,
-            text: message.body,
-            user: t.user,
-            isNew: true,
-            timestamp: message.date
-        };
-        var $oldMessage = $el.find('[data-id=' + clearMessage.id + ']');
+        if (message.dialogId != t.dialogId) return;
+        if (!message.isViewer) message.user = t.user;
+
+        var $oldMessage = $el.find('[data-id=' + message.id + ']');
         if ($oldMessage.length) return;
-        var $newMessage = t.createMessage(clearMessage);
+        var $newMessage = t.createMessage(message);
         $el.find('.messages').append($newMessage);
         t.makeMessages($newMessage);
         t.scrollBottom();
@@ -760,12 +790,13 @@ var Messages = Widget.extend({
             $textarea.val('');
             var $newMessage = t.createMessage({
                 id: 'loading',
-                isNew: false,
+                isNew: true,
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
+            $newMessage.addClass('loading');
             $el.find('.messages').append($newMessage);
             t.makeMessages($newMessage);
             if (isScroll) {
@@ -773,7 +804,7 @@ var Messages = Widget.extend({
             }
             $textarea.focus();
             Events.fire('send_message', t.dialogId, text, function(messageId) {
-                $newMessage.attr('data-id', messageId);
+                $newMessage.removeClass('loading').attr('data-id', messageId);
             });
         } else {
             $textarea.focus();

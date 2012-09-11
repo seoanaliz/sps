@@ -3,7 +3,7 @@
  */
 var Events = {
     delay: 0,
-    isDebug: true,
+    isDebug: false,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -173,6 +173,7 @@ var Eventlist = {
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.out != 0),
                     text: makeMsg(dirtyMessage.body.split('<br>').join('\n'), true),
+                    dialogId: dirtyMessage.dialog_id,
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]
