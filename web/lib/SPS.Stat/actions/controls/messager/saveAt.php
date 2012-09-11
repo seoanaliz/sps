@@ -23,8 +23,7 @@ class saveAt
             $user = StatUsers::add_user( $user_id );
 
         StatUsers::set_access_token( $user_id, $access_token );
-
+        MesDialogs::get_all_dialogs( $user_id );
         die( ObjectHelper::ToJSON( array( 'response' => $user )));
-
     }
 }

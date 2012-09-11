@@ -6,23 +6,54 @@
 
     class MesDialogs
     {
-        //to do execute добавить
-        public static function get_last_dialogs( $user_id, $offset, $limit )
+//        //to do execute добавить
+//        public static function get_last_dialogs( $user_id, $offset, $limit )
+//        {
+//            if ( !$limit )
+//                $limit = 25;
+//            $access_token = StatUsers::get_access_token( $user_id );
+//            if ( !$access_token )
+//                return 'no access_token';
+//            $params = array(
+//                            'access_token'      =>  $access_token,
+//                            'count'             =>  $limit,
+//                            'offset'            =>  $offset
+//            );
+//
+//            $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
+//                unset( $dialogs_array[0] );
+//
+//            return( $dialogs_array );
+//        }
+
+        public static function get_last_dialogs( $id, $offset, $limit )
         {
             if ( !$limit )
                 $limit = 25;
-            $access_token = StatUsers::get_access_token( $user_id );
+            $access_token = StatUsers::get_access_token( $id );
             if ( !$access_token )
                 return 'no access_token';
             $params = array(
-                            'access_token'      =>  $access_token,
-                            'count'             =>  $limit,
-                            'offset'            =>  $offset
+                'access_token'      =>  $access_token,
+                'count'             =>  $limit,
+                'preview_lenght'    =>  50,
+                'offset'            =>  $offset
             );
 
-            $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
-                unset( $dialogs_array[0] );
+            $offset = 0;
+            $dialogs_array = array();
 
+//            while ( 1 ) {
+//                $params[ 'offset' ] = $offset;
+            $res   = VkHelper::api_request( 'messages.getDialogs', $params );
+            $count = $res[0];
+            unset( $res[0] );
+//                $offset += 100;
+
+            $dialogs_array = array_merge( $dialogs_array, $res );
+//                if ( $count < $offset )
+//                    break;
+//            }
             return( $dialogs_array );
         }
 
@@ -33,7 +64,6 @@
 
             $offset = 0;
             $dialog_array = array();
-            $t = 0;
             while(1) {
                 $code   = '';
                 $return = "return{";
@@ -57,6 +87,11 @@
                 if ( count ( $res->a24 ) < 200 || $offset > $max_offset )
                     break;
                 sleep(0.4);
+            }
+            foreach( $dialog_array as $dialog )
+            {
+                $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
+                MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '');
             }
             return $dialog_array;
         }
@@ -87,21 +122,23 @@
             return $result;
         }
 
-        public static function addDialog( $user_id, $rec_id, $status )
+        public static function addDialog( $user_id, $rec_id, $last_update, $state, $status )
         {
             $sql = 'INSERT INTO '
-                        . TABLE_MES_DIALOGS . '( user_id, rec_id, status )
+                        . TABLE_MES_DIALOGS . '( id,user_id, rec_id, status, last_update, state )
                     VALUES
-                            ( @user_id,@rec_id,@status )
+                            ( DEFAULT, @user_id,@rec_id,@status,@last_update, @state )
                     RETURNING id';
 
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetInteger( '@rec_id', $rec_id );
+            $cmd->SetInteger( '@last_update', $last_update );
+            $cmd->SetInteger( '@state', $state );
             $cmd->SetString ( '@status', $status );
             $ds = $cmd->Execute();
             $ds->Next();
-            return $ds->GetValue( 'id', TYPE_INTEGER ) ;
+            return $ds->GetValue( 'id', TYPE_INTEGER );
         }
 
         public static function get_dialog_id( $user_id, $rec_id )
@@ -145,7 +182,7 @@
 
             $res = VkHelper::api_request( 'messages.send', $params, 0 );
 
-            if ( isset( $res->error ) )
+            if ( isset( $res->error ))
                 return false;
             return $res;
         }
@@ -174,7 +211,6 @@
         public static function toggle_read_unread( $user_id, $mess_ids, $unread )
         {
             $method = $unread ? 'markAsNew' : 'markAsRead';
-
             if ( is_array( $mess_ids ))
                 $mess_ids = implode( ',', $mess_ids );
 
@@ -278,9 +314,6 @@
 
         public static function set_dialog_ts( $user_id, $rec_id, $time, $in, $read )
         {
-            $state = 0;
-            if ( $in && !$read )
-                $state = 4;
             $sql = 'UPDATE ' . TABLE_MES_DIALOGS . '
                     SET
                         last_update = @time, state = @state
@@ -290,10 +323,27 @@
             $cmd->SetInt( '@user_id', $user_id );
             $cmd->SetInt( '@rec_id',  $rec_id  );
             $cmd->SetInt( '@time', $time );
-            $cmd->SetInt( '@state', $state);
+            $cmd->SetInt( '@state', MesDialogs::calculate_state( $read, $in ));
             $ds = $cmd->Execute();
 
             $ds->Next();
+        }
+
+        public static function calculate_state( $read, $in )
+        {
+            return ( $in && !$read ) ? 4 : 0;
+        }
+
+        public static function set_state( $dialogs_id, $state )
+        {
+            $dialogs_id = explode( ',', $dialogs_id );
+            foreach( $dialogs_id as $dialog ) {
+                $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET state=@state where id=@dialog_id';
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+                $cmd->SetInt( '@dialog_id', $dialog );
+                $cmd->SetInt( '@state', $state );
+                $cmd->Execute();
+            }
         }
 
     }
