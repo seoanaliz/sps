@@ -38,9 +38,7 @@
 
             //todo не уверен, нужна ли проверка на "главность"
             if (    !$general
-                    ||
-                    ( $general && StatUsers::is_Sadmin( $userId ) )
-                    ) {
+                    || ( $general && StatUsers::is_Sadmin( $userId ))) {
 
                 $m_class::extricate_entry( $groupId, $entry_id);
 

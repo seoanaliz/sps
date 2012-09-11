@@ -7,11 +7,11 @@
     class MesDialogs
     {
         //to do execute добавить
-        public static function get_last_dialogs( $id, $offset, $limit )
+        public static function get_last_dialogs( $user_id, $offset, $limit )
         {
             if ( !$limit )
                 $limit = 25;
-            $access_token = StatUsers::get_access_token( $id );
+            $access_token = StatUsers::get_access_token( $user_id );
             if ( !$access_token )
                 return 'no access_token';
             $params = array(
@@ -20,13 +20,45 @@
                             'offset'            =>  $offset
             );
 
-            $offset = 0;
-            $dialogs_array = array();
-
             $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
                 unset( $dialogs_array[0] );
 
             return( $dialogs_array );
+        }
+
+        public static function get_all_dialogs( $user_id, $max_offset = '' )
+        {
+            $max_offset = $max_offset ? $max_offset : 9000000;
+            $access_token = StatUsers::get_access_token( $user_id );
+
+            $offset = 0;
+            $dialog_array = array();
+            $t = 0;
+            while(1) {
+                $code   = '';
+                $return = "return{";
+                for( $i = 0; $i < 25; $i++ ) {
+                    $code   .= "var a$i = API.messages.getDialogs({\"count\":200,\"offset\":$offset});";
+                    $return .= "\"a$i\":a$i,";
+                    $offset += 200;
+                }
+
+                $code .= trim( $return, ',' ) . "};";
+                $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ), 0 );
+                //todo logs
+                if ( isset( $res->error ))
+                    return false;
+
+                foreach ( $res as $stak ) {
+                    unset( $stak[0] );
+                    $dialog_array = array_merge( $dialog_array, $stak );
+                }
+
+                if ( count ( $res->a24 ) < 200 || $offset > $max_offset )
+                    break;
+                sleep(0.4);
+            }
+            return $dialog_array;
         }
 
         //возвращает лист диалогов отдельной группы
@@ -38,6 +70,7 @@
             $code   = '';
             $return = "return{";
             foreach( $rec_ids as $id ) {
+                $id = abs( $id );
                 $code   .= "var a$id = API.messages.getDialogs({\"uid\":$id }) ;";
                 $return .= "\"a$id\":a$id,";
             }
@@ -138,7 +171,6 @@
             return $result;
         }
 
-
         public static function toggle_read_unread( $user_id, $mess_ids, $unread )
         {
             $method = $unread ? 'markAsNew' : 'markAsRead';
@@ -155,9 +187,11 @@
             if ( isset( $res->error ) )
                 return false;
             return true;
+
+            //todo маркер прочитанности в бд
         }
 
-        public static function get_last_activity( $user_id, $rec_id )
+        public static function get_last_online( $user_id, $rec_id )
         {
             $params = array (
                     'access_token'  =>  StatUsers::get_access_token( $user_id ),
@@ -189,7 +223,8 @@
             return (array)$res;
         }
 
-        public static function watch_dog_wo_long_pull( $user_id ){
+        public static function watch_dog_wo_long_pull( $user_id )
+        {
             $access_token = StatUsers::get_access_token( $user_id );
             if ( !$access_token )
                 return 'no access_token';
@@ -240,5 +275,26 @@
             }
             return $res;
         }
+
+        public static function set_dialog_ts( $user_id, $rec_id, $time, $in, $read )
+        {
+            $state = 0;
+            if ( $in && !$read )
+                $state = 4;
+            $sql = 'UPDATE ' . TABLE_MES_DIALOGS . '
+                    SET
+                        last_update = @time, state = @state
+                    WHERE
+                        user_id = @user_id AND rec_id = @rec_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInt( '@user_id', $user_id );
+            $cmd->SetInt( '@rec_id',  $rec_id  );
+            $cmd->SetInt( '@time', $time );
+            $cmd->SetInt( '@state', $state);
+            $ds = $cmd->Execute();
+
+            $ds->Next();
+        }
+
     }
 ?>

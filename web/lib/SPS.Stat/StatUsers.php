@@ -122,8 +122,6 @@
             $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
 
             if ( $acc_tok ) {
-//                print_r( Session::setString( 'access_token', $acc_tok ) );
-//                print_r($acc_tok);
             }
             return $acc_tok ? $acc_tok : false;
         }
@@ -140,6 +138,16 @@
 //            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
         }
 
+        public static function get_im_users()
+        {
+            $sql = 'SELECT user_id,access_token FROM ' . TABLE_STAT_USERS . ' WHERE access_token<>\'\'';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $ds = $cmd->Execute();
+            $usersIds = array();
+            while ( $ds->Next() )
+                $usersIds[] = $ds->getValue( 'user_id', TYPE_INTEGER );
 
+            return $usersIds;
+        }
     }
 ?>

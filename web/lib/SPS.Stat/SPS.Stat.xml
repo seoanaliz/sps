@@ -23,6 +23,9 @@
         <action name="OurAdminsStat">
             <path>daemons/OurAdminsStat</path>
         </action>
+        <action name="MesCheckUpdates">
+            <path>daemons/MesCheckUpdates</path>
+        </action>
 
     </group>
 
