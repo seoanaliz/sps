@@ -260,8 +260,8 @@
                 $where = ' AND read=false AND in_message=false ';
             }
 
-//            $limit =  $limit ? $limit : 1000;
-//
+            $limit =  $limit ? $limit : 1000;
+
             $sql = 'SELECT rec_id FROM '
                         . TABLE_MES_GROUP_DIALOG_REL . ' as a, '
                         . TABLE_MES_DIALOGS . ' as b
@@ -278,6 +278,7 @@
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
+            $cmd->GetQuery();
             $ds = $cmd->Execute();
 
             $res = array();
