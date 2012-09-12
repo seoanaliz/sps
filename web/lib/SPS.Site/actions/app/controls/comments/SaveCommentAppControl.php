@@ -24,7 +24,7 @@
 
             $article = ArticleFactory::GetById(Request::getInteger('id'), array(), array(BaseFactory::WithoutDisabled => false));
 
-            if (empty($article) || $article->sourceFeedId != -1) {
+            if (empty($article) || $article->sourceFeedId != SourceFeedUtility::FakeSourceAuthors) {
                 $result['message'] = 'accessError';
                 //echo ObjectHelper::ToJSON($result);
                 return false;

@@ -51,6 +51,9 @@
         /** @var string */
         public $doc;
 
+        /** @var array */
+        public $topfaceData;
+
         /** @var int */
         public $articleId;
 

@@ -69,11 +69,13 @@
             if ( $originalObject != null ) {
                 $originalArticleRecord = ArticleRecordFactory::GetOne(
                     array('articleQueueId' => $this->originalObject->articleQueueId)
-                    , array(BaseFactory::WithColumns => '"articleRecordId"')
                 );
 
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
+                }
+                if (!empty($originalArticleRecord)) {
+                    $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
                 }
             }
 
@@ -116,6 +118,7 @@
                         $this->articleRecord->poll          = $forceArticleRecord->poll;
                         $this->articleRecord->text_links    = $forceArticleRecord->text_links;
                         $this->articleRecord->doc           = $forceArticleRecord->doc;
+                        $this->articleRecord->topfaceData   = $forceArticleRecord->topfaceData;
                     }
                 }
             }
