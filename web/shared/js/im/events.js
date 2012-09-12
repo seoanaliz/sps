@@ -102,6 +102,12 @@ var Eventlist = {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
                 var clearText = dirtyDialog.body || dirtyDialog.title;
+                clearText = clearText.split('<br>');
+                if (clearText.length > 2) {
+                    clearText = clearText.slice(0, 2).join('<br>') + '...';
+                } else {
+                    clearText = clearText.join('<br>');
+                }
                 if (clearText.length > 250) {
                     clearText = clearText.substring(0, 200) + '...';
                 }
@@ -161,7 +167,7 @@ var Eventlist = {
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.out != 0),
-                    text: dirtyMessage.body.replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
+                    text: makeMsg(dirtyMessage.body.split('<br>').join('\n'), true),
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]
@@ -173,21 +179,7 @@ var Eventlist = {
     },
     send_message: function(dialogId, text, callback) {
         simpleAjax('messages.send', {dialogId: dialogId, text: text}, function(data) {
-            callback({
-                id: data,
-                isNew: false,
-                isViewer: true,
-                text: $.trim(text)
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;")
-                    .split('\n').join('<br/>')
-                    .replace(uriExp, '<a target="_blank" href="$1">$1</a>'),
-                timestamp: Math.floor(new Date().getTime() / 1000),
-                user: Configs.viewer
-            });
+            callback(data);
         });
     },
     message_mark_as_read: function(messageId, callback) {

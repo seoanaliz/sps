@@ -10,7 +10,7 @@ class watchDog
 {
 
     public function Execute() {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'timeout' );
@@ -32,9 +32,21 @@ class watchDog
             $event =  (array) $event ;
             $stat = isset( $event[0] ) ? $event[0] : 4;
             $attach = array();
-//            print_r($event);
 
             switch ( $stat ) {
+                case 3:
+                    $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
+                    $result[] = array(
+                        'type'    => 'read',
+                        'content' => array(
+                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'from_id'   =>  $from_id,
+                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
+                            'groups'    =>  $ids[$from_id],
+                        )
+                    );
+
+                    break;
                 case 4:
                     $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
                     if ( isset( $event[7]->attach1_type )) {
@@ -68,8 +80,10 @@ class watchDog
         }
         $result = array_reverse($result);
         header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
-        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
-        die();
-//        print_r($result);
+        $res =  ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  )));
+        if( $cb )
+            $res = $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
+//        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
+        die( $res );
     }
 }
