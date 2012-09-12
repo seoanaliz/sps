@@ -69,7 +69,6 @@
             if ( $originalObject != null ) {
                 $originalArticleRecord = ArticleRecordFactory::GetOne(
                     array('articleQueueId' => $this->originalObject->articleQueueId)
-                    , array(BaseFactory::WithColumns => '"articleRecordId"')
                 );
 
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
