@@ -193,8 +193,8 @@ var Eventlist = {
             callback(data);
         });
     },
-    message_mark_as_read: function(messageId, callback) {
-        simpleAjax('markMes', {mids: messageId}, function() {
+    message_mark_as_read: function(messageId, dialogId, callback) {
+        simpleAjax('markMes', {mids: messageId, dialogsId: dialogId}, function() {
             callback(true);
         });
     },

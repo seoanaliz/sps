@@ -697,7 +697,7 @@ var Messages = Widget.extend({
         if (e.type != 'mouseenter') return;
         var $message = $(e.currentTarget);
         if ($message.hasClass('viewer')) return;
-        Events.fire('message_mark_as_read', $message.data('id'), function() {
+        Events.fire('message_mark_as_read', $message.data('id'), this.dialogId, function() {
             $message.removeClass('new');
         });
     },
@@ -806,7 +806,12 @@ var Messages = Widget.extend({
             }
             $textarea.focus();
             Events.fire('send_message', t.dialogId, text, function(messageId) {
-                $newMessage.removeClass('loading').attr('data-id', messageId);
+                var $oldMessage = $el.find('[data-id=' + messageId + ']');
+                if ($oldMessage.length) {
+                    return $newMessage.remove();
+                } else {
+                    $newMessage.removeClass('loading').attr('data-id', messageId);
+                }
             });
         } else {
             $textarea.focus();
