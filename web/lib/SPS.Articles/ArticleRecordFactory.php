@@ -87,6 +87,11 @@
                     , 'type'        => TYPE_STRING
                     , 'max'         => 500
                 )
+                ,'topfaceData' => array(
+                    'name'          => 'topfaceData'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
+                )
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER

@@ -49,6 +49,10 @@
     <label>{lang:vt.articleRecord.textLinks}</label>
     <?= FormHelper::FormInput( $prefixRecord . '[text_links]', ObjectHelper::ToJSON($articleRecord->text_links), 'text_links', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
 </div>
+<div data-row="topfaceData" class="row">
+    <label>{lang:vt.articleRecord.topfaceData}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[topfaceData]', ObjectHelper::ToJSON($articleRecord->topfaceData), 'topfaceData', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+</div>
 
 <div data-row="files" class="row">
     <label>{lang:vt.articleRecord.photos}</label>

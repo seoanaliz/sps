@@ -83,7 +83,7 @@
             $this->articleRecord->photos = $photos;
 
             //fix arrays
-            $arrays = array('retweet', 'video', 'music', 'text_links');
+            $arrays = array('retweet', 'video', 'music', 'text_links', 'topfaceData');
             $data   = Request::getArray( "articleRecord" );
             foreach ($arrays as $arrayName) {
                 $value = !empty($data[$arrayName]) ? $data[$arrayName] : '[]';
@@ -116,6 +116,7 @@
                         $this->articleRecord->poll          = $forceArticleRecord->poll;
                         $this->articleRecord->text_links    = $forceArticleRecord->text_links;
                         $this->articleRecord->doc           = $forceArticleRecord->doc;
+                        $this->articleRecord->topfaceData   = $forceArticleRecord->topfaceData;
                     }
                 }
             }
