@@ -90,15 +90,17 @@ var Eventlist = {
         simpleAjax('getGroupDialogs', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearUser = {
+                    id: dirtyDialog.uid.userId,
+                    name: dirtyDialog.uid.name,
+                    photo: dirtyDialog.uid.ava,
+                    isOnline: (dirtyDialog.uid.online != 0)
+                };
                 clearData.push({
                     id: dirtyDialog.id,
-                    user: {
-                        id: dirtyDialog.uid.userId,
-                        name: dirtyDialog.uid.name,
-                        photo: dirtyDialog.uid.ava,
-                        isOnline: (dirtyDialog.uid.online != 0)
-                    }
+                    user: clearUser
                 });
+                UserCollection.add(clearUser);
             });
             callback(clearData);
         });
@@ -112,6 +114,12 @@ var Eventlist = {
         simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearUser = {
+                    id: dirtyDialog.uid.userId,
+                    name: dirtyDialog.uid.name,
+                    photo: dirtyDialog.uid.ava,
+                    isOnline: (dirtyDialog.uid.online != 0)
+                };
                 var clearText = dirtyDialog.body || dirtyDialog.title;
                 clearText = clearText.split('<br>');
                 if (clearText.length > 2) {
@@ -127,16 +135,12 @@ var Eventlist = {
                     isNew: (dirtyDialog.read_state != 1),
                     isViewer: (dirtyDialog.out != 0),
                     viewer: Configs.viewer,
-                    user: {
-                        id: dirtyDialog.uid.userId,
-                        name: dirtyDialog.uid.name,
-                        photo: dirtyDialog.uid.ava,
-                        isOnline: (dirtyDialog.uid.online != 0)
-                    },
+                    user: clearUser,
                     text: clearText,
                     timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
+                UserCollection.add(clearUser);
             });
             callback(clearData);
         });
@@ -154,12 +158,14 @@ var Eventlist = {
             var clearUsers = {};
             var clearMessages = [];
             $.each(dirtyUsers, function(i, dirtyUser) {
-                clearUsers[dirtyUser.userId] = {
+                var clearUser = {
                     id: dirtyUser.userId,
                     name: dirtyUser.name,
                     photo: dirtyUser.ava,
                     isOnline: (dirtyUser.online != 0)
                 };
+                clearUsers[dirtyUser.userId] = clearUser;
+                UserCollection.add(clearUser);
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
                 var clearAttachments = {};

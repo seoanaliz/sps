@@ -58,6 +58,17 @@ var Configs = {
     viewer: {}
 };
 
+var UserCollection = {
+    _users: {},
+
+    get: function(userId) {
+        return this._users[userId];
+    },
+    add: function(user) {
+        return this._users[user.id] = user;
+    }
+};
+
 $(document).ready(function() {
     if (!$('#main').length) {
         return;
@@ -219,11 +230,13 @@ var LeftColumn = Widget.extend({
     bindEvents: function() {
         var t = this;
         var $el = $(t.el);
-        var $header = $el.find('.header');
 
         t.on('scroll', function() {
-            if (t.messages) t.messages.trigger('scroll');
-            else if (t.dialogs) t.dialogs.trigger('scroll');
+            if (t.messages) {
+                t.messages.trigger('scroll');
+            } else if (t.dialogs) {
+                t.dialogs.trigger('scroll');
+            }
         });
     },
 
@@ -233,7 +246,7 @@ var LeftColumn = Widget.extend({
         if (t.messages) {
             t.messages.addMessage(message);
         } else if (t.dialogs) {
-            t.dialogs.addMessage();
+            t.dialogs.addMessage(message);
         }
     },
 
@@ -256,15 +269,20 @@ var LeftColumn = Widget.extend({
         var t = this;
         var tabPrefix = t.tabPrefixDialogs;
 
-        t.messages = false;
+        if (t.messages) {
+            t.messages.destroy();
+        }
+        if (t.dialogs) {
+            t.dialogs.destroy();
+        }
         t.dialogs = new Dialogs({
             el: $(t.el).find('.list'),
             runData: {
                 listId: listId
             }
         });
-        t.dialogs.on('select', function(id, title) {
-            t.initMessages(id, title);
+        t.dialogs.on('select', function(dialogId, title, userId) {
+            t.initMessages(dialogId, title, userId);
         });
         t.dialogs.on('addList', function() {
             t.trigger('updateList');
@@ -285,20 +303,22 @@ var LeftColumn = Widget.extend({
         t.tabs.selectTab(tabPrefix + listId);
         t.curListId = listId;
     },
-    initMessages: function(dialogId, title) {
+    initMessages: function(dialogId, title, userId) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
         title = $.trim(title) || '...';
 
-        t.dialogs = false;
+        if (t.dialogs) {
+            t.dialogs.destroy();
+        }
+        if (t.messages) {
+            t.messages.destroy();
+        }
         t.messages = new Messages({
             el: $(t.el).find('.list'),
             runData: {
                 dialogId: dialogId,
-                user: {
-                    id: 0,
-                    name: title
-                }
+                userId: userId
             }
         });
 
@@ -506,12 +526,13 @@ var Dialogs = Widget.extend({
         var $target = $(e.currentTarget);
         var listId = $target.data('id');
         var title = $target.data('title');
-        t.selectDialog(listId, title, true);
+        var userId = $target.data('user-id');
+        t.selectDialog(listId, title, userId, true);
     },
 
-    selectDialog: function(id, title, isTrigger) {
+    selectDialog: function(dialogId, title, userId, isTrigger) {
         var t = this;
-        if (isTrigger) t.trigger('select', id, title);
+        if (isTrigger) t.trigger('select', dialogId, title, userId);
     },
 
     scrollTop: function() {
@@ -596,6 +617,7 @@ var Messages = Widget.extend({
     template: MESSAGES,
     tmplMessage: MESSAGES_ITEM,
     tmplMessagesBlock: MESSAGES_BLOCK,
+    userId: null,
     dialogId: null,
     itemsLimit: 30,
     currentPage: 0,
@@ -610,6 +632,7 @@ var Messages = Widget.extend({
 
     run: function(params) {
         var t = this;
+        var userId = t.userId = params.userId;
         var dialogId = t.dialogId = params.dialogId;
 
         t.templateData = {
@@ -617,7 +640,7 @@ var Messages = Widget.extend({
             list: [],
             isLoad: true,
             viewer: Configs.viewer,
-            user: Data.users[0]
+            user: UserCollection.get(userId) || Data.users[0]
         };
         t.renderTemplate();
         t.updateTop();

@@ -79,7 +79,7 @@ var DIALOGS_BLOCK =
 
 var DIALOGS_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
-'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>">' +
+'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>" data-user-id="<?=user.id?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<a href="http://vk.com/id<?=user.id?>" target="_blank"><img src="<?=user.photo?>" alt="" /></a>' +

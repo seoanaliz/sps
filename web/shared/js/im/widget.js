@@ -32,7 +32,7 @@ var Widget = Event.extend({
             var eventName = event.split(':')[0];
             var selector = event.split(':')[1];
             var eventMethod = $.proxy(t[methodName], t);
-            $(t.el).delegate(selector, eventName, eventMethod);
+            $(t.el).delegate(selector, eventName + '.widget', eventMethod);
         });
 
         return this;
@@ -52,5 +52,13 @@ var Widget = Event.extend({
         t.renderTemplate();
 
         return this;
+    },
+
+    destroy: function() {
+        var t = this;
+
+        $(t.el).off().empty();
+
+        delete this;
     }
 });
