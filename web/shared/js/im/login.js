@@ -56,5 +56,7 @@ $(document).ready(function() {
 
 function onSuccess(token) {
     $.cookie('token', token, {path: '/', expires: 30});
-    location.replace('/im/');
+    Events.fire('add_user', token, function() {
+        location.replace('/im/');
+    });
 }

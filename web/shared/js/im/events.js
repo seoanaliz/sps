@@ -48,26 +48,36 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-    get_user: function(userId, token, callback) {
-        simpleAjax('saveAt', {userId: userId, access_token: token}, function(data) {
+    add_user: function(token, callback) {
+        simpleAjax('saveAt', {access_token: token}, function() {
+            callback(true);
+        })
+    },
+    get_user: function(callback) {
+        simpleAjax('addUser', function(data) {
             callback({
                 id: data.userId,
                 name: data.name,
                 photo: data.ava
             });
-        })
+        });
     },
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
+            var unread = 0;
             $.each(dirtyData, function(i, dirtyList) {
-                clearData.push({
-                    id: dirtyList.group_id,
-                    title: dirtyList.name
-                });
+                if (typeof dirtyList == 'number') {
+                    unread = dirtyList;
+                } else {
+                    clearData.push({
+                        id: dirtyList.group_id,
+                        title: dirtyList.name
+                    });
+                }
             });
 
-            callback(clearData);
+            callback(clearData, unread);
         });
     },
     get_dialogs_list: function(listId, offset, limit, callback) {
@@ -168,6 +178,7 @@ var Eventlist = {
                     isNew: (dirtyMessage.read_state != 1),
                     isViewer: (dirtyMessage.out != 0),
                     text: makeMsg(dirtyMessage.body.split('<br>').join('\n'), true),
+                    dialogId: dirtyMessage.dialog_id,
                     attachments: clearAttachments,
                     timestamp: dirtyMessage.date,
                     user: clearUsers[dirtyMessage.from_id]

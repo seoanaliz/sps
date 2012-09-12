@@ -6,7 +6,7 @@ body {
 
 #main {
     width: 1100px;
-    margin: 10px auto;
+    margin: 0 auto;
 
     &>.left-column {
         float: left;
@@ -14,8 +14,6 @@ body {
         border: 1px solid @border_main;
         padding-top: 50px;
         position: relative;
-
-        .border-radius(3px);
 
         &>.header {
             position: absolute;
@@ -25,8 +23,6 @@ body {
             border-bottom: 1px solid @border_inside;
             background: @bg_gray;
             width: 798px;
-
-            .border-radius(3px 3px 0 0);
 
             &.fixed {
                 position: fixed;
@@ -65,6 +61,10 @@ body {
                 }
                 .message {
                     padding: 5px 0;
+
+                    &.loading {
+                        background: url(http://st0.userapi.com/images/upload.gif) no-repeat 20px center;
+                    }
 
                     &.new {
                         background-color: @bg_light_hover;
@@ -153,8 +153,6 @@ body {
                 width: 800px;
                 z-index: 1;
 
-                .border-radius(0 0 3px 3px);
-
                 &.fixed {
                     position: fixed;
                     box-shadow: 0 -2px 1px rgba(0,0,0, 0.1);
@@ -227,6 +225,10 @@ body {
 
                     &:hover {
                         background: @bg_light_hover;
+
+                        &>.history > .from-me.new {
+                            background-color: @bg_hover;
+                        }
                     }
 
                     &.new {
@@ -320,7 +322,13 @@ body {
                             &.active {
                                 opacity: 1;
                                 background-color: @bg_active;
-                                background-image: url('../../images/common/add-white.png');
+
+                                &.plus {
+                                    background-image: url('../../images/common/add-white.png');
+                                }
+                                &.select {
+                                    background-image: url('../../images/common/select-white.png');
+                                }
                             }
                         }
                     }

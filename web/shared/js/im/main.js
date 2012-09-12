@@ -38,8 +38,8 @@ function makeMsg(msg, isNotClean) {
             full = decodeURIComponent(full);
         } catch (e){}
 
-        if (full.length > 55) {
-            full = full.substr(0, 53) + '..';
+        if (full.length > 255) {
+            full = full.substr(0, 253) + '..';
         }
 
         if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
@@ -63,48 +63,6 @@ $(document).ready(function() {
         return;
     }
 
-    (function() {
-        return;
-        var code = 'return {' +
-            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
-            'longPoll: API.messages.getLongPollServer()' +
-        '};';
-
-        $.ajax({
-            url: 'https://api.vk.com/method/execute',
-            dataType: 'jsonp',
-            data: {
-                access_token: Configs.token,
-                code: code
-            },
-            success: function(data) {
-                console.log(data);
-                initVK(data.response);
-            }
-        });
-
-        function initVK(data) {
-            (function poll(ts) {
-                console.log('poll...');
-                var longPoll = data.longPoll;
-                var ts = ts || longPoll.ts;
-                var url = longPoll.server;
-                $.ajax({
-                    url: 'http://' + url,
-                    dataType: 'json',
-                    data: {
-                        ts: ts,
-                        key: longPoll.key,
-                        act: 'a_check',
-                        wait: 25,
-                        mode: 2
-                    },
-                    success: function(data) {}
-                });
-            })();
-        }
-    })();
-
     if (!Configs.vkId) {
         return location.replace('/login/');
     }
@@ -112,7 +70,7 @@ $(document).ready(function() {
         return location.replace('/im/login/');
     }
 
-    Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
+    Events.fire('get_user', function(viewer) {
         Configs.viewer = viewer;
         var im = new IM({
             el: '#main'
@@ -145,7 +103,6 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll(ts) {
-            console.log('poll...');
             var timeout = 15;
             $.ajax({
                 url: 'http://im.' + hostname + '/int/controls/watchDog/',
@@ -193,12 +150,46 @@ var IM = Widget.extend({
 
     newEvent: function(event) {
         var t = this;
+        var dirtyMessage;
+        var message;
 
         switch (event.type) {
-            case 'inMessage':
-                var message = event.content;
+            //@todo: объеденить
+            case 'outMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: true,
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
                 t.leftColumn.addMessage(message);
-                t.rightColumn.addMessage(message);
+            break;
+            case 'inMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
+                t.leftColumn.addMessage(message);
+
+                if (!message.isViewer) {
+                    t.rightColumn.addMessage(message);
+                }
             break;
         }
     }
@@ -229,16 +220,6 @@ var LeftColumn = Widget.extend({
         var t = this;
         var $el = $(t.el);
         var $header = $el.find('.header');
-
-        t.on('scroll', (function onScroll() {
-            $el.css('padding-top', $header.outerHeight());
-            if ($(window).scrollTop() > 10) {
-                $header.addClass('fixed');
-            } else {
-                $header.removeClass('fixed');
-            }
-            return onScroll;
-        })());
 
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
@@ -307,12 +288,17 @@ var LeftColumn = Widget.extend({
     initMessages: function(dialogId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
+        title = $.trim(title) || '...';
 
         t.dialogs = false;
         t.messages = new Messages({
             el: $(t.el).find('.list'),
             runData: {
-                dialogId: dialogId
+                dialogId: dialogId,
+                user: {
+                    id: 0,
+                    name: title
+                }
             }
         });
 
@@ -345,7 +331,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.list.incrementCounter(message.groups, message.dialog_id);
+        t.list.incrementCounter(message.groups, message.dialogId);
     },
 
     initList: function() {
@@ -368,7 +354,7 @@ var Dialogs = Widget.extend({
     tmplDialogsBlock: DIALOGS_BLOCK,
     listId: null,
     itemsLimit: 20,
-    currentPage: 1,
+    currentPage: 0,
 
     preloadData: {},
     isBlock: false,
@@ -385,15 +371,16 @@ var Dialogs = Widget.extend({
 
         t.templateData = {id: listId, list: [], isLoad: true};
         t.renderTemplate();
-        t.getBlockData(0, function(data) {
+        t.getBlockData(t.currentPage, function(data) {
             t.templateData = {id: listId, list: data};
             t.listId = listId;
             t.renderTemplate();
-            t.bindEvents();
             t.scrollTop();
+            t.bindEvents();
             t.makeDialogs($el);
-            t.preload();
         });
+        t.currentPage++;
+        t.preload();
     },
 
     bindEvents: function() {
@@ -401,7 +388,7 @@ var Dialogs = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', (function onScroll() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
+            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
                 t.showMore();
             }
             return onScroll;
@@ -431,6 +418,7 @@ var Dialogs = Widget.extend({
         var dialogId = $dialog.data('id');
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
+
                 function onCreate() {
                     $.each(t.templateData.list, function(i, dialog) {
                         if (dialog.id == dialogId) {
@@ -459,6 +447,14 @@ var Dialogs = Widget.extend({
                         },
                         onchange: function(item) {
                             $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
                         },
                         onselect: function(item) {
                             if (item.id == 'add_list') {
@@ -563,7 +559,7 @@ var Dialogs = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },
@@ -579,10 +575,10 @@ var Dialogs = Widget.extend({
             var $block = t.createBlock(data);
             $dialogs.append($block);
             t.makeDialogs($block);
-            t.preload();
             t.unlock();
         });
         t.currentPage++;
+        t.preload();
     },
 
     isLock: function() {
@@ -601,8 +597,8 @@ var Messages = Widget.extend({
     tmplMessage: MESSAGES_ITEM,
     tmplMessagesBlock: MESSAGES_BLOCK,
     dialogId: null,
-    itemsLimit: 20,
-    currentPage: 1,
+    itemsLimit: 30,
+    currentPage: 0,
 
     preloadData: {},
     user: {},
@@ -620,11 +616,12 @@ var Messages = Widget.extend({
             id: dialogId,
             list: [],
             isLoad: true,
-            viewer: Data.users[0],
+            viewer: Configs.viewer,
             user: Data.users[0]
         };
         t.renderTemplate();
-        t.getBlockData(0, function(data) {
+        t.updateTop();
+        t.getBlockData(t.currentPage, function(data) {
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -651,10 +648,11 @@ var Messages = Widget.extend({
             $textarea.inputMemory('message' + dialogId);
             $textarea.focus();
             $textarea[0].scrollTop = $textarea[0].scrollHeight;
-            t.bindEvents();
             t.scrollBottom();
-            t.preload();
+            t.bindEvents();
         });
+        t.currentPage++;
+        t.preload();
     },
 
     bindEvents: function() {
@@ -662,10 +660,9 @@ var Messages = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', (function onScroll() {
-            t.updateInputBox();
             t.updateTop();
 
-            if ($(window).scrollTop() < 600) {
+            if ($(window).scrollTop() < 300) {
                 t.showMore();
             }
             return onScroll;
@@ -685,17 +682,12 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if (message.dialog_id != t.dialogId) return;
-        var clearMessage = {
-            id: message.mid,
-            text: message.body,
-            user: t.user,
-            isNew: true,
-            timestamp: message.date
-        };
-        var $oldMessage = $el.find('[data-id=' + clearMessage.id + ']');
+        if (message.dialogId != t.dialogId) return;
+        if (!message.isViewer) message.user = t.user;
+
+        var $oldMessage = $el.find('[data-id=' + message.id + ']');
         if ($oldMessage.length) return;
-        var $newMessage = t.createMessage(clearMessage);
+        var $newMessage = t.createMessage(message);
         $el.find('.messages').append($newMessage);
         t.makeMessages($newMessage);
         t.scrollBottom();
@@ -726,7 +718,7 @@ var Messages = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.messages.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },
@@ -743,23 +735,11 @@ var Messages = Widget.extend({
             var $block = t.createBlock(data);
             $messages.prepend($block);
             t.makeMessages($block);
-            t.preload();
             t.unlock();
             $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
         });
         t.currentPage++;
-    },
-
-    updateInputBox: function() {
-        var t = this;
-        var $el = $(t.el);
-        var $inputBox = $el.find('.post-message');
-
-        if ($(window).scrollTop() + $(window).height() < $(document).height() - 10) {
-            $inputBox.addClass('fixed');
-        } else {
-            $inputBox.removeClass('fixed');
-        }
+        t.preload();
     },
 
     updateTop: function() {
@@ -767,7 +747,7 @@ var Messages = Widget.extend({
         var $el = $(t.el);
         var $messages = $el.find('.messages');
 
-        $messages.css('padding-top', $(window).height() - $messages.height() - 173);
+        $messages.css('padding-top', $(window).height() - $messages.height() - 162);
     },
 
     scrollBottom: function() {
@@ -812,12 +792,13 @@ var Messages = Widget.extend({
             $textarea.val('');
             var $newMessage = t.createMessage({
                 id: 'loading',
-                isNew: false,
+                isNew: true,
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
             });
+            $newMessage.addClass('loading');
             $el.find('.messages').append($newMessage);
             t.makeMessages($newMessage);
             if (isScroll) {
@@ -825,7 +806,7 @@ var Messages = Widget.extend({
             }
             $textarea.focus();
             Events.fire('send_message', t.dialogId, text, function(messageId) {
-                $newMessage.attr('data-id', messageId);
+                $newMessage.removeClass('loading').attr('data-id', messageId);
             });
         } else {
             $textarea.focus();

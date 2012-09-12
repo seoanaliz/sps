@@ -477,6 +477,9 @@
                 <page uri="daemons://wr-oadmins/">
                     <actions>SPS.Stat.OurAdminsStat</actions>
                 </page>
+                <page uri="daemons://MesCheckUpdates/">
+                    <actions>SPS.Stat.MesCheckUpdates</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">

@@ -50,7 +50,7 @@ var TABS_ITEM =
 '<div data-id="<?=id?>" class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>"><?=title?></div>';
 
 var LEFT_COLUMN =
-'<div class="header"></div>' +
+'<div class="header fixed"></div>' +
 '<div class="list"></div>';
 
 var RIGHT_COLUMN =
@@ -133,7 +133,7 @@ var MESSAGES =
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
 '</div>' +
-'<div class="post-message clear-fix">' +
+'<div class="post-message clear-fix fixed">' +
     '<div class="left-column">' +
         '<div class="photo">' +
             '<a target="_blank" href="http://vk.com/id<?=viewer.id?>" title="Это Вы">' +

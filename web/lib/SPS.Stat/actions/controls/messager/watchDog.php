@@ -35,20 +35,22 @@ class watchDog
 
             switch ( $stat ) {
                 case 3:
-                    $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
-                    $result[] = array(
+                    $from_id   = isset( $event[3] )? $event[3] : $event['uid'];
+                    $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
+                    $result[]  = array(
                         'type'    => 'read',
                         'content' => array(
-                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'mid'       =>  isset( $event[1] ) ? $event[1] : $event['mid'],
                             'from_id'   =>  $from_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  $ids[$from_id],
+                            'groups'    =>  $ids[ $from_id ],
                         )
                     );
-
+                    MesDialogs::set_state( $dialog_id, 0 );
                     break;
                 case 4:
-                    $from_id  = isset( $event[3] )? $event[3] : $event['uid'];
+                    $from_id  = isset( $event[3] ) ? $event[3] : $event['uid'];
+                    MesDialogs::set_dialog_ts( $user_id, $from_id, $event[3], !( $event[2] & 2 ), 0 );
                     if ( isset( $event[7]->attach1_type )) {
                         $message = MesDialogs::get_group_dilogs_list( $user_id, array( $from_id ));
                         $attach = reset( $message )->attachments;
@@ -61,7 +63,7 @@ class watchDog
                             'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
                             'from_id'   =>  $from_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  $ids[$from_id],
+                            'groups'    =>  $ids[ $from_id ],
                             'attachments'=>  $attach
                         )
                     );

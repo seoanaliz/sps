@@ -44,16 +44,21 @@
             $cmd->SetInteger( '@user_id', $userId );
             $ds = $cmd->Execute();
             $res = array();
+            $unread = MesGroups::get_unread_group_counters( $userId );
 
-            while($ds->Next()) {
+            while( $ds->Next()) {
+
+                $group_id = $ds->getValue( 'group_id', TYPE_INTEGER );
                 $res[] = array(
-                    'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
+                    'group_id'  =>  $group_id,
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
+                    'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
                 );
             }
 
             ksort( $res );
+            $res['ungrouped_unread'] = MesGroups::get_unread_ungr_counters( $userId );
             return $res;
         }
 
@@ -217,7 +222,6 @@
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
             $ids = array();
-
             while( $ds->Next() ) {
                 $a  =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER );
@@ -253,8 +257,13 @@
             return $ids;
         }
 
-        public static function get_group_dialogs( $group_id, $limit, $offset = 0 )
+        public static function get_group_dialogs( $user_id, $group_id, $limit, $offset = 0, $only_unr_out = 0 )
         {
+            $where = '';
+            if ( $only_unr_out ) {
+                $where = ' AND read=false AND in_message=false ';
+            }
+
             $limit =  $limit ? $limit : 1000;
 
             $sql = 'SELECT rec_id FROM '
@@ -262,15 +271,18 @@
                         . TABLE_MES_DIALOGS . ' as b
                     WHERE
                         a.group_id=@group_id AND
-                        a.dialog_id=b.id
+                        a.dialog_id=b.id AND
+                        b.user_id=@user_id
                     ORDER BY
-                        rec_id
-                    LIMIT  @limit
-                    OFFSET @offset';
+                        state desc, last_update DESC
+                    OFFSET @offset
+                    LIMIT  @limit';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
+            $cmd->SetInteger('@user_id', $user_id);
+            $cmd->GetQuery();
             $ds = $cmd->Execute();
 
             $res = array();
@@ -279,5 +291,76 @@
             }
             return $res;
         }
+
+        public static function get_ungroup_dialogs( $user_id,  $limit, $offset = 0, $only_unr_out = 0 )
+        {
+            $sql = 'SELECT
+                        rec_id
+                    FROM '
+                        . TABLE_MES_DIALOGS . ' as b
+                    LEFT JOIN '
+                        . TABLE_MES_GROUP_DIALOG_REL . ' as a ON b.id = a.dialog_id
+                    WHERE
+                        a.dialog_id IS NULL AND b.user_id=@user_id
+                    ORDER BY
+                        state desc, last_update desc
+                    OFFSET
+                        @offset
+                    LIMIT
+                        @limit';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@limit', $limit );
+            $cmd->SetInteger( '@offset', $offset );
+            $cmd->SetInteger('@user_id', $user_id);
+            $ds = $cmd->Execute();
+
+            $res = array();
+            while ( $ds->Next() ) {
+                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
+            }
+            return $res;
+        }
+
+        public static function get_unread_group_counters( $user_id )
+        {
+            $sql = 'SELECT
+                        count(group_id),group_id
+                    FROM '
+                      . TABLE_MES_DIALOGS . ' as a,  '
+                      . TABLE_MES_GROUP_DIALOG_REL . ' as b
+                    WHERE
+                        user_id=@user_id AND a.id=b.dialog_id AND state=4
+                    GROUP BY group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger('@user_id', $user_id);
+            $ds = $cmd->Execute();
+
+            $res = array();
+            while ( $ds->Next()) {
+                $res[$ds->GetValue( 'group_id', TYPE_INTEGER )] =  $ds->GetValue( 'count', TYPE_INTEGER );
+            }
+            return $res;
+        }
+
+        public static function get_unread_ungr_counters( $user_id )
+        {
+            $sql = 'SELECT
+                        count(*)
+                    FROM '
+                        . TABLE_MES_DIALOGS . ' as a
+                    LEFT JOIN '
+                        . TABLE_MES_GROUP_DIALOG_REL . ' as b ON a.id=b.dialog_id
+                    WHERE
+                        user_id=@user_id and group_id IS NULL and state=4';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger('@user_id', $user_id);
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
+        }
+
+
     }
 ?>

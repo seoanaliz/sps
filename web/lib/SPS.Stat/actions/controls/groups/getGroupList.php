@@ -18,7 +18,6 @@
             error_reporting( 0 );
             $user_id    =   Request::getInteger( 'userId' );
             $type       =   Request::getString ( 'type' );
-           // $vk_lists   =   Request::getInteger( 'vkLists' );
 
             $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
             if ( !$type || !in_array( $type, $type_array, 1 ) )
@@ -33,6 +32,4 @@
 
             echo ObjectHelper::ToJSON( array( 'response' => $res ));
         }
-
-
     }
