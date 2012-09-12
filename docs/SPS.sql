@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		10.08.2012
+Modified		12.09.2012
 Project		
 Model			
 Company		
@@ -205,6 +205,7 @@ Create table "articleRecords"
 	"poll" Varchar(500),
 	"text_links" Text,
 	"doc" Varchar(500),
+	"topfaceData" Text,
 	"articleId" Integer,
 	"articleQueueId" Integer,
  primary key ("articleRecordId")

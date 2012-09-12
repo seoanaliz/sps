@@ -75,6 +75,9 @@
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
                 }
+                if (!empty($originalArticleRecord)) {
+                    $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
+                }
             }
 
             //get photos from request
@@ -116,6 +119,7 @@
                         $this->articleRecord->poll          = $forceArticleRecord->poll;
                         $this->articleRecord->text_links    = $forceArticleRecord->text_links;
                         $this->articleRecord->doc           = $forceArticleRecord->doc;
+                        $this->articleRecord->topfaceData   = $forceArticleRecord->topfaceData;
                     }
                 }
             }
