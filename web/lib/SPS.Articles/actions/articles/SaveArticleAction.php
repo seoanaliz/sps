@@ -58,8 +58,9 @@
                 $object->articleId = $originalObject->articleId;
             }
 
+            $objectData = Request::getArray('article');
             if (empty($object->sourceFeedId)) {
-                $object->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
+                $object->sourceFeedId = !empty($objectData['sourceFeedId']) ? $objectData['sourceFeedId'] : SourceFeedUtility::FakeSourceAuthors;
             }
 
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
@@ -115,7 +116,7 @@
                 }
             }
 
-            if ($object->sourceFeedId == -1) {
+            if ($object->sourceFeedId == SourceFeedUtility::FakeSourceAuthors) {
                 if (empty($object->authorId)) {
                     $errors['fields']['authorId']['null'] = 'null';
                 }
