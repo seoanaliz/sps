@@ -97,7 +97,7 @@
             }
 
             //не авторские посты
-            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors)) {
+            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
                 $this->search['_sourceFeedId'] = array(-999 => -999);
                 return;
             }
@@ -120,6 +120,18 @@
                 } else {
                     $this->search['_authorId'] = array(-1 => -1);
                 }
+            }
+
+            if ($type == SourceFeedUtility::Topface) {
+                $targetFeedId = Request::getInteger( 'targetFeedId' );
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                    $this->search['targetFeedId'] = -999;
+                }
+
+                $this->search['rateGE'] = null;
+                $this->search['rateLE'] = null;
+                $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
+                //$this->search['targetFeedId'] = $targetFeedId;
             }
         }
 

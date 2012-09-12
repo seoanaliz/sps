@@ -22,6 +22,11 @@ class UploadUserToPublic {
         $article->sourceFeedId = SourceFeedUtility::FakeSourceTopface;
         $article->statusId = 1;
 
+        $targetFeed = TargetFeedFactory::GetOne(array('externalId' => $publicId));
+        if (!empty($targetFeed)) {
+            $article->targetFeedId = $targetFeed->targetFeedId;
+        }
+
         ConnectionFactory::BeginTransaction();
 
         $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
