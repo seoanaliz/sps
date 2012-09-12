@@ -34,7 +34,7 @@
         }
 
         public static function GetSourceFeedIds($currentTargetFeedId = 0) {
-            $result = array(-1 => -1);
+            $result = array(-1 => -1, -2 => -2);
 
             if (is_array(self::$sourceFeedIds) && array_key_exists($currentTargetFeedId, self::$sourceFeedIds)) {
                 return self::$sourceFeedIds[$currentTargetFeedId];
