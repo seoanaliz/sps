@@ -65,19 +65,20 @@ var Eventlist = {
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            var unread = 0;
+            var count = 0;
             $.each(dirtyData, function(i, dirtyList) {
                 if (typeof dirtyList == 'number') {
-                    unread = dirtyList;
+                    count = dirtyList;
                 } else {
                     clearData.push({
                         id: dirtyList.group_id,
-                        title: dirtyList.name
+                        title: dirtyList.name,
+                        count: dirtyList.unread
                     });
                 }
             });
 
-            callback(clearData, unread);
+            callback(clearData, count);
         });
     },
     get_dialogs_list: function(listId, offset, limit, callback) {
@@ -89,15 +90,17 @@ var Eventlist = {
         simpleAjax('getGroupDialogs', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearUser = {
+                    id: dirtyDialog.uid.userId,
+                    name: dirtyDialog.uid.name,
+                    photo: dirtyDialog.uid.ava,
+                    isOnline: (dirtyDialog.uid.online != 0)
+                };
                 clearData.push({
                     id: dirtyDialog.id,
-                    user: {
-                        id: dirtyDialog.uid.userId,
-                        name: dirtyDialog.uid.name,
-                        photo: dirtyDialog.uid.ava,
-                        isOnline: (dirtyDialog.uid.online != 0)
-                    }
+                    user: clearUser
                 });
+                UserCollection.add(clearUser);
             });
             callback(clearData);
         });
@@ -111,6 +114,12 @@ var Eventlist = {
         simpleAjax('getDialogsList', params, function(dirtyData) {
             var clearData = [];
             $.each(dirtyData, function(i, dirtyDialog) {
+                var clearUser = {
+                    id: dirtyDialog.uid.userId,
+                    name: dirtyDialog.uid.name,
+                    photo: dirtyDialog.uid.ava,
+                    isOnline: (dirtyDialog.uid.online != 0)
+                };
                 var clearText = dirtyDialog.body || dirtyDialog.title;
                 clearText = clearText.split('<br>');
                 if (clearText.length > 2) {
@@ -126,16 +135,12 @@ var Eventlist = {
                     isNew: (dirtyDialog.read_state != 1),
                     isViewer: (dirtyDialog.out != 0),
                     viewer: Configs.viewer,
-                    user: {
-                        id: dirtyDialog.uid.userId,
-                        name: dirtyDialog.uid.name,
-                        photo: dirtyDialog.uid.ava,
-                        isOnline: (dirtyDialog.uid.online != 0)
-                    },
+                    user: clearUser,
                     text: clearText,
                     timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
+                UserCollection.add(clearUser);
             });
             callback(clearData);
         });
@@ -153,12 +158,14 @@ var Eventlist = {
             var clearUsers = {};
             var clearMessages = [];
             $.each(dirtyUsers, function(i, dirtyUser) {
-                clearUsers[dirtyUser.userId] = {
+                var clearUser = {
                     id: dirtyUser.userId,
                     name: dirtyUser.name,
                     photo: dirtyUser.ava,
                     isOnline: (dirtyUser.online != 0)
                 };
+                clearUsers[dirtyUser.userId] = clearUser;
+                UserCollection.add(clearUser);
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
                 var clearAttachments = {};
@@ -193,8 +200,8 @@ var Eventlist = {
             callback(data);
         });
     },
-    message_mark_as_read: function(messageId, callback) {
-        simpleAjax('markMes', {mids: messageId}, function() {
+    message_mark_as_read: function(messageId, dialogId, callback) {
+        simpleAjax('markMes', {mids: messageId, dialogsId: dialogId}, function() {
             callback(true);
         });
     },
