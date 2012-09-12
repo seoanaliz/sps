@@ -71,12 +71,12 @@
             if ( $originalObject != null ) {
                 $originalArticleRecord = ArticleRecordFactory::GetOne(
                     array('articleId' => $this->originalObject->articleId)
-                    , array(BaseFactory::WithColumns => '"articleRecordId"')
                 );
 
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
                 }
+
                 if (!empty($originalArticleRecord)) {
                     $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
                 }
