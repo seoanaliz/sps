@@ -131,7 +131,7 @@
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
-                //$this->search['targetFeedId'] = $targetFeedId;
+                $this->search['targetFeedId'] = $targetFeedId;
             }
         }
 

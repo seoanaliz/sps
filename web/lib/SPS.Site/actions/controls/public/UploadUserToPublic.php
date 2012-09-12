@@ -16,6 +16,7 @@ class UploadUserToPublic {
 
         $article = new Article();
 
+        $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = DateTimeWrapper::Now();
         $article->externalId = -1;
         $article->rate = 0;
