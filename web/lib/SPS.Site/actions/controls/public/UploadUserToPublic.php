@@ -35,7 +35,7 @@ class UploadUserToPublic {
         if ($result) {
             $articleRecord = new ArticleRecord();
             $articleRecord->articleId = $article->articleId;
-            $articleRecord->content = sprintf("[id%d|%s]", $socialId, !empty($text) ? $text : ($firstName . ', ' . $age));
+            $articleRecord->content = sprintf("[id%d|%s], %d", $socialId, $firstName, $age);
 
             $articleRecord->photos = $this->savePostPhotos($photo);
             //$articleRecord->link = 'http://topface.com/vklike/' . $userId . '/';
