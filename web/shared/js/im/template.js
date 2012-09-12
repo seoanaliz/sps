@@ -246,7 +246,10 @@ var MESSAGE_ATTACHMENT =
 var LIST =
 '<? if (isset("list") && list.length) { ?>' +
     '<div class="item" data-id="999999" data-title="Не в списке">' +
-        '<div class="title active">Не в списке</div>' +
+        '<div class="title active">' +
+            'Не в списке' +
+            '<span class="counter"><?=count ? "+" + count : ""?></span>' +
+        '</div>' +
     '</div>' +
     '<? each(LIST_ITEM, list); ?>' +
 '<? } else { ?>' +
@@ -256,8 +259,8 @@ var LIST =
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
     '<div class="title">' +
-        '<?=title?><span class="counter"></span>' +
-        '<div class="icon plus"></div>' +
+        '<?=title?>' +
+        '<span class="counter"><?=count ? "+" + count : ""?></span>' +
     '</div>' +
     '<? if (isset("dialogs") && dialogs.length) { ?>' +
         '<div class="list">' +

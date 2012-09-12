@@ -843,8 +843,8 @@ var List = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        Events.fire('get_lists', function(data) {
-            t.templateData = {list: data};
+        Events.fire('get_lists', function(data, count) {
+            t.templateData = {list: data, count: count};
             t.renderTemplate();
 
             var openListsIds = t.getOpenListsIds();
@@ -896,7 +896,7 @@ var List = Widget.extend({
 
     update: function() {
         var t = this;
-        t.run();
+        //t.run();
     },
 
     clickIcon: function(e) {
