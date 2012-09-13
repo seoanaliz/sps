@@ -861,6 +861,11 @@ var Messages = Widget.extend({
             }
             $textarea.focus();
             Events.fire('send_message', t.dialogId, text, function(messageId) {
+                if (!messageId) {
+                    $textarea.val(text);
+                    $newMessage.remove();
+                    return;
+                }
                 var $oldMessage = $el.find('[data-id=' + messageId + ']');
                 if ($oldMessage.length) {
                     return $newMessage.remove();
