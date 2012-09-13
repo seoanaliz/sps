@@ -57,7 +57,7 @@ var Widget = Event.extend({
     destroy: function() {
         var t = this;
 
-        $(t.el).off().empty();
+        $(t.el).undelegate('.widget').empty();
 
         delete this;
     }
