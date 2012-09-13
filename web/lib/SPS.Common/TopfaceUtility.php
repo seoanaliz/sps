@@ -27,7 +27,7 @@
             $targetFeed = TargetFeedFactory::GetById($article->targetFeedId);
 
             $data = array(
-                'result' => 0,
+                'result' => 1,
                 'userId' => $articleRecord->topfaceData['userId'],
                 'publicName' => $targetFeed->title,
                 'publicUrl' => 'http://vk.com/wall-' . $targetFeed->externalId,
