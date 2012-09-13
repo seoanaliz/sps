@@ -202,6 +202,12 @@ var IM = Widget.extend({
                     t.rightColumn.addMessage(message);
                 }
             break;
+            case 'read':
+                message = event.content;
+                var messageId = message.mid;
+
+                t.leftColumn.readMessage(messageId);
+            break;
         }
     }
 });
@@ -240,6 +246,13 @@ var LeftColumn = Widget.extend({
         });
     },
 
+    readMessage: function(messageId) {
+        var t = this;
+
+        if (t.messages) {
+            t.messages.readMessage(messageId);
+        }
+    },
     addMessage: function(message) {
         var t = this;
 
@@ -718,7 +731,7 @@ var Messages = Widget.extend({
         if (message.dialogId != t.dialogId) return;
         if (!message.isViewer) message.user = t.user;
 
-        var $oldMessage = $el.find('[data-id=' + message.id + ']');
+        var $oldMessage = $el.find('.message[data-id=' + message.id + ']');
         if ($oldMessage.length) return;
         var $newMessage = t.createMessage(message);
         $el.find('.messages').append($newMessage);
@@ -735,6 +748,13 @@ var Messages = Widget.extend({
         Events.fire('message_mark_as_read', $message.data('id'), this.dialogId, function() {
             t.trigger('markAsRead');
         });
+    },
+
+    readMessage: function(messageId) {
+        var t = this;
+        var $el = $(t.el);
+        var $message = $el.find('.message[data-id=' + messageId + ']');
+        $message.removeClass('new');
     },
 
     preload: function() {
