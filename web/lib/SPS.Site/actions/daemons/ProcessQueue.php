@@ -85,7 +85,7 @@ sql;
 
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
                     } catch (ChangeSenderException $Ex) {
                         //ниче не делаем
@@ -101,7 +101,7 @@ sql;
          * @param ArticleRecord $articleRecord
          * @param Publisher $publisher
          */
-        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher) {
+        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher, $article) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
             if ($isWithSmallPhoto) {
                 $articleRecord->photos = array();
@@ -136,6 +136,10 @@ sql;
                 $articleQueue->externalId = $sender->send_post();
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
+
+                if ($article->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {
+                    TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
+                }
             } catch (ChangeSenderException $Ex){
                 throw $Ex;
             } catch (Exception $Ex){
