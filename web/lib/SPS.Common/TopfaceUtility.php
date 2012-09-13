@@ -34,7 +34,8 @@
                 'postUrl' => '',
             );
 
-            self::post_request(self::URL, $data);
+            $result = self::post_request(self::URL, $data);
+            var_dump($result);
         }
 
         private static function post_request($url, $data, $referer='') {
