@@ -169,7 +169,7 @@ var IM = Widget.extend({
             case 'outMessage':
                 dirtyMessage = event.content;
                 message = {
-                    groups: dirtyMessage.groups,
+                    lists: (dirtyMessage.groups == '-1') ? [999999] : dirtyMessage.groups,
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
@@ -185,7 +185,7 @@ var IM = Widget.extend({
             case 'inMessage':
                 dirtyMessage = event.content;
                 message = {
-                    groups: dirtyMessage.groups,
+                    lists: (dirtyMessage.groups == '-1') ? [999999] : dirtyMessage.groups,
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
@@ -271,9 +271,11 @@ var LeftColumn = Widget.extend({
 
         if (t.messages) {
             t.messages.destroy();
+            t.messages = null;
         }
         if (t.dialogs) {
             t.dialogs.destroy();
+            t.dialogs = null;
         }
         t.dialogs = new Dialogs({
             el: $(t.el).find('.list'),
@@ -283,15 +285,6 @@ var LeftColumn = Widget.extend({
         });
         t.dialogs.on('select', function(dialogId, title, userId) {
             t.initMessages(dialogId, title, userId);
-        });
-        t.dialogs.on('addList', function() {
-            t.trigger('updateList');
-        });
-        t.dialogs.on('addToList', function() {
-            t.trigger('updateList');
-        });
-        t.dialogs.on('removeFromList', function() {
-            t.trigger('updateList');
         });
 
         if (t.curListId && t.curListId != listId) {
@@ -308,11 +301,13 @@ var LeftColumn = Widget.extend({
         var tabPrefix = t.tabPrefixMessages;
         title = $.trim(title) || '...';
 
-        if (t.dialogs) {
-            t.dialogs.destroy();
-        }
         if (t.messages) {
             t.messages.destroy();
+            t.messages = null;
+        }
+        if (t.dialogs) {
+            t.dialogs.destroy();
+            t.dialogs = null;
         }
         t.messages = new Messages({
             el: $(t.el).find('.list'),
@@ -320,6 +315,9 @@ var LeftColumn = Widget.extend({
                 dialogId: dialogId,
                 userId: userId
             }
+        });
+        t.messages.on('markAsRead', function() {
+            t.trigger('updateList');
         });
 
         if (t.curDialogId && t.curDialogId != dialogId) {
@@ -351,7 +349,8 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.list.incrementCounter(message.groups, message.dialogId);
+        t.update();
+        //t.list.incrementCounter(message.lists, message.dialogId);
     },
 
     initList: function() {
@@ -415,24 +414,34 @@ var Dialogs = Widget.extend({
         })());
     },
 
-    addMessage: function() {
+    addMessage: function(message) {
         var t = this;
         var $el = $(t.el);
         var listId = t.listId;
+        var isUpdate = false;
 
-        t.getBlockData(0, function(data) {
-            t.templateData = {id: listId, list: data};
-            t.listId = listId;
-            t.renderTemplate();
-            t.bindEvents();
-            t.scrollTop();
-            t.makeDialogs($el);
-            t.preload();
+        $.each(message.lists, function(i, listId) {
+            if (listId == t.listId) {
+                isUpdate = true;
+                return false;
+            }
         });
+
+        if (isUpdate) {
+            t.getBlockData(0, function(data) {
+                t.templateData = {id: listId, list: data};
+                t.renderTemplate();
+                t.bindEvents();
+                t.scrollTop();
+                t.makeDialogs($el);
+                t.preload();
+            });
+        }
     },
 
     clickPlus: function(e) {
         var t = this;
+        console.log('!!!');
         var $target = $(e.currentTarget);
         var $dialog = $target.closest('.dialog');
         var dialogId = $dialog.data('id');
@@ -717,11 +726,13 @@ var Messages = Widget.extend({
     },
 
     hoverMessage: function(e) {
+        var t = this;
         if (e.type != 'mouseenter') return;
         var $message = $(e.currentTarget);
         if ($message.hasClass('viewer')) return;
+        $message.removeClass('new');
         Events.fire('message_mark_as_read', $message.data('id'), this.dialogId, function() {
-            $message.removeClass('new');
+            t.trigger('markAsRead');
         });
     },
 
@@ -855,6 +866,7 @@ var Messages = Widget.extend({
 var List = Widget.extend({
     template: LIST,
     dialogsLimit: 100,
+    currentList: null,
 
     events: {
         'click: .item > .title > .icon': 'clickIcon',
@@ -869,14 +881,18 @@ var List = Widget.extend({
         Events.fire('get_lists', function(data, count) {
             t.templateData = {list: data, count: count};
             t.renderTemplate();
+            if (t.currentList) {
+                $(t.el).find('.title.active, .dialog.active').removeClass('active');
+                $el.find('.item[data-id=' + t.currentList + ']').find('.title').addClass('active');
+            }
 
-            var openListsIds = t.getOpenListsIds();
-            $.each(openListsIds, function(i, listId) {
-                if (!listId) return;
-                Events.fire('get_lists', function(data) {
-                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
-                });
-            });
+//            var openListsIds = t.getOpenListsIds();
+//            $.each(openListsIds, function(i, listId) {
+//                if (!listId) return;
+//                Events.fire('get_lists', function(data) {
+//                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
+//                });
+//            });
         });
     },
 
@@ -919,7 +935,7 @@ var List = Widget.extend({
 
     update: function() {
         var t = this;
-        //t.run();
+        t.run();
     },
 
     clickIcon: function(e) {
@@ -946,6 +962,7 @@ var List = Widget.extend({
         $(t.el).find('.title.active, .dialog.active').removeClass('active');
         $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
+        t.currentList = listId;
     },
 
     selectMessages: function(e) {
