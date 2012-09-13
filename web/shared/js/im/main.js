@@ -286,7 +286,9 @@ var LeftColumn = Widget.extend({
         t.dialogs.on('select', function(dialogId, title, userId) {
             t.initMessages(dialogId, title, userId);
         });
-
+        t.dialogs.on('addList', function() {
+            t.trigger('updateList');
+        });
         if (t.curListId && t.curListId != listId) {
             t.tabs.removeTab(tabPrefix + t.curListId);
         }
@@ -441,7 +443,6 @@ var Dialogs = Widget.extend({
 
     clickPlus: function(e) {
         var t = this;
-        console.log('!!!');
         var $target = $(e.currentTarget);
         var $dialog = $target.closest('.dialog');
         var dialogId = $dialog.data('id');
