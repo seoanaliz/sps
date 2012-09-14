@@ -74,7 +74,7 @@
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
                 }
-                if (!empty($originalArticleRecord)) {
+                if (!empty($originalArticleRecord) && !empty($originalArticleRecord->topfaceData)) {
                     $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
                 }
             }
