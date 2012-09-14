@@ -111,7 +111,10 @@
             }
 
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ));
+            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ), 1 );
+            if( isset($res->error ))
+                return array();
+
             $result = array();
             foreach( $res as $dialog ) {
                 if ( !isset($dialog[1] ))
@@ -189,12 +192,12 @@
 
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
         {
-            $acess_token = StatUsers::get_access_token( $user_id );
-            if ( !$acess_token )
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
                 return 'no access_token';
 
             $params = array (
-                    'access_token'  =>  $acess_token,
+                    'access_token'  =>  $access_token,
                     'uid'           =>  $rec_id,
                     'offset'        =>  $offset,
                     'count'         =>  $limit
@@ -205,6 +208,25 @@
                 return false;
             unset ( $result[0] );
 
+            return $result;
+        }
+
+        public static function get_messages( $user_id, $message_ids )
+        {
+            $message_ids = implode ( ',', $message_ids );
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+
+            $params = array(
+                'access_token'  =>  $access_token,
+                'mids'           =>  $message_ids
+            );
+
+            $result = VkHelper::api_request('messages.getById', $params, 0 );
+            if ( $result[0] == 0 )
+                return false;
+            unset ( $result[0] );
             return $result;
         }
 
@@ -338,13 +360,18 @@
         {
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
-                $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET state=@state where id=@dialog_id';
+                $sql = 'UPDATE '
+                            . TABLE_MES_DIALOGS .
+                       'SET
+                            state=@state, last_updates=@last_updates
+                        WHERE
+                            id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
                 $cmd->SetInt( '@dialog_id', $dialog );
+                $cmd->SetInteger( '@last_updates', time() );
                 $cmd->SetInt( '@state', $state );
                 $cmd->Execute();
             }
         }
-
     }
 ?>

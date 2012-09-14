@@ -25,7 +25,6 @@ class getGroupDialogs
         $res = array();
         foreach( $users_array as $user ) {
             $dialog['uid'] = $user;
-
             $dialog['id'] = MesDialogs::get_dialog_id( $user_id, $dialog['uid']['userId'] );
             $dialog['groups'] = $ids[$dialog['uid']['userId']];
             $res[] = $dialog;

@@ -41,7 +41,7 @@ class watchDog
                         'type'    => 'read',
                         'content' => array(
                             'mid'       =>  isset( $event[1] ) ? $event[1] : $event['mid'],
-                            'from_id'   =>  $from_id,
+                            'from_id'   =>  $user_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
                             'groups'    =>  $ids[ $from_id ],
                         )
@@ -54,6 +54,15 @@ class watchDog
                     if ( isset( $event[7]->attach1_type )) {
                         $message = MesDialogs::get_group_dilogs_list( $user_id, array( $from_id ));
                         $attach = reset( $message )->attachments;
+                    } elseif ( isset( $event[7]->fwd )) {
+                        $mid     = array( $event[1] );
+                        $message =reset( MesDialogs::get_messages( $user_id, $mid ));
+                        foreach ( $message->fwd_messages as $mess ) {
+                            $fwd[] = array( 'body'      =>  $mess->body,
+                                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $mess->uid )),
+                                            'date'      =>  $mess->body
+                            );
+                        }
                     }
                     $result[] = array(
                         'type'    => $event[2] & 2 ? 'outMessage' : 'inMessage',
@@ -61,10 +70,11 @@ class watchDog
                             'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
                             'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
                             'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
-                            'from_id'   =>  $from_id,
+                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id )),
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
                             'groups'    =>  $ids[ $from_id ],
-                            'attachments'=>  $attach
+                            'attachments'=>  $attach,
+                            'fwd'       =>  $fwd,
                         )
                     );
 
@@ -75,7 +85,16 @@ class watchDog
                     $result[] = array(
                         'type'      =>  $status,
                         'content'   =>  array(
-                            'userId'    =>  trim( $event[1], '-' )
+                            'userId'    =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' )))
+                        )
+                    );
+                    break;
+                case 61:
+                    $result[] = array(
+                        'type'      =>  'typing',
+                        'content'   =>  array(
+                            'userId'        =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' ))),
+                            'start_typing'  =>  $event[2]
                         )
                     );
             }
