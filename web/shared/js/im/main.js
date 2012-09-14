@@ -1,4 +1,55 @@
-var uriExp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+function makeMsg(msg, isNotClean) {
+    function clean(str) {
+        if (isNotClean) {
+            return str;
+        }
+        else {
+            return str ? str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;') : '';
+        }
+    }
+
+    function indexOf(arr, value, from) {
+        for (var i = from || 0, l = (arr || []).length; i < l; i++) {
+            if (arr[i] == value) return i;
+        }
+        return -1;
+    }
+
+    return clean(msg).replace(/\n/g, '<br>').replace(/(@)?((https?:\/\/)?)((([A-Za-z0-9][A-Za-z0-9\-\_\.]*[A-Za-z0-9])|(([а-яА-Я0-9\-\_\.]+\.рф)))(\/([A-Za-zА-Яа-я0-9\-\_#%&?+\/\.=;:~]*[^\.\,;\(\)\?\<\&\s:])?)?)/ig, function () {
+        var domain = arguments[5],
+            url = arguments[4],
+            full = arguments[0],
+            protocol = arguments[2] || 'http://';
+        var pre = arguments[1];
+
+        if (domain.indexOf('.') == -1) return full;
+        var topDomain = domain.split('.').pop();
+        if (topDomain.length > 5 || indexOf('aero,asia,biz,com,coop,edu,gov,info,int,jobs,mil,mobi,name,net,org,pro,tel,travel,xxx,ru,ua,su,рф,fi,fr,uk,cn,gr,ie,nl,au,co,gd,im,cc,si,ly,gl,be,eu,tv,to,me,io'.split(','), topDomain) == -1) return full;
+
+        if (pre == '@') {
+            return full;
+        }
+        try {
+            full = decodeURIComponent(full);
+        } catch (e){}
+
+        if (full.length > 255) {
+            full = full.substr(0, 253) + '..';
+        }
+
+        if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
+            url = url.replace(/[^a-zA-Z0-9#%;_\-.\/?&=\[\]]/g, encodeURIComponent);
+            return '<a href="'+ (protocol + url).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" target="_blank">' + full + '</a>';
+        }
+        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
+    })
+}
+
 var Configs = {
     vkId: $.cookie('uid'),
     token: $.cookie('token'),
@@ -12,48 +63,6 @@ $(document).ready(function() {
         return;
     }
 
-    (function() {
-        return;
-        var code = 'return {' +
-            'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
-            'longPoll: API.messages.getLongPollServer()' +
-        '};';
-
-        $.ajax({
-            url: 'https://api.vk.com/method/execute',
-            dataType: 'jsonp',
-            data: {
-                access_token: Configs.token,
-                code: code
-            },
-            success: function(data) {
-                console.log(data);
-                initVK(data.response);
-            }
-        });
-
-        function initVK(data) {
-            (function poll(ts) {
-                console.log('poll...');
-                var longPoll = data.longPoll;
-                var ts = ts || longPoll.ts;
-                var url = longPoll.server;
-                $.ajax({
-                    url: 'http://' + url,
-                    dataType: 'json',
-                    data: {
-                        ts: ts,
-                        key: longPoll.key,
-                        act: 'a_check',
-                        wait: 25,
-                        mode: 2
-                    },
-                    success: function(data) {}
-                });
-            })();
-        }
-    })();
-
     if (!Configs.vkId) {
         return location.replace('/login/');
     }
@@ -61,7 +70,7 @@ $(document).ready(function() {
         return location.replace('/im/login/');
     }
 
-    Events.fire('get_user', Configs.vkId, Configs.token, function(viewer) {
+    Events.fire('get_user', function(viewer) {
         Configs.viewer = viewer;
         var im = new IM({
             el: '#main'
@@ -94,7 +103,6 @@ var IM = Widget.extend({
         var t = this;
 
         (function poll(ts) {
-            console.log('poll...');
             var timeout = 15;
             $.ajax({
                 url: 'http://im.' + hostname + '/int/controls/watchDog/',
@@ -142,12 +150,46 @@ var IM = Widget.extend({
 
     newEvent: function(event) {
         var t = this;
+        var dirtyMessage;
+        var message;
 
         switch (event.type) {
-            case 'inMessage':
-                var message = event.content;
+            //@todo: объеденить
+            case 'outMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: true,
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
                 t.leftColumn.addMessage(message);
-                t.rightColumn.addMessage(message);
+            break;
+            case 'inMessage':
+                dirtyMessage = event.content;
+                message = {
+                    groups: dirtyMessage.groups,
+
+                    id: dirtyMessage.mid,
+                    isNew: (dirtyMessage.read_state != 1),
+                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    text: dirtyMessage.body,
+                    dialogId: dirtyMessage.dialog_id,
+                    attachments: [],
+                    timestamp: dirtyMessage.date,
+                    user: dirtyMessage.out ? Configs.viewer : {}
+                };
+                t.leftColumn.addMessage(message);
+
+                if (!message.isViewer) {
+                    t.rightColumn.addMessage(message);
+                }
             break;
         }
     }
@@ -178,16 +220,6 @@ var LeftColumn = Widget.extend({
         var t = this;
         var $el = $(t.el);
         var $header = $el.find('.header');
-
-        t.on('scroll', (function onScroll() {
-            $el.css('padding-top', $header.outerHeight());
-            if ($(window).scrollTop() > 10) {
-                $header.addClass('fixed');
-            } else {
-                $header.removeClass('fixed');
-            }
-            return onScroll;
-        })());
 
         t.on('scroll', function() {
             if (t.messages) t.messages.trigger('scroll');
@@ -256,12 +288,17 @@ var LeftColumn = Widget.extend({
     initMessages: function(dialogId, title) {
         var t = this;
         var tabPrefix = t.tabPrefixMessages;
+        title = $.trim(title) || '...';
 
         t.dialogs = false;
         t.messages = new Messages({
             el: $(t.el).find('.list'),
             runData: {
-                dialogId: dialogId
+                dialogId: dialogId,
+                user: {
+                    id: 0,
+                    name: title
+                }
             }
         });
 
@@ -294,7 +331,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.list.incrementCounter(message.groups, message.dialog_id);
+        t.list.incrementCounter(message.groups, message.dialogId);
     },
 
     initList: function() {
@@ -380,6 +417,7 @@ var Dialogs = Widget.extend({
         var dialogId = $dialog.data('id');
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
+
                 function onCreate() {
                     $.each(t.templateData.list, function(i, dialog) {
                         if (dialog.id == dialogId) {
@@ -408,6 +446,14 @@ var Dialogs = Widget.extend({
                         },
                         onchange: function(item) {
                             $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
                         },
                         onselect: function(item) {
                             if (item.id == 'add_list') {
@@ -512,7 +558,7 @@ var Dialogs = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
             Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },
@@ -569,10 +615,11 @@ var Messages = Widget.extend({
             id: dialogId,
             list: [],
             isLoad: true,
-            viewer: Data.users[0],
+            viewer: Configs.viewer,
             user: Data.users[0]
         };
         t.renderTemplate();
+        t.updateTop();
         t.getBlockData(0, function(data) {
             var users = data.users;
             var messages = data.messages;
@@ -611,7 +658,6 @@ var Messages = Widget.extend({
         var $el = $(t.el);
 
         t.on('scroll', (function onScroll() {
-            t.updateInputBox();
             t.updateTop();
 
             if ($(window).scrollTop() < 600) {
@@ -623,7 +669,7 @@ var Messages = Widget.extend({
             t.sendMessage();
         });
         $el.find('textarea').keydown(function(e) {
-            if (!e.shiftKey && e.keyCode == KEY.ENTER) {
+            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
                 return false;
             }
@@ -634,17 +680,12 @@ var Messages = Widget.extend({
         var t = this;
         var $el = $(t.el);
 
-        if (message.dialog_id != t.dialogId) return;
-        var clearMessage = {
-            id: message.mid,
-            text: message.body,
-            user: t.user,
-            isNew: true,
-            timestamp: message.date
-        };
-        var $oldMessage = $el.find('[data-id=' + clearMessage.id + ']');
+        if (message.dialogId != t.dialogId) return;
+        if (!message.isViewer) message.user = t.user;
+
+        var $oldMessage = $el.find('[data-id=' + message.id + ']');
         if ($oldMessage.length) return;
-        var $newMessage = t.createMessage(clearMessage);
+        var $newMessage = t.createMessage(message);
         $el.find('.messages').append($newMessage);
         t.makeMessages($newMessage);
         t.scrollBottom();
@@ -675,7 +716,7 @@ var Messages = Widget.extend({
             if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
         } else {
             Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback) && data.messages.length) callback(data);
+                if ($.isFunction(callback)) callback(data);
             });
         }
     },
@@ -699,24 +740,12 @@ var Messages = Widget.extend({
         t.currentPage++;
     },
 
-    updateInputBox: function() {
-        var t = this;
-        var $el = $(t.el);
-        var $inputBox = $el.find('.post-message');
-
-        if ($(window).scrollTop() + $(window).height() < $(document).height() - 10) {
-            $inputBox.addClass('fixed');
-        } else {
-            $inputBox.removeClass('fixed');
-        }
-    },
-
     updateTop: function() {
         var t = this;
         var $el = $(t.el);
         var $messages = $el.find('.messages');
 
-        $messages.css('padding-top', $(window).height() - $messages.height() - 173);
+        $messages.css('padding-top', $(window).height() - $messages.height() - 162);
     },
 
     scrollBottom: function() {
@@ -758,15 +787,24 @@ var Messages = Widget.extend({
         var isScroll = true;
 
         if (text) {
-            Events.fire('send_message', t.dialogId, text, function(data) {
-                $textarea.val('');
-                var $newMessage = t.createMessage(data);
-                $el.find('.messages').append($newMessage);
-                t.makeMessages($newMessage);
-                if (isScroll) {
-                    t.scrollBottom();
-                }
-                $textarea.focus();
+            $textarea.val('');
+            var $newMessage = t.createMessage({
+                id: 'loading',
+                isNew: true,
+                isViewer: true,
+                text: makeMsg(text),
+                timestamp: Math.floor(new Date().getTime() / 1000),
+                user: Configs.viewer
+            });
+            $newMessage.addClass('loading');
+            $el.find('.messages').append($newMessage);
+            t.makeMessages($newMessage);
+            if (isScroll) {
+                t.scrollBottom();
+            }
+            $textarea.focus();
+            Events.fire('send_message', t.dialogId, text, function(messageId) {
+                $newMessage.removeClass('loading').attr('data-id', messageId);
             });
         } else {
             $textarea.focus();
