@@ -362,13 +362,13 @@
             foreach( $dialogs_id as $dialog ) {
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
-                       'SET
-                            state=@state, last_updates=@last_updates
+                       ' SET
+                            state=@state, last_update = @last_update
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
                 $cmd->SetInt( '@dialog_id', $dialog );
-                $cmd->SetInteger( '@last_updates', time() );
+                $cmd->SetInteger( '@last_update', time() );
                 $cmd->SetInt( '@state', $state );
                 $cmd->Execute();
             }
