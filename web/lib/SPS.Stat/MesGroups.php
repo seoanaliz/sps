@@ -259,11 +259,7 @@
 
         public static function get_group_dialogs( $user_id, $group_id, $limit, $offset = 0, $only_unr_out = 0 )
         {
-            $where = '';
-            if ( $only_unr_out ) {
-                $where = ' AND read=false AND in_message=false ';
-            }
-
+            $where = $only_unr_out ? ' AND state=4' : '';
             $limit =  $limit ? $limit : 1000;
 
             $sql = 'SELECT rec_id FROM '
@@ -272,9 +268,9 @@
                     WHERE
                         a.group_id=@group_id AND
                         a.dialog_id=b.id AND
-                        b.user_id=@user_id
+                        b.user_id=@user_id  ' . $where . '
                     ORDER BY
-                        state desc, last_update DESC
+                        state DESC, last_update DESC
                     OFFSET @offset
                     LIMIT  @limit';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
@@ -294,6 +290,7 @@
 
         public static function get_ungroup_dialogs( $user_id,  $limit, $offset = 0, $only_unr_out = 0 )
         {
+            $where = $only_unr_out ? ' AND state=4' : '';
             $sql = 'SELECT
                         rec_id
                     FROM '
@@ -301,7 +298,7 @@
                     LEFT JOIN '
                         . TABLE_MES_GROUP_DIALOG_REL . ' as a ON b.id = a.dialog_id
                     WHERE
-                        a.dialog_id IS NULL AND b.user_id=@user_id
+                        a.dialog_id IS NULL AND b.user_id=@user_id ' . $where . '
                     ORDER BY
                         state desc, last_update desc
                     OFFSET
@@ -309,6 +306,7 @@
                     LIMIT
                         @limit';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
@@ -360,7 +358,5 @@
 
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
         }
-
-
     }
 ?>

@@ -117,7 +117,7 @@
 
             $result = array();
             foreach( $res as $dialog ) {
-                if ( !isset($dialog[1] ))
+                if ( !isset( $dialog[1] ))
                     continue;
 
                 $result[] = $dialog[1];
@@ -151,7 +151,6 @@
             $cmd->SetInteger( '@rec_id',  $rec_id  );
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-            $id = false;
             if ( $ds->Next() );
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
             return $id ? $id : false;
@@ -363,15 +362,41 @@
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
                        ' SET
-                            state=@state, last_update = @last_update
+                            state=@state
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
                 $cmd->SetInt( '@dialog_id', $dialog );
-                $cmd->SetInteger( '@last_update', time() );
                 $cmd->SetInt( '@state', $state );
                 $cmd->Execute();
             }
+        }
+
+        public static function search_dialogs( $user_id, $search )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                'access_token'  =>  $access_token,
+                'q'             =>  $search,
+                'fields'        =>  'photo,online,counters',
+            );
+
+            $res = VkHelper::api_request( 'messages.searchDialogs', $params, 0 );
+            $result = array();
+            foreach( $res as $user ) {
+                if ( $user->type !='profile' )
+                    continue;
+                $result[] = array(
+                    'userId'    =>  $user->uid,
+                    'ava'       =>  $user->photo,
+                    'name'      =>  $user->first_name . ' ' . $user->last_name,
+                    'online'    =>  $user->online,
+                    'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $user->uid )
+                );
+            }
+            return $result;
         }
     }
 ?>

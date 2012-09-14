@@ -20,7 +20,7 @@ class writeMes
         if ( !$rec_id )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' ) ) );
         $res = MesDialogs::writeMessage( $user_id, $rec_id, $text );
-
+        MesDialogs::set_state( $dialog_id, 0 );
         if( $res === 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
         elseif ( $res )
