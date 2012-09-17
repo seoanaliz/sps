@@ -7,7 +7,7 @@
      */
     class TopfaceUtility {
 
-        const URL = 'http://gamma.topface.com/socialboard/publicpostresult/';
+        const URL = 'http://topface.com/socialboard/publicpostresult/';
 
         public static function AcceptPost(Article $article, ArticleRecord $articleRecord, $externalId) {
             $targetFeed = TargetFeedFactory::GetById($article->targetFeedId);
