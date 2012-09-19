@@ -19,12 +19,15 @@ class writeMes
         $rec_id = MesDialogs::get_opponent( $user_id, $dialog_id );
         if ( !$rec_id )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' ) ) );
+        $res = MesDialogs::writeMessage( $user_id, $rec_id, $text );
 
-        if ( MesDialogs::writeMessage( $user_id, $rec_id, $text ) )
-            die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
+        if( $res === 'no access_token' )
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
+        elseif ( $res )
+            die( ObjectHelper::ToJSON( array( 'response' => $res )));
         else
             //todo обработка ошибок, капча, в частности
-            die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
+            die( ObjectHelper::ToJSON( array( 'response' => false )));
 
     }
 }

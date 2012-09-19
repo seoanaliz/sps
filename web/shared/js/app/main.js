@@ -126,7 +126,7 @@ var app = (function () {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            Events.fire('wall_load', {clear: true}, function(data) {
+            Events.fire('wall_load', {clear: true, tabType: $tab.data('type')}, function(data) {
                 $wallList.html(data);
                 _updateItems();
             });

@@ -104,6 +104,13 @@
         </group>
     </group>
 
+
+    <group name="publicControls">
+        <action name="UploadUserToPublic">
+            <path>controls/public/UploadUserToPublic</path>
+        </action>
+    </group>
+
     <group name="Site">
         <action name="GetIndexPage" />
     </group>

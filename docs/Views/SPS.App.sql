@@ -40,6 +40,7 @@ CREATE OR REPLACE VIEW "getAuthorEvents" AS
 SELECT "public"."authorEvents"."articleId"
 	, "public"."authorEvents"."authorId"
 	, "public"."authorEvents"."commentIds"
+	, "public"."authorEvents"."isQueued"
 	, "public"."authorEvents"."isSent"
  FROM "public"."authorEvents";
  

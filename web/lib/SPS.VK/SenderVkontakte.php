@@ -1,4 +1,5 @@
 <?php
+    Package::Load( 'SPS.Stat' );
 
     class ChangeSenderException extends Exception{}
 
@@ -8,36 +9,43 @@
      * @subpackage VK
      * @author     Shuler
      */
+
     class SenderVkontakte {
-        protected $post_photo_array;    //массив адресов фоток
-        protected $post_text;           //текст поста
-        protected $attachments = '';    //аттачи
-        protected $vk_access_token;
-        protected $vk_group_id;         //id паблика, куда постим
-        protected $vk_aplication_id;    //id аппа, с которого постим
-        protected $vk_app_seckey;       //
-        protected $link;                //ссылка на источник
-        protected $sign;                //ссыль на пользователя, пока неактивно
-        protected $header;              //заголовок ссылки
+
+        private $change_admin_errors = array( 5, 7, 14, 15 );
+        private $post_photo_array;    //массив адресов фоток
+        private $post_text;                     //текст поста
+        private $attachments = '';              //аттачи
+        private $vk_access_token;
+        private $vk_group_id;                   //id паблика, куда постим
+        private $vk_aplication_id;              //id аппа, с которого постим
+        private $vk_app_seckey;
+        private $link;                          //ссылка на источник
+        private $sign;                          //ссыль на пользователя, пока неактивно
+        private $header;                        //заголовок ссылки
+        private $audio_id = array();            //заголовок ссылки
+        private $video_id = array();            //заголовок ссылки
 
         const METH          =   'https://api.vk.com/method/';
         const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
-        const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
+    //    const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
         const TESTING       =   false;
         const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
+        const ALBUM_NAME    =   'wall photo';
+
         //(например, получение разгаданной капчи)
 
-        public function __construct($post_data)
+        public function __construct( $post_data )
         {
-            $this->post_photo_array = $post_data['photo_array']; //массив вида array('photoXXXX_YYYYYYY','...')
-            $this->post_text = $post_data['text'];
-            $this->vk_group_id = $post_data['group_id'];
-            $this->vk_app_seckey = $post_data['vk_app_seckey'];
-            $this->vk_access_token = $post_data['vk_access_token'];
-            $this->audio_id = $post_data['audio_id'];//массив вида array('videoXXXX_YYYYYYY','...')
-            $this->video_id = $post_data['video_id'];//массив вида array('audioXXXX_YYYYYYY','...')
-            $this->link = $post_data['link'];
-            $this->header = $post_data['header'];
+            $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
+            $this->post_text        =   $this->text_corrector( $post_data['text'] );
+            $this->vk_group_id      =   $post_data['group_id'] ;
+            $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
+            $this->vk_access_token  =   $post_data['vk_access_token'];
+            $this->audio_id         =   isset( $post_data['audio_id'] ) ? $post_data['audio_id'] : array();//массив вида array('videoXXXX_YYYYYYY','...')
+            $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
+            $this->link             =   $post_data['link'];
+            $this->header           =   $post_data['header'];
         }
 
         private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
@@ -47,7 +55,6 @@
             }
 
             $ch = curl_init($url);
-            print_r($arr_of_fields);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -83,226 +90,52 @@
 
         //возвращаемые значения
         //Удачная отсылка
-        //      true - пост со ссылкой
         //      -ХХХ_УУУ - id поста (ХХХ - id паблика, УУУ - поста в этом паблике)
         //Неудачная
-        //      исключение 'please change admin'  -  всплыла капча и не удалось ее убить антигейтом, либо слишком много сообщений
-        //              от данного издателя. Нужно его поменять в обоих случаях
+        //      исключение 'please change admin'  -
+        //          всплыла капча и не удалось ее убить антигейтом,
+        //          либо слишком много сообщений от данного издателя,
+        //          либо токен сгорел
         //
         //      исключения на все остальное
+
         public function send_post()
         {
-            $try_cntr = 0; #счетчик количества попыток послать запрос
-            $attachment = array();
+            $photo_array = array();
 
-            $fields1 = array(    'gid'           =>  $this->vk_group_id,
-                                 'access_token'  =>  $this->vk_access_token);
-            if (is_array($this->post_photo_array)){
-                foreach($this->post_photo_array as $photo_adr)
-                {
-                    //первый запрос, получение адреса для заливки фото
-                    $url = self::METH . "photos.getWallUploadServer";
-                    $fwd = $this->qurl_request($url, $fields1);
-                    $tmp = $fwd;
-
-                    $fwd = json_decode($fwd);
-
-                    if (!empty ($fwd->error)){
-                        $fwd = $fwd->error;
-                        echo '<br>ERROR!<br>';
-                        print_r($fwd);
-                        throw new exception("Error in photos.getWallUploadServer : $fwd->error_msg");
-                    }
-
-                    $fwd = $fwd -> response;
-
-                    sleep(1);
-                    $upload_url = $fwd -> upload_url;
-
-                    if(empty($fwd->upload_url)){
-                        throw new exception("Smthg wrong in photos.getWallUploadServer : $tmp");
-                    }
-
-                    //заливка фото
-                    $content = $this->qurl_request($upload_url, array('file1' => '@'.$photo_adr));
-                    $content = json_decode($content);
-                    if (empty($content->photo)) {
-                        throw new exception(" Error uploading photo. Response : $content");
-                    }
-
-                    sleep(0.5);
-                    //"закрепляем" фотку
-                    $url2 = self::METH . "photos.saveWallPhoto";
-                    $fields = array(    'gid'           =>  $this->vk_group_id,
-                                        'server'        =>  $content->server,
-                                        'hash'          =>  $content->hash,
-                                        'photo'         =>  $content->photo,
-                                        'access_token'  =>  $this->vk_access_token );
-
-                    $fwd2 = $this->qurl_request($url2, $fields);
-                    $fwd2 = json_decode($fwd2);
-                    if (!empty ($fwd2->error)){
-                        $fwd2 = $fwd2->error;
-                        echo '<br>ERROR!<br>';
-                        //                    print_r($fwd2);
-                        throw new exception("Error in photos.saveWallPhoto : $fwd2->error_msg");
-                    }
-
-                    $fwd2 = $fwd2->response;
-                    $fwd2 = $fwd2[0];
-                    $attachment[] = $fwd2->id;
-                }
-            }
-            //только фотки
-            $attachment = implode(',', $attachment);
-
-            //другие аттачи
-            $other_attachments = '';
-            if (!empty($this->audio_id)) {
-                $other_attachments .= ',' . implode(',', $this->audio_id);
+            $meth = $this->link ? 'album' : 'wall';
+            foreach( $this->post_photo_array as $photo_adr ) {
+                $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
 
-            if (!empty($this->video_id)) {
-                $other_attachments .= ',' . implode(',', $this->video_id);
-            }
-            $other_attachments = trim($other_attachments, ',');
-            if($this->post_text == '') {
-                $this->post_text = $this->header;
+            $attachments = array_merge( $photo_array, $this->audio_id, $this->video_id );
+            if (  $this->post_text =='©' || ( $this->post_text == '' && count( $attachments ) == 1 ) ) {
+    //            $this->post_text = "&#01;";
             }
 
-            if (($this->post_text =='©' || $this->post_text == '') && $attachment == '' && $other_attachments == '') {
-                $this->post_text = "&#01;";
-            }
+            if ( $this->link )
+                $attachments[] = $this->link ;
+            $check_id = $this->post( $attachments );
+            $time_a = VkHelper::get_vk_time();
 
-            $arr_fields = array('owner_id'      =>  '-'.$this->vk_group_id,
-                                'message'       =>  $this->post_text,
-                                'access_token'  =>  $this->vk_access_token,
-                                'attachment'    =>  $attachment . ',' . $other_attachments,
-                                'from_group'    =>   1
-            );
+            sleep(4);
+            $check_id = $this->delivery_check( count( $attachments ) , $time_a );
+    //            sleep(20);
+    //            $this->edit_post($attachments, $check_id);
 
-
-            $url = self::METH . "/wall.post";
-            $fwd3 = '';
-
-            $link_attached = 0;
-            if (strlen($arr_fields['attachment']) < 2) {
-                $arr_fields['attachment'] = $this->link;
-                $link_attached = 1;
-            }
-
-            //цикл для отправки
-            $capcha_tries = 0;
-            $old_id = '';
-            $counter = 0;
-            while (true) {
-                $counter ++;
-                if ($counter > 8)
-                    throw new exception( __CLASS__ . '::' . __FUNCTION__ .
-                        " it seems we have an endless circle here");
-                if ( $capcha_tries > self::FALSE_COUNTER ) {
-                    throw new ChangeSenderException();
-                }
-
-                $fwd3 = $this->qurl_request(self::METH . "/wall.post", $arr_fields);
-                $fwd3 = json_decode($fwd3);
-                if (self::TESTING) {
-                    echo '<br>ответ отправки<br>';
-                    print_r($fwd3);
-                    echo '<br><br>';
-                }
-                $old_id = $fwd3->response->post_id;
-
-                //проверка на капчу
-                if (!empty ($fwd3->error)) {
-                    $fwd3 = $fwd3->error;
-                    if ($fwd3->error_code == '14') {
-                        $cew = $this->captcha($fwd3->captcha_img, $fwd3->captcha_sid);
-                        if ($cew) {
-                            $arr_fields['captcha_sid'] = $fwd3->captcha_sid;
-                            $arr_fields['captcha_key'] = $cew;
-                        } else $capcha_tries ++;
-
-                    } elseif ($fwd3->error_code == '214') {
-                        throw new ChangeSenderException();
-                    } else
-                        throw new exception("Error in wall.post : $fwd3->error_msg");
-                    // на ссылку
-                } elseif ( $this->link && $old_id && !$link_attached) {
-                    //получение массива фоток из ^ поста, его удаление
-                    $arr_tmp = array(   'owner_id'      =>  '-' . $this->vk_group_id,
-                                        'access_token'  =>  $this->vk_access_token,
-                                        'count'         =>  5,
-                                        'from_group'    =>  1
-                    );
-                    $url3 = self::METH . "/wall.get";
-                    $fwd3 = json_decode($this->qurl_request($url3, $arr_tmp))->response;
-
-                    unset($fwd3[0]);
-                    //                print_r($fwd3);
-                    $attachment = '-1';
-                    foreach($fwd3 as $f) {
-                        echo $f->id . ' vs ' . $old_id;
-                        echo '<br>';
-                        echo '<br>';
-                        if ($f->id == $old_id) {
-                            if (is_array($f->attachments)) {
-                                $attachment = array();
-                                foreach($f->attachments as $k) {
-                                    if (!empty($k->photo->owner_id)) {
-                                        $attachment[] = 'photo' . $k->photo->owner_id . '_' . $k->photo->pid;
-                                        echo $k->photo->owner_id . '_' . $k->photo->pid . '<br>';
-                                    }
-                                }
-                            }
-                            $attachment = implode(',', $attachment);
-                            break;
-
-                        }
-                    }
-                    if ($attachment == '-1') {
-                        throw new exception( __CLASS__ . '::' . __FUNCTION__ .
-                            " Can't find post : $old_id in $this->vk_group_id");
-                    }
-
-                    // удаляем старый пост
-                    $url = self::METH . 'wall.delete';
-
-                    $params = array(
-                        'owner_id'      =>  '-' . $this->vk_group_id,
-                        'post_id'       =>  $old_id,
-                        'access_token'  =>  $this->vk_access_token
-                    );
-                    $fwd = $this->qurl_request($url, $params);
-                    $fwd = json_decode($fwd);
-                    if (!empty ($fwd3->error)) {
-                        $fwd3 = $fwd3->error;
-                        throw new exception("Error in wall.delete : $fwd->error_msg");
-                    }
-                    sleep(0.6);
-
-                    if (!$link_attached) {
-                        $attachment .= ',' . $this->link;
-                        $link_attached = 1;
-                        $arr_fields['attachment'] = $attachment . ',' . $other_attachments;
-                        $arr_fields['attachment'] = trim($arr_fields['attachment'], ',');
-                    }
-
-                    echo '<br><br>';
-                }
-
-                //выходы из цикла
-                if ($fwd3->response->processing == 1 || (!$this->link && $old_id))
-                    break;
-                unset ($fwd3);
-            }
-
-            if ($old_id)
-                return '-' . $this->vk_group_id . '_' . $old_id;
-            return true;
-
+            if ( !$check_id )
+                throw new exception( "can't find post: vk.com/public" . $this->vk_group_id );
+            else
+                return '-' . $this->vk_group_id . '_' . $check_id;
         }
 
+        public function text_corrector( $text )
+        {
+            $text = strip_tags( $text );
+    //            $text = htmlspecialchars( $text );
+            $text = str_replace( '@', '&#64;', $text );
+            return $text;
+        }
 
         private function remove_tags()
         {
@@ -316,7 +149,7 @@
         // нужно учитывать это время
         //если повезет, возвращает  текст капчи,
         // false в случае неправильной разгадки/недоступности работников распознавания
-        private function captcha($url, $vk_sid)
+        private function captcha( $url, $vk_sid )
         {
             //не требующие пока изменений настройки
             $domain="antigate.com";
@@ -400,11 +233,11 @@
                                 if (self::TESTING) echo "timelimit ($mtimeout) hit\n";
                                 continue(2);
                             }
-                            if (self::TESTING) echo "waiting for $rtimeout seconds\n";
+                            if ( self::TESTING ) echo "waiting for $rtimeout seconds\n";
                             sleep($rtimeout);
                         } else {
-                            $ex = explode('|', $result);
-                            if (trim($ex[0])=='OK') return trim($ex[1]);
+                            $ex = explode( '|', $result );
+                            if ( trim( $ex[ 0 ] )=='OK' ) return trim($ex[1]);
                         }
                     }
                     return false;
@@ -414,30 +247,233 @@
         }
 
         //$post_id  = idпаблика_idпоста
-        public function delete_post($post_id)
-        {
+    //        public function delete_post( $post_id )
+    //        {
+    //
+    //            $post_id = trim($post_id, '-');
+    //            $id = explode('_', $post_id);
+    //            $params = array(
+    //                'owner_id'      =>  '-' . $id[0],
+    //                'post_id'       =>  $id[1],
+    //                'access_token'  =>  $this->vk_access_token
+    //            );
+    //
+    //            $url = self::METH . 'wall.delete';
+    //            $fwd = $this->qurl_request($url, $params);
+    //            $fwd = json_decode($fwd);
+    //
+    //            if (!empty ($fwd->error)) {
+    //                $fwd3 = $fwd->error;
+    //                throw new exception("Error in wall.delete : $fwd->error_msg");
+    //            }
+    //
+    //            return true;
+    //        }
 
-            $post_id = trim($post_id, '-');
-            $id = explode('_', $post_id);
+        //нужно для однотипных названий (альбом 1, альбом 2)
+        //возвращает массив о последнем таком альбоме:
+        // id, количество фото в нем, сколько всего таких
+        private function get_album( $title_search = '' )
+        {
+            $title_search = $title_search ? $title_search : self::ALBUM_NAME;
+            $title_search = trim ( mb_convert_case($title_search, MB_CASE_LOWER, "UTF-8" ) );
             $params = array(
-                'owner_id'      =>  '-' . $id[0],
-                'post_id'       =>  $id[1],
-                'access_token'  =>  $this->vk_access_token
+                'gid'   =>  $this->vk_group_id
             );
 
-            $url = self::METH . 'wall.delete';
-            $fwd = $this->qurl_request($url, $params);
-            $fwd = json_decode($fwd);
+            $res = VkHelper::api_request( 'photos.getAlbums', $params );
 
-            if (!empty ($fwd->error)) {
-                $fwd3 = $fwd->error;
-                throw new exception("Error in wall.delete : $fwd->error_msg");
+            $i = 1;
+            $album_id = '';
+            foreach ( $res as $album ) {
+                if ( substr_count( mb_convert_case( $album->title, MB_CASE_LOWER, "UTF-8" ), $title_search ) > 0 ) {
+                    $i++;
+                    $album_id   = $album->aid;
+                    $album_size = $album->size;
+                }
             }
 
-            return true;
+            $res = array( 'id' => $album_id, 'counter' =>   $i, 'size'  => $album_size );
+
+            if ( $i > 1 )
+                return( $res );
+
+            return false;
+
         }
 
+        private function create_album( $counter = 1, $privacy = 1, $title = '' )
+        {
+            $counter = $counter ? $counter : 1;
+            $title = $title ? $title : self::ALBUM_NAME . ' ' . $counter;
+
+            $params = array(
+                'gid'       =>  $this->vk_group_id,
+                'title'     =>  $title,
+                'privacy'   =>  $privacy,
+            );
+            $res = VkHelper::api_request( 'photos.createAlbum', $params );
+            return  $res->aid  ;
+        }
+
+        private function post( $attaches )
+        {
+            $attaches = implode( ',', $attaches );
+            $params = array(
+                'owner_id'      =>  '-' . $this->vk_group_id,
+                'message'       =>  $this->post_text,
+                'access_token'  =>  $this->vk_access_token,
+                'attachment'    =>  $attaches,
+                'from_group'    =>  1
+            );
+
+            $res = VkHelper::api_request( 'wall.post', $params, false );
+            if ( isset( $res->post_id ) )
+                return $res->post_id;
+
+            elseif( isset( $res->processing ) )
+                return true;
+
+            elseif ( isset( $res->error ) )
+
+                if ( in_array( $res->error->error_code, $this->change_admin_errors ) )
+                    throw new ChangeSenderException();
+
+                else
+                    throw new Exception( 'Error in wall.post: ' . $res->error->error_code
+                        . ', public: '. $this->vk_group_id );
+
+        }
+
+        private function delivery_check( $attacments_count, $time_after )
+        {
+            $params = array(
+                'owner_id'      =>  '-' . $this->vk_group_id,
+                'count'         =>  5,
+                'access_token'  =>  $this->vk_access_token,
+            );
+
+            $res = VkHelper::api_request( 'wall.get', $params, false );
+    //            echo '<br>----------------------------<br>';
+
+            unset( $res[0] );
+            $text2 = substr( preg_replace( "/[\s]+/", '', $this->post_text ), 0, 95 );
+            foreach ( $res as $post ) {
+                $text1 = $this->text_corrector( htmlspecialchars_decode( $post->text ), ENT_NOQUOTES, 'UTF-8' );
+                $text1 =  substr( preg_replace( "/[\s]+/", '', $text1 ), 0, 95 );
+                if ( $attacments_count === count( $post->attachments )
+                    && abs( $post->date - $time_after ) < 10 )  {
+                    return $post->id;
+                }
+            }
+            return false;
+        }
+
+        //todo
+        private function edit_post( $attaches, $post_id )
+        {
+            $attaches[] = 'photo670456_285217131';
+            $attaches = implode( ',', $attaches );
+            sleep(0.3);
+            $params = array(
+                'owner_id'      =>  '-' . $this->vk_group_id,
+                'post_id'       =>  $post_id,
+                'message'       =>  $this->post_text,
+                'access_token'  =>  $this->vk_access_token,
+                'attachments'   =>  $attaches,
+                'from_group'    =>  1
+            );
+
+            $res = VkHelper::api_request( 'wall.edit', $params, false );
+    //            print_r($res);
+            die();
+
+        }
+
+        //todo описания фоток матьматьмать
+        public function load_photo( $path, $destination = 'wall', $caption = '' )
+        {
+            if ( !is_file( $path ))
+                throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
+
+            $aid = '';
+            switch ( $destination ) {
+                case 'wall':
+                    $method_get_server = 'photos.getWallUploadServer';
+                    $method_save_photo = 'photos.saveWallPhoto';
+                    $photo_list = 'photo' ;
+                    break;
+                case 'album':
+                    $album = $this->get_album();
+
+                    if ( !$album || $album['size'] > 470 )
+                        $aid = $this->create_album( $album[ 'counter' ] );
+                    else
+                        $aid = $album['id'];
+
+                    $method_get_server  =   'photos.getUploadServer';
+                    $method_save_photo  =   'photos.save';
+                    $photo_list         =   'photos_list' ;
+                    break;
+                default:
+                    return false;
+            }
+
+            $params = array(
+                'gid'           =>  $this->vk_group_id,
+                'access_token'  =>  $this->vk_access_token,
+                'aid'           =>  $aid
+            );
+
+            //первый запрос, получение адреса для заливки фото
+            $res = VkHelper::api_request( $method_get_server, $params, false );
+            sleep( 0.3 );
+            $upload_url = $res->upload_url;
+            if ( !$upload_url )
+                throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
+                    . " in post to vk.com/publiic" . $this->vk_group_id );
+
+            $photo_size = ImageHelper::GetImageSizes( $path );
+
+    //            echo $destination;
+            if ( $photo_size['width'] > 2000 || $photo_size['height'] > 2000 ) {
+                ImageHelper::Resize( $path, $path, 2000, 2000, 80 );
+            }
+
+            //заливка фото
+            $content = $this->qurl_request( $upload_url, array('file1' => '@' . $path ) );
+            $content = json_decode( $content );
+
+    //            print_r($content);
+            if (empty( $content->$photo_list ) ) {
+                throw new exception(" Error uploading photo. Response : $content  in post to vk.com/publiic" . $this->vk_group_id );
+            }
+
+            sleep( 1 );
+
+            //"закрепляем" фотку
+            $url2 = self::METH .$method_save_photo;
+            $params = array(    'gid'           =>  $this->vk_group_id,
+                'server'        =>  $content->server,
+                'hash'          =>  $content->hash,
+                $photo_list     =>  $content->$photo_list,
+                'access_token'  =>  $this->vk_access_token,
+                'aid'           =>  $aid,
+                'caption'       =>  $caption
+            );
+
+            $res = VkHelper::api_request( $method_save_photo, $params );
+            if( isset( $res->error ) )
+                ;
+            $res = $res[0];
+
+            if( $destination == 'wall' )
+                return $res->id;
+            return "photo" . $res->owner_id . "_" . $res->pid;
+
+        }
 
     }
+
 
 ?>

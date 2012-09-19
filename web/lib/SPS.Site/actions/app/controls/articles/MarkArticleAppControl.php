@@ -24,7 +24,12 @@
                 );
 
                 if (!empty($article)) {
-                    AuthorEventUtility::EventQueueRemove($id);
+                    if (!empty($article->queuedAt)) {
+                        AuthorEventUtility::EventQueueRemove($id);
+                    }
+                    if (!empty($article->sentAt)) {
+                        AuthorEventUtility::EventSentRemove($id);
+                    }
                 }
             }
         }

@@ -151,9 +151,13 @@
                 <page uri="controls://saveAt/">
                     <actions>SPS.Stat.saveAt</actions>
                 </page>
-
+                <page uri="controls://watchDog/">
+                    <actions>SPS.Stat.watchDog</actions>
+                </page>
+                <page uri="controls://getGroupDialogs/">
+                    <actions>SPS.Stat.getGroupDialogs</actions>
+                </page>
             </pageGroup>
-
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
                 <page uri="vt://login" boot="">
@@ -473,6 +477,9 @@
                 <page uri="daemons://wr-oadmins/">
                     <actions>SPS.Stat.OurAdminsStat</actions>
                 </page>
+                <page uri="daemons://MesCheckUpdates/">
+                    <actions>SPS.Stat.MesCheckUpdates</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">
@@ -530,6 +537,21 @@
             <pageGroup name="tools">
                 <page uri="tools://init-editors/">
                     <actions>SPS.Common.InitEditorsTool</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="im" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="im://">
+                    <template>tmpl://im/index.tmpl.php</template>
+                </page>
+                <page uri="im://login/" boot="">
+                    <template>tmpl://im/login.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="publicControls" boot="">
+                <page uri="controls://upload-user-to-public/">
+                    <actions>SPS.Site.UploadUserToPublic</actions>
                 </page>
             </pageGroup>
 

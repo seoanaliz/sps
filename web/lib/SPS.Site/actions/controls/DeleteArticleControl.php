@@ -29,6 +29,12 @@
                 return;
             }
 
+            //topface moderation failed
+            if ($object->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {
+                $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $id));
+                TopfaceUtility::DeclinePost($object, $articleRecord);
+            }
+
             if ($id) {
                 $o = new Article();
                 $o->statusId = 3;

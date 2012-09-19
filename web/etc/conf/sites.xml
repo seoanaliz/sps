@@ -20,6 +20,7 @@
 				<path name="app" value="/app" />
 				<path name="appControls" value="/app/controls" />
 				<path name="tools" value="/tools" />
+				<path name="im" value="/im" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
@@ -63,6 +64,7 @@
 			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
+				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
                         <mediaServer class="MediaServerManager">
@@ -109,6 +111,7 @@
             <host name="production">
                 <hostname>sps.verumnets.ru</hostname>
                 <hostname>socialboard.ru</hostname>
+                <hostname>im.socialboard.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">

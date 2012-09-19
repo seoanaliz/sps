@@ -12,19 +12,18 @@ class saveAt
     {
         error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
-        $access_token   =   Request::getString( 'access_token' );
+        $access_token   =   Request::getString(  'access_token' );
 
         if ( !$access_token || !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
 
-        StatUsers::add_user( $user_id );
+        $user = StatUsers::is_our_user( $user_id );
+        if ( !$user)
+            $user = StatUsers::add_user( $user_id );
 
         StatUsers::set_access_token( $user_id, $access_token );
-
-        echo  ObjectHelper::ToJSON(array('response' => true));
-        die();
-
-
+        MesDialogs::get_all_dialogs( $user_id );
+        die( ObjectHelper::ToJSON( array( 'response' => $user )));
     }
 }

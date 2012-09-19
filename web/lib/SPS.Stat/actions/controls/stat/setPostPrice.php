@@ -12,10 +12,24 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
+//            error_reporting( 0 );
+//            set_time_limit(0);
+            $public_id   =   Request::getInteger( 'publId' );
+            if (empty( $public_id )) {
+                echo ObjectHelper::ToJSON(array( 'response' => false ));
+                die();
+            }
 
-            $publicId = Request::getInteger( 'publId' );
-            $price  = Request::getInteger( 'price' );
+//            StatPublics::truncate_table( TABLE_TEMPL_USER_IDS );
+//            StatPublics::truncate_table( TABLE_TEMPL_PUBLIC_SHORTNAMES );
+            StatPublics::get_public_users( $public_id );
+            $users_array = StatPublics::get_distinct_users();
+
+            $a = StatPublics::collect_fave_publics( $users_array );
+            print_r ($a);
+            die();
+            $publicId   =   Request::getInteger( 'publId' );
+            $price      =   Request::getInteger( 'price' );
 
             if (empty($publId)) {
                 echo ObjectHelper::ToJSON(array('response' => false));
@@ -24,12 +38,12 @@
             $price = $price ? $price : 0;
 
             $query = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET price=@price WHERE vk_id=@publ_id';
-            $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@publ_id',    $publicId);
-            $cmd->SetInteger('@price',   $price);
+            $cmd = new SqlCommand( $query, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@publ_id', $publicId );
+            $cmd->SetInteger( '@price',   $price );
             $cmd->Execute();
 
-            echo ObjectHelper::ToJSON(array('response' => true));
+            echo ObjectHelper::ToJSON(array( 'response' => true ));
         }
     }
 

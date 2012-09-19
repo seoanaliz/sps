@@ -44,7 +44,6 @@ $jsFiles = array(
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
-    'js://st/data.js',
     'js://st/events.js',
     'js://st/template.js',
 );
@@ -87,6 +86,6 @@ if(!empty($jsFilesAdds)) {
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>

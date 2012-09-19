@@ -97,8 +97,8 @@
             }
 
             //не авторские посты
-            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors)) {
-                $this->search['_sourceFeedId'] = array(-2 => -2);
+            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
+                $this->search['_sourceFeedId'] = array(-999 => -999);
                 return;
             }
 
@@ -106,12 +106,12 @@
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
                 if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                    return;
+                    $this->search['targetFeedId'] = -999;
                 }
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
-                $this->search['_sourceFeedId'] = array(-1 => -1);
+                $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
                 $this->search['targetFeedId'] = $targetFeedId;
 
                 //фильтр источников выступает как фильтр авторов
@@ -120,6 +120,18 @@
                 } else {
                     $this->search['_authorId'] = array(-1 => -1);
                 }
+            }
+
+            if ($type == SourceFeedUtility::Topface) {
+                $targetFeedId = Request::getInteger( 'targetFeedId' );
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                    $this->search['targetFeedId'] = -999;
+                }
+
+                $this->search['rateGE'] = null;
+                $this->search['rateLE'] = null;
+                $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
+                $this->search['targetFeedId'] = $targetFeedId;
             }
         }
 

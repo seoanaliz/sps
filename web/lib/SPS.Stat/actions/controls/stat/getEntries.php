@@ -17,13 +17,14 @@ class getEntries {
     public function Execute() {
 
         error_reporting( 0 );
+
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );
+        $period     =   Request::getInteger( 'period' );//
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
