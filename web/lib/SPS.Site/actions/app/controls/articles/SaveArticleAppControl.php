@@ -50,7 +50,7 @@
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
-            $articleRecord->content = $text;
+            $articleRecord->content = mb_substr($text, 0, 4100);
             $articleRecord->likes = 0;
             $articleRecord->photos = $this->getPhotos();
 

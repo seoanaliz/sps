@@ -120,7 +120,11 @@ sql;
             );
 
             if (!empty($articleRecord->photos)) {
-                foreach ($articleRecord->photos as $photoItem) {
+                /**
+                 * отправляем не более 10 фоток
+                 */
+                $articlePhotos = array_slice($articleRecord->photos, 0, 10);
+                foreach ($articlePhotos as $photoItem) {
                     $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                     $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
 
