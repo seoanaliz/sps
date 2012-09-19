@@ -70,6 +70,6 @@ html,body{background-color:#f1f1f1;}
 .main .right-column>.menu .item.selected,.main .right-column>.menu .item:hover{background-color:#e1e7ed;}
 .main .right-column>.menu .item.selected{font-weight:bold;}
 .wall-dropdown-menu{position:absolute;margin-top:5px;margin-right:-22px;background-color:#DEE5EB;border:none;}.wall-dropdown-menu .ui-dropdown-menu-item{padding:5px 10px;cursor:pointer;color:#2b587a;}.wall-dropdown-menu .ui-dropdown-menu-item.active,.wall-dropdown-menu .ui-dropdown-menu-item:hover{color:#fff;background-color:#2b587a;}
-.image-compositing{position:relative;overflow:hidden;height:10px;}.image-compositing:after{content:'' !important;position:absolute;top:0;left:0;right:0;bottom:0;background:url('../../images/common/upload.gif') center no-repeat #ffffff;width:100% !important;height:100% !important;z-index:1;visibility:visible !important;}
+.image-compositing{position:relative;overflow:hidden;}.image-compositing:after{content:'' !important;position:absolute;top:0;left:0;right:0;bottom:0;background:url('../../images/common/upload.gif') center no-repeat #ffffff;width:100% !important;height:100% !important;z-index:1;visibility:visible !important;}
 .qq-upload-list{display:none;}
 .qq-upload-button{margin-top:3px;color:#2b587a;}.qq-upload-button:hover{text-decoration:underline;}
