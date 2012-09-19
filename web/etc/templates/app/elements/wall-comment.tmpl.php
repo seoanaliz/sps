@@ -2,6 +2,7 @@
     /** @var $comment Comment */
     if (!empty($comment)) {
         $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
+        $isEditor = !empty($comment->authorId) ? false : true;
 
         $showDelete = false;
         if (!empty($__Author) && !empty($comment->authorId) && $comment->authorId == $__Author->authorId) {
@@ -29,6 +30,9 @@
     <div class="content">
         <div class="title">
             <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">{$commentAuthor->FullName()}</a>
+            <? if ($isEditor) { ?>
+                <span class="mark-editor">— редактор</span>
+            <? } ?>
         </div>
         <div class="text">
             <?

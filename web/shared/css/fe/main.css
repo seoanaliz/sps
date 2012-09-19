@@ -232,7 +232,7 @@ i{font-style:italic;}
 .post>.comments{margin-top:10px;margin-left:40px;}.post>.comments>.list>.show-more{text-align:center;padding:7px 0;cursor:pointer;color:#6A7989;background-color:#e1e7ed;}.post>.comments>.list>.show-more.hide{background-color:transparent;}.post>.comments>.list>.show-more.hide:hover{background-color:#e1e7ed;}
 .post>.comments>.list>.show-more.load{background-image:url('../../images/common/upload.gif');background-position:center;background-repeat:no-repeat;}
 .post>.comments>.list>.comment{position:relative;border-top:1px solid #DEE5EB;padding:10px 0;}.post>.comments>.list>.comment>.photo{position:absolute;overflow:hidden;left:0;width:32px;height:32px;}.post>.comments>.list>.comment>.photo img{max-width:100%;}
-.post>.comments>.list>.comment>.content{margin-left:42px;}
+.post>.comments>.list>.comment>.content{margin-left:42px;}.post>.comments>.list>.comment>.content>.title .mark-editor{color:#999;font-size:0.9em;}
 .post>.comments>.list>.comment>.content>.text{margin:.2em 0;}
 .post>.comments>.list>.comment>.content>.date{color:#999;font-size:.9em;}
 .post>.comments>.list>.comment:hover>.delete{-ms-filter:progid:DXImageTransform.Microsoft.Alpha(opacity=(50));filter:alpha(opacity = (50));opacity:0.5;}
