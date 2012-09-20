@@ -181,7 +181,8 @@ $(document).ready(function(){
                     $input.placeholder();
                     $input.keyup(function(e) {
                         if (e.keyCode == KEY.ENTER) {
-                            var authorId = intval($input.val());
+                            $input.blur();
+                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
                             var confirmBox = new Box({
                                 id: 'addAuthor' + authorId,
                                 title: 'Добавление автора',
@@ -194,6 +195,9 @@ $(document).ready(function(){
                                     var box = this;
 
                                     VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                        if (!dataVK.response) {
+                                            return box.setHTML('Пользователь не найден');
+                                        }
                                         var user = dataVK.response[0];
                                         var clearUser = {
                                             id: user.uid,
