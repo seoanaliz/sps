@@ -232,10 +232,10 @@ $(document).ready(function(){
                         }
                         function addAuthor() {
                             var box = this;
-                            box.setHTML(tmpl(BOX_LOADING));
+                            box.setHTML(tmpl(BOX_LOADING, {height: 200}));
                             box.setButtons([{label: 'Закрыть', isWhite: true}]);
                             Events.fire('users_editor_add', [authorId, function(data) {
-                                box.hide();
+                                box.remove();
                                 updatePage();
                             }]);
                         }

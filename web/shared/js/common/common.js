@@ -463,7 +463,6 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $body.data('overflow-y', $body.css('overflow-y'));
             $layout = $('<div/>')
                 .addClass('box-layout')
                 .appendTo($body)
@@ -472,7 +471,6 @@ var Box = (function() {
                         boxesHistory[boxesHistory.length-1].hide();
                         if (!boxesHistory.length) {
                             $(this).hide();
-                            //$body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
                         }
                     }
                 })
@@ -512,6 +510,7 @@ var Box = (function() {
         box.$box = $box;
         box.show = show;
         box.hide = hide;
+        box.remove = remove;
         box.setHTML = setHTML;
         box.setTitle = setTitle;
         box.setButtons = setButtons;
@@ -524,7 +523,6 @@ var Box = (function() {
 
             $box.show();
             $layout.show();
-            //$body.css({overflowY: 'hidden', paddingRight: 17});
             refreshTop();
 
             try {
@@ -553,6 +551,11 @@ var Box = (function() {
             }
 
             return box;
+        }
+        function remove() {
+            hide();
+            delete boxesCollection[params.id];
+            $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
