@@ -29,7 +29,9 @@
     </div>
     <div class="content">
         <div class="title">
-            <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">{$commentAuthor->FullName()}</a>
+            <? if (!empty($commentAuthor)) { ?>
+                <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">{$commentAuthor->FullName()}</a>
+            <? } ?>
             <? if ($isEditor) { ?>
                 <span class="mark-editor">— редактор</span>
             <? } ?>

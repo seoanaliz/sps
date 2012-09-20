@@ -12,9 +12,11 @@
                     </a>
                 </div>
                 <div class="info">
-                    <div class="title">
-                        <a target="_blank" href="http://vk.com/id{$__Author->vkId}">{$__Author->FullName()}</a>
-                    </div>
+                    <? if (!empty($__Author)) { ?>
+                        <div class="title">
+                            <a target="_blank" href="http://vk.com/id{$__Author->vkId}">{$__Author->FullName()}</a>
+                        </div>
+                    <? } ?>
                     <!--div class="other">
                         <span class="rating"><span class="icon"></span> 300</span>
                         <span class="likes"><span class="icon hart"></span> 15000</span>

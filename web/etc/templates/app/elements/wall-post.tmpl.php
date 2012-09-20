@@ -33,9 +33,11 @@
     <? } ?>
     <div class="content">
         <div class="hight-light {$asNew}" data-type="{$newPostType}">
-            <div class="title">
-                <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
-            </div>
+            <? if (!empty($author)) { ?>
+                <div class="title">
+                    <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
+                </div>
+            <? } ?>
             <div class="text">
                 <?
                 $content = $articleRecord->content;
