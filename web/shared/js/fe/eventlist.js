@@ -480,6 +480,13 @@ var Eventlist = {
             }
         });
     },
+    users_editor_add: function(userId, callback) {
+        callback();
+    },
+
+    users_editor_remove: function(userId, callback) {
+        callback();
+    },
 
     leftcolumn_sort_type_change: function() {
         loadArticles(true);

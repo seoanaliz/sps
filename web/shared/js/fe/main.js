@@ -177,6 +177,13 @@ $(document).ready(function(){
                     var $container = $('#wall');
                     $container.html(data);
 
+                    $container.delegate('.delete', 'click', function() {
+                        var $author = $(this).closest('.author');
+                        Events.fire('users_editor_remove', [$author.data('id'), function(data) {
+                            $author.remove();
+                        }]);
+                    });
+
                     var $input = $container.find('.author-link');
                     $input.placeholder();
                     $input.keyup(function(e) {
@@ -223,13 +230,16 @@ $(document).ready(function(){
                             });
                             confirmBox.show();
                         }
+                        function addAuthor() {
+                            var box = this;
+                            box.setHTML(tmpl(BOX_LOADING));
+                            box.setButtons([{label: 'Закрыть', isWhite: true}]);
+                            Events.fire('users_editor_add', [authorId, function(data) {
+                                box.hide();
+                                updatePage();
+                            }]);
+                        }
                     });
-
-                    function addAuthor() {
-                        var box = this;
-                        box.hide();
-                        updatePage();
-                    }
                 });
             })();
         } else {

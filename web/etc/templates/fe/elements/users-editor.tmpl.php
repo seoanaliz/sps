@@ -5,7 +5,7 @@
         </div>
     </div>
     <div class="authors-list">
-        <div class="author">
+        <div class="author" data-id="1">
             <div class="photo">
                 <img src="http://cs10308.userapi.com/u4718705/e_be62b8f2.jpg" alt="" />
             </div>
