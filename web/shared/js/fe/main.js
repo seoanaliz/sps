@@ -184,6 +184,20 @@ $(document).ready(function(){
                         }]);
                     });
 
+                    $container.delegate('.description', 'click', function() {
+                        var $input = $(this);
+                        var $author = $(this).closest('.author');
+                        $input.attr('contenteditable', 'true');
+                    });
+                    $container.delegate('.description', 'keyup keydown keypress', function(e) {
+                        var $input = $(this);
+                        var $author = $(this).closest('.author');
+
+                        if (e.keyCode == KEY.ENTER) {
+                            $input.blur().removeAttr('contenteditable');
+                        }
+                    });
+
                     var $input = $container.find('.author-link');
                     $input.placeholder();
                     $input.keyup(function(e) {

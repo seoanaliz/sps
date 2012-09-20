@@ -1201,7 +1201,7 @@ body.editor-mode {
 
     .authors-list {
         .author+.author {
-            margin-bottom: 5px;
+            margin-top: 5px;
         }
         .author {
             background-color: #fff;
@@ -1227,6 +1227,19 @@ body.editor-mode {
                 .name {}
                 .description {
                     color: #999;
+                    display: inline-block;
+                    padding: 2px 4px;
+                    cursor: pointer;
+                    margin-left: -4px;
+
+                    &:hover {
+                        background-color: @bg_hover;
+                    }
+                    &[contenteditable] {
+                        color: #000;
+                        background-color: #fff;
+                        outline: 1px solid @border_main;
+                    }
                 }
             }
 
