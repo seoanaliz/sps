@@ -69,6 +69,7 @@
         'js://fe/edit-post.js',
         'js://fe/main.js',
         'js://fe/files.js',
+        'js://st/template.js',
     );
 
     CssHelper::Init( false );

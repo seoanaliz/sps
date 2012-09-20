@@ -239,7 +239,7 @@ i {font-style: italic;}
     line-height: 17px;
 }
 .left-panel .newpost.collapsed {line-height: 12px;}
-.left-panel .wall {background: #fff; overflow: hidden;}
+.left-panel .wall {background: #fff; overflow: hidden; .border-radius(0 0 2px 2px);}
 .left-panel .wall:empty {
     color: #aaa;
     font-size: 14px;
@@ -343,7 +343,7 @@ i {font-style: italic;}
 .spr.delete {
     width: 14px;
     height:14px;
-    background: url(../../images/common/statusx_op.gif) no-repeat center;
+    background: url(../../images/common/delete.png) no-repeat center;
     -moz-transition: all .2s;
     -webkit-transition: all .2s;
 }
@@ -1091,7 +1091,7 @@ i {font-style: italic;}
                     right: 0;
                     width: 20px;
                     height: 20px;
-                    background: url('../../images/common/statusx_op.gif') center no-repeat;
+                    background: url('../../images/common/delete.png') center no-repeat;
                     cursor: pointer;
 
                     .opacity(0);
@@ -1153,6 +1153,98 @@ i {font-style: italic;}
                     textarea {
                         height: 20px;
                     }
+                }
+            }
+        }
+    }
+}
+
+body.editor-mode {
+    .left-panel > .block {
+        &>* {
+            display: none !important;
+        }
+        &>.header {
+            display: block !important;
+            border-bottom: 1px solid @border_inside;
+
+            &>* {
+                display: none !important;
+            }
+            .type-selector {
+                display: block !important;
+                margin: 0;
+            }
+        }
+        &>.wall {
+            display: block !important;
+        }
+    }
+}
+.users-editor {
+    background-color: @bg_light_gray;
+    padding: 10px;
+    .border-radius(0 0 2px 2px);
+
+    .add-author {
+        margin-bottom: 10px;
+
+        .input-wrapper {
+            padding-right: 10px;
+
+            input {
+                width: 100%;
+                padding: 4px;
+            }
+        }
+    }
+
+    .authors-list {
+        .author+.author {
+            margin-bottom: 5px;
+        }
+        .author {
+            background-color: #fff;
+            border: 1px solid @border_main;
+            padding: 5px;
+            min-height: 30px;
+            position: relative;
+            line-height: normal;
+
+            .photo {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+
+                img {
+                    max-width: 100%;
+                }
+            }
+
+            .info {
+                margin-left: 40px;
+            }
+
+            .delete {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 20px;
+                height: 20px;
+                background: url('../../images/common/delete.png') center no-repeat;
+                cursor: pointer;
+                opacity: 0;
+
+                .transition(0.2s opacity);
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+
+            &:hover {
+                .delete {
+                    opacity: 0.5;
                 }
             }
         }

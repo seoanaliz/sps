@@ -472,6 +472,15 @@ var Eventlist = {
         });
     },
 
+    users_editor_get: function(callback) {
+        $.ajax({
+            url: controlsRoot + 'users-editor/',
+            success: function (data) {
+                callback(data);
+            }
+        });
+    },
+
     leftcolumn_sort_type_change: function() {
         loadArticles(true);
     },
