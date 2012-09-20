@@ -499,7 +499,7 @@ var Box = (function() {
         })).appendTo($layout).hide();
 
         if (params.closeBtn) {
-            $box.find('> .title').click(function() {
+            $box.find('> .title > .close').click(function() {
                 box.hide();
             });
         }
