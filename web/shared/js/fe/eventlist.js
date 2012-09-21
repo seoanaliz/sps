@@ -488,6 +488,10 @@ var Eventlist = {
         callback();
     },
 
+    users_editor_edit_desc: function(userId, description, callback) {
+        callback();
+    },
+
     leftcolumn_sort_type_change: function() {
         loadArticles(true);
     },

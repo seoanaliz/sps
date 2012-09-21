@@ -189,12 +189,16 @@ $(document).ready(function(){
                         var $author = $(this).closest('.author');
                         $input.attr('contenteditable', 'true');
                     });
-                    $container.delegate('.description', 'keyup keydown keypress', function(e) {
+                    $container.delegate('.description', 'keyup', function(e) {
+                        if (!e.originalEvent) return;
+
                         var $input = $(this);
                         var $author = $(this).closest('.author');
+                        var clearText = $input.text();
 
                         if (e.keyCode == KEY.ENTER) {
-                            $input.blur().removeAttr('contenteditable');
+                            $input.blur().html(clearText).removeAttr('contenteditable');
+                            Events.fire('users_editor_edit_desc', [$author.data('id'), clearText, function() {}]);
                         }
                     });
 
