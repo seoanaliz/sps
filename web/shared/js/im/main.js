@@ -76,6 +76,8 @@ $(document).ready(function() {
 
     if (!Configs.vkId) {
         return location.replace('/login/');
+    } else {
+        $.cookie('uid', Configs.vkId, {expires: 30});
     }
     if (!Configs.token) {
         return location.replace('/im/login/');
@@ -390,35 +392,10 @@ var EndlessListAbstract = Widget.extend({
     listId: null,
     itemsLimit: 20,
     currentPage: 0,
-    preloadData: {},
     eventName: 'get_dialogs',
     isBlock: false,
     isDown: true,
-
-    addItem: function(item) {
-        var t = this;
-        var $el = $(t.el);
-        var listId = t.listId;
-        var isUpdate = false;
-
-        $.each(item.lists, function(i, listId) {
-            if (listId == t.listId) {
-                isUpdate = true;
-                return false;
-            }
-        });
-
-        if (isUpdate) {
-            t.getBlockData(0, function(data) {
-                t.templateData = {id: listId, list: data};
-                t.renderTemplate();
-                t.bindEvents();
-                t.scrollTop();
-                t.makeItems($el);
-                t.preload();
-            });
-        }
-    },
+    isPreload: true,
 
     createBlock: function(data) {
         var t = this;
@@ -430,10 +407,13 @@ var EndlessListAbstract = Widget.extend({
         return $(tmpl(t.tmplItem, data));
     },
 
+    fireEvent: function(page, callback) {},
+
     makeItems: function($el) {},
 
     preload: function() {
         var t = this;
+        if (!t.isPreload) return;
         var page = t.currentPage;
         t.getBlockData(page, function(data) {
             if (!t.preloadData[t.listId]) t.preloadData[t.listId] = {};
@@ -447,7 +427,7 @@ var EndlessListAbstract = Widget.extend({
         if (t.preloadData[t.listId] && t.preloadData[t.listId][page]) {
             if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
         } else {
-            Events.fire(t.eventName, t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+            t.fireEvent(page, function(data) {
                 if ($.isFunction(callback)) callback(data);
             });
         }
@@ -507,6 +487,7 @@ var Dialogs = EndlessListAbstract.extend({
         var $el = $(t.el);
         var listId = t.listId = params.listId;
 
+        t.preloadData = {};
         t.templateData = {id: listId, list: [], isLoad: true};
         t.renderTemplate();
         t.getBlockData(t.currentPage, function(data) {
@@ -514,6 +495,7 @@ var Dialogs = EndlessListAbstract.extend({
             t.listId = listId;
             t.renderTemplate();
             t.bindEvents();
+            t.scrollTop();
             t.makeItems($el);
         });
         t.currentPage++;
@@ -532,9 +514,36 @@ var Dialogs = EndlessListAbstract.extend({
         })());
     },
 
+    fireEvent: function(page, callback) {
+        var t = this;
+        Events.fire(t.eventName, t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+            callback(data);
+        });
+    },
+
     addMessage: function(message) {
         var t = this;
-        t.addItem(message);
+        var $el = $(t.el);
+        var listId = t.listId;
+        var isUpdate = false;
+
+        $.each(item.lists, function(i, listId) {
+            if (listId == t.listId) {
+                isUpdate = true;
+                return false;
+            }
+        });
+
+        if (isUpdate) {
+            t.getBlockData(0, function(data) {
+                t.templateData = {id: listId, list: data};
+                t.renderTemplate();
+                t.bindEvents();
+                t.scrollTop();
+                t.makeItems($el);
+                t.preload();
+            });
+        }
     },
 
     clickPlus: function(e) {
@@ -683,6 +692,7 @@ var Messages = EndlessListAbstract.extend({
         var userId = t.userId = params.userId;
         var dialogId = t.dialogId = params.dialogId;
 
+        t.preloadData = {};
         t.templateData = {
             id: dialogId,
             list: [],
@@ -692,8 +702,8 @@ var Messages = EndlessListAbstract.extend({
         };
         t.renderTemplate();
         t.updateTop();
+        t.scrollBottom();
         t.getBlockData(t.currentPage, function(data) {
-            console.log(data);
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -750,6 +760,18 @@ var Messages = EndlessListAbstract.extend({
         });
     },
 
+    createBlock: function(data) {
+        var t = this;
+        return $(tmpl(t.tmplItemsBlock, {id: t.currentPage, list: data.messages}));
+    },
+
+    fireEvent: function(page, callback) {
+        var t = this;
+        Events.fire(t.eventName, t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
+            callback(data);
+        });
+    },
+
     addMessage: function(message) {
         var t = this;
         var $el = $(t.el);
@@ -760,7 +782,7 @@ var Messages = EndlessListAbstract.extend({
         var $oldMessage = $el.find('.message[data-id=' + message.id + ']');
         if ($oldMessage.length) return;
         var $newMessage = t.createItem(message);
-        $el.find('.messages').append($newMessage);
+        $el.find(t.itemsListSelector).append($newMessage);
         t.makeItems($newMessage);
         t.scrollBottom();
     },
@@ -817,7 +839,6 @@ var Messages = EndlessListAbstract.extend({
         var $el = $(t.el);
         var $textarea = $el.find('textarea');
         var text = $.trim($textarea.val());
-        var isScroll = true;
 
         if (text) {
             $textarea.val('');
@@ -832,9 +853,7 @@ var Messages = EndlessListAbstract.extend({
             $newMessage.addClass('loading');
             $el.find(t.itemsListSelector).append($newMessage);
             t.makeItems($newMessage);
-            if (isScroll) {
-                t.scrollBottom();
-            }
+            t.scrollBottom();
             $textarea.focus();
             Events.fire('send_message', t.dialogId, text, function(messageId) {
                 if (!messageId) {
