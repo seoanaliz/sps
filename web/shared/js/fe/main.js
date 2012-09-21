@@ -179,7 +179,7 @@ $(document).ready(function(){
 
                     $container.delegate('.delete', 'click', function() {
                         var $author = $(this).closest('.author');
-                        Events.fire('authors_remove', [$author.data('id'), function(data) {
+                        Events.fire('author_remove', [$author.data('id'), function(data) {
                             $author.remove();
                         }]);
                     });
