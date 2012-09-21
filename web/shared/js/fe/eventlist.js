@@ -474,18 +474,47 @@ var Eventlist = {
 
     authors_get: function(callback) {
         $.ajax({
-            url: controlsRoot + 'authors-editor/',
+            url: controlsRoot + 'authors-list/',
+            data : {
+                targetFeedId: Elements.rightdd()
+            },
             success: function (data) {
                 callback(data);
             }
         });
     },
     author_add: function(userId, callback) {
-        callback();
+        $.ajax({
+            url: controlsRoot + 'author-add/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                vkId: userId,
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
     },
 
     author_remove: function(userId, callback) {
-        callback();
+        $.ajax({
+            url: controlsRoot + 'author-delete/',
+            type: 'GET',
+            dataType : "json",
+            data: {
+                vkId: userId,
+                targetFeedId: Elements.rightdd()
+            },
+            success: function (data) {
+                callback(true);
+            }
+        });
     },
 
     author_edit_desc: function(userId, description, callback) {

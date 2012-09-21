@@ -57,9 +57,6 @@
         <action name="SaveLinkInfoControl">
             <path>controls/SaveLinkInfoControl</path>
         </action>
-        <action name="GetAuthorsEditorControl">
-            <path>controls/GetAuthorsEditorControl</path>
-        </action>
         <group name="Articles">
             <action name="GetArticlesListControl">
                 <path>controls/GetArticlesListControl</path>
@@ -102,6 +99,18 @@
             </action>
             <action name="SaveGridLineItemControl">
                 <path>controls/grid/SaveGridLineItemControl</path>
+            </action>
+        </group>
+
+        <group name="Author">
+            <action name="GetAuthorsListControl">
+                <path>controls/authors/GetAuthorsListControl</path>
+            </action>
+            <action name="AddAuthorControl">
+                <path>controls/authors/AddAuthorControl</path>
+            </action>
+            <action name="DeleteAuthorControl">
+                <path>controls/authors/DeleteAuthorControl</path>
             </action>
         </group>
     </group>

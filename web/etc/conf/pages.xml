@@ -39,10 +39,6 @@
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
                 </page>
-                <page uri="controls://authors-editor/">
-                    <actions>SPS.Site.GetAuthorsEditorControl</actions>
-                    <template>tmpl://fe/elements/authors-editor.tmpl.php</template>
-                </page>
                 <page uri="controls://arcticle-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
@@ -78,6 +74,16 @@
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
+                </page>
+                <page uri="controls://authors-list/">
+                    <actions>SPS.Site.GetAuthorsListControl</actions>
+                    <template>tmpl://fe/elements/authors-list.tmpl.php</template>
+                </page>
+                <page uri="controls://author-add/">
+                    <actions>SPS.Site.AddAuthorControl</actions>
+                </page>
+                <page uri="controls://author-delete/">
+                    <actions>SPS.Site.DeleteAuthorControl</actions>
                 </page>
             </pageGroup>
 
