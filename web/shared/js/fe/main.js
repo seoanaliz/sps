@@ -170,7 +170,7 @@ $(document).ready(function(){
         $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        if ($(this).data('type') == 'authors-editor') {
+        if ($(this).data('type') == 'authors-list') {
             (function updatePage() {
                 Events.fire('authors_get', function(data) {
                     $('body').addClass('editor-mode');
@@ -229,6 +229,7 @@ $(document).ready(function(){
                                             name: user.first_name + ' ' + user.last_name,
                                             photo: user.photo_medium_rec
                                         };
+                                        authorId = clearUser.id;
                                         var BOX_ADD_AUTHOR =
                                         '<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
                                             '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +

@@ -1,14 +1,14 @@
 <?
     /** @var $authors Author[] */
 ?>
-<div class="users-editor">
+<div class="authors-list">
     <div class="add-author">
         <div class="input-wrapper">
             <input type="text" class="author-link" placeholder="Введите ссылку на страницу пользователя" />
         </div>
     </div>
     <? if (!empty($authors)) { ?>
-    <div class="authors-list">
+    <div class="list">
         <? foreach ($authors as $author) { ?>
             <div class="author" data-id="{$author->vkId}">
                 <div class="photo">

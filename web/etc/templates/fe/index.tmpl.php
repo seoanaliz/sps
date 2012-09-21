@@ -11,7 +11,7 @@
                     <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
                         <a class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
                     <? } ?>
-                    <a data-type="authors-editor">Editor</a>
+                    <a data-type="authors-list">+</a>
                 </div>
 
                 <select multiple="multiple" id="source-select">
