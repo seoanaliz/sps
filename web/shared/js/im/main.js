@@ -527,7 +527,7 @@ var Dialogs = EndlessListAbstract.extend({
         var listId = t.listId;
         var isUpdate = false;
 
-        $.each(item.lists, function(i, listId) {
+        $.each(message.lists, function(i, listId) {
             if (listId == t.listId) {
                 isUpdate = true;
                 return false;
