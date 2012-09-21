@@ -251,7 +251,8 @@ body.editor-mode .left-panel>.block>.wall{display:block !important;}
 .users-editor .authors-list .author+.author{margin-top:5px;}
 .users-editor .authors-list .author{background-color:#fff;border:1px solid #c4cde0;padding:5px;min-height:30px;position:relative;line-height:normal;}.users-editor .authors-list .author .photo{position:absolute;width:30px;height:30px;}.users-editor .authors-list .author .photo img{max-width:100%;}
 .users-editor .authors-list .author .info{margin-left:40px;}
-.users-editor .authors-list .author .info .description{color:#999;display:inline-block;padding:2px 4px;cursor:pointer;margin-left:-4px;white-space:nowrap;max-width:200px;overflow:hidden;}.users-editor .authors-list .author .info .description>*{display:none;}
+.users-editor .authors-list .author .info .description{color:#999;display:inline-block;padding:2px 4px;cursor:pointer;margin-left:-4px;white-space:nowrap;max-width:200px;overflow:hidden;}.users-editor .authors-list .author .info .description>*{margin:0;padding:0;}
+.users-editor .authors-list .author .info .description>br{display:none;}
 .users-editor .authors-list .author .info .description:hover{background-color:#e1e7ed;}
 .users-editor .authors-list .author .info .description[contenteditable]{color:#000;background-color:#fff;outline:1px solid #c4cde0;}
 .users-editor .authors-list .author .delete{position:absolute;top:0;right:0;width:20px;height:20px;background:url('../../images/common/delete.png') center no-repeat;cursor:pointer;opacity:0;-webkit-transition:0.2s opacity;-moz-transition:0.2s opacity;-o-transition:0.2s opacity;transition:0.2s opacity;}.users-editor .authors-list .author .delete:hover{opacity:1;}

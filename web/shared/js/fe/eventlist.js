@@ -472,23 +472,23 @@ var Eventlist = {
         });
     },
 
-    users_editor_get: function(callback) {
+    authors_get: function(callback) {
         $.ajax({
-            url: controlsRoot + 'users-editor/',
+            url: controlsRoot + 'authors-editor/',
             success: function (data) {
                 callback(data);
             }
         });
     },
-    users_editor_add: function(userId, callback) {
+    author_add: function(userId, callback) {
         callback();
     },
 
-    users_editor_remove: function(userId, callback) {
+    author_remove: function(userId, callback) {
         callback();
     },
 
-    users_editor_edit_desc: function(userId, description, callback) {
+    author_edit_desc: function(userId, description, callback) {
         callback();
     },
 

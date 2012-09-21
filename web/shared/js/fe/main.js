@@ -170,16 +170,16 @@ $(document).ready(function(){
         $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        if ($(this).data('type') == 'users-editor') {
+        if ($(this).data('type') == 'authors-editor') {
             (function updatePage() {
-                Events.fire('users_editor_get', function(data) {
+                Events.fire('authors_get', function(data) {
                     $('body').addClass('editor-mode');
                     var $container = $('#wall');
                     $container.html(data);
 
                     $container.delegate('.delete', 'click', function() {
                         var $author = $(this).closest('.author');
-                        Events.fire('users_editor_remove', [$author.data('id'), function(data) {
+                        Events.fire('authors_remove', [$author.data('id'), function(data) {
                             $author.remove();
                         }]);
                     });
@@ -187,18 +187,18 @@ $(document).ready(function(){
                     $container.delegate('.description', 'click', function() {
                         var $input = $(this);
                         var $author = $(this).closest('.author');
-                        $input.attr('contenteditable', 'true');
+                        $input.attr('contenteditable', 'true').focus();
                     });
                     $container.delegate('.description', 'keyup', function(e) {
                         if (!e.originalEvent) return;
 
-                        var $input = $(this);
-                        var $author = $(this).closest('.author');
-                        var clearText = $input.text();
-
                         if (e.keyCode == KEY.ENTER) {
-                            $input.blur().html(clearText).removeAttr('contenteditable');
-                            Events.fire('users_editor_edit_desc', [$author.data('id'), clearText, function() {}]);
+                            var $input = $(this);
+                            var $author = $(this).closest('.author');
+                            var clearText = $input.text();
+
+                            $input.blur().removeAttr('contenteditable').html(clearText);
+                            Events.fire('author_edit_desc', [$author.data('id'), clearText, function() {}]);
                         }
                     });
 
@@ -252,7 +252,7 @@ $(document).ready(function(){
                             var box = this;
                             box.setHTML(tmpl(BOX_LOADING, {height: 200}));
                             box.setButtons([{label: 'Закрыть', isWhite: true}]);
-                            Events.fire('users_editor_add', [authorId, function(data) {
+                            Events.fire('author_add', [authorId, function(data) {
                                 box.remove();
                                 updatePage();
                             }]);
@@ -558,8 +558,8 @@ $(document).ready(function(){
     (function(){
         var w = $(window),
             b = $("#wallloadmore");
-        w.scroll(function(){
-            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
+        w.scroll(function() {
+            if (b.is(':visible') && w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
                 b.click();
             }
         });

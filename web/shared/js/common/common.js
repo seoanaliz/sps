@@ -1304,3 +1304,108 @@ var BOX_ACTION =
 
 var BOX_LOADING =
 '<div class="box-loading" style="<?=isset("height") ? "min-height: " + height + "px" : ""?>"></div>';
+
+var MVC = (function() {
+    var ArrayProto  = Array.prototype,
+        ObjProto    = Object.prototype,
+        FuncProto   = Function.prototype;
+
+    var slice            = ArrayProto.slice,
+        unshift          = ArrayProto.unshift,
+        toString         = ObjProto.toString,
+        hasOwnProperty   = ObjProto.hasOwnProperty;
+
+    var nativeForEach      = ArrayProto.forEach,
+        nativeMap          = ArrayProto.map,
+        nativeReduce       = ArrayProto.reduce,
+        nativeReduceRight  = ArrayProto.reduceRight,
+        nativeFilter       = ArrayProto.filter,
+        nativeEvery        = ArrayProto.every,
+        nativeSome         = ArrayProto.some,
+        nativeIndexOf      = ArrayProto.indexOf,
+        nativeLastIndexOf  = ArrayProto.lastIndexOf,
+        nativeIsArray      = Array.isArray,
+        nativeKeys         = Object.keys,
+        nativeBind         = FuncProto.bind;
+
+    var lib = (function() {
+        function each(obj, iterator, context) {
+            if (obj == null) return;
+            if (nativeForEach && obj.forEach === nativeForEach) {
+                obj.forEach(iterator, context);
+            } else if (obj.length === +obj.length) {
+                for (var i = 0, l = obj.length; i < l; i++) {
+                    if (i in obj && iterator.call(context, obj[i], i, obj) === breaker) return;
+                }
+            } else {
+                for (var key in obj) {
+                    if (_.has(obj, key)) {
+                        if (iterator.call(context, obj[key], key, obj) === breaker) return;
+                    }
+                }
+            }
+        }
+
+        function extend(obj) {
+            each(slice.call(arguments, 1), function(source) {
+                for (var prop in source) {
+                    obj[prop] = source[prop];
+                }
+            });
+            return obj;
+        }
+
+        return {
+            each: each,
+            extend: extend,
+            tmpl: tmpl
+        };
+    })();
+
+    function model(options) {
+        return {
+            get: null,
+            set: null,
+            unset: null,
+            clear: null
+        };
+    }
+
+    function view(options) {
+        return {
+            render: null,
+            remove: null
+        };
+    }
+
+    function controller(options) {
+        return {};
+    }
+
+    return {
+        model: model,
+        view: view,
+        controller: controller
+    };
+})();
+
+var TEST_TEMPLATE = '';
+
+var testModel = new MVC.model({
+    text: 'Text'
+});
+
+var testView = new MVC.view({
+    el: '#textElement',
+    model: testModel,
+    template: TEST_TEMPLATE,
+    events: {
+        'click: .icon': 'open'
+    },
+    methods: {
+        open: function() {
+            this.trigger('open');
+        }
+    }
+});
+testView.render();

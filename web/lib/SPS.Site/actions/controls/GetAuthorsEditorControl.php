@@ -2,13 +2,13 @@
     Package::Load('SPS.Site');
 
     /**
-     * GetUsersEditorControl Action
+     * GetAuthorsEditorControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Kohver
      */
 
-    class GetUsersEditorControl {
+    class GetAuthorsEditorControl {
         /**
          * Entry Point
          */

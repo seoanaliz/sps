@@ -39,9 +39,9 @@
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
                 </page>
-                <page uri="controls://users-editor/">
-                    <actions>SPS.Site.GetUsersEditorControl</actions>
-                    <template>tmpl://fe/elements/users-editor.tmpl.php</template>
+                <page uri="controls://authors-editor/">
+                    <actions>SPS.Site.GetAuthorsEditorControl</actions>
+                    <template>tmpl://fe/elements/authors-editor.tmpl.php</template>
                 </page>
                 <page uri="controls://arcticle-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
