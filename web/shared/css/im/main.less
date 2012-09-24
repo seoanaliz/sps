@@ -12,7 +12,7 @@ body {
         float: left;
         width: 800px;
         border: 1px solid @border_main;
-        padding-top: 50px;
+        padding-top: 40px;
         position: relative;
 
         &>.header {
@@ -218,8 +218,10 @@ body {
             }
 
             &>.dialogs {
+                .dialog+.dialog {
+                    border-top: 1px solid @border_inside;
+                }
                 .dialog {
-                    border-bottom: 1px solid @border_inside;
                     padding: 10px;
                     cursor: pointer;
 
