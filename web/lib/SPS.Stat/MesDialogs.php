@@ -396,17 +396,20 @@
 
         public static function set_state( $dialogs_id, $state )
         {
+            $now = time();
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
                        ' SET
-                            state=@state
+                            state=@state,
+                            last_update=@now
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
+                $cmd->SetInt( '@now',   $now );
                 $cmd->Execute();
             }
         }

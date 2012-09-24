@@ -24,7 +24,7 @@ class writeMes
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
         elseif ( $res ) {
             die( ObjectHelper::ToJSON( array( 'response' => $res )));
-            MesDialogs::set_state( $dialog_id, 0 );
+//            MesDialogs::set_state( $dialog_id, 0 );
         } else {
             print($res);
             //todo обработка ошибок, капча, в частности
