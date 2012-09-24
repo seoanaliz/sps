@@ -42,12 +42,12 @@
             return $ds->getValue('max', TYPE_INTEGER);
         }
 
-        public static function get_public_users( $public_id, $table, $offset = 0 )
+        public static function get_public_users( $public_id, $data_base, $offset = 0 )
         {
             $public_id = +$public_id;
             $offset    = +$offset;
             $sql = "INSERT INTO publics VALUES (@public_id, '{0}')";
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( $data_base ));
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->Execute();
 
@@ -68,7 +68,7 @@
                     $values .= implode( ',', $query_reuslt->users ) . ',';
                 }
                 echo '<br>' . count( explode( ',', $values)) . '<br>';
-                sleep(0.5);
+                sleep(0.4);
                 $values = "{" . trim( $values, ',' ) . "}";
 
                 $sql = 'UPDATE publics SET "vkIds" = "vkIds" + @array WHERE "publicId" = @public_id';
@@ -76,7 +76,6 @@
                 $cmd->SetString ( '@array',     $values );
                 $cmd->SetInteger( '@public_id', $public_id );
                 $cmd->Execute();
-//                die($cmd->GetQuery());
             }
         }
 
