@@ -61,7 +61,6 @@
         {
             $max_offset = $max_offset ? $max_offset : 9000000;
             $access_token = StatUsers::get_access_token( $user_id );
-
             $offset = 0;
             $dialog_array = array();
             while(1) {
@@ -71,6 +70,8 @@
                     $code   .= "var a$i = API.messages.getDialogs({\"count\":200,\"offset\":$offset});";
                     $return .= "\"a$i\":a$i,";
                     $offset += 200;
+                    if ( $offset >= $max_offset )
+                        break;
                 }
 
                 $code .= trim( $return, ',' ) . "};";
@@ -84,7 +85,7 @@
                     $dialog_array = array_merge( $dialog_array, $stak );
                 }
 
-                if ( count ( $res->a24 ) < 200 || $offset > $max_offset )
+                if ( count ( $res->a0 ) < 200 || $offset > $max_offset )
                     break;
                 sleep(0.4);
             }
@@ -185,8 +186,46 @@
             $res = VkHelper::api_request( 'messages.send', $params, 0 );
 
             if ( isset( $res->error ))
-                return false;
+                return $res->error;
             return $res;
+        }
+
+        public static function add_message_to_queue( $user_id, $dialog_id, $text )
+        {
+            $now = time();
+            $sql = 'INSERT INTO '
+                        . TABLE_MES_QUEUES . ' ( created_time, user_id, dialog_id )
+                    VALUES
+                        (@created_time, @user_id, @dialog_id)
+                    RETURNING id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger( '@dialog_id',    $dialog_id );
+            $cmd->SetInteger( '@user_id',      $user_id );
+            $cmd->SetInteger( '@created_time', $now );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            $id = $ds->GetInteger('id');
+
+            $sql = 'INSERT INTO '
+                . TABLE_MES_TEXTS . ' ( id, text)
+                    VALUES
+                        ( @id, @text)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@id',   $id );
+            $cmd->SetString ( '@text', $text );
+            $cmd->Execute();
+        }
+
+        public static function mark_message_as_sent( $message_id )
+        {
+            $now = time();
+            $sql = 'UPDATE '
+                        . TABLE_MES_QUEUES . ' SET sent_time=@sent_time, sent=TRUE
+                    WHERE id=@message_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@message_id', $message_id );
+            $cmd->SetInteger( '@sent_time',  $now );
+            $cmd->Execute();
         }
 
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
@@ -365,7 +404,7 @@
                             state=@state
                         WHERE
                             id=@dialog_id';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
                 $cmd->Execute();
@@ -398,5 +437,7 @@
             }
             return $result;
         }
+
+
     }
 ?>

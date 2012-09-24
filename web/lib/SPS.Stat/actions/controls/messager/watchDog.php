@@ -60,7 +60,7 @@ class watchDog
                         foreach ( $message->fwd_messages as $mess ) {
                             $fwd[] = array( 'body'      =>  $mess->body,
                                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $mess->uid )),
-                                            'date'      =>  $mess->body
+                                            'date'      =>  $mess->body,
                             );
                         }
                     }
