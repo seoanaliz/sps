@@ -137,6 +137,7 @@ table, tr, td, th {
 a {
     color: #2B587A;
     text-decoration: none;
+    cursor: pointer;
 
     &:focus, &:hover {
         outline: none;
@@ -480,11 +481,11 @@ input {
                 float: right;
                 width: 18px;
                 height: 18px;
-                background: url('../../images/st/delete-white.png') center no-repeat;
+                background: url('../../images/common/delete-white.png') center no-repeat;
                 opacity: .5;
                 cursor: pointer;
 
-                -webkit-transition: .2s opacity;
+                .transition(0.2s opacity);
 
                 &:hover {
                     opacity: 1;
