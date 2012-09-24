@@ -477,7 +477,7 @@
 //                        $array[$i] = $array[$i]['id'];
 //                    else
 //                         unset($array[$i]);
-                elseif ($array[$i]['likes_tr'] < LIKES_LIMIT)
+                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT)
                     $array[$i]['likes'] = '-';
             }
 
