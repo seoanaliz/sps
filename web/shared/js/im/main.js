@@ -3,6 +3,7 @@ var Configs = {
     token: $.cookie('token'),
     appId: vk_appId,
     controlsRoot: controlsRoot,
+    commonDialogsList: 999999,
     viewer: {}
 };
 
@@ -119,7 +120,7 @@ var IM = Widget.extend({
             case 'outMessage':
                 dirtyMessage = event.content;
                 message = {
-                    lists: (dirtyMessage.groups == '-1') ? [999999] : dirtyMessage.groups,
+                    lists: (dirtyMessage.groups == '-1') ? [Configs.commonDialogsList] : dirtyMessage.groups,
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
@@ -135,7 +136,7 @@ var IM = Widget.extend({
             case 'inMessage':
                 dirtyMessage = event.content;
                 message = {
-                    lists: (dirtyMessage.groups == '-1') ? [999999] : dirtyMessage.groups,
+                    lists: (dirtyMessage.groups == '-1') ? [Configs.commonDialogsList] : dirtyMessage.groups,
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
@@ -180,7 +181,7 @@ var LeftColumn = Widget.extend({
 
         var t = this;
         t.initTabs();
-        t.initDialogs(999999, 'Не в списке');
+        t.initDialogs(Configs.commonDialogsList, 'Не в списке');
         t.bindEvents();
     },
 
@@ -229,40 +230,9 @@ var LeftColumn = Widget.extend({
             }
         });
     },
-    initDialogs: function(listId, title) {
+    showPage: function(pageName, title, params) {
         var t = this;
-        var tabPrefix = t.tabPrefixDialogs;
-
-        if (t.messages) {
-            t.messages.destroy();
-            t.messages = null;
-        }
-        if (t.dialogs) {
-            t.dialogs.destroy();
-            t.dialogs = null;
-        }
-        t.dialogs = new Dialogs({
-            el: t.$el.find('.list'),
-            listId: listId
-        });
-        t.dialogs.on('select', function(dialogId, title, userId) {
-            t.initMessages(dialogId, title, userId);
-        });
-        t.dialogs.on('addList', function() {
-            t.trigger('updateList');
-        });
-        if (t.curListId && t.curListId != listId) {
-            t.tabs.removeTab(tabPrefix + t.curListId);
-        }
-        if (!t.tabs.getTab(tabPrefix + listId).length) {
-            t.tabs.prependTab(tabPrefix + listId, title);
-        }
-        t.tabs.selectTab(tabPrefix + listId);
-        t.curListId = listId;
-    },
-    initMessages: function(dialogId, title, userId) {
-        var t = this;
-        var tabPrefix = t.tabPrefixMessages;
+        var tabId, tabPrefix;
         title = $.trim(title) || '...';
 
         if (t.messages) {
@@ -273,23 +243,64 @@ var LeftColumn = Widget.extend({
             t.dialogs.destroy();
             t.dialogs = null;
         }
-        t.messages = new Messages({
-            el: t.$el.find('.list'),
-            dialogId: dialogId,
-            userId: userId
-        });
-        t.messages.on('markAsRead', function() {
-            t.trigger('updateList');
-        });
 
-        if (t.curDialogId && t.curDialogId != dialogId) {
-            t.tabs.removeTab(tabPrefix + t.curDialogId);
+        switch(pageName) {
+            case 'dialogs':
+                var listId = params.listId;
+                tabPrefix = t.tabPrefixDialogs;
+                tabId = tabPrefix + listId;
+
+                if (!t.tabs.getTab(tabId).length) {
+                    t.tabs.removeTab(tabPrefix + t.curListId);
+                    t.tabs.prependTab(tabId, title);
+                }
+
+                t.dialogs = new Dialogs({
+                    el: t.$el.find('.list'),
+                    listId: listId
+                });
+                t.dialogs.on('select', function(dialogId, title, userId) {
+                    t.initMessages(dialogId, title, userId);
+                });
+                t.dialogs.on('addList', function() {
+                    t.trigger('updateList');
+                });
+                t.curListId = listId;
+            break;
+            case 'messages':
+                var dialogId = params.dialogId;
+                var userId = params.userId;
+                tabPrefix = t.tabPrefixMessages;
+                tabId = tabPrefix + dialogId;
+
+                if (!t.tabs.getTab(tabId).length) {
+                    t.tabs.removeTab(tabPrefix + t.curDialogId);
+                    t.tabs.appendTab(tabId, title);
+                }
+
+                t.messages = new Messages({
+                    el: t.$el.find('.list'),
+                    dialogId: dialogId,
+                    userId: userId
+                });
+                t.messages.on('markAsRead', function() {
+                    t.trigger('updateList');
+                });
+                t.curDialogId = dialogId;
+            break;
         }
-        if (!t.tabs.getTab(tabPrefix + dialogId).length) {
-            t.tabs.appendTab(tabPrefix + dialogId, title);
-        }
-        t.tabs.selectTab(tabPrefix + dialogId);
-        t.curDialogId = dialogId;
+
+        t.tabs.selectTab(tabId);
+        t.curTabId = tabId;
+        t.curTabPrefix = tabPrefix;
+    },
+    initDialogs: function(listId, title) {
+        var t = this;
+        return t.showPage('dialogs', title, {listId: listId});
+    },
+    initMessages: function(dialogId, title, userId) {
+        var t = this;
+        return t.showPage('messages', title, {dialogId: dialogId, userId: userId});
     }
 });
 

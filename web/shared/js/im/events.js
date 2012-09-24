@@ -83,7 +83,7 @@ var Eventlist = {
     },
     get_dialogs_list: function(listId, offset, limit, callback) {
         var params = {
-            groupId: listId == 999999 ? undefined : listId,
+            groupId: listId == Configs.commonDialogsList ? undefined : listId,
             offset: offset,
             limit: limit
         };
@@ -107,7 +107,7 @@ var Eventlist = {
     },
     get_dialogs: function(listId, offset, limit, callback) {
         var params = {
-            groupId: listId == 999999 ? undefined : listId,
+            groupId: listId == Configs.commonDialogsList ? undefined : listId,
             offset: offset,
             limit: limit
         };
