@@ -61,7 +61,6 @@
         {
             $max_offset = $max_offset ? $max_offset : 9000000;
             $access_token = StatUsers::get_access_token( $user_id );
-
             $offset = 0;
             $dialog_array = array();
             while(1) {
@@ -71,6 +70,8 @@
                     $code   .= "var a$i = API.messages.getDialogs({\"count\":200,\"offset\":$offset});";
                     $return .= "\"a$i\":a$i,";
                     $offset += 200;
+                    if ( $offset >= $max_offset )
+                        break;
                 }
 
                 $code .= trim( $return, ',' ) . "};";
@@ -84,7 +85,7 @@
                     $dialog_array = array_merge( $dialog_array, $stak );
                 }
 
-                if ( count ( $res->a24 ) < 200 || $offset > $max_offset )
+                if ( count ( $res->a0 ) < 200 || $offset > $max_offset )
                     break;
                 sleep(0.4);
             }
@@ -111,10 +112,13 @@
             }
 
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ));
+            $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ), 1 );
+            if( isset($res->error ))
+                return array();
+
             $result = array();
             foreach( $res as $dialog ) {
-                if ( !isset($dialog[1] ))
+                if ( !isset( $dialog[1] ))
                     continue;
 
                 $result[] = $dialog[1];
@@ -148,7 +152,6 @@
             $cmd->SetInteger( '@rec_id',  $rec_id  );
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-            $id = false;
             if ( $ds->Next() );
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
             return $id ? $id : false;
@@ -183,18 +186,56 @@
             $res = VkHelper::api_request( 'messages.send', $params, 0 );
 
             if ( isset( $res->error ))
-                return false;
+                return $res->error;
             return $res;
+        }
+
+        public static function add_message_to_queue( $user_id, $dialog_id, $text )
+        {
+            $now = time();
+            $sql = 'INSERT INTO '
+                        . TABLE_MES_QUEUES . ' ( created_time, user_id, dialog_id )
+                    VALUES
+                        (@created_time, @user_id, @dialog_id)
+                    RETURNING id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger( '@dialog_id',    $dialog_id );
+            $cmd->SetInteger( '@user_id',      $user_id );
+            $cmd->SetInteger( '@created_time', $now );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            $id = $ds->GetInteger('id');
+
+            $sql = 'INSERT INTO '
+                . TABLE_MES_TEXTS . ' ( id, text)
+                    VALUES
+                        ( @id, @text)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@id',   $id );
+            $cmd->SetString ( '@text', $text );
+            $cmd->Execute();
+        }
+
+        public static function mark_message_as_sent( $message_id )
+        {
+            $now = time();
+            $sql = 'UPDATE '
+                        . TABLE_MES_QUEUES . ' SET sent_time=@sent_time, sent=TRUE
+                    WHERE id=@message_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@message_id', $message_id );
+            $cmd->SetInteger( '@sent_time',  $now );
+            $cmd->Execute();
         }
 
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
         {
-            $acess_token = StatUsers::get_access_token( $user_id );
-            if ( !$acess_token )
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
                 return 'no access_token';
 
             $params = array (
-                    'access_token'  =>  $acess_token,
+                    'access_token'  =>  $access_token,
                     'uid'           =>  $rec_id,
                     'offset'        =>  $offset,
                     'count'         =>  $limit
@@ -205,6 +246,25 @@
                 return false;
             unset ( $result[0] );
 
+            return $result;
+        }
+
+        public static function get_messages( $user_id, $message_ids )
+        {
+            $message_ids = implode ( ',', $message_ids );
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+
+            $params = array(
+                'access_token'  =>  $access_token,
+                'mids'           =>  $message_ids
+            );
+
+            $result = VkHelper::api_request('messages.getById', $params, 0 );
+            if ( $result[0] == 0 )
+                return false;
+            unset ( $result[0] );
             return $result;
         }
 
@@ -338,13 +398,46 @@
         {
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
-                $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET state=@state where id=@dialog_id';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+                $sql = 'UPDATE '
+                            . TABLE_MES_DIALOGS .
+                       ' SET
+                            state=@state
+                        WHERE
+                            id=@dialog_id';
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
                 $cmd->Execute();
             }
         }
+
+        public static function search_dialogs( $user_id, $search )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                'access_token'  =>  $access_token,
+                'q'             =>  $search,
+                'fields'        =>  'photo,online,counters',
+            );
+
+            $res = VkHelper::api_request( 'messages.searchDialogs', $params, 0 );
+            $result = array();
+            foreach( $res as $user ) {
+                if ( $user->type !='profile' )
+                    continue;
+                $result[] = array(
+                    'userId'    =>  $user->uid,
+                    'ava'       =>  $user->photo,
+                    'name'      =>  $user->first_name . ' ' . $user->last_name,
+                    'online'    =>  $user->online,
+                    'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $user->uid )
+                );
+            }
+            return $result;
+        }
+
 
     }
 ?>
