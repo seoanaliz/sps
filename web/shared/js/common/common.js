@@ -463,7 +463,6 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $body.data('overflow-y', $body.css('overflow-y'));
             $layout = $('<div/>')
                 .addClass('box-layout')
                 .appendTo($body)
@@ -472,7 +471,6 @@ var Box = (function() {
                         boxesHistory[boxesHistory.length-1].hide();
                         if (!boxesHistory.length) {
                             $(this).hide();
-                            //$body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
                         }
                     }
                 })
@@ -501,7 +499,7 @@ var Box = (function() {
         })).appendTo($layout).hide();
 
         if (params.closeBtn) {
-            $box.find('> .title').click(function() {
+            $box.find('> .title > .close').click(function() {
                 box.hide();
             });
         }
@@ -512,6 +510,7 @@ var Box = (function() {
         box.$box = $box;
         box.show = show;
         box.hide = hide;
+        box.remove = remove;
         box.setHTML = setHTML;
         box.setTitle = setTitle;
         box.setButtons = setButtons;
@@ -524,7 +523,6 @@ var Box = (function() {
 
             $box.show();
             $layout.show();
-            //$body.css({overflowY: 'hidden', paddingRight: 17});
             refreshTop();
 
             try {
@@ -553,6 +551,11 @@ var Box = (function() {
             }
 
             return box;
+        }
+        function remove() {
+            hide();
+            delete boxesCollection[params.id];
+            $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
@@ -1235,3 +1238,69 @@ var Box = (function() {
         return methods.init.apply(this, arguments);
     };
 })(jQuery);
+
+/**
+ * Templating
+ */
+var tmpl = (function($) {
+    var cache = {};
+    var format = function(str) {
+        return str
+            .replace(/[\r\t\n]/g, ' ')
+            .split('<?').join('\t')
+            .split("'").join("\\'")
+            .replace(/\t=(.*?)\?>/g, "',$1,'")
+            .split('?>').join("p.push('")
+            .split('\t').join("');")
+            .split('\r').join("\\'");
+    };
+    var tmpl = function(str, data) {
+        try {
+            var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
+                ? function() {
+                return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
+            }
+                : (new Function('obj',
+                'var p=[],' +
+                    'print=function(){p.push.apply(p,arguments)},' +
+                    'isset=function(v){return !!obj[v]},' +
+                    'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
+                    "with(obj){p.push('" + format(str) + "');} return p.join('');"
+            ));
+            return (cache[str] = fn(data || {}));
+        }
+        catch(e) {
+            if (window.console && console.log) console.log(format(str));
+            throw e;
+        }
+    };
+
+    return tmpl;
+})(jQuery);
+
+var BOX_LAYOUT =
+'<div  class="box-layout"></div>';
+
+var BOX_WRAP =
+'<div class="box-wrap">' +
+    '<? if (isset("title")) { ?>' +
+        '<div class="title">' +
+            '<span class="text"><?=title?></span>' +
+            '<? if (isset("closeBtn")) { ?>' +
+                '<div class="close"></div>' +
+            '<? } ?>' +
+        '</div>' +
+    '<? } ?>' +
+    '<div class="body clear-fix"><?=body?></div>' +
+    '<? if (isset("buttons") && buttons.length) { ?>' +
+        '<div class="actions-wrap">' +
+            '<div class="actions"></div>' +
+        '</div>' +
+    '<? } ?>' +
+'</div>';
+
+var BOX_ACTION =
+'<button class="action button<?=isset("isWhite") ? " white" : ""?>"><?=label?></button>';
+
+var BOX_LOADING =
+'<div class="box-loading" style="<?=isset("height") ? "min-height: " + height + "px" : ""?>"></div>';

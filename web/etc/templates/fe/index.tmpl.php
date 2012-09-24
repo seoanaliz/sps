@@ -9,8 +9,9 @@
 
                 <div class="type-selector">
                     <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                        <a href="#" class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                        <a class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
                     <? } ?>
+                    <a data-type="authors-list">+</a>
                 </div>
 
                 <select multiple="multiple" id="source-select">
@@ -35,7 +36,7 @@
             <div class="wall-title">
                 <span class="count">&nbsp;</span>
                 <span class="filter" id="filter-list">
-                    <a href="javascript:;" data-type="new">новые записи</a>
+                    <a data-type="new">новые записи</a>
                 </span>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
@@ -101,9 +102,9 @@
                    </div -->
 
                     <div class="type-selector">
-                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <a href="#" class="active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
-                        <a href="#" class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                        <a class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <a class="active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
+                        <a class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
                     </div>
 
                 </div>
@@ -112,7 +113,7 @@
             <div class="queue-title">&nbsp;</div>
             <div class="items drop" id="queue" style="display: none;"></div>
             <div class="queue-footer">
-                <a class="add-button" href="javascript:;">Добавить ячейку</a>
+                <a class="add-button">Добавить ячейку</a>
             </div>
         </div>
     </div>
