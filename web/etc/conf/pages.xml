@@ -470,24 +470,16 @@
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
-                <page uri="daemons://wr-posts/">
-                    <actions>SPS.Stat.WrPosts</actions>
-                </page>
-                <page uri="daemons://wr-points/">
-                    <actions>SPS.Stat.WrPoints</actions>
-                </page>
-                <page uri="daemons://wr-unix/">
-                    <actions>SPS.Stat.WrUnix</actions>
-                </page>
-                <page uri="daemons://wr-cleaner/">
-                    <actions>SPS.Stat.WrCleaner</actions>
-                </page>
                 <page uri="daemons://wr-oadmins/">
                     <actions>SPS.Stat.OurAdminsStat</actions>
                 </page>
                 <page uri="daemons://MesCheckUpdates/">
                     <actions>SPS.Stat.MesCheckUpdates</actions>
                 </page>
+                <page uri="daemons://MessageSender/">
+                    <actions>SPS.Stat.MessageSender</actions>
+                </page>
+
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">

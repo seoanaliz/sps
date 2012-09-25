@@ -148,5 +148,14 @@
 
             return $usersIds;
         }
+
+        public static function set_mes_limit_ts( $user_id ) {
+            $now = time();
+            $sql = 'UPDATE ' . TABLE_STAT_USERS . ' SET mes_block_ts=@now WHERE user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id );
+            $cmd->SetInteger('@now', $now );
+            $cmd->Execute();
+        }
     }
 ?>

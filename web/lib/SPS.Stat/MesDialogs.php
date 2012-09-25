@@ -6,26 +6,6 @@
 
     class MesDialogs
     {
-//        //to do execute добавить
-//        public static function get_last_dialogs( $user_id, $offset, $limit )
-//        {
-//            if ( !$limit )
-//                $limit = 25;
-//            $access_token = StatUsers::get_access_token( $user_id );
-//            if ( !$access_token )
-//                return 'no access_token';
-//            $params = array(
-//                            'access_token'      =>  $access_token,
-//                            'count'             =>  $limit,
-//                            'offset'            =>  $offset
-//            );
-//
-//            $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
-//                unset( $dialogs_array[0] );
-//
-//            return( $dialogs_array );
-//        }
-
         public static function get_last_dialogs( $id, $offset, $limit )
         {
             if ( !$limit )
@@ -440,7 +420,6 @@
             }
             return $result;
         }
-
 
     }
 ?>

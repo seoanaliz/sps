@@ -8,23 +8,14 @@
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
-        <action name="WrUnix">
-            <path>daemons/WrUnix</path>
-        </action>
-	    <action name="WrPosts">
-            <path>daemons/WrPosts</path>
-        </action>
-	    <action name="WrPoints">
-            <path>daemons/WrPoints</path>
-        </action>
-        <action name="WrCleaner">
-            <path>daemons/WrCleaner</path>
-        </action>
         <action name="OurAdminsStat">
             <path>daemons/OurAdminsStat</path>
         </action>
         <action name="MesCheckUpdates">
             <path>daemons/MesCheckUpdates</path>
+        </action>
+        <action name="MessageSender">
+            <path>daemons/MessageSender</path>
         </action>
 
     </group>
