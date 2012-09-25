@@ -658,7 +658,8 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).on('resize.' + EVENTS_NAMESPACE, function(e) {
+                    var events = ['resize.' + EVENTS_NAMESPACE, 'scroll.' + EVENTS_NAMESPACE].join(' ');
+                    $(window).on(events, function(e) {
                         if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
                         var $menu = $el.dropdown('getMenu');
                         if ($menu.is(':visible')) {
@@ -851,6 +852,12 @@ var Box = (function() {
                 if (options.position == 'right') {
                     offsetLeft += ($target.width() - $menu.width())
                 }
+                if (options.position == 'top') {
+                    offsetTop -= $menu.outerHeight()
+                        + $el.outerHeight()
+                        + (parseFloat($menu.css('margin-top')) * 2)
+                        - (parseFloat($menu.css('margin-bottom')) * 2);
+                }
                 if (isFixed) {
                     offsetTop -= $(document).scrollTop();
                     offsetLeft -= $(document).scrollLeft();
@@ -935,12 +942,17 @@ var Box = (function() {
     var methods = {
         init: function(params) {
             return this.each(function() {
+                var t = this;
+                var $el = $(this);
                 var defaults = {
                     openEvent: 'mousedown',
-                    emptyMenuText: 'Ничего не найдено'
+                    emptyMenuText: 'Ничего не найдено',
+                    caseSensitive: false,
+                    getValue: function() {
+                        return $el.val();
+                    }
                 };
                 var options = $.extend(defaults, params);
-                var $el = $(this);
                 var defData = options.data.slice(0);
                 var searchTimeout;
 
@@ -964,14 +976,24 @@ var Box = (function() {
                         }
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            $el.dropdown($.extend(options, {
-                                isShow: $el.is(':focus'),
-                                data: !$el.val() ? defData : $.grep(defData, function(n, i) {
-                                    var str = $.trim(n.title).toLowerCase().split('ё').join('е');
-                                    var searchStr = $.trim($el.val()).toLowerCase().split('ё').join('е');
-                                    return !!(str.indexOf(searchStr) !== -1);
-                                })
-                            }));
+                            var elVal = options.getValue.apply(t) || '';
+                            var data = !elVal ? defData : $.grep(defData, function(n, i) {
+                                var str = $.trim(n.title).split('ё').join('е');
+                                var searchStr = $.trim(elVal).split('ё').join('е');
+                                if (!options.caseSensitive) {
+                                    str = str.toLowerCase();
+                                    searchStr = searchStr.toLowerCase();
+                                }
+                                return !!(str.indexOf(searchStr) !== -1);
+                            });
+                            if (data.length || options.emptyMenuText) {
+                                $el.dropdown($.extend(options, {
+                                    isShow: $el.is(':focus'),
+                                    data: data
+                                }));
+                            } else {
+                                $el.dropdown('close');
+                            }
                         }, 0);
                     });
 

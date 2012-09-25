@@ -697,6 +697,42 @@ var Messages = EndlessListAbstract.extend({
         var dialogId = t.dialogId;
         $textarea.placeholder();
         $textarea.autoResize();
+//        $textarea.autocomplete({
+//            position: 'top',
+//            emptyMenuText: '',
+//            caseSensitive: true,
+//            data: [
+//                {id: 2, title: 'Привет'},
+//                {id: 2, title: 'привет'},
+//                {id: 1, title: 'как'},
+//                {id: 1, title: 'Как'},
+//                {id: 5, title: 'дела'},
+//                {id: 5, title: 'Дела'},
+//                {id: 4, title: 'что'},
+//                {id: 4, title: 'Что'},
+//                {id: 5, title: 'делаешь'},
+//                {id: 5, title: 'Делаешь'},
+//                {id: 3, title: 'пока'},
+//                {id: 3, title: 'Пока'}
+//            ],
+//            onchange: function(item) {
+//                $textarea.val(item.title);
+//            }
+////            getValue: function() {
+////                var text = $textarea.val();
+////                var words = text.split(' ');
+////                var lastWord = words.pop();
+////                return lastWord;
+////            },
+////            onchange: function(item) {
+////                var text = $textarea.val();
+////                var words = text.split(' ');
+////                var lastWord = words.pop();
+////                words.push(item.title);
+////                text = words.join(' ');
+////                $textarea.val(text);
+////            }
+//        });
         $textarea.inputMemory('message' + dialogId);
         $textarea.focus();
         $textarea[0].scrollTop = $textarea[0].scrollHeight;
