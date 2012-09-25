@@ -7,16 +7,18 @@ var Configs = {
     viewer: {}
 };
 
-var UserCollection = {
-    _users: {},
-
-    get: function(userId) {
-        return this._users[userId];
+var Collection = Class.extend({
+    get: function(itemId) {
+        var _items = this._items || (this._items = {});
+        return itemId ? _items[itemId] : _items;
     },
-    add: function(user) {
-        return this._users[user.id] = user;
+    add: function(id, item) {
+        var _items = this._items || (this._items = {});
+        return _items[id] = item;
     }
-};
+});
+var UsersCollection = new Collection();
+var MessagesCollection = new Collection();
 
 $(document).ready(function() {
     if (!$('#main').length) {
@@ -305,14 +307,14 @@ var LeftColumn = Widget.extend({
 });
 
 var EndlessListAbstract = Widget.extend({
-    template: DIALOGS,
-    tmplItem: DIALOGS_ITEM,
-    tmplItemsBlock: DIALOGS_BLOCK,
-    itemsListSelector: '.dialogs',
+    template: null,
+    tmplItem: null,
+    tmplItemsBlock: null,
+    itemsListSelector: '.items',
     listId: null,
     itemsLimit: 20,
     currentPage: 0,
-    eventName: 'get_dialogs',
+    eventName: 'get_items',
     isBlock: false,
     isDown: true,
     isPreload: true,
@@ -407,6 +409,7 @@ var Dialogs = EndlessListAbstract.extend({
         var t = this;
         Events.fire(t.eventName, t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
             callback(data);
+            t.addToCollection(data);
         });
     },
     makeItems: function($el) {
@@ -441,6 +444,18 @@ var Dialogs = EndlessListAbstract.extend({
         });
         t.currentPage++;
         t.preload();
+    },
+    addToCollection: function(data) {
+        $.each(data, function(i, message) {
+            MessagesCollection.add(message.id, {
+                id: 'loading',
+                isNew: message.isNew,
+                isViewer: message.isViewer,
+                text: message.text,
+                timestamp: message.timestamp,
+                user: message.isViewer ? message.viewer : message.user
+            });
+        });
     },
     bindEvents: function() {
         var t = this;
@@ -630,15 +645,18 @@ var Messages = EndlessListAbstract.extend({
         var t = this;
         var userId = t.userId = params.userId;
         var dialogId = t.dialogId = params.dialogId;
+        var lastMessage = MessagesCollection.get(dialogId);
 
         t.templateData = {
-            id: dialogId,
-            list: [],
             isLoad: true,
+
+            id: dialogId,
+            list: !lastMessage ? [] : [lastMessage],
             viewer: Configs.viewer,
-            user: UserCollection.get(userId) || Data.users[0]
+            user: UsersCollection.get(userId) || Data.users[0]
         };
         t.renderTemplate();
+        t.makeItems(t.$el.find(t.itemsListSelector));
         t.updateTop();
         t.scrollBottom();
 
@@ -662,8 +680,10 @@ var Messages = EndlessListAbstract.extend({
             t.renderTemplate();
             t.initTextarea();
             t.makeItems(t.$el.find(t.itemsListSelector));
+            t.updateTop();
             t.scrollBottom();
             t.bindEvents();
+            setTimeout(t.scrollBottom, 100);
         });
         t.currentPage++;
         t.preload();
@@ -896,6 +916,7 @@ var List = Widget.extend({
 var Tabs = Widget.extend({
     template: TABS,
     tabTemplate: TABS_ITEM,
+    activeClass: 'selected',
 
     events: {
         'click: .tab': 'clickTab'
@@ -905,15 +926,17 @@ var Tabs = Widget.extend({
         var t = this;
         var $target = $(e.currentTarget);
         var tabId = $target.data('id');
-        t.selectTab(tabId, true);
+        if (!$target.hasClass(t.activeClass)) {
+            t.selectTab(tabId, true);
+        }
     },
 
     selectTab: function(id, isTrigger) {
         var t = this;
         var $tab = t.getTab(id);
 
-        t.$el.find('.tab.selected').removeClass('selected');
-        $tab.addClass('selected');
+        t.getSelectedTab().removeClass(t.activeClass);
+        $tab.addClass(t.activeClass);
 
         if (isTrigger) t.trigger('select', id);
     },
@@ -924,7 +947,7 @@ var Tabs = Widget.extend({
     },
     getSelectedTab: function() {
         var t = this;
-        return t.$el.find('.tab.selected');
+        return t.$el.find('.tab.' + t.activeClass);
     },
     appendTab: function(id, title) {
         var t = this;

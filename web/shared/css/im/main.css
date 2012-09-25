@@ -19,7 +19,7 @@ body{overflow-y:scroll;}
 #main>.left-column>.list>.post-message>.center-column{width:70%;float:left;}#main>.left-column>.list>.post-message>.center-column>.content{margin:0 10px;margin-right:20px;}#main>.left-column>.list>.post-message>.center-column>.content textarea{width:100%;min-height:40px;max-height:100px;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}
 #main>.left-column>.list>.post-message>.center-column>.content .actions{margin-top:10px;}
 #main>.left-column>.list>.post-message>.right-column{width:15%;float:left;}#main>.left-column>.list>.post-message>.right-column>.photo{width:50px;height:50px;display:inline-block;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}#main>.left-column>.list>.post-message>.right-column>.photo img{max-width:100%;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}
-#main>.left-column>.list>.dialogs .dialog+.dialog{border-top:1px solid #dae1e8;}
+#main>.left-column>.list>.dialogs .dialogs-block+.dialogs-block,#main>.left-column>.list>.dialogs .dialog+.dialog{border-top:1px solid #dae1e8;}
 #main>.left-column>.list>.dialogs .dialog{padding:10px;cursor:pointer;}#main>.left-column>.list>.dialogs .dialog:hover{background:#edf1f5;}#main>.left-column>.list>.dialogs .dialog:hover>.history>.from-me.new{background-color:#e1e7ed;}
 #main>.left-column>.list>.dialogs .dialog.new{background-color:#edf1f5;}#main>.left-column>.list>.dialogs .dialog.new:hover{background-color:#e1e7ed;}
 #main>.left-column>.list>.dialogs .dialog>.user{width:25%;float:left;overflow:hidden;position:relative;min-height:50px;}#main>.left-column>.list>.dialogs .dialog>.user>.photo{position:absolute;width:50px;height:50px;overflow:hidden;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}#main>.left-column>.list>.dialogs .dialog>.user>.photo img{max-width:100%;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;}
@@ -41,6 +41,7 @@ body{overflow-y:scroll;}
 .ui-dropdown-add-to-list input{width:100%;border-left:0;border-right:0;}
 .empty{color:#777;text-align:center;padding:30% 0;line-height:0;}
 .load{background:#ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;padding:30% 0;}
+.mini-load{background:#ffffff url(http://st0.userapi.com/images/upload.gif) no-repeat center;padding:5% 0;}
 .scroll-like-mac::-webkit-scrollbar{width:6px;height:6px;}
 .scroll-like-mac::-webkit-scrollbar-thumb{background:rgba(0, 0, 0, 0.1);border-radius:3px;}
 .scroll-like-mac:hover::-webkit-scrollbar-thumb,.scroll-like-mac:focus::-webkit-scrollbar-thumb{background:rgba(0, 0, 0, 0.4);}

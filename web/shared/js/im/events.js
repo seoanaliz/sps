@@ -100,7 +100,7 @@ var Eventlist = {
                     id: dirtyDialog.id,
                     user: clearUser
                 });
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             callback(clearData);
         });
@@ -140,7 +140,7 @@ var Eventlist = {
                     timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             callback(clearData);
         });
@@ -165,7 +165,7 @@ var Eventlist = {
                     isOnline: (dirtyUser.online != 0)
                 };
                 clearUsers[dirtyUser.userId] = clearUser;
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
                 var clearAttachments = {};

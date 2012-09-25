@@ -40,7 +40,6 @@ body {
                 color: @color_gray;
                 font-size: 16px;
                 height: 400px;
-                /*background: url('http://dribbble.s3.amazonaws.com/users/4826/screenshots/423457/404_bulb.jpg') no-repeat center;*/
                 background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
             }
 
@@ -218,6 +217,7 @@ body {
             }
 
             &>.dialogs {
+                .dialogs-block+.dialogs-block,
                 .dialog+.dialog {
                     border-top: 1px solid @border_inside;
                 }
@@ -456,6 +456,10 @@ body {
 .load {
     background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
     padding: 30% 0;
+}
+.mini-load {
+    background: #fff url(http://st0.userapi.com/images/upload.gif) no-repeat center;
+    padding: 5% 0;
 }
 
 .scroll-like-mac {
