@@ -195,11 +195,19 @@ $(document).ready(function(){
             '</a>' +
             ' из списка авторов?';
 
-           (function updatePage() {
-                Events.fire('authors_get', function(data) {
+           (function updatePage(method) {
+                Events.fire(method || 'authors_get', function(data) {
                     $('body').addClass('editor-mode');
                     var $container = $('#wall');
                     $container.html(data);
+
+                    var $navigation = $container.find('.authors-types');
+                    $navigation.delegate('.tab', 'click', function() {
+                        $navigation.find('.tab.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                        updatePage('authors_get');
+                    });
+
                     var $input = $container.find('.author-link');
                     $input.placeholder();
                     $input.keyup(function(e) {

@@ -1165,6 +1165,10 @@ i {font-style: italic;}
 }
 
 body.editor-mode {
+    .authors-list {
+        display: block;
+    }
+
     .left-panel > .block {
         &>* {
             display: none !important;
@@ -1186,10 +1190,19 @@ body.editor-mode {
         }
     }
 }
+
 .authors-list {
+    display: none;
     background-color: @bg_light_gray;
     padding: 10px;
+
     .border-radius(0 0 2px 2px);
+
+    .authors-types {
+        padding: 0;
+        margin-bottom: 10px;
+        margin-top: -0.7em;
+    }
 
     .add-author {
         margin-bottom: 10px;

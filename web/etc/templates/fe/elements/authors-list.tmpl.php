@@ -2,6 +2,11 @@
     /** @var $authors Author[] */
 ?>
 <div class="authors-list">
+    <div class="authors-types tab-bar">
+        <div class="tab selected" data-type="authors">Авторы</div>
+        <!-- <div class="tab" data-type="novice">Новички</div> -->
+        <!-- <div class="tab" data-type="editors">Редакторы</div> -->
+    </div>
     <div class="add-author">
         <div class="input-wrapper">
             <input type="text" class="author-link" placeholder="Введите ссылку на страницу пользователя" />
