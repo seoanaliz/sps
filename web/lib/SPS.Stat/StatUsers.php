@@ -25,7 +25,6 @@
 
         public static function get_vk_user_info( $ids )
         {
-
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
             if ( !trim( $ids ))

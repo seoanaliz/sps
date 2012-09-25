@@ -14,7 +14,7 @@ class MesCheckUpdates
         $im_users = StatUsers::get_im_users();
 
         foreach( $im_users as $user ) {
-            $dialogs = MesDialogs::get_all_dialogs( $user );
+            $dialogs = MesDialogs::get_all_dialogs( $user, 200 );
 
             if ( !$dialogs )
                 continue;

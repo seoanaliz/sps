@@ -25,6 +25,7 @@ define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, '
 //статистика по нашим админам
     define( 'TABLE_OADMINS_POSTS', 'oadmins_posts' );  #посты на
     define( 'TABLE_OADMINS', 'oadmins' );              #на
+    define( 'TABLE_OADMINS_CONF', 'oadmins_conf' );
 
 //messeger
     define ( 'TABLE_MES_DIALOGS', 'mes_dialogs' ); #список диалогов, статус для каждого

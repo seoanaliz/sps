@@ -116,10 +116,9 @@
             if ( $this->link )
                 $attachments[] = $this->link ;
             $check_id = $this->post( $attachments );
-            $time_a = VkHelper::get_vk_time();
 
             sleep(4);
-            $check_id = $this->delivery_check( count( $attachments ) , $time_a );
+            $check_id = $this->delivery_check( count( $attachments ));
     //            sleep(20);
     //            $this->edit_post($attachments, $check_id);
 
@@ -345,8 +344,13 @@
 
         }
 
-        private function delivery_check( $attacments_count, $time_after )
+        private function delivery_check( $attacments_count )
         {
+
+            $time_after = VkHelper::get_vk_time();
+            if ( !$time_after )
+                die();
+            sleep(4);
             $params = array(
                 'owner_id'      =>  '-' . $this->vk_group_id,
                 'count'         =>  5,
@@ -354,19 +358,19 @@
             );
 
             $res = VkHelper::api_request( 'wall.get', $params, false );
-    //            echo '<br>----------------------------<br>';
 
             unset( $res[0] );
             $text2 = substr( preg_replace( "/[\s]+/", '', $this->post_text ), 0, 95 );
             foreach ( $res as $post ) {
                 $text1 = $this->text_corrector( htmlspecialchars_decode( $post->text ), ENT_NOQUOTES, 'UTF-8' );
                 $text1 =  substr( preg_replace( "/[\s]+/", '', $text1 ), 0, 95 );
-                if ( $attacments_count === count( $post->attachments )
-                    && abs( $post->date - $time_after ) < 10 )  {
+                if (
+                    //$attacments_count === count( $post->attachments )  &&
+                    abs( $post->date - $time_after ) < 10 )  {
                     return $post->id;
                 }
             }
-            return false;
+            return true;
         }
 
         //todo

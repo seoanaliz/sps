@@ -106,6 +106,9 @@
             <action name="getGroupDialogs">
                 <path>controls/messager/getGroupDialogs</path>
             </action>
+            <action name="searchDialog">
+                <path>controls/messager/searchDialog</path>
+            </action>
         </group>
     </group>
 

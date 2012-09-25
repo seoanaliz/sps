@@ -6,9 +6,27 @@
     class AdminsWork extends wrapper
     {
 
+        public static  $white_list = array(
+            1715958,
+            2814488,
+            6810901,
+            7203958,
+            7875269,
+            18379341,
+            25766591,
+            27575384,
+            43916879,
+            58540552,
+            114080351,
+            121069867,
+            135339094,
+            182447583,
+            110337004,
+
+        );
+
         public function execute()
         {
-//            error_reporting( 0 );
             $publics = StatPublics::get_our_publics_list();
 
             $result = array();
@@ -30,6 +48,15 @@
 //            Response::setInteger( 'pages', round($i/50,0));
 //            Response::setInteger( 'last_time', date("d.m.Y", $time_for_table));
             Response::setArray( 'our_publics', $publics );
+        }
+
+        private function get_conf() {
+            $sql = 'SELECT * FROM ' . TABLE_OADMINS_CONF;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+
         }
 
         public static function get_public_admins($date_min, $date_max, $public_id = 0 ) {
@@ -59,40 +86,46 @@
 
 
             while ($ds->Next()) {
-
                 $a['id']    = $ds->getValue('author_id', TYPE_INTEGER);
+                if ( !in_array( $a['id'], self::$white_list )) {
+                    continue;
+                }
                 $a['name']  = $ds->getValue('name', TYPE_STRING);
                 $a['ava']   = $ds->getValue('ava', TYPE_STRING);
 
                 $res[$a['id']] = $a;
                 $a = array();
             }
-            $public_line = $public_id ? ' AND c."externalId"=@publicId ' : '';
-            $sql = 'select a."vkId",a."firstName",a."lastName",a.avatar
-                    from authors as a,articles as b,"targetFeeds" as c
-                    where a."authorId"=b."authorId"
-                        and c."targetFeedId"=b."targetFeedId"
-                        and b."sentAt">@sentFrom
-                        AND b."sentAt"<@sentTo'
-                        . $public_line ;
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
-
-            $cmd->SetString  ('@sentFrom',    date('Y-m-d 00:00:00', $date_min)  );
-            $cmd->SetString  ('@sentTo',      date('Y-m-d 00:00:00', $date_max)    );
-            if ( $public_id )
-                $cmd->SetString  ('@publicId',   $public_id['id']  );
+//            $public_line = $public_id ? ' AND c."externalId"=@publicId ' : '';
+//            $sql = 'select a."vkId",a."firstName",a."lastName",a.avatar
+//                    from authors as a,articles as b,"targetFeeds" as c
+//                    where a."authorId"=b."authorId"
+//                        and c."targetFeedId"=b."targetFeedId"
+//                        and b."sentAt">@sentFrom
+//                        AND b."sentAt"<@sentTo'
+//                        . $public_line ;
+//            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+//
+//            $cmd->SetString  ('@sentFrom',    date('Y-m-d 00:00:00', $date_min)  );
+//            $cmd->SetString  ('@sentTo',      date('Y-m-d 00:00:00', $date_max)    );
+//            if ( $public_id )
+//                $cmd->SetString  ('@publicId',   $public_id['id']  );
 //            echo $cmd->GetQuery();
-            $ds = $cmd->Execute();
-
-            while ( $ds->Next() ) {
-
-                $a['id']  = $ds->getValue('vkId', TYPE_INTEGER);
-                $a['name']  = $ds->getValue('firstName', TYPE_STRING) . ' ' . $ds->getValue('lastName', TYPE_STRING);
-                $a['ava']   = $ds->getValue('avatar', TYPE_STRING);
-
-                $res[$a['id']] = $a;
-                $a = array();
-            }
+//            $ds = $cmd->Execute();
+//
+//            while ( $ds->Next() ) {
+//
+//                $a['id']  = $ds->getValue('vkId', TYPE_INTEGER);
+//                if ( !in_array( $a['id'], self::$white_list )) {
+//                    echo 'откинул ' . $a['id'] . '<br>';
+//                    continue;
+//                }
+//                $a['name']  = $ds->getValue('firstName', TYPE_STRING) . ' ' . $ds->getValue('lastName', TYPE_STRING);
+//                $a['ava']   = $ds->getValue('avatar', TYPE_STRING);
+//
+//                $res[$a['id']] = $a;
+//                $a = array();
+//            }
 
             if (count($res) == 0)
                 return false;
@@ -101,9 +134,6 @@
 
         public static function get_stat( $author_id, $public_id, $date_min = 0, $date_max = 0 )
         {
-
-//            echo '<br>min' . $date_min .'<br>max' . $date_max . '<br>';
-
             $date_max = $date_max ? $date_max : 1543395811;
             $date_min = $date_min ? $date_min : 0;
             $sql = 'SELECT * FROM ' . TABLE_OADMINS_POSTS . '
@@ -118,8 +148,6 @@
             $cmd->SetInteger('@public_id', $public_id);
             $cmd->SetInteger('@date_min',  $date_min);
             $cmd->SetInteger('@date_max',  $date_max);
-
-            $query =  $cmd->GetQuery();
             $ds = $cmd->Execute();
             $res = array();
             $diff = 0;
@@ -129,17 +157,8 @@
             $reposts = 0;
             $overposts = 0;
             $time_prev = 0;
-//            print_r($query);
-//            echo '<br>AdminsWork::get_public_admins ' . microtime() . '<br>';
-//            $connect_line = "host=localhost user=postgres password='' dbname='sps'";
-//            $db  = pg_connect($connect_line);
-//            $res = pg_query( $db, $query);
-//            $res = pg_fetch_all($res);
 
-//            print_r($res);
-//            die();
             while ( $ds->Next() ) {
-
                 $post_id     = $ds->getValue( 'vk_post_id', TYPE_INTEGER );
                 $res[]       = $post_id;
                 $reposts    += $ds->getValue( 'reposts', TYPE_INTEGER );
@@ -148,6 +167,7 @@
 
                 $post_time = $ds->GetValue( 'post_time', TYPE_INTEGER );
                 if ( $post_time - $time_prev < 11 * 60 ) {
+//                    echo ($post_time - $time_prev) . '<br>';
                     $overposts++;
                 }
                 $time_prev = $post_time;
@@ -159,14 +179,12 @@
                     $compls++;
             }
 
-//            $sb_posts = self::get_sboard_posts( $author_id, $public_id, date('Y-m-d 00:00:00' ,$date_min), date('Y-m-d 00:00:00' ,$date_max ) );
-//            $sb_posts = self::get_sboard_posts( $author_id, $public_id, date('Y-m-d 00:00:00' ,$date_min), date('Y-m-d 00:00:00' ,$date_max ) );
-
-            $q = count($res);
+            $q = count( $res );
+            print_r($res);
             if ( $q < 1)
                 return false;
             $res['rel_likes']   = round( $diff / $q);
-            $res['reposts']     = round( $reposts / $q);
+            $res['reposts']     = round( $reposts / $q, 2);
             $res['topics']      = $topics;
             $res['compls']      = $compls;
             $res['overposts']   = $overposts;
@@ -201,18 +219,12 @@
 
             $ds->Last();
             $a = $ds->GetCursor();
-//            echo '<br><br>';
-//            print_r($a);
-//            echo '<br><br>';echo '<br><br>';
             return ++$a;
 
         }
 
         public static function get_posts( $author_id, $public_id, $date_min = 0, $date_max = 0 )
         {
-
-//            echo '<br>min' . $date_min .'<br>max' . $date_max . '<br>';
-
             $date_max = $date_max ? $date_max : 1543395811;
             $date_min = $date_min ? $date_min : 0;
             $sql = 'SELECT * FROM ' . TABLE_OADMINS_POSTS . '
@@ -227,6 +239,7 @@
             $cmd->SetInteger('@public_id', $public_id);
             $cmd->SetInteger('@date_min',  $date_min);
             $cmd->SetInteger('@date_max',  $date_max);
+//            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             $res = array();
             $diff = 0;
@@ -247,8 +260,7 @@
                 $diff_rel   += $ds->getValue( 'rel_likes', TYPE_FLOAT );
 
                 $post_time = $ds->GetValue( 'post_time', TYPE_INTEGER );
-                if ( $post_time - $time_prev < 21 * 60 ) {
-
+                if ( $post_time - $time_prev < 11 * 60 ) {
                     $overposts++;
                 }
                 $time_prev = $post_time;
@@ -261,11 +273,10 @@
             }
 
             $q = count($res);
-//            echo '<br>кол-во<br>'. $q . '<br>';
             if ($q < 1)
                 return false;
             $res['rel_likes']   = round( $diff / $q);
-            $res['reposts']     = round( $reposts / $q);
+            $res['reposts']     = round( $reposts / $q );
             $res['topics']      = $topics;
             $res['compls']      = $compls;
             $res['overposts']   = $overposts;
