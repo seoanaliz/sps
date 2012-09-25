@@ -83,7 +83,7 @@ var Eventlist = {
     },
     get_dialogs_list: function(listId, offset, limit, callback) {
         var params = {
-            groupId: listId == 999999 ? undefined : listId,
+            groupId: listId == Configs.commonDialogsList ? undefined : listId,
             offset: offset,
             limit: limit
         };
@@ -100,14 +100,14 @@ var Eventlist = {
                     id: dirtyDialog.id,
                     user: clearUser
                 });
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             callback(clearData);
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
         var params = {
-            groupId: listId == 999999 ? undefined : listId,
+            groupId: listId == Configs.commonDialogsList ? undefined : listId,
             offset: offset,
             limit: limit
         };
@@ -140,7 +140,7 @@ var Eventlist = {
                     timestamp: dirtyDialog.date,
                     lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
                 });
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             callback(clearData);
         });
@@ -165,7 +165,7 @@ var Eventlist = {
                     isOnline: (dirtyUser.online != 0)
                 };
                 clearUsers[dirtyUser.userId] = clearUser;
-                UserCollection.add(clearUser);
+                UsersCollection.add(clearUser.id, clearUser);
             });
             $.each(dirtyMessages, function(i, dirtyMessage) {
                 var clearAttachments = {};

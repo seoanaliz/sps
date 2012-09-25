@@ -34,7 +34,7 @@ var DIALOGS =
 '</div>';
 
 var DIALOGS_BLOCK =
-'<div class="dialogs-block<?=id?>">' +
+'<div class="dialogs-block dialogs-block<?=id?>">' +
     '<? each(DIALOGS_ITEM, list); ?>' +
 '</div>';
 
@@ -87,6 +87,9 @@ var DIALOGS_ITEM =
 var MESSAGES =
 '<div class="messages" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
+        '<? if (isset("isLoad") && isLoad) { ?>' +
+            '<div class="mini-load"></div>' +
+        '<? } ?>' +
         '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
     '<? } else if (isset("isLoad") && isLoad) { ?>' +
         '<div class="load"></div>' +
@@ -120,7 +123,7 @@ var MESSAGES =
 '</div>';
 
 var MESSAGES_BLOCK =
-'<div class="messages-block<?=id?>">' +
+'<div class="messages-block messages-block<?=id?>">' +
     '<? each(MESSAGES_ITEM, list); ?>' +
 '</div>';
 
@@ -154,7 +157,7 @@ var MESSAGES_ITEM =
 '</div>';
 
 var MESSAGE_ATTACHMENT_PHOTO =
-'<a target="_blank" href="<?=isset("src_xxxbig") ? src_xxxbig : src_big?>" style="height: <?=height?>px">' +
+'<a target="_blank" href="<?=isset("src_xxxbig") ? src_xxxbig : src_big?>">' +
     '<img src="<?=src_big?>" alt="" />' +
 '</a>';
 

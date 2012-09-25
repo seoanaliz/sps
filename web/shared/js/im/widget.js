@@ -1,64 +1,73 @@
-var Widget = Event.extend({
-    init: function(options) {
-        var t = this;
+var Widget = (function() {
+    var eventNameSpace = 'widget';
+    var eventSplitter = ':';
+    var template = tmpl;
 
-        t._configure(options);
-        t._bindEvents();
-        t.run(t.runData);
+    return Event.extend({
+        init: function(options) {
+            var t = this;
 
-        return this;
-    },
+            t._configure(options);
+            t._bindEvents();
+            t.run(options);
 
-    _configure: function(options) {
-        var t = this;
+            return this;
+        },
 
-        t.options =      options                  || t.options              || $.error('options not found');
-        t.el =           options.el               || t.el                   || $.error('el not found');
-        t.events =       options.events           || t.events               || {};
-        t.template =     options.template         || t.template             || '';
-        t.templateData = options.templateData     || t.templateData         || {};
-        t.runData =      options.runData          || t.runData              || {};
+        _configure: function(options) {
+            var t = this;
 
-        t.run = options.run || t.run;
-        t.renderTemplate = options.renderTemplate || t.renderTemplate;
+            t.options = options || $.error('Options not found.');
 
-        return this;
-    },
+            t.el = options.el || t.el || $.error('El not found.');
+            t.model = options.model || t.model || {};
+            t.events = options.events || t.events || {};
+            t.template = options.template || t.template || '';
+            t.templateData = options.templateData || t.templateData || {};
 
-    _bindEvents: function() {
-        var t = this;
+            t.$el = $(t.el);
 
-        $.each(t.events, function(event, methodName) {
-            var eventName = event.split(':')[0];
-            var selector = event.split(':')[1];
-            var eventMethod = $.proxy(t[methodName], t);
-            $(t.el).delegate(selector, eventName + '.widget', eventMethod);
-        });
+            return this;
+        },
 
-        return this;
-    },
+        _bindEvents: function() {
+            var t = this;
 
-    renderTemplate: function(el) {
-        var t = this;
+            for (var event in t.events) {
+                if (!t.events.hasOwnProperty(event)) continue;
 
-        $(el || t.el).html(tmpl(t.template, t.templateData));
+                var methodName = t.events[event];
+                var eventName = event.split(eventSplitter)[0];
+                var selector = event.split(eventSplitter)[1];
+                var eventMethod = $.proxy(t[methodName], t);
+                t.$el.delegate(selector, eventName + '.' + eventNameSpace, eventMethod);
+            }
 
-        return this;
-    },
+            return this;
+        },
 
-    run: function(runData) {
-        var t = this;
+        renderTemplate: function() {
+            var t = this;
 
-        t.renderTemplate();
+            t.$el.html(template(t.template, t.templateData));
 
-        return this;
-    },
+            return this;
+        },
 
-    destroy: function() {
-        var t = this;
+        run: function(runData) {
+            var t = this;
 
-        $(t.el).undelegate('.widget').empty();
+            t.renderTemplate();
 
-        delete this;
-    }
-});
+            return this;
+        },
+
+        destroy: function() {
+            var t = this;
+
+            t.$el.undelegate('.' + eventNameSpace).empty();
+
+            delete this;
+        }
+    });
+})();
