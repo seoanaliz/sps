@@ -18,6 +18,10 @@
                 <page uri="/stat">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
+                <page uri="/oadmins">
+                    <actions>SPS.Stat.AdminsWork</actions>
+                    <template>tmpl://vt/stat_admins/index.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -167,6 +171,10 @@
                 <page uri="controls://getGroupDialogs/">
                     <actions>SPS.Stat.getGroupDialogs</actions>
                 </page>
+                <page uri="controls://searchDialog/">
+                    <actions>SPS.Stat.searchDialog</actions>
+                </page>
+
             </pageGroup>
 
             <pageGroup name="vt" boot="SPS.Common.CheckAuth">
@@ -187,9 +195,9 @@
                         <actions>Sps.Stat.GraphGrow</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
                     </page>
-                    <page uri="vt://oadmins/">
+                    <page uri="vt://stat/">
                         <actions>SPS.Stat.AdminsWork</actions>
-                        <template>tmpl://vt/stat_admins/index.tmpl.php</template>
+                        <template>tmpl://vt/stat_admins/setup.tmpl.php</template>
                     </page>
 
                     <pageGroup name="siteParam">
