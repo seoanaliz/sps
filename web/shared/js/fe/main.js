@@ -186,14 +186,14 @@ $(document).ready(function(){
             '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
                 '<?=user.name?>' +
             '</a>' +
-            'автором?';
+            ' автором?';
 
              var BOX_DELETE_AUTHOR =
             'Вы действительно хотите удалить ' +
             '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
                 '<?=user.name?>' +
             '</a>' +
-            'из списка авторов?';
+            ' из списка авторов?';
 
            (function updatePage() {
                 Events.fire('authors_get', function(data) {
