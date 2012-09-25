@@ -366,6 +366,7 @@ var EndlessListAbstract = Widget.extend({
 
         t.lock();
         t.getBlockData(t.currentPage, function(data) {
+            if (!data.length) return;
             var $block = t.createBlock(data);
 
             if (t.isDown) {
