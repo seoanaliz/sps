@@ -255,5 +255,5 @@ body.editor-mode .left-panel>.block>.wall{display:block !important;}
 .authors-list>.list .author .info .description>br{display:none;}
 .authors-list>.list .author .info .description:hover{background-color:#e1e7ed;}
 .authors-list>.list .author .info .description[contenteditable]{color:#000;background-color:#fff;outline:1px solid #c4cde0;}
-.authors-list>.list .author .delete{position:absolute;top:0;right:0;width:20px;height:20px;background:url('../../images/common/delete.png') center no-repeat;cursor:pointer;opacity:0;-webkit-transition:0.2s opacity;-moz-transition:0.2s opacity;-o-transition:0.2s opacity;transition:0.2s opacity;}.authors-list>.list .author .delete:hover{opacity:1;}
+.authors-list>.list .author .delete{position:absolute;top:50%;right:10px;width:20px;height:20px;margin-top:-10px;background:url('../../images/common/delete.png') center no-repeat;cursor:pointer;opacity:0;-webkit-transition:0.2s opacity;-moz-transition:0.2s opacity;-o-transition:0.2s opacity;transition:0.2s opacity;}.authors-list>.list .author .delete:hover{opacity:1;}
 .authors-list>.list .author:hover .delete{opacity:0.5;}
