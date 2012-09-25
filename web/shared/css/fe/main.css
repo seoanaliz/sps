@@ -243,11 +243,13 @@ i{font-style:italic;}
 .post>.comments>.new-comment.open>.photo{position:absolute;width:32px;height:32px;}.post>.comments>.new-comment.open>.photo img{max-width:100%;}
 .post>.comments>.new-comment.open>.actions{margin-top:6px;margin-left:38px;}.post>.comments>.new-comment.open>.actions>.text{color:gray;margin-left:5px;}
 .post>.comments>.new-comment.open>.textarea-wrap{margin-left:38px;}.post>.comments>.new-comment.open>.textarea-wrap textarea{height:20px;}
+body.editor-mode .authors-list{display:block;}
 body.editor-mode .left-panel>.block>*{display:none !important;}
 body.editor-mode .left-panel>.block>.header{display:block !important;border-bottom:1px solid #dae1e8;}body.editor-mode .left-panel>.block>.header>*{display:none !important;}
 body.editor-mode .left-panel>.block>.header .type-selector{display:block !important;margin:0;}
 body.editor-mode .left-panel>.block>.wall{display:block !important;}
-.authors-list{background-color:#f7f7f7;padding:10px;-webkit-border-radius:0 0 2px 2px;-moz-border-radius:0 0 2px 2px;border-radius:0 0 2px 2px;}.authors-list .add-author{margin-bottom:10px;}.authors-list .add-author .input-wrapper{padding-right:10px;}.authors-list .add-author .input-wrapper input{width:100%;padding:4px;}
+.authors-list{display:none;background-color:#f7f7f7;padding:10px;-webkit-border-radius:0 0 2px 2px;-moz-border-radius:0 0 2px 2px;border-radius:0 0 2px 2px;}.authors-list .authors-types{padding:0;margin-bottom:10px;margin-top:-0.7em;}
+.authors-list .add-author{margin-bottom:10px;}.authors-list .add-author .input-wrapper{padding-right:10px;}.authors-list .add-author .input-wrapper input{width:100%;padding:4px;}
 .authors-list>.list .author+.author{margin-top:5px;}
 .authors-list>.list .author{background-color:#fff;border:1px solid #c4cde0;padding:5px;min-height:30px;position:relative;line-height:normal;}.authors-list>.list .author .photo{position:absolute;width:30px;height:30px;}.authors-list>.list .author .photo img{max-width:100%;}
 .authors-list>.list .author .info{margin-left:40px;}
