@@ -328,7 +328,11 @@ var EndlessListAbstract = Widget.extend({
     },
     createBlock: function(data) {
         var t = this;
-        return $(tmpl(t.tmplItemsBlock, {id: t.currentPage, list: data}));
+        if (data.length) {
+            return $(tmpl(t.tmplItemsBlock, {id:t.currentPage, list:data}));
+        } else {
+            return false;
+        }
     },
     createItem: function(data) {
         var t = this;
@@ -367,6 +371,7 @@ var EndlessListAbstract = Widget.extend({
         t.lock();
         t.getBlockData(t.currentPage, function(data) {
             var $block = t.createBlock(data);
+            if (!$block) return;
 
             if (t.isDown) {
                 $items.append($block);
@@ -638,7 +643,11 @@ var Messages = EndlessListAbstract.extend({
     },
     createBlock: function(data) {
         var t = this;
-        return $(tmpl(t.tmplItemsBlock, {id: t.currentPage, list: data.messages}));
+        if (data.messages.length) {
+            return $(tmpl(t.tmplItemsBlock, {id:t.currentPage, list:data.messages}));
+        } else {
+            return false;
+        }
     },
 
     run: function(params) {
