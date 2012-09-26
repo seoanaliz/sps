@@ -30,15 +30,17 @@
 
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
-                echo  ObjectHelper::ToJSON( array( 'response' => $user ));
-                die();
+                $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                die(  ObjectHelper::ToJSON( array( 'response' => $user )));
+
             }
 	     
             $users = StatUsers::get_vk_user_info( $user_id );
-  	     foreach ( $users as $user ) {
+            foreach ( $users as $user ) {
                 $user['rank']     = $rank;
                 $user['comments'] = $comments;
                 $user = StatUsers::add_user( $user );
+                $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
             }
             if ( $user )
                 echo  ObjectHelper::ToJSON(array('response' => $user));
