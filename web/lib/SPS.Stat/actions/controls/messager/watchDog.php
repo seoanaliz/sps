@@ -35,7 +35,7 @@ class watchDog
 
             switch ( $stat ) {
                 case 3:
-                    $from_id   = isset( $event[3] )? $event[3] : $event['uid'];
+                    $from_id   = isset( $event[3] )? $event[3] :    $event['uid'];
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
                     $result[]  = array(
                         'type'    => 'read',
@@ -50,7 +50,7 @@ class watchDog
                     break;
                 case 4:
                     $from_id  = isset( $event[3] ) ? $event[3] : $event['uid'];
-                    MesDialogs::set_dialog_ts( $user_id, $from_id, $event[5], !( $event[2] & 2 ), 0 );
+                    MesDialogs::set_dialog_ts( $user_id, $from_id, time(), !( $event[2] & 2 ), 0 );
                     if ( isset( $event[7]->attach1_type )) {
                         $message = MesDialogs::get_group_dilogs_list( $user_id, array( $from_id ));
                         $attach = reset( $message )->attachments;
