@@ -501,7 +501,8 @@
         }
 
         //templates
-        public static function add_template( $text, $groups ) {
+        public static function add_template( $text, $groups )
+        {
             $groups = '{' . $groups . '}';
             $sql = 'INSERT INTO ' . TABLE_MES_DIALOG_TEMPLATES . '
                         (text, groups)
@@ -517,9 +518,11 @@
             return $ds->GetInteger( 'id');
         }
 
-        public static function search_template( $search, $group ) {
+        //templates
+        public static function search_template( $search, $group )
+        {
             $text   = pg_escape_string( $search );
-            $search = " text ILIKE '%" . $text . "%' ";
+            $search = $search ? " text ILIKE '%" . $text . "%' " : ' 1 = 1' ;
 
             $sql = 'SELECT
                         text, id
@@ -527,8 +530,7 @@
                         . TABLE_MES_DIALOG_TEMPLATES . '
                     WHERE '
                         . $search .
-                        'AND @group = ANY(groups)
-                    ';
+                        ' AND @group = ANY(groups)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString ( '@group', $group );
             $ds = $cmd->Execute();
@@ -539,6 +541,20 @@
                                 'tmpl_id'   =>  $ds->GetValue('id'));
             }
             return $res;
+        }
+
+        //templates
+        public static function del_template( $tmpl_id )
+        {
+            $sql = 'DELETE FROM '
+                        . TABLE_MES_DIALOG_TEMPLATES . '
+                    WHERE
+                        id=@id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString  ( '@id',     $id );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger( 'id');
         }
     }
 ?>
