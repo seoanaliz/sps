@@ -128,6 +128,12 @@
                 <page uri="controls://getDialogsList/">
                     <actions>SPS.Stat.getDialogsList</actions>
                 </page>
+                <page uri="controls://addTemplate/">
+                    <actions>SPS.Stat.addTemplate</actions>
+                </page>
+                <page uri="controls://findTemplate/">
+                    <actions>SPS.Stat.findTemplate</actions>
+                </page>
                 <page uri="controls://getDialog/">
                     <actions>SPS.Stat.getDialog</actions>
                 </page>

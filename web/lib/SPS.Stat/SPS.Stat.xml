@@ -73,6 +73,12 @@
             <action name="getDialogsList">
                 <path>controls/messager/getDialogsList</path>
             </action>
+            <action name="findTemplate">
+                <path>controls/messager/findTemplate</path>
+            </action>
+            <action name="addTemplate">
+                <path>controls/messager/addTemplate</path>
+            </action>
             <action name="getDialog">
                 <path>controls/messager/getDialog</path>
             </action>

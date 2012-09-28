@@ -434,6 +434,7 @@
             $cmd->SetInteger( '@sent_time',  $now );
             $cmd->Execute();
         }
+
         //проверяет наличие завявок на добавление в друзья, конвертит их в диалоги
         public static  function check_friend_requests( $user_id )
         {
@@ -497,6 +498,42 @@
             $cmd->SetInteger ( '@activity_time', $now );
             $cmd->SetBoolean( '@queued',         $queued );
             $cmd->Execute();
+        }
+
+        //templates
+        public static function add_template( $text, $groups ) {
+            $groups = '{' . $groups . '}';
+            $sql = 'INSERT INTO ' . TABLE_MES_DIALOG_TEMPLATES . '
+                        (text, groups)
+                    VALUES
+                        (@text, @groups)
+            ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString  ( '@text', $text );
+            $cmd->SetString  ( '@groups', $groups );
+            $cmd->Execute();
+        }
+
+        public static function search_template( $search, $group ) {
+            $text   = pg_escape_string( $search );
+            $search = " text ILIKE '%" . $text . "%' ";
+
+            $sql = 'SELECT
+                        text
+                    FROM '
+                        . TABLE_MES_DIALOG_TEMPLATES . '
+                    WHERE '
+                        . $search .
+                        'AND @group = ANY(groups)
+                    ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@group', $group );
+            $ds = $cmd->Execute();
+            $res = array();
+            while($ds->Next()) {
+                $res[] = $ds->GetValue('text');
+            }
+            return $res;
         }
     }
 ?>
