@@ -507,11 +507,14 @@
                         (text, groups)
                     VALUES
                         (@text, @groups)
+                    RETURNING id
             ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString  ( '@text', $text );
             $cmd->SetString  ( '@groups', $groups );
-            $cmd->Execute();
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger( 'id');
         }
 
         public static function search_template( $search, $group ) {
@@ -519,7 +522,7 @@
             $search = " text ILIKE '%" . $text . "%' ";
 
             $sql = 'SELECT
-                        text
+                        text, id
                     FROM '
                         . TABLE_MES_DIALOG_TEMPLATES . '
                     WHERE '
@@ -531,7 +534,9 @@
             $ds = $cmd->Execute();
             $res = array();
             while($ds->Next()) {
-                $res[] = $ds->GetValue('text');
+                $res[] = array(
+                                'text'      =>  $ds->GetValue('text'),
+                                'tmpl_id'   =>  $ds->GetValue('id'));
             }
             return $res;
         }

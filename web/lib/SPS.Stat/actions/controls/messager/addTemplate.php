@@ -17,8 +17,8 @@ class addTemplate
 
         if (!$group_ids)
             $group_ids = '0';
-        MesDialogs::add_template( $text, $group_ids);
+        $res = MesDialogs::add_template( $text, $group_ids);
 
-        echo ObjectHelper::ToJSON( array( 'response' => true ));
+        echo ObjectHelper::ToJSON( array( 'response' => $res ));
     }
 }
