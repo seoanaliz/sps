@@ -5,7 +5,7 @@ class addTemplate
 {
     public function execute()
     {
-//        error_reporting( 0 );
+        error_reporting( 0 );
 
         $user_id        =   Request::getInteger( 'userId' );
         $text           =   Request::getString ( 'text'   );
