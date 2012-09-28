@@ -549,12 +549,11 @@
             $sql = 'DELETE FROM '
                         . TABLE_MES_DIALOG_TEMPLATES . '
                     WHERE
-                        id=@id';
+                          id=@id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetString  ( '@id',     $id );
-            $ds = $cmd->Execute();
-            $ds->Next();
-            return $ds->GetInteger( 'id');
+            $cmd->SetString( '@id', $tmpl_id );
+
+            return $cmd->ExecuteNonQuery() ? true : false;
         }
     }
 ?>

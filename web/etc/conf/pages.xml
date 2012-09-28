@@ -134,6 +134,9 @@
                 <page uri="controls://findTemplate/">
                     <actions>SPS.Stat.findTemplate</actions>
                 </page>
+                <page uri="controls://deleteTemplate/">
+                    <actions>SPS.Stat.deleteTemplate</actions>
+                </page>
                 <page uri="controls://getDialog/">
                     <actions>SPS.Stat.getDialog</actions>
                 </page>

@@ -79,6 +79,9 @@
             <action name="addTemplate">
                 <path>controls/messager/addTemplate</path>
             </action>
+            <action name="deleteTemplate">
+                <path>controls/messager/deleteTemplate</path>
+            </action>
             <action name="getDialog">
                 <path>controls/messager/getDialog</path>
             </action>
