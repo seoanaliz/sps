@@ -23,13 +23,15 @@ class writeMes
         if( $res === 'no access_token' )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
         elseif ( !isset($res->error_code )) {
+            MesDialogs::log_activity( $dialog_id, 0 );
             die( ObjectHelper::ToJSON( array( 'response' => $res )));
 //            MesDialogs::set_state( $dialog_id, 0 );
         } elseif ( $res->error_code != 9 ) {
             MesDialogs::add_message_to_queue( $user_id, $dialog_id, $text );
-            StatUsers::set_mes_limit_ts( $user_id );
+            MesDialogs::log_activity( $dialog_id, 1 );
+            $ts = StatUsers::set_mes_limit_ts( $user_id );
             //todo обработка ошибок, капча, в частности
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'add to queue' )));
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'add to queue', 'time_next_available' => $ts )));
         } elseif ( $res->error_code == 9 ) {
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'flood control' )));
         } else {

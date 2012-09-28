@@ -35,6 +35,7 @@ define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, '
     define ( 'TABLE_MES_GROUP_DIALOG_REL', 'mes_group_dialog_relation' );  #принадлежность даилога группам
     define ( 'TABLE_MES_QUEUES', 'mes_queue' ); #очередь сообщений
     define ( 'TABLE_MES_TEXTS', 'mes_texts' ); #сами сообщения
+    define ( 'TABLE_MES_ACTIVITY_LOG', 'mes_activity_log');
 
 //статистика по юзерам пабликов
     define( 'TABLE_TEMPL_USER_IDS',          'temp_user_ids'); //здесь хранятся юзеры 1 паблика. Только на время работы

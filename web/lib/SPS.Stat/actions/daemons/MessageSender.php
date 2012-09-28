@@ -21,12 +21,11 @@ class MessageSender
                 if (isset($delivery->error_msg)) {
                     if ( $delivery->errore_code == 7 )
                     {
-                        StatUsers::set_mes_limit_ts( $user_id );
-                        continue;
+                        StatUsers::set_mes_limit_ts( $user_id, 1 );
+                        continue(2);
                     }
                     //todo обработак ошибок, логирование
                 }
-
                 MesDialogs::mark_message_as_sent( $message['message_id'] );
             }
         }

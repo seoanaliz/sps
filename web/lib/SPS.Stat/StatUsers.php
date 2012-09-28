@@ -111,30 +111,24 @@
         public static function get_access_token( $id )
         {
             $id = $id ? $id : AuthVkontakte::IsAuth();
-            
             $sql = 'SELECT access_token FROM ' . TABLE_STAT_USERS . ' WHERE user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $id );
             $ds = $cmd->Execute();
             $ds->Next();
-
             $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
 
-            if ( $acc_tok ) {
-            }
             return $acc_tok ? $acc_tok : false;
         }
 
         public static function set_access_token( $user_id, $access_token )
         {
+            str_replace( '"', '', $access_token);
             $sql = 'UPDATE ' . TABLE_STAT_USERS . ' SET access_token=@access_token WHERE user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetString(  '@access_token', $access_token );
-            $ds = $cmd->ExecuteNonQuery();
-//            $ds->Next();
-//
-//            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
+            $cmd->ExecuteNonQuery();
         }
 
         public static function get_im_users()
@@ -149,13 +143,33 @@
             return $usersIds;
         }
 
-        public static function set_mes_limit_ts( $user_id ) {
+        public static function set_mes_limit_ts( $user_id, $forced = 0 ) {
             $now = time();
-            $sql = 'UPDATE ' . TABLE_STAT_USERS . ' SET mes_block_ts=@now WHERE user_id=@user_id';
+            if ( !$forced )
+                $now -= 86700;
+            $sql = 'UPDATE
+                    ' . TABLE_STAT_USERS . '
+                    SET
+                        mes_block_ts=@now
+                    WHERE
+                        user_id=@user_id
+                        AND mes_block_ts < @now
+                    ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger('@user_id', $user_id );
             $cmd->SetInteger('@now', $now );
             $cmd->Execute();
+            $sql = 'SELECT mes_block_ts FROM
+                    ' . TABLE_STAT_USERS . '
+                    WHERE
+                        user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id );
+            $cmd->SetInteger('@now', $now );
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            return $ds->GetInteger('mes_block_ts');
         }
     }
 ?>

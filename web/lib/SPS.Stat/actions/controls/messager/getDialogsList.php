@@ -44,7 +44,30 @@ class getDialogsList
         }
 
         $user_ids = array();
-//        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
+
+        //костыли вы мои, костыли...
+        //добавляет псевдодиалоги(заявки в друзья)
+        //добавляет псевдодиалоги(заявки в друзья)
+        foreach( $res_ids as $res_id ) {
+            foreach( $row_dialog_array as $dialog ) {
+                $dialog->uid ;
+                if ( $dialog->uid == $res_id ) {
+                    continue(2);
+                }
+            }
+//            echo 'ВОТ ОНО!!!';
+            $new_dialog =(object) array(
+                    'mid'           =>  '',
+                    'date'          =>  '',
+                    'out'           =>  '',
+                    'uid'           =>  $res_id,
+                    'read_state'    =>  '',
+                    'out'           =>  '',
+                    'title'         =>  '',
+                    'body'          =>  'Этот пользователь добавил Вас в друзья, но пока ничего не написал'
+            );
+            $row_dialog_array[] = $new_dialog;
+        }
 
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
@@ -76,6 +99,8 @@ class getDialogsList
             die( ObjectHelper::ToJSON( array( 'response' => array())));
 
         $users_array = StatUsers::get_vk_user_info( $user_ids );
+
+
 
         foreach( $dialogs_array as &$dialog ) {
             $dialog->uid = $users_array[ $dialog->uid ];
