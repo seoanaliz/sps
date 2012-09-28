@@ -69,9 +69,12 @@ class getDialogsList
             $row_dialog_array[] = $new_dialog;
         }
 
+        $statuses = MesDialogs::get_statuses($user_id, $res_ids);
+
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
             $dialog->groups = MesDialogs::get_rec_groups( $user_id, $dialog->uid );
+            $dialog->status = $statuses[$dialog->uid];
             if( !$dialog->id ) {
                 $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
                 MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '');

@@ -241,7 +241,7 @@
             return (array) $res;
         }
 
-        //устанавливает ярлык диалогу(пока не востребована)
+        //устанавливает ярлык диалогу
         public static function set_status( $dialog_id, $status )
         {
             $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET status=@status WHERE id=@dialog_id';
@@ -251,6 +251,27 @@
             if ( $cmd->ExecuteNonQuery() )
                 return true;
             return false;
+        }
+
+        public static function get_statuses( $user_id, $rec_ids ) {
+            $rec_ids = '{' . implode( ',', $rec_ids  ) . '}';
+            $sql = 'SELECT
+                        rec_id, status
+                    FROM '
+                        . TABLE_MES_DIALOGS . '
+                    WHERE
+                       rec_id = ANY( @rec_ids )
+                       AND user_id=@user_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@rec_ids', $rec_ids );
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds =  $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[$ds->GetInteger( 'rec_id' )] = $ds->GetValue( 'status' );
+            }
+            return $res;
         }
 
         //отслеживание новых сообщений, без лонгпулла
