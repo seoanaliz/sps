@@ -48,3 +48,6 @@ body{overflow-y:scroll;}
 .scroll-like-mac:hover::-webkit-scrollbar-thumb,.scroll-like-mac:focus::-webkit-scrollbar-thumb{background:rgba(0, 0, 0, 0.4);}
 .scroll-like-mac::-webkit-resizer,.scroll-like-mac::-webkit-scrollbar-corner,.scroll-like-mac::-webkit-scrollbar-track-piece{background:transparent;}
 .scroll-like-mac:hover::-webkit-resizer,.scroll-like-mac:hover::-webkit-scrollbar-corner,.scroll-like-mac:hover::-webkit-scrollbar-track-piece{background:transparent;}
+.box-templates>.title{margin:7px 0 4px;color:#2B587A;font-size:1.18em;font-weight:bold;}
+.box-templates>.input-wrap{margin-right:10px;margin-bottom:7px;}.box-templates>.input-wrap>input[type="text"],.box-templates>.input-wrap>textarea{width:100%;}
+.box-templates>.input-wrap>textarea{height:50px;}

@@ -1149,8 +1149,9 @@ var Box = (function() {
                 run(options.oncreate, $el);
             });
         },
-        addTag: function(id, params) {
+        addTag: function(params) {
             return this.each(function() {
+                var id = params.id;
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
@@ -1219,7 +1220,7 @@ var Box = (function() {
         var width = $wrap.width() - parseInt($el.css('padding')) * 2;
 
         $el.css({
-            width: (width - left) < 40 ? width : (width - left)
+            width: (width - left) < 40 ? width : (width - left - 1)
         });
     }
 

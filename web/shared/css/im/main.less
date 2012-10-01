@@ -499,3 +499,25 @@ body {
         background: transparent;
     }
 }
+
+.box-templates {
+    &>.title {
+        margin: 7px 0 4px;
+        color: #2B587A;
+        font-size: 1.18em;
+        font-weight: bold;
+    }
+
+    &>.input-wrap {
+        margin-right: 10px;
+        margin-bottom: 7px;
+
+        &>input[type="text"],
+        &>textarea {
+            width: 100%;
+        }
+        &>textarea {
+            height: 50px;
+        }
+    }
+}

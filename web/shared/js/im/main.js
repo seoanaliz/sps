@@ -5,7 +5,7 @@ var Configs = {
     controlsRoot: controlsRoot,
     commonDialogsList: 999999,
     viewer: {},
-    disableAutocomplete: true
+    disableAutocomplete: false
 };
 
 var Collection = Class.extend({
@@ -618,6 +618,7 @@ var Messages = EndlessListAbstract.extend({
     },
 
     userId: null,
+    listId: 1,
     dialogId: null,
     user: {},
 
@@ -715,7 +716,7 @@ var Messages = EndlessListAbstract.extend({
             t.sendMessage();
         });
         $el.find('.save-template').click(function() {
-            var box = new CreateTemplateBox(1, $el.find('textarea').val());
+            var box = new CreateTemplateBox(t.listId, $el.find('textarea').val());
             box.show();
         });
         $el.find('textarea').keydown(function(e) {
@@ -741,28 +742,28 @@ var Messages = EndlessListAbstract.extend({
                     return text ? text : 'notShowAllItems';
                 },
                 oncreate: function() {
-                    Events.fire('get_templates', 1, function(data) {
+                    Events.fire('get_templates', t.listId, function(data) {
                         $textarea.autocomplete('setData', data);
                     });
                 },
                 onchange: function(item) {
                     $textarea.val(item.title);
                 }
-    //            Автокомплит по отдельному слову
-    //            getValue: function() {
-    //                var text = $textarea.val();
-    //                var words = text.split(' ');
-    //                var lastWord = words.pop();
-    //                return lastWord;
-    //            },
-    //            onchange: function(item) {
-    //                var text = $textarea.val();
-    //                var words = text.split(' ');
-    //                var lastWord = words.pop();
-    //                words.push(item.title);
-    //                text = words.join(' ');
-    //                $textarea.val(text);
-    //            }
+                // Автокомплит по отдельному слову
+                //getValue: function() {
+                //    var text = $textarea.val();
+                //    var words = text.split(' ');
+                //    var lastWord = words.pop();
+                //    return lastWord;
+                //},
+                //onchange: function(item) {
+                //    var text = $textarea.val();
+                //    var words = text.split(' ');
+                //    var lastWord = words.pop();
+                //    words.push(item.title);
+                //    text = words.join(' ');
+                //    $textarea.val(text);
+                //}
             });
         }
         $textarea.inputMemory('message' + dialogId);
@@ -1059,27 +1060,73 @@ function makeMsg(msg, isNotClean) {
 
 function CreateTemplateBox(listId, text) {
     var SAVE_TEMPLATE_BOX =
-    '<div class="">' +
-        '<textarea><?=text?></textarea>' +
+    '<div class="box-templates">' +
+//        '<div class="title">' +
+//            'Выберите списки' +
+//        '</div>' +
+//        '<div class="input-wrap">' +
+//            '<input class="lists" type="text"/>' +
+//        '</div>' +
+        '<div class="title">' +
+            'Введите текст шаблона' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text"><?=text?></textarea>' +
+        '</div>' +
     '</div>';
 
     var box = new Box({
         id: 'templateBox' + listId,
-        title: 'Добавление шаблона ответа',
-        buttons: [
-            {label: 'Сохранить', onclick: saveTemplate},
-            {label: 'Отменить', isWhite: true}
-        ],
+        title: 'Добавление нового шаблона',
         onshow: function() {
-            var $textarea = this.$box.find('textarea');
+            var $input = this.$el.find('.lists');
+            var $textarea = this.$el.find('.template-text');
             var text = $textarea.val();
+            var lists = [
+                {id: 1, title: 'asdasd'},
+                {id: 2, title: 'fdsdfadasd'},
+                {id: 3, title: 'cxvxcvasdasd'}
+            ];
             $textarea.focus();
             $textarea.selectRange(text.length, text.length);
+
+            $input.tags({
+                onadd: function(tag) {
+                    lists.push(parseInt(tag.id));
+                },
+                onremove: function(tagId) {
+                    lists = jQuery.grep(lists, function(value) {
+                        return value != tagId;
+                    });
+                }
+            }).autocomplete({
+                data: lists,
+                target: $input.closest('.ui-tags'),
+                onchange: function(item) {
+                    $(this).tags('addTag', item).val('').focus();
+                }
+            }).keydown(function(e) {
+                if (e.keyCode == KEY.DEL && !$(this).val()) {
+                    $(this).tags('removeLastTag');
+                }
+            }).tags('addTag', lists[0]);
         }
     });
     box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+    box.setButtons([
+        {label: 'Сохранить', onclick: saveTemplate},
+        {label: 'Отменить', isWhite: true}
+    ]);
 
-    function saveTemplate() {}
+    function saveTemplate() {
+        var $textarea = box.$el.find('textarea');
+        var text = $textarea.val();
+        box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+        box.setButtons([{label: 'Закрыть'}]);
+        Events.fire('add_template', text, listId, function() {
+            box.hide();
+        });
+    }
 
     return box;
 }

@@ -112,7 +112,7 @@ var MESSAGES =
             '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
-                //'<a class="link save-template">Готовый ответ</button>' +
+                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -225,7 +225,7 @@ var LIST =
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title">' +
+    '<div class="title<?=isset("isRead") && isRead ? " new" : ""?>">' +
         '<?=title?>' +
         '<span class="counter"><?=count ? "+" + count : ""?></span>' +
     '</div>' +
