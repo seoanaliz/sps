@@ -38,7 +38,11 @@ class getDialog
             $dialog_array = array();
         elseif ( $dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
-        $res = array( 'messages' =>  $dialog_array, 'dialogers'  =>  $users_info );
+        $groups = MesGroups::get_dialog_group( $dialog_id );
+        $res = array( 'messages'    =>  $dialog_array,
+                      'dialogers'   =>  $users_info,
+                      'groupIds'    =>  $groups
+        );
 
         die( ObjectHelper::ToJSON( array( 'response' => $res )));
     }
