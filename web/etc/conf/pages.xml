@@ -140,6 +140,9 @@
                 <page uri="controls://getDialog/">
                     <actions>SPS.Stat.getDialog</actions>
                 </page>
+                <page uri="controls://toggleReadRead/">
+                    <actions>SPS.Stat.toggleReadRead</actions>
+                </page>
                 <page uri="controls://addDialog/">
                     <actions>SPS.Stat.addDialog</actions>
                 </page>
