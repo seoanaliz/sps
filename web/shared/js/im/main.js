@@ -618,7 +618,7 @@ var Messages = EndlessListAbstract.extend({
     },
 
     userId: null,
-    listId: 1,
+    listId: null,
     dialogId: null,
     user: {},
 
@@ -647,7 +647,7 @@ var Messages = EndlessListAbstract.extend({
     createBlock: function(data) {
         var t = this;
         if (data.messages.length) {
-            return $(tmpl(t.tmplItemsBlock, {id:t.currentPage, list:data.messages}));
+            return $(tmpl(t.tmplItemsBlock, {id: t.currentPage, list: data.messages}));
         } else {
             return false;
         }
@@ -673,6 +673,7 @@ var Messages = EndlessListAbstract.extend({
         t.scrollBottom();
 
         t.getBlockData(t.currentPage, function(data) {
+            t.listId = data.lists[0];
             var users = data.users;
             var messages = data.messages;
             var user = {};
@@ -690,8 +691,8 @@ var Messages = EndlessListAbstract.extend({
             };
             t.user = user;
             t.renderTemplate();
-            t.initTextarea();
             t.makeItems(t.$el.find(t.itemsListSelector));
+            t.initTextarea();
             t.updateTop();
             t.scrollBottom();
             t.bindEvents();
@@ -703,6 +704,7 @@ var Messages = EndlessListAbstract.extend({
     bindEvents: function() {
         var t = this;
         var $el = t.$el;
+        var listId = t.listId;
 
         t.on('scroll', (function onScroll() {
             t.updateTop();
@@ -716,7 +718,7 @@ var Messages = EndlessListAbstract.extend({
             t.sendMessage();
         });
         $el.find('.save-template').click(function() {
-            var box = new CreateTemplateBox(t.listId, $el.find('textarea').val());
+            var box = new CreateTemplateBox(listId, $el.find('textarea').val());
             box.show();
         });
         $el.find('textarea').keydown(function(e) {
@@ -731,20 +733,20 @@ var Messages = EndlessListAbstract.extend({
         var $el = t.$el;
         var $textarea = $el.find('textarea');
         var dialogId = t.dialogId;
+        var listId = t.listId;
         $textarea.placeholder();
         $textarea.autoResize();
-        if (!Configs.disableAutocomplete) {
+        $textarea.inputMemory('message' + dialogId);
+        $textarea.focus();
+        $textarea[0].scrollTop = $textarea[0].scrollHeight;
+        Events.fire('get_templates', listId, function(data) {
             $textarea.autocomplete({
                 position: 'top',
                 notFoundText: '',
+                data: data,
                 getValue: function() {
                     var text = $.trim($textarea.val());
                     return text ? text : 'notShowAllItems';
-                },
-                oncreate: function() {
-                    Events.fire('get_templates', t.listId, function(data) {
-                        $textarea.autocomplete('setData', data);
-                    });
                 },
                 onchange: function(item) {
                     $textarea.val(item.title);
@@ -765,10 +767,7 @@ var Messages = EndlessListAbstract.extend({
                 //    $textarea.val(text);
                 //}
             });
-        }
-        $textarea.inputMemory('message' + dialogId);
-        $textarea.focus();
-        $textarea[0].scrollTop = $textarea[0].scrollHeight;
+        });
     },
     addMessage: function(message) {
         var t = this;
