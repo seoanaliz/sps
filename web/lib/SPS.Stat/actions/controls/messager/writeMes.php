@@ -21,7 +21,7 @@ class writeMes
 
         $res = MesDialogs::writeMessage( $user_id, $rec_id, $text );
         if( $res === 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' ) ) );
+            die( ERR_NO_ACC_TOK );
         elseif ( !isset($res->error_code )) {
             MesDialogs::log_activity( $dialog_id, 0 );
             die( ObjectHelper::ToJSON( array( 'response' => $res )));

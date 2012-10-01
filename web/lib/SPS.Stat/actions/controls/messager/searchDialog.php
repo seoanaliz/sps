@@ -16,7 +16,7 @@ class searchDialog
 
         $res = MesDialogs::search_dialogs( $user_id, $search );
         if ( $res == 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
+            die( ERR_NO_ACC_TOK );
         die( ObjectHelper::ToJSON( array( 'response' => $res )));
     }
 }

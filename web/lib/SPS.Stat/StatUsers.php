@@ -23,17 +23,21 @@
             return false;
         }
 
-        public static function get_vk_user_info( $ids )
+        public static function get_vk_user_info( $ids, $user_id = '' )
         {
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
             if ( !trim( $ids ))
                 return array();
+            if( $user_id )
+                $acc_tok = StatUsers::get_access_token( $user_id );
             $users  =   array();
             $params = array(
                 'uids'   =>  $ids,
                 'fields' =>  'photo,online',
             );
+            if( isset( $acc_tok ) && $acc_tok )
+                $params['access_token'] =   $acc_tok;
 
             $result = VkHelper::api_request( 'users.get', $params );
 

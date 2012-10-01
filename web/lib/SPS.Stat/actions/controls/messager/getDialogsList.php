@@ -5,7 +5,7 @@ class getDialogsList
 {
     public function execute()
     {
-        error_reporting( 0 );
+//        error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         $only_new       =   Request::getInteger( 'unreadIn' );
@@ -18,8 +18,8 @@ class getDialogsList
 //        $date_end       =   Request::getInteger( 'toDate' );
 
         $group_id       =   $group_id ? $group_id : 0;
-        $offset         =   $offset ? $offset : 0;
-        $limit          =   $limit  ?  $limit  :   25;
+        $offset         =   $offset ? $offset     : 0;
+        $limit          =   $limit  ?  $limit     :   25;
         $only_new       =   $only_new ? 1 : 0;
 //        $date_start     =   $date_start ? $date_start : 0;
 //        $date_end       =   $date_end ? $date_end : 2000000000;
@@ -30,21 +30,16 @@ class getDialogsList
 
         $dialogs_array = array();
         if ( !$group_id ) {
-//            $row_dialog_array = MesDialogs::get_last_dialogs( $user_id, $offset, $limit );
             $res_ids            = MesGroups::get_ungroup_dialogs( $user_id, $limit, $offset, $only_new );
             $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
-//            if ( !$row_dialog_array )
-//                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' )));
-            if( $row_dialog_array == 'no access_token' )
-                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
         }
         else {
             $res_ids = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
             $row_dialog_array  = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
         }
-
+        if( $row_dialog_array == 'no access_token' )
+            die( ERR_NO_ACC_TOK );
         $user_ids = array();
-
         //костыли вы мои, костыли...
         //добавляет псевдодиалоги(заявки в друзья)
         //добавляет псевдодиалоги(заявки в друзья)
@@ -101,7 +96,7 @@ class getDialogsList
         if ( count( $user_ids ) < 1 )
             die( ObjectHelper::ToJSON( array( 'response' => array())));
 
-        $users_array = StatUsers::get_vk_user_info( $user_ids );
+        $users_array = StatUsers::get_vk_user_info( $user_ids, $user_id );
 
 
 

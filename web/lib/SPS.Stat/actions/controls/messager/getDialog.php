@@ -31,13 +31,13 @@ class getDialog
             unset( $message->uid );
             $users[] = $message->from_id;
         }
-        $users_info = StatUsers::get_vk_user_info( $users );
+        $users_info = StatUsers::get_vk_user_info( $users, $user_id );
         $dialog_array = array_reverse( $dialog_array );
 
         if ( !$dialog_array )
             $dialog_array = array();
         elseif ( $dialog_array == 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'  =>  'user is not authorized' )));
+            die( ERR_NO_ACC_TOK );
         $res = array( 'messages' =>  $dialog_array, 'dialogers'  =>  $users_info );
 
         die( ObjectHelper::ToJSON( array( 'response' => $res )));

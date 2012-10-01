@@ -19,7 +19,7 @@ class getGroupDialogs
         }
 
         $res_ids = MesGroups::get_group_dialogs( $user_id, $group_id, 0 );
-        $users_array = StatUsers::get_vk_user_info( $res_ids );
+        $users_array = StatUsers::get_vk_user_info( $res_ids, $user_id );
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
 
         $res = array();

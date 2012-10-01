@@ -7,7 +7,8 @@
 
 define('ADMIN_RANK', 2);
 
-define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, 'err_mes'    =>  'parameters missing ' ) ));
+define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'parameters missing '    )));
+define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
 
 ###tables
 

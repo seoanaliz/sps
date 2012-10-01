@@ -65,7 +65,7 @@ class watchDog
                         $message =reset( MesDialogs::get_messages( $user_id, $mid ));
                         foreach ( $message->fwd_messages as $mess ) {
                             $fwd[] = array( 'body'      =>  $mess->body,
-                                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $mess->uid )),
+                                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $mess->uid, $user_id )),
                                             'date'      =>  $mess->body,
                             );
                         }
@@ -81,7 +81,7 @@ class watchDog
                             'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
                             'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
                             'date'      =>  time(),
-                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id )),
+                            'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id, $user_id )),
                             'dialog_id' =>  $dialog_id,
                             'groups'    =>  $ids[ $from_id ],
                             'attachments'=>  $attach,
@@ -95,7 +95,7 @@ class watchDog
                     $result[] = array(
                         'type'      =>  $status,
                         'content'   =>  array(
-                            'userId'    =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' )))
+                            'userId'    =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' ), $user_id ))
                         )
                     );
                     break;
@@ -103,7 +103,7 @@ class watchDog
                     $result[] = array(
                         'type'      =>  'typing',
                         'content'   =>  array(
-                            'userId'        =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' ))),
+                            'userId'        =>  reset( StatUsers::get_vk_user_info(trim( $event[1], '-' ), $user_id )),
                             'start_typing'  =>  $event[2]
                         )
                     );
