@@ -192,7 +192,7 @@ var Eventlist = {
                     user: clearUsers[dirtyMessage.from_id]
                 });
             });
-            clearData = {users: clearUsers, messages: clearMessages};
+            clearData = {users: clearUsers, messages: clearMessages, lists: dirtyData.groupIds};
             callback(clearData);
         });
     },
