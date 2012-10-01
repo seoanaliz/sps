@@ -935,12 +935,14 @@ var List = Widget.extend({
         var t = this;
         var $el = t.$el;
         $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
+        Events.fire('set_list_as_new', listId, function() {});
     },
 
     setAsRead: function(listId) {
         var t = this;
         var $el = t.$el;
         $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
+        Events.fire('set_list_as_read', listId, function() {});
     },
 
     addMessage: function(message) {

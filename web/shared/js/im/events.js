@@ -252,6 +252,16 @@ var Eventlist = {
         simpleAjax('deleteTemplate', {tmplId: tmplId}, function() {
             callback(true);
         });
+    },
+    set_list_as_read: function(listId, callback) {
+        simpleAjax('toggleReadRead', {groupId: listId, read: true}, function() {
+            callback(true);
+        });
+    },
+    set_list_as_new: function(listId, callback) {
+        simpleAjax('toggleReadRead', {groupId: listId, read: false}, function() {
+            callback(true);
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
