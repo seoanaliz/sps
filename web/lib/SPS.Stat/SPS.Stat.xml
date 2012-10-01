@@ -91,6 +91,9 @@
             <action name="writeMes">
                 <path>controls/messager/writeMes</path>
             </action>
+            <action name="toggleReadRead">
+                <path>controls/messager/toggleReadRead</path>
+            </action>
             <action name="markMes">
                 <path>controls/messager/markMes</path>
             </action>
