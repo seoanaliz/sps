@@ -359,18 +359,21 @@
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
         }
 
-        public static  function toggle_read_unread_gr( $user_id, $group_id )
+        public static  function toggle_read_unread_gr( $user_id, $group_id, $read )
         {
+
             $sql = 'UPDATE '
                         . TABLE_MES_GROUP_USER_REL . '
                     SET
-                          read_mark = NOT read_mark
+                          read_mark = @read
                     WHERE
                         user_id=@user_id
                         AND group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id',  $user_id  );
             $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetBoolean( '@read', $read );
+
             return $cmd->ExecuteNonQuery();
         }
     }
