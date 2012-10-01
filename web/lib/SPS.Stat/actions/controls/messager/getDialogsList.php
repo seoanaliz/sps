@@ -5,7 +5,7 @@ class getDialogsList
 {
     public function execute()
     {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         $only_new       =   Request::getInteger( 'unreadIn' );
@@ -50,7 +50,6 @@ class getDialogsList
                     continue(2);
                 }
             }
-//            echo 'ВОТ ОНО!!!';
             $new_dialog =(object) array(
                     'mid'           =>  '',
                     'date'          =>  '',
