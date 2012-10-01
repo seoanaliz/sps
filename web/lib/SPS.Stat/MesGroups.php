@@ -32,7 +32,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.general
+            $sql = 'SELECT c.group_id, c.name, c.general, b.read_mark
                     FROM '
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
@@ -54,6 +54,7 @@
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
+                    'isRead'    =>  $ds->GetBoolean( 'read_mark' ),
                 );
             }
 
@@ -356,6 +357,21 @@
             $ds->Next();
 
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
+        }
+
+        public static  function toggle_read_unread_gr( $user_id, $group_id )
+        {
+            $sql = 'UPDATE '
+                        . TABLE_MES_GROUP_USER_REL . '
+                    SET
+                          read_mark = NOT read_mark
+                    WHERE
+                        user_id=@user_id
+                        AND group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id',  $user_id  );
+            $cmd->SetInteger( '@group_id', $group_id );
+            return $cmd->ExecuteNonQuery();
         }
     }
 ?>
