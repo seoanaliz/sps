@@ -1,5 +1,5 @@
 var Configs = {
-    vkId: 13049517,//$.cookie('uid'),
+    vkId: $.cookie('uid'),
     token: $.cookie('token'),
     appId: vk_appId,
     controlsRoot: controlsRoot,
@@ -144,7 +144,7 @@ var IM = Widget.extend({
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    isViewer: (dirtyMessage.from_id.uid == Configs.vkId),
                     text: dirtyMessage.body,
                     dialogId: dirtyMessage.dialog_id,
                     attachments: [],

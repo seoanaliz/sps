@@ -335,7 +335,6 @@
                         $posts[$t]['link'] = $link;
                         $posts[$t]['doc'] = $doc;
                     }
-
                 }
 
                 //получение описания каждой фотки, крайне сомнительная вещь
@@ -486,11 +485,6 @@
 
         }
 
-        public function get_albums()
-        {
-
-        }
-
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
         public function get_posts_count($wall_url = '')
@@ -500,7 +494,6 @@
             }
 
             $a = $this->get_page($wall_url . '?own=1');
-
             preg_match('/<div.*?class="summary".*?>(.*?)<\/div/', $a, $matches);
             $matches = $matches[1];
             //            echo 'matches : ' . $matches . '<br>';
@@ -563,7 +556,6 @@
         private function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
-
             $text = str_replace( '&#189;',  "½",    $text );
             $text = str_replace( '&#188;',  "¼",    $text );
             $text = str_replace( '&#190;',  "¾",    $text );
@@ -617,15 +609,11 @@
                 unset ($matches);
 
             }
-
-
-
             return true;
         }
 
         public function get_time($date)
         {
-
             //            echo $date.'<br>';
             //начало сегодняшнего дня (для сегодняшних постов)
             $date = trim($date);
@@ -708,31 +696,25 @@
             return $month;
         }
 
-        //$post_id  = idпаблика_idпоста
-        public function get_post_likes($post_id)
+        //$post_ids  = массив idпаблика_idпоста
+        //ограничение - 90 постов
+        public static function get_post_likes( $post_ids )
         {
-            $post_id = trim($post_id, '-');
-
+            $post_ids = implode( ',', $post_ids );
             $params = array(
-                'posts'   =>   '-' . $post_id,
-                'access_token'  =>  $this->vk_access_token
+                'posts'   =>   $post_ids
             );
 
-            $url = self::METH . 'wall.getById';
-            $fwd = $this->qurl_request($url, $params);
-            $fwd = json_decode($fwd);
-            if (!empty ($fwd->error)) {
-                $fwd = $fwd->error;
-                throw new exception("Error in wall.delete : $fwd->error_msg");
+            $res = VkHelper::api_request( 'wall.getById', $params, 0 );
+            $result = array();
+            foreach( $res as $post ) {
+                $result[ $post->to_id . '_' . $post->id ] = array
+                    (
+                      'likes'   =>     $post->likes->count,
+                      'reposts' =>     $post->reposts->count,
+                );
             }
-
-            $res = array(
-                'likes'     =>  $fwd->response[0]->likes->count,
-                'reposts'   =>  $fwd->response[0]->reposts->count,
-            );
-            return $res;
-
+            return $result;
         }
-
     }
 ?>

@@ -24,6 +24,8 @@ class saveAt
 
         StatUsers::set_access_token( $user_id, $access_token );
         MesDialogs::get_all_dialogs( $user_id );
+        MesDialogs::check_friend_requests( $user );
+
         die( ObjectHelper::ToJSON( array( 'response' => $user )));
     }
 }
