@@ -718,7 +718,6 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    console.log('asdasd');
                     var events = ['resize.' + EVENTS_NAMESPACE, 'scroll.' + EVENTS_NAMESPACE].join(' ');
                     $(window).on(events, function(e) {
                         if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
