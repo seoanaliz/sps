@@ -225,7 +225,7 @@ var LIST =
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title<?=isset("isRead") && isRead ? " new" : ""?>">' +
+    '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
         '<?=title?>' +
         '<span class="counter"><?=count ? "+" + count : ""?></span>' +
     '</div>' +

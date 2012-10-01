@@ -906,10 +906,6 @@ var List = Widget.extend({
                 $el.find('.title.active, .dialog.active').removeClass('active');
                 $el.find('.item[data-id=' + t.currentList + ']').find('.title').addClass('active');
             }
-            var newLists = globalStorage.items();
-            $.each(newLists, function(listId) {
-                t.setAsNew(listId.toString().substr('list'.length));
-            });
         });
     },
 
@@ -922,8 +918,8 @@ var List = Widget.extend({
         $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
         t.setAsRead(listId);
-        globalStorage.items('list' + listId, null);
         t.currentList = listId;
+        Events.fire('set_list_as_read', listId, function() {});
     },
 
     update: function() {
@@ -935,22 +931,20 @@ var List = Widget.extend({
         var t = this;
         var $el = t.$el;
         $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
-        Events.fire('set_list_as_new', listId, function() {});
     },
 
     setAsRead: function(listId) {
         var t = this;
         var $el = t.$el;
         $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
-        Events.fire('set_list_as_read', listId, function() {});
     },
 
     addMessage: function(message) {
         var t = this;
         t.update();
         $.each(message.lists, function(i, listId) {
-            globalStorage.items('list' + listId, true);
             t.setAsNew(listId);
+            Events.fire('set_list_as_new', listId, function() {});
         });
     }
 });

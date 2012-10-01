@@ -254,12 +254,12 @@ var Eventlist = {
         });
     },
     set_list_as_read: function(listId, callback) {
-        simpleAjax('toggleReadRead', {groupId: listId, read: true}, function() {
+        simpleAjax('toggleReadRead', {groupId: listId, read: 1}, function() {
             callback(true);
         });
     },
     set_list_as_new: function(listId, callback) {
-        simpleAjax('toggleReadRead', {groupId: listId, read: false}, function() {
+        simpleAjax('toggleReadRead', {groupId: listId}, function() {
             callback(true);
         });
     }
