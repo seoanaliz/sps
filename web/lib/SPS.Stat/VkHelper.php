@@ -29,7 +29,6 @@
             $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
             if ( isset( $res->error ) )
                 if ( $throw_exc_on_errors ) {
-                   // print_r('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
                     throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
                 }
                 else
@@ -43,11 +42,7 @@
             if (empty( $url )) {
                 return false;
             }
-            if (self::TESTING) {
-                echo '<br>данные для запроса <br>';
-                print_r($arr_of_fields);
-                echo '<br>';
-            }
+
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -65,7 +60,7 @@
 
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_HEADER, 0);
-            if (is_array($arr_of_fields)) {
+            if (is_array( $arr_of_fields )) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $arr_of_fields);
 
             } else return false;
@@ -76,21 +71,14 @@
                 return 'error in curl: '. curl_error($ch);
             }
 
-            if (self::TESTING) {
-                echo '<br>ответ <br>';
-                print_r($result);
-                echo '<br>';
-            }
             curl_close($ch);
             return $result;
         }
 
         public static function get_vk_time()
         {
-            return self::api_request('getServerTime', array());
+            return self::api_request( 'getServerTime', array() );
         }
-
-
 
         public static function multiget( $urls, &$result )
         {
@@ -151,9 +139,7 @@
                 }
                 curl_multi_close( $mh );
             }
-
         }
-
     }
 
 ?>

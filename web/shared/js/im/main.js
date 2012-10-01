@@ -4,7 +4,8 @@ var Configs = {
     appId: vk_appId,
     controlsRoot: controlsRoot,
     commonDialogsList: 999999,
-    viewer: {}
+    viewer: {},
+    disableAutocomplete: false
 };
 
 var Collection = Class.extend({
@@ -26,7 +27,7 @@ $(document).ready(function() {
     }
 
     if (!Configs.vkId) {
-        return location.replace('/login/');
+        return location.replace('/login/?' + btoa('im'));
     } else {
         $.cookie('uid', Configs.vkId, {expires: 30});
     }
@@ -116,6 +117,7 @@ var IM = Widget.extend({
         var t = this;
         var dirtyMessage;
         var message;
+        if (!event || !event.type) return;
 
         switch (event.type) {
             //@todo: объеденить
@@ -142,7 +144,7 @@ var IM = Widget.extend({
 
                     id: dirtyMessage.mid,
                     isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
+                    isViewer: (dirtyMessage.from_id.uid == Configs.vkId),
                     text: dirtyMessage.body,
                     dialogId: dirtyMessage.dialog_id,
                     attachments: [],
@@ -616,6 +618,7 @@ var Messages = EndlessListAbstract.extend({
     },
 
     userId: null,
+    listId: 1,
     dialogId: null,
     user: {},
 
@@ -712,6 +715,10 @@ var Messages = EndlessListAbstract.extend({
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
+        $el.find('.save-template').click(function() {
+            var box = new CreateTemplateBox(t.listId, $el.find('textarea').val());
+            box.show();
+        });
         $el.find('textarea').keydown(function(e) {
             if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
@@ -726,42 +733,39 @@ var Messages = EndlessListAbstract.extend({
         var dialogId = t.dialogId;
         $textarea.placeholder();
         $textarea.autoResize();
-//        $textarea.autocomplete({
-//            position: 'top',
-//            emptyMenuText: '',
-//            caseSensitive: true,
-//            data: [
-//                {id: 2, title: 'Привет'},
-//                {id: 2, title: 'привет'},
-//                {id: 1, title: 'как'},
-//                {id: 1, title: 'Как'},
-//                {id: 5, title: 'дела'},
-//                {id: 5, title: 'Дела'},
-//                {id: 4, title: 'что'},
-//                {id: 4, title: 'Что'},
-//                {id: 5, title: 'делаешь'},
-//                {id: 5, title: 'Делаешь'},
-//                {id: 3, title: 'пока'},
-//                {id: 3, title: 'Пока'}
-//            ],
-//            onchange: function(item) {
-//                $textarea.val(item.title);
-//            }
-////            getValue: function() {
-////                var text = $textarea.val();
-////                var words = text.split(' ');
-////                var lastWord = words.pop();
-////                return lastWord;
-////            },
-////            onchange: function(item) {
-////                var text = $textarea.val();
-////                var words = text.split(' ');
-////                var lastWord = words.pop();
-////                words.push(item.title);
-////                text = words.join(' ');
-////                $textarea.val(text);
-////            }
-//        });
+        if (!Configs.disableAutocomplete) {
+            $textarea.autocomplete({
+                position: 'top',
+                notFoundText: '',
+                getValue: function() {
+                    var text = $.trim($textarea.val());
+                    return text ? text : 'notShowAllItems';
+                },
+                oncreate: function() {
+                    Events.fire('get_templates', t.listId, function(data) {
+                        $textarea.autocomplete('setData', data);
+                    });
+                },
+                onchange: function(item) {
+                    $textarea.val(item.title);
+                }
+                // Автокомплит по отдельному слову
+                //getValue: function() {
+                //    var text = $textarea.val();
+                //    var words = text.split(' ');
+                //    var lastWord = words.pop();
+                //    return lastWord;
+                //},
+                //onchange: function(item) {
+                //    var text = $textarea.val();
+                //    var words = text.split(' ');
+                //    var lastWord = words.pop();
+                //    words.push(item.title);
+                //    text = words.join(' ');
+                //    $textarea.val(text);
+                //}
+            });
+        }
         $textarea.inputMemory('message' + dialogId);
         $textarea.focus();
         $textarea[0].scrollTop = $textarea[0].scrollHeight;
@@ -865,7 +869,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.update();
+        t.list.addMessage(message);
     },
 
     initList: function() {
@@ -888,7 +892,7 @@ var List = Widget.extend({
     currentList: null,
 
     events: {
-        'click: .item > .title': 'selectDialogs'
+        'click: .item > .title': 'clickList'
     },
 
     run: function() {
@@ -899,18 +903,13 @@ var List = Widget.extend({
             t.templateData = {list: data, count: count};
             t.renderTemplate();
             if (t.currentList) {
-                t.$el.find('.title.active, .dialog.active').removeClass('active');
+                $el.find('.title.active, .dialog.active').removeClass('active');
                 $el.find('.item[data-id=' + t.currentList + ']').find('.title').addClass('active');
             }
         });
     },
 
-    update: function() {
-        var t = this;
-        t.run();
-    },
-
-    selectDialogs: function(e) {
+    clickList: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
@@ -918,7 +917,35 @@ var List = Widget.extend({
         t.$el.find('.title.active, .dialog.active').removeClass('active');
         $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
+        t.setAsRead(listId);
         t.currentList = listId;
+        Events.fire('set_list_as_read', listId, function() {});
+    },
+
+    update: function() {
+        var t = this;
+        t.run();
+    },
+
+    setAsNew: function(listId) {
+        var t = this;
+        var $el = t.$el;
+        $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
+    },
+
+    setAsRead: function(listId) {
+        var t = this;
+        var $el = t.$el;
+        $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
+    },
+
+    addMessage: function(message) {
+        var t = this;
+        t.update();
+        $.each(message.lists, function(i, listId) {
+            t.setAsNew(listId);
+            Events.fire('set_list_as_new', listId, function() {});
+        });
     }
 });
 
@@ -1025,4 +1052,77 @@ function makeMsg(msg, isNotClean) {
         }
         return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
     })
+}
+
+function CreateTemplateBox(listId, text) {
+    var SAVE_TEMPLATE_BOX =
+    '<div class="box-templates">' +
+//        '<div class="title">' +
+//            'Выберите списки' +
+//        '</div>' +
+//        '<div class="input-wrap">' +
+//            '<input class="lists" type="text"/>' +
+//        '</div>' +
+        '<div class="title">' +
+            'Введите текст шаблона' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text"><?=text?></textarea>' +
+        '</div>' +
+    '</div>';
+
+    var box = new Box({
+        id: 'templateBox' + listId,
+        title: 'Добавление нового шаблона',
+        onshow: function() {
+            var $input = this.$el.find('.lists');
+            var $textarea = this.$el.find('.template-text');
+            var text = $textarea.val();
+            var lists = [
+                {id: 1, title: 'asdasd'},
+                {id: 2, title: 'fdsdfadasd'},
+                {id: 3, title: 'cxvxcvasdasd'}
+            ];
+            $textarea.focus();
+            $textarea.selectRange(text.length, text.length);
+
+            $input.tags({
+                onadd: function(tag) {
+                    lists.push(parseInt(tag.id));
+                },
+                onremove: function(tagId) {
+                    lists = jQuery.grep(lists, function(value) {
+                        return value != tagId;
+                    });
+                }
+            }).autocomplete({
+                data: lists,
+                target: $input.closest('.ui-tags'),
+                onchange: function(item) {
+                    $(this).tags('addTag', item).val('').focus();
+                }
+            }).keydown(function(e) {
+                if (e.keyCode == KEY.DEL && !$(this).val()) {
+                    $(this).tags('removeLastTag');
+                }
+            }).tags('addTag', lists[0]);
+        }
+    });
+    box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+    box.setButtons([
+        {label: 'Сохранить', onclick: saveTemplate},
+        {label: 'Отменить', isWhite: true}
+    ]);
+
+    function saveTemplate() {
+        var $textarea = box.$el.find('textarea');
+        var text = $textarea.val();
+        box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+        box.setButtons([{label: 'Закрыть'}]);
+        Events.fire('add_template', text, listId, function() {
+            box.hide();
+        });
+    }
+
+    return box;
 }

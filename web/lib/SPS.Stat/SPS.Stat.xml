@@ -8,23 +8,14 @@
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
-        <action name="WrUnix">
-            <path>daemons/WrUnix</path>
-        </action>
-	    <action name="WrPosts">
-            <path>daemons/WrPosts</path>
-        </action>
-	    <action name="WrPoints">
-            <path>daemons/WrPoints</path>
-        </action>
-        <action name="WrCleaner">
-            <path>daemons/WrCleaner</path>
-        </action>
         <action name="OurAdminsStat">
             <path>daemons/OurAdminsStat</path>
         </action>
         <action name="MesCheckUpdates">
             <path>daemons/MesCheckUpdates</path>
+        </action>
+        <action name="MessageSender">
+            <path>daemons/MessageSender</path>
         </action>
 
     </group>
@@ -82,6 +73,15 @@
             <action name="getDialogsList">
                 <path>controls/messager/getDialogsList</path>
             </action>
+            <action name="findTemplate">
+                <path>controls/messager/findTemplate</path>
+            </action>
+            <action name="addTemplate">
+                <path>controls/messager/addTemplate</path>
+            </action>
+            <action name="deleteTemplate">
+                <path>controls/messager/deleteTemplate</path>
+            </action>
             <action name="getDialog">
                 <path>controls/messager/getDialog</path>
             </action>
@@ -90,6 +90,9 @@
             </action>
             <action name="writeMes">
                 <path>controls/messager/writeMes</path>
+            </action>
+            <action name="toggleReadRead">
+                <path>controls/messager/toggleReadRead</path>
             </action>
             <action name="markMes">
                 <path>controls/messager/markMes</path>

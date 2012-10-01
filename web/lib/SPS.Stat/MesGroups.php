@@ -32,7 +32,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.general
+            $sql = 'SELECT c.group_id, c.name, c.general, b.read_mark
                     FROM '
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
@@ -54,6 +54,7 @@
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
+                    'isRead'    =>  $ds->GetBoolean( 'read_mark' ),
                 );
             }
 
@@ -181,7 +182,7 @@
             return false;
         }
 
-        public static function check_group_name_free( $user_id, $group_name )
+        public static function check_group_name_used( $user_id, $group_name )
         {
             $sql = 'SELECT a.group_id
                     FROM
@@ -192,14 +193,16 @@
                         AND a.user_id = @user_id
                         AND b.name = @group_name';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id',      $user_id);
-            $cmd->SetString ('@group_name',   $group_name);
+            $cmd->SetInteger( '@user_id',      $user_id);
+            $cmd->SetString ( '@group_name',   $group_name);
             $ds = $cmd->Execute();
-            $ds->Next();
-            if ($a = $ds->getValue( 'group_id' , TYPE_INTEGER ))
-                return false;
 
-            return true;
+            $ds->Next();
+            $a = $ds->GetInteger( 'group_id' );
+            if ( $a )
+                return $a;
+
+            return false;
         }
 
         public static function delete_group( $group_id )
@@ -270,7 +273,7 @@
                         a.dialog_id=b.id AND
                         b.user_id=@user_id  ' . $where . '
                     ORDER BY
-                        state DESC, last_update DESC
+                        last_update DESC
                     OFFSET @offset
                     LIMIT  @limit';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
@@ -278,7 +281,6 @@
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
-            $cmd->GetQuery();
             $ds = $cmd->Execute();
 
             $res = array();
@@ -300,7 +302,7 @@
                     WHERE
                         a.dialog_id IS NULL AND b.user_id=@user_id ' . $where . '
                     ORDER BY
-                        state desc, last_update desc
+                        last_update DESC
                     OFFSET
                         @offset
                     LIMIT
@@ -309,9 +311,8 @@
 
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-            $cmd->SetInteger('@user_id', $user_id);
+            $cmd->SetInteger( '@user_id', $user_id);
             $ds = $cmd->Execute();
-
             $res = array();
             while ( $ds->Next() ) {
                 $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
@@ -330,9 +331,8 @@
                         user_id=@user_id AND a.id=b.dialog_id AND state=4
                     GROUP BY group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger('@user_id', $user_id);
+            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-
             $res = array();
             while ( $ds->Next()) {
                 $res[$ds->GetValue( 'group_id', TYPE_INTEGER )] =  $ds->GetValue( 'count', TYPE_INTEGER );
@@ -357,6 +357,24 @@
             $ds->Next();
 
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
+        }
+
+        public static  function toggle_read_unread_gr( $user_id, $group_id, $read )
+        {
+
+            $sql = 'UPDATE '
+                        . TABLE_MES_GROUP_USER_REL . '
+                    SET
+                          read_mark = @read
+                    WHERE
+                        user_id=@user_id
+                        AND group_id=@group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id',  $user_id  );
+            $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetBoolean( '@read', $read );
+
+            return $cmd->ExecuteNonQuery();
         }
     }
 ?>

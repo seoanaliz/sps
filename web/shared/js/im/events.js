@@ -73,7 +73,8 @@ var Eventlist = {
                     clearData.push({
                         id: dirtyList.group_id,
                         title: dirtyList.name,
-                        count: dirtyList.unread
+                        count: dirtyList.unread,
+                        isRead: dirtyList.isRead
                     });
                 }
             });
@@ -222,6 +223,43 @@ var Eventlist = {
     },
     remove_from_list: function(dialogId, listId, callback) {
         simpleAjax('exlEntryFromGroup', {entryId: dialogId, groupId: listId}, function() {
+            callback(true);
+        });
+    },
+    get_templates: function(listId, callback) {
+        simpleAjax('findTemplate', {groupId: listId, search: ''}, function(data) {
+            var clearTemplates = [];
+            $.each(data, function(i, dirtyTemplate) {
+                clearTemplates.push({
+                    title: dirtyTemplate.text,
+                    id: dirtyTemplate.tmpl_id
+                });
+            });
+            callback(clearTemplates);
+        });
+    },
+    edit_template: function(tmplId, text, listId, callback) {
+        simpleAjax('addTemplate', {tmplId: tmplId, text: text, groupIds: listId}, function() {
+            callback(true);
+        });
+    },
+    add_template: function(text, listId, callback) {
+        simpleAjax('addTemplate', {text: text, groupIds: listId}, function() {
+            callback(true);
+        });
+    },
+    delete_template: function(tmplId, callback) {
+        simpleAjax('deleteTemplate', {tmplId: tmplId}, function() {
+            callback(true);
+        });
+    },
+    set_list_as_read: function(listId, callback) {
+        simpleAjax('toggleReadRead', {groupId: listId, read: 1}, function() {
+            callback(true);
+        });
+    },
+    set_list_as_new: function(listId, callback) {
+        simpleAjax('toggleReadRead', {groupId: listId}, function() {
             callback(true);
         });
     }

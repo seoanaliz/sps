@@ -107,9 +107,12 @@ var MESSAGES =
     '</div>' +
     '<div class="center-column">' +
         '<div class="content">' +
-            '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '<div class="textarea-wrap">' +
+                '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
+                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -222,7 +225,7 @@ var LIST =
 
 var LIST_ITEM =
 '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title">' +
+    '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
         '<?=title?>' +
         '<span class="counter"><?=count ? "+" + count : ""?></span>' +
     '</div>' +

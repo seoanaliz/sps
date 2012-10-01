@@ -150,7 +150,7 @@ var List = (function() {
                                             data: friends,
                                             target: $users.closest('.ui-tags'),
                                             onchange: function(item) {
-                                                $(this).tags('addTag', item.id, item).val('').focus();
+                                                $(this).tags('addTag', item).val('').focus();
                                             }
                                         })
                                         .keydown(function(e) {
@@ -174,7 +174,7 @@ var List = (function() {
                                             data: lists,
                                             target: $lists.closest('.ui-tags'),
                                             onchange: function(item) {
-                                                $(this).tags('addTag', item.id, item).val('').focus();
+                                                $(this).tags('addTag', item).val('').focus();
                                             }
                                         })
                                         .keydown(function(e) {
@@ -182,7 +182,7 @@ var List = (function() {
                                                 $(this).tags('removeLastTag');
                                             }
                                         })
-                                        .tags('addTag', listId, {id: listId, title: listTitle})
+                                        .tags('addTag', {id: listId, title: listTitle})
                                     ;
                                     $box.find('input[value=""]:first').focus();
                                 }

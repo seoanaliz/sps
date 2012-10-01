@@ -1,4 +1,5 @@
 {increal:tmpl://fe/elements/header.tmpl.php}
+<script src="{web:js://fe/main.js}" type="text/javascript"></script>
 <div id="go-to-top">Наверх</div>
 <div class="layer clear-fix">
     <div class="left-panel">

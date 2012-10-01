@@ -18,8 +18,8 @@ class getDialogsList
 //        $date_end       =   Request::getInteger( 'toDate' );
 
         $group_id       =   $group_id ? $group_id : 0;
-        $offset         =   $offset ? $offset : 0;
-        $limit          =   $limit  ?  $limit  :   25;
+        $offset         =   $offset ? $offset     : 0;
+        $limit          =   $limit  ?  $limit     :   25;
         $only_new       =   $only_new ? 1 : 0;
 //        $date_start     =   $date_start ? $date_start : 0;
 //        $date_end       =   $date_end ? $date_end : 2000000000;
@@ -30,25 +30,45 @@ class getDialogsList
 
         $dialogs_array = array();
         if ( !$group_id ) {
-//            $row_dialog_array = MesDialogs::get_last_dialogs( $user_id, $offset, $limit );
             $res_ids            = MesGroups::get_ungroup_dialogs( $user_id, $limit, $offset, $only_new );
             $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
-//            if ( !$row_dialog_array )
-//                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'no dialogs' )));
-            if( $row_dialog_array == 'no access_token' )
-                die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
         }
         else {
             $res_ids = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
             $row_dialog_array  = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
         }
-
+        if( $row_dialog_array == 'no access_token' )
+            die( ERR_NO_ACC_TOK );
         $user_ids = array();
-//        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
+        //костыли вы мои, костыли...
+        //добавляет псевдодиалоги(заявки в друзья)
+        //добавляет псевдодиалоги(заявки в друзья)
+        foreach( $res_ids as $res_id ) {
+            foreach( $row_dialog_array as $dialog ) {
+                $dialog->uid ;
+                if ( $dialog->uid == $res_id ) {
+                    continue(2);
+                }
+            }
+            $new_dialog =(object) array(
+                    'mid'           =>  '',
+                    'date'          =>  '',
+                    'out'           =>  '',
+                    'uid'           =>  $res_id,
+                    'read_state'    =>  '',
+                    'out'           =>  '',
+                    'title'         =>  '',
+                    'body'          =>  'Этот пользователь добавил Вас в друзья, но пока ничего не написал'
+            );
+            $row_dialog_array[] = $new_dialog;
+        }
+
+        $statuses = MesDialogs::get_statuses($user_id, $res_ids);
 
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
             $dialog->groups = MesDialogs::get_rec_groups( $user_id, $dialog->uid );
+            $dialog->status = $statuses[$dialog->uid];
             if( !$dialog->id ) {
                 $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
                 MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '');
@@ -75,7 +95,9 @@ class getDialogsList
         if ( count( $user_ids ) < 1 )
             die( ObjectHelper::ToJSON( array( 'response' => array())));
 
-        $users_array = StatUsers::get_vk_user_info( $user_ids );
+        $users_array = StatUsers::get_vk_user_info( $user_ids, $user_id );
+
+
 
         foreach( $dialogs_array as &$dialog ) {
             $dialog->uid = $users_array[ $dialog->uid ];

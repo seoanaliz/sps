@@ -138,8 +138,20 @@
                 <page uri="controls://getDialogsList/">
                     <actions>SPS.Stat.getDialogsList</actions>
                 </page>
+                <page uri="controls://addTemplate/">
+                    <actions>SPS.Stat.addTemplate</actions>
+                </page>
+                <page uri="controls://findTemplate/">
+                    <actions>SPS.Stat.findTemplate</actions>
+                </page>
+                <page uri="controls://deleteTemplate/">
+                    <actions>SPS.Stat.deleteTemplate</actions>
+                </page>
                 <page uri="controls://getDialog/">
                     <actions>SPS.Stat.getDialog</actions>
+                </page>
+                <page uri="controls://toggleReadRead/">
+                    <actions>SPS.Stat.toggleReadRead</actions>
                 </page>
                 <page uri="controls://addDialog/">
                     <actions>SPS.Stat.addDialog</actions>
@@ -480,24 +492,16 @@
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
-                <page uri="daemons://wr-posts/">
-                    <actions>SPS.Stat.WrPosts</actions>
-                </page>
-                <page uri="daemons://wr-points/">
-                    <actions>SPS.Stat.WrPoints</actions>
-                </page>
-                <page uri="daemons://wr-unix/">
-                    <actions>SPS.Stat.WrUnix</actions>
-                </page>
-                <page uri="daemons://wr-cleaner/">
-                    <actions>SPS.Stat.WrCleaner</actions>
-                </page>
                 <page uri="daemons://wr-oadmins/">
                     <actions>SPS.Stat.OurAdminsStat</actions>
                 </page>
                 <page uri="daemons://MesCheckUpdates/">
                     <actions>SPS.Stat.MesCheckUpdates</actions>
                 </page>
+                <page uri="daemons://MessageSender/">
+                    <actions>SPS.Stat.MessageSender</actions>
+                </page>
+
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">

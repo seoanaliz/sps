@@ -9,10 +9,16 @@
 class MesCheckUpdates
 {
     public function execute() {
-
         set_time_limit( 300 );
         $im_users = StatUsers::get_im_users();
+        $this->check_new_messages( $im_users);
+        foreach( $im_users as $user ) {
+            MesDialogs::check_friend_requests( $user );
+        }
+    }
 
+    public function check_new_messages( $im_users )
+    {
         foreach( $im_users as $user ) {
             $dialogs = MesDialogs::get_all_dialogs( $user, 200 );
 
@@ -25,7 +31,5 @@ class MesCheckUpdates
             }
             sleep(0.4);
         }
-
-
     }
 }

@@ -183,17 +183,24 @@ body {
 
                     &>.content {
                         margin: 0 10px;
-                        margin-right: 20px;
 
-                        textarea {
-                            width: 100%;
-                            min-height: 40px;
-                            max-height: 100px;
-                            .border-radius(2px);
+                        &>.textarea-wrap {
+                            margin-right: 10px;
+
+                            textarea {
+                                width: 100%;
+                                min-height: 40px;
+                                max-height: 100px;
+                                .border-radius(2px);
+                            }
                         }
 
                         .actions {
                             margin-top: 10px;
+
+                            &>.link {
+                                float: right;
+                            }
                         }
                     }
                 }
@@ -406,6 +413,12 @@ body {
                             background-color: @bg_dark_hover;
                         }
                     }
+                    &.new {
+                        &>.counter {
+                            background-color: @bg_active;
+                            color: #fff;
+                        }
+                    }
 
                     &>.icon {
                         position: absolute;
@@ -484,5 +497,27 @@ body {
     &:hover::-webkit-scrollbar-corner,
     &:hover::-webkit-scrollbar-track-piece {
         background: transparent;
+    }
+}
+
+.box-templates {
+    &>.title {
+        margin: 7px 0 4px;
+        color: #2B587A;
+        font-size: 1.18em;
+        font-weight: bold;
+    }
+
+    &>.input-wrap {
+        margin-right: 10px;
+        margin-bottom: 7px;
+
+        &>input[type="text"],
+        &>textarea {
+            width: 100%;
+        }
+        &>textarea {
+            height: 50px;
+        }
     }
 }

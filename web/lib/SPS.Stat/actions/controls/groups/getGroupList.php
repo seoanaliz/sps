@@ -15,7 +15,7 @@
     */
         public function Execute()
         {
-            error_reporting( 0 );
+            //error_reporting( 0 );
             $user_id    =   Request::getInteger( 'userId' );
             $type       =   Request::getString ( 'type' );
 

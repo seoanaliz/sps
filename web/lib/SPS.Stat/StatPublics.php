@@ -61,13 +61,13 @@
                     $offset += 1000;
                 }
                 $code .= trim($return, ',') . "};";
-                $res = VkHelper::api_request( 'execute', array( 'code' => $code)  );
+                $res = VkHelper::api_request( 'execute', array( 'code' => $code ));
                 if ( count( $res->a0->users ) == 0 )
                     break;
                 foreach( $res as $query_reuslt ) {
                     $values .= implode( ',', $query_reuslt->users ) . ',';
                 }
-                echo '<br>' . count( explode( ',', $values)) . '<br>';
+//                echo '<br>' . count( explode( ',', $values)) . '<br>';
                 sleep(0.4);
                 $values = "{" . trim( $values, ',' ) . "}";
 
@@ -122,10 +122,10 @@
             $url_array = array();
             foreach( $users_array as $user ) {
                 $url_array[] = self::FAVE_PUBLS_URL . $user;
-                echo self::FAVE_PUBLS_URL . $user . '<br>';
+//                echo self::FAVE_PUBLS_URL . $user . '<br>';
                 $i++;
                 if ( $i == 20 ) {
-                    echo '1 <br>';
+//                    echo '1 <br>';
                     $res = array();
                     VkHelper::multiget( $url_array, $res );
 //                    print_r($res);
@@ -158,6 +158,7 @@
              return $cmd->ExecuteNonQuery();
          }
 
+        //sh table
         public static function get_intersections( $first_public, $second_public )
         {
             $sql = 'SELECT icount(
@@ -172,6 +173,7 @@
             return $ds->GetInteger( 'icount');
         }
 
+        //sh table
         public static function get_table()
         {
             $publics = self::get_50k();
@@ -185,11 +187,10 @@
                     echo 'между ' . $publics[$i] . ' и ' . $publics[$j] . ' ' . $res[$j][$i] .' пересечений<br>';
                 }
 
-
                 echo '<br>';
                 die( $a - microtime(1));
             }
-            print_r($res);
+//            print_r($res);
             return $res;
         }
 

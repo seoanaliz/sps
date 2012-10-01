@@ -6,26 +6,8 @@
 
     class MesDialogs
     {
-//        //to do execute добавить
-//        public static function get_last_dialogs( $user_id, $offset, $limit )
-//        {
-//            if ( !$limit )
-//                $limit = 25;
-//            $access_token = StatUsers::get_access_token( $user_id );
-//            if ( !$access_token )
-//                return 'no access_token';
-//            $params = array(
-//                            'access_token'      =>  $access_token,
-//                            'count'             =>  $limit,
-//                            'offset'            =>  $offset
-//            );
-//
-//            $dialogs_array   = VkHelper::api_request( 'messages.getDialogs', $params );
-//                unset( $dialogs_array[0] );
-//
-//            return( $dialogs_array );
-//        }
 
+        //слить с  get_all_dialogs
         public static function get_last_dialogs( $id, $offset, $limit )
         {
             if ( !$limit )
@@ -40,23 +22,15 @@
                 'offset'            =>  $offset
             );
 
-            $offset = 0;
             $dialogs_array = array();
-
-//            while ( 1 ) {
-//                $params[ 'offset' ] = $offset;
             $res   = VkHelper::api_request( 'messages.getDialogs', $params );
-            $count = $res[0];
             unset( $res[0] );
-//                $offset += 100;
-
             $dialogs_array = array_merge( $dialogs_array, $res );
-//                if ( $count < $offset )
-//                    break;
-//            }
+
             return( $dialogs_array );
         }
 
+        //получает все диалоги, $max_offset - ограничение
         public static function get_all_dialogs( $user_id, $max_offset = '' )
         {
             $max_offset = $max_offset ? $max_offset : 9000000;
@@ -138,13 +112,15 @@
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetInteger( '@rec_id', $rec_id );
             $cmd->SetInteger( '@last_update', $last_update );
-            $cmd->SetInteger( '@state', $state );
+            $cmd->SetInteger( '@state',  $state  );
             $cmd->SetString ( '@status', $status );
             $ds = $cmd->Execute();
             $ds->Next();
-            return $ds->GetValue( 'id', TYPE_INTEGER );
+            $dialog_id = $ds->GetValue( 'id', TYPE_INTEGER );
+            return ( $dialog_id ? $dialog_id : false );
         }
 
+        //возвращает id диалога
         public static function get_dialog_id( $user_id, $rec_id )
         {
             $sql = 'SELECT id FROM ' . TABLE_MES_DIALOGS . ' WHERE rec_id=@rec_id AND user_id=@user_id';
@@ -157,6 +133,7 @@
             return $id ? $id : false;
         }
 
+        //возвращает id второго участника диалога
         public static function get_opponent( $user_id, $dialog_id )
         {
             $sql = 'SELECT rec_id FROM ' . TABLE_MES_DIALOGS
@@ -190,44 +167,7 @@
             return $res;
         }
 
-        public static function add_message_to_queue( $user_id, $dialog_id, $text )
-        {
-            $now = time();
-            $sql = 'INSERT INTO '
-                        . TABLE_MES_QUEUES . ' ( created_time, user_id, dialog_id )
-                    VALUES
-                        (@created_time, @user_id, @dialog_id)
-                    RETURNING id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
-            $cmd->SetInteger( '@dialog_id',    $dialog_id );
-            $cmd->SetInteger( '@user_id',      $user_id );
-            $cmd->SetInteger( '@created_time', $now );
-            $ds = $cmd->Execute();
-            $ds->Next();
-            $id = $ds->GetInteger('id');
-
-            $sql = 'INSERT INTO '
-                . TABLE_MES_TEXTS . ' ( id, text)
-                    VALUES
-                        ( @id, @text)';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger( '@id',   $id );
-            $cmd->SetString ( '@text', $text );
-            $cmd->Execute();
-        }
-
-        public static function mark_message_as_sent( $message_id )
-        {
-            $now = time();
-            $sql = 'UPDATE '
-                        . TABLE_MES_QUEUES . ' SET sent_time=@sent_time, sent=TRUE
-                    WHERE id=@message_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger( '@message_id', $message_id );
-            $cmd->SetInteger( '@sent_time',  $now );
-            $cmd->Execute();
-        }
-
+        //возвращает $limit(максимум 200) сообщений между юзером и $rec_id, начиная с $offset
         public static function get_specific_dialog( $user_id, $rec_id, $offset, $limit )
         {
             $access_token = StatUsers::get_access_token( $user_id );
@@ -249,6 +189,7 @@
             return $result;
         }
 
+        //возвращает массив сообщений по id, $message_ids - массив этих id
         public static function get_messages( $user_id, $message_ids )
         {
             $message_ids = implode ( ',', $message_ids );
@@ -300,6 +241,7 @@
             return (array) $res;
         }
 
+        //устанавливает ярлык диалогу
         public static function set_status( $dialog_id, $status )
         {
             $sql = 'UPDATE ' . TABLE_MES_DIALOGS . ' SET status=@status WHERE id=@dialog_id';
@@ -311,14 +253,28 @@
             return false;
         }
 
-        private static function get_long_poll_server( $token )
-        {
-            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 1 );
-            if ( isset( $res->error ) )
-                return false;
-            return (array)$res;
+        public static function get_statuses( $user_id, $rec_ids ) {
+            $rec_ids = '{' . implode( ',', $rec_ids  ) . '}';
+            $sql = 'SELECT
+                        rec_id, status
+                    FROM '
+                        . TABLE_MES_DIALOGS . '
+                    WHERE
+                       rec_id = ANY( @rec_ids )
+                       AND user_id=@user_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@rec_ids', $rec_ids );
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds =  $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[$ds->GetInteger( 'rec_id' )] = $ds->GetValue( 'status' );
+            }
+            return $res;
         }
 
+        //отслеживание новых сообщений, без лонгпулла
         public static function watch_dog_wo_long_pull( $user_id )
         {
             $access_token = StatUsers::get_access_token( $user_id );
@@ -335,6 +291,7 @@
             return $res;
         }
 
+        //отслеживание изменений лонгпуллом
         public static function watch_dog( $user_id, $timeout, $ts = 0 )
         {
             $access_token = StatUsers::get_access_token( $user_id );
@@ -350,6 +307,15 @@
             return $res;
         }
 
+        private static function get_long_poll_server( $token )
+        {
+            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 1 );
+            if ( isset( $res->error ) )
+                return false;
+            return (array)$res;
+        }
+
+        //возвращает список групп юзера, в которых состоит $rec_id
         public static function get_rec_groups( $user_id, $rec_id )
         {
             $sql = "SELECT DISTINCT(a.group_id) FROM "
@@ -394,23 +360,28 @@
             return ( $in && !$read ) ? 4 : 0;
         }
 
+        //устанавливает статус диалога в нашей бд
         public static function set_state( $dialogs_id, $state )
         {
+            $now = time();
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
                        ' SET
-                            state=@state
+                            state=@state,
+                            last_update=@now
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
+                $cmd->SetInt( '@now',   $now );
                 $cmd->Execute();
             }
         }
 
+        //поиск по именам
         public static function search_dialogs( $user_id, $search )
         {
             $access_token = StatUsers::get_access_token( $user_id );
@@ -438,6 +409,172 @@
             return $result;
         }
 
+        //queue
+        public static function add_message_to_queue( $user_id, $dialog_id, $text )
+        {
+            $now = time();
+            $text_id = MesDialogs::add_text( $text);
 
+            $sql = 'INSERT INTO '
+                . TABLE_MES_QUEUES . ' ( id, created_time, user_id, dialog_id )
+                    VALUES
+                        ( @id, @created_time, @user_id, @dialog_id )';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd->SetInteger( '@id',    $text_id );
+            $cmd->SetInteger( '@dialog_id',    $dialog_id );
+            $cmd->SetInteger( '@user_id',      $user_id );
+            $cmd->SetInteger( '@created_time', $now );
+            $cmd->Execute();
+
+        }
+
+        public static function add_text( $text )
+        {
+            $sql = 'INSERT INTO '
+                . TABLE_MES_TEXTS . ' ( text )
+                    VALUES
+                        ( @text )
+                    RETURNING id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+
+            $cmd->SetString ( '@text', $text );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return  $ds->GetInteger('id');
+        }
+
+        //queue
+        public static function mark_message_as_sent( $message_id )
+        {
+            $now = time();
+            $sql = 'UPDATE '
+                . TABLE_MES_QUEUES . ' SET sent_time=@sent_time, sent=TRUE
+                    WHERE id=@message_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@message_id', $message_id );
+            $cmd->SetInteger( '@sent_time',  $now );
+            $cmd->Execute();
+        }
+
+        //проверяет наличие завявок на добавление в друзья, конвертит их в диалоги
+        public static  function check_friend_requests( $user_id )
+        {
+            $requests = MesDialogs::get_friend_requests( $user_id );
+            if ( $requests == 'no access_token' )
+                return false;
+            $group_id = MesGroups::check_group_name_used( $user_id, '+ friends');
+            if ( !$group_id ) {
+                $group_id =  MesGroups::setGroup( '', '+ friends', '');
+                MesGroups::implement_group( $group_id, $user_id );
+            }
+            foreach( $requests as $request ) {
+                $dialog_id = MesDialogs::addDialog( $user_id, $request->uid, time(), 0, '');
+                if ( !$dialog_id )
+                    continue;
+                if( isset( $request->message )) {
+                    $text_id = MesDialogs::add_text( $request->message );
+                    MesDialogs::set_status( $dialog_id, $text_id );
+                }
+                MesGroups::implement_entry( $group_id, $dialog_id );
+            }
+        }
+
+        //
+        public static function get_friend_requests( $user_id )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                            'access_token'  =>  $access_token,
+                            'need_messages' =>  1,
+                            'count'         =>  1000,
+                            'out'           =>  0,
+                            'sort'          =>  0
+            );
+            $requests = array();
+            $offset = 0;
+            while (1) {
+                $res = VkHelper::api_request( 'friends.getRequests', $params, 0 );
+                if ( isset ( $res->error ))
+                    break;
+                $requests = array_merge( $requests, $res );
+                if ( count( $res ) < 1 || count( $res ) < 1000 )
+                    break;
+                $offset += 1000;
+                $params['offset'] = $offset;
+            }
+            return $requests;
+        }
+
+        public static function log_activity( $dialog_id, $queued )
+        {
+            $now = time();
+            $queued = $queued ? 'true' : 'false';
+            $sql = 'INSERT INTO '
+                        . TABLE_MES_ACTIVITY_LOG . '(dialog_id, activity_time, queued)
+                    VALUES(@dialog_id, @activity_time, @queued)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger ( '@dialog_id',     $dialog_id );
+            $cmd->SetInteger ( '@activity_time', $now );
+            $cmd->SetBoolean( '@queued',         $queued );
+            $cmd->Execute();
+        }
+
+        //templates
+        public static function add_template( $text, $groups )
+        {
+            $groups = '{' . $groups . '}';
+            $sql = 'INSERT INTO ' . TABLE_MES_DIALOG_TEMPLATES . '
+                        (text, groups)
+                    VALUES
+                        (@text, @groups)
+                    RETURNING id
+            ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString  ( '@text', $text );
+            $cmd->SetString  ( '@groups', $groups );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger( 'id');
+        }
+
+        //templates
+        public static function search_template( $search, $group )
+        {
+            $text   = pg_escape_string( $search );
+            $search = $search ? " text ILIKE '%" . $text . "%' " : ' 1 = 1' ;
+
+            $sql = 'SELECT
+                        text, id
+                    FROM '
+                        . TABLE_MES_DIALOG_TEMPLATES . '
+                    WHERE '
+                        . $search .
+                        ' AND @group = ANY(groups)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@group', $group );
+            $ds = $cmd->Execute();
+            $res = array();
+            while($ds->Next()) {
+                $res[] = array(
+                                'text'      =>  $ds->GetValue('text'),
+                                'tmpl_id'   =>  $ds->GetValue('id'));
+            }
+            return $res;
+        }
+
+        //templates
+        public static function del_template( $tmpl_id )
+        {
+            $sql = 'DELETE FROM '
+                        . TABLE_MES_DIALOG_TEMPLATES . '
+                    WHERE
+                          id=@id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString( '@id', $tmpl_id );
+
+            return $cmd->ExecuteNonQuery() ? true : false;
+        }
     }
 ?>
