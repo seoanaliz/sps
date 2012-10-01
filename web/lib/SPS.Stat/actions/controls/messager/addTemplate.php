@@ -10,7 +10,7 @@ class addTemplate
         $user_id        =   Request::getInteger( 'userId' );
         $text           =   Request::getString ( 'text'   );
         $group_ids      =   Request::getstring ( 'groupIds' );
-        $act            =   Request::getString ();
+//        $act            =   Request::getString ();
 
         if ( !$user_id || !$text ) {
             die(ERR_MISSING_PARAMS);
