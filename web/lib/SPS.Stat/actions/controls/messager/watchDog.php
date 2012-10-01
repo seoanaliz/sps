@@ -11,6 +11,7 @@ class watchDog
 
     public function Execute() {
         error_reporting( 0 );
+        header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
         $timeout   =   Request::getInteger( 'timeout' );
@@ -18,12 +19,17 @@ class watchDog
         $timeout   =   $timeout ? $timeout : 15;
 
         if ( !$user_id ) {
-            die(ERR_MISSING_PARAMS);
+            if( $cb )
+                die ($cb . '(' . ERR_MISSING_PARAMS . ');');
+            die( ERR_MISSING_PARAMS );
         }
 
         $events  = MesDialogs::watch_dog( $user_id, $timeout, $times );
-        if ( $events == 'no access_token' )
-            die( ObjectHelper::ToJSON( array( 'response' => false )));
+        if ( $events == 'no access_token' ) {
+            if( $cb )
+                die ( $cb . '(' . ERR_NO_ACC_TOK . ');');
+            die( ERR_NO_ACC_TOK );
+        }
 
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
         $result = array();
@@ -64,20 +70,24 @@ class watchDog
                             );
                         }
                     }
+
+                    $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
+                    if( !$dialog_id ) {
+                        $dialog_id = MesDialogs::addDialog( $user_id, $from_id, time(), 4, '' );
+                    }
                     $result[] = array(
                         'type'    => $event[2] & 2 ? 'outMessage' : 'inMessage',
                         'content' => array(
                             'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
                             'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
-                            'date'      =>  isset( $event[4] )? $event[4] : $event['date'],
+                            'date'      =>  time(),
                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id )),
-                            'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
+                            'dialog_id' =>  $dialog_id,
                             'groups'    =>  $ids[ $from_id ],
                             'attachments'=>  $attach,
                             'fwd'       =>  $fwd,
                         )
                     );
-
                     break;
                 case 8:
                     $status = 'online';
@@ -97,14 +107,14 @@ class watchDog
                             'start_typing'  =>  $event[2]
                         )
                     );
+                    break;
             }
         }
         $result = array_reverse($result);
-        header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
+
         $res =  ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  )));
         if( $cb )
             $res = $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
-//        echo  $cb . '(' . ObjectHelper::ToJSON( array( 'response' =>array( 'events' => $result, 'ts'=> $events->ts  ))) . ');';
         die( $res );
     }
 }
