@@ -107,9 +107,12 @@ var MESSAGES =
     '</div>' +
     '<div class="center-column">' +
         '<div class="content">' +
-            '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '<div class="textarea-wrap">' +
+                '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
+                //'<a class="link save-template">Готовый ответ</button>' +
             '</div>' +
         '</div>' +
     '</div>' +

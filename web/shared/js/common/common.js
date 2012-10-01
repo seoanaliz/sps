@@ -27,6 +27,66 @@ if (!window.console) {
     };
 }
 
+(function() {
+    var globalStageKey = 'globalStorage';
+
+    window.globalStorage = {
+        _serialize: function(obj) {
+            return JSON.stringify(obj);
+        },
+        _unserialize: function(str) {
+            return JSON.parse(str);
+        },
+        _setItems: function(items) {
+            localStorage.setItem(globalStageKey, this._serialize(items));
+        },
+        _addItems: function(items) {
+            for (var item in items) {
+                if (items.hasOwnProperty(item)) this._addItem(item, items[item]);
+            }
+        },
+        _addItem: function(key, value) {
+            var allItems = this._getItems();
+            allItems[key] = value;
+            this._setItems(allItems);
+        },
+        _getItems: function() {
+            return this._unserialize(localStorage.getItem(globalStageKey)) || {};
+        },
+        _getItem: function(key) {
+            return this._getItems()[key];
+        },
+        _removeItems: function() {
+            localStorage.setItem(globalStageKey, '');
+        },
+        _removeItem: function(key) {
+            var allItems = this._getItems();
+            delete allItems[key];
+            this._setItems(allItems);
+        },
+        items: function() {
+            var isSetItem = (typeof arguments[0] == 'string' && arguments[1]);
+            var isGetItem = (typeof arguments[0] == 'string' && !arguments[1]);
+            var isSetItems = (typeof arguments[0] == 'object');
+            var isRemoveItem = (typeof arguments[0] == 'string' && arguments[1] === null);
+            var isRemoveItems = (typeof arguments[0] === null);
+            if (isRemoveItem) {
+                return this._removeItem(arguments[0]);
+            } else if (isRemoveItems) {
+                return this._removeItems();
+            } else if (isSetItem) {
+                return this._addItem(arguments[0], arguments[1]);
+            } else if (isSetItems) {
+                return this._setItems(arguments[0]);
+            } else if (isGetItem) {
+                return this._getItem(arguments[0]);
+            } else {
+                return this._getItems();
+            }
+        }
+    };
+})();
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
@@ -507,7 +567,7 @@ var Box = (function() {
         setHTML(params.html);
         setButtons(params.buttons);
 
-        box.$box = $box;
+        box.$el = box.$box = $box;
         box.show = show;
         box.hide = hide;
         box.remove = remove;
@@ -637,7 +697,7 @@ var Box = (function() {
                     openEvent: 'mousedown', // Собитие элемента, при котором открывается меню. click, mousedown
                     closeEvent: 'mousedown', // Собитие document при котором закрывается меню. click, mousedown
                     itemDataKey: 'item', // Ключ привязки данных к пункту меню
-                    emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
+                    emptyMenuText: '', // Текст, который появляется, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
                     // На все события можно подписаться по имени события. Пример: $dropdown.on('change', callback)
                     oncreate: function() {},
@@ -776,17 +836,7 @@ var Box = (function() {
                     options: options
                 });
 
-                if (options.data.length || !options.emptyMenuText) {
-                    $.each(options.data, function(i, item) {
-                        $el.dropdown('appendItem', item);
-                    });
-                } else {
-                    $('<div/>')
-                        .text(options.emptyMenuText)
-                        .addClass(CLASS_EMPTY_MENU)
-                        .appendTo($menu)
-                    ;
-                }
+                $el.dropdown('setData', options.data);
 
                 if (options.isShow && $el.is(':visible')) {
                     $el.dropdown('open');
@@ -807,6 +857,10 @@ var Box = (function() {
                 var options = data.options;
                 var $menu = data.$menu;
                 var $target = data.$target;
+
+                if (!options.data.length && !options.emptyMenuText) {
+                    return;
+                }
 
                 $menu.css({
                     width: options.width || $target.outerWidth() - 2
@@ -878,6 +932,26 @@ var Box = (function() {
         getItem: function(id) {
             return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
         },
+        setData: function(dataItems) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                options.data = dataItems;
+                if (options.data.length || !options.emptyMenuText) {
+                    $.each(options.data, function(i, item) {
+                        $el.dropdown('appendItem', item);
+                    });
+                } else {
+                    var $emptyItem = $('<div/>')
+                        .text(options.emptyMenuText)
+                        .addClass(CLASS_EMPTY_MENU)
+                    ;
+                    $menu.html($emptyItem);
+                }
+            });
+        },
         appendItem: function(item) {
             return this.each(function() {
                 var $el = $(this);
@@ -946,15 +1020,17 @@ var Box = (function() {
                 var $el = $(this);
                 var defaults = {
                     openEvent: 'mousedown',
-                    emptyMenuText: 'Ничего не найдено',
+                    notFoundText: 'Ничего не найдено',
                     caseSensitive: false,
+                    data: [],
                     getValue: function() {
                         return $el.val();
                     }
                 };
                 var options = $.extend(defaults, params);
-                var defData = options.data.slice(0);
                 var searchTimeout;
+                options.notFoundText = options.emptyMenuText;
+                options.defData = options.data.slice(0);
 
                 $el.dropdown(options);
 
@@ -977,6 +1053,7 @@ var Box = (function() {
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
                             var elVal = options.getValue.apply(t) || '';
+                            var defData = options.defData;
                             var data = !elVal ? defData : $.grep(defData, function(n, i) {
                                 var str = $.trim(n.title).split('ё').join('е');
                                 var searchStr = $.trim(elVal).split('ё').join('е');
@@ -989,7 +1066,8 @@ var Box = (function() {
                             if (data.length || options.emptyMenuText) {
                                 $el.dropdown($.extend(options, {
                                     isShow: $el.is(':focus'),
-                                    data: data
+                                    data: data,
+                                    emptyMenuText: options.notFoundText
                                 }));
                             } else {
                                 $el.dropdown('close');
@@ -1002,6 +1080,17 @@ var Box = (function() {
                         options: options
                     });
                 }
+            });
+        },
+
+        setData: function(dataItems) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                options.defData = dataItems;
+
+                $el.dropdown('setData', dataItems);
             });
         }
     };

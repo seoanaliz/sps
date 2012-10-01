@@ -1,10 +1,11 @@
 var Configs = {
-    vkId: $.cookie('uid'),
+    vkId: 13049517,//$.cookie('uid'),
     token: $.cookie('token'),
     appId: vk_appId,
     controlsRoot: controlsRoot,
     commonDialogsList: 999999,
-    viewer: {}
+    viewer: {},
+    disableAutocomplete: true
 };
 
 var Collection = Class.extend({
@@ -116,6 +117,7 @@ var IM = Widget.extend({
         var t = this;
         var dirtyMessage;
         var message;
+        if (!event || !event.type) return;
 
         switch (event.type) {
             //@todo: объеденить
@@ -712,6 +714,10 @@ var Messages = EndlessListAbstract.extend({
         $el.find('.button.send').click(function() {
             t.sendMessage();
         });
+        $el.find('.save-template').click(function() {
+            var box = new CreateTemplateBox(1, $el.find('textarea').val());
+            box.show();
+        });
         $el.find('textarea').keydown(function(e) {
             if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
@@ -726,42 +732,39 @@ var Messages = EndlessListAbstract.extend({
         var dialogId = t.dialogId;
         $textarea.placeholder();
         $textarea.autoResize();
-//        $textarea.autocomplete({
-//            position: 'top',
-//            emptyMenuText: '',
-//            caseSensitive: true,
-//            data: [
-//                {id: 2, title: 'Привет'},
-//                {id: 2, title: 'привет'},
-//                {id: 1, title: 'как'},
-//                {id: 1, title: 'Как'},
-//                {id: 5, title: 'дела'},
-//                {id: 5, title: 'Дела'},
-//                {id: 4, title: 'что'},
-//                {id: 4, title: 'Что'},
-//                {id: 5, title: 'делаешь'},
-//                {id: 5, title: 'Делаешь'},
-//                {id: 3, title: 'пока'},
-//                {id: 3, title: 'Пока'}
-//            ],
-//            onchange: function(item) {
-//                $textarea.val(item.title);
-//            }
-////            getValue: function() {
-////                var text = $textarea.val();
-////                var words = text.split(' ');
-////                var lastWord = words.pop();
-////                return lastWord;
-////            },
-////            onchange: function(item) {
-////                var text = $textarea.val();
-////                var words = text.split(' ');
-////                var lastWord = words.pop();
-////                words.push(item.title);
-////                text = words.join(' ');
-////                $textarea.val(text);
-////            }
-//        });
+        if (!Configs.disableAutocomplete) {
+            $textarea.autocomplete({
+                position: 'top',
+                notFoundText: '',
+                getValue: function() {
+                    var text = $.trim($textarea.val());
+                    return text ? text : 'notShowAllItems';
+                },
+                oncreate: function() {
+                    Events.fire('get_templates', 1, function(data) {
+                        $textarea.autocomplete('setData', data);
+                    });
+                },
+                onchange: function(item) {
+                    $textarea.val(item.title);
+                }
+    //            Автокомплит по отдельному слову
+    //            getValue: function() {
+    //                var text = $textarea.val();
+    //                var words = text.split(' ');
+    //                var lastWord = words.pop();
+    //                return lastWord;
+    //            },
+    //            onchange: function(item) {
+    //                var text = $textarea.val();
+    //                var words = text.split(' ');
+    //                var lastWord = words.pop();
+    //                words.push(item.title);
+    //                text = words.join(' ');
+    //                $textarea.val(text);
+    //            }
+            });
+        }
         $textarea.inputMemory('message' + dialogId);
         $textarea.focus();
         $textarea[0].scrollTop = $textarea[0].scrollHeight;
@@ -865,7 +868,7 @@ var RightColumn = Widget.extend({
 
     addMessage: function(message) {
         var t = this;
-        t.update();
+        t.list.addMessage(message);
     },
 
     initList: function() {
@@ -888,7 +891,7 @@ var List = Widget.extend({
     currentList: null,
 
     events: {
-        'click: .item > .title': 'selectDialogs'
+        'click: .item > .title': 'clickList'
     },
 
     run: function() {
@@ -899,18 +902,17 @@ var List = Widget.extend({
             t.templateData = {list: data, count: count};
             t.renderTemplate();
             if (t.currentList) {
-                t.$el.find('.title.active, .dialog.active').removeClass('active');
+                $el.find('.title.active, .dialog.active').removeClass('active');
                 $el.find('.item[data-id=' + t.currentList + ']').find('.title').addClass('active');
             }
+            var newLists = globalStorage.items();
+            $.each(newLists, function(listId) {
+                t.setAsNew(listId.toString().substr('list'.length));
+            });
         });
     },
 
-    update: function() {
-        var t = this;
-        t.run();
-    },
-
-    selectDialogs: function(e) {
+    clickList: function(e) {
         var t = this;
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
@@ -918,7 +920,35 @@ var List = Widget.extend({
         t.$el.find('.title.active, .dialog.active').removeClass('active');
         $target.find('.title').addClass('active');
         t.trigger('selectDialogs', listId, title);
+        t.setAsRead(listId);
+        globalStorage.items('list' + listId, null);
         t.currentList = listId;
+    },
+
+    update: function() {
+        var t = this;
+        t.run();
+    },
+
+    setAsNew: function(listId) {
+        var t = this;
+        var $el = t.$el;
+        $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
+    },
+
+    setAsRead: function(listId) {
+        var t = this;
+        var $el = t.$el;
+        $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
+    },
+
+    addMessage: function(message) {
+        var t = this;
+        t.update();
+        $.each(message.lists, function(i, listId) {
+            globalStorage.items('list' + listId, true);
+            t.setAsNew(listId);
+        });
     }
 });
 
@@ -1025,4 +1055,31 @@ function makeMsg(msg, isNotClean) {
         }
         return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
     })
+}
+
+function CreateTemplateBox(listId, text) {
+    var SAVE_TEMPLATE_BOX =
+    '<div class="">' +
+        '<textarea><?=text?></textarea>' +
+    '</div>';
+
+    var box = new Box({
+        id: 'templateBox' + listId,
+        title: 'Добавление шаблона ответа',
+        buttons: [
+            {label: 'Сохранить', onclick: saveTemplate},
+            {label: 'Отменить', isWhite: true}
+        ],
+        onshow: function() {
+            var $textarea = this.$box.find('textarea');
+            var text = $textarea.val();
+            $textarea.focus();
+            $textarea.selectRange(text.length, text.length);
+        }
+    });
+    box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+
+    function saveTemplate() {}
+
+    return box;
 }

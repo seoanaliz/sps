@@ -224,6 +224,28 @@ var Eventlist = {
         simpleAjax('exlEntryFromGroup', {entryId: dialogId, groupId: listId}, function() {
             callback(true);
         });
+    },
+    get_templates: function(listId, callback) {
+        var data = [
+            {title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'},
+            {title: 'Suspendisse sit amet tortor sit amet nunc sollicitudin sagittis'},
+            {title: 'Integer auctor venenatis est ac congue'},
+            {title: 'Proin velit arcu, feugiat congue luctus sed, malesuada eu dolor'},
+            {title: 'Proin hendrerit mi nec magna ullamcorper pulvinar'},
+            {title: 'Многие думают, что Lorem Ipsum - взятый с потолка псевдо-латинский набор слов'},
+            {title: 'Его корни уходят в один фрагмент классической латыни 45 года н.э'},
+            {title: 'Есть много вариантов Lorem Ipsum, но большинство из них имеет не всегда приемлемые модификации'},
+            {title: 'Если вам нужен Lorem Ipsum для серьёзного проекта, вы наверняка не хотите какой-нибудь шутки'},
+            {title: 'Он использует словарь из более чем 200 латинских слов'},
+            {title: 'В результате сгенерированный Lorem Ipsum выглядит правдоподобно'}
+        ];
+        callback(data);
+    },
+    save_template: function(text, listId, callback) {
+        callback(true);
+    },
+    delete_template: function(id, callback) {
+        callback(true);
     }
 };
 $.extend(Events.eventList, Eventlist);
