@@ -540,6 +540,26 @@
         }
 
         //templates
+        public static function edit_template( $tmpl_id, $text )
+        {
+            $sql = 'UPDATE '
+                        . TABLE_MES_DIALOG_TEMPLATES . '
+                    SET
+                        text=@text
+                    WHERE
+                        id=@tmpl_id
+                    RETURNING id
+            ';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@text'    , $text );
+            $cmd->SetInteger( '@tmpl_id', $tmpl_id );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger( 'id');
+        }
+
+        //templates
         public static function search_template( $search, $group )
         {
             $text   = pg_escape_string( $search );
