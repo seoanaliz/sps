@@ -27,7 +27,7 @@ $(document).ready(function() {
     }
 
     if (!Configs.vkId) {
-        return location.replace('/login/');
+        return location.replace('/login/?' + btoa('im'));
     } else {
         $.cookie('uid', Configs.vkId, {expires: 30});
     }
