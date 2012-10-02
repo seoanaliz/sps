@@ -138,7 +138,7 @@ var app = (function () {
             $newPost.addClass('open');
         });
         $newPost.find('textarea').bind('keyup', function(e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
                 _wallPost(this);
             }
         });
@@ -238,7 +238,7 @@ var app = (function () {
             $newComment.addClass('open');
         });
         $wall.delegate('.new-comment textarea', 'keyup', function(e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
                 _commentPost(this);
             }
         });

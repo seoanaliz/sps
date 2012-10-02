@@ -722,7 +722,7 @@ var Messages = EndlessListAbstract.extend({
             box.show();
         });
         $el.find('textarea').keydown(function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
                 return false;
             }
