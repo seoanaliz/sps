@@ -462,19 +462,16 @@
             $requests = MesDialogs::get_friend_requests( $user_id );
             if ( $requests == 'no access_token' )
                 return false;
-            $group_id = MesGroups::check_group_name_used( $user_id, '+ friends');
+            $group_id = MesGroups::check_group_name_used( $user_id, 'Заявки в друзья' );
             if ( !$group_id ) {
-                $group_id =  MesGroups::setGroup( '', '+ friends', '');
+                $group_id =  MesGroups::setGroup( '', 'Заявки в друзья', '' );
                 MesGroups::implement_group( $group_id, $user_id );
             }
+
             foreach( $requests as $request ) {
-                $dialog_id = MesDialogs::addDialog( $user_id, $request->uid, time(), 0, '');
+                $dialog_id = MesDialogs::addDialog( $user_id, $request->uid, time(), 0, '' );
                 if ( !$dialog_id )
-                    continue;
-                if( isset( $request->message )) {
-                    $text_id = MesDialogs::add_text( $request->message );
-                    MesDialogs::set_status( $dialog_id, $text_id );
-                }
+                    $dialog_id = MesDialogs::get_dialog_id( $user_id, $request->uid );
                 MesGroups::implement_entry( $group_id, $dialog_id );
             }
         }

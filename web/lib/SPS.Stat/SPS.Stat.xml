@@ -50,6 +50,9 @@
             <action name="shareGroup">
                 <path>controls/groups/shareGroup</path>
             </action>
+            <action name="setGroupOrder">
+                <path>controls/groups/setGroupOrder</path>
+            </action>
             <action name="setGroup">
                 <path>controls/groups/setGroup</path>
             </action>

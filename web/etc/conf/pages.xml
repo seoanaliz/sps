@@ -131,6 +131,9 @@
                 <page uri="controls://shareGroup/">
                     <actions>SPS.Stat.shareGroup</actions>
                 </page>
+                <page uri="controls://setGroupOrder/">
+                    <actions>SPS.Stat.setGroupOrder</actions>
+                </page>
 
             </pageGroup>
 
