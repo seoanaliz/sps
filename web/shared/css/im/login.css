@@ -2,3 +2,4 @@
 #login input{font-size:14px;width:378px;padding:5px 10px;margin:10px auto;display:none;}
 #login .hint{color:#777;font-size:11px;}
 #login .result{font-size:14px;display:none;padding:10px;margin:10px 0;}#login .result.success{background:#d9ffcf;border:1px solid #cbeec1;}
+#login .window-hint{position:fixed;background-color:#ccc;padding:10px;margin-top:-20px;margin-left:-20px;text-align:left;}#login .window-hint:after{position:absolute;top:50%;right:-10px;width:0;height:0;border-top:10px solid transparent;border-left:10px solid #ccc;border-bottom:10px solid transparent;margin-top:-10px;content:'';}

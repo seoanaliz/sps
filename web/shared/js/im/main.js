@@ -915,8 +915,8 @@ var List = Widget.extend({
         var listId = $target.data('id');
         t.$el.find('.title.active, .dialog.active').removeClass('active');
         $target.find('.title').addClass('active');
+        $target.find('.title').removeClass('new');
         t.trigger('selectDialogs', listId, title);
-        t.setAsRead(listId);
         t.currentList = listId;
         Events.fire('set_list_as_read', listId, function() {});
     },
@@ -926,24 +926,10 @@ var List = Widget.extend({
         t.run();
     },
 
-    setAsNew: function(listId) {
-        var t = this;
-        var $el = t.$el;
-        $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
-    },
-
-    setAsRead: function(listId) {
-        var t = this;
-        var $el = t.$el;
-        $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
-    },
-
     addMessage: function(message) {
         var t = this;
-        t.update();
-        $.each(message.lists, function(i, listId) {
-            t.setAsNew(listId);
-            Events.fire('set_list_as_new', listId, function() {});
+        Events.fire('set_list_as_new', message.lists.join(','), function() {
+            t.update();
         });
     }
 });

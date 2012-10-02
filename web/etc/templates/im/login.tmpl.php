@@ -1,6 +1,6 @@
 <?
     $appId = 3069029;
-    $scope = 'messages,wall,offline';
+    $scope = 'messages,wall,offline,friends';
     $loginUrl = 'https://oauth.vk.com/authorize' .
         '?client_id=' . $appId .
         '&scope=' . $scope .
@@ -10,6 +10,11 @@
 ?>
 
 {increal:tmpl://im/elements/header.tmpl.php}
+<style type="text/css">
+    body {
+        overflow: hidden !important;
+    }
+</style>
 <div id="login" class="login">
     <a id="loginBtn" href="{$loginUrl}" class="button">Получить ключ доступа</a>
     <input id="accessToken" type="text" placeholder="Введите URL нового окна..." />
