@@ -575,8 +575,10 @@ var Box = (function() {
         box.setTitle = setTitle;
         box.setButtons = setButtons;
         box.refreshTop = refreshTop;
+        box.visible = false;
 
         function show() {
+            box.visible = true;
             if (boxesHistory.length) {
                 boxesHistory[boxesHistory.length-1].$box.hide();
             }
@@ -587,21 +589,18 @@ var Box = (function() {
 
             try {
                 params.onshow.call(box, $box);
-            } catch(e) {
-                //console.log(e);
-            }
+            } catch(e) {}
 
             boxesHistory.push(box);
             return box;
         }
         function hide() {
+            box.visible = false;
             $box.hide();
 
             try {
                 params.onhide.call(box, $box);
-            } catch(e) {
-                //console.log(e);
-            }
+            } catch(e) {}
 
             boxesHistory.pop();
             if (boxesHistory.length) {
@@ -613,7 +612,7 @@ var Box = (function() {
             return box;
         }
         function remove() {
-            hide();
+            if (box.visible) hide();
             delete boxesCollection[params.id];
             $box.remove();
         }
@@ -1173,8 +1172,9 @@ var Box = (function() {
                 var options = data.options;
                 var $wrap = data.$wrap;
                 var $tag = $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']');
+                var isAlready = !!$tag.length;
 
-                if ($tag.length) {
+                if (isAlready) {
                     $tag.remove();
                 }
 
@@ -1197,7 +1197,9 @@ var Box = (function() {
                 $el.data(DATA_KEY, data);
                 refreshPadding($el);
 
-                run(options.onadd, $el, params);
+                if (!isAlready) {
+                    run(options.onadd, $el, params);
+                }
             });
         },
         removeTag: function(id) {

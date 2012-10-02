@@ -962,9 +962,11 @@ var List = Widget.extend({
 
         $(window).on('mouseup.list', function(e) {
             $(this).off('mousemove.list mouseup.list');
+            clearTimeout(timeout);
+
+            if (!t.isDragging) return;
             $('html, body').removeClass('no-select');
             $target.removeClass('drag').css({top: 0});
-            clearTimeout(timeout);
             setTimeout(function() {
                 t.isDragging = false;
                 t.setOrder();
@@ -1104,12 +1106,12 @@ function makeMsg(msg, isNotClean) {
 function CreateTemplateBox(listId, text) {
     var SAVE_TEMPLATE_BOX =
     '<div class="box-templates">' +
-//        '<div class="title">' +
-//            'Выберите списки' +
-//        '</div>' +
-//        '<div class="input-wrap">' +
-//            '<input class="lists" type="text"/>' +
-//        '</div>' +
+        '<div class="title">' +
+            'Выберите списки' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<input class="lists" type="text"/>' +
+        '</div>' +
         '<div class="title">' +
             'Введите текст шаблона' +
         '</div>' +
@@ -1119,57 +1121,75 @@ function CreateTemplateBox(listId, text) {
     '</div>';
 
     var box = new Box({
-        id: 'templateBox' + listId,
         title: 'Добавление нового шаблона',
+        html: tmpl(BOX_LOADING, {height: 100}),
+        buttons: [
+            {label: 'Закрыть'}
+        ],
         onshow: function() {
-            var $input = this.$el.find('.lists');
-            var $textarea = this.$el.find('.template-text');
-            var text = $textarea.val();
-            var lists = [
-                {id: 1, title: 'asdasd'},
-                {id: 2, title: 'fdsdfadasd'},
-                {id: 3, title: 'cxvxcvasdasd'}
-            ];
-            $textarea.focus();
-            $textarea.selectRange(text.length, text.length);
+            Events.fire('get_lists', function(dirtyLists) {
+                var listsIds = [];
+                var clearLists = [];
+                var currentList = {};
+                $.each(dirtyLists, function(i, list) {
+                    if (list.id) {
+                        clearLists.push(list);
+                    }
+                    if (listId == list.id) {
+                        currentList = list;
+                    }
+                });
 
-            $input.tags({
-                onadd: function(tag) {
-                    lists.push(parseInt(tag.id));
-                },
-                onremove: function(tagId) {
-                    lists = jQuery.grep(lists, function(value) {
-                        return value != tagId;
+                box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+                box.setButtons([
+                    {label: 'Сохранить', onclick: saveTemplate},
+                    {label: 'Отменить', isWhite: true}
+                ]);
+
+                var $input = box.$el.find('.lists');
+                var $textarea = box.$el.find('.template-text');
+                var templateText = $textarea.val();
+                $textarea.focus();
+                $textarea.selectRange(templateText.length, templateText.length);
+
+                $input.tags({
+                    onadd: function(tag) {
+                        listsIds.push(parseInt(tag.id));
+                    },
+                    onremove: function(tagId) {
+                        listsIds = jQuery.grep(listsIds, function(listsIds) {
+                            return listsIds != tagId;
+                        });
+                    }
+                }).autocomplete({
+                    data: clearLists,
+                    target: $input.closest('.ui-tags'),
+                    onchange: function(item) {
+                        $(this).tags('addTag', item).val('').focus();
+                    }
+                }).keydown(function(e) {
+                    if (e.keyCode == KEY.DEL && !$(this).val()) {
+                        $(this).tags('removeLastTag');
+                    }
+                });
+                if (currentList.id) {
+                    $input.tags('addTag', currentList);
+                }
+
+                function saveTemplate() {
+                    var $textarea = box.$el.find('textarea');
+                    var text = $textarea.val();
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Events.fire('add_template', text, listsIds.join(','), function() {
+                        box.hide();
                     });
                 }
-            }).autocomplete({
-                data: lists,
-                target: $input.closest('.ui-tags'),
-                onchange: function(item) {
-                    $(this).tags('addTag', item).val('').focus();
-                }
-            }).keydown(function(e) {
-                if (e.keyCode == KEY.DEL && !$(this).val()) {
-                    $(this).tags('removeLastTag');
-                }
-            }).tags('addTag', lists[0]);
+            });
+        },
+        onhide: function() {
+            box.remove();
         }
     });
-    box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
-    box.setButtons([
-        {label: 'Сохранить', onclick: saveTemplate},
-        {label: 'Отменить', isWhite: true}
-    ]);
-
-    function saveTemplate() {
-        var $textarea = box.$el.find('textarea');
-        var text = $textarea.val();
-        box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-        box.setButtons([{label: 'Закрыть'}]);
-        Events.fire('add_template', text, listId, function() {
-            box.hide();
-        });
-    }
-
     return box;
 }
