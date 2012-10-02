@@ -31,8 +31,8 @@
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
                 $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                MesDialogs::check_friend_requests($user_id);
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
-
             }
 	     
             $users = StatUsers::get_vk_user_info( $user_id );
@@ -41,6 +41,7 @@
                 $user['comments'] = $comments;
                 $user = StatUsers::add_user( $user );
                 $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                MesDialogs::check_friend_requests($user_id);
             }
             if ( $user )
                 echo  ObjectHelper::ToJSON(array('response' => $user));

@@ -722,7 +722,7 @@ var Messages = EndlessListAbstract.extend({
             box.show();
         });
         $el.find('textarea').keydown(function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
                 return false;
             }
@@ -889,8 +889,11 @@ var List = Widget.extend({
     template: LIST,
     dialogsLimit: 100,
     currentList: null,
+    isEditMode: true,
+    isDragging: false,
 
     events: {
+        'mousedown: .drag-wrap': 'mouseDownList',
         'click: .item > .title': 'clickList'
     },
 
@@ -910,6 +913,7 @@ var List = Widget.extend({
 
     clickList: function(e) {
         var t = this;
+        if (t.isDragging) return;
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
@@ -921,9 +925,67 @@ var List = Widget.extend({
         Events.fire('set_list_as_read', listId, function() {});
     },
 
+    mouseDownList: function(e) {
+        var t = this;
+        if (!t.isEditMode) return;
+        var $placeholder = $(e.currentTarget);
+        var $target = $placeholder.find('.item:first');
+        var timeout = setTimeout(function() {
+            t.isDragging = true;
+            $target.addClass('drag');
+            $placeholder.height($target.height());
+            $('html, body').addClass('no-select');
+        }, 300);
+        var startY = e.clientY;
+
+        $(window).on('mousemove.list', (function update(e) {
+            if (t.isDragging) {
+                var top = e.clientY - startY;
+                var height = $placeholder.height();
+                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var $next = $placeholder.next('.drag-wrap');
+                var $prev = $placeholder.prev('.drag-wrap');
+
+                if (position > 0 && $next.length) {
+                    $placeholder.before($next);
+                    startY += height;
+                } else if (position < 0 && $prev.length) {
+                    $placeholder.after($prev);
+                    startY -= height;
+                }
+                top = e.clientY - startY;
+                $target.css({top: top});
+            }
+
+            return update;
+        })(e));
+
+        $(window).on('mouseup.list', function(e) {
+            $(this).off('mousemove.list mouseup.list');
+            $('html, body').removeClass('no-select');
+            $target.removeClass('drag').css({top: 0});
+            clearTimeout(timeout);
+            setTimeout(function() {
+                t.isDragging = false;
+                t.setOrder();
+            }, 0);
+        });
+    },
+
     update: function() {
         var t = this;
         t.run();
+    },
+
+    setOrder: function() {
+        var t = this;
+        var $el = t.$el;
+        var listIds = [];
+        $el.find('.item').each(function() {
+            var listId = $(this).data('id');
+            if (listId != Configs.commonDialogsList) listIds.push(listId);
+        });
+        Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
     addMessage: function(message) {

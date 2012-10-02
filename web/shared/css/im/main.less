@@ -372,8 +372,21 @@ body {
             bottom: 0;
             width: 100%;
 
-            &>.item {
+            .drag-wrap {
+                position: relative;
+            }
+
+            .item {
                 .user-select(none);
+
+                &.drag {
+                    position: absolute;
+                    width: 100%;
+                    background-color: @bg_light_hover;
+                    cursor: pointer;
+
+                    .opacity(0.7);
+                }
 
                 &>.title {
                     padding: 5px 30px 5px 10px;

@@ -1,3 +1,6 @@
+.fl{float:left;}
+.fr{float:right;}
+.no-select{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}
 .ui-corner-all,.ui-corner-top,.ui-corner-left,.ui-corner-tl{-moz-border-radius-topleft:0;-webkit-border-top-left-radius:0;-khtml-border-top-left-radius:0;border-top-left-radius:0;}
 .ui-corner-all,.ui-corner-top,.ui-corner-right,.ui-corner-tr{-moz-border-radius-topright:0;-webkit-border-top-right-radius:0;-khtml-border-top-right-radius:0;border-top-right-radius:0;}
 .ui-corner-all,.ui-corner-bottom,.ui-corner-left,.ui-corner-bl{-moz-border-radius-bottomleft:0;-webkit-border-bottom-left-radius:0;-khtml-border-bottom-left-radius:0;border-bottom-left-radius:0;}

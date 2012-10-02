@@ -38,7 +38,10 @@
                         ' . TABLE_MES_GROUPS . ' as c
                     WHERE
                        c.group_id = b.group_id
-                        AND b.user_id = @user_id';
+                        AND b.user_id = @user_id
+                    ORDER BY
+                        b.seq_number
+                    ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@user_id', $userId );
@@ -359,13 +362,13 @@
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
         }
 
-        public static  function toggle_read_unread_gr( $user_id, $group_id, $read )
+        public static function toggle_read_unread_gr( $user_id, $group_id, $read )
         {
 
             $sql = 'UPDATE '
                         . TABLE_MES_GROUP_USER_REL . '
                     SET
-                          read_mark = @read
+                        read_mark = @read
                     WHERE
                         user_id=@user_id
                         AND group_id=@group_id';
@@ -376,5 +379,32 @@
 
             return $cmd->ExecuteNonQuery();
         }
+
+        public static function set_list_place( $user_id, $group_id, $number )
+        {
+            $sql = 'UPDATE '
+                        . TABLE_MES_GROUP_USER_REL .
+                   ' SET
+                        seq_number  = @number
+                    WHERE
+                        group_id    = @group_id
+                        AND user_id = @user_id
+                   ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id' , $user_id  );
+            $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetInteger( '@number'  , $number   );
+            return $cmd->ExecuteNonQuery();
+        }
+
+        public static function set_lists_order( $user_id, $group_ids )
+        {
+            $group_ids = explode( ',', $group_ids );
+            $i = 0;
+            foreach( $group_ids as $group_id ) {
+                MesGroups::set_list_place( $user_id, $group_id, $i++ );
+            }
+        }
     }
+
 ?>
