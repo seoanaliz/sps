@@ -682,6 +682,7 @@ var Box = (function() {
     var TRIGGER_CHANGE = 'change';
     var TRIGGER_CREATE = 'create';
     var TRIGGER_UPDATE = 'update';
+    var dropdownId = 0;
 
     var methods = {
         init: function(parameters) {
@@ -718,73 +719,6 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    var events = ['resize.' + EVENTS_NAMESPACE, 'scroll.' + EVENTS_NAMESPACE].join(' ');
-                    $(window).on(events, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            $el.dropdown('refreshPosition');
-                        }
-                    });
-                    $(document).on(options.closeEvent + '.' + EVENTS_NAMESPACE, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        $el.dropdown('close');
-                        run(options.onclose, $el, $menu);
-                    });
-                    $(document).on('keydown.' + EVENTS_NAMESPACE, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-
-                            switch(e.keyCode) {
-                                case KEY.UP:
-                                case KEY.DOWN:
-                                    var $hoverItem;
-                                    if (e.keyCode == KEY.UP) {
-                                        $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
-                                    } else if (e.keyCode == KEY.DOWN) {
-                                        $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
-                                    }
-                                    if (!$hoveringItem.length || !$hoverItem.length) {
-                                        if (e.keyCode == KEY.UP) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
-                                        } else if (e.keyCode == KEY.DOWN) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
-                                        }
-                                    }
-
-                                    if ($hoverItem.length) {
-                                        $hoveringItem.removeClass(CLASS_ITEM_HOVER);
-                                        $hoverItem.addClass(CLASS_ITEM_HOVER);
-                                        var positionTop = $hoverItem.position().top;
-                                        var scrollTop = $menu.scrollTop() + positionTop;
-                                        if (positionTop + $hoverItem.height() > $menu.height()) {
-                                            $menu.scrollTop(scrollTop);
-                                        } else if (positionTop < 0) {
-                                            $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
-                                        }
-                                        return false;
-                                    }
-                                break;
-                                case KEY.TAB:
-                                    $el.dropdown('close');
-                                    return true;
-                                break;
-                                case KEY.ENTER:
-                                    if ($hoveringItem.length) {
-                                        select($hoveringItem);
-                                    }
-                                    return false;
-                                break;
-                                case KEY.ESC:
-                                    $el.dropdown('close');
-                                    return false;
-                                break;
-                            }
-                        }
-                    });
                     $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
@@ -805,38 +739,22 @@ var Box = (function() {
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    select($(this));
+                    $el.dropdown('select', $(this));
                 });
                 $menu.on(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
                 $menu.hide();
 
-                function select($item) {
-                    var data = $item.data(options.itemDataKey);
-                    switch(options.type) {
-                        case TYPE_RADIO:
-                            $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
-                            $item.addClass(CLASS_ITEM_ACTIVE);
-                        break;
-                        case TYPE_CHECKBOX:
-                            $item.toggleClass(CLASS_ITEM_ACTIVE);
-                        break;
-                    }
-                    $el.dropdown('close');
-                    run(options.onchange, $el, data);
-                    run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, data);
-                    $el.trigger(TRIGGER_CHANGE);
-                }
-
                 $el.data(DATA_KEY, {
+                    id: dropdownId++,
                     $el: $el,
                     $menu: $menu,
                     $target: $target,
                     options: options
                 });
 
-                $el.dropdown('setData', options.data);
+                $el.dropdown('setItems', options.data);
 
                 if (options.isShow && $el.is(':visible')) {
                     $el.dropdown('open');
@@ -850,6 +768,28 @@ var Box = (function() {
                 }
             });
         },
+        select: function($item) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var itemData = $item.data(options.itemDataKey);
+                switch(options.type) {
+                    case TYPE_RADIO:
+                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    break;
+                    case TYPE_CHECKBOX:
+                        $item.toggleClass(CLASS_ITEM_ACTIVE);
+                    break;
+                }
+                $el.dropdown('close');
+                run(options.onchange, $el, itemData);
+                run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, itemData);
+                $el.trigger(TRIGGER_CHANGE);
+            });
+        },
         open: function(notTrigger) {
             return this.each(function() {
                 var $el = $(this);
@@ -857,6 +797,8 @@ var Box = (function() {
                 var options = data.options;
                 var $menu = data.$menu;
                 var $target = data.$target;
+                var dropdownId = data.id;
+                var nameSpace = EVENTS_NAMESPACE + dropdownId;
 
                 if (!options.data.length && !options.emptyMenuText) {
                     return;
@@ -868,6 +810,73 @@ var Box = (function() {
 
                 $el.dropdown('refreshPosition');
                 $menu.show();
+
+                $(window).on('resize.' + nameSpace + ' scroll.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        $el.dropdown('refreshPosition');
+                    }
+                });
+                $(document).on(options.closeEvent + '.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    $el.dropdown('close');
+                    run(options.onclose, $el, $menu);
+                });
+                $(document).on('keydown.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+
+                        switch(e.keyCode) {
+                            case KEY.UP:
+                            case KEY.DOWN:
+                                var $hoverItem;
+                                if (e.keyCode == KEY.UP) {
+                                    $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
+                                } else if (e.keyCode == KEY.DOWN) {
+                                    $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
+                                }
+                                if (!$hoveringItem.length || !$hoverItem.length) {
+                                    if (e.keyCode == KEY.UP) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
+                                    } else if (e.keyCode == KEY.DOWN) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
+                                    }
+                                }
+
+                                if ($hoverItem.length) {
+                                    $hoveringItem.removeClass(CLASS_ITEM_HOVER);
+                                    $hoverItem.addClass(CLASS_ITEM_HOVER);
+                                    var positionTop = $hoverItem.position().top;
+                                    var scrollTop = $menu.scrollTop() + positionTop;
+                                    if (positionTop + $hoverItem.height() > $menu.height()) {
+                                        $menu.scrollTop(scrollTop);
+                                    } else if (positionTop < 0) {
+                                        $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
+                                    }
+                                    return false;
+                                }
+                            break;
+                            case KEY.TAB:
+                                $el.dropdown('close');
+                                return true;
+                            break;
+                            case KEY.ENTER:
+                                if ($hoveringItem.length) {
+                                    $el.dropdown('select', $hoveringItem);
+                                }
+                                return false;
+                            break;
+                            case KEY.ESC:
+                                $el.dropdown('close');
+                                return false;
+                            break;
+                        }
+                    }
+                });
 
                 if (!notTrigger) {
                     run(options.onopen, $el, $menu);
@@ -881,9 +890,16 @@ var Box = (function() {
             var options = data.options;
             var $menu = data.$menu;
             var $target = data.$target;
+            var dropdownId = data.id;
+            var nameSpace = EVENTS_NAMESPACE + dropdownId;
 
             $target.removeClass(CLASS_ACTIVE);
             $menu.hide();
+
+            $(window).off('resize.' + nameSpace);
+            $(window).off('scroll.' + nameSpace);
+            $(document).off(options.closeEvent + '.' + nameSpace);
+            $(document).off('keydown.' + nameSpace);
 
             if (!notTrigger) {
                 run(options.onclose, $el, $menu);
@@ -932,7 +948,7 @@ var Box = (function() {
         getItem: function(id) {
             return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
         },
-        setData: function(dataItems) {
+        setItems: function(dataItems) {
             return this.each(function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
@@ -1083,14 +1099,14 @@ var Box = (function() {
             });
         },
 
-        setData: function(dataItems) {
+        setItems: function(dataItems) {
             return this.each(function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 options.defData = dataItems;
 
-                $el.dropdown('setData', dataItems);
+                $el.dropdown('setItems', dataItems);
             });
         }
     };

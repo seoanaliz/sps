@@ -2,22 +2,44 @@ $(document).ready(function() {
     var newWindow;
 
     $('#loginBtn').click(function() {
+        var screenX = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
+        var screenY = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
+        var outerWidth = $(window).width();
+        var outerHeight = $(window).height();
         var width = 400;
-        var height = 100;
-        var top = window.screen.height / 3 - height / 2;
-        var left = window.screen.width / 2 - width / 2;
+        var height = 200;
+        var top = parseInt(screenY + 280);
+        var left = parseInt(screenX + ((outerWidth - width) / 2));
         var params = {
             top: top,
             left: left,
             width: width,
             height: height,
-            resizable: 'yes',
-            scrollbars: 'yes',
-            status: 'yes'
+            menubar: 'no',
+            toolbar: 'no',
+            resizable: 'no',
+            scrollbars: 'no',
+            directories: 'no',
+            location: 'yes',
+            status: 'no'
         };
         var paramsStr = $.param(params).split('&').join(',');
         newWindow = window.open($(this).attr('href'), 'VK', paramsStr);
         $('#accessToken').fadeIn(200);
+
+        var $windowHint = $('.window-hint');
+        if (!$windowHint.length) $windowHint = $('<div>').addClass('window-hint');
+        $windowHint.show().html('Где-то здесь должно быть окно. Нажмите Разрешить, если вы не устанавливали наше приложение, а затем скопируйте всё содержимое адресной строки этого окна.').css({
+            top: top,
+            left: left - 160,
+            width: 150
+        });
+        $('#login').append($windowHint);
+        $(window).focus(function() {
+            var $windowHint = $('.window-hint');
+            $windowHint.fadeOut(200);
+            newWindow.close();
+        });
 
         return false;
     });
@@ -47,7 +69,6 @@ $(document).ready(function() {
                 .addClass('success')
                 .html('Ключ доступа успешно сохранен')
             ;
-            newWindow.close();
             $button.slideUp(200);
             onSuccess(accessToken);
         });
