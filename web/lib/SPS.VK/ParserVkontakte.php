@@ -16,6 +16,10 @@
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
+        /**
+         * Максимальное количество постов, для которых можно запросить лайки
+         */
+        const MAX_POST_LIKE_COUNT = 90;
 
         public function __construct($public_id = '')
         {

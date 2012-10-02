@@ -101,6 +101,21 @@
                     'name'         => 'rate'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_LE
+                ),
+                'importedAtFrom' => array(
+                    'name'         => 'importedAt',
+                    'type'       => TYPE_DATETIME,
+                    'searchType' => SEARCHTYPE_GE
+                ),
+                'importedAtTo' => array(
+                    'name'         => 'importedAt',
+                    'type'       => TYPE_DATETIME,
+                    'searchType' => SEARCHTYPE_LE
+                )
+                ,'externalIdSet' => array(
+                    'name'         => 'externalId',
+                    'type'          => TYPE_BOOLEAN,
+                    'searchType' => SEARCHTYPE_NOT_NULL
                 )
                 ,'_authorId' => array(
                     'name'         => 'authorId'
