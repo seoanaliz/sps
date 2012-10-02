@@ -985,9 +985,7 @@ var List = Widget.extend({
             var listId = $(this).data('id');
             if (listId != Configs.commonDialogsList) listIds.push(listId);
         });
-        Events.fire('set_list_order', listIds.join(','), function() {
-            console.log(listIds);
-        });
+        Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
     addMessage: function(message) {
