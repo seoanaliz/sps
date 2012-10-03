@@ -55,8 +55,6 @@ class SyncLikes {
             }
         }
 
-        print(count($articleExternalIds));
-
         // если ничего не нашли
         if (!$articleExternalIds) return;
 
