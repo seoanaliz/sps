@@ -106,6 +106,31 @@
                     'name'         => 'pageSize'
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 25
+                )
+                ,'sentAtFrom' => array(
+                    'name'         => 'sentAt',
+                    'type'       => TYPE_DATETIME,
+                    'searchType' => SEARCHTYPE_GE
+                ),
+                'sentAtTo' => array(
+                    'name'         => 'sentAt',
+                    'type'       => TYPE_DATETIME,
+                    'searchType' => SEARCHTYPE_LE
+                )
+                ,'externalIdNot' => array(
+                    'name'         => 'externalId',
+                    'type'          => TYPE_STRING,
+                    'searchType' => SEARCHTYPE_NOT_EQUALS
+                )
+                ,'externalIdExist' => array(
+                    'name'         => 'externalId',
+                    'type'          => TYPE_BOOLEAN,
+                    'searchType' => SEARCHTYPE_NOT_NULL
+                )
+                ,'emptyExternalLikes'=> array(
+                    'name'         => 'externalLikes',
+                    'type'          => TYPE_BOOLEAN,
+                    'searchType' => SEARCHTYPE_NULL
                 ))
         );
         
