@@ -215,7 +215,8 @@ var LeftColumn = Widget.extend({
 
         if (t.messages) {
             t.messages.addMessage(message);
-        } else if (t.dialogs) {
+        }
+        if (t.dialogs) {
             t.dialogs.addMessage(message);
         }
     },
@@ -258,9 +259,13 @@ var LeftColumn = Widget.extend({
                     t.dialogs.destroy();
                     t.dialogs = null;
                 }
+                if (t.dialogs) {
+                    t.dialogs.show();
+                }
                 if (!t.dialogs) {
+                    t.$el.find('#list-dialogs').show();
                     t.dialogs = new Dialogs({
-                        el: t.$el.find('.list'),
+                        el: t.$el.find('#list-dialogs'),
                         listId: listId
                     });
                     t.dialogs.on('select', function(dialogId, title, userId) {
@@ -269,8 +274,6 @@ var LeftColumn = Widget.extend({
                     t.dialogs.on('addList', function() {
                         t.trigger('updateList');
                     });
-                } else {
-                    t.dialogs.show();
                 }
 
                 t.curListId = listId;
@@ -293,17 +296,19 @@ var LeftColumn = Widget.extend({
                     t.messages.destroy();
                     t.messages = null;
                 }
+                if (t.messages) {
+                    t.messages.show();
+                }
                 if (!t.messages) {
+                    t.$el.find('#list-messages').show();
                     t.messages = new Messages({
-                        el: t.$el.find('.list'),
+                        el: t.$el.find('#list-messages'),
                         dialogId: dialogId,
                         userId: userId
                     });
                     t.messages.on('markAsRead', function() {
                         t.trigger('updateList');
                     });
-                } else {
-                    t.messages.show();
                 }
 
                 t.curDialogId = dialogId;
@@ -418,6 +423,7 @@ var EndlessList = Widget.extend({
 
 var CachePage = EndlessList.extend({
     _isVisible: true,
+    _isScrollBottom: false,
     _scroll: null,
     _html: null,
 
@@ -427,19 +433,27 @@ var CachePage = EndlessList.extend({
     show: function() {
         var t = this;
         t._isVisible = true;
-        t.$el.html(t._html);
-        $(window).scrollTop(t._scroll);
+        t.$el.show();
+        if (t._isScrollBottom) {
+            $(window).scrollTop($(document).height() - $(window).height());
+        } else {
+            $(window).scrollTop(t._scroll);
+        }
     },
     hide: function() {
         var t = this;
         t._isVisible = false;
         t._scroll = $(window).scrollTop();
-        t._html = t.$el.html();
+        t._isScrollBottom = ($(document).height() - $(window).height() == $(window).scrollTop());
+        t.$el.hide();
     },
     trigger: function(events, obj, obj2) {
         var t = this;
-        if (!t.isVisible()) return t;
-        else return t._super(events, obj, obj2);
+        if (!t.isVisible()) {
+            return t;
+        } else {
+            return t._super(events, obj, obj2);
+        }
     }
 });
 
@@ -510,12 +524,13 @@ var Dialogs = CachePage.extend({
     bindEvents: function() {
         var t = this;
         var $el = t.$el;
-
         t.on('scroll', (function onScroll() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
-                t.showMore();
+            if (t.isVisible()) {
+                if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
+                    t.showMore();
+                }
+                return onScroll;
             }
-            return onScroll;
         })());
     },
     addMessage: function(message) {
@@ -644,7 +659,10 @@ var Dialogs = CachePage.extend({
         if (isTrigger) t.trigger('select', dialogId, title, userId);
     },
     scrollTop: function() {
-        $(window).scrollTop(0);
+        var t = this;
+        if (t.isVisible()) {
+            $(window).scrollTop(0);
+        }
     }
 });
 
@@ -739,7 +757,9 @@ var Messages = CachePage.extend({
             t.updateTop();
             t.scrollBottom();
             t.bindEvents();
-            setTimeout(t.scrollBottom, 100);
+            setTimeout(function() {
+                t.scrollBottom();
+            }, 100);
         });
         t.currentPage++;
         t.preload();
@@ -750,10 +770,11 @@ var Messages = CachePage.extend({
         var listId = t.listId;
 
         t.on('scroll', (function onScroll() {
-            t.updateTop();
-
-            if ($(window).scrollTop() < 300) {
-                t.showMore();
+            if (t.isVisible()) {
+                t.updateTop();
+                if ($(window).scrollTop() < 300) {
+                    t.showMore();
+                }
             }
             return onScroll;
         })());
@@ -845,13 +866,17 @@ var Messages = CachePage.extend({
     },
     updateTop: function() {
         var t = this;
-        var $el = t.$el;
-        var $messages = $el.find(t.itemsListSelector);
-
-        $messages.css('padding-top', $(window).height() - $messages.height() - 152);
+        if (t.isVisible()) {
+            var $el = t.$el;
+            var $messages = $el.find(t.itemsListSelector);
+            $messages.css('padding-top', $(window).height() - $messages.height() - 152);
+        }
     },
     scrollBottom: function() {
-        $(window).scrollTop($(document).height());
+        var t = this;
+        if (t.isVisible()) {
+            $(window).scrollTop($(document).height());
+        }
     },
     sendMessage: function() {
         var t = this;

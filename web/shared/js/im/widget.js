@@ -2,7 +2,6 @@ var Widget = (function() {
     var widgetId = 0;
     var eventNameSpace = 'widget';
     var eventSplitter = ':';
-    var template = tmpl;
 
     return Event.extend({
         init: function(options) {
@@ -51,7 +50,7 @@ var Widget = (function() {
         renderTemplate: function() {
             var t = this;
 
-            t.$el.html(template(t.template, t.templateData));
+            t.$el.html(t.tmpl(t.template, t.templateData));
 
             return this;
         },
@@ -70,6 +69,8 @@ var Widget = (function() {
             t.$el.undelegate('.' + eventNameSpace + t.id).empty();
 
             delete this;
-        }
+        },
+
+        tmpl: tmpl
     });
 })();
