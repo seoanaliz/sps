@@ -361,22 +361,24 @@
         }
 
         //устанавливает статус диалога в нашей бд
-        public static function set_state( $dialogs_id, $state )
+        public static function set_state( $dialogs_id, $state, $change_time = 1 )
         {
+            $time = $change_time ? ',last_update=@now' : '';
             $now = time();
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
                        ' SET
-                            state=@state,
-                            last_update=@now
+                            state=@state
+                            ' . $time . '
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
                 $cmd->SetInt( '@now',   $now );
+                echo $cmd->getQuery();
                 $cmd->Execute();
             }
         }
@@ -425,7 +427,6 @@
             $cmd->SetInteger( '@user_id',      $user_id );
             $cmd->SetInteger( '@created_time', $now );
             $cmd->Execute();
-
         }
 
         public static function add_text( $text )
