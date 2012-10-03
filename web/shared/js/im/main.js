@@ -196,7 +196,8 @@ var LeftColumn = Widget.extend({
         t.on('scroll', function() {
             if (t.messages) {
                 t.messages.trigger('scroll');
-            } else if (t.dialogs) {
+            }
+            if (t.dialogs) {
                 t.dialogs.trigger('scroll');
             }
         });
@@ -239,17 +240,11 @@ var LeftColumn = Widget.extend({
         var tabId, tabPrefix;
         title = $.trim(title) || '...';
 
-        if (t.messages) {
-            t.messages.destroy();
-            t.messages = null;
-        }
-        if (t.dialogs) {
-            t.dialogs.destroy();
-            t.dialogs = null;
-        }
-
         switch(pageName) {
             case 'dialogs':
+                if (t.messages) {
+                    t.messages.hide();
+                }
                 var listId = params.listId;
                 tabPrefix = t.tabPrefixDialogs;
                 tabId = tabPrefix + listId;
@@ -259,19 +254,31 @@ var LeftColumn = Widget.extend({
                     t.tabs.prependTab(tabId, title);
                 }
 
-                t.dialogs = new Dialogs({
-                    el: t.$el.find('.list'),
-                    listId: listId
-                });
-                t.dialogs.on('select', function(dialogId, title, userId) {
-                    t.initMessages(dialogId, title, userId);
-                });
-                t.dialogs.on('addList', function() {
-                    t.trigger('updateList');
-                });
+                if (t.dialogs && t.dialogs.listId != listId) {
+                    t.dialogs.destroy();
+                    t.dialogs = null;
+                }
+                if (!t.dialogs) {
+                    t.dialogs = new Dialogs({
+                        el: t.$el.find('.list'),
+                        listId: listId
+                    });
+                    t.dialogs.on('select', function(dialogId, title, userId) {
+                        t.initMessages(dialogId, title, userId);
+                    });
+                    t.dialogs.on('addList', function() {
+                        t.trigger('updateList');
+                    });
+                } else {
+                    t.dialogs.show();
+                }
+
                 t.curListId = listId;
             break;
             case 'messages':
+                if (t.dialogs) {
+                    t.dialogs.hide();
+                }
                 var dialogId = params.dialogId;
                 var userId = params.userId;
                 tabPrefix = t.tabPrefixMessages;
@@ -282,14 +289,23 @@ var LeftColumn = Widget.extend({
                     t.tabs.appendTab(tabId, title);
                 }
 
-                t.messages = new Messages({
-                    el: t.$el.find('.list'),
-                    dialogId: dialogId,
-                    userId: userId
-                });
-                t.messages.on('markAsRead', function() {
-                    t.trigger('updateList');
-                });
+                if (t.messages && t.messages.dialogId != dialogId) {
+                    t.messages.destroy();
+                    t.messages = null;
+                }
+                if (!t.messages) {
+                    t.messages = new Messages({
+                        el: t.$el.find('.list'),
+                        dialogId: dialogId,
+                        userId: userId
+                    });
+                    t.messages.on('markAsRead', function() {
+                        t.trigger('updateList');
+                    });
+                } else {
+                    t.messages.show();
+                }
+
                 t.curDialogId = dialogId;
             break;
         }
@@ -308,7 +324,7 @@ var LeftColumn = Widget.extend({
     }
 });
 
-var EndlessListAbstract = Widget.extend({
+var EndlessList = Widget.extend({
     template: null,
     tmplItem: null,
     tmplItemsBlock: null,
@@ -400,7 +416,34 @@ var EndlessListAbstract = Widget.extend({
     }
 });
 
-var Dialogs = EndlessListAbstract.extend({
+var CachePage = EndlessList.extend({
+    _isVisible: true,
+    _scroll: null,
+    _html: null,
+
+    isVisible: function() {
+        return !!this._isVisible;
+    },
+    show: function() {
+        var t = this;
+        t._isVisible = true;
+        t.$el.html(t._html);
+        $(window).scrollTop(t._scroll);
+    },
+    hide: function() {
+        var t = this;
+        t._isVisible = false;
+        t._scroll = $(window).scrollTop();
+        t._html = t.$el.html();
+    },
+    trigger: function(events, obj, obj2) {
+        var t = this;
+        if (!t.isVisible()) return t;
+        else return t._super(events, obj, obj2);
+    }
+});
+
+var Dialogs = CachePage.extend({
     template: DIALOGS,
     tmplItem: DIALOGS_ITEM,
     tmplItemsBlock: DIALOGS_BLOCK,
@@ -605,7 +648,7 @@ var Dialogs = EndlessListAbstract.extend({
     }
 });
 
-var Messages = EndlessListAbstract.extend({
+var Messages = CachePage.extend({
     template: MESSAGES,
     tmplItem: MESSAGES_ITEM,
     tmplItemsBlock: MESSAGES_BLOCK,
@@ -744,6 +787,7 @@ var Messages = EndlessListAbstract.extend({
                 position: 'top',
                 notFoundText: '',
                 data: data,
+                strictSearch: true,
                 getValue: function() {
                     var text = $.trim($textarea.val());
                     return text ? text : 'notShowAllItems';

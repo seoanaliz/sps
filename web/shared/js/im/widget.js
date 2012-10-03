@@ -1,4 +1,5 @@
 var Widget = (function() {
+    var widgetId = 0;
     var eventNameSpace = 'widget';
     var eventSplitter = ':';
     var template = tmpl;
@@ -19,6 +20,7 @@ var Widget = (function() {
 
             t.options = options || $.error('Options not found.');
 
+            t.id = widgetId++;
             t.el = options.el || t.el || $.error('El not found.');
             t.model = options.model || t.model || {};
             t.events = options.events || t.events || {};
@@ -40,7 +42,7 @@ var Widget = (function() {
                 var eventName = event.split(eventSplitter)[0];
                 var selector = event.split(eventSplitter)[1];
                 var eventMethod = $.proxy(t[methodName], t);
-                t.$el.delegate(selector, eventName + '.' + eventNameSpace, eventMethod);
+                t.$el.delegate(selector, eventName + '.' + eventNameSpace + t.id, eventMethod);
             }
 
             return this;
@@ -65,7 +67,7 @@ var Widget = (function() {
         destroy: function() {
             var t = this;
 
-            t.$el.undelegate('.' + eventNameSpace).empty();
+            t.$el.undelegate('.' + eventNameSpace + t.id).empty();
 
             delete this;
         }
