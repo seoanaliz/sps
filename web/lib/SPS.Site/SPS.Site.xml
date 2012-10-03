@@ -42,6 +42,9 @@
         <action name="SyncUserpics">
             <path>daemons/SyncUserpics</path>
         </action>
+        <action name="SyncLikes">
+            <path>daemons/SyncLikes</path>
+        </action>
     </group>
 
     <group name="Controls">
