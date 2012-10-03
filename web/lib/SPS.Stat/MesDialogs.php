@@ -378,7 +378,6 @@
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
                 $cmd->SetInt( '@now',   $now );
-                echo $cmd->getQuery();
                 $cmd->Execute();
             }
         }
