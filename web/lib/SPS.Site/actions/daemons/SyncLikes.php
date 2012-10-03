@@ -25,7 +25,7 @@ class SyncLikes {
         $parser = new ParserVkontakte();
 
         // со вчера 00-00-00 до 23-59-59
-        $DateInterval = new DateInterval('P20D');
+        $DateInterval = new DateInterval('P1D');
         $from = DateTimeWrapper::Now()->setTime(0, 0, 0)->sub($DateInterval);
         $to = DateTimeWrapper::Now()->setTime(23, 59, 59)->sub($DateInterval);
 
