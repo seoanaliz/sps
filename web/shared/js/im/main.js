@@ -315,7 +315,7 @@ var LeftColumn = Widget.extend({
                 }
 
                 t.curDialogId = dialogId;
-                t.trigger('selectDialog', dialogId)
+                t.trigger('selectDialog', dialogId);
             break;
         }
 
