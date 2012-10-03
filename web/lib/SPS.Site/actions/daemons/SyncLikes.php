@@ -20,45 +20,51 @@ class SyncLikes {
         $this->daemon->maxExecutionTime = '01:00:00';
 
         // макс. кол-во постов которое будем обрабатывать за один раз
+        $maxArticlesSelectFromQueue = 100;
         $maxPostsPerRequest = ParserVkontakte::MAX_POST_LIKE_COUNT;
         $parser = new ParserVkontakte();
 
         // со вчера 00-00-00 до 23-59-59
-        $DateInterval = new DateInterval('P1D');
+        $DateInterval = new DateInterval('P20D');
         $from = DateTimeWrapper::Now()->setTime(0, 0, 0)->sub($DateInterval);
         $to = DateTimeWrapper::Now()->setTime(23, 59, 59)->sub($DateInterval);
 
-        // Параметры поиска
+        // загружаем посты постранично, чтобы сильно не жрало память
         $search = array(
             'sentAtFrom' => $from,
             'sentAtTo' => $to,
             'externalIdNot' => '1',
             'externalIdExist' => true,
-            'emptyExternalLikes' => true
+            'emptyExternalLikes' => true,
+            'pageSize' => $maxArticlesSelectFromQueue
         );
 
-        $count = ArticleQueueFactory::Count($search, array(BaseFactory::WithoutDisabled => false));
-        $pageCount = ceil($count / $maxPostsPerRequest);
         $page = 0;
-        $search['pageSize'] = $maxPostsPerRequest;
-        while ($page++ < $pageCount) {
-            $search['page'] = $page - 1;
-
+        $articleExternalIds = array();
+        while (true) {
+            $search['page'] = $page++;
             // Список постов
             $ArticlesQueues = ArticleQueueFactory::Get($search, array(BaseFactory::WithoutDisabled => false));
 
-            $articleExternalIds = array();
+            if (!$ArticlesQueues) break;
+
             foreach ($ArticlesQueues as $ArticleQueue) {
-                /** @var $ArticlesQueues ArticleQueue */
+                /** @var $ArticleQueue ArticleQueue */
                 // делаем так, чтобы было легко найти articleQueueId при обновлении
                 $articleExternalIds[$ArticleQueue->externalId] = $ArticleQueue->articleQueueId;
             }
+        }
 
-            // если ничего не нашли
-            if (!$articleExternalIds) continue;
+        print(count($articleExternalIds));
 
-            // Получаем лайки
-            $likes =  $parser->get_post_likes(array_keys($articleExternalIds));
+        // если ничего не нашли
+        if (!$articleExternalIds) return;
+
+        // Получаем лайки, срезая с массива куски размером $maxPostsPerRequest
+        $offset = 0;
+        while ($articleExternalIdsSlice = array_slice($articleExternalIds, $offset, $maxPostsPerRequest)) {
+            $offset += $maxPostsPerRequest;
+            $likes =  $parser->get_post_likes(array_keys($articleExternalIdsSlice));
             if ($likes) {
 
                 foreach ($likes as $externalId => $values) {
