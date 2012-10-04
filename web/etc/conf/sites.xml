@@ -35,10 +35,6 @@
 				    <param name="senderEmail">admin@1adw.com</param>
 				    <param name="charset">utf-8</param>
     			</mailFactory>
-                <memcache class="MemcacheHelper">
-				    <param name="server">localhost</param>
-				    <param name="active">false</param>
-    			</memcache>
                 <vkapi class="AuthVkontakte">
                     <param name="appId">1868779</param>
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
