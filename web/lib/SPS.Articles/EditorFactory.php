@@ -22,7 +22,7 @@
             'class'       => 'Editor'
             , 'table'     => 'editors'
             , 'view'      => 'getEditors'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache', 'IsLocked' => 'IsLocked' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false, 'IsLocked' => 'IsLocked' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'editorId' => array(

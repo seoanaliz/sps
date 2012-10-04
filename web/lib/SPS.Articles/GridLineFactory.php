@@ -22,7 +22,7 @@
             'class'       => 'GridLine'
             , 'table'     => 'gridLines'
             , 'view'      => 'getGridLines'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array( 'targetFeeds' )
             , 'fields'    => array(
                 'gridLineId' => array(

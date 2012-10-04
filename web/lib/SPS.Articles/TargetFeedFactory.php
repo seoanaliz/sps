@@ -22,7 +22,7 @@
             'class'       => 'TargetFeed'
             , 'table'     => 'targetFeeds'
             , 'view'      => 'getTargetFeeds'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanCache' => false )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'targetFeedId' => array(

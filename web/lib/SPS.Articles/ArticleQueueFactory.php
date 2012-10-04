@@ -22,7 +22,7 @@
             'class'       => 'ArticleQueue'
             , 'table'     => 'articleQueues'
             , 'view'      => 'getArticleQueues'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
             , 'cacheDeps' => array( 'articles', 'targetFeeds' )
             , 'fields'    => array(
                 'articleQueueId' => array(
