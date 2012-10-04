@@ -12,7 +12,10 @@ var TABS_ITEM =
 
 var LEFT_COLUMN =
 '<div class="header fixed"></div>' +
-'<div class="list"></div>';
+'<div class="list">' +
+    '<div id="list-messages"></div>' +
+    '<div id="list-dialogs"></div>' +
+'</div>';
 
 var RIGHT_COLUMN =
 '<div class="header">' +
