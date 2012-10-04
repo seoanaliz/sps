@@ -22,7 +22,7 @@
             'class'       => 'SourceFeed'
             , 'table'     => 'sourceFeeds'
             , 'view'      => 'getSourceFeeds'
-            , 'flags'     => array( 'CanCache' => false )
+            , 'flags'     => array( 'CanCache' => 'CanCache' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'sourceFeedId' => array(
