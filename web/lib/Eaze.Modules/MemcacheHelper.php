@@ -114,9 +114,9 @@
         private static $initialized = false;
 
         /**
-         * Memcache instance
+         * Memcached instance
          *
-         * @var Memcache
+         * @var Memcached
          */
         private static $memcache;
 
@@ -161,7 +161,7 @@
             } else {
                 self::$isActive = true;
 
-                if ( !class_exists( 'Memcache' ) ) {
+                if ( !class_exists( 'Memcached' ) ) {
                     self::$isActive = false;
                     Logger::Warning( 'Memcache module is not installed' );
                 }
@@ -278,7 +278,7 @@
             }
 
             Logger::Debug( '%s value with key %s, flag %d, expire %d', $operation, $key, $flag, $expire );
-            return self::$memcache->$operation( $key, $value, $flag, $expire );
+            return self::$memcache->$operation( $key, $value, $expire );
         }
 
 
@@ -388,7 +388,7 @@
             }
 
             $blockKey = sprintf( '%s_block', self::PrepareKey( $key ) );
-            return self::$memcache->add( $blockKey, $value, 0, $expire  );
+            return self::$memcache->add( $blockKey, $value, $expire  );
         }
 
 
@@ -502,7 +502,7 @@
                 return false;
             }
 
-            return self::$memcache->close();
+            //return self::$memcache->close();
         }
 
 
@@ -542,7 +542,7 @@
                 return false;
             }
 
-            self::$memcache = new Memcache();
+            self::$memcache = new Memcached();
             self::$isActive = false;
 
             foreach ( self::$serversParams as $server ) {
@@ -550,12 +550,7 @@
                     $isAdded = self::$memcache->addServer(
                         $server['host']
                         , $server['port']
-                        , $server['persistent']
                         , $server['weight']
-                        , $server['timeout']
-                        , $server['retryInterval']
-                        , $server['status']
-                        , $server['failureCallback']
                     );
 
                     self::$isActive = $isAdded === true ? true : self::$isActive;
@@ -564,7 +559,7 @@
 
             if ( self::IsActive() ) {
                 if ( !empty( self::$clientParams['autocompress'] ) || self::$clientParams['active'] != 'false' ) {
-                    self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
+                    //self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
                 }
             } else {
                 Logger::Warning( 'All memcache servers were marked as an inactive' );
