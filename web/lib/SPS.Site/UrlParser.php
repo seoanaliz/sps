@@ -7,8 +7,13 @@
      */
     class UrlParser {
         public static function Parse($url) {
-            $result = array();
+            $cacheKey = 'url_' . md5($url);
+            $cacheResult = MemcacheHelper::Get( $cacheKey );
+            if ($cacheResult !== false) {
+                return $cacheResult;
+            }
 
+            $result = array();
             $html = self::GetUrlContent($url);
             if (empty($html)) {
                 return $result;
@@ -45,6 +50,9 @@
                 $result['imgOriginal'] = !empty($imgOriginal) ? $imgOriginal : $img;
             }
 
+            //кешируем данные на 10 минут
+            MemcacheHelper::Set( $cacheKey, $result, 0, 600 );
+
             return $result;
         }
 
@@ -65,21 +73,11 @@
         }
 
         public static function getUrlContent($url) {
-            $cacheKey = 'url_' . md5($url);
-            $cacheResult = MemcacheHelper::Get( $cacheKey );
-            if ($cacheResult !== false) {
-                return $cacheResult;
-            }
-
             $hnd = curl_init($url);
             curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
             $result = curl_exec($hnd);
             if (curl_errno($hnd)) return false;
-
-            //кешируем урл на 10 минут
-            MemcacheHelper::Set( $cacheKey, $result, 0, 600 );
-
             return $result;
         }
     }
