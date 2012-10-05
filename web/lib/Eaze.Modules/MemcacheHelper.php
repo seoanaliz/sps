@@ -116,7 +116,7 @@
         /**
          * Memcache instance
          *
-         * @var Memcache
+         * @var Memcached
          */
         private static $memcache;
 
@@ -542,7 +542,7 @@
                 return false;
             }
 
-            self::$memcache = new Memcache();
+            self::$memcache = new Memcached();
             self::$isActive = false;
 
             foreach ( self::$serversParams as $server ) {
@@ -564,7 +564,7 @@
 
             if ( self::IsActive() ) {
                 if ( !empty( self::$clientParams['autocompress'] ) || self::$clientParams['active'] != 'false' ) {
-                    self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
+                    //self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
                 }
             } else {
                 Logger::Warning( 'All memcache servers were marked as an inactive' );
