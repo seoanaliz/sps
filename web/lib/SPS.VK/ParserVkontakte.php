@@ -710,6 +710,11 @@
             );
 
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
+
+            if (property_exists($res, 'error')) {
+                throw new Exception('wall.getById::'.$res->error->error_msg);
+            }
+
             $result = array();
             foreach( $res as $post ) {
                 $result[ $post->to_id . '_' . $post->id ] = array
