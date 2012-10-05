@@ -12,13 +12,11 @@ class AlbumUpdate
         set_time_limit( 1000 );
         $publics = StatPublics::get_our_publics_list();
         foreach ( $publics as $public ) {
-//            echo '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++';
-//            echo 'vk.com/club' . $public['id'] . '<br>';
-
+            //получаем 2 массива альбомов паблика - из базы и из вк
+           //сравниваем, 3 возможности
             $vk_albums  = VkAlbums::get_vk_public_albums(  $public['id'] );
             $our_albums = VkAlbums::get_public_album_list( $public['id'] );
             foreach( $vk_albums as $vk_album ) {
-//                echo '       vk.com/album-' . $public['id'] . '_' . $vk_album->aid .'<br>';
                 $alum_stat = VkAlbums::get_vk_album_stats( $public['id'], $vk_album->aid );
                 $params = array(
                     'public_id'         =>  $public['id'],
@@ -29,29 +27,25 @@ class AlbumUpdate
                     'comments_quantity' =>  $alum_stat['comments'],
                     'photos_quantity'   =>  $vk_album->size
                 );
-
+                //пересечение массивов
                 if ( $our_albums && in_array( $vk_album->aid, $our_albums )) {
                     $this->update_album( $params, 'update' );
                     $key = array_search( $vk_album->aid, $our_albums );
                     unset( $our_albums[$key] );
-
+                //если в вк есть альбом, у нас не внесенный в бд
                 } else {
                     $this->update_album( $params, 'insert');
                     VkAlbums::set_album_state($vk_album->aid, $public['id'], 2 );
                 }
 
             }
-            echo '<br>тут должен быть пустой массив<br>';
-            echo '<br><br>';
-            echo '<br><br>';
+
+            //не найденные в вк альбомы( удаленные )
             foreach( $our_albums as $missed_in_check ) {
                 VkAlbums::set_album_state( $missed_in_check, $public['id'], 1 );
             }
-            die();
         }
     }
-
-
 
     public function update_album( $params, $act )
     {
