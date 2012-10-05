@@ -12,7 +12,7 @@
             'class'       => 'SiteParam'
             , 'table'     => 'siteParams'
             , 'view'      => 'getSiteParams'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'siteParamId' => array(

@@ -14,7 +14,13 @@
          */
         public function Execute() {
             $result = UrlParser::Parse(Request::getString('url'));
-            echo ObjectHelper::ToJSON($result);
+            $callback = Request::getString('callback');
+
+            if (!empty($callback)) {
+                echo "$callback (" . ObjectHelper::ToJSON($result) . ");";
+            } else {
+                echo ObjectHelper::ToJSON($result);
+            }
         }
     }
 ?>
