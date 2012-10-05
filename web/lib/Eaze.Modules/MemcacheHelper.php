@@ -161,7 +161,7 @@
             } else {
                 self::$isActive = true;
 
-                if ( !class_exists( 'Memcache' ) ) {
+                if ( !class_exists( 'Memcached' ) ) {
                     self::$isActive = false;
                     Logger::Warning( 'Memcache module is not installed' );
                 }
