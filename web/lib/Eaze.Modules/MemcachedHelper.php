@@ -278,7 +278,7 @@
             }
 
             Logger::Debug( '%s value with key %s, flag %d, expire %d', $operation, $key, $flag, $expire );
-            return self::$memcache->$operation( $key, $value, $flag, $expire );
+            return self::$memcache->$operation( $key, $value, $expire );
         }
 
 
