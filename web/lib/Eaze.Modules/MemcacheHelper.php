@@ -116,7 +116,7 @@
         /**
          * Memcache instance
          *
-         * @var Memcached
+         * @var Memcache
          */
         private static $memcache;
 
@@ -161,7 +161,7 @@
             } else {
                 self::$isActive = true;
 
-                if ( !class_exists( 'Memcached' ) ) {
+                if ( !class_exists( 'Memcache' ) ) {
                     self::$isActive = false;
                     Logger::Warning( 'Memcache module is not installed' );
                 }
@@ -542,7 +542,7 @@
                 return false;
             }
 
-            self::$memcache = new Memcached();
+            self::$memcache = new Memcache();
             self::$isActive = false;
 
             foreach ( self::$serversParams as $server ) {
@@ -564,7 +564,7 @@
 
             if ( self::IsActive() ) {
                 if ( !empty( self::$clientParams['autocompress'] ) || self::$clientParams['active'] != 'false' ) {
-                    //self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
+                    self::$memcache->setCompressThreshold( self::AutoCompressThreshold, self::AutoCompressMinSaving );
                 }
             } else {
                 Logger::Warning( 'All memcache servers were marked as an inactive' );
