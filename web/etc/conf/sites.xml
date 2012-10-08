@@ -116,7 +116,7 @@
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.sps.verumnets.ru</param>
+                            <param name="host">media.sps.verumnets.ru:8081</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
