@@ -250,7 +250,11 @@
                 }
             }
 
-            return self::$memcache->get( $key );
+            if (is_array($key)) {
+                return self::$memcache->getMulti( $key );
+            } else {
+                return self::$memcache->get( $key );
+            }
         }
 
 
@@ -271,7 +275,7 @@
             }
 
             self::$TotalSetRequests++;
-            $flag = self::checkCompressCompatibility( $value ) && $flag == MEMCACHE_COMPRESSED ? MEMCACHE_COMPRESSED : 0;
+            $flag = self::checkCompressCompatibility( $value ) && $flag == 2 ? 2 : 0;
 
             if ( $prepareKey ) {
                 $key = self::PrepareKey( $key );
