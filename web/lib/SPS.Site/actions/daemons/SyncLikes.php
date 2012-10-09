@@ -49,6 +49,7 @@ class SyncLikes {
             $likes = array();
             try {
                 $likes =  $parser->get_post_likes(array_keys($articleExternalIdsSlice));
+                sleep(1);
             } catch (Exception $exception){
                 Logger::Warning($exception->getMessage());
             }
@@ -116,7 +117,7 @@ class SyncLikes {
     private function getAllArticles() {
         $sql = 'SELECT aq."externalId", aq."articleQueueId" FROM "articles" a
                 INNER JOIN "articleQueues" aq USING ("articleId")
-                WHERE a."authorId" IS NOT NULL
+                WHERE 1=1
                 AND aq."externalId" IS NOT NULL
                 AND aq."externalId" != \'1\'
                 AND aq."externalLikes" IS NULL
