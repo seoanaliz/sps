@@ -96,7 +96,7 @@
                 $short_name = str_replace('/', '', $short_name);
                 $short_name = str_replace('\\', '', $short_name);
                 preg_match('/(?s)id=\"public_followers\".*?span class=\"fl_r\".?>.*?(\d.*?)<\/div>/', $a, $population);
-                $population = str_replace('<span class="num_delim"> </span>', '', $population[1]);
+                $population = str_replace('<span class="num_delim"> </span>', '', (!empty($population[1]) ? $population[1] : ''));
                 $population =  (int)$population;
                 return array(
                     'type'       =>     $type,
