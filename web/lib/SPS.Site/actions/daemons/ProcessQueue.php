@@ -107,6 +107,10 @@ sql;
                 $articleRecord->photos = array();
             }
 
+            $link = $articleRecord->link;
+            if (strpos($link, 'topface.com') !== false) {
+                $link .= '?ref=pub';
+            }
             $post_data = array(
                 'text' => $articleRecord->content,
                 'group_id' => $targetFeed->externalId,
@@ -115,7 +119,7 @@ sql;
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
-                'link' => $articleRecord->link,
+                'link' => $link,
                 'header' => '',
             );
 
