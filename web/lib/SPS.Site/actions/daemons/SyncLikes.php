@@ -118,7 +118,9 @@ class SyncLikes {
                 INNER JOIN "articleQueues" aq USING ("articleId")
                 WHERE a."authorId" IS NOT NULL
                 AND aq."externalId" IS NOT NULL
-                AND aq."externalId" != \'1\'';
+                AND aq."externalId" != \'1\'
+                AND aq."externalLikes" IS NULL
+                LIMIT 1000';
 
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
         $ds         = $cmd->Execute();
