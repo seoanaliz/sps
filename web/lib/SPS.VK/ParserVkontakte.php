@@ -68,7 +68,7 @@
 
                 return array(
                     'type'      =>  'id',
-                    'id'        =>  $oid[1],
+                    'id'        =>  !empty($oid[1]) ? $oid[1] : null,
                     'avatara'   =>  $ava,
                     'name'      =>  $name,
                     'short_name' =>     $short_name
