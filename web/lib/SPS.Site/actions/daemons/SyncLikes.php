@@ -122,7 +122,7 @@ class SyncLikes {
                 AND aq."externalId" != \'1\'
                 AND aq."externalLikes" IS NULL
                 ORDER BY random()
-                LIMIT 1000';
+                LIMIT 3000';
 
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
         $ds         = $cmd->Execute();
