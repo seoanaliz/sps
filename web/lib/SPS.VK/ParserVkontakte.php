@@ -16,6 +16,10 @@
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
+        /**
+         * Максимальное количество постов, для которых можно запросить лайки
+         */
+        const MAX_POST_LIKE_COUNT = 90;
 
         public function __construct($public_id = '')
         {
@@ -64,7 +68,7 @@
 
                 return array(
                     'type'      =>  'id',
-                    'id'        =>  $oid[1],
+                    'id'        =>  !empty($oid[1]) ? $oid[1] : null,
                     'avatara'   =>  $ava,
                     'name'      =>  $name,
                     'short_name' =>     $short_name
@@ -92,7 +96,7 @@
                 $short_name = str_replace('/', '', $short_name);
                 $short_name = str_replace('\\', '', $short_name);
                 preg_match('/(?s)id=\"public_followers\".*?span class=\"fl_r\".?>.*?(\d.*?)<\/div>/', $a, $population);
-                $population = str_replace('<span class="num_delim"> </span>', '', $population[1]);
+                $population = str_replace('<span class="num_delim"> </span>', '', (!empty($population[1]) ? $population[1] : ''));
                 $population =  (int)$population;
                 return array(
                     'type'       =>     $type,
@@ -706,6 +710,11 @@
             );
 
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
+
+            if (property_exists($res, 'error')) {
+                throw new Exception('wall.getById::'.$res->error->error_msg);
+            }
+
             $result = array();
             foreach( $res as $post ) {
                 $result[ $post->to_id . '_' . $post->id ] = array

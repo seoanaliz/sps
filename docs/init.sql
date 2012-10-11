@@ -13,3 +13,7 @@ INSERT INTO "public"."auditEventTypes" ("title", "alias")
 VALUES ('Ошибки импорта', 'importErrors');
 INSERT INTO "public"."auditEventTypes" ("title", "alias")
 VALUES ('Ошибки экспорта', 'exportErrors');
+INSERT INTO "public"."auditEventTypes" ("title", "alias")
+VALUES ('Удаление поста', 'articleDelete');
+INSERT INTO "public"."auditEventTypes" ("title", "alias")
+VALUES ('Планирование поста', 'articleQueue');

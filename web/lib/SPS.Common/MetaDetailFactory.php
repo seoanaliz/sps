@@ -12,7 +12,7 @@
             'class'       => 'MetaDetail'
             , 'table'     => 'metaDetails'
             , 'view'      => 'getMetaDetails'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'metaDetailId' => array(

@@ -112,6 +112,12 @@
                     AuthorEventUtility::EventQueue($article);
                 }
 
+                AuditUtility::CreateEvent(
+                    'articleQueue'
+                    , 'article'
+                    , $article->articleId
+                    , "Queued by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . ", queueId is " . $articleQueueRecord->articleQueueId);
+
                 $result = array(
                     'success' => true,
                     'id' => $articleQueueRecord->articleQueueId
