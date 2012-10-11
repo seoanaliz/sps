@@ -5,15 +5,71 @@
 
     class MesGroups
     {
-        public static function is_general( $groupId )
+        //типы групп :
+        // 0 - обычная
+        // 1 - запросы в друзья
+        // 2 - не в списке
+        public static function check_group_type( $group_id )
         {
-            $group = self::get_group( $groupId );
-            if ( $group['general'] == 1 )
-                return true;
-            return false;
+            $sql = 'SELECT type FROM '
+                        . TABLE_MES_GROUPS .
+                    ' WHERE group_id = @group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id', $group_id );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger('type');
         }
 
-        private static function get_group( $groupId )
+        public static function get_unlist_dialogs_group( $user_id )
+        {
+            $group_id = MesGroups::get_groups_by_type( $user_id, 2 );
+            $group_id = $group_id[0];
+            if ( !$group_id ) {
+                $group_id =  MesGroups::setGroup( '', 'unlist', '' );
+                MesGroups::set_group_type( $group_id, 2 );
+                MesGroups::implement_group( $group_id, $user_id );
+            }
+            return $group_id;
+        }
+
+        public static function get_groups_by_type( $user_id, $type )
+        {
+            $sql = 'SELECT a.group_id
+                    FROM
+                    '  . TABLE_MES_GROUP_USER_REL . ' as a
+                    , ' . TABLE_MES_GROUPS . ' as b
+                    WHERE
+                        a.group_id = b.group_id
+                        AND a.user_id = @user_id
+                        AND b.type = @group_type';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@user_id',      $user_id);
+            $cmd->SetInteger( '@group_type',   $type);
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[] = $ds->GetInteger( 'group_id' );
+            }
+            return $res;
+        }
+
+        public static function set_group_type( $group_id, $type )
+        {
+            $sql =  'UPDATE '
+                     . TABLE_MES_GROUPS .
+                    ' SET
+                        type=@type
+                     WHERE
+                        group_id = @group_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetInteger( '@type', $type );
+            $ds = $cmd->Execute();
+
+        }
+
+        public static function get_group( $groupId )
         {
             $sql = 'SELECT group_id, name, general, name FROM ' .
                         TABLE_MES_GROUPS
@@ -82,7 +138,7 @@
                     $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $gr_id);
                     $cmd->SetInteger('@user_id', $id);
-                    if ($cmd->ExecuteNonQuery())
+                    if ( $cmd->ExecuteNonQuery())
                         $i++;
                 }
             }
@@ -297,13 +353,14 @@
         {
             $where = $only_unr_out ? ' AND state=4' : '';
             $sql = 'SELECT
-                        rec_id
+                        rec_id, id
                     FROM '
                         . TABLE_MES_DIALOGS . ' as b
                     LEFT JOIN '
-                        . TABLE_MES_GROUP_DIALOG_REL . ' as a ON b.id = a.dialog_id
+                        . TABLE_MES_GROUP_DIALOG_REL . ' as a
+                    ON b.id = a.dialog_id
                     WHERE
-                        a.dialog_id IS NULL AND b.user_id=@user_id ' . $where . '
+                        a.group_id IS NULL AND b.user_id=@user_id ' . $where . '
                     ORDER BY
                         last_update DESC
                     OFFSET
@@ -318,7 +375,7 @@
             $ds = $cmd->Execute();
             $res = array();
             while ( $ds->Next() ) {
-                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
+                $res[$ds->GetInteger( 'id')] =  $ds->GetInteger( 'rec_id' );
             }
             return $res;
         }
@@ -364,7 +421,6 @@
 
         public static function toggle_read_unread_gr( $user_id, $group_id, $read )
         {
-
             $sql = 'UPDATE '
                         . TABLE_MES_GROUP_USER_REL . '
                     SET
@@ -400,9 +456,19 @@
         public static function set_lists_order( $user_id, $group_ids )
         {
             $group_ids = explode( ',', $group_ids );
-            $i = 0;
+            $i = 2;
             foreach( $group_ids as $group_id ) {
-                MesGroups::set_list_place( $user_id, $group_id, $i++ );
+                $type = MesGroups::check_group_type( $group_id );
+                switch( $type) {
+                    case 1:
+                        MesGroups::set_list_place( $user_id, $group_id, 1 );
+                        break;
+                    case 2:
+                        MesGroups::set_list_place( $user_id, $group_id, 0 );
+                        break;
+                    default:
+                        MesGroups::set_list_place( $user_id, $group_id, $i++ );
+                }
             }
         }
     }

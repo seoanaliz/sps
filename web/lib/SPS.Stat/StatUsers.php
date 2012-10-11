@@ -15,9 +15,9 @@
             return false;
         }
 
-        public static function is_our_user( $userId )
+        public static function is_our_user( $user_id )
         {
-            $user = self::get_user( $userId );
+            $user = self::get_user( $user_id );
             if ( $user['userId'] )
                 return $user;
             return false;
@@ -147,7 +147,8 @@
             return $usersIds;
         }
 
-        public static function set_mes_limit_ts( $user_id, $forced = 0 ) {
+        public static function set_mes_limit_ts( $user_id, $forced = 0 )
+        {
             $now = time();
             if ( !$forced )
                 $now -= 86700;
@@ -174,6 +175,19 @@
             $ds->Next();
 
             return $ds->GetInteger('mes_block_ts');
+        }
+
+        public static function get_friendship_state( $user_id, $rec_ids )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                'access_token'  =>  $access_token,
+                'uids'          =>  $rec_ids
+            );
+            $res = VkHelper::api_request( 'friends.areFriends', $params, 0 );
+            return $res;
         }
     }
 ?>

@@ -6,7 +6,7 @@
      */
 
 //    define ( 'ACC_TOK_WRK', 'b03d241fb0371ee7b0371ee7b6b01c4063bb037b0222679cb604e99dfff088b' );
-    define ( 'ACC_TOK_WRK', '35b9bd2b3dbdfebd3dbdfebd6e3d96a03933dbd3db8c62b879c7877d660642a' );
+    define ( 'ACC_TOK_WRK', '0b8c8e800086894200868942b100a9af1a000860093b1dc50eb180b9b836874e8ec5f99' );
     define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
     class VkHelper {
@@ -19,11 +19,9 @@
          */
 
         const TESTING = false;
-
-
         public static function api_request( $method, $request_params, $throw_exc_on_errors = 1 )
         {
-            if ( !isset( $request_params['access_token'] ) )
+            if ( !isset( $request_params['access_token'] ))
                 $request_params['access_token']  =  ACC_TOK_WRK;
             $url = VK_API_URL . $method;
             $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
@@ -37,7 +35,7 @@
             return $res->response;
         }
 
-        public static function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
+        public static function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '')
         {
             if (empty( $url )) {
                 return false;
@@ -141,5 +139,4 @@
             }
         }
     }
-
 ?>

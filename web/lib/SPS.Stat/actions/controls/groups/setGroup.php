@@ -40,7 +40,7 @@
                 die(ERR_MISSING_PARAMS);
             }
 
-            if ( !$m_class::check_group_name_free( $userId, $groupName ) )  {
+            if ( $m_class::check_group_name_used( $userId, $groupName ) )  {
                 echo ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist') );
                 die();
             }

@@ -31,7 +31,7 @@
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
                 $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
-                MesDialogs::check_friend_requests($user_id);
+                MesDialogs::check_friend_requests( $user_id );
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }
 	     
