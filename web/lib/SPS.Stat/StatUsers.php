@@ -39,8 +39,9 @@
             if( isset( $acc_tok ) && $acc_tok )
                 $params['access_token'] =   $acc_tok;
 
-            $result = VkHelper::api_request( 'users.get', $params );
-
+            $result = VkHelper::api_request( 'users.get', $params, 0 );
+            if ( isset( $res->error ))
+                die( ERR_NO_ACC_TOK );
             foreach( $result as $user )
             {
                 $users[ $user->uid ] = array(
