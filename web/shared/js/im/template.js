@@ -1,14 +1,16 @@
 var MAIN =
-'<div class="left-column"></div>' +
-'<div class="right-column"></div>';
+'<div id="left-column"></div>' +
+'<div id="right-column"></div>';
 
 var TABS =
-'<div class="tab-bar">' +
+'<div class="tab-bar messenger">' +
     '<? each(TABS_ITEM, tabs); ?>' +
 '</div>';
 
 var TABS_ITEM =
-'<div data-id="<?=id?>" class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>"><?=title?></div>';
+'<div class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>">' +
+    '<?=label?>' +
+'</div>';
 
 var LEFT_COLUMN =
 '<div class="header fixed"></div>' +
@@ -17,33 +19,26 @@ var LEFT_COLUMN =
     '<div id="list-dialogs"></div>' +
 '</div>';
 
-var RIGHT_COLUMN =
-'<div class="header">' +
-    '<div class="tab-bar">' +
-        '<div class="tab selected">Контакты</div>' +
-    '</div>' +
-'</div>' +
-'<div class="list scroll-like-mac"></div>';
-
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
         '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
-    '<? } else if (isset("isLoad") && isLoad) { ?>' +
-        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
 '</div>';
 
-var DIALOGS_BLOCK =
-'<div class="dialogs-block dialogs-block<?=id?>">' +
-    '<? each(DIALOGS_ITEM, list); ?>' +
+var DIALOGS_LOADING =
+'<div class="dialogs">' +
+    '<div class="load"></div>' +
 '</div>';
+
+var DIALOGS_BLOCK =
+'<? each(DIALOGS_ITEM, list); ?>';
 
 var DIALOGS_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
-'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>" data-user-id="<?=user.id?>">' +
+'<div class="dialog clear-fix<?=(isNew && !isViewer) ? " new" : ""?>" data-id="<?=id?>" data-title="<?=user.name?>" data-user-id="<?=user.id?>" data-message-id="<?=messageId?>">' +
     '<div class="user">' +
         '<div class="photo">' +
             '<a href="http://vk.com/id<?=user.id?>" target="_blank"><img src="<?=user.photo?>" alt="" /></a>' +
@@ -128,10 +123,40 @@ var MESSAGES =
     '</div>' +
 '</div>';
 
-var MESSAGES_BLOCK =
-'<div class="messages-block messages-block<?=id?>">' +
-    '<? each(MESSAGES_ITEM, list); ?>' +
+var MESSAGES_LOADING =
+'<div class="messages">' +
+    '<div class="load"></div>' +
+'</div>' +
+'<div class="post-message clear-fix fixed">' +
+    '<div class="left-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=viewer.id?>" title="Это Вы">' +
+                '<img src="<?=viewer.photo?>" alt="" />' +
+            '</a>' +
+        '</div>' +
+    '</div>' +
+    '<div class="center-column">' +
+        '<div class="content">' +
+            '<div class="textarea-wrap">' +
+                '<textarea rows="" cols="" placeholder="Введите ваше сообщение..."></textarea>' +
+            '</div>' +
+            '<div class="actions">' +
+                '<button class="button send">Отправить</button>' +
+                '<a class="link save-template">Создать шаблон</button>' +
+            '</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="right-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>" title="<?=user.name?>">' +
+                '<img src="<?=user.photo?>" alt="" />' +
+            '</a>' +
+        '</div>' +
+    '</div>' +
 '</div>';
+
+var MESSAGES_BLOCK =
+'<? each(MESSAGES_ITEM, list); ?>';
 
 var MESSAGES_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
@@ -213,36 +238,35 @@ var MESSAGE_ATTACHMENT =
     '</div>' +
 '<? } ?>';
 
-var LIST =
-'<? if (isset("list") && list.length) { ?>' +
-    '<div class="item" data-id="999999" data-title="Не в списке">' +
-        '<div class="title active">' +
-            'Не в списке' +
-            '<span class="counter"><?=count ? "+" + count : ""?></span>' +
-        '</div>' +
+
+var RIGHT_COLUMN =
+'<div class="header">' +
+    '<div class="tab-bar">' +
+        '<div class="tab selected">Контакты</div>' +
     '</div>' +
-    '<? each(LIST_ITEM, list); ?>' +
-'<? } else { ?>' +
-    '<div class="empty">Список пуст</div>' +
-'<? } ?>';
+'</div>' +
+'<div class="list scroll-like-mac">' +
+    '<? if (isset("list") && list.length) { ?>' +
+        '<div class="item" data-id="999999" data-title="Не в списке">' +
+            '<div class="title active">' +
+                'Не в списке' +
+                '<span class="counter"><?=counter ? "+" + counter : ""?></span>' +
+            '</div>' +
+        '</div>' +
+        '<? each(LIST_ITEM, list); ?>' +
+    '<? } else { ?>' +
+        '<div class="empty">Список пуст</div>' +
+    '<? } ?>' +
+'</div>';
 
 var LIST_ITEM =
 '<div class="drag-wrap">' +
-    '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-        '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
-            '<?=title?>' +
-            '<span class="counter"><?=count ? "+" + count : ""?></span>' +
-        '</div>' +
-        '<? if (isset("dialogs") && dialogs.length) { ?>' +
-            '<div class="list">' +
-                '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
+    '<? if (isset("title")) { ?>' +
+        '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
+            '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
+                '<?=title?>' +
+                '<span class="counter"><?=counter ? "+" + counter : ""?></span>' +
             '</div>' +
-        '<? } ?>' +
-    '</div>' +
-'</div>';
-
-var LIST_ITEM_DIALOG =
-'<div class="dialog" data-id="<?=id?>" data-title="<?=user.name?>">' +
-    '<div class="icon"><img src="<?=user.photo?>" alt="" /></div>' +
-    '<div class="title"><?=user.name?><span class="counter"></span></div>' +
+        '</div>' +
+    '<? } ?>' +
 '</div>';

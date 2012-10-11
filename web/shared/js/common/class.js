@@ -20,6 +20,8 @@
 
         // Copy the properties over onto the new prototype
         for (var name in prop) {
+            if (!prop.hasOwnProperty(name)) continue;
+
             // Check if we're overwriting an existing function
             prototype[name] = typeof prop[name] == "function" &&
                 typeof _super[name] == "function" && fnTest.test(prop[name]) ?

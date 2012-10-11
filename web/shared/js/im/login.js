@@ -78,6 +78,6 @@ $(document).ready(function() {
 function onSuccess(token) {
     $.cookie('token', token, {path: '/', expires: 30});
     Events.fire('add_user', token, function() {
-        location.replace('/im/');
+        window.location = '/' + atob(location.search.substr(1));
     });
 }

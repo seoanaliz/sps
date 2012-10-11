@@ -9,7 +9,7 @@ var Widget = (function() {
 
             t._configure(options);
             t._bindEvents();
-            t.run(options);
+            t.run();
 
             return this;
         },
@@ -17,16 +17,23 @@ var Widget = (function() {
         _configure: function(options) {
             var t = this;
 
-            t.options = options || $.error('Options not found.');
+            t.options = options;
+
+            if (!t.options) throw new TypeError('Options not found');
 
             t.id = widgetId++;
-            t.el = options.el || t.el || $.error('El not found.');
-            t.model = options.model || t.model || {};
+            t.model = options.model || t.model;
             t.events = options.events || t.events || {};
-            t.template = options.template || t.template || '';
-            t.templateData = options.templateData || t.templateData || {};
+            t.template = options.template || t.template;
+            t.selector = options.selector || t.selector;
+            t.modelClass = options.modelClass || t.modelClass;
 
-            t.$el = $(t.el);
+            if (!t.template) throw new TypeError('Template not found');
+            if (!t.selector) throw new TypeError('Selector not found');
+            if (t.modelClass && !t.model) throw new TypeError('Model not found');
+            if (t.model && !(t.model instanceof t.modelClass)) throw new TypeError('Model is not correct');
+
+            t.$el = $(t.selector);
 
             return this;
         },
@@ -50,7 +57,7 @@ var Widget = (function() {
         renderTemplate: function() {
             var t = this;
 
-            t.$el.html(t.tmpl(t.template, t.templateData));
+            t.$el.html(t.tmpl(t.template, (t.model && t.model.data())));
 
             return this;
         },

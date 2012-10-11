@@ -53,57 +53,24 @@ var Eventlist = {
             callback(true);
         })
     },
-    get_user: function(callback) {
-        simpleAjax('addUser', function(data) {
-            callback({
-                id: data.userId,
-                name: data.name,
-                photo: data.ava
-            });
+    get_viewer: function(callback) {
+        simpleAjax('addUser', function(rawUser) {
+            callback(Cleaner.user(rawUser));
         });
     },
     get_lists: function(callback) {
-        simpleAjax('getGroupList', function(dirtyData) {
+        simpleAjax('getGroupList', function(rawData) {
             var clearData = [];
             var count = 0;
-            $.each(dirtyData, function(i, dirtyList) {
-                if (typeof dirtyList == 'number') {
-                    count = dirtyList;
+            $.each(rawData, function(i, rawListItem) {
+                if (typeof rawListItem == 'number') {
+                    count = rawListItem;
                 } else {
-                    clearData.push({
-                        id: dirtyList.group_id,
-                        title: dirtyList.name,
-                        count: dirtyList.unread,
-                        isRead: dirtyList.isRead
-                    });
+                    clearData.push(Cleaner.listItem(rawListItem));
                 }
             });
 
             callback(clearData, count);
-        });
-    },
-    get_dialogs_list: function(listId, offset, limit, callback) {
-        var params = {
-            groupId: listId == Configs.commonDialogsList ? undefined : listId,
-            offset: offset,
-            limit: limit
-        };
-        simpleAjax('getGroupDialogs', params, function(dirtyData) {
-            var clearData = [];
-            $.each(dirtyData, function(i, dirtyDialog) {
-                var clearUser = {
-                    id: dirtyDialog.uid.userId,
-                    name: dirtyDialog.uid.name,
-                    photo: dirtyDialog.uid.ava,
-                    isOnline: (dirtyDialog.uid.online != 0)
-                };
-                clearData.push({
-                    id: dirtyDialog.id,
-                    user: clearUser
-                });
-                UsersCollection.add(clearUser.id, clearUser);
-            });
-            callback(clearData);
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
@@ -112,38 +79,13 @@ var Eventlist = {
             offset: offset,
             limit: limit
         };
-        simpleAjax('getDialogsList', params, function(dirtyData) {
+        simpleAjax('getDialogsList', params, function(rawData) {
             var clearData = [];
-            $.each(dirtyData, function(i, dirtyDialog) {
-                var clearUser = {
-                    id: dirtyDialog.uid.userId,
-                    name: dirtyDialog.uid.name,
-                    photo: dirtyDialog.uid.ava,
-                    isOnline: (dirtyDialog.uid.online != 0)
-                };
-                var clearText = dirtyDialog.body || dirtyDialog.title;
-                clearText = clearText.split('<br>');
-                if (clearText.length > 2) {
-                    clearText = clearText.slice(0, 2).join('<br>') + '...';
-                } else {
-                    clearText = clearText.join('<br>');
-                }
-                if (clearText.length > 250) {
-                    clearText = clearText.substring(0, 200) + '...';
-                }
-                clearData.push({
-                    id: dirtyDialog.id,
-                    isNew: (dirtyDialog.read_state != 1),
-                    isViewer: (dirtyDialog.out != 0),
-                    viewer: Configs.viewer,
-                    user: clearUser,
-                    text: clearText,
-                    timestamp: dirtyDialog.date,
-                    lists: (typeof dirtyDialog.groups == 'string') ? [] : dirtyDialog.groups
-                });
-                UsersCollection.add(clearUser.id, clearUser);
+            $.each(rawData, function(i, rawDialog) {
+                var clearDialog = Cleaner.dialog(rawDialog);
+                clearData.push(clearDialog);
             });
-            callback(clearData);
+            callback({list: clearData});
         });
     },
     get_messages: function(dialogId, offset, limit, callback) {
@@ -152,47 +94,24 @@ var Eventlist = {
             offset: offset,
             limit: limit
         };
-        simpleAjax('getDialog', params, function(dirtyData) {
-            var clearData = [];
-            var dirtyUsers = dirtyData.dialogers;
-            var dirtyMessages = dirtyData.messages;
+        simpleAjax('getDialog', params, function(rawData) {
+            var clearData = {};
+            var rawUsers = rawData.dialogers;
+            var rawMessages = rawData.messages;
             var clearUsers = {};
             var clearMessages = [];
-            $.each(dirtyUsers, function(i, dirtyUser) {
-                var clearUser = {
-                    id: dirtyUser.userId,
-                    name: dirtyUser.name,
-                    photo: dirtyUser.ava,
-                    isOnline: (dirtyUser.online != 0)
-                };
-                clearUsers[dirtyUser.userId] = clearUser;
-                UsersCollection.add(clearUser.id, clearUser);
+            $.each(rawUsers, function(i, rawUser) {
+                var clearUser = Cleaner.user(rawUser);
+                clearUsers[rawUser.userId] = clearUser;
             });
-            $.each(dirtyMessages, function(i, dirtyMessage) {
-                var clearAttachments = {};
-                if (dirtyMessage.attachments) {
-                    $.each(dirtyMessage.attachments, function (i, attachment) {
-                        if (!clearAttachments[attachment.type]) {
-                            clearAttachments[attachment.type] = {
-                                type: attachment.type,
-                                list: []
-                            };
-                        }
-                        clearAttachments[attachment.type].list.push(attachment[attachment.type]);
-                    });
-                }
-                clearMessages.push({
-                    id: dirtyMessage.mid,
-                    isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.out != 0),
-                    text: makeMsg(dirtyMessage.body.split('<br>').join('\n'), true),
-                    dialogId: dirtyMessage.dialog_id,
-                    attachments: clearAttachments,
-                    timestamp: dirtyMessage.date,
-                    user: clearUsers[dirtyMessage.from_id]
-                });
+            $.each(rawMessages, function(i, rawMessage) {
+                clearMessages.push(Cleaner.message(rawMessage));
             });
-            clearData = {users: clearUsers, messages: clearMessages, lists: dirtyData.groupIds};
+            clearData = {
+                users: clearUsers,
+                list: clearMessages,
+                lists: rawData.groupIds
+            };
             callback(clearData);
         });
     },
@@ -229,11 +148,8 @@ var Eventlist = {
     get_templates: function(listId, callback) {
         simpleAjax('findTemplate', {groupId: listId, search: ''}, function(data) {
             var clearTemplates = [];
-            $.each(data, function(i, dirtyTemplate) {
-                clearTemplates.push({
-                    title: dirtyTemplate.text,
-                    id: dirtyTemplate.tmpl_id
-                });
+            $.each(data, function(i, rawTemplate) {
+                clearTemplates.push(Cleaner.template(rawTemplate));
             });
             callback(clearTemplates);
         });
@@ -270,3 +186,202 @@ var Eventlist = {
     }
 };
 $.extend(Events.eventList, Eventlist);
+
+/**
+ * Helpers
+ */
+var Cleaner = {
+    longPollMessage: function(rawContent, isOut) {
+        var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+
+        return {
+            id: rawContent.mid,
+            isNew: (rawContent.read_state != 1),
+            isViewer: isOut,
+            text: rawContent.body,
+            attachments: [],
+            timestamp: rawContent.date,
+            user: user,
+            viewer: user,
+            lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
+            dialogId: rawContent.dialog_id
+        };
+    },
+
+    longPollDialog: function(rawContent, isOut) {
+        var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+
+        return {
+            id: rawContent.dialog_id,
+            isNew: (rawContent.read_state != 1),
+            isViewer: isOut,
+            text: makeDlg(rawContent.body || rawContent.title),
+            attachments: [],
+            timestamp: rawContent.date,
+            user: user,
+            viewer: user,
+            lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
+            messageId: rawContent.mid
+        };
+    },
+
+    longPollOnline: function(rawContent) {
+        var user = rawContent.userId;
+
+        return {
+            isOnline: user.online,
+            userId: user.userId
+        };
+    },
+
+    longPollRead: function(rawContent) {
+        return {
+            id: rawContent.mid
+        }
+    },
+
+    user: function(rawUser) {
+        var clearUser = {};
+
+        if (rawUser && rawUser.userId) {
+            clearUser = {
+                id: rawUser.userId,
+                name: rawUser.name,
+                photo: rawUser.ava,
+                isOnline: (rawUser.online != 0)
+            };
+        } else {
+            clearUser = {};
+        }
+        return clearUser;
+    },
+
+    attachments: function(rawAttachments) {
+        var clearAttachments = {};
+
+        if (rawAttachments) {
+            $.each(rawAttachments, function (i, attachment) {
+                if (!clearAttachments[attachment.type]) {
+                    clearAttachments[attachment.type] = {
+                        type: attachment.type,
+                        list: []
+                    };
+                }
+                clearAttachments[attachment.type].list.push(attachment[attachment.type]);
+            });
+        }
+        return clearAttachments;
+    },
+
+    message: function(rawMessage) {
+        return {
+            id: rawMessage.mid,
+            isNew: (rawMessage.read_state != 1),
+            isViewer: (rawMessage.out != 0),
+            viewer: new UserModel(),
+            user: new UserModel(),
+//            user: typeof rawMessage.from_id == 'number' ? userCollection.get(rawMessage.from_id) : this.user(rawMessage.from_id),
+            text: makeMsg(rawMessage.body.split('<br>').join('\n'), true),
+            timestamp: rawMessage.date,
+            attachments: this.attachments(rawMessage.attachments),
+            dialogId: rawMessage.dialog_id
+        };
+    },
+
+    dialog: function(rawDialog) {
+        return {
+            id: rawDialog.id,
+            isNew: (rawDialog.read_state != 1),
+            isViewer: (rawDialog.out != 0),
+            viewer: new UserModel(),
+            user: this.user(rawDialog.uid),
+            text: makeDlg(rawDialog.body || rawDialog.title),
+            timestamp: rawDialog.date,
+            attachments: [],
+            lists: (typeof rawDialog.groups == 'string') ? [] : rawDialog.groups,
+            messageId: rawDialog.mid
+        };
+    },
+
+    listItem: function(rawList) {
+        return {
+            id: rawList.group_id,
+            title: rawList.name,
+            count: rawList.unread,
+            isRead: rawList.isRead
+        };
+    },
+
+    template: function(rawTemplate) {
+        return {
+            id: rawTemplate.tmpl_id,
+            title: rawTemplate.text
+        };
+    }
+};
+
+function makeMsg(msg, isNotClean) {
+    function clean(str) {
+        if (isNotClean) {
+            return str;
+        }
+        else {
+            return str ? str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;') : '';
+        }
+    }
+
+    function indexOf(arr, value, from) {
+        for (var i = from || 0, l = (arr || []).length; i < l; i++) {
+            if (arr[i] == value) return i;
+        }
+        return -1;
+    }
+
+    return clean(msg).replace(/\n/g, '<br>').replace(/(@)?((https?:\/\/)?)((([A-Za-z0-9][A-Za-z0-9\-\_\.]*[A-Za-z0-9])|(([а-яА-Я0-9\-\_\.]+\.рф)))(\/([A-Za-zА-Яа-я0-9\-\_#%&?+\/\.=;:~]*[^\.\,;\(\)\?\<\&\s:])?)?)/ig, function () {
+        var domain = arguments[5],
+            url = arguments[4],
+            full = arguments[0],
+            protocol = arguments[2] || 'http://';
+        var pre = arguments[1];
+
+        if (domain.indexOf('.') == -1) return full;
+        var topDomain = domain.split('.').pop();
+        if (topDomain.length > 5 || indexOf('aero,asia,biz,com,coop,edu,gov,info,int,jobs,mil,mobi,name,net,org,pro,tel,travel,xxx,ru,ua,su,рф,fi,fr,uk,cn,gr,ie,nl,au,co,gd,im,cc,si,ly,gl,be,eu,tv,to,me,io'.split(','), topDomain) == -1) return full;
+
+        if (pre == '@') {
+            return full;
+        }
+        try {
+            full = decodeURIComponent(full);
+        } catch (e){}
+
+        if (full.length > 255) {
+            full = full.substr(0, 253) + '..';
+        }
+
+        if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
+            url = url.replace(/[^a-zA-Z0-9#%;_\-.\/?&=\[\]]/g, encodeURIComponent);
+            return '<a href="'+ (protocol + url).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" target="_blank">' + full + '</a>';
+        }
+        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
+    })
+}
+
+function makeDlg(text) {
+    var clearText = text;
+    clearText = clearText.split('<br>');
+    if (clearText.length > 2) {
+        clearText = clearText.slice(0, 2).join('<br>') + '...';
+    } else {
+        clearText = clearText.join('<br>');
+    }
+    if (clearText.length > 250) {
+        clearText = clearText.substring(0, 200) + '...';
+    }
+    return clearText;
+}
