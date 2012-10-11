@@ -12,7 +12,7 @@
             'class'       => 'NavigationType'
             , 'table'     => 'navigationTypes'
             , 'view'      => 'getNavigationTypes'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanCache' => false )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'navigationTypeId' => array(

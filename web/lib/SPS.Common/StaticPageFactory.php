@@ -12,7 +12,7 @@
             'class'       => 'StaticPage'
             , 'table'     => 'staticPages'
             , 'view'      => 'getStaticPages'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
             , 'cacheDeps' => array( 'staticPages' )
             , 'fields'    => array(
                 'staticPageId' => array(

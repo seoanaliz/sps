@@ -131,6 +131,9 @@
                 <page uri="controls://shareGroup/">
                     <actions>SPS.Stat.shareGroup</actions>
                 </page>
+                <page uri="controls://setGroupOrder/">
+                    <actions>SPS.Stat.setGroupOrder</actions>
+                </page>
 
             </pageGroup>
 
@@ -501,7 +504,9 @@
                 <page uri="daemons://MessageSender/">
                     <actions>SPS.Stat.MessageSender</actions>
                 </page>
-
+                <page uri="daemons://SyncLikes/">
+                    <actions>SPS.Site.SyncLikes</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="vtControls" boot="">

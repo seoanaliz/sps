@@ -92,6 +92,9 @@ var IM = Widget.extend({
         t.leftColumn.on('updateList', function() {
             t.rightColumn.update();
         });
+        t.leftColumn.on('selectDialog', function(dialogId) {
+            t.rightColumn.trigger('selectDialog', dialogId);
+        });
         t.rightColumn.on('selectDialogs', function(id, title) {
             t.leftColumn.initDialogs(id, title);
         });
@@ -196,7 +199,8 @@ var LeftColumn = Widget.extend({
         t.on('scroll', function() {
             if (t.messages) {
                 t.messages.trigger('scroll');
-            } else if (t.dialogs) {
+            }
+            if (t.dialogs) {
                 t.dialogs.trigger('scroll');
             }
         });
@@ -214,7 +218,8 @@ var LeftColumn = Widget.extend({
 
         if (t.messages) {
             t.messages.addMessage(message);
-        } else if (t.dialogs) {
+        }
+        if (t.dialogs) {
             t.dialogs.addMessage(message);
         }
     },
@@ -239,17 +244,11 @@ var LeftColumn = Widget.extend({
         var tabId, tabPrefix;
         title = $.trim(title) || '...';
 
-        if (t.messages) {
-            t.messages.destroy();
-            t.messages = null;
-        }
-        if (t.dialogs) {
-            t.dialogs.destroy();
-            t.dialogs = null;
-        }
-
         switch(pageName) {
             case 'dialogs':
+                if (t.messages) {
+                    t.messages.hide();
+                }
                 var listId = params.listId;
                 tabPrefix = t.tabPrefixDialogs;
                 tabId = tabPrefix + listId;
@@ -259,19 +258,33 @@ var LeftColumn = Widget.extend({
                     t.tabs.prependTab(tabId, title);
                 }
 
-                t.dialogs = new Dialogs({
-                    el: t.$el.find('.list'),
-                    listId: listId
-                });
-                t.dialogs.on('select', function(dialogId, title, userId) {
-                    t.initMessages(dialogId, title, userId);
-                });
-                t.dialogs.on('addList', function() {
-                    t.trigger('updateList');
-                });
+                if (t.dialogs && t.dialogs.listId != listId) {
+                    t.dialogs.destroy();
+                    t.dialogs = null;
+                }
+                if (t.dialogs) {
+                    t.dialogs.show();
+                }
+                if (!t.dialogs) {
+                    t.$el.find('#list-dialogs').show();
+                    t.dialogs = new Dialogs({
+                        el: t.$el.find('#list-dialogs'),
+                        listId: listId
+                    });
+                    t.dialogs.on('select', function(dialogId, title, userId) {
+                        t.initMessages(dialogId, title, userId);
+                    });
+                    t.dialogs.on('addList', function() {
+                        t.trigger('updateList');
+                    });
+                }
+
                 t.curListId = listId;
             break;
             case 'messages':
+                if (t.dialogs) {
+                    t.dialogs.hide();
+                }
                 var dialogId = params.dialogId;
                 var userId = params.userId;
                 tabPrefix = t.tabPrefixMessages;
@@ -282,15 +295,27 @@ var LeftColumn = Widget.extend({
                     t.tabs.appendTab(tabId, title);
                 }
 
-                t.messages = new Messages({
-                    el: t.$el.find('.list'),
-                    dialogId: dialogId,
-                    userId: userId
-                });
-                t.messages.on('markAsRead', function() {
-                    t.trigger('updateList');
-                });
+                if (t.messages && t.messages.dialogId != dialogId) {
+                    t.messages.destroy();
+                    t.messages = null;
+                }
+                if (t.messages) {
+                    t.messages.show();
+                }
+                if (!t.messages) {
+                    t.$el.find('#list-messages').show();
+                    t.messages = new Messages({
+                        el: t.$el.find('#list-messages'),
+                        dialogId: dialogId,
+                        userId: userId
+                    });
+                    t.messages.on('markAsRead', function() {
+                        t.trigger('updateList');
+                    });
+                }
+
                 t.curDialogId = dialogId;
+                t.trigger('selectDialog', dialogId);
             break;
         }
 
@@ -308,7 +333,7 @@ var LeftColumn = Widget.extend({
     }
 });
 
-var EndlessListAbstract = Widget.extend({
+var EndlessList = Widget.extend({
     template: null,
     tmplItem: null,
     tmplItemsBlock: null,
@@ -400,7 +425,43 @@ var EndlessListAbstract = Widget.extend({
     }
 });
 
-var Dialogs = EndlessListAbstract.extend({
+var CachePage = EndlessList.extend({
+    _isVisible: true,
+    _isScrollBottom: false,
+    _scroll: null,
+    _html: null,
+
+    isVisible: function() {
+        return !!this._isVisible;
+    },
+    show: function() {
+        var t = this;
+        t._isVisible = true;
+        t.$el.show();
+        if (t._isScrollBottom) {
+            $(window).scrollTop($(document).height() - $(window).height());
+        } else {
+            $(window).scrollTop(t._scroll);
+        }
+    },
+    hide: function() {
+        var t = this;
+        t._isVisible = false;
+        t._scroll = $(window).scrollTop();
+        t._isScrollBottom = ($(document).height() - $(window).height() == $(window).scrollTop());
+        t.$el.hide();
+    },
+    trigger: function(events, obj, obj2) {
+        var t = this;
+        if (!t.isVisible()) {
+            return t;
+        } else {
+            return t._super(events, obj, obj2);
+        }
+    }
+});
+
+var Dialogs = CachePage.extend({
     template: DIALOGS,
     tmplItem: DIALOGS_ITEM,
     tmplItemsBlock: DIALOGS_BLOCK,
@@ -467,12 +528,13 @@ var Dialogs = EndlessListAbstract.extend({
     bindEvents: function() {
         var t = this;
         var $el = t.$el;
-
         t.on('scroll', (function onScroll() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
-                t.showMore();
+            if (t.isVisible()) {
+                if ($(window).scrollTop() >= $(document).height() - $(window).height() - 300) {
+                    t.showMore();
+                }
+                return onScroll;
             }
-            return onScroll;
         })());
     },
     addMessage: function(message) {
@@ -601,11 +663,14 @@ var Dialogs = EndlessListAbstract.extend({
         if (isTrigger) t.trigger('select', dialogId, title, userId);
     },
     scrollTop: function() {
-        $(window).scrollTop(0);
+        var t = this;
+        if (t.isVisible()) {
+            $(window).scrollTop(0);
+        }
     }
 });
 
-var Messages = EndlessListAbstract.extend({
+var Messages = CachePage.extend({
     template: MESSAGES,
     tmplItem: MESSAGES_ITEM,
     tmplItemsBlock: MESSAGES_BLOCK,
@@ -696,7 +761,9 @@ var Messages = EndlessListAbstract.extend({
             t.updateTop();
             t.scrollBottom();
             t.bindEvents();
-            setTimeout(t.scrollBottom, 100);
+            setTimeout(function() {
+                t.scrollBottom();
+            }, 100);
         });
         t.currentPage++;
         t.preload();
@@ -707,10 +774,11 @@ var Messages = EndlessListAbstract.extend({
         var listId = t.listId;
 
         t.on('scroll', (function onScroll() {
-            t.updateTop();
-
-            if ($(window).scrollTop() < 300) {
-                t.showMore();
+            if (t.isVisible()) {
+                t.updateTop();
+                if ($(window).scrollTop() < 300) {
+                    t.showMore();
+                }
             }
             return onScroll;
         })());
@@ -722,7 +790,7 @@ var Messages = EndlessListAbstract.extend({
             box.show();
         });
         $el.find('textarea').keydown(function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
                 t.sendMessage();
                 return false;
             }
@@ -744,6 +812,7 @@ var Messages = EndlessListAbstract.extend({
                 position: 'top',
                 notFoundText: '',
                 data: data,
+                strictSearch: true,
                 getValue: function() {
                     var text = $.trim($textarea.val());
                     return text ? text : 'notShowAllItems';
@@ -801,13 +870,17 @@ var Messages = EndlessListAbstract.extend({
     },
     updateTop: function() {
         var t = this;
-        var $el = t.$el;
-        var $messages = $el.find(t.itemsListSelector);
-
-        $messages.css('padding-top', $(window).height() - $messages.height() - 152);
+        if (t.isVisible()) {
+            var $el = t.$el;
+            var $messages = $el.find(t.itemsListSelector);
+            $messages.css('padding-top', $(window).height() - $messages.height() - 152);
+        }
     },
     scrollBottom: function() {
-        $(window).scrollTop($(document).height());
+        var t = this;
+        if (t.isVisible()) {
+            $(window).scrollTop($(document).height());
+        }
     },
     sendMessage: function() {
         var t = this;
@@ -876,11 +949,14 @@ var RightColumn = Widget.extend({
         t.list = new List({
             el: t.$el.find('.list')
         });
-        t.list.on('selectDialogs', function(id, title) {
-            t.trigger('selectDialogs', id, title);
+        t.list.on('selectDialogs', function(listId, title) {
+            t.trigger('selectDialogs', listId, title);
         });
-        t.list.on('selectMessages', function(id, title) {
-            t.trigger('selectMessages', id, title);
+        t.list.on('selectMessages', function(dialogId, title) {
+            t.trigger('selectMessages', dialogId, title);
+        });
+        t.on('selectDialog', function(dialogId) {
+            t.list.currentDialogId = dialogId;
         });
     }
 });
@@ -888,9 +964,13 @@ var RightColumn = Widget.extend({
 var List = Widget.extend({
     template: LIST,
     dialogsLimit: 100,
-    currentList: null,
+    currentListId: null,
+    currentDialogId: null,
+    isEditMode: true,
+    isDragging: false,
 
     events: {
+        'mousedown: .drag-wrap': 'mouseDownList',
         'click: .item > .title': 'clickList'
     },
 
@@ -901,24 +981,74 @@ var List = Widget.extend({
         Events.fire('get_lists', function(data, count) {
             t.templateData = {list: data, count: count};
             t.renderTemplate();
-            if (t.currentList) {
+            if (t.currentListId) {
                 $el.find('.title.active, .dialog.active').removeClass('active');
-                $el.find('.item[data-id=' + t.currentList + ']').find('.title').addClass('active');
+                $el.find('.item[data-id=' + t.currentListId + ']').find('.title').addClass('active');
             }
         });
     },
 
     clickList: function(e) {
         var t = this;
+        if (t.isDragging) return;
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
         t.$el.find('.title.active, .dialog.active').removeClass('active');
         $target.find('.title').addClass('active');
+        $target.find('.title').removeClass('new');
         t.trigger('selectDialogs', listId, title);
-        t.setAsRead(listId);
-        t.currentList = listId;
+        t.currentListId = listId;
         Events.fire('set_list_as_read', listId, function() {});
+    },
+
+    mouseDownList: function(e) {
+        var t = this;
+        if (!t.isEditMode) return;
+        var $placeholder = $(e.currentTarget);
+        var $target = $placeholder.find('.item:first');
+        var timeout = setTimeout(function() {
+            t.isDragging = true;
+            $target.addClass('drag');
+            $placeholder.height($target.height());
+            $('html, body').addClass('no-select');
+        }, 300);
+        var startY = e.clientY;
+
+        $(window).on('mousemove.list', (function update(e) {
+            if (t.isDragging) {
+                var top = e.clientY - startY;
+                var height = $placeholder.height();
+                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var $next = $placeholder.next('.drag-wrap');
+                var $prev = $placeholder.prev('.drag-wrap');
+
+                if (position > 0 && $next.length) {
+                    $placeholder.before($next);
+                    startY += height;
+                } else if (position < 0 && $prev.length) {
+                    $placeholder.after($prev);
+                    startY -= height;
+                }
+                top = e.clientY - startY;
+                $target.css({top: top});
+            }
+
+            return update;
+        })(e));
+
+        $(window).on('mouseup.list', function(e) {
+            $(this).off('mousemove.list mouseup.list');
+            clearTimeout(timeout);
+
+            if (!t.isDragging) return;
+            $('html, body').removeClass('no-select');
+            $target.removeClass('drag').css({top: 0});
+            setTimeout(function() {
+                t.isDragging = false;
+                t.setOrder();
+            }, 0);
+        });
     },
 
     update: function() {
@@ -926,25 +1056,26 @@ var List = Widget.extend({
         t.run();
     },
 
-    setAsNew: function(listId) {
+    setOrder: function() {
         var t = this;
         var $el = t.$el;
-        $el.find('.item[data-id=' + listId + ']').find('.title').addClass('new');
-    },
-
-    setAsRead: function(listId) {
-        var t = this;
-        var $el = t.$el;
-        $el.find('.item[data-id=' + listId + ']').find('.title').removeClass('new');
+        var listIds = [];
+        $el.find('.item').each(function() {
+            var listId = $(this).data('id');
+            if (listId != Configs.commonDialogsList) listIds.push(listId);
+        });
+        Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
     addMessage: function(message) {
         var t = this;
-        t.update();
-        $.each(message.lists, function(i, listId) {
-            t.setAsNew(listId);
-            Events.fire('set_list_as_new', listId, function() {});
-        });
+        if (message.dialogId != t.currentDialogId) {
+            Events.fire('set_list_as_new', message.lists.join(','), function() {
+                t.update();
+            });
+        } else {
+            t.update();
+        }
     }
 });
 
@@ -1056,12 +1187,12 @@ function makeMsg(msg, isNotClean) {
 function CreateTemplateBox(listId, text) {
     var SAVE_TEMPLATE_BOX =
     '<div class="box-templates">' +
-//        '<div class="title">' +
-//            'Выберите списки' +
-//        '</div>' +
-//        '<div class="input-wrap">' +
-//            '<input class="lists" type="text"/>' +
-//        '</div>' +
+        '<div class="title">' +
+            'Выберите списки' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<input class="lists" type="text"/>' +
+        '</div>' +
         '<div class="title">' +
             'Введите текст шаблона' +
         '</div>' +
@@ -1071,57 +1202,75 @@ function CreateTemplateBox(listId, text) {
     '</div>';
 
     var box = new Box({
-        id: 'templateBox' + listId,
         title: 'Добавление нового шаблона',
+        html: tmpl(BOX_LOADING, {height: 100}),
+        buttons: [
+            {label: 'Закрыть'}
+        ],
         onshow: function() {
-            var $input = this.$el.find('.lists');
-            var $textarea = this.$el.find('.template-text');
-            var text = $textarea.val();
-            var lists = [
-                {id: 1, title: 'asdasd'},
-                {id: 2, title: 'fdsdfadasd'},
-                {id: 3, title: 'cxvxcvasdasd'}
-            ];
-            $textarea.focus();
-            $textarea.selectRange(text.length, text.length);
+            Events.fire('get_lists', function(dirtyLists) {
+                var listsIds = [];
+                var clearLists = [];
+                var currentList = {};
+                $.each(dirtyLists, function(i, list) {
+                    if (list.id) {
+                        clearLists.push(list);
+                    }
+                    if (listId == list.id) {
+                        currentList = list;
+                    }
+                });
 
-            $input.tags({
-                onadd: function(tag) {
-                    lists.push(parseInt(tag.id));
-                },
-                onremove: function(tagId) {
-                    lists = jQuery.grep(lists, function(value) {
-                        return value != tagId;
+                box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+                box.setButtons([
+                    {label: 'Сохранить', onclick: saveTemplate},
+                    {label: 'Отменить', isWhite: true}
+                ]);
+
+                var $input = box.$el.find('.lists');
+                var $textarea = box.$el.find('.template-text');
+                var templateText = $textarea.val();
+                $textarea.focus();
+                $textarea.selectRange(templateText.length, templateText.length);
+
+                $input.tags({
+                    onadd: function(tag) {
+                        listsIds.push(parseInt(tag.id));
+                    },
+                    onremove: function(tagId) {
+                        listsIds = jQuery.grep(listsIds, function(listsIds) {
+                            return listsIds != tagId;
+                        });
+                    }
+                }).autocomplete({
+                    data: clearLists,
+                    target: $input.closest('.ui-tags'),
+                    onchange: function(item) {
+                        $(this).tags('addTag', item).val('').focus();
+                    }
+                }).keydown(function(e) {
+                    if (e.keyCode == KEY.DEL && !$(this).val()) {
+                        $(this).tags('removeLastTag');
+                    }
+                });
+                if (currentList.id) {
+                    $input.tags('addTag', currentList);
+                }
+
+                function saveTemplate() {
+                    var $textarea = box.$el.find('textarea');
+                    var text = $textarea.val();
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Events.fire('add_template', text, listsIds.join(','), function() {
+                        box.hide();
                     });
                 }
-            }).autocomplete({
-                data: lists,
-                target: $input.closest('.ui-tags'),
-                onchange: function(item) {
-                    $(this).tags('addTag', item).val('').focus();
-                }
-            }).keydown(function(e) {
-                if (e.keyCode == KEY.DEL && !$(this).val()) {
-                    $(this).tags('removeLastTag');
-                }
-            }).tags('addTag', lists[0]);
+            });
+        },
+        onhide: function() {
+            box.remove();
         }
     });
-    box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
-    box.setButtons([
-        {label: 'Сохранить', onclick: saveTemplate},
-        {label: 'Отменить', isWhite: true}
-    ]);
-
-    function saveTemplate() {
-        var $textarea = box.$el.find('textarea');
-        var text = $textarea.val();
-        box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-        box.setButtons([{label: 'Закрыть'}]);
-        Events.fire('add_template', text, listId, function() {
-            box.hide();
-        });
-    }
-
     return box;
 }

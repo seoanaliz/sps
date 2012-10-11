@@ -12,7 +12,7 @@
             'class'       => 'Navigation'
             , 'table'     => 'navigations'
             , 'view'      => 'getNavigations'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'IsLocked' => 'IsLocked' )
+            , 'flags'     => array( 'CanCache' => false, 'IsLocked' => 'IsLocked' )
             , 'cacheDeps' => array( 'navigationTypes', 'staticPages' )
             , 'fields'    => array(
                 'navigationId' => array(

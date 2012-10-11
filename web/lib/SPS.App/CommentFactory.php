@@ -22,7 +22,7 @@
             'class'       => 'Comment'
             , 'table'     => 'comments'
             , 'view'      => 'getComments'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array( 'articles', 'authors', 'editors' )
             , 'fields'    => array(
                 'commentId' => array(

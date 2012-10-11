@@ -22,7 +22,7 @@
             'class'       => 'Publisher'
             , 'table'     => 'publishers'
             , 'view'      => 'getPublishers'
-            , 'flags'     => array( 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanCache' => false )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'publisherId' => array(

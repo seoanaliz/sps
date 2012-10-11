@@ -1568,10 +1568,11 @@ var Elements = {
     initLinkLoader: function(obj, full){
         var container   = obj.parents('div.link-info-content');
         var link        = obj.attr('rel');
+
         $.ajax({
-            url: controlsRoot + 'parse-url/',
+            url: 'http://im.' + hostname + '/int/controls/parse-url/',
             type: 'GET',
-            dataType : "json",
+            dataType: 'jsonp',
             data: {
                 url: link
             },

@@ -7,8 +7,13 @@
      */
     class UrlParser {
         public static function Parse($url) {
-            $result = array();
+            $cacheKey = 'url_' . md5($url);
+            $cacheResult = MemcacheHelper::Get( $cacheKey );
+            if ($cacheResult !== false) {
+                return $cacheResult;
+            }
 
+            $result = array();
             $html = self::GetUrlContent($url);
             if (empty($html)) {
                 return $result;
@@ -44,6 +49,9 @@
                 $result['img'] = $img;
                 $result['imgOriginal'] = !empty($imgOriginal) ? $imgOriginal : $img;
             }
+
+            //кешируем данные на 10 минут
+            MemcacheHelper::Set( $cacheKey, $result, 0, 600 );
 
             return $result;
         }

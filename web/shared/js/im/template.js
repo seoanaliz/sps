@@ -12,7 +12,10 @@ var TABS_ITEM =
 
 var LEFT_COLUMN =
 '<div class="header fixed"></div>' +
-'<div class="list"></div>';
+'<div class="list">' +
+    '<div id="list-messages"></div>' +
+    '<div id="list-dialogs"></div>' +
+'</div>';
 
 var RIGHT_COLUMN =
 '<div class="header">' +
@@ -224,16 +227,18 @@ var LIST =
 '<? } ?>';
 
 var LIST_ITEM =
-'<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-    '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
-        '<?=title?>' +
-        '<span class="counter"><?=count ? "+" + count : ""?></span>' +
-    '</div>' +
-    '<? if (isset("dialogs") && dialogs.length) { ?>' +
-        '<div class="list">' +
-            '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
+'<div class="drag-wrap">' +
+    '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
+        '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
+            '<?=title?>' +
+            '<span class="counter"><?=count ? "+" + count : ""?></span>' +
         '</div>' +
-    '<? } ?>' +
+        '<? if (isset("dialogs") && dialogs.length) { ?>' +
+            '<div class="list">' +
+                '<? each(LIST_ITEM_DIALOG, dialogs); ?>' +
+            '</div>' +
+        '<? } ?>' +
+    '</div>' +
 '</div>';
 
 var LIST_ITEM_DIALOG =

@@ -262,6 +262,11 @@ var Eventlist = {
         simpleAjax('toggleReadRead', {groupId: listId}, function() {
             callback(true);
         });
+    },
+    set_list_order: function(listIds, callback) {
+        simpleAjax('setGroupOrder', {groupIds: listIds}, function() {
+            callback(true);
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
