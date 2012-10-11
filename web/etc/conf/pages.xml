@@ -494,6 +494,9 @@
                 <page uri="daemons://MessageSender/">
                     <actions>SPS.Stat.MessageSender</actions>
                 </page>
+                <page uri="daemons://AlbumUpdate/">
+                    <actions>SPS.Stat.AlbumUpdate</actions>
+                </page>
 
             </pageGroup>
 
