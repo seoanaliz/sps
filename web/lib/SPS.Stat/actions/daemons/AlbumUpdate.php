@@ -11,6 +11,11 @@ class AlbumUpdate
     public function execute() {
         set_time_limit( 1000 );
         $publics = StatPublics::get_our_publics_list();
+        $last_update = VkAlbums::get_last_update_time();
+
+        if ( $last_update - time() < 86400 && $last_update )
+            die('Не сейчас');
+        $ts = wrapper::morning( time());
         foreach ( $publics as $public ) {
             //получаем 2 массива альбомов паблика - из базы и из вк
            //сравниваем, 3 возможности
@@ -27,6 +32,9 @@ class AlbumUpdate
                     'comments_quantity' =>  $alum_stat['comments'],
                     'photos_quantity'   =>  $vk_album->size
                 );
+
+                VkAlbums::save_point( $params, $ts);
+
                 //пересечение массивов
                 if ( $our_albums && in_array( $vk_album->aid, $our_albums )) {
                     $this->update_album( $params, 'update' );

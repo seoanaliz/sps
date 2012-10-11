@@ -50,6 +50,24 @@
             $cmd->Execute();
         }
 
+        public static function save_point( $params, $ts )
+        {
+            $sql = 'INSERT INTO '
+                .  TABLE_ALBUM_POINTS .
+                ' (public_id, album_id, photos_quantity, likes_quantity,comments_quantity,ts)
+                    VALUES (@public_id,@album_id,@photos_quantity,@likes_quantity,@comments_quantity,@ts )';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@public_id', $params['public_id'] );
+            $cmd->SetInteger( '@album_id',  $params['album_id'] );
+            $cmd->SetInteger( '@photos_quantity',   $params['photos_quantity'] );
+            $cmd->SetInteger( '@likes_quantity',    $params['likes_quantity'] );
+            $cmd->SetInteger( '@comments_quantity', $params['comments_quantity'] );
+            $cmd->SetInteger( '@ts', $ts );
+
+            $cmd->Execute( );
+
+        }
+
         public static function get_vk_album_stats( $public_id, $album_id )
         {
             $delimiter = '-' . $public_id . '_';
@@ -84,7 +102,15 @@
                 'likes'   =>  $likes,
                 'comments'=>  $comments
             );
+        }
 
+        public static function get_last_update_time()
+        {
+            $sql = 'SELECT MAX(ts) FROM ' . TABLE_ALBUM_POINTS ;
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return $ds->GetInteger( 'ts' );
         }
 
     }
