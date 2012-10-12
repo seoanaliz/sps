@@ -87,8 +87,8 @@
                         </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps.verumnets.ru:8081</param>
-                            <param name="mainLocation">/beta/</param>
-                            <param name="tempLocation">/beta/temp/</param>
+                            <param name="mainLocation">/</param>
+                            <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
                             <param name="uploadHost">127.0.0.1</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
