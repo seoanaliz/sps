@@ -75,29 +75,41 @@
                     </modules>
                 </settings>
 			</host>
-            <host name="devel">
-                <hostname>mystery.vmkteam.ru</hostname>
+            <host name="beta">
+                <hostname>beta.socialboard.ru</hostname>
+                <hostname>im.beta.socialboard.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
-                            <param name="appId">2853330</param>
-                            <param name="password">1h2pQNcNMw54IwO6kuVi</param>
-                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
+                            <param name="appId">2879919</param>
+                            <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.mystery.vmkteam.ru</param>
-                            <param name="mainLocation">/</param>
-                            <param name="tempLocation">/temp/</param>
-                            <param name="uploadPort">80</param>
-                            <param name="uploadHost">media.mystery.vmkteam.ru</param>
+                            <param name="host">media.sps.verumnets.ru:8081</param>
+                            <param name="mainLocation">/beta/</param>
+                            <param name="tempLocation">/beta/temp/</param>
+                            <param name="uploadPort">8001</param>
+                            <param name="uploadHost">127.0.0.1</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
+                        <memcache class="MemcacheHelper">
+                            <servers compress="true" autocompress="true" active="false">
+                                <server host="127.0.0.1" port="40100" active="true" />
+                            </servers>
+                        </memcache>
                     </modules>
                     <databases>
                         <database driver="PgSql">
-                            <name>sps_devel</name>
-                            <user>postgres</user>
+                            <name>sps-beta</name>
+                            <user>sps</user>
+                            <password></password>
+                            <encoding>UTF8</encoding>
+                        </database>
+                        <database driver="PgSql" name="tst">
+                            <name>tst-beta</name>
+                            <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
                         </database>
