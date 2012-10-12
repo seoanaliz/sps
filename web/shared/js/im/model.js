@@ -48,7 +48,8 @@ var UserModel = Model.extend({
 var TabsModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
-            tabs: [new TabModel().data()]
+            lists: [],
+            dialogs: []
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
@@ -58,8 +59,8 @@ var TabModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
             id: null,
-            isSelected: false,
-            label: '...'
+            label: '...',
+            isSelected: false
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }

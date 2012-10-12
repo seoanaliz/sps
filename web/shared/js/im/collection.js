@@ -35,3 +35,7 @@ var UserCollection = Collection.extend({
 var MessageCollection = Collection.extend({
     _modelClass: MessageModel
 });
+
+var TabCollection = Collection.extend({
+    _modelClass: TabModel
+});

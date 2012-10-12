@@ -4,11 +4,21 @@ var MAIN =
 
 var TABS =
 '<div class="tab-bar messenger">' +
-    '<? each(TABS_ITEM, tabs); ?>' +
+    '<? if (isset("lists") && lists.length) { ?>' +
+        '<? each(TABS_ITEM_LIST, lists); ?>' +
+    '<? } ?>' +
+    '<? if (isset("dialogs") && dialogs.length) { ?>' +
+        '<? each(TABS_ITEM_DIALOG, dialogs); ?>' +
+    '<? } ?>' +
 '</div>';
 
-var TABS_ITEM =
-'<div class="tab<?=(isset("isSelected") && isSelected) ? " selected" : ""?>">' +
+var TABS_ITEM_LIST =
+'<div class="tab list<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>">' +
+    '<?=label?>' +
+'</div>';
+
+var TABS_ITEM_DIALOG =
+'<div class="tab dialog<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>">' +
     '<?=label?>' +
 '</div>';
 
