@@ -6,6 +6,7 @@
     class AdminsWork extends wrapper
     {
 
+
         public static  $white_list = array(
             1715958,
             2814488,
@@ -55,11 +56,10 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $ds = $cmd->Execute();
             $ds->Next();
-
-
         }
 
-        public static function get_public_admins($date_min, $date_max, $public_id = 0 ) {
+        public static function get_public_admins($date_min, $date_max, $public_id = 0 )
+        {
             $date_max = $date_max ? $date_max : 1445736044;
             $date_min = $date_min ? $date_min : 0;
 
@@ -71,8 +71,8 @@
                             AND a.post_time > @date_min
                             AND a.post_time < @date_max '
                             . $public_line . '
-                        ORDER BY b.name'
-                        ;
+                        ORDER BY b.name
+                        ';
             }
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
@@ -83,7 +83,6 @@
 
             $ds = $cmd->Execute();
             $res = array();
-
 
             while ($ds->Next()) {
                 $a['id']    = $ds->getValue('author_id', TYPE_INTEGER);
@@ -285,6 +284,211 @@
             return $res;
         }
 
+
+        //todo учет статусов?
+        public static function get_articles( $author_sb_id, $target_feed_id = -1,  $time_from = 0, $time_to = 0 )
+        {
+            $feed_check = $target_feed_id == -1 ? '' : ' AND "targetFeedId" = @feed_id ';
+            $time_from  = $time_from ? date( 'Y-m-d H:i:s', 0 ) : date( 'Y-m-d H:i:s', $time_from );
+            $time_to    = $time_from ? date( 'Y-m-d H:i:s', time()) : date( 'Y-m-d H:i:s', $time_to );
+            $sql = 'SELECT
+                        "articleId"
+                    FROM
+                        articles
+                    WHERE
+                            "authorId"   =  @author_id '
+                      . $feed_check .
+                      ' AND "createdAt" >= @time_from
+                        AND "createdAt" <= @time_to';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
+            $cmd->SetInteger( '@author_id', $author_sb_id );
+            $cmd->SetString ( '@time_from', $time_from );
+            $cmd->SetString ( '@time_to'  , $time_to   );
+            $cmd->SetInteger( '@feed_id'  , $target_feed_id );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[] =  $ds->GetInteger( 'articleId' );
+            }
+            return $res;
+        }
+
+        //article_ids -  строка id постов чз запятую
+        public static function get_posts_quality( $article_ids )
+        {
+            $article_ids = '{' . $article_ids . '}';
+            $sql = 'SELECT
+                       "articleId",
+                        char_length( content ) as length,
+                        substring( "photos" from 3 for 2 ) as photos
+                    FROM
+                        "articleRecords"
+                    WHERE
+                        "articleId" = any( @article_id )';
+//            $sql = 'SELECT char_length(content)as length,photos FROM "articleRecords" where "articleRecordId" = @article_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetString( '@article_id', $article_ids );
+            $ds = $cmd->Execute();
+            $res = array();
+
+            $average_mark = 0;
+            $i = 0;
+            while ( $ds->next()) {
+                $i++;
+                $length      =  $ds->GetInteger( 'length' );
+                $article_id  =  $ds->GetInteger( 'articleId' );
+                $photo_count =  trim( $ds->GetString( 'photos' ), ':');
+                $length      =  $length > 4000 ? 4000 : $length;
+                $photo_count =  $photo_count > 10 ? 10 : $photo_count;
+                $average_mark += 5 * ( floor( $length / 400 ) + $photo_count );
+            }
+            return round( $average_mark / ( $i ? $i : 1)  );
+        }
+
+        //todo авторские/неавторские/все
+        public static function get_average_values( $target_feed_id, $time_from = 0, $time_to = 0 )
+        {
+            $time_from = $time_from ? date( 'Y-m-d H:i:s', 0 ) : date( 'Y-m-d H:i:s', $time_from );
+            $time_to   = $time_from ? date( 'Y-m-d H:i:s', time()) : date( 'Y-m-d H:i:s', $time_to );
+            $sql = 'SELECT
+                        avg("externalLikes")    as avg_likes,
+                        avg("externalRetweets") as avg_retweets
+                    FROM
+                        "articleQueues"
+                    WHERE
+                       "targetFeedId"    = @target_feed_id
+                        AND "sentAt" >= @time_from
+                        AND "sentAt" <= @time_to
+                        AND "externalLikes" > 20
+                    ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetInteger( '@target_feed_id', $target_feed_id );
+            $cmd->SetString ( '@time_from',      $time_from );
+            $cmd->SetString ( '@time_to'  ,      $time_to   );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return array(
+                'likes'         =>  round( $ds->GetFloat( 'avg_likes' )),
+                'retweets'      =>  round( $ds->GetFloat( 'avg_retweets' ))
+            );
+        }
+
+        public static function get_authors_top( $public_ids )
+        {
+
+        }
+
+        public static function get_public_authors( $target_feed_id )
+        {
+            $sql = 'SELECT * FROM authors WHERE @feed_id = ANY("targetFeedIds")';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetInteger( '@feed_id'  , $target_feed_id );
+            $ds = $cmd->Execute();
+//            print_r($ds);
+            $res = array();
+            while ( $ds->Next()) {
+               $res[ $ds->GetInteger( 'vkId')] =  array(
+                                                    'sb_id' =>  $ds->GetInteger( 'authorId' ),
+                                                    'name'  =>  $ds->GetValue( 'firstName' ) . ' ' . $ds->GetValue('lastName'),
+                                                    'ava'   =>  $ds->GetValue( 'avatar' )
+                   );
+            }
+            return $res;
+        }
+
+        //todo все посты/авторские(пока - авторские)
+        public static function get_gen_editor_work( $editor_vk_id, $target_feed_id = -1, $time_from = 0, $time_to = 0 )
+        {
+            $feed_check = $target_feed_id == -1 ? '' : ' AND "targetFeedId" = @feed_id ';
+            $time_from  = $time_from ? date( 'Y-m-d H:i:s', 0 ) : date( 'Y-m-d H:i:s', $time_from );
+            $time_to    = $time_from ? date( 'Y-m-d H:i:s', time()) : date( 'Y-m-d H:i:s', $time_to );
+
+            $sql = 'SELECT
+                        count(*),
+                        avg("externalLikes") as avg_likes,
+                        avg("externalRetweets") as avg_retweets
+                    FROM
+                       "articleQueues" AS a,
+                       "authorEvents"  AS b
+                    WHERE
+                        author=@author'
+                       . $feed_check .
+                       'AND "sentAt" >= @time_from
+                        AND "sentAt" <= @time_to
+                        AND a."articleId" = b."articleId"';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetString ( '@author'   , $editor_vk_id );
+            $cmd->SetString ( '@time_from', $time_from );
+            $cmd->SetString ( '@time_to'  , $time_to   );
+            $cmd->SetInteger( '@feed_id'  , $target_feed_id );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return array(
+                'posts_quantity'    =>  $ds->GetInteger(),
+                'avg_likes'         =>  round( $ds->GetFloat( 'avg_likes' )),
+                'avg_retweets'      =>  round( $ds->GetFloat( 'avg_retweets' ))
+            );
+
+        }
+
+        public static function get_author_posts_likes( $author_sb_id, $article_ids )
+        {
+            $article_ids = '{' . $article_ids . '}';
+            $sql = 'SELECT
+                        count(*),
+                        avg("externalLikes") as avg_likes,
+                        avg("externalRetweets") as avg_retweets
+                    FROM
+                        "articleQueues" AS a,
+                         authors AS b
+                    WHERE
+                       "authorId" = @authorId
+                        AND "articleId" = any( @article_id )
+                        AND cast( a."author" as integer ) =  b."vkId" ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+            $cmd->SetInteger( '@authorId' , $author_sb_id );
+            $cmd->SetString( '@article_id', $article_ids );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return array(
+                'posts_quantity'=>  $ds->GetInteger( 'count' ),
+                'likes'         =>  round( $ds->GetFloat( 'avg_likes' )),
+                'retweets'      =>  round( $ds->GetFloat( 'avg_retweets' )),
+            );
+        }
+
+        public static function get_author_final_score( $author_id, $publics_list, $time_from = -1, $time_to = -1 )
+        {
+            $ids_rel = StatPublics::get_sb_public_ids( $publics_list );
+            print_r($ids_rel);
+            $res = array();
+            echo '<br>' . $author_id . '<br>';
+            foreach( $ids_rel as $public_id => $target_feed_id ) {
+
+                $articles = AdminsWork::get_articles( $author_id, $target_feed_id, $time_from, $time_to );
+
+                $articles = implode( ',', $articles );
+                if ( !$articles )
+                    continue;
+                print_r($articles);
+                echo ' <br>';
+                $average_quality = AdminsWork::get_posts_quality( $articles );
+                print_r($average_quality);
+                echo '<br>';
+                $likes_rt_quan   = AdminsWork::get_author_posts_likes( $author_id, $articles );
+                print_r($likes_rt_quan);
+                echo '<br>';
+                $average         = AdminsWork::get_average_values( $target_feed_id, $time_from, $time_to );
+                $final_cf =
+                   (    $likes_rt_quan['likes']    / ( $average['likes']    * 200 )        +
+                    7 * $likes_rt_quan['retweets'] / ( $average['retweets'] * 200 )) *
+                        $likes_rt_quan['posts_quantity'] * $average_quality;
+                $res[ $public_id ][ 'coef' ] = $final_cf;
+            }
+
+            return $res;
+        }
 
     }
 ?>
