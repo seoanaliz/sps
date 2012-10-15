@@ -175,6 +175,7 @@ var MESSAGES_LOADING =
 var MESSAGES_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
 '<? var isViewer = isset("isViewer") && isViewer; ?>' +
+'<? var user = isViewer ? viewer : user; ?>' +
 '<div class="message clear-fix<?=isNew ? " new" : ""?><?=isViewer ? " viewer" : ""?>" data-id="<?=id?>">' +
     '<div class="left-column">' +
         '<div class="photo">' +

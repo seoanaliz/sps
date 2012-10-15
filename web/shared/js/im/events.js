@@ -297,7 +297,7 @@ var Cleaner = {
 
     dialog: function(rawDialog) {
         var user = new UserModel(this.user(rawDialog.uid));
-        var viewer = userCollection.get(Configs.vkId) || new UserModel();;
+        var viewer = userCollection.get(Configs.vkId) || new UserModel();
 
         return {
             id: rawDialog.id,

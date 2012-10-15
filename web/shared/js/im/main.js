@@ -118,7 +118,7 @@ var Main = Widget.extend({
                 (function() {
                     var message = Cleaner.longPollRead(event.content);
                     t._leftColumn.readMessage(message.id);
-                    t._leftColumn.readDialog(message.id);
+                    t._leftColumn.readDialog(message.dialogId);
                 })();
                 break;
             }
@@ -170,6 +170,18 @@ var LeftColumn = Widget.extend({
             t.showDialog(dialogId, true);
         });
 
+        t._messages.on('hoverMessage', function(e) {
+            var $message = $(e.currentTarget);
+            var messageId = $message.data('id');
+            var dialogId = t._messages._pageId;
+            if ($message.hasClass('viewer')) return;
+            t._messages.readMessage(messageId);
+            t._dialogs.readDialog(dialogId);
+            Events.fire('message_mark_as_read', messageId, dialogId, function() {
+                t.trigger('markAsRead');
+            });
+        });
+
         t._tabs.on('clickDialog', function(e) {
             var $tab = $(e.currentTarget);
             var dialogId = $tab.data('id');
@@ -212,9 +224,9 @@ var LeftColumn = Widget.extend({
         var t = this;
         t._tabs.setOffline(userId);
     },
-    addMessage: function(message) {
+    addMessage: function(messageModel) {
         var t = this;
-        t._messages.addMessage(message);
+        t._messages.addMessage(messageModel);
     },
     addDialog: function(dialog) {
         var t = this;
@@ -554,7 +566,12 @@ var Dialogs = EndlessPage.extend({
         return $dialog;
     },
     readDialog: function(dialogId) {
-        console.log('READ DIALOG: ' + dialogId);
+        var t = this;
+        var $el = t.el();
+        var $dialog = $el.find('.dialog[data-id=' + dialogId + ']');
+        var $dialogMessage = $dialog.find('.from-me');
+        $dialog.removeClass('new');
+        $dialogMessage.removeClass('new');
     }
 });
 
@@ -595,9 +612,7 @@ var Messages = EndlessPage.extend({
     },
     hoverMessage: function(e) {
         var t = this;
-        var $message = $(e.currentTarget);
-        var messageId = $message.data('id');
-        t.readMessage(messageId);
+        t.trigger('hoverMessage', e);
     },
 
     onShow: function() {
@@ -686,7 +701,8 @@ var Messages = EndlessPage.extend({
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
-                user: Configs.viewer
+                user: userCollection.get(Configs.vkId),
+                dialogId: t._pageId
             }));
             $newMessage.addClass('loading');
             t.scrollBottom();
@@ -714,6 +730,7 @@ var Messages = EndlessPage.extend({
         if (messageModel.data('dialogId') != t._pageId) return false;
 
         var $el = t.el();
+        console.log(messageModel.data());
         var $message = $(t.tmpl()(t._templateItem, messageModel));
         var $oldMessage = $el.find('[data-id=' + messageModel.data('id') + ']');
         if ($oldMessage.length) {
@@ -725,7 +742,10 @@ var Messages = EndlessPage.extend({
         return $message;
     },
     readMessage: function(messageId) {
-        console.log('READ MESSAGE: ' + messageId);
+        var t = this;
+        var $el = t.el();
+        var $message = $el.find('.message[data-id=' + messageId + ']');
+        $message.removeClass('new');
     },
     onScroll: function() {
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
