@@ -20,8 +20,16 @@ var TABS_ITEM_LIST =
 var TABS_ITEM_DIALOG =
 '<div class="tab dialog<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>">' +
     '<?=label?>' +
-    '<div class="icon online"></div>' +
-    '<div class="icon select"></div>' +
+    '<? if (isset("isOnline") && isOnline) { ?>' +
+        '<div class="icon online"></div>' +
+    '<? } else { ?>' +
+        '<div class="icon offline"></div>' +
+    '<? } ?>' +
+    '<? if (isset("isOnList") && isOnList) { ?>' +
+        '<div class="icon select"></div>' +
+    '<? } else { ?>' +
+        '<div class="icon plus"></div>' +
+    '<? } ?>' +
 '</div>';
 
 var LEFT_COLUMN =

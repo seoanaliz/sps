@@ -10,8 +10,8 @@ var Collection = Class.extend({
         return arguments.length ? this._models[key] : this._models;
     },
     add: function(key, model) {
-        if (typeof key === 'undefined') {
-            throw new Error('Key is undefined');
+        if (!key) {
+            throw new Error('Key is not correct');
         } else if (!(model instanceof this._modelClass)) {
             throw new TypeError('Model not found');
         }

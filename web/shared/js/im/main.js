@@ -205,12 +205,12 @@ var LeftColumn = Widget.extend({
     },
 
     setOnline: function(userId) {
-        console.log('ONLINE: ' + userId);
         var t = this;
+        t._tabs.setOnline(userId);
     },
     setOffline: function(userId) {
-        console.log('OFFLINE: ' + userId);
         var t = this;
+        t._tabs.setOffline(userId);
     },
     addMessage: function(message) {
         var t = this;
@@ -375,6 +375,7 @@ var EndlessPage = Page.extend({
         }
 
         function setData(data) {
+            t.onLoad(data);
             var $list = t.el().find(t._itemsSelector);
             var $block;
             var bottom = $(document).height() - $(window).scrollTop();
@@ -530,6 +531,7 @@ var Dialogs = EndlessPage.extend({
     },
     onLoad: function(data) {
         var dialogs = data.list;
+        if (!dialogs.length) return;
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
@@ -607,15 +609,14 @@ var Messages = EndlessPage.extend({
         var t = this;
         var user = data.user;
         var messages = data.list;
+        if (!messages.length) return;
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.data('id'), userModel);
 
         for (var i in messages) {
             if (!messages.hasOwnProperty(i)) continue;
-            if (messages[i].user && messages[i].user.id != Configs.vkId) {
-                messages[i].user = userModel.data();
-            }
+            if (!messages[i].isViewer) messages[i].user = userModel.data();
             var messageModel = new MessageModel(messages[i]);
             messageCollection.add(messageModel.data('id'), messageModel);
         }
@@ -725,6 +726,11 @@ var Messages = EndlessPage.extend({
     },
     readMessage: function(messageId) {
         console.log('READ MESSAGE: ' + messageId);
+    },
+    onScroll: function() {
+        this._super.apply(this, Array.prototype.slice.call(arguments, 0));
+        var t = this;
+        t.updateTopPadding();
     }
 });
 
@@ -859,6 +865,7 @@ var RightColumn = Widget.extend({
 var Tabs = Widget.extend({
     _template: TABS,
     _modelClass: TabsModel,
+    _userId: null,
 
     _events: {
         'click: .tab.dialog': 'clickDialog',
@@ -897,12 +904,36 @@ var Tabs = Widget.extend({
     setDialog: function(dialogId) {
         var t = this;
         var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
-        var label = dialogModel.data('user').data()['name'];
+        var userModel = dialogModel.data('user');
+        t._userId = userModel.data('id');
+        var label = userModel.data('name');
+        var isOnline = userModel.data('isOnline');
         var tabListModelData = t.model().data('list');
-        var tabDialogModel = new TabModel({id: dialogId, label: label, isSelected: true});
+        var tabDialogModel = new TabModel({
+            id: dialogId,
+            label: label,
+            isSelected: true,
+            isOnline: isOnline,
+            isOnList: false
+        });
         if (tabListModelData) tabListModelData['isSelected'] = false;
         t.model().data('dialog', tabDialogModel);
         t.renderTemplate();
+    },
+
+    setOnline: function(userId) {
+        var t = this;
+        //@todo привести к нормальному виду
+        if (t._userId == userId) {
+            t.el().find('.tab.dialog > .icon.offline').removeClass('offline').addClass('online');
+        }
+    },
+    setOffline: function(userId) {
+        var t = this;
+        //@todo привести к нормальному виду
+        if (t._userId == userId) {
+            t.el().find('.tab.dialog > .icon.online').removeClass('online').addClass('offline');
+        }
     }
 });
 

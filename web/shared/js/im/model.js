@@ -60,7 +60,9 @@ var TabModel = Model.extend({
         this._defData = $.extend({
             id: null,
             label: '...',
-            isSelected: false
+            isSelected: false,
+            isOnline: false,
+            isOnList: false
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
