@@ -21,7 +21,9 @@ var Configs = {
 };
 
 var userCollection = new UserCollection();
-var messageCollection = new Collection();
+var messageCollection = new MessageCollection();
+var dialogCollection = new DialogCollection();
+var listCollection = new ListCollection();
 
 var Main = Widget.extend({
     _template: MAIN,
@@ -32,49 +34,58 @@ var Main = Widget.extend({
 
     run: function() {
         var t = this;
-        t.renderTemplate();
 
-        t._leftColumn = new LeftColumn({
-            selector: t._leftColumnSelector
-        });
+        Events.fire('get_viewer', function(data) {
+            var viewer = new UserModel(data);
+            userCollection.add(viewer.data('id'), viewer);
 
-        t._rightColumn = new RightColumn({
-            selector: t._rightColumnSelector,
-            model: new GroupsModel()
-        });
+            t.renderTemplate();
 
-        t.on('scroll', function(e) {
-            t._leftColumn.onScroll(e);
-        });
-
-        t._leftColumn.on('changeDialog', function(dialogId) {
-            t._rightColumn.setDialog(dialogId);
-        });
-        t._leftColumn.on('changeList', function(listId) {
-            t._rightColumn.setList(listId);
-        });
-        t._rightColumn.on('changeList', function(listId) {
-
-        });
-
-        (function poll(ts) {
-            var timeout = 15;
-            $.ajax({
-                url: 'http://im.' + Configs.hostName + '/int/controls/watchDog/',
-                dataType: 'jsonp',
-                data: {
-                    userId: Configs.vkId,
-                    timeout: timeout,
-                    ts: ts
-                },
-                success: function(data) {
-                    poll(data.response.ts);
-                    $.each(data.response.events, function(i, event) {
-                        t.fireEvent(event);
-                    });
-                }
+            t._leftColumn = new LeftColumn({
+                selector: t._leftColumnSelector
             });
-        })();
+            t._rightColumn = new RightColumn({
+                selector: t._rightColumnSelector,
+                model: new ListsModel()
+            });
+
+            t.on('scroll', function(e) {
+                t._leftColumn.onScroll(e);
+            });
+
+            t._leftColumn.on('changeDialog', function(dialogId) {
+                t._rightColumn.setDialog(dialogId);
+            });
+            t._leftColumn.on('changeList', function(listId) {
+                t._rightColumn.setList(listId);
+            });
+            t._rightColumn.on('changeDialog', function(dialogId) {
+                t._leftColumn.showDialog(dialogId);
+            });
+            t._rightColumn.on('setList', function(listId) {
+                t._leftColumn.showList(listId);
+            });
+
+            (function poll(ts) {
+                return;
+                var timeout = 15;
+                $.ajax({
+                    url: 'http://im.' + Configs.hostName + '/int/controls/watchDog/',
+                    dataType: 'jsonp',
+                    data: {
+                        userId: Configs.vkId,
+                        timeout: timeout,
+                        ts: ts
+                    },
+                    success: function(data) {
+                        poll(data.response.ts);
+                        $.each(data.response.events, function(i, event) {
+                            t.fireEvent(event);
+                        });
+                    }
+                });
+            })();
+        });
     },
 
     fireEvent: function(event) {
@@ -92,7 +103,6 @@ var Main = Widget.extend({
                     var message = Cleaner.longPollMessage(event.content, isViewer);
                     var dialog = Cleaner.longPollDialog(event.content, isViewer);
                     t._leftColumn.addMessage(message);
-                    t._leftColumn.addDialog(dialog);
 
                     if (!message.isViewer) {
                         t._rightColumn.addMessage(message);
@@ -205,6 +215,7 @@ var Page = Widget.extend({
     _service: 'get_dialogs',
     _isBlock: false,
     _isCache: true,
+    _scroll: null,
 
     run: function() {
         var t = this;
@@ -222,7 +233,7 @@ var Page = Widget.extend({
     },
     renderTemplateLoading: function() {
         var t = this;
-        t.el().html(t.tmpl()(t._templateLoading, (t.model() && t.model().data())));
+        t.el().html(t.tmpl()(t._templateLoading, t.model()));
         return this;
     },
     getData: function() {
@@ -243,11 +254,13 @@ var Page = Widget.extend({
         var t = this;
         t._isVisible = true;
         t.el().show();
+        $(window).scrollTop(t._scroll);
         return this;
     },
     hide: function() {
         var t = this;
         t._isVisible = false;
+        t._scroll = $(window).scrollTop();
         t.el().hide();
         return this;
     },
@@ -271,6 +284,14 @@ var EndlessPage = Page.extend({
     _isPreload: true,
     _preloadData: null,
 
+    changePage: function(pageId, force) {
+        var t = this;
+        if (force || (t._isCache && t._pageId != pageId)) {
+            t._pageLoaded = 0;
+            t._preloadData = {};
+        }
+        this._super.apply(this, Array.prototype.slice.call(arguments, 0));
+    },
     getData: function() {
         var t = this;
         if (!t.isLock()) {
@@ -283,10 +304,11 @@ var EndlessPage = Page.extend({
             Events.fire(t._service, t._pageId, offset, limit, function(data) {
                 t._pageLoaded = nextPage;
 
+                t.onLoad(data);
                 t.model().data(data);
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
-                t.onLoad(data);
+                t.onRender();
                 t.unlock();
 
                 if (t._isPreload) {
@@ -309,6 +331,7 @@ var EndlessPage = Page.extend({
     },
     onShow: function() {},
     onLoad: function(data) {},
+    onRender: function() {},
     makeList: function($list) {},
     showMore: function() {
         var t = this;
@@ -334,7 +357,7 @@ var EndlessPage = Page.extend({
             var bottom = $(document).height() - $(window).scrollTop();
             var html = '';
             $.each(data.list, function(i, obj) {
-                html += tmpl(t._templateItem, obj);
+                html += t.tmpl()(t._templateItem, obj);
             });
 
             $block = $(html);
@@ -395,6 +418,25 @@ var Dialogs = EndlessPage.extend({
     clickPlus: function(e) {
         var t = this;
         t.trigger('clickPlus', e);
+        return false;
+    },
+    onLoad: function(data) {
+        var dialogs = data.list;
+        for (var i in dialogs) {
+            if (!dialogs.hasOwnProperty(i)) continue;
+            var dialogModel = new DialogModel(dialogs[i]);
+            dialogCollection.add(dialogModel.data('id'), dialogModel);
+        }
+    },
+    addDialog: function(dialog) {
+        if (!(dialog instanceof DialogModel)) throw new TypeError('Dialog is not correct');
+
+        var t = this;
+        var $el = t.el();
+        var $dialog = $(t.tmpl()(t._templateItem, dialog));
+        $dialog.prependTo($el.find(t._itemsSelector));
+        t.makeList($dialog);
+        return $dialog;
     }
 });
 
@@ -438,7 +480,24 @@ var Messages = EndlessPage.extend({
         t.updateTopPadding();
         t.scrollBottom();
     },
-    onLoad: function() {
+    onLoad: function(data) {
+        var t = this;
+        var user = data.user;
+        var messages = data.list;
+
+        var userModel = new UserModel(user);
+        userCollection.add(userModel.data('id'), userModel);
+
+        for (var i in messages) {
+            if (!messages.hasOwnProperty(i)) continue;
+            if (messages[i].user && messages[i].user.id != Configs.vkId) {
+                messages[i].user = userModel.data();
+            }
+            var messageModel = new MessageModel(messages[i]);
+            messageCollection.add(messageModel.data('id'), messageModel);
+        }
+    },
+    onRender: function() {
         var t = this;
         t.onShow();
         t.makeTextarea(t.el().find('textarea:first'));
@@ -476,7 +535,7 @@ var Messages = EndlessPage.extend({
 
         if (text) {
             $textarea.val('');
-            var $newMessage = t.createItem({
+            var $newMessage = t.addMessage({
                 id: 'loading',
                 isNew: true,
                 isViewer: true,
@@ -485,11 +544,9 @@ var Messages = EndlessPage.extend({
                 user: Configs.viewer
             });
             $newMessage.addClass('loading');
-            $el.find(t._itemsSelector).append($newMessage);
-            t.makeItems($newMessage);
             t.scrollBottom();
             $textarea.focus();
-            Events.fire('send_message', t.dialogId, text, function(messageId) {
+            Events.fire('send_message', t._pageId, text, function(messageId) {
                 if (!messageId) {
                     $textarea.val(text);
                     $newMessage.remove();
@@ -497,7 +554,7 @@ var Messages = EndlessPage.extend({
                 }
                 var $oldMessage = $el.find('[data-id=' + messageId + ']');
                 if ($oldMessage.length) {
-                    return $newMessage.remove();
+                    $newMessage.remove();
                 } else {
                     $newMessage.removeClass('loading').attr('data-id', messageId);
                 }
@@ -505,14 +562,74 @@ var Messages = EndlessPage.extend({
         } else {
             $textarea.focus();
         }
+    },
+    addMessage: function(message) {
+        if (!(message instanceof MessageModel)) throw new TypeError('Message is not correct');
+        var t = this;
+        var $el = t.el();
+        var $message = $(t.tmpl()(t._templateItem, message));
+        $message.appendTo($el.find(t._itemsSelector));
+        t.makeList($message);
+        return $message;
     }
 });
 
 var RightColumn = Widget.extend({
     _template: RIGHT_COLUMN,
-    _modelClass: GroupsModel,
+    _modelClass: ListsModel,
+    _isEditMode: true,
+    _isDragging: false,
 
-    setDialog: function(dialogId) {}
+    _events: {
+        'mousedown: .drag-wrap': 'mouseDownList',
+        'click: .item': 'clickList'
+    },
+
+    run: function() {
+        var t = this;
+        var $el = t.el();
+        Events.fire('get_lists', function(data) {
+            var list = data.list;
+            var isSetCommonList = false;
+            for (var i in list) {
+                if (!list.hasOwnProperty(i)) continue;
+                var listModel = new ListModel(list[i]);
+                listCollection.add(listModel.data('id'), listModel);
+            }
+            if (!isSetCommonList) {
+                var commonListModel = new ListModel({
+                    id: Configs.commonDialogsList,
+                    title: 'Не в списке'
+                });
+                list.unshift(commonListModel);
+                listCollection.add(commonListModel.data('id'), commonListModel);
+            }
+            t.model().data(data);
+            t.renderTemplate();
+        });
+    },
+
+    mouseDownList: function(e) {
+        var t = this;
+    },
+    clickList: function(e) {
+        var t = this;
+        var $list = $(e.currentTarget);
+        var listId = $list.data('id');
+        t.setList(listId, true);
+    },
+
+    setList: function(listId, isTrigger) {
+        var t = this;
+        t.renderTemplate();
+        if (isTrigger) t.trigger('setList', listId);
+    },
+    setDialog: function(dialogId, isTrigger) {
+        var t = this;
+        t.renderTemplate();
+        if (isTrigger) t.trigger('setDialog', dialogId);
+    },
+    update: function() {}
 });
 
 var Tabs = Widget.extend({
@@ -531,25 +648,36 @@ var Tabs = Widget.extend({
 
     clickDialog: function(e) {
         var t = this;
-        t.trigger('selectDialog', e);
+        t.trigger('clickDialog', e);
     },
 
     clickList: function(e) {
         var t = this;
-        t.trigger('clickTabList', e);
+        t.trigger('clickList', e);
     },
 
-    setDialog: function(id, label) {
+    setList: function(listId) {
         var t = this;
-        var tabModel = new TabModel({id: id, label: label});
-        t.model().data('dialogs', [tabModel.data()]);
+        var listModel = listCollection.get(listId) || new ListModel({
+            id: Configs.commonDialogsList,
+            title: 'Не в списке'
+        });
+        var label = listModel.data('title');
+        var tabListModel = new TabModel({id: listId, label: label, isSelected: true});
+        var tabDialogModelData = t.model().data('dialog');
+        if (tabDialogModelData) tabDialogModelData['isSelected'] = false;
+        t.model().data('list', tabListModel);
         t.renderTemplate();
     },
 
-    setList: function(id, label) {
+    setDialog: function(dialogId) {
         var t = this;
-        var tabModel = new TabModel({id: id, label: label});
-        t.model().data('lists', [tabModel.data()]);
+        var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
+        var label = dialogModel.data('user').data()['name'];
+        var tabListModelData = t.model().data('list');
+        var tabDialogModel = new TabModel({id: dialogId, label: label, isSelected: true});
+        if (tabListModelData) tabListModelData['isSelected'] = false;
+        t.model().data('dialog', tabDialogModel);
         t.renderTemplate();
     }
 });

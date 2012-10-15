@@ -70,7 +70,7 @@ var Eventlist = {
                 }
             });
 
-            callback(clearData, count);
+            callback({list: clearData, counter: count});
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
@@ -98,17 +98,20 @@ var Eventlist = {
             var clearData = {};
             var rawUsers = rawData.dialogers;
             var rawMessages = rawData.messages;
-            var clearUsers = {};
+            var clearUser = {};
             var clearMessages = [];
             $.each(rawUsers, function(i, rawUser) {
-                var clearUser = Cleaner.user(rawUser);
-                clearUsers[rawUser.userId] = clearUser;
+                clearUser = Cleaner.user(rawUser);
+                if (clearUser.id != Configs.vkId) {
+                    return false;
+                }
             });
             $.each(rawMessages, function(i, rawMessage) {
                 clearMessages.push(Cleaner.message(rawMessage));
             });
             clearData = {
-                users: clearUsers,
+                user: clearUser,
+                viewer: userCollection.get(Configs.vkId),
                 list: clearMessages,
                 lists: rawData.groupIds
             };
@@ -193,6 +196,7 @@ $.extend(Events.eventList, Eventlist);
 var Cleaner = {
     longPollMessage: function(rawContent, isOut) {
         var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var viewer = userCollection.get(Configs.vkId);
 
         return {
             id: rawContent.mid,
@@ -202,7 +206,7 @@ var Cleaner = {
             attachments: [],
             timestamp: rawContent.date,
             user: user,
-            viewer: user,
+            viewer: viewer,
             lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
             dialogId: rawContent.dialog_id
         };
@@ -210,6 +214,7 @@ var Cleaner = {
 
     longPollDialog: function(rawContent, isOut) {
         var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var viewer = userCollection.get(Configs.vkId);
 
         return {
             id: rawContent.dialog_id,
@@ -219,7 +224,7 @@ var Cleaner = {
             attachments: [],
             timestamp: rawContent.date,
             user: user,
-            viewer: user,
+            viewer: viewer,
             lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
             messageId: rawContent.mid
         };
@@ -274,13 +279,15 @@ var Cleaner = {
     },
 
     message: function(rawMessage) {
+        var user = userCollection.get(rawMessage.from_id) || new UserModel();
+        var viewer = userCollection.get(Configs.vkId) || new UserModel();
+
         return {
             id: rawMessage.mid,
             isNew: (rawMessage.read_state != 1),
             isViewer: (rawMessage.out != 0),
-            viewer: new UserModel(),
-            user: new UserModel(),
-//            user: typeof rawMessage.from_id == 'number' ? userCollection.get(rawMessage.from_id) : this.user(rawMessage.from_id),
+            user: user,
+            viewer: viewer,
             text: makeMsg(rawMessage.body.split('<br>').join('\n'), true),
             timestamp: rawMessage.date,
             attachments: this.attachments(rawMessage.attachments),
@@ -289,12 +296,15 @@ var Cleaner = {
     },
 
     dialog: function(rawDialog) {
+        var user = new UserModel(this.user(rawDialog.uid));
+        var viewer = userCollection.get(Configs.vkId) || new UserModel();;
+
         return {
             id: rawDialog.id,
             isNew: (rawDialog.read_state != 1),
             isViewer: (rawDialog.out != 0),
-            viewer: new UserModel(),
-            user: this.user(rawDialog.uid),
+            user: user,
+            viewer: viewer,
             text: makeDlg(rawDialog.body || rawDialog.title),
             timestamp: rawDialog.date,
             attachments: [],

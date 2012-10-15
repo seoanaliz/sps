@@ -46,7 +46,7 @@ var Widget = (function() {
 
         renderTemplate: function() {
             var t = this;
-            t.el().html(t.tmpl()(t.template(), (t.model() && t.model().data())));
+            t.el().html(t.tmpl()(t.template(), t.model()));
             return this;
         },
 
@@ -83,6 +83,26 @@ var Widget = (function() {
             } else {
                 var throughParams = ['_template', '_model', '_modelClass', '_events'];
 
+                function tmplWrapper(template, tmplData) {
+                    var t = this;
+                    if (tmplData instanceof Model) {
+                        tmplData = tmplData.data();
+                    }
+                    (function getModelData(data) {
+                        if (typeof data == 'object') {
+                            for (var i in data) {
+                                if (!data.hasOwnProperty(i)) continue;
+                                if (data[i] instanceof Model) {
+                                    data[i] = data[i].data();
+                                } else {
+                                    getModelData(data[i])
+                                }
+                            }
+                        }
+                    })(tmplData);
+                    return tmpl(template, tmplData);
+                }
+
                 for (var i in throughParams) {
                     if (!throughParams.hasOwnProperty(i)) continue;
                     var optionKey = throughParams[i].replace(/^_/, '');
@@ -94,8 +114,8 @@ var Widget = (function() {
                 if (!options.selector) throw new TypeError('Selector not found');
                 if (!options.model && options.modelClass) throw new TypeError('Model not found');
                 t
-                    .tmpl(options.tmpl || tmpl)
-                    .id(options.id)
+                    .id(options.id || (widgetId = widgetId + 1))
+                    .tmpl(options.tmpl || tmplWrapper)
                     .modelClass(options.modelClass)
                     .events(options.events)
                     .template(options.template)
@@ -134,7 +154,9 @@ var Widget = (function() {
             if (!arguments.length) {
                 return t._model;
             } else {
-                if (!(model instanceof t.modelClass())) throw new TypeError('Model is not correct');
+                if (!(model instanceof t.modelClass())) {
+                    throw new TypeError('Model is not correct');
+                }
                 t._model = model;
                 return t;
             }

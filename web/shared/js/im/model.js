@@ -48,8 +48,8 @@ var UserModel = Model.extend({
 var TabsModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
-            lists: [],
-            dialogs: []
+            list: null,
+            dialog: null
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
@@ -70,7 +70,7 @@ var DialogsModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
             id: null,
-            list: [new DialogModel().data()]
+            list: [new DialogModel()]
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
@@ -82,8 +82,8 @@ var DialogModel = Model.extend({
             id: null,
             isNew: false,
             isViewer: false,
-            viewer: new UserModel().data(),
-            user: new UserModel().data(),
+            viewer: new UserModel(),
+            user: new UserModel(),
             text: '',
             timestamp: 0,
             attachments: [],
@@ -98,9 +98,9 @@ var MessagesModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
             id: null,
-            viewer: new UserModel().data(),
-            user: new UserModel().data(),
-            list: [new MessageModel().data()]
+            user: new UserModel(),
+            viewer: new UserModel(),
+            list: [new MessageModel()]
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
@@ -112,8 +112,8 @@ var MessageModel = Model.extend({
             id: null,
             isNew: false,
             isViewer: false,
-            viewer: new UserModel().data(),
-            user: new UserModel().data(),
+            viewer: new UserModel(),
+            user: new UserModel(),
             text: '',
             timestamp: 0,
             attachments: [],
@@ -123,23 +123,23 @@ var MessageModel = Model.extend({
     }
 });
 
-var GroupsModel = Model.extend({
+var ListsModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
-            list: [new GroupModel().data()],
+            list: [new ListModel()],
             counter: null
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
-var GroupModel = Model.extend({
+var ListModel = Model.extend({
     init: function(data) {
         this._defData = $.extend({
-            isRead: false,
             id: null,
-            title: '',
-            counter: null
+            title: '...',
+            counter: null,
+            isRead: false
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }

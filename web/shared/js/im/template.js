@@ -4,11 +4,11 @@ var MAIN =
 
 var TABS =
 '<div class="tab-bar messenger">' +
-    '<? if (isset("lists") && lists.length) { ?>' +
-        '<? each(TABS_ITEM_LIST, lists); ?>' +
+    '<? if (isset("list")) { ?>' +
+        '<? each(TABS_ITEM_LIST, [list]); ?>' +
     '<? } ?>' +
-    '<? if (isset("dialogs") && dialogs.length) { ?>' +
-        '<? each(TABS_ITEM_DIALOG, dialogs); ?>' +
+    '<? if (isset("dialog")) { ?>' +
+        '<? each(TABS_ITEM_DIALOG, [dialog]); ?>' +
     '<? } ?>' +
 '</div>';
 
@@ -32,7 +32,7 @@ var LEFT_COLUMN =
 var DIALOGS =
 '<div class="dialogs" data-id="<?=id?>">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<?=tmpl(DIALOGS_BLOCK, {id: 0, list: list})?>' +
+        '<? each(DIALOGS_ITEM, list); ?>' +
     '<? } else { ?>' +
         '<div class="empty">Список диалогов пуст</div>' +
     '<? } ?>' +
@@ -42,9 +42,6 @@ var DIALOGS_LOADING =
 '<div class="dialogs">' +
     '<div class="load"></div>' +
 '</div>';
-
-var DIALOGS_BLOCK =
-'<? each(DIALOGS_ITEM, list); ?>';
 
 var DIALOGS_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
@@ -98,7 +95,7 @@ var MESSAGES =
         '<? if (isset("isLoad") && isLoad) { ?>' +
             '<div class="mini-load"></div>' +
         '<? } ?>' +
-        '<?=tmpl(MESSAGES_BLOCK, {id: 0, list: list})?>' +
+        '<? each(MESSAGES_ITEM, list); ?>' +
     '<? } else if (isset("isLoad") && isLoad) { ?>' +
         '<div class="load"></div>' +
     '<? } else { ?>' +
@@ -164,9 +161,6 @@ var MESSAGES_LOADING =
         '</div>' +
     '</div>' +
 '</div>';
-
-var MESSAGES_BLOCK =
-'<? each(MESSAGES_ITEM, list); ?>';
 
 var MESSAGES_ITEM =
 '<? var isNew = isset("isNew") && isNew; ?>' +
@@ -257,12 +251,6 @@ var RIGHT_COLUMN =
 '</div>' +
 '<div class="list scroll-like-mac">' +
     '<? if (isset("list") && list.length) { ?>' +
-        '<div class="item" data-id="999999" data-title="Не в списке">' +
-            '<div class="title active">' +
-                'Не в списке' +
-                '<span class="counter"><?=counter ? "+" + counter : ""?></span>' +
-            '</div>' +
-        '</div>' +
         '<? each(LIST_ITEM, list); ?>' +
     '<? } else { ?>' +
         '<div class="empty">Список пуст</div>' +
@@ -275,7 +263,7 @@ var LIST_ITEM =
         '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
             '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
                 '<?=title?>' +
-                '<span class="counter"><?=counter ? "+" + counter : ""?></span>' +
+                '<span class="counter"><?=isset("counter") && counter ? "+" + counter : ""?></span>' +
             '</div>' +
         '</div>' +
     '<? } ?>' +

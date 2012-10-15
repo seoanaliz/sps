@@ -1,5 +1,6 @@
 var Event = (function() {
     var eventSplitter = /\s+/;
+    var isDebug = false;
 
     var Event = Class.extend({
         on: function(events, callback, context) {
@@ -56,6 +57,10 @@ var Event = (function() {
             }
 
             while (event = events.shift()) {
+                if (isDebug) {
+                    console.log(event);
+                }
+
                 // Копируем список коллбэков, чтобы предотвратить их замену.
                 if (all = calls.all) all = all.slice();
                 if (list = calls[event]) list = list.slice();
@@ -80,8 +85,8 @@ var Event = (function() {
         }
     });
 
-    Event.bind = Event.on;
-    Event.unbind = Event.off;
+    Event.prototype.bind = Event.on;
+    Event.prototype.unbind = Event.off;
 
     return Event;
 })();
