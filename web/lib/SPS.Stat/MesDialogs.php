@@ -635,5 +635,19 @@
 
             return $cmd->ExecuteNonQuery() ? true : false;
         }
+
+        public static function delete_dialog( $user_id, $rec_id )
+        {
+            $dialog_id = MesDialogs::get_dialog_id( $user_id, $rec_id );
+            $sql = 'DELETE FROM ' . TABLE_MES_DIALOGS . ' WHERE id=@dialog_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@dialog_id', $dialog_id );
+            $cmd->Execute();
+
+            $sql = 'DELETE FROM ' . TABLE_MES_GROUP_DIALOG_REL . ' WHERE dialog_id=@dialog_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@dialog_id', $dialog_id );
+            $cmd->Execute();
+        }
     }
 ?>
