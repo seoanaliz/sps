@@ -59,6 +59,9 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
+            t._leftColumn.on('addList', function() {
+                t._rightColumn.update();
+            });
             t._rightColumn.on('changeDialog', function(dialogId) {
                 t._leftColumn.showDialog(dialogId);
             });
@@ -67,14 +70,12 @@ var Main = Widget.extend({
             });
 
             (function poll(ts) {
-                return;
-                var timeout = 15;
                 $.ajax({
                     url: 'http://im.' + Configs.hostName + '/int/controls/watchDog/',
                     dataType: 'jsonp',
                     data: {
                         userId: Configs.vkId,
-                        timeout: timeout,
+                        timeout: 15,
                         ts: ts
                     },
                     success: function(data) {
@@ -85,6 +86,8 @@ var Main = Widget.extend({
                     }
                 });
             })();
+
+            t._leftColumn.showList(Configs.commonDialogsList);
         });
     },
 
@@ -102,10 +105,11 @@ var Main = Widget.extend({
                     var isViewer = (event.type == 'outMessage');
                     var message = Cleaner.longPollMessage(event.content, isViewer);
                     var dialog = Cleaner.longPollDialog(event.content, isViewer);
-                    t._leftColumn.addMessage(message);
+                    t._leftColumn.addMessage(new MessageModel(message));
+                    t._leftColumn.addDialog(new DialogModel(dialog));
 
                     if (!message.isViewer) {
-                        t._rightColumn.addMessage(message);
+                        t._rightColumn.update();
                     }
                 })();
                 break;
@@ -113,7 +117,8 @@ var Main = Widget.extend({
             case 'read': {
                 (function() {
                     var message = Cleaner.longPollRead(event.content);
-                    t._leftColumn.readMessage(message);
+                    t._leftColumn.readMessage(message.id);
+                    t._leftColumn.readDialog(message.id);
                 })();
                 break;
             }
@@ -176,8 +181,6 @@ var LeftColumn = Widget.extend({
             var listId = $tab.data('id');
             t.showList(listId, true);
         });
-
-        t.showList(Configs.commonDialogsList, true);
     },
     onScroll: function(e) {
         var t = this;
@@ -201,10 +204,30 @@ var LeftColumn = Widget.extend({
         if (isTrigger) t.trigger('changeDialog', dialogId);
     },
 
-    setOnline: function(userId) {},
-    setOffline: function(userId) {},
-    addMessage: function(message) {},
-    readMessage: function() {}
+    setOnline: function(userId) {
+        console.log('ONLINE: ' + userId);
+        var t = this;
+    },
+    setOffline: function(userId) {
+        console.log('OFFLINE: ' + userId);
+        var t = this;
+    },
+    addMessage: function(message) {
+        var t = this;
+        t._messages.addMessage(message);
+    },
+    addDialog: function(dialog) {
+        var t = this;
+        t._dialogs.addDialog(dialog);
+    },
+    readMessage: function(messageId) {
+        var t = this;
+        t._messages.readMessage(messageId);
+    },
+    readDialog: function(dialogId) {
+        var t = this;
+        t._dialogs.readDialog(dialogId);
+    }
 });
 
 var Page = Widget.extend({
@@ -417,6 +440,91 @@ var Dialogs = EndlessPage.extend({
     },
     clickPlus: function(e) {
         var t = this;
+        var $target = $(e.currentTarget);
+        var $dialog = $target.closest('.dialog');
+        var dialogId = $dialog.data('id');
+        if (!$target.data('dropdown')) {
+            (function updateDropdown() {
+
+                function onCreate() {
+                    var dialogs = t.model().data('list');
+                    $.each(dialogs, function(i, dialog) {
+                        if (dialog.id == dialogId) {
+                            $.each(dialog.lists, function(i, listId) {
+                                $target.dropdown('getItem', listId).addClass('active');
+                            });
+                            return false;
+                        }
+                    });
+                }
+
+                Events.fire('get_lists', function(data) {
+                    var list = data.list;
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        oncreate: onCreate,
+                        onupdate: onCreate,
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            Events.fire('add_list', $input.val(), function() {
+                                                updateDropdown();
+                                                t.trigger('addList');
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
+                        },
+                        data: $.merge(list, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ])
+                    });
+                });
+            })();
+        }
         t.trigger('clickPlus', e);
         return false;
     },
@@ -428,15 +536,23 @@ var Dialogs = EndlessPage.extend({
             dialogCollection.add(dialogModel.data('id'), dialogModel);
         }
     },
-    addDialog: function(dialog) {
-        if (!(dialog instanceof DialogModel)) throw new TypeError('Dialog is not correct');
-
+    addDialog: function(dialogModel) {
         var t = this;
+        if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
+        if ($.inArray(t._pageId, dialogModel.data('lists')) == -1) return false;
+
         var $el = t.el();
-        var $dialog = $(t.tmpl()(t._templateItem, dialog));
+        var $dialog = $(t.tmpl()(t._templateItem, dialogModel));
+        var $oldDialog = $el.find('[data-id=' + dialogModel.data('id') + ']');
+        if ($oldDialog.length) {
+            $oldDialog.remove();
+        }
         $dialog.prependTo($el.find(t._itemsSelector));
         t.makeList($dialog);
         return $dialog;
+    },
+    readDialog: function(dialogId) {
+        console.log('READ DIALOG: ' + dialogId);
     }
 });
 
@@ -469,11 +585,18 @@ var Messages = EndlessPage.extend({
     },
     clickSaveTmpl: function(e) {
         var t = this;
-        var listId = t._pageId;
-        var box = new CreateTemplateBox(listId, t.el().find('textarea').val());
+        var listId = t.model().data('lists')[0];
+        var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), function() {
+            t.updateAutocomplite();
+        });
         box.show();
     },
-    hoverMessage: function(e) {},
+    hoverMessage: function(e) {
+        var t = this;
+        var $message = $(e.currentTarget);
+        var messageId = $message.data('id');
+        t.readMessage(messageId);
+    },
 
     onShow: function() {
         var t = this;
@@ -515,6 +638,27 @@ var Messages = EndlessPage.extend({
         $textarea.inputMemory('message' + t._pageId);
         $textarea.focus();
         $textarea[0].scrollTop = $textarea[0].scrollHeight;
+        t.updateAutocomplite();
+    },
+    updateAutocomplite: function() {
+        var t = this;
+        var $textarea = t.el().find('textarea:first');
+        var listId = t.model().data('lists')[0];
+        Events.fire('get_templates', listId, function(data) {
+            $textarea.autocomplete({
+                position: 'top',
+                notFoundText: '',
+                data: data,
+                strictSearch: true,
+                getValue: function() {
+                    var text = $.trim($textarea.val());
+                    return text ? text : 'notShowAllItems';
+                },
+                onchange: function(item) {
+                    $textarea.val(item.title);
+                }
+            });
+        });
     },
     updateTopPadding: function() {
         var t = this;
@@ -535,14 +679,14 @@ var Messages = EndlessPage.extend({
 
         if (text) {
             $textarea.val('');
-            var $newMessage = t.addMessage({
+            var $newMessage = t.addMessage(new MessageModel({
                 id: 'loading',
                 isNew: true,
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 user: Configs.viewer
-            });
+            }));
             $newMessage.addClass('loading');
             t.scrollBottom();
             $textarea.focus();
@@ -563,14 +707,24 @@ var Messages = EndlessPage.extend({
             $textarea.focus();
         }
     },
-    addMessage: function(message) {
-        if (!(message instanceof MessageModel)) throw new TypeError('Message is not correct');
+    addMessage: function(messageModel) {
         var t = this;
+        if (!(messageModel instanceof MessageModel)) throw new TypeError('Message is not correct');
+        if (messageModel.data('dialogId') != t._pageId) return false;
+
         var $el = t.el();
-        var $message = $(t.tmpl()(t._templateItem, message));
+        var $message = $(t.tmpl()(t._templateItem, messageModel));
+        var $oldMessage = $el.find('[data-id=' + messageModel.data('id') + ']');
+        if ($oldMessage.length) {
+            $oldMessage.remove();
+        }
         $message.appendTo($el.find(t._itemsSelector));
         t.makeList($message);
+        t.scrollBottom();
         return $message;
+    },
+    readMessage: function(messageId) {
+        console.log('READ MESSAGE: ' + messageId);
     }
 });
 
@@ -599,7 +753,9 @@ var RightColumn = Widget.extend({
             if (!isSetCommonList) {
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
-                    title: 'Не в списке'
+                    title: 'Не в списке',
+                    isSelected: true,
+                    isDraggable: false
                 });
                 list.unshift(commonListModel);
                 listCollection.add(commonListModel.data('id'), commonListModel);
@@ -611,16 +767,82 @@ var RightColumn = Widget.extend({
 
     mouseDownList: function(e) {
         var t = this;
+        if (!t._isEditMode) return;
+        var $placeholder = $(e.currentTarget);
+        var $target = $placeholder.find('.item:first');
+        var timeout = setTimeout(function() {
+            t._isDragging = true;
+            $target.addClass('drag');
+            $placeholder.height($target.height());
+            $('html, body').addClass('no-select');
+        }, 300);
+        var startY = e.clientY;
+
+        $(window).on('mousemove.list', (function update(e) {
+            if (t._isDragging) {
+                var top = e.clientY - startY;
+                var height = $placeholder.height();
+                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var $next = $placeholder.next('.drag-wrap');
+                var $prev = $placeholder.prev('.drag-wrap');
+
+                if (position > 0 && $next.length) {
+                    $placeholder.before($next);
+                    startY += height;
+                } else if (position < 0 && $prev.length) {
+                    $placeholder.after($prev);
+                    startY -= height;
+                }
+                top = e.clientY - startY;
+                $target.css({top: top});
+            }
+
+            return update;
+        })(e));
+
+        $(window).on('mouseup.list', function(e) {
+            $(this).off('mousemove.list mouseup.list');
+            clearTimeout(timeout);
+
+            if (!t._isDragging) return;
+            $('html, body').removeClass('no-select');
+            $target.removeClass('drag').css({top: 0});
+            setTimeout(function() {
+                t._isDragging = false;
+                t.setOrder();
+            }, 0);
+        });
     },
     clickList: function(e) {
         var t = this;
+        if (t._isDragging) return;
         var $list = $(e.currentTarget);
         var listId = $list.data('id');
         t.setList(listId, true);
     },
 
+    setOrder: function() {
+        var t = this;
+        var $el = t.el();
+        var listIds = [];
+        $el.find('.item').each(function() {
+            var listId = $(this).data('id');
+            if (listId != Configs.commonDialogsList) listIds.push(listId);
+        });
+        Events.fire('set_list_order', listIds.join(','), function() {});
+    },
+
     setList: function(listId, isTrigger) {
         var t = this;
+        var list = t.model().data('list');
+        for (var i in list) {
+            if (!list.hasOwnProperty(i)) continue;
+            if (list[i].id == listId) {
+                list[i].isSelected = true;
+            } else {
+                list[i].isSelected = false;
+            }
+        }
         t.renderTemplate();
         if (isTrigger) t.trigger('setList', listId);
     },
@@ -629,7 +851,9 @@ var RightColumn = Widget.extend({
         t.renderTemplate();
         if (isTrigger) t.trigger('setDialog', dialogId);
     },
-    update: function() {}
+    update: function() {
+        console.log('UPDATE RIGHT COLUMN');
+    }
 });
 
 var Tabs = Widget.extend({
@@ -710,7 +934,7 @@ $(document).ready(function() {
     });
 });
 
-function CreateTemplateBox(listId, text) {
+function CreateTemplateBox(listId, text, onSuccess) {
     var SAVE_TEMPLATE_BOX =
     '<div class="box-templates">' +
         '<div class="title">' +
@@ -734,12 +958,12 @@ function CreateTemplateBox(listId, text) {
             {label: 'Закрыть'}
         ],
         onshow: function() {
-            Events.fire('get_lists', function(lists) {
+            Events.fire('get_lists', function(data) {
+                var list = data.list;
                 var listsIds = [];
                 var clearLists = [];
                 var currentList = {};
-                $.each(lists, function(i, listItem) {
-
+                $.each(list, function(i, listItem) {
                     if (listItem.id) {
                         clearLists.push(listItem);
                     }
@@ -792,6 +1016,7 @@ function CreateTemplateBox(listId, text) {
                     box.setButtons([{label: 'Закрыть'}]);
                     Events.fire('add_template', text, listsIds.join(','), function() {
                         box.hide();
+                        if ($.isFunction(onSuccess)) onSuccess();
                     });
                 }
             });

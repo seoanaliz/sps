@@ -20,6 +20,8 @@ var TABS_ITEM_LIST =
 var TABS_ITEM_DIALOG =
 '<div class="tab dialog<?=(isset("isSelected") && isSelected) ? " selected" : ""?>" data-id="<?=id?>">' +
     '<?=label?>' +
+    '<div class="icon online"></div>' +
+    '<div class="icon select"></div>' +
 '</div>';
 
 var LEFT_COLUMN =
@@ -258,10 +260,10 @@ var RIGHT_COLUMN =
 '</div>';
 
 var LIST_ITEM =
-'<div class="drag-wrap">' +
+'<div class="<?=isset("isDraggable") && isDraggable ? "drag-wrap" : ""?>">' +
     '<? if (isset("title")) { ?>' +
         '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
-            '<div class="title<?=isset("isRead") && isRead ? "" : " new"?>">' +
+            '<div class="title<?=isset("isRead") && isRead ? "" : " new"?><?=isset("isSelected") && isSelected ? " active" : ""?>">' +
                 '<?=title?>' +
                 '<span class="counter"><?=isset("counter") && counter ? "+" + counter : ""?></span>' +
             '</div>' +

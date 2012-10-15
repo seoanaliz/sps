@@ -1097,7 +1097,7 @@ var List = Widget.extend({
     currentListId: null,
     currentDialogId: null,
     isEditMode: true,
-    isDragging: false,
+    _isDragging: false,
 
     events: {
         'mousedown: .drag-wrap': 'mouseDownList',
@@ -1120,7 +1120,7 @@ var List = Widget.extend({
 
     clickList: function(e) {
         var t = this;
-        if (t.isDragging) return;
+        if (t._isDragging) return;
         var $target = $(e.currentTarget).closest('.item');
         var title = $target.data('title');
         var listId = $target.data('id');
@@ -1138,7 +1138,7 @@ var List = Widget.extend({
         var $placeholder = $(e.currentTarget);
         var $target = $placeholder.find('.item:first');
         var timeout = setTimeout(function() {
-            t.isDragging = true;
+            t._isDragging = true;
             $target.addClass('drag');
             $placeholder.height($target.height());
             $('html, body').addClass('no-select');
@@ -1146,7 +1146,7 @@ var List = Widget.extend({
         var startY = e.clientY;
 
         $(window).on('mousemove.list', (function update(e) {
-            if (t.isDragging) {
+            if (t._isDragging) {
                 var top = e.clientY - startY;
                 var height = $placeholder.height();
                 var position = intval((e.clientY - $placeholder.offset().top) / height);
@@ -1171,11 +1171,11 @@ var List = Widget.extend({
             $(this).off('mousemove.list mouseup.list');
             clearTimeout(timeout);
 
-            if (!t.isDragging) return;
+            if (!t._isDragging) return;
             $('html, body').removeClass('no-select');
             $target.removeClass('drag').css({top: 0});
             setTimeout(function() {
-                t.isDragging = false;
+                t._isDragging = false;
                 t.setOrder();
             }, 0);
         });

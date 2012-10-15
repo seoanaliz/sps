@@ -139,7 +139,9 @@ var ListModel = Model.extend({
             id: null,
             title: '...',
             counter: null,
-            isRead: false
+            isRead: false,
+            isSelected: false,
+            isDraggable: true
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }

@@ -318,7 +318,9 @@ var Cleaner = {
             id: rawList.group_id,
             title: rawList.name,
             count: rawList.unread,
-            isRead: rawList.isRead
+            isRead: rawList.isRead,
+            isSelected: false,
+            isDraggable: true
         };
     },
 
