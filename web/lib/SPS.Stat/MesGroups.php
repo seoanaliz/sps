@@ -37,15 +37,15 @@
         {
             $sql = 'SELECT a.group_id
                     FROM
-                    '  . TABLE_MES_GROUP_USER_REL . ' as a
+                    '   . TABLE_MES_GROUP_USER_REL . ' as a
                     , ' . TABLE_MES_GROUPS . ' as b
                     WHERE
-                        a.group_id = b.group_id
+                        a.group_id    = b.group_id
                         AND a.user_id = @user_id
-                        AND b.type = @group_type';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@user_id',      $user_id);
-            $cmd->SetInteger( '@group_type',   $type);
+                        AND b.type    = @group_type';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInteger( '@user_id',    $user_id);
+            $cmd->SetInteger( '@group_type', $type);
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
@@ -88,7 +88,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.general, b.read_mark
+            $sql = 'SELECT c.group_id, c.name, c.type, b.read_mark
                     FROM '
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
@@ -106,11 +106,13 @@
             $unread = MesGroups::get_unread_group_counters( $userId );
 
             while( $ds->Next()) {
-
-                $group_id = $ds->getValue( 'group_id', TYPE_INTEGER );
+                $group_id = $ds->getInteger( 'group_id');
+                $type     = $ds->getInteger( 'type' );
+                if ( $type === 2 )
+                    continue;
                 $res[] = array(
                     'group_id'  =>  $group_id,
-                    'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
+                    'type'      =>  $type,
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
                     'isRead'    =>  $ds->GetBoolean( 'read_mark' ),
