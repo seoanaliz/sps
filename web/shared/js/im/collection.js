@@ -15,7 +15,7 @@ var Collection = Class.extend({
             console.log(model);
             throw new Error('Key is not correct');
         } else if (!(model instanceof this._modelClass)) {
-            throw new TypeError('Model not found');
+            throw new TypeError('Model is not correct');
         }
         key = key.toString();
         this._models[key] = model;

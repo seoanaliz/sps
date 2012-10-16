@@ -4,11 +4,11 @@ var MAIN =
 
 var TABS =
 '<div class="tab-bar messenger">' +
-    '<? if (isset("list")) { ?>' +
-        '<? each(TABS_ITEM_LIST, [list]); ?>' +
+    '<? if (isset("listTab")) { ?>' +
+        '<? each(TABS_ITEM_LIST, [listTab]); ?>' +
     '<? } ?>' +
-    '<? if (isset("dialog")) { ?>' +
-        '<? each(TABS_ITEM_DIALOG, [dialog]); ?>' +
+    '<? if (isset("dialogTab")) { ?>' +
+        '<? each(TABS_ITEM_DIALOG, [dialogTab]); ?>' +
     '<? } ?>' +
 '</div>';
 

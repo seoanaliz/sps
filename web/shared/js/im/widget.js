@@ -81,11 +81,12 @@ var Widget = (function() {
             if (!arguments.length) {
                 return t._options;
             } else {
-                var throughParams = ['_template', '_model', '_modelClass', '_events'];
+                var throughParams = ['template', 'model', 'modelClass', 'events'];
 
-                function tmplWrapper(template, tmplData) {
+                function tmplWrapper(template, data) {
                     var t = this;
-                    if (tmplData instanceof Model) {
+                    var tmplData = $.extend(true, {}, data);
+                    if (data instanceof Model) {
                         tmplData = tmplData.data();
                     }
                     (function getModelData(data) {
@@ -105,22 +106,27 @@ var Widget = (function() {
 
                 for (var i in throughParams) {
                     if (!throughParams.hasOwnProperty(i)) continue;
-                    var optionKey = throughParams[i].replace(/^_/, '');
-                    var param = t[throughParams[i]] || t.constructor.prototype[throughParams[i]];
+                    var optionKey = throughParams[i];
+                    var paramKey = '_' + throughParams[i];
+                    var param = t[paramKey] || t.constructor.prototype[paramKey];
                     if (param) options[optionKey] = param;
                 }
 
-                if (!options.template) throw new TypeError('Template not found');
-                if (!options.selector) throw new TypeError('Selector not found');
-                if (!options.model && options.modelClass) throw new TypeError('Model not found');
-                t
-                    .id(options.id || (widgetId = widgetId + 1))
-                    .tmpl(options.tmpl || tmplWrapper)
-                    .modelClass(options.modelClass)
-                    .events(options.events)
-                    .template(options.template)
-                    .selector(options.selector)
-                ;
+                if (!options.template) {
+                    throw new TypeError('Template not found');
+                }
+                if (!options.selector) {
+                    throw new TypeError('Selector not found');
+                }
+                if (!options.model && options.modelClass) {
+                    throw new TypeError('Model not found');
+                }
+                t.id(options.id || (widgetId = widgetId + 1));
+                t.tmpl(options.tmpl || tmplWrapper);
+                t.modelClass(options.modelClass);
+                t.events(options.events);
+                t.template(options.template);
+                t.selector(options.selector);
                 if (t.modelClass()) {
                     t.model(options.model);
                 }
