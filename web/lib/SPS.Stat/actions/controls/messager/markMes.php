@@ -26,6 +26,5 @@ class markMes
             die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
         else
             die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
-
     }
 }

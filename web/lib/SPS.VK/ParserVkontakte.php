@@ -38,7 +38,6 @@
         //      name        :   имя/название паблика (паблик может не иметь названия)
         //      short_name  :   короткий адрес(берется из ссылки, то есть может быть вида id234242, vasyapupkin...)
         //      если страница удалена, вернет false. при проблемах с закачкой - exception
-
         public function get_info($url)
         {
             if (self::TESTING) echo '<br>get info'.$url . '<br>';
@@ -106,7 +105,6 @@
             return false;
         }
 
-
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
         //          -1               пост не прошел отбора, его не нужно выводить
@@ -142,7 +140,6 @@
         //              группы или посетителей(от последних отсеивается)
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
-
         public function get_posts($page_number, $trig_inc = false)
         {
             $offset = $page_number * self::PAGE_SIZE;
@@ -708,8 +705,7 @@
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
             $result = array();
             foreach( $res as $post ) {
-                $result[ $post->to_id . '_' . $post->id ] = array
-                    (
+                $result[ $post->to_id . '_' . $post->id ] = array(
                       'likes'   =>     $post->likes->count,
                       'reposts' =>     $post->reposts->count,
                 );

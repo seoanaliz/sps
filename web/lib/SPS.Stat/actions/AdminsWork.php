@@ -5,24 +5,37 @@
 
     class AdminsWork extends wrapper
     {
-
-
         public static  $white_list = array(
+            2701428,
             1715958,
             2814488,
+            3969468,
+            4181767,
+            5155508,
+            5274121,
             6810901,
             7203958,
             7875269,
+            10497980,
+            11716281,
+            13049517,
+            17662525,
             18379341,
             25766591,
             27575384,
+            43032990,
             43916879,
             58540552,
+            61514101,
+            83475534,
+            106175502,
+            110337004,
             114080351,
             121069867,
             135339094,
-            182447583,
-            110337004,
+            150220483,
+            161113216,
+            178503163,
 
         );
 
@@ -48,7 +61,11 @@
 
 //            Response::setInteger( 'pages', round($i/50,0));
 //            Response::setInteger( 'last_time', date("d.m.Y", $time_for_table));
+            $conf =
+
             Response::setArray( 'our_publics', $publics );
+
+//            Response::SetArray( 'options', $ );
         }
 
         private function get_conf() {
@@ -284,7 +301,6 @@
             return $res;
         }
 
-
         //todo учет статусов?
         public static function get_articles( $author_sb_id, $target_feed_id = -1,  $time_from = 0, $time_to = 0 )
         {
@@ -385,7 +401,6 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
             $cmd->SetInteger( '@feed_id'  , $target_feed_id );
             $ds = $cmd->Execute();
-//            print_r($ds);
             $res = array();
             while ( $ds->Next()) {
                $res[ $ds->GetInteger( 'vkId')] =  array(
@@ -489,6 +504,8 @@
 
             return $res;
         }
+
+
 
     }
 ?>
