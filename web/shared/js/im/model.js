@@ -8,8 +8,16 @@ var Model = Event.extend({
     },
     setData: function(data) {
         this._defData = this._defData || {};
-        this._data = $.extend(true, this._defData, data);
+        this._data = $.extend(this._defData, data);
     },
+    get: function(key) {
+        return this._data[key];
+    },
+    set: function(key, value) {
+        this._data[key] = value;
+        return this;
+    },
+    // Shortcut
     data: function(key, value) {
         if (typeof key === 'object') {
             this.setData(key);
@@ -23,64 +31,57 @@ var Model = Event.extend({
         } else {
             return this._data;
         }
-    },
-    get: function(key) {
-        return this._data[key];
-    },
-    set: function(key, value) {
-        this._data[key] = value;
-        return this;
     }
 });
 
 var UserModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             name: '...',
             photo: 'http://vk.com/images/camera_c.gif',
             isOnline: false
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var TabsModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             list: null,
             dialog: null
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var TabModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             label: '...',
             isSelected: false,
             isOnline: false,
             isOnList: false
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var DialogsModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             list: [new DialogModel()]
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var DialogModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             isNew: false,
             isViewer: false,
@@ -91,26 +92,26 @@ var DialogModel = Model.extend({
             attachments: [],
             lists: [],
             messageId: null
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var MessagesModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             user: new UserModel(),
             viewer: new UserModel(),
             list: []
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var MessageModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             isNew: false,
             isViewer: false,
@@ -120,31 +121,31 @@ var MessageModel = Model.extend({
             timestamp: 0,
             attachments: [],
             dialogId: null
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var ListsModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             list: [new ListModel()],
             counter: null
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
 
 var ListModel = Model.extend({
-    init: function(data) {
-        this._defData = $.extend({
+    init: function() {
+        this._defData = {
             id: null,
             title: '...',
             counter: null,
             isRead: false,
             isSelected: false,
             isDraggable: true
-        }, data);
+        };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }
 });
