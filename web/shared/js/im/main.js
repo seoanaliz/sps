@@ -251,6 +251,7 @@ var Page = Widget.extend({
     _isBlock: false,
     _isCache: true,
     _scroll: null,
+    _isBottom: false,
 
     run: function() {
         var t = this;
@@ -289,13 +290,18 @@ var Page = Widget.extend({
         var t = this;
         t._isVisible = true;
         t.el().show();
-        $(window).scrollTop(t._scroll);
+        if (t._isBottom) {
+            $(window).scrollTop($(document).height() - $(window).height());
+        } else {
+            $(window).scrollTop(t._scroll);
+        }
         return this;
     },
     hide: function() {
         var t = this;
         t._isVisible = false;
         t._scroll = $(window).scrollTop();
+        t._isBottom = $(window).scrollTop() + $(window).height() == $(document).height();
         t.el().hide();
         return this;
     },
