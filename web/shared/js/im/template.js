@@ -106,8 +106,6 @@ var MESSAGES =
             '<div class="mini-load"></div>' +
         '<? } ?>' +
         '<? each(MESSAGES_ITEM, list); ?>' +
-    '<? } else if (isset("isLoad") && isLoad) { ?>' +
-        '<div class="load"></div>' +
     '<? } else { ?>' +
         '<div class="empty">История сообщений пуста</div>' +
     '<? } ?>' +
@@ -142,7 +140,12 @@ var MESSAGES =
 
 var MESSAGES_LOADING =
 '<div class="messages">' +
-    '<div class="load"></div>' +
+    '<? if (isset("list") && list.length) { ?>' +
+        '<div class="mini-load"></div>' +
+        '<? each(MESSAGES_ITEM, list); ?>' +
+    '<? } else { ?>' +
+        '<div class="load"></div>' +
+    '<? } ?>' +
 '</div>' +
 '<div class="post-message clear-fix fixed">' +
     '<div class="left-column">' +

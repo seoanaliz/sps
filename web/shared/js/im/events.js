@@ -317,7 +317,7 @@ var Cleaner = {
         return {
             id: rawList.group_id,
             title: rawList.name,
-            count: rawList.unread,
+            counter: rawList.unread,
             isRead: rawList.isRead,
             isSelected: false,
             isDraggable: true

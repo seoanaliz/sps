@@ -10,7 +10,9 @@ var Collection = Class.extend({
         return arguments.length ? this._models[key] : this._models;
     },
     add: function(key, model) {
-        if (!key) {
+        if (!key && key !== 0) {
+            console.log(key);
+            console.log(model);
             throw new Error('Key is not correct');
         } else if (!(model instanceof this._modelClass)) {
             throw new TypeError('Model not found');

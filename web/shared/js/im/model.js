@@ -8,7 +8,7 @@ var Model = Event.extend({
     },
     setData: function(data) {
         this._defData = this._defData || {};
-        this._data = $.extend(this._defData, data);
+        this._data = $.extend(true, this._defData, data);
     },
     data: function(key, value) {
         if (typeof key === 'object') {
@@ -102,7 +102,7 @@ var MessagesModel = Model.extend({
             id: null,
             user: new UserModel(),
             viewer: new UserModel(),
-            list: [new MessageModel()]
+            list: []
         }, data);
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     }

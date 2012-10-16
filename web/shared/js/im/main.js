@@ -324,6 +324,9 @@ var EndlessPage = Page.extend({
         if (force || (t._isCache && t._pageId != pageId)) {
             t._pageLoaded = 0;
             t._preloadData = {};
+            if (t.model()) {
+                t.model().data('list', []);
+            }
         }
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
@@ -547,7 +550,13 @@ var Dialogs = EndlessPage.extend({
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
+            var messageModel = new MessageModel(dialogs[i]);
+            var userModel = dialogModel.data('user');
             dialogCollection.add(dialogModel.data('id'), dialogModel);
+            userCollection.add(userModel.data('id'), userModel);
+            if (dialogModel.data('messageId')) {
+                messageCollection.add(dialogModel.data('messageId'), messageModel);
+            }
         }
     },
     addDialog: function(dialogModel) {
@@ -592,6 +601,7 @@ var Messages = EndlessPage.extend({
         'hover: .message.new': 'hoverMessage',
         'keydown: textarea': 'keyDownTextarea'
     },
+
     clickSend: function(e) {
         var t = this;
         t.sendMessage();
@@ -615,6 +625,17 @@ var Messages = EndlessPage.extend({
         t.trigger('hoverMessage', e);
     },
 
+    renderTemplateLoading: function() {
+        var t = this;
+        var dialogId = t._pageId;
+        var messageId = dialogCollection.get(dialogId).data('messageId');
+        var userId = dialogCollection.get(dialogId).data('user').data('id');
+        t.model().data('viewer', userCollection.get(Configs.vkId));
+        t.model().data('user', userCollection.get(userId));
+        t.model().data('list').push(messageCollection.get(messageId).data());
+        t._super.apply(this, Array.prototype.slice.call(arguments, 0));
+        t.makeList(t.el().find(t._itemsSelector));
+    },
     onShow: function() {
         var t = this;
         t.updateTopPadding();
@@ -695,15 +716,16 @@ var Messages = EndlessPage.extend({
 
         if (text) {
             $textarea.val('');
-            var $newMessage = t.addMessage(new MessageModel({
+            var newMessageModel = new MessageModel({
                 id: 'loading',
                 isNew: true,
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
-                user: userCollection.get(Configs.vkId),
+                viewer: userCollection.get(Configs.vkId),
                 dialogId: t._pageId
-            }));
+            });
+            var $newMessage = t.addMessage(newMessageModel);
             $newMessage.addClass('loading');
             t.scrollBottom();
             $textarea.focus();
@@ -730,7 +752,6 @@ var Messages = EndlessPage.extend({
         if (messageModel.data('dialogId') != t._pageId) return false;
 
         var $el = t.el();
-        console.log(messageModel.data());
         var $message = $(t.tmpl()(t._templateItem, messageModel));
         var $oldMessage = $el.find('[data-id=' + messageModel.data('id') + ']');
         if ($oldMessage.length) {
@@ -878,7 +899,8 @@ var RightColumn = Widget.extend({
         if (isTrigger) t.trigger('setDialog', dialogId);
     },
     update: function() {
-        console.log('UPDATE RIGHT COLUMN');
+        var t = this;
+        t.run();
     }
 });
 
@@ -889,7 +911,8 @@ var Tabs = Widget.extend({
 
     _events: {
         'click: .tab.dialog': 'clickDialog',
-        'click: .tab.list': 'clickList'
+        'click: .tab.list': 'clickList',
+        'click: .icon': 'clickPlus'
     },
 
     init: function() {
@@ -899,12 +922,116 @@ var Tabs = Widget.extend({
 
     clickDialog: function(e) {
         var t = this;
-        t.trigger('clickDialog', e);
+        //@todo: do well
+        var $target = $(e.currentTarget);
+        if (!$target.hasClass('.selected')) {
+            t.trigger('clickDialog', e);
+        }
     },
-
     clickList: function(e) {
         var t = this;
-        t.trigger('clickList', e);
+        var $target = $(e.currentTarget);
+        if (!$target.hasClass('.selected')) {
+            t.trigger('clickList', e);
+        }
+    },
+    clickPlus: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var tabDialogModelData = t.model().data('dialog');
+        var dialogId = tabDialogModelData['id'];
+        if (!$target.data('dropdown')) {
+            (function updateDropdown() {
+
+                function onCreate() {
+                    var dialogs = t.model().data('list');
+                    $.each(dialogs, function(i, dialog) {
+                        if (dialog.id == dialogId) {
+                            $.each(dialog.lists, function(i, listId) {
+                                $target.dropdown('getItem', listId).addClass('active');
+                            });
+                            return false;
+                        }
+                    });
+                }
+
+                Events.fire('get_lists', function(data) {
+                    var list = data.list;
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'left',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list-tabs',
+                        oncreate: onCreate,
+                        onupdate: onCreate,
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeAttr('style');
+                            $target.parent().find('.offline, .online').removeAttr('style');
+
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            //@todo: do well
+                            $target.css('display', 'inline');
+                            $target.parent().find('.offline, .online').hide();
+                            $(this).dropdown('refreshPosition');
+
+                            $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            Events.fire('add_list', $input.val(), function() {
+                                                updateDropdown();
+                                                t.trigger('addList');
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
+                        },
+                        data: $.merge(list, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ])
+                    });
+                });
+            })();
+        }
+        t.trigger('clickPlus', e);
+        return false;
     },
 
     setList: function(listId) {
