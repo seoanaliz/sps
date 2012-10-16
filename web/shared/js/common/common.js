@@ -1375,14 +1375,14 @@ var Box = (function() {
 var tmpl = (function($) {
     var cache = {};
     var format = function(str) {
-        return str
+        return str ? str
             .replace(/[\r\t\n]/g, ' ')
             .split('<?').join('\t')
             .split("'").join("\\'")
             .replace(/\t=(.*?)\?>/g, "',$1,'")
             .split('?>').join("p.push('")
             .split('\t').join("');")
-            .split('\r').join("\\'");
+            .split('\r').join("\\'") : str;
     };
     var tmpl = function(str, data) {
         try {
