@@ -338,38 +338,43 @@ var EndlessPage = Page.extend({
     },
     getData: function() {
         var t = this;
-        if (!t.isLock()) {
-            t.lock();
             var limit = t._itemsLimit;
             var offset = t._pageLoaded * limit;
             var nextPage = t._pageLoaded + 1;
+            var pageId = t._pageId;
 
             t.onShow();
-            Events.fire(t._service, t._pageId, offset, limit, function(data) {
-                t._pageLoaded = nextPage;
+            Events.fire(t._service, pageId, offset, limit, function(data) {
+                if (pageId == t._pageId) {
+                    t._pageLoaded = nextPage;
 
-                t.onLoad(data);
-                t.model().data(data);
-                t.renderTemplate();
-                t.makeList(t.el().find(t._itemsSelector));
-                t.onRender();
-                t.unlock();
+                    t.onLoad(data);
+                    t.model().data(data);
+                    t.renderTemplate();
+                    t.makeList(t.el().find(t._itemsSelector));
+                    t.onRender();
+                    t.unlock();
 
-                if (t._isPreload) {
-                    t.preloadData(nextPage + 1);
+                    if (t._isPreload) {
+                        t.preloadData(nextPage + 1);
+                    }
+                } else {
+                    t.unlock();
                 }
             });
-        }
     },
     preloadData: function(pageNumber) {
         var t = this;
         var limit = t._itemsLimit;
         var offset = pageNumber * limit;
+        var pageId = t._pageId;
 
         if (!t._preloadData) t._preloadData = {};
         if (!t._preloadData[pageNumber]) {
-            Events.fire(t._service, t._pageId, offset, limit, function(data) {
-                t._preloadData[pageNumber] = data;
+            Events.fire(t._service, pageId, offset, limit, function(data) {
+                if (pageId == t._pageId) {
+                    t._preloadData[pageNumber] = data;
+                }
             });
         }
     },
@@ -382,6 +387,7 @@ var EndlessPage = Page.extend({
         var nextPage = t._pageLoaded + 1;
         var limit = t._itemsLimit;
         var offset = nextPage * limit;
+        var pageId = t._pageId;
 
         if (!t._preloadData) t._preloadData = {};
         if (t._preloadData[nextPage]) {
@@ -389,8 +395,12 @@ var EndlessPage = Page.extend({
         } else {
             if (!t.isLock()) {
                 t.lock();
-                Events.fire(t._service, t._pageId, offset, limit, function(data) {
-                    setData(data);
+                Events.fire(t._service, pageId, offset, limit, function(data) {
+                    if (pageId == t._pageId) {
+                        setData(data);
+                    } else {
+                        t.unlock();
+                    }
                 });
             }
         }
@@ -638,7 +648,9 @@ var Messages = EndlessPage.extend({
         var userId = dialogCollection.get(dialogId).data('user').data('id');
         t.model().data('viewer', userCollection.get(Configs.vkId));
         t.model().data('user', userCollection.get(userId));
-        t.model().data('list').push(messageCollection.get(messageId).data());
+        if (messageCollection.get(messageId)) {
+            t.model().data('list').push(messageCollection.get(messageId).data());
+        }
         t._super.apply(this, Array.prototype.slice.call(arguments, 0));
         t.makeList(t.el().find(t._itemsSelector));
     },
