@@ -61,7 +61,7 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
-            t._leftColumn.on('addList', function() {
+            t._leftColumn.on('addList markAsRead', function() {
                 t._rightColumn.update();
             });
             t._rightColumn.on('changeDialog', function(dialogId) {
@@ -839,16 +839,29 @@ var RightColumn = Widget.extend({
             }
             var list = data.list;
             var isSetCommonList = false;
+            var isSetSelectedList = false;
             for (var i in list) {
                 if (!list.hasOwnProperty(i)) continue;
                 list[i] = new ListModel(list[i]);
                 listCollection.add(list[i].id(), list[i]);
+
+                var currentList = t.model().list();
+                for (var i2 in currentList) {
+                    if (!currentList.hasOwnProperty(i2)) continue;
+                    var currentItem = currentList[i2];
+                    if (currentItem && currentItem.id() == list[i].id()) {
+                        if (currentItem.isSelected()) {
+                            list[i].isSelected(currentItem.isSelected());
+                            isSetSelectedList = true;
+                        }
+                    }
+                }
             }
             if (!isSetCommonList) {
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
                     title: 'Не в списке',
-                    isSelected: true,
+                    isSelected: !isSetSelectedList,
                     isDraggable: false
                 });
                 list.unshift(commonListModel);
