@@ -392,7 +392,6 @@
             return ($sum/$q);
         }
 
-
         private function kill_attritions($array)
         {
             $res = array();
@@ -486,26 +485,11 @@
         //если указать wall_url, вернет количество постов с этого )
         public function get_posts_count($wall_url = '')
         {
-            if ($wall_url == ''){
-                $wall_url = $this->page_adr;
-            }
-
-            $a = $this->get_page($wall_url . '?own=1');
-            preg_match('/<div.*?class="summary".*?>(.*?)<\/div/', $a, $matches);
-            $matches = $matches[1];
-            //            echo 'matches : ' . $matches . '<br>';
-            if (    substr_count($matches, 'Нет записей') > 0 ||
-                substr_count($matches, $this->u_w('Нет записей')) > 0)
-                throw new exception("wall's end");
-            $matches = str_replace('<span class="num_delim"> </span>', '', $matches );
-            $count = explode(' ', $matches);
-
-            if (!$count[1] )
-                throw new Exception(__CLASS__.'::' .__FUNCTION__.' не удалось получить количество постов со стены ' . $this->page_adr);
-            $this -> count = $count[1];
-            //            echo "<br>posts: " . ((int)$count[1]). "<br>";
-            //            die();
-            return (int)$count[1];
+            $params = array( 'owner_id' => '-' . $this->page_id,
+                'count'    =>  1,
+                'filter' => 'owner' );
+            $res = VkHelper::api_request( 'wall.get', $params );
+            return $res[0];
         }
 
         private function u_w($str)
