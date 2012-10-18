@@ -1144,7 +1144,7 @@ var Box = (function() {
                     border: $el.css('border'),
                     margin: $el.css('margin'),
                     background: $el.css('background'),
-                    width: $el.outerWidth() - (parseInt($el.css('border-width')) * 2)
+                    width: $el.outerWidth() - (intval($el.css('border-width')) * 2)
                 }));
 
                 $el.css({
@@ -1161,6 +1161,7 @@ var Box = (function() {
                     tags: {}
                 });
 
+                refreshPadding($el);
                 run(options.oncreate, $el);
             });
         },
@@ -1178,20 +1179,16 @@ var Box = (function() {
                     $tag.remove();
                 }
 
-                $tag = $(
-                    '<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
-                        '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
-                        '<span class="' + CLASS_TAG_DELETE + '"></span>' +
-                    '</span>')
-                ;
+                $tag = $('<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
+                            '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
+                            '<span class="' + CLASS_TAG_DELETE + '"></span>' +
+                        '</span>');
 
                 $tag.find('.delete').click(function() {
-                        $tag.remove();
-                        refreshPadding($el);
-
-                        run(options.onremove, $el, id);
-                    })
-                ;
+                    $tag.remove();
+                    refreshPadding($el);
+                    run(options.onremove, $el, id);
+                });
 
                 $el.before($tag);
                 $el.data(DATA_KEY, data);
@@ -1211,7 +1208,6 @@ var Box = (function() {
 
                 $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']').remove();
                 refreshPadding($el);
-
                 run(options.onremove, $el, id);
             });
         },
@@ -1224,7 +1220,6 @@ var Box = (function() {
 
             $tag.remove();
             refreshPadding($el);
-
             run(options.onremove, $el, $tag.data('id'));
         }
     };
