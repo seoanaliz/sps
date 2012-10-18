@@ -985,6 +985,11 @@ var Tabs = Widget.extend({
                         oncreate: onCreate,
                         onupdate: onCreate,
                         onopen: function() {
+                            //@todo: do well
+                            $target.css('display', 'inline');
+                            $target.parent().find('.offline, .online').hide();
+                            $(this).dropdown('refreshPosition');
+
                             $target.addClass('active');
                         },
                         onclose: function() {
@@ -994,11 +999,6 @@ var Tabs = Widget.extend({
                             $target.removeClass('active');
                         },
                         onchange: function(item) {
-                            //@todo: do well
-                            $target.css('display', 'inline');
-                            $target.parent().find('.offline, .online').hide();
-                            $(this).dropdown('refreshPosition');
-
                             $(this).dropdown('open');
 
                             var $menu = $(this).dropdown('getMenu');
