@@ -22,7 +22,7 @@ var Model = Event.extend({
             this.setData(key);
             return this._data;
         } else if (typeof key !== 'undefined' && typeof value !== 'undefined') {
-            key = key.toString();
+            key += '';
             return this.set(key, value);
         } else if (key) {
             key = key.toString();

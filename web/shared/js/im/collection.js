@@ -10,14 +10,13 @@ var Collection = Class.extend({
         return arguments.length ? this._models[key] : this._models;
     },
     add: function(key, model) {
-        if (!key && key !== 0) {
-            console.log(key);
-            console.log(model);
+        if (typeof key === 'undefined') {
+            console.log([key, model]);
             throw new Error('Key is not correct');
         } else if (!(model instanceof this._modelClass)) {
             throw new TypeError('Model is not correct');
         }
-        key = key.toString();
+        key += '';
         this._models[key] = model;
         return this;
     },

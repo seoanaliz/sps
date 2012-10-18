@@ -333,6 +333,7 @@ var EndlessPage = Page.extend({
         if (force || (t._isCache && t._pageId != pageId)) {
             t._pageLoaded = 0;
             t._preloadData = {};
+            t._isEnded = false;
             if (t.model() && t.model().list) {
                 t.model().list([]);
             }
@@ -343,24 +344,21 @@ var EndlessPage = Page.extend({
         var t = this;
         var limit = t._itemsLimit;
         var offset = t._pageLoaded * limit;
-        var nextPage = t._pageLoaded + 1;
         var pageId = t._pageId;
 
         t.onShow();
-        Events.fire(t._service, pageId, offset, limit, function(data) {
+        t.lock();
+            Events.fire(t._service, pageId, offset, limit, function(data) {
             t.unlock();
 
             if (pageId == t._pageId) {
-                t._pageLoaded = nextPage;
-
                 t.onLoad(data);
-                t.model().data(data);
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
                 t.onRender();
 
                 if (t._isPreload) {
-                    t.preloadData(nextPage);
+                    t.preloadData(1);
                 }
             }
         });
@@ -396,42 +394,42 @@ var EndlessPage = Page.extend({
         if (t._isEnded) {
             return;
         }
-        if (preloadData[currentPage]) {
-            t.unlock();
-            setData(preloadData[currentPage]);
-        } else {
-            if (!t.isLock()) {
-                t.lock();
+
+        if (!t.isLock()) {
+            t.lock();
+            if (preloadData[nextPage]) {
+                setData(preloadData[nextPage]);
+            } else {
                 Events.fire(t._service, pageId, offset, limit, function(data) {
-                    t.unlock();
-                    if (pageId == t._pageId) {
-                        setData(data);
-                    }
+                    setData(data);
                 });
             }
         }
 
         function setData(data) {
-            t.onLoad(data);
-            var $list = t.el().find(t._itemsSelector);
-            var $block;
-            var bottom = $(document).height() - $(window).scrollTop();
-            var html = '';
-            $.each(data.list, function(i, obj) {
-                html += t.tmpl()(t._templateItem, obj);
-            });
+            t.unlock();
+            if (pageId == t._pageId) {
+                t.onLoad(data);
+                var $list = t.el().find(t._itemsSelector);
+                var $block;
+                var bottom = $(document).height() - $(window).scrollTop();
+                var html = '';
+                $.each(data.list, function(i, obj) {
+                    html += t.tmpl()(t._templateItem, obj);
+                });
 
-            $block = $(html);
-            if (t._isTop) {
-                $list.prepend($block);
-                $(window).scrollTop($(document).height() - bottom);
-            } else {
-                $list.append($block);
-            }
-            t.makeList($block);
-            t._pageLoaded = nextPage;
-            if (t._isPreload) {
-                t.preloadData(nextPage);
+                $block = $(html);
+                if (t._isTop) {
+                    $list.prepend($block);
+                    $(window).scrollTop($(document).height() - bottom);
+                } else {
+                    $list.append($block);
+                }
+                t.makeList($block);
+                t._pageLoaded = nextPage;
+                if (t._isPreload) {
+                    t.preloadData(nextPage + 1);
+                }
             }
         }
     },
@@ -572,6 +570,7 @@ var Dialogs = EndlessPage.extend({
         if (!dialogs.length) {
             t._isEnded = true;
         }
+        t.model().data(data);
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
@@ -682,6 +681,7 @@ var Messages = EndlessPage.extend({
         if (!messages.length) {
             t._isEnded = true;
         }
+        t.model().data(data);
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.id(), userModel);
