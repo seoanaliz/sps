@@ -34,11 +34,13 @@ var Main = Widget.extend({
 
     run: function() {
         var t = this;
+        t.el().hide();
 
         Events.fire('get_viewer', function(data) {
             var viewer = new UserModel(data);
-            userCollection.add(viewer.data('id'), viewer);
+            userCollection.add(viewer.id(), viewer);
 
+            t.el().fadeIn(500);
             t.renderTemplate();
 
             t._leftColumn = new LeftColumn({
@@ -59,7 +61,7 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
-            t._leftColumn.on('addList', function() {
+            t._leftColumn.on('addList markAsRead', function() {
                 t._rightColumn.update();
             });
             t._rightColumn.on('changeDialog', function(dialogId) {
@@ -277,9 +279,9 @@ var Page = Widget.extend({
         if (!t.isLock()) {
             t.lock();
             Events.fire(t._service, function(data) {
+                t.unlock();
                 t.model().data(data);
                 t.renderTemplate();
-                t.unlock();
             });
         }
     },
@@ -324,56 +326,54 @@ var EndlessPage = Page.extend({
     _isTop: false,
     _isPreload: true,
     _preloadData: null,
+    _isEnded: false,
 
     changePage: function(pageId, force) {
         var t = this;
         if (force || (t._isCache && t._pageId != pageId)) {
             t._pageLoaded = 0;
             t._preloadData = {};
-            if (t.model()) {
-                t.model().data('list', []);
+            t._isEnded = false;
+            if (t.model() && t.model().list) {
+                t.model().list([]);
             }
         }
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     getData: function() {
         var t = this;
-            var limit = t._itemsLimit;
-            var offset = t._pageLoaded * limit;
-            var nextPage = t._pageLoaded + 1;
-            var pageId = t._pageId;
+        var limit = t._itemsLimit;
+        var offset = t._pageLoaded * limit;
+        var pageId = t._pageId;
 
-            t.onShow();
+        t.onShow();
+        t.lock();
             Events.fire(t._service, pageId, offset, limit, function(data) {
-                if (pageId == t._pageId) {
-                    t._pageLoaded = nextPage;
+            t.unlock();
 
-                    t.onLoad(data);
-                    t.model().data(data);
-                    t.renderTemplate();
-                    t.makeList(t.el().find(t._itemsSelector));
-                    t.onRender();
-                    t.unlock();
+            if (pageId == t._pageId) {
+                t.onLoad(data);
+                t.renderTemplate();
+                t.makeList(t.el().find(t._itemsSelector));
+                t.onRender();
 
-                    if (t._isPreload) {
-                        t.preloadData(nextPage + 1);
-                    }
-                } else {
-                    t.unlock();
+                if (t._isPreload) {
+                    t.preloadData(1);
                 }
-            });
+            }
+        });
     },
     preloadData: function(pageNumber) {
         var t = this;
         var limit = t._itemsLimit;
         var offset = pageNumber * limit;
         var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
 
-        if (!t._preloadData) t._preloadData = {};
-        if (!t._preloadData[pageNumber]) {
+        if (!preloadData[pageNumber] && !t.isLock()) {
             Events.fire(t._service, pageId, offset, limit, function(data) {
                 if (pageId == t._pageId) {
-                    t._preloadData[pageNumber] = data;
+                    preloadData[pageNumber] = data;
                 }
             });
         }
@@ -384,49 +384,52 @@ var EndlessPage = Page.extend({
     makeList: function($list) {},
     showMore: function() {
         var t = this;
-        var nextPage = t._pageLoaded + 1;
+        var currentPage = t._pageLoaded;
+        var nextPage = currentPage + 1;
         var limit = t._itemsLimit;
         var offset = nextPage * limit;
         var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
 
-        if (!t._preloadData) t._preloadData = {};
-        if (t._preloadData[nextPage]) {
-            setData(t._preloadData[nextPage]);
-        } else {
-            if (!t.isLock()) {
-                t.lock();
+        if (t._isEnded) {
+            return;
+        }
+
+        if (!t.isLock()) {
+            t.lock();
+            if (preloadData[nextPage]) {
+                setData(preloadData[nextPage]);
+            } else {
                 Events.fire(t._service, pageId, offset, limit, function(data) {
-                    if (pageId == t._pageId) {
-                        setData(data);
-                    } else {
-                        t.unlock();
-                    }
+                    setData(data);
                 });
             }
         }
 
         function setData(data) {
-            t.onLoad(data);
-            var $list = t.el().find(t._itemsSelector);
-            var $block;
-            var bottom = $(document).height() - $(window).scrollTop();
-            var html = '';
-            $.each(data.list, function(i, obj) {
-                html += t.tmpl()(t._templateItem, obj);
-            });
-
-            $block = $(html);
-            if (t._isTop) {
-                $list.prepend($block);
-                $(window).scrollTop($(document).height() - bottom);
-            } else {
-                $list.append($block);
-            }
-            t.makeList($block);
             t.unlock();
-            t._pageLoaded = nextPage;
-            if (t._isPreload) {
-                t.preloadData(nextPage + 1);
+            if (pageId == t._pageId) {
+                t.onLoad(data);
+                var $list = t.el().find(t._itemsSelector);
+                var $block;
+                var bottom = $(document).height() - $(window).scrollTop();
+                var html = '';
+                $.each(data.list, function(i, obj) {
+                    html += t.tmpl()(t._templateItem, obj);
+                });
+
+                $block = $(html);
+                if (t._isTop) {
+                    $list.prepend($block);
+                    $(window).scrollTop($(document).height() - bottom);
+                } else {
+                    $list.append($block);
+                }
+                t.makeList($block);
+                t._pageLoaded = nextPage;
+                if (t._isPreload) {
+                    t.preloadData(nextPage + 1);
+                }
             }
         }
     },
@@ -479,7 +482,8 @@ var Dialogs = EndlessPage.extend({
             (function updateDropdown() {
 
                 function onCreate() {
-                    var dialogs = t.model().data('list');
+                    var dialogs = t.model().list();
+
                     $.each(dialogs, function(i, dialog) {
                         if (dialog.id == dialogId) {
                             $.each(dialog.lists, function(i, listId) {
@@ -561,28 +565,37 @@ var Dialogs = EndlessPage.extend({
         return false;
     },
     onLoad: function(data) {
+        var t = this;
         var dialogs = data.list;
-        if (!dialogs.length) return;
+        if (!dialogs.length) {
+            t._isEnded = true;
+        }
+        t.model().data(data);
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
             var messageModel = new MessageModel(dialogs[i]);
-            var userModel = dialogModel.data('user');
-            dialogCollection.add(dialogModel.data('id'), dialogModel);
-            userCollection.add(userModel.data('id'), userModel);
-            if (dialogModel.data('messageId')) {
-                messageCollection.add(dialogModel.data('messageId'), messageModel);
+            var userModel = dialogModel.user();
+
+            if (dialogModel) {
+                dialogCollection.add(dialogModel.id(), dialogModel);
+            }
+            if (userModel) {
+                userCollection.add(userModel.id(), userModel);
+            }
+            if (dialogModel.messageId()) {
+                messageCollection.add(dialogModel.messageId(), messageModel);
             }
         }
     },
     addDialog: function(dialogModel) {
         var t = this;
         if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
-        if ($.inArray(t._pageId, dialogModel.data('lists')) == -1) return false;
+        if ($.inArray(t._pageId, dialogModel.lists()) == -1) return false;
 
         var $el = t.el();
         var $dialog = $(t.tmpl()(t._templateItem, dialogModel));
-        var $oldDialog = $el.find('[data-id=' + dialogModel.data('id') + ']');
+        var $oldDialog = $el.find('[data-id=' + dialogModel.id() + ']');
         if ($oldDialog.length) {
             $oldDialog.remove();
         }
@@ -630,7 +643,9 @@ var Messages = EndlessPage.extend({
     },
     clickSaveTmpl: function(e) {
         var t = this;
-        var listId = t.model().data('lists')[0];
+        var dialogId = t._pageId;
+        var dialogModel = dialogCollection.get(dialogId);
+        var listId = dialogModel.lists()[0];
         var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), function() {
             t.updateAutocomplite();
         });
@@ -644,12 +659,12 @@ var Messages = EndlessPage.extend({
     renderTemplateLoading: function() {
         var t = this;
         var dialogId = t._pageId;
-        var messageId = dialogCollection.get(dialogId).data('messageId');
-        var userId = dialogCollection.get(dialogId).data('user').data('id');
-        t.model().data('viewer', userCollection.get(Configs.vkId));
-        t.model().data('user', userCollection.get(userId));
+        var messageId = dialogCollection.get(dialogId).messageId();
+        var userId = dialogCollection.get(dialogId).user().id();
+        t.model().viewer(userCollection.get(Configs.vkId));
+        t.model().user(userCollection.get(userId));
         if (messageCollection.get(messageId)) {
-            t.model().data('list').push(messageCollection.get(messageId).data());
+            t.model().list().push(messageCollection.get(messageId).data());
         }
         t._super.apply(this, Array.prototype.slice.call(arguments, 0));
         t.makeList(t.el().find(t._itemsSelector));
@@ -663,16 +678,19 @@ var Messages = EndlessPage.extend({
         var t = this;
         var user = data.user;
         var messages = data.list;
-        if (!messages.length) return;
+        if (!messages.length) {
+            t._isEnded = true;
+        }
+        t.model().data(data);
 
         var userModel = new UserModel(user);
-        userCollection.add(userModel.data('id'), userModel);
+        userCollection.add(userModel.id(), userModel);
 
         for (var i in messages) {
             if (!messages.hasOwnProperty(i)) continue;
             if (!messages[i].isViewer) messages[i].user = userModel.data();
             var messageModel = new MessageModel(messages[i]);
-            messageCollection.add(messageModel.data('id'), messageModel);
+            messageCollection.add(messageModel.id(), messageModel);
         }
     },
     onRender: function() {
@@ -698,7 +716,9 @@ var Messages = EndlessPage.extend({
     updateAutocomplite: function() {
         var t = this;
         var $textarea = t.el().find('textarea:first');
-        var listId = t.model().data('lists')[0];
+        var dialogId = t._pageId;
+        var dialogModel = dialogCollection.get(dialogId);
+        var listId = dialogModel.lists()[0];
         Events.fire('get_templates', listId, function(data) {
             $textarea.autocomplete({
                 position: 'top',
@@ -767,11 +787,11 @@ var Messages = EndlessPage.extend({
     addMessage: function(messageModel) {
         var t = this;
         if (!(messageModel instanceof MessageModel)) throw new TypeError('Message is not correct');
-        if (messageModel.data('dialogId') != t._pageId) return false;
+        if (messageModel.dialogId() != t._pageId) return false;
 
         var $el = t.el();
         var $message = $(t.tmpl()(t._templateItem, messageModel));
-        var $oldMessage = $el.find('[data-id=' + messageModel.data('id') + ']');
+        var $oldMessage = $el.find('[data-id=' + messageModel.id() + ']');
         if ($oldMessage.length) {
             $oldMessage.remove();
         }
@@ -798,6 +818,7 @@ var RightColumn = Widget.extend({
     _modelClass: ListsModel,
     _isEditMode: true,
     _isDragging: false,
+    _isFirstRun: true,
 
     _events: {
         'mousedown: .drag-wrap': 'mouseDownList',
@@ -807,25 +828,47 @@ var RightColumn = Widget.extend({
     run: function() {
         var t = this;
         var $el = t.el();
+
+        if (t._isFirstRun) {
+            $el.hide();
+        }
         Events.fire('get_lists', function(data) {
+            if (t._isFirstRun) {
+                t._isFirstRun = false;
+                $el.fadeIn(500);
+            }
             var list = data.list;
             var isSetCommonList = false;
+            var isSetSelectedList = false;
             for (var i in list) {
                 if (!list.hasOwnProperty(i)) continue;
-                var listModel = new ListModel(list[i]);
-                listCollection.add(listModel.data('id'), listModel);
+                list[i] = new ListModel(list[i]);
+                listCollection.add(list[i].id(), list[i]);
+
+                var currentList = t.model().list();
+                for (var i2 in currentList) {
+                    if (!currentList.hasOwnProperty(i2)) continue;
+                    var currentItem = currentList[i2];
+                    if (currentItem && currentItem.id() == list[i].id()) {
+                        if (currentItem.isSelected()) {
+                            list[i].isSelected(currentItem.isSelected());
+                            isSetSelectedList = true;
+                        }
+                    }
+                }
             }
             if (!isSetCommonList) {
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
                     title: 'Не в списке',
-                    isSelected: true,
+                    isSelected: !isSetSelectedList,
                     isDraggable: false
                 });
                 list.unshift(commonListModel);
-                listCollection.add(commonListModel.data('id'), commonListModel);
+                listCollection.add(commonListModel.id(), commonListModel);
             }
-            t.model().data(data);
+            t.model().counter(data.counter);
+            t.model().list(list);
             t.renderTemplate();
         });
     },
@@ -899,14 +942,12 @@ var RightColumn = Widget.extend({
 
     setList: function(listId, isTrigger) {
         var t = this;
-        var list = t.model().data('list');
+        var list = t.model().list();
+        var item;
         for (var i in list) {
             if (!list.hasOwnProperty(i)) continue;
-            if (list[i].id == listId) {
-                list[i].isSelected = true;
-            } else {
-                list[i].isSelected = false;
-            }
+            item = list[i];
+            item.isSelected(item.id() == listId);
         }
         t.renderTemplate();
         if (isTrigger) t.trigger('setList', listId);
@@ -933,11 +974,6 @@ var Tabs = Widget.extend({
         'click: .icon': 'clickPlus'
     },
 
-    init: function() {
-        var t = this;
-        this._super.apply(this, Array.prototype.slice.call(arguments, 0));
-    },
-
     clickDialog: function(e) {
         var t = this;
         //@todo: do well
@@ -956,20 +992,17 @@ var Tabs = Widget.extend({
     clickPlus: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
-        var tabDialogModelData = t.model().data('dialog');
-        var dialogId = tabDialogModelData['id'];
+        var dialogTab = t.model().dialogTab();
+        var dialogId = dialogTab.id();
+        var dialogModel = dialogCollection.get(dialogId);
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
 
                 function onCreate() {
-                    var dialogs = t.model().data('list');
-                    $.each(dialogs, function(i, dialog) {
-                        if (dialog.id == dialogId) {
-                            $.each(dialog.lists, function(i, listId) {
-                                $target.dropdown('getItem', listId).addClass('active');
-                            });
-                            return false;
-                        }
+                    var lists = dialogModel.lists();
+
+                    $.each(lists, function(i, listId) {
+                        $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
 
@@ -984,6 +1017,11 @@ var Tabs = Widget.extend({
                         oncreate: onCreate,
                         onupdate: onCreate,
                         onopen: function() {
+                            //@todo: do well
+                            $target.css('display', 'inline');
+                            $target.parent().find('.offline, .online').hide();
+                            $(this).dropdown('refreshPosition');
+
                             $target.addClass('active');
                         },
                         onclose: function() {
@@ -993,11 +1031,6 @@ var Tabs = Widget.extend({
                             $target.removeClass('active');
                         },
                         onchange: function(item) {
-                            //@todo: do well
-                            $target.css('display', 'inline');
-                            $target.parent().find('.offline, .online').hide();
-                            $(this).dropdown('refreshPosition');
-
                             $(this).dropdown('open');
 
                             var $menu = $(this).dropdown('getMenu');
@@ -1058,31 +1091,35 @@ var Tabs = Widget.extend({
             id: Configs.commonDialogsList,
             title: 'Не в списке'
         });
-        var label = listModel.data('title');
-        var tabListModel = new TabModel({id: listId, label: label, isSelected: true});
-        var tabDialogModelData = t.model().data('dialog');
-        if (tabDialogModelData) tabDialogModelData['isSelected'] = false;
-        t.model().data('list', tabListModel);
+        var label = listModel.title();
+        var listTab = new TabModel({id: listId, label: label, isSelected: true});
+        var dialogTab = t.model().dialogTab();
+        if (dialogTab) {
+            dialogTab.isSelected(false);
+        }
+        t.model().listTab(listTab);
         t.renderTemplate();
     },
 
     setDialog: function(dialogId) {
         var t = this;
         var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
-        var userModel = dialogModel.data('user');
-        t._userId = userModel.data('id');
-        var label = userModel.data('name');
-        var isOnline = userModel.data('isOnline');
-        var tabListModelData = t.model().data('list');
-        var tabDialogModel = new TabModel({
+        var userModel = dialogModel.user();
+        t._userId = userModel.id();
+        var label = userModel.name();
+        var isOnline = userModel.isOnline();
+        var listTab = t.model().listTab();
+        var dialogTab = new TabModel({
             id: dialogId,
             label: label,
             isSelected: true,
             isOnline: isOnline,
             isOnList: false
         });
-        if (tabListModelData) tabListModelData['isSelected'] = false;
-        t.model().data('dialog', tabDialogModel);
+        if (listTab) {
+            listTab.isSelected(false);
+        }
+        t.model().dialogTab(dialogTab);
         t.renderTemplate();
     },
 
