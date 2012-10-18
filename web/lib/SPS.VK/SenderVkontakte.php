@@ -74,7 +74,7 @@
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             if (is_array($arr_of_fields)) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $arr_of_fields);
+                curl_setopt( $ch, CURLOPT_POSTFIELDS, $arr_of_fields );
 
             } else return false;
 
@@ -242,28 +242,27 @@
         }
 
         //$post_id  = idпаблика_idпоста
-    //        public function delete_post( $post_id )
-    //        {
-    //
-    //            $post_id = trim($post_id, '-');
-    //            $id = explode('_', $post_id);
-    //            $params = array(
-    //                'owner_id'      =>  '-' . $id[0],
-    //                'post_id'       =>  $id[1],
-    //                'access_token'  =>  $this->vk_access_token
-    //            );
-    //
-    //            $url = self::METH . 'wall.delete';
-    //            $fwd = $this->qurl_request($url, $params);
-    //            $fwd = json_decode($fwd);
-    //
-    //            if (!empty ($fwd->error)) {
-    //                $fwd3 = $fwd->error;
-    //                throw new exception("Error in wall.delete : $fwd->error_msg");
-    //            }
-    //
-    //            return true;
-    //        }
+            public function delete_post( $post_id )
+            {
+                $post_id = trim($post_id, '-');
+                $id = explode('_', $post_id);
+                $params = array(
+                    'owner_id'      =>  '-' . $id[0],
+                    'post_id'       =>  $id[1],
+                    'access_token'  =>  $this->vk_access_token
+                );
+
+                $url = self::METH . 'wall.delete';
+                $fwd = $this->qurl_request($url, $params);
+                $fwd = json_decode($fwd);
+
+                if (!empty ($fwd->error)) {
+                    $fwd3 = $fwd->error;
+                    throw new exception("Error in wall.delete : $fwd->error_msg");
+                }
+
+                return true;
+            }
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:

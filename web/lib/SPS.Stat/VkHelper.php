@@ -75,7 +75,7 @@
 
         public static function get_vk_time()
         {
-            return self::api_request( 'getServerTime', array() );
+            return self::api_request( 'getServerTime', array( 'access_token' =>  '' ), 0 );
         }
 
         public static function multiget( $urls, &$result )
@@ -137,6 +137,11 @@
                 }
                 curl_multi_close( $mh );
             }
+        }
+
+        public static function get_service_access_token()
+        {
+            return 'ac76f4c1ac7cce39ac7cce396eac53e861aac7cac69f6a7fc0316a798a4d74a14f6e2e6';
         }
     }
 ?>
