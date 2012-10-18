@@ -385,6 +385,7 @@ function makeMsg(msg, isNotClean) {
 }
 
 function makeDlg(text) {
+    if (!text) return '';
     var clearText = text;
     clearText = clearText.split('<br>');
     if (clearText.length > 2) {

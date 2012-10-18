@@ -34,11 +34,13 @@ var Main = Widget.extend({
 
     run: function() {
         var t = this;
+        t.el().hide();
 
         Events.fire('get_viewer', function(data) {
             var viewer = new UserModel(data);
             userCollection.add(viewer.id(), viewer);
 
+            t.el().fadeIn(500);
             t.renderTemplate();
 
             t._leftColumn = new LeftColumn({
@@ -277,9 +279,9 @@ var Page = Widget.extend({
         if (!t.isLock()) {
             t.lock();
             Events.fire(t._service, function(data) {
+                t.unlock();
                 t.model().data(data);
                 t.renderTemplate();
-                t.unlock();
             });
         }
     },
@@ -324,6 +326,7 @@ var EndlessPage = Page.extend({
     _isTop: false,
     _isPreload: true,
     _preloadData: null,
+    _isEnded: false,
 
     changePage: function(pageId, force) {
         var t = this;
@@ -345,6 +348,8 @@ var EndlessPage = Page.extend({
 
         t.onShow();
         Events.fire(t._service, pageId, offset, limit, function(data) {
+            t.unlock();
+
             if (pageId == t._pageId) {
                 t._pageLoaded = nextPage;
 
@@ -353,13 +358,10 @@ var EndlessPage = Page.extend({
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
                 t.onRender();
-                t.unlock();
 
                 if (t._isPreload) {
-                    t.preloadData(nextPage + 1);
+                    t.preloadData(nextPage);
                 }
-            } else {
-                t.unlock();
             }
         });
     },
@@ -368,12 +370,12 @@ var EndlessPage = Page.extend({
         var limit = t._itemsLimit;
         var offset = pageNumber * limit;
         var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
 
-        if (!t._preloadData) t._preloadData = {};
-        if (!t._preloadData[pageNumber]) {
+        if (!preloadData[pageNumber] && !t.isLock()) {
             Events.fire(t._service, pageId, offset, limit, function(data) {
                 if (pageId == t._pageId) {
-                    t._preloadData[pageNumber] = data;
+                    preloadData[pageNumber] = data;
                 }
             });
         }
@@ -384,22 +386,26 @@ var EndlessPage = Page.extend({
     makeList: function($list) {},
     showMore: function() {
         var t = this;
-        var nextPage = t._pageLoaded + 1;
+        var currentPage = t._pageLoaded;
+        var nextPage = currentPage + 1;
         var limit = t._itemsLimit;
         var offset = nextPage * limit;
         var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
 
-        if (!t._preloadData) t._preloadData = {};
-        if (t._preloadData[nextPage]) {
-            setData(t._preloadData[nextPage]);
+        if (t._isEnded) {
+            return;
+        }
+        if (preloadData[currentPage]) {
+            t.unlock();
+            setData(preloadData[currentPage]);
         } else {
             if (!t.isLock()) {
                 t.lock();
                 Events.fire(t._service, pageId, offset, limit, function(data) {
+                    t.unlock();
                     if (pageId == t._pageId) {
                         setData(data);
-                    } else {
-                        t.unlock();
                     }
                 });
             }
@@ -423,10 +429,9 @@ var EndlessPage = Page.extend({
                 $list.append($block);
             }
             t.makeList($block);
-            t.unlock();
             t._pageLoaded = nextPage;
             if (t._isPreload) {
-                t.preloadData(nextPage + 1);
+                t.preloadData(nextPage);
             }
         }
     },
@@ -562,8 +567,11 @@ var Dialogs = EndlessPage.extend({
         return false;
     },
     onLoad: function(data) {
+        var t = this;
         var dialogs = data.list;
-        if (!dialogs.length) return;
+        if (!dialogs.length) {
+            t._isEnded = true;
+        }
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
@@ -671,7 +679,9 @@ var Messages = EndlessPage.extend({
         var t = this;
         var user = data.user;
         var messages = data.list;
-        if (!messages.length) return;
+        if (!messages.length) {
+            t._isEnded = true;
+        }
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.id(), userModel);
@@ -808,6 +818,7 @@ var RightColumn = Widget.extend({
     _modelClass: ListsModel,
     _isEditMode: true,
     _isDragging: false,
+    _isFirstRun: true,
 
     _events: {
         'mousedown: .drag-wrap': 'mouseDownList',
@@ -817,7 +828,15 @@ var RightColumn = Widget.extend({
     run: function() {
         var t = this;
         var $el = t.el();
+
+        if (t._isFirstRun) {
+            $el.hide();
+        }
         Events.fire('get_lists', function(data) {
+            if (t._isFirstRun) {
+                t._isFirstRun = false;
+                $el.fadeIn(500);
+            }
             var list = data.list;
             var isSetCommonList = false;
             for (var i in list) {
