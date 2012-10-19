@@ -537,8 +537,8 @@ i {
   -moz-box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 2px 4px -2px rgba(0, 0, 0, 0.15);
 }
-.right-panel .items .slot.new .delete-time,
-.right-panel .items .slot:hover .delete-time,
+.right-panel .items .slot.new .time-of-removal,
+.right-panel .items .slot:hover .time-of-removal,
 .right-panel .items .slot.new .datepicker,
 .right-panel .items .slot:hover .datepicker {
   opacity: .5;
@@ -557,7 +557,7 @@ i {
   z-index: 1;
   margin: 0;
 }
-.right-panel .items .slot .delete-time,
+.right-panel .items .slot .time-of-removal,
 .right-panel .items .slot .datepicker {
   vertical-align: top;
   display: inline-block;
@@ -571,13 +571,13 @@ i {
   -moz-transition: all .2s;
   -webkit-transition: all .2s;
 }
-.right-panel .items .slot .delete-time.active,
+.right-panel .items .slot .time-of-removal.active,
 .right-panel .items .slot .datepicker.active,
-.right-panel .items .slot .delete-time:hover,
+.right-panel .items .slot .time-of-removal:hover,
 .right-panel .items .slot .datepicker:hover {
   opacity: 1;
 }
-.right-panel .items .slot .delete-time {
+.right-panel .items .slot .time-of-removal {
   background: url('../../images/common/delete.png') center no-repeat;
 }
 .right-panel .items .slot input.hasDatepick {

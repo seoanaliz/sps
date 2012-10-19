@@ -82,6 +82,16 @@
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
+                <page uri="controls://authors-list/">
+                    <actions>SPS.Site.GetAuthorsListControl</actions>
+                    <template>tmpl://fe/elements/authors-list.tmpl.php</template>
+                </page>
+                <page uri="controls://author-add/">
+                    <actions>SPS.Site.AddAuthorControl</actions>
+                </page>
+                <page uri="controls://author-delete/">
+                    <actions>SPS.Site.DeleteAuthorControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -499,7 +509,7 @@
                 <page uri="daemons://PublicsGrowFixer/">
                     <actions>SPS.Stat.PublicsGrowFixer</actions>
                 </page>
-                     <page uri="daemons://SyncLikes/">
+                 <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
                  </page>
 
