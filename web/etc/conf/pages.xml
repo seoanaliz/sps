@@ -499,9 +499,11 @@
                 <page uri="daemons://PublicsGrowFixer/">
                     <actions>SPS.Stat.PublicsGrowFixer</actions>
                 </page>
+                     <page uri="daemons://SyncLikes/">
+                     <actions>SPS.Site.SyncLikes</actions>
+                 </page>
 
             </pageGroup>
-
             <pageGroup name="vtControls" boot="">
                 <page uri="controls://generate-grid-sql/">
                     <actions>SPS.Articles.GenerateGridSQL</actions>
