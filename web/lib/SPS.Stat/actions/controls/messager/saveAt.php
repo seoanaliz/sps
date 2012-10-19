@@ -22,8 +22,8 @@ class saveAt
         if ( !$user)
             $user = StatUsers::add_user( $user_id );
 
-//        StatUsers::set_access_token( $user_id, $access_token );
-//        MesDialogs::get_all_dialogs( $user_id );
+        StatUsers::set_access_token( $user_id, $access_token );
+        MesDialogs::get_all_dialogs( $user_id );
         MesDialogs::check_friend_requests( $user_id );
 
         die( ObjectHelper::ToJSON( array( 'response' => $user )));

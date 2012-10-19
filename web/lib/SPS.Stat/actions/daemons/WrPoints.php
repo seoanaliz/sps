@@ -10,7 +10,6 @@
 
     public function Execute()
     {
-
             $this->ids = $this->get_publics();
             $this->points();
     }
@@ -126,7 +125,6 @@
 //                    continue;
             }
             $date_to = time() - 86400;
-            print_r(array($date_from, $date_to));
 
             $sql = "SELECT * FROM posts_for_likes WHERE vk_id LIKE '" . $id[0] . "_%' AND time_st>$date_from AND time_st<$date_to ORDER BY time_st";
             echo "<br> $sql <br> ";
