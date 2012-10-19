@@ -396,8 +396,27 @@ $(document).ready(function(){
 
             if (!$input) {
                 $input = $('<input />')
-                    .attr({class: "time-edit", type: "text"})
-                    .css({width: $time.width() + 2})
+                    .attr('type', 'text')
+                    .attr('class', 'time-edit')
+                    .width($time.width() + 2)
+                    .val($time.text())
+                    .appendTo($post);
+                $time.data('input', $input);
+            } else {
+                $time.data('input').show();
+            }
+            $input.mask("29:59").focus().select();
+        })
+        .delegate('.time-of-removal', 'click', function(e) {
+            var $time = $(this);
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('input');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr('type', 'text')
+                    .attr('class', 'time-edit')
+                    .width($time.width() + 2)
                     .val($time.text())
                     .appendTo($post);
                 $time.data('input', $input);
