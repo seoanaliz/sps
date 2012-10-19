@@ -20,12 +20,11 @@ class markMes
             die(ERR_MISSING_PARAMS);
         }
 
-        MesDialogs::set_state( $dialogs_id, 0 );
+        MesDialogs::set_state( $dialog_id, 0, 0 );
 
         if ( MesDialogs::toggle_read_unread( $user_id, $mess_id, $unread ) )
             die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
         else
             die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
-
     }
 }

@@ -13,14 +13,13 @@
 
             $res = array();
             foreach ( $publics as $public ) {
-
                 if( $public->type != 'vk'             ||
                     $public->externalId ==  25678227  ||
                     $public->externalId ==  26776509  ||
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
-                    $public->externalId ==  38000555  ||
+//                    $public->externalId ==  38000555  ||
                     $public->externalId ==  35807078 )
                     continue;
 
@@ -194,6 +193,62 @@
             return $res;
         }
 
+        public static function get_sb_public_ids( $vk_public_ids )
+        {
+            if ( is_array( $vk_public_ids ))
+                $vk_public_ids = implode( ',', $vk_public_ids );
+            $vk_public_ids = '{' . $vk_public_ids . '}';
+            $sql = 'SELECT
+                        "externalId",
+                        "targetFeedId"
+                    FROM
+                        "targetFeeds"
+                    WHERE
+                        "externalId" = ANY(@public_ids)
+                    ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString ( '@public_ids',     $vk_public_ids );
+            echo $cmd->getQuery();
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[ $ds->GetInteger( 'externalId')]    =  $ds->GetInteger( 'targetFeedId' );
+            }
+            return $res;
+        }
 
+
+        public static function save_conf( $c1,$c2,$c3,$c4,$lv )
+        {
+            $sql = 'UPDATE oadmins_conf SET complicate = @1,
+                                            reposts    = @2,
+                                            rel_mark   = @3,
+                                            overposts  = @4,
+                                            price      = @lv ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+
+            $cmd->SetFloat('@1'   , $c1);
+            $cmd->SetFloat('@2'   , $c2);
+            $cmd->SetFloat('@3'   , $c3);
+            $cmd->SetFloat('@4'   , $c4);
+            $cmd->SetInteger('@lv', $lv);
+
+            $cmd->Execute();
+        }
+
+        public static function get_conf()
+        {
+            $sql = 'SELECT * FROM oadmins_conf';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            return array(
+                'c1_old'    =>  $ds->GetFloat( 'complicate' ),
+                'c2_old'    =>  $ds->GetFloat( 'reposts'    ),
+                'c3_old'    =>  $ds->GetFloat( 'rel_mark'   ),
+                'c4_old'    =>  $ds->GetFloat( 'overposts'  ),
+                'lval_old'  =>  $ds->GetFloat( 'price'      ),
+            );
+        }
     }
 ?>

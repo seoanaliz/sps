@@ -22,6 +22,9 @@
                     <actions>SPS.Stat.AdminsWork</actions>
                     <template>tmpl://vt/stat_admins/index.tmpl.php</template>
                 </page>
+                <page uri="/oadmins/cof12">
+                    <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -78,16 +81,6 @@
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
-                </page>
-                <page uri="controls://authors-list/">
-                    <actions>SPS.Site.GetAuthorsListControl</actions>
-                    <template>tmpl://fe/elements/authors-list.tmpl.php</template>
-                </page>
-                <page uri="controls://author-add/">
-                    <actions>SPS.Site.AddAuthorControl</actions>
-                </page>
-                <page uri="controls://author-delete/">
-                    <actions>SPS.Site.DeleteAuthorControl</actions>
                 </page>
             </pageGroup>
 
@@ -209,10 +202,6 @@
                     <page uri="vt://stat/">
                         <actions>Sps.Stat.GraphGrow</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
-                    </page>
-                    <page uri="vt://stat/">
-                        <actions>SPS.Stat.AdminsWork</actions>
-                        <template>tmpl://vt/stat_admins/setup.tmpl.php</template>
                     </page>
 
                     <pageGroup name="siteParam">
@@ -504,11 +493,17 @@
                 <page uri="daemons://MessageSender/">
                     <actions>SPS.Stat.MessageSender</actions>
                 </page>
-                <page uri="daemons://SyncLikes/">
-                    <actions>SPS.Site.SyncLikes</actions>
+                <page uri="daemons://AlbumUpdate/">
+                    <actions>SPS.Stat.AlbumUpdate</actions>
                 </page>
-            </pageGroup>
+                <page uri="daemons://PublicsGrowFixer/">
+                    <actions>SPS.Stat.PublicsGrowFixer</actions>
+                </page>
+                     <page uri="daemons://SyncLikes/">
+                     <actions>SPS.Site.SyncLikes</actions>
+                 </page>
 
+            </pageGroup>
             <pageGroup name="vtControls" boot="">
                 <page uri="controls://generate-grid-sql/">
                     <actions>SPS.Articles.GenerateGridSQL</actions>
