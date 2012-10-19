@@ -25,9 +25,6 @@
                 <page uri="/oadmins/cof12">
                     <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
                 </page>
-		<page uri="/oadmins/cof12">
-                    <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
-                </page>
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
