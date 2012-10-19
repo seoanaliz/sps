@@ -571,6 +571,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="publicControls" boot="">
+                <page uri="controls://upload-user-to-public/">
+                    <actions>SPS.Site.UploadUserToPublic</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>
