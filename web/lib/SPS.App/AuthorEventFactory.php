@@ -22,7 +22,7 @@
             'class'       => 'AuthorEvent'
             , 'table'     => 'authorEvents'
             , 'view'      => 'getAuthorEvents'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates', 'AddablePK' => 'AddablePK' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates', 'AddablePK' => 'AddablePK' )
             , 'cacheDeps' => array( 'authors', 'articles' )
             , 'fields'    => array(
                 'articleId' => array(

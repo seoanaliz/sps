@@ -83,6 +83,7 @@ SELECT "public"."articleRecords"."articleRecordId"
 	, "public"."articleRecords"."poll"
 	, "public"."articleRecords"."text_links"
 	, "public"."articleRecords"."doc"
+	, "public"."articleRecords"."topfaceData"
 	, "public"."articleRecords"."articleId"
 	, "public"."articleRecords"."articleQueueId"
  FROM "public"."articleRecords";

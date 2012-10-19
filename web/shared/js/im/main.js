@@ -1,415 +1,478 @@
-function makeMsg(msg, isNotClean) {
-    function clean(str) {
-        if (isNotClean) {
-            return str;
-        }
-        else {
-            return str ? str
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;') : '';
-        }
-    }
-
-    function indexOf(arr, value, from) {
-        for (var i = from || 0, l = (arr || []).length; i < l; i++) {
-            if (arr[i] == value) return i;
-        }
-        return -1;
-    }
-
-    return clean(msg).replace(/\n/g, '<br>').replace(/(@)?((https?:\/\/)?)((([A-Za-z0-9][A-Za-z0-9\-\_\.]*[A-Za-z0-9])|(([а-яА-Я0-9\-\_\.]+\.рф)))(\/([A-Za-zА-Яа-я0-9\-\_#%&?+\/\.=;:~]*[^\.\,;\(\)\?\<\&\s:])?)?)/ig, function () {
-        var domain = arguments[5],
-            url = arguments[4],
-            full = arguments[0],
-            protocol = arguments[2] || 'http://';
-        var pre = arguments[1];
-
-        if (domain.indexOf('.') == -1) return full;
-        var topDomain = domain.split('.').pop();
-        if (topDomain.length > 5 || indexOf('aero,asia,biz,com,coop,edu,gov,info,int,jobs,mil,mobi,name,net,org,pro,tel,travel,xxx,ru,ua,su,рф,fi,fr,uk,cn,gr,ie,nl,au,co,gd,im,cc,si,ly,gl,be,eu,tv,to,me,io'.split(','), topDomain) == -1) return full;
-
-        if (pre == '@') {
-            return full;
-        }
-        try {
-            full = decodeURIComponent(full);
-        } catch (e){}
-
-        if (full.length > 255) {
-            full = full.substr(0, 253) + '..';
-        }
-
-        if (domain.match(/^([a-zA-Z0-9\.\_\-]+\.)?(vkontakte\.ru|vk\.com|vk\.cc|vkadre\.ru|vshtate\.ru|userapi\.com)$/)) {
-            url = url.replace(/[^a-zA-Z0-9#%;_\-.\/?&=\[\]]/g, encodeURIComponent);
-            return '<a href="'+ (protocol + url).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '" target="_blank">' + full + '</a>';
-        }
-        return '<a href="http://vk.com/away.php?utf=1&to=' + encodeURIComponent(protocol + url) + '" target="_blank">' + full + '</a>';
-    })
-}
-
 var Configs = {
     vkId: $.cookie('uid'),
     token: $.cookie('token'),
     appId: vk_appId,
     controlsRoot: controlsRoot,
-    viewer: {}
+    hostName: hostname,
+    commonDialogsList: 999999,
+    disableAutocomplete: false,
+    easyDateParams: {
+        live: true,
+        set_title: false,
+        date_parse: function(date) {
+            date = intval(date) * 1000;
+            if (!date) return;
+            return new Date(date);
+        },
+        uneasy_format: function(date) {
+            return date.toLocaleDateString();
+        }
+    }
 };
 
-$(document).ready(function() {
-    if (!$('#main').length) {
-        return;
-    }
+var userCollection = new UserCollection();
+var messageCollection = new MessageCollection();
+var dialogCollection = new DialogCollection();
+var listCollection = new ListCollection();
 
-    if (!Configs.vkId) {
-        return location.replace('/login/');
-    }
-    if (!Configs.token) {
-        return location.replace('/im/login/');
-    }
-
-    Events.fire('get_user', function(viewer) {
-        Configs.viewer = viewer;
-        var im = new IM({
-            el: '#main'
-        });
-        $(window).on('scroll', function() {
-            im.trigger('scroll');
-        });
-        $(window).on('resize', function() {
-            im.trigger('scroll');
-        });
-    });
-});
-
-/* Instant Messenger */
-var IM = Widget.extend({
-    template: MAIN,
-    leftColumn: null,
-    rightColumn: null,
+var Main = Widget.extend({
+    _template: MAIN,
+    _leftColumn: null,
+    _leftColumnSelector: '#left-column',
+    _rightColumn: null,
+    _rightColumnSelector: '#right-column',
 
     run: function() {
-        this._super();
-
         var t = this;
-        t.initLeftColumn();
-        t.initRightColumn();
-        t.bindEvents();
-    },
+        t.el().hide();
 
-    bindEvents: function() {
-        var t = this;
+        Events.fire('get_viewer', function(data) {
+            var viewer = new UserModel(data);
+            userCollection.add(viewer.id(), viewer);
 
-        (function poll(ts) {
-            var timeout = 15;
-            $.ajax({
-                url: 'http://im.' + hostname + '/int/controls/watchDog/',
-                data: {
-                    userId: Configs.vkId,
-                    timeout: timeout,
-                    ts: ts
-                },
-                dataType: 'jsonp',
-                success: function(data) {
-                    poll(data.response.ts);
-                    $.each(data.response.events, function(i, event) {
-                        t.newEvent(event);
-                    });
-                }
+            t.el().fadeIn(500);
+            t.renderTemplate();
+
+            t._leftColumn = new LeftColumn({
+                selector: t._leftColumnSelector
             });
-        })();
+            t._rightColumn = new RightColumn({
+                selector: t._rightColumnSelector,
+                model: new ListsModel()
+            });
 
-        t.on('scroll', function() {
-            t.leftColumn.trigger('scroll');
-        });
-        t.leftColumn.on('updateList', function() {
-            t.rightColumn.update();
-        });
-        t.rightColumn.on('selectDialogs', function(id, title) {
-            t.leftColumn.initDialogs(id, title);
-        });
-        t.rightColumn.on('selectMessages', function(id, title) {
-            t.leftColumn.initMessages(id, title);
+            t.on('scroll', function(e) {
+                t._leftColumn.onScroll(e);
+            });
+
+            t._leftColumn.on('changeDialog', function(dialogId) {
+                t._rightColumn.setDialog(dialogId);
+            });
+            t._leftColumn.on('changeList', function(listId) {
+                t._rightColumn.setList(listId);
+            });
+            t._leftColumn.on('addList markAsRead', function() {
+                t._rightColumn.update();
+            });
+            t._rightColumn.on('changeDialog', function(dialogId) {
+                t._leftColumn.showDialog(dialogId);
+            });
+            t._rightColumn.on('setList', function(listId) {
+                t._leftColumn.showList(listId);
+            });
+
+            (function poll(ts) {
+                $.ajax({
+                    url: 'http://im.' + Configs.hostName + '/int/controls/watchDog/',
+                    dataType: 'jsonp',
+                    data: {
+                        userId: Configs.vkId,
+                        timeout: 15,
+                        ts: ts
+                    },
+                    success: function(data) {
+                        poll(data.response.ts);
+                        $.each(data.response.events, function(i, event) {
+                            t.fireEvent(event);
+                        });
+                    }
+                });
+            })();
+
+            t._leftColumn.showList(Configs.commonDialogsList);
         });
     },
 
-    initLeftColumn: function() {
+    fireEvent: function(event) {
         var t = this;
-        t.leftColumn = new LeftColumn({
-            el: $(t.el).find('> .left-column')
-        });
-    },
-    initRightColumn: function() {
-        var t = this;
-        t.rightColumn = new RightColumn({
-            el: $(t.el).find('> .right-column')
-        });
-    },
-
-    newEvent: function(event) {
-        var t = this;
-        var dirtyMessage;
-        var message;
+        if (!event || !event.type) {
+            console.log(['Bad Event: ', event]);
+            return;
+        }
 
         switch (event.type) {
-            //@todo: объеденить
-            case 'outMessage':
-                dirtyMessage = event.content;
-                message = {
-                    groups: dirtyMessage.groups,
-
-                    id: dirtyMessage.mid,
-                    isNew: (dirtyMessage.read_state != 1),
-                    isViewer: true,
-                    text: dirtyMessage.body,
-                    dialogId: dirtyMessage.dialog_id,
-                    attachments: [],
-                    timestamp: dirtyMessage.date,
-                    user: dirtyMessage.out ? Configs.viewer : {}
-                };
-                t.leftColumn.addMessage(message);
-            break;
             case 'inMessage':
-                dirtyMessage = event.content;
-                message = {
-                    groups: dirtyMessage.groups,
+            case 'outMessage': {
+                (function() {
+                    var isViewer = (event.type == 'outMessage');
+                    var message = Cleaner.longPollMessage(event.content, isViewer);
+                    var dialog = Cleaner.longPollDialog(event.content, isViewer);
+                    t._leftColumn.addMessage(new MessageModel(message));
+                    t._leftColumn.addDialog(new DialogModel(dialog));
 
-                    id: dirtyMessage.mid,
-                    isNew: (dirtyMessage.read_state != 1),
-                    isViewer: (dirtyMessage.from_id == Configs.vkId),
-                    text: dirtyMessage.body,
-                    dialogId: dirtyMessage.dialog_id,
-                    attachments: [],
-                    timestamp: dirtyMessage.date,
-                    user: dirtyMessage.out ? Configs.viewer : {}
-                };
-                t.leftColumn.addMessage(message);
-
-                if (!message.isViewer) {
-                    t.rightColumn.addMessage(message);
-                }
-            break;
+                    if (!message.isViewer) {
+                        t._rightColumn.update();
+                    }
+                })();
+                break;
+            }
+            case 'read': {
+                (function() {
+                    var message = Cleaner.longPollRead(event.content);
+                    t._leftColumn.readMessage(message.id);
+                    t._leftColumn.readDialog(message.dialogId);
+                })();
+                break;
+            }
+            case 'online':
+            case 'offline': {
+                (function() {
+                    var online = Cleaner.longPollOnline(event.content);
+                    if (online.isOnline) {
+                        t._leftColumn.setOnline(online.userId);
+                    } else {
+                        t._leftColumn.setOffline(online.userId);
+                    }
+                })();
+                break;
+            }
         }
     }
 });
 
 var LeftColumn = Widget.extend({
-    template: LEFT_COLUMN,
-    dialogs: null,
-    messages: null,
-    tabs: null,
-    tabPrefixDialogs: 'dialogs',
-    tabPrefixMessages: 'messages',
-    curListId: null,
-    curDialogId: null,
-    keyListId: 'keyListId',
-    keyDialogId: 'keyDialogId',
+    _template: LEFT_COLUMN,
+    _dialogs: null,
+    _dialogsSelector: '#list-dialogs',
+    _messages: null,
+    _messagesSelector: '#list-messages',
+    _tabs: null,
+    _tabsSelector: '.header',
 
     run: function() {
-        this._super();
-
         var t = this;
-        t.initTabs();
-        t.initDialogs(999999, 'Не в списке');
-        t.bindEvents();
-    },
+        t.renderTemplate();
 
-    bindEvents: function() {
-        var t = this;
-        var $el = $(t.el);
-        var $header = $el.find('.header');
+        t._tabs = new Tabs({
+            selector: t._tabsSelector,
+            model: new TabsModel()
+        });
+        t._messages = new Messages({
+            selector: t._messagesSelector,
+            model: new MessagesModel()
+        });
+        t._dialogs = new Dialogs({
+            selector: t._dialogsSelector,
+            model: new DialogsModel()
+        });
 
-        t.on('scroll', function() {
-            if (t.messages) t.messages.trigger('scroll');
-            else if (t.dialogs) t.dialogs.trigger('scroll');
+        t._dialogs.on('clickDialog', function(e) {
+            var $dialog = $(e.currentTarget);
+            var dialogId = $dialog.data('id');
+            t.showDialog(dialogId, true);
+        });
+
+        t._messages.on('hoverMessage', function(e) {
+            var $message = $(e.currentTarget);
+            var messageId = $message.data('id');
+            var dialogId = t._messages._pageId;
+            if ($message.hasClass('viewer')) return;
+            t._messages.readMessage(messageId);
+            t._dialogs.readDialog(dialogId);
+            Events.fire('message_mark_as_read', messageId, dialogId, function() {
+                t.trigger('markAsRead');
+            });
+        });
+
+        t._tabs.on('clickDialog', function(e) {
+            var $tab = $(e.currentTarget);
+            var dialogId = $tab.data('id');
+            t.showDialog(dialogId, true);
+        });
+
+        t._tabs.on('clickList', function(e) {
+            var $tab = $(e.currentTarget);
+            var listId = $tab.data('id');
+            t.showList(listId, true);
         });
     },
-
-    addMessage: function(message) {
+    onScroll: function(e) {
         var t = this;
+        t._messages.onScroll(e);
+        t._dialogs.onScroll(e);
+    },
 
-        if (t.messages) {
-            t.messages.addMessage(message);
-        } else if (t.dialogs) {
-            t.dialogs.addMessage();
+    showList: function(listId, isTrigger) {
+        var t = this;
+        t._messages.hide();
+        t._dialogs.show().changePage(listId);
+        t._tabs.setList(listId);
+        if (isTrigger) t.trigger('changeList', listId);
+    },
+
+    showDialog: function(dialogId, isTrigger) {
+        var t = this;
+        t._dialogs.hide();
+        t._messages.show().changePage(dialogId);
+        t._tabs.setDialog(dialogId);
+        if (isTrigger) t.trigger('changeDialog', dialogId);
+    },
+
+    setOnline: function(userId) {
+        var t = this;
+        t._tabs.setOnline(userId);
+    },
+    setOffline: function(userId) {
+        var t = this;
+        t._tabs.setOffline(userId);
+    },
+    addMessage: function(messageModel) {
+        var t = this;
+        t._messages.addMessage(messageModel);
+    },
+    addDialog: function(dialog) {
+        var t = this;
+        t._dialogs.addDialog(dialog);
+    },
+    readMessage: function(messageId) {
+        var t = this;
+        t._messages.readMessage(messageId);
+    },
+    readDialog: function(dialogId) {
+        var t = this;
+        t._dialogs.readDialog(dialogId);
+    }
+});
+
+var Page = Widget.extend({
+    _isVisible: false,
+    _templateLoading: '',
+    _pageId: null,
+    _cache: null,
+    _service: 'get_dialogs',
+    _isBlock: false,
+    _isCache: true,
+    _scroll: null,
+    _isBottom: false,
+
+    run: function() {
+        var t = this;
+        if (t._pageId) {
+            t.changePage(t._pageId, true);
         }
     },
-
-    initTabs: function() {
+    changePage: function(pageId, force) {
         var t = this;
+        if (force || (t._isCache && t._pageId != pageId)) {
+            t._pageId = pageId;
+            t.renderTemplateLoading();
+            t.getData();
+        }
+    },
+    renderTemplateLoading: function() {
+        var t = this;
+        t.el().html(t.tmpl()(t._templateLoading, t.model()));
+        return this;
+    },
+    getData: function() {
+        var t = this;
+        if (!t.isLock()) {
+            t.lock();
+            Events.fire(t._service, function(data) {
+                t.unlock();
+                t.model().data(data);
+                t.renderTemplate();
+            });
+        }
+    },
+    isVisible: function() {
+        return !!this._isVisible;
+    },
+    show: function() {
+        var t = this;
+        t._isVisible = true;
+        t.el().show();
+        if (t._isBottom) {
+            $(window).scrollTop($(document).height() - $(window).height());
+        } else {
+            $(window).scrollTop(t._scroll);
+        }
+        return this;
+    },
+    hide: function() {
+        var t = this;
+        t._isVisible = false;
+        t._scroll = $(window).scrollTop();
+        t._isBottom = $(window).scrollTop() + $(window).height() == $(document).height();
+        t.el().hide();
+        return this;
+    },
+    isLock: function() {
+        return !!this._isBlock;
+    },
+    lock: function() {
+        this._isBlock = true;
+    },
+    unlock: function() {
+        this._isBlock = false;
+    }
+});
 
-        t.tabs = new Tabs({
-            el: $(t.el).find('.header'),
-            templateData: {tabs: []}
-        });
-        t.tabs.on('select', function(id, title) {
-            if (id.indexOf('messages') == 0) {
-                t.initMessages(id.substring(t.tabPrefixMessages.length), title);
-            } else {
-                t.initDialogs(id.substring(t.tabPrefixDialogs.length), title);
+var EndlessPage = Page.extend({
+    _templateItem: '',
+    _itemsLimit: 20,
+    _itemsSelector: '',
+    _pageLoaded: null,
+    _isTop: false,
+    _isPreload: true,
+    _preloadData: null,
+    _isEnded: false,
+
+    changePage: function(pageId, force) {
+        var t = this;
+        if (force || (t._isCache && t._pageId != pageId)) {
+            t._pageLoaded = 0;
+            t._preloadData = {};
+            t._isEnded = false;
+            if (t.model() && t.model().list) {
+                t.model().list([]);
             }
-        });
-    },
-    initDialogs: function(listId, title) {
-        var t = this;
-        var tabPrefix = t.tabPrefixDialogs;
-
-        t.messages = false;
-        t.dialogs = new Dialogs({
-            el: $(t.el).find('.list'),
-            runData: {
-                listId: listId
-            }
-        });
-        t.dialogs.on('select', function(id, title) {
-            t.initMessages(id, title);
-        });
-        t.dialogs.on('addList', function() {
-            t.trigger('updateList');
-        });
-        t.dialogs.on('addToList', function() {
-            t.trigger('updateList');
-        });
-        t.dialogs.on('removeFromList', function() {
-            t.trigger('updateList');
-        });
-
-        if (t.curListId && t.curListId != listId) {
-            t.tabs.removeTab(tabPrefix + t.curListId);
         }
-        if (!t.tabs.getTab(tabPrefix + listId).length) {
-            t.tabs.prependTab(tabPrefix + listId, title);
-        }
-        t.tabs.selectTab(tabPrefix + listId);
-        t.curListId = listId;
+        this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
-    initMessages: function(dialogId, title) {
+    getData: function() {
         var t = this;
-        var tabPrefix = t.tabPrefixMessages;
-        title = $.trim(title) || '...';
+        var limit = t._itemsLimit;
+        var offset = t._pageLoaded * limit;
+        var pageId = t._pageId;
 
-        t.dialogs = false;
-        t.messages = new Messages({
-            el: $(t.el).find('.list'),
-            runData: {
-                dialogId: dialogId,
-                user: {
-                    id: 0,
-                    name: title
+        t.onShow();
+        t.lock();
+            Events.fire(t._service, pageId, offset, limit, function(data) {
+            t.unlock();
+
+            if (pageId == t._pageId) {
+                t.onLoad(data);
+                t.renderTemplate();
+                t.makeList(t.el().find(t._itemsSelector));
+                t.onRender();
+
+                if (t._isPreload) {
+                    t.preloadData(1);
                 }
             }
         });
+    },
+    preloadData: function(pageNumber) {
+        var t = this;
+        var limit = t._itemsLimit;
+        var offset = pageNumber * limit;
+        var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
 
-        if (t.curDialogId && t.curDialogId != dialogId) {
-            t.tabs.removeTab(tabPrefix + t.curDialogId);
+        if (!preloadData[pageNumber] && !t.isLock()) {
+            Events.fire(t._service, pageId, offset, limit, function(data) {
+                if (pageId == t._pageId) {
+                    preloadData[pageNumber] = data;
+                }
+            });
         }
-        if (!t.tabs.getTab(tabPrefix + dialogId).length) {
-            t.tabs.appendTab(tabPrefix + dialogId, title);
+    },
+    onShow: function() {},
+    onLoad: function(data) {},
+    onRender: function() {},
+    makeList: function($list) {},
+    showMore: function() {
+        var t = this;
+        var currentPage = t._pageLoaded;
+        var nextPage = currentPage + 1;
+        var limit = t._itemsLimit;
+        var offset = nextPage * limit;
+        var pageId = t._pageId;
+        var preloadData = t._preloadData || {};
+
+        if (t._isEnded) {
+            return;
         }
-        t.tabs.selectTab(tabPrefix + dialogId);
-        t.curDialogId = dialogId;
+
+        if (!t.isLock()) {
+            t.lock();
+            if (preloadData[nextPage]) {
+                setData(preloadData[nextPage]);
+            } else {
+                Events.fire(t._service, pageId, offset, limit, function(data) {
+                    setData(data);
+                });
+            }
+        }
+
+        function setData(data) {
+            t.unlock();
+            if (pageId == t._pageId) {
+                t.onLoad(data);
+                var $list = t.el().find(t._itemsSelector);
+                var $block;
+                var bottom = $(document).height() - $(window).scrollTop();
+                var html = '';
+                $.each(data.list, function(i, obj) {
+                    html += t.tmpl()(t._templateItem, obj);
+                });
+
+                $block = $(html);
+                if (t._isTop) {
+                    $list.prepend($block);
+                    $(window).scrollTop($(document).height() - bottom);
+                } else {
+                    $list.append($block);
+                }
+                t.makeList($block);
+                t._pageLoaded = nextPage;
+                if (t._isPreload) {
+                    t.preloadData(nextPage + 1);
+                }
+            }
+        }
+    },
+    checkAtTop: function() {
+        var t = this;
+        return !!($(window).scrollTop() < 300);
+    },
+    checkAtBottom: function() {
+        var t = this;
+        return !!($(window).scrollTop() >= $(document).height() - $(window).height() - 300);
+    },
+    onScroll: function() {
+        var t = this;
+        if (!t.isVisible()) return;
+        if (t.checkAtTop() && t._isTop || t.checkAtBottom() && !t._isTop) {
+            t.showMore();
+        }
     }
 });
 
-var RightColumn = Widget.extend({
-    template: RIGHT_COLUMN,
-    list: null,
+var Dialogs = EndlessPage.extend({
+    _template: DIALOGS,
+    _modelClass: DialogsModel,
+    _templateItem: DIALOGS_ITEM,
+    _templateLoading: DIALOGS_LOADING,
+    _itemsLimit: 20,
+    _itemsSelector: '.dialogs',
+    _service: 'get_dialogs',
+    _pageLoaded: null,
+    _pageId: Configs.commonDialogsList,
 
-    run: function() {
-        this._super();
-
-        var t = this;
-        t.initList();
-    },
-
-    update: function() {
-        var t = this;
-        t.list.update();
-    },
-
-    addMessage: function(message) {
-        var t = this;
-        t.list.incrementCounter(message.groups, message.dialogId);
-    },
-
-    initList: function() {
-        var t = this;
-        t.list = new List({
-            el: $(t.el).find('.list')
-        });
-        t.list.on('selectDialogs', function(id, title) {
-            t.trigger('selectDialogs', id, title);
-        });
-        t.list.on('selectMessages', function(id, title) {
-            t.trigger('selectMessages', id, title);
-        });
-    }
-});
-
-var Dialogs = Widget.extend({
-    template: DIALOGS,
-    tmplDialog: DIALOGS_ITEM,
-    tmplDialogsBlock: DIALOGS_BLOCK,
-    listId: null,
-    itemsLimit: 20,
-    currentPage: 1,
-
-    preloadData: {},
-    isBlock: false,
-
-    events: {
+    _events: {
         'click: .dialog': 'clickDialog',
         'click: .action.icon': 'clickPlus'
     },
 
-    run: function(params) {
-        var t = this;
-        var $el = $(t.el);
-        var listId = t.listId = params.listId;
-
-        t.templateData = {id: listId, list: [], isLoad: true};
-        t.renderTemplate();
-        t.getBlockData(0, function(data) {
-            t.templateData = {id: listId, list: data};
-            t.listId = listId;
-            t.renderTemplate();
-            t.bindEvents();
-            t.scrollTop();
-            t.makeDialogs($el);
-            t.preload();
-        });
+    makeList: function($list) {
+        $list.find('.date').easydate(Configs.easyDateParams);
     },
-
-    bindEvents: function() {
+    clickDialog: function(e) {
         var t = this;
-        var $el = $(t.el);
-
-        t.on('scroll', (function onScroll() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 1000) {
-                t.showMore();
-            }
-            return onScroll;
-        })());
+        t.trigger('clickDialog', e);
     },
-
-    addMessage: function() {
-        var t = this;
-        var $el = $(t.el);
-        var listId = t.listId;
-
-        t.getBlockData(0, function(data) {
-            t.templateData = {id: listId, list: data};
-            t.listId = listId;
-            t.renderTemplate();
-            t.bindEvents();
-            t.scrollTop();
-            t.makeDialogs($el);
-            t.preload();
-        });
-    },
-
     clickPlus: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
@@ -419,7 +482,9 @@ var Dialogs = Widget.extend({
             (function updateDropdown() {
 
                 function onCreate() {
-                    $.each(t.templateData.list, function(i, dialog) {
+                    var dialogs = t.model().list();
+
+                    $.each(dialogs, function(i, dialog) {
                         if (dialog.id == dialogId) {
                             $.each(dialog.lists, function(i, listId) {
                                 $target.dropdown('getItem', listId).addClass('active');
@@ -429,7 +494,8 @@ var Dialogs = Widget.extend({
                     });
                 }
 
-                Events.fire('get_lists', function(lists) {
+                Events.fire('get_lists', function(data) {
+                    var list = data.list;
                     $target.dropdown({
                         isShow: true,
                         position: 'right',
@@ -488,554 +554,709 @@ var Dialogs = Widget.extend({
                                 t.trigger('removeFromList');
                             });
                         },
-                        data: $.merge(lists, [
+                        data: $.merge(list, [
                             {id: 'add_list', title: 'Создать список'}
                         ])
                     });
                 });
             })();
         }
+        t.trigger('clickPlus', e);
         return false;
     },
-
-    clickDialog: function(e) {
-        if ($(e.target).closest('a').length) return;
-
+    onLoad: function(data) {
         var t = this;
-        var $target = $(e.currentTarget);
-        var listId = $target.data('id');
-        var title = $target.data('title');
-        t.selectDialog(listId, title, true);
-    },
+        var dialogs = data.list;
+        if (!dialogs.length) {
+            t._isEnded = true;
+        }
+        t.model().data(data);
+        for (var i in dialogs) {
+            if (!dialogs.hasOwnProperty(i)) continue;
+            var dialogModel = new DialogModel(dialogs[i]);
+            var messageModel = new MessageModel(dialogs[i]);
+            var userModel = dialogModel.user();
 
-    selectDialog: function(id, title, isTrigger) {
-        var t = this;
-        if (isTrigger) t.trigger('select', id, title);
-    },
-
-    scrollTop: function() {
-        $(window).scrollTop(0);
-    },
-
-    createBlock: function(data) {
-        var t = this;
-        return $(tmpl(t.tmplDialogsBlock, {id: t.currentPage, list: data}));
-    },
-
-    createDialog: function(data) {
-        var t = this;
-        return $(tmpl(t.tmplDialog, data));
-    },
-
-    makeDialogs: function($el) {
-        $el.find('.date').easydate({
-            live: true,
-            set_title: false,
-            date_parse: function(date) {
-                date = intval(date) * 1000;
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
+            if (dialogModel) {
+                dialogCollection.add(dialogModel.id(), dialogModel);
             }
-        });
-    },
-
-    preload: function() {
-        var t = this;
-        var page = t.currentPage;
-        t.getBlockData(page, function(data) {
-            if (!t.preloadData[t.listId]) t.preloadData[t.listId] = {};
-            t.preloadData[t.listId][page] = data;
-        });
-    },
-
-    getBlockData: function(page, callback) {
-        var t = this;
-
-        if (t.preloadData[t.listId] && t.preloadData[t.listId][page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[t.listId][page]);
-        } else {
-            Events.fire('get_dialogs', t.listId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
-            });
+            if (userModel) {
+                userCollection.add(userModel.id(), userModel);
+            }
+            if (dialogModel.messageId()) {
+                messageCollection.add(dialogModel.messageId(), messageModel);
+            }
         }
     },
-
-    showMore: function() {
+    addDialog: function(dialogModel) {
         var t = this;
-        if (t.isLock()) return;
-        var $el = $(t.el);
-        var $dialogs = $el.find('.dialogs');
+        if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
+        if ($.inArray(t._pageId, dialogModel.lists()) == -1) return false;
 
-        t.lock();
-        t.getBlockData(t.currentPage, function(data) {
-            var $block = t.createBlock(data);
-            $dialogs.append($block);
-            t.makeDialogs($block);
-            t.preload();
-            t.unlock();
-        });
-        t.currentPage++;
+        var $el = t.el();
+        var $dialog = $(t.tmpl()(t._templateItem, dialogModel));
+        var $oldDialog = $el.find('[data-id=' + dialogModel.id() + ']');
+        if ($oldDialog.length) {
+            $oldDialog.remove();
+        }
+        $dialog.prependTo($el.find(t._itemsSelector));
+        t.makeList($dialog);
+        return $dialog;
     },
-
-    isLock: function() {
-        return this.isBlock;
-    },
-    lock: function() {
-        this.isBlock = true;
-    },
-    unlock: function() {
-        this.isBlock = false;
+    readDialog: function(dialogId) {
+        var t = this;
+        var $el = t.el();
+        var $dialog = $el.find('.dialog[data-id=' + dialogId + ']');
+        var $dialogMessage = $dialog.find('.from-me');
+        $dialog.removeClass('new');
+        $dialogMessage.removeClass('new');
     }
 });
 
-var Messages = Widget.extend({
-    template: MESSAGES,
-    tmplMessage: MESSAGES_ITEM,
-    tmplMessagesBlock: MESSAGES_BLOCK,
-    dialogId: null,
-    itemsLimit: 20,
-    currentPage: 1,
+var Messages = EndlessPage.extend({
+    _template: MESSAGES,
+    _modelClass: MessagesModel,
+    _templateItem: MESSAGES_ITEM,
+    _templateLoading: MESSAGES_LOADING,
+    _itemsLimit: 20,
+    _itemsSelector: '.messages',
+    _service: 'get_messages',
+    _pageLoaded: null,
+    _isTop: true,
 
-    preloadData: {},
-    user: {},
-    isBlock: false,
-
-    events: {
-        'hover: .message.new': 'hoverMessage'
+    _events: {
+        'click: .button.send': 'clickSend',
+        'click: .save-template': 'clickSaveTmpl',
+        'hover: .message.new': 'hoverMessage',
+        'keydown: textarea': 'keyDownTextarea'
     },
 
-    run: function(params) {
+    clickSend: function(e) {
         var t = this;
-        var dialogId = t.dialogId = params.dialogId;
-
-        t.templateData = {
-            id: dialogId,
-            list: [],
-            isLoad: true,
-            viewer: Configs.viewer,
-            user: Data.users[0]
-        };
-        t.renderTemplate();
-        t.updateTop();
-        t.getBlockData(0, function(data) {
-            var users = data.users;
-            var messages = data.messages;
-            var user = {};
-            $.each(users, function(i, obj) {
-                if (obj.id != Configs.vkId) {
-                    user = obj;
-                    return false;
-                }
-            });
-            t.templateData = {
-                id: dialogId,
-                list: messages,
-                viewer: Configs.viewer,
-                user: user
-            };
-            t.user = user;
-            t.renderTemplate();
-            var $el = $(t.el);
-            var $textarea = $el.find('textarea');
-
-            t.makeMessages($el);
-            $textarea.placeholder();
-            $textarea.autoResize();
-            $textarea.inputMemory('message' + dialogId);
-            $textarea.focus();
-            $textarea[0].scrollTop = $textarea[0].scrollHeight;
-            t.bindEvents();
-            t.scrollBottom();
-            t.preload();
-        });
+        t.sendMessage();
     },
-
-    bindEvents: function() {
+    keyDownTextarea: function(e) {
         var t = this;
-        var $el = $(t.el);
-
-        t.on('scroll', (function onScroll() {
-            t.updateTop();
-
-            if ($(window).scrollTop() < 600) {
-                t.showMore();
-            }
-            return onScroll;
-        })());
-        $el.find('.button.send').click(function() {
+        if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
             t.sendMessage();
-        });
-        $el.find('textarea').keydown(function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                t.sendMessage();
-                return false;
-            }
-        });
-    },
-
-    addMessage: function(message) {
-        var t = this;
-        var $el = $(t.el);
-
-        if (message.dialogId != t.dialogId) return;
-        if (!message.isViewer) message.user = t.user;
-
-        var $oldMessage = $el.find('[data-id=' + message.id + ']');
-        if ($oldMessage.length) return;
-        var $newMessage = t.createMessage(message);
-        $el.find('.messages').append($newMessage);
-        t.makeMessages($newMessage);
-        t.scrollBottom();
-    },
-
-    hoverMessage: function(e) {
-        if (e.type != 'mouseenter') return;
-        var $message = $(e.currentTarget);
-        if ($message.hasClass('viewer')) return;
-        Events.fire('message_mark_as_read', $message.data('id'), function() {
-            $message.removeClass('new');
-        });
-    },
-
-    preload: function() {
-        var t = this;
-        var page = t.currentPage;
-        t.getBlockData(page, function(data) {
-            if (!t.preloadData[t.dialogId]) t.preloadData[t.dialogId] = {};
-            t.preloadData[t.dialogId][page] = data;
-        });
-    },
-
-    getBlockData: function(page, callback) {
-        var t = this;
-
-        if (t.preloadData[t.dialogId] && t.preloadData[t.dialogId][page]) {
-            if ($.isFunction(callback)) callback(t.preloadData[t.dialogId][page]);
-        } else {
-            Events.fire('get_messages', t.dialogId, (page * t.itemsLimit), t.itemsLimit, function(data) {
-                if ($.isFunction(callback)) callback(data);
-            });
         }
     },
-
-    showMore: function() {
+    clickSaveTmpl: function(e) {
         var t = this;
-        if (t.isLock()) return;
-        var $el = $(t.el);
-        var $messages = $el.find('.messages');
-
-        t.lock();
-        t.getBlockData(t.currentPage, function(data) {
-            var blockId = t.currentPage;
-            var $block = t.createBlock(data);
-            $messages.prepend($block);
-            t.makeMessages($block);
-            t.preload();
-            t.unlock();
-            $(window).scrollTop($(window).scrollTop() + $block.outerHeight(true));
+        var dialogId = t._pageId;
+        var dialogModel = dialogCollection.get(dialogId);
+        var listId = dialogModel.lists()[0];
+        var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), function() {
+            t.updateAutocomplite();
         });
-        t.currentPage++;
+        box.show();
     },
-
-    updateTop: function() {
+    hoverMessage: function(e) {
         var t = this;
-        var $el = $(t.el);
-        var $messages = $el.find('.messages');
-
-        $messages.css('padding-top', $(window).height() - $messages.height() - 162);
+        t.trigger('hoverMessage', e);
     },
 
+    renderTemplateLoading: function() {
+        var t = this;
+        var dialogId = t._pageId;
+        var messageId = dialogCollection.get(dialogId).messageId();
+        var userId = dialogCollection.get(dialogId).user().id();
+        t.model().viewer(userCollection.get(Configs.vkId));
+        t.model().user(userCollection.get(userId));
+        if (messageCollection.get(messageId)) {
+            t.model().list().push(messageCollection.get(messageId).data());
+        }
+        t._super.apply(this, Array.prototype.slice.call(arguments, 0));
+        t.makeList(t.el().find(t._itemsSelector));
+    },
+    onShow: function() {
+        var t = this;
+        t.updateTopPadding();
+        t.scrollBottom();
+    },
+    onLoad: function(data) {
+        var t = this;
+        var user = data.user;
+        var messages = data.list;
+        if (!messages.length) {
+            t._isEnded = true;
+        }
+        t.model().data(data);
+
+        var userModel = new UserModel(user);
+        userCollection.add(userModel.id(), userModel);
+
+        for (var i in messages) {
+            if (!messages.hasOwnProperty(i)) continue;
+            if (!messages[i].isViewer) messages[i].user = userModel.data();
+            var messageModel = new MessageModel(messages[i]);
+            messageCollection.add(messageModel.id(), messageModel);
+        }
+    },
+    onRender: function() {
+        var t = this;
+        t.onShow();
+        t.makeTextarea(t.el().find('textarea:first'));
+    },
+    makeList: function($list) {
+        var t = this;
+        $list.find('.videos').imageComposition({width: 500, height: 240});
+        $list.find('.photos').imageComposition({width: 500, height: 300});
+        $list.find('.date').easydate(Configs.easyDateParams);
+    },
+    makeTextarea: function($textarea) {
+        var t = this;
+        $textarea.placeholder();
+        $textarea.autoResize();
+        $textarea.inputMemory('message' + t._pageId);
+        $textarea.focus();
+        $textarea[0].scrollTop = $textarea[0].scrollHeight;
+        t.updateAutocomplite();
+    },
+    updateAutocomplite: function() {
+        var t = this;
+        var $textarea = t.el().find('textarea:first');
+        var dialogId = t._pageId;
+        var dialogModel = dialogCollection.get(dialogId);
+        var listId = dialogModel.lists()[0];
+        Events.fire('get_templates', listId, function(data) {
+            $textarea.autocomplete({
+                position: 'top',
+                notFoundText: '',
+                data: data,
+                strictSearch: true,
+                getValue: function() {
+                    var text = $.trim($textarea.val());
+                    return text ? text : 'notShowAllItems';
+                },
+                onchange: function(item) {
+                    $textarea.val(item.title);
+                }
+            });
+        });
+    },
+    updateTopPadding: function() {
+        var t = this;
+        if (!t.isVisible()) return;
+        var $messages = t.el().find(t._itemsSelector);
+        $messages.css('padding-top', $(window).height() - $messages.height() - 152);
+    },
     scrollBottom: function() {
+        var t = this;
+        if (!t.isVisible()) return;
         $(window).scrollTop($(document).height());
     },
-
-    createBlock: function(data) {
-        var t = this;
-        return $(tmpl(t.tmplMessagesBlock, {id: t.currentPage, list: data.messages}));
-    },
-
-    createMessage: function(data) {
-        var t = this;
-        return $(tmpl(t.tmplMessage, data));
-    },
-
-    makeMessages: function($el) {
-        $el.find('.videos').imageComposition({width: 500, height: 240});
-        $el.find('.photos').imageComposition({width: 500, height: 300});
-        $el.find('.date').easydate({
-            live: true,
-            set_title: false,
-            date_parse: function(date) {
-                date = intval(date) * 1000;
-                if (!date) return;
-                return new Date(date);
-            },
-            uneasy_format: function(date) {
-                return date.toLocaleDateString();
-            }
-        });
-    },
-
     sendMessage: function() {
         var t = this;
-        var $el = $(t.el);
+        var $el = t.el();
         var $textarea = $el.find('textarea');
         var text = $.trim($textarea.val());
-        var isScroll = true;
 
         if (text) {
             $textarea.val('');
-            var $newMessage = t.createMessage({
+            var newMessageModel = new MessageModel({
                 id: 'loading',
                 isNew: true,
                 isViewer: true,
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
-                user: Configs.viewer
+                viewer: userCollection.get(Configs.vkId),
+                dialogId: t._pageId
             });
+            var $newMessage = t.addMessage(newMessageModel);
             $newMessage.addClass('loading');
-            $el.find('.messages').append($newMessage);
-            t.makeMessages($newMessage);
-            if (isScroll) {
-                t.scrollBottom();
-            }
+            t.scrollBottom();
             $textarea.focus();
-            Events.fire('send_message', t.dialogId, text, function(messageId) {
-                $newMessage.removeClass('loading').attr('data-id', messageId);
+            Events.fire('send_message', t._pageId, text, function(messageId) {
+                if (!messageId) {
+                    $textarea.val(text);
+                    $newMessage.remove();
+                    return;
+                }
+                var $oldMessage = $el.find('[data-id=' + messageId + ']');
+                if ($oldMessage.length) {
+                    $newMessage.remove();
+                } else {
+                    $newMessage.removeClass('loading').attr('data-id', messageId);
+                }
             });
         } else {
             $textarea.focus();
         }
     },
+    addMessage: function(messageModel) {
+        var t = this;
+        if (!(messageModel instanceof MessageModel)) throw new TypeError('Message is not correct');
+        if (messageModel.dialogId() != t._pageId) return false;
 
-    isLock: function() {
-        return this.isBlock;
+        var $el = t.el();
+        var $message = $(t.tmpl()(t._templateItem, messageModel));
+        var $oldMessage = $el.find('[data-id=' + messageModel.id() + ']');
+        if ($oldMessage.length) {
+            $oldMessage.remove();
+        }
+        $message.appendTo($el.find(t._itemsSelector));
+        t.makeList($message);
+        t.scrollBottom();
+        return $message;
     },
-    lock: function() {
-        this.isBlock = true;
+    readMessage: function(messageId) {
+        var t = this;
+        var $el = t.el();
+        var $message = $el.find('.message[data-id=' + messageId + ']');
+        $message.removeClass('new');
     },
-    unlock: function() {
-        this.isBlock = false;
+    onScroll: function() {
+        this._super.apply(this, Array.prototype.slice.call(arguments, 0));
+        var t = this;
+        t.updateTopPadding();
     }
 });
 
-var List = Widget.extend({
-    template: LIST,
-    dialogsLimit: 100,
+var RightColumn = Widget.extend({
+    _template: RIGHT_COLUMN,
+    _modelClass: ListsModel,
+    _isEditMode: true,
+    _isDragging: false,
+    _isFirstRun: true,
 
-    events: {
-        'click: .item > .title > .icon': 'clickIcon',
-        'click: .item > .title': 'selectDialogs',
-        'click: .dialog': 'selectMessages'
+    _events: {
+        'mousedown: .drag-wrap': 'mouseDownList',
+        'click: .item': 'clickList'
     },
 
     run: function() {
         var t = this;
-        var $el = $(t.el);
+        var $el = t.el();
 
+        if (t._isFirstRun) {
+            $el.hide();
+        }
         Events.fire('get_lists', function(data) {
-            t.templateData = {list: data};
-            t.renderTemplate();
+            if (t._isFirstRun) {
+                t._isFirstRun = false;
+                $el.fadeIn(500);
+            }
+            var list = data.list;
+            var isSetCommonList = false;
+            var isSetSelectedList = false;
+            for (var i in list) {
+                if (!list.hasOwnProperty(i)) continue;
+                list[i] = new ListModel(list[i]);
+                listCollection.add(list[i].id(), list[i]);
 
-            var openListsIds = t.getOpenListsIds();
-            $.each(openListsIds, function(i, listId) {
-                if (!listId) return;
-                Events.fire('get_lists', function(data) {
-                    $el.find('.item[data-id=' + listId + ']').find('.icon.plus').click();
+                var currentList = t.model().list();
+                for (var i2 in currentList) {
+                    if (!currentList.hasOwnProperty(i2)) continue;
+                    var currentItem = currentList[i2];
+                    if (currentItem && currentItem.id() == list[i].id()) {
+                        if (currentItem.isSelected()) {
+                            list[i].isSelected(currentItem.isSelected());
+                            isSetSelectedList = true;
+                        }
+                    }
+                }
+            }
+            if (!isSetCommonList) {
+                var commonListModel = new ListModel({
+                    id: Configs.commonDialogsList,
+                    title: 'Не в списке',
+                    isSelected: !isSetSelectedList,
+                    isDraggable: false
                 });
-            });
+                list.unshift(commonListModel);
+                listCollection.add(commonListModel.id(), commonListModel);
+            }
+            t.model().counter(data.counter);
+            t.model().list(list);
+            t.renderTemplate();
         });
     },
 
-    getOpenListsIds: function() {
-        var openListsIds = localStorage.getItem('openListsIds');
-        if (!openListsIds) openListsIds = '';
-        return openListsIds.split(',');
-    },
-
-    setOpenListsIds: function(listIds) {
-        localStorage.setItem('openListsIds', listIds.join(','));
-    },
-
-    addOpenListId: function(listId) {
+    mouseDownList: function(e) {
         var t = this;
-        var listIds = t.getOpenListsIds();
+        if (!t._isEditMode) return;
+        var $placeholder = $(e.currentTarget);
+        var $target = $placeholder.find('.item:first');
+        var timeout = setTimeout(function() {
+            t._isDragging = true;
+            $target.addClass('drag');
+            $placeholder.height($target.height());
+            $('html, body').addClass('no-select');
+        }, 300);
+        var startY = e.clientY;
 
-        for (var i = 0; i < listIds.length; i++) {
-            if (listId == listIds[i]) {
-                return;
+        $(window).on('mousemove.list', (function update(e) {
+            if (t._isDragging) {
+                var top = e.clientY - startY;
+                var height = $placeholder.height();
+                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var $next = $placeholder.next('.drag-wrap');
+                var $prev = $placeholder.prev('.drag-wrap');
+
+                if (position > 0 && $next.length) {
+                    $placeholder.before($next);
+                    startY += height;
+                } else if (position < 0 && $prev.length) {
+                    $placeholder.after($prev);
+                    startY -= height;
+                }
+                top = e.clientY - startY;
+                $target.css({top: top});
             }
-        }
 
-        listIds.push(listId);
-        t.setOpenListsIds(listIds);
+            return update;
+        })(e));
+
+        $(window).on('mouseup.list', function(e) {
+            $(this).off('mousemove.list mouseup.list');
+            clearTimeout(timeout);
+
+            if (!t._isDragging) return;
+            $('html, body').removeClass('no-select');
+            $target.removeClass('drag').css({top: 0});
+            setTimeout(function() {
+                t._isDragging = false;
+                t.setOrder();
+            }, 0);
+        });
     },
-
-    removeOpenListId: function(listId) {
+    clickList: function(e) {
         var t = this;
-        var listIds = t.getOpenListsIds();
-
-        for (var i = 0; i < listIds.length; i++) {
-            if (listId == listIds[i]) {
-                listIds.splice(i, i);
-            }
-        }
-
-        t.setOpenListsIds(listIds);
+        if (t._isDragging) return;
+        var $list = $(e.currentTarget);
+        var listId = $list.data('id');
+        t.setList(listId, true);
     },
 
+    setOrder: function() {
+        var t = this;
+        var $el = t.el();
+        var listIds = [];
+        $el.find('.item').each(function() {
+            var listId = $(this).data('id');
+            if (listId != Configs.commonDialogsList) listIds.push(listId);
+        });
+        Events.fire('set_list_order', listIds.join(','), function() {});
+    },
+
+    setList: function(listId, isTrigger) {
+        var t = this;
+        var list = t.model().list();
+        var item;
+        for (var i in list) {
+            if (!list.hasOwnProperty(i)) continue;
+            item = list[i];
+            item.isSelected(item.id() == listId);
+        }
+        t.renderTemplate();
+        if (isTrigger) t.trigger('setList', listId);
+    },
+    setDialog: function(dialogId, isTrigger) {
+        var t = this;
+        t.renderTemplate();
+        if (isTrigger) t.trigger('setDialog', dialogId);
+    },
     update: function() {
         var t = this;
         t.run();
-    },
-
-    clickIcon: function(e) {
-        var t = this;
-        var $target = $(e.currentTarget).closest('.item');
-        var listId = $target.data('id');
-        var notAnimate = false;
-        if ($target.data('dialogs')) {
-            t.toggleDialogs($target, notAnimate);
-        } else {
-            Events.fire('get_dialogs_list', listId, 0, t.dialogsLimit, function(data) {
-                $target.data('dialogs', data);
-                t.toggleDialogs($target, notAnimate);
-            });
-        }
-        return false;
-    },
-
-    selectDialogs: function(e) {
-        var t = this;
-        var $target = $(e.currentTarget).closest('.item');
-        var title = $target.data('title');
-        var listId = $target.data('id');
-        $(t.el).find('.title.active, .dialog.active').removeClass('active');
-        $target.find('.title').addClass('active');
-        t.trigger('selectDialogs', listId, title);
-    },
-
-    selectMessages: function(e) {
-        var t = this;
-        var $target = $(e.currentTarget);
-        var dialogId = $target.data('id');
-        var title = $target.data('title');
-        $(t.el).find('.title.active, .dialog.active').removeClass('active');
-        $target.closest('.dialog').addClass('active');
-        t.trigger('selectMessages', dialogId, title);
-    },
-
-    toggleDialogs: function($el, notAnimate) {
-        var t = this;
-        var listId = $el.data('id');
-        var dialogs = $el.data('dialogs');
-        if (dialogs.length) {
-            var list = $el.find('> .list');
-            if (list.length) {
-                list.slideUp(100, function() {
-                    $(this).remove();
-                });
-                t.removeOpenListId(listId);
-            } else {
-                var html = '<div class="list">';
-                $.each(dialogs, function(i, dialog) {
-                    html += tmpl(LIST_ITEM_DIALOG, dialog);
-                });
-                html += '</div>';
-                var $dialogs = $(html);
-                $el.append($dialogs);
-                t.addOpenListId(listId);
-
-                if (!notAnimate) {
-                    var cssHeight = $dialogs.css('height');
-                    var height = $dialogs.height();
-                    $dialogs.css({height: 0, opacity: 0}).animate({height: height, opacity: 1}, 100, function() {
-                        $(this).css({height: cssHeight})
-                    });
-                }
-            }
-        }
-    },
-
-    incrementCounter: function(listIds, dialogId) {
-        var t = this;
-        var $el = $(t.el);
-
-        $.each(listIds, function(i, listId) {
-            var $item = $el.find('.item[data-id=' + listId + ']');
-            increment($item.find('> .title'));
-        });
-
-        var $dialog = $el.find('.dialog[data-id=' + dialogId + ']');
-        increment($dialog.find('> .title'));
-
-        function increment($item) {
-            if ($item.length) {
-                var $counter = $item.find('.counter');
-                if (!$counter.data('counter')) {
-                    $counter.counter({prefix: '+'});
-                    $item.click(function() {
-                        $counter.counter('setCounter', 0);
-                    });
-                }
-                $counter.counter('increment');
-            }
-        }
     }
 });
 
 var Tabs = Widget.extend({
-    template: TABS,
-    tabTemplate: TABS_ITEM,
+    _template: TABS,
+    _modelClass: TabsModel,
+    _userId: null,
 
-    events: {
-        'click: .tab': 'clickTab'
+    _events: {
+        'click: .tab.dialog': 'clickDialog',
+        'click: .tab.list': 'clickList',
+        'click: .icon': 'clickPlus'
     },
 
-    clickTab: function(e) {
+    clickDialog: function(e) {
+        var t = this;
+        //@todo: do well
+        var $target = $(e.currentTarget);
+        if (!$target.hasClass('.selected')) {
+            t.trigger('clickDialog', e);
+        }
+    },
+    clickList: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
-        var tabId = $target.data('id');
-        t.selectTab(tabId, true);
+        if (!$target.hasClass('.selected')) {
+            t.trigger('clickList', e);
+        }
+    },
+    clickPlus: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var dialogTab = t.model().dialogTab();
+        var dialogId = dialogTab.id();
+        var dialogModel = dialogCollection.get(dialogId);
+        if (!$target.data('dropdown')) {
+            (function updateDropdown() {
+
+                function onCreate() {
+                    var lists = dialogModel.lists();
+
+                    $.each(lists, function(i, listId) {
+                        $target.dropdown('getItem', listId).addClass('active');
+                    });
+                }
+
+                Events.fire('get_lists', function(data) {
+                    var list = data.list;
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'left',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list-tabs',
+                        oncreate: onCreate,
+                        onupdate: onCreate,
+                        onopen: function() {
+                            //@todo: do well
+                            $target.css('display', 'inline');
+                            $target.parent().find('.offline, .online').hide();
+                            $(this).dropdown('refreshPosition');
+
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeAttr('style');
+                            $target.parent().find('.offline, .online').removeAttr('style');
+
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+
+                            var $menu = $(this).dropdown('getMenu');
+                            var $selectedItems = $menu.find('.ui-dropdown-menu-item.active');
+                            if ($selectedItems.length) {
+                                $target.addClass('select').removeClass('plus');
+                            } else {
+                                $target.addClass('plus').removeClass('select');
+                            }
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            Events.fire('add_list', $input.val(), function() {
+                                                updateDropdown();
+                                                t.trigger('addList');
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                Events.fire('add_to_list', dialogId, item.id, function() {
+                                    t.trigger('addToList');
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            Events.fire('remove_from_list', dialogId, item.id, function() {
+                                t.trigger('removeFromList');
+                            });
+                        },
+                        data: $.merge(list, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ])
+                    });
+                });
+            })();
+        }
+        t.trigger('clickPlus', e);
+        return false;
     },
 
-    selectTab: function(id, isTrigger) {
+    setList: function(listId) {
         var t = this;
-        var $tab = t.getTab(id);
-
-        $(t.el).find('.tab.selected').removeClass('selected');
-        $tab.addClass('selected');
-
-        if (isTrigger) t.trigger('select', id);
+        var listModel = listCollection.get(listId) || new ListModel({
+            id: Configs.commonDialogsList,
+            title: 'Не в списке'
+        });
+        var label = listModel.title();
+        var listTab = new TabModel({id: listId, label: label, isSelected: true});
+        var dialogTab = t.model().dialogTab();
+        if (dialogTab) {
+            dialogTab.isSelected(false);
+        }
+        t.model().listTab(listTab);
+        t.renderTemplate();
     },
-    getTab: function(id) {
-        var t = this;
 
-        return $(t.el).find('.tab[data-id="' + id + '"]');
+    setDialog: function(dialogId) {
+        var t = this;
+        var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
+        var userModel = dialogModel.user();
+        t._userId = userModel.id();
+        var label = userModel.name();
+        var isOnline = userModel.isOnline();
+        var listTab = t.model().listTab();
+        var dialogTab = new TabModel({
+            id: dialogId,
+            label: label,
+            isSelected: true,
+            isOnline: isOnline,
+            isOnList: false
+        });
+        if (listTab) {
+            listTab.isSelected(false);
+        }
+        t.model().dialogTab(dialogTab);
+        t.renderTemplate();
     },
-    getSelectedTab: function() {
-        var t = this;
 
-        return $(t.el).find('.tab.selected');
+    setOnline: function(userId) {
+        var t = this;
+        //@todo привести к нормальному виду
+        if (t._userId == userId) {
+            t.el().find('.tab.dialog > .icon.offline').removeClass('offline').addClass('online');
+        }
     },
-    appendTab: function(id, title) {
+    setOffline: function(userId) {
         var t = this;
-
-        if (t.getTab(id).length) return;
-        $(t.el).find('.tab-bar').append(tmpl(t.tabTemplate, {id: id, title: title}));
-    },
-    prependTab: function(id, title) {
-        var t = this;
-
-        if (t.getTab(id).length) return;
-        $(t.el).find('.tab-bar').prepend(tmpl(t.tabTemplate, {id: id, title: title}));
-    },
-    removeTab: function(id) {
-        var t = this;
-
-        t.getTab(id).remove();
+        //@todo привести к нормальному виду
+        if (t._userId == userId) {
+            t.el().find('.tab.dialog > .icon.online').removeClass('online').addClass('offline');
+        }
     }
 });
+
+/**
+ * Initialization
+ */
+$(document).ready(function() {
+    if (!$('#main').length) {
+        return;
+    }
+
+    if (!Configs.vkId) {
+        location.replace('/login/?' + btoa('im'));
+        return;
+    } else {
+        $.cookie('uid', Configs.vkId, {expires: 30});
+    }
+
+    if (!Configs.token) {
+        location.replace('/im/login/? ' + btoa('im'));
+        return;
+    }
+
+    var main = new Main({
+        selector: '#main'
+    });
+    $(window).on('scroll resize', function() {
+        main.trigger('scroll');
+    });
+});
+
+function CreateTemplateBox(listId, text, onSuccess) {
+    var SAVE_TEMPLATE_BOX =
+    '<div class="box-templates">' +
+        '<div class="title">' +
+            'Выберите списки' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<input class="lists" type="text"/>' +
+        '</div>' +
+        '<div class="title">' +
+            'Введите текст шаблона' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text"><?=text?></textarea>' +
+        '</div>' +
+    '</div>';
+
+    var box = new Box({
+        title: 'Добавление нового шаблона',
+        html: tmpl(BOX_LOADING, {height: 100}),
+        buttons: [
+            {label: 'Закрыть'}
+        ],
+        onshow: function() {
+            Events.fire('get_lists', function(data) {
+                var list = data.list;
+                var listsIds = [];
+                var clearLists = [];
+                var currentList = {};
+                $.each(list, function(i, listItem) {
+                    if (listItem.id) {
+                        clearLists.push(listItem);
+                    }
+                    if (listId == listItem.id) {
+                        currentList = listItem;
+                    }
+                });
+
+                box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+                box.setButtons([
+                    {label: 'Сохранить', onclick: saveTemplate},
+                    {label: 'Отменить', isWhite: true}
+                ]);
+
+                var $input = box.$el.find('.lists');
+                var $textarea = box.$el.find('.template-text');
+                var templateText = $textarea.val();
+                $textarea.focus();
+                $textarea.selectRange(templateText.length, templateText.length);
+
+                $input.tags({
+                    onadd: function(tag) {
+                        listsIds.push(parseInt(tag.id));
+                    },
+                    onremove: function(tagId) {
+                        listsIds = jQuery.grep(listsIds, function(listsIds) {
+                            return listsIds != tagId;
+                        });
+                    }
+                }).autocomplete({
+                    data: clearLists,
+                    target: $input.closest('.ui-tags'),
+                    onchange: function(item) {
+                        $(this).tags('addTag', item).val('').focus();
+                    }
+                }).keydown(function(e) {
+                    if (e.keyCode == KEY.DEL && !$(this).val()) {
+                        $(this).tags('removeLastTag');
+                    }
+                });
+
+                if (currentList.id) {
+                    $input.tags('addTag', currentList);
+                }
+
+                function saveTemplate() {
+                    var $textarea = box.$el.find('textarea');
+                    var text = $textarea.val();
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Events.fire('add_template', text, listsIds.join(','), function() {
+                        box.hide();
+                        if ($.isFunction(onSuccess)) onSuccess();
+                    });
+                }
+            });
+        },
+        onhide: function() {
+            box.remove();
+        }
+    });
+    return box;
+}

@@ -365,7 +365,7 @@
         }
     }
 
-    var id = 0;
+    var id = 1;
     $.fn.easydate = function(options) {
         var settings = $.extend({}, defaults, options);
         this.data('easydate.settings', settings);

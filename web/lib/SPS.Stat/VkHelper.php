@@ -73,9 +73,9 @@
             return $result;
         }
 
-        public static function get_vk_time()
+        public static function get_vk_time( $access_token = '' )
         {
-            return self::api_request( 'getServerTime', array( 'access_token' =>  '' ), 0 );
+            return self::api_request( 'getServerTime', array( 'access_token' =>  $access_token ), 0 );
         }
 
         public static function multiget( $urls, &$result )
@@ -141,7 +141,55 @@
 
         public static function get_service_access_token()
         {
-            return 'ac76f4c1ac7cce39ac7cce396eac53e861aac7cac69f6a7fc0316a798a4d74a14f6e2e6';
+            $connect =  ConnectionFactory::Get( 'tst' );
+            while( 1 ) {
+                $sql = 'SELECT access_token
+                        FROM serv_access_tokens
+                        WHERE active IS TRUE
+                        ORDER BY random()
+                        LIMIT 1';
+                $cmd = new SqlCommand( $sql, $connect );
+                $ds  = $cmd->Execute();
+                $ds->Next();
+                $at  = $ds->GetString( 'access_token' );
+                if ( !$at )
+                    return false;
+                if ( self::check_at( $at ))
+                    return $at;
+            }
         }
+
+        public static function deactivate_at( $access_token )
+        {
+            $sql = 'UPDATE serv_access_tokens
+                    SET active=false
+                    WHERE access_token =@access_token';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetString('@access_token ', $access_token );
+            $cmd->Execute();
+        }
+
+        public static function check_at( $access_token )
+        {
+            $res = self::get_vk_time( $access_token );
+            if ( isset( $res->error )) {
+                self::deactivate_at( $access_token );
+                return false;
+            }
+            return true;
+        }
+
+        public static function set_service_at( $user_id, $access_token, $app_id )
+        {
+            $sql = 'INSERT INTO serv_access_tokens(user_id, access_token, app_id )
+                    VALUES( @user_id, @access_token, @app_id )';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetString ( '@access_token ', $access_token );
+            $cmd->SetInteger( '@user_id ',      $user_id );
+            $cmd->SetInteger( '@app_id',        $app_id );
+            echo $cmd->GetQuery();
+            $cmd->Execute();
+        }
+
     }
 ?>

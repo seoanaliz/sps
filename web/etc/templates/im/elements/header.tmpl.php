@@ -50,6 +50,8 @@ $jsFiles = array(
     'js://im/data.js',
     'js://im/template.js',
     'js://im/events.js',
+    'js://im/model.js',
+    'js://im/collection.js',
     'js://im/login.js',
     'js://im/main.js',
 );

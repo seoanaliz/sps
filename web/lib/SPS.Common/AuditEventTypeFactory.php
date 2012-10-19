@@ -22,7 +22,7 @@
             'class'       => 'AuditEventType'
             , 'table'     => 'auditEventTypes'
             , 'view'      => 'getAuditEventTypes'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'auditEventTypeId' => array(

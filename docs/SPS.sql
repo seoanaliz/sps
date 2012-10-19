@@ -1,6 +1,6 @@
 /*
 Created		16.08.2008
-Modified		10.08.2012
+Modified		12.09.2012
 Project		
 Model			
 Company		
@@ -205,6 +205,7 @@ Create table "articleRecords"
 	"poll" Varchar(500),
 	"text_links" Text,
 	"doc" Varchar(500),
+	"topfaceData" Text,
 	"articleId" Integer,
 	"articleQueueId" Integer,
  primary key ("articleRecordId")
@@ -387,7 +388,7 @@ Create index "IX_vfsFoldersTreeTreeLKey" on "vfsFoldersTree" using btree ("lKey"
 Create index "IX_feedByRate" on "articles" using btree ("sourceFeedId","rate") where (("statusId" <> 2) AND ("statusId" <> 3));
 Create index "IX_queuedAt" on "articles" using btree ("queuedAt") where ('queuedAt' IS NOT NULL);
 Create index "IX_sentAt" on "articles" using btree ("sentAt") where ('sentAt' IS NOT NULL);
-
+Create index "IX_externalId" on "articles" using btree ("externalId");
 
 /* Create Foreign Keys */
 Create index "IX_FK_usersStatusId_users" on "users" ("statusId");

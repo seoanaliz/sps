@@ -40,7 +40,7 @@
                 $params['access_token'] =   $acc_tok;
 
             $result = VkHelper::api_request( 'users.get', $params, 0 );
-            if ( isset( $res->error ))
+            if ( isset( $result->error ))
                 die( ERR_NO_ACC_TOK );
             foreach( $result as $user )
             {
@@ -72,6 +72,7 @@
             $cmd->SetString ( '@name',        $users['name'] );
             $cmd->SetString ( '@ava',         $users['ava'] );
             $cmd->SetString ( '@comments',    $users['comments'] );
+            echo
             $res = $cmd->ExecuteNonQuery();
 
             if ( !$res )

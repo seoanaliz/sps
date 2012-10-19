@@ -13,7 +13,8 @@ class MesCheckUpdates
         error_reporting(0);
 
         $im_users = StatUsers::get_im_users();
-        $this->check_new_messages( $im_users );
+        self::check_new_messages( $im_users );
+            die();
         foreach( $im_users as $user ) {
 //                $this->ungroup_transfer( $user );
             MesDialogs::check_friend_requests( $user );
@@ -29,35 +30,32 @@ class MesCheckUpdates
         }
     }
 
-    public function check_new_messages( $im_users )
+    public static function check_new_messages( $im_users )
     {
         foreach( $im_users as $user ) {
             $dialogs = MesDialogs::get_all_dialogs( $user, 200 );
-
             if ( !$dialogs )
                 continue;
             foreach( $dialogs as $dialog ) {
-                if (isset($dialog->chat_id) )
+                if ( isset( $dialog->chat_id ))
                     continue;
                 $dialog_id = MesDialogs::get_dialog_id( $user, $dialog->uid );
-                echo 'dialog ' . $dialog_id. '<br>';
-                $state_our = MesDialogs::get_state( $dialog_id );
-                $state = MesDialogs::calculate_state( !$dialog->out, $dialog->read_state );
-                echo 'state ' . $state . '<br>';
-                echo 'state_our ' . $state_our  . '<br>';
-
+                $group_ids = MesGroups::get_dialog_group( $dialog_id );
+                $old_ts = MesDialogs::get_dialog_ts( $user, $dialog->uid);
+                $act = '';
+                if ( !$dialog->read_state && !$dialog->out && $old_ts != $dialog->date )
+                    $act = 'add';
+                elseif( $dialog->read_state && !$dialog->out || $dialog->out )
+                    $act = 'del';
+                if ( $act )
+                    MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
+                //если сообщение
                 $check_ts =  MesDialogs::get_dialog_ts( $user, $dialog->uid );
-                echo $check_ts . '<br>';
-                if ( $check_ts == $dialog->date || ( $state != $state_our && $state = 0 )  )
+                if ( $check_ts == $dialog->date )
                     continue;
 
                 echo 'hurray!!<br>';
                 MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, !$dialog->out, $dialog->read_state );
-
-                $group_id = MesGroups::get_dialog_group( $dialog_id );
-                echo 'group ' . $dialog->read_state . '<br>';
-
-                MesGroups::toggle_read_unread_gr( $user, $group_id[0], $dialog->read_state ? true : false );
             }
             sleep(0.4);
         }

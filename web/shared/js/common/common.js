@@ -27,6 +27,66 @@ if (!window.console) {
     };
 }
 
+(function() {
+    var globalStageKey = 'globalStorage';
+
+    window.globalStorage = {
+        _serialize: function(obj) {
+            return JSON.stringify(obj);
+        },
+        _unserialize: function(str) {
+            return JSON.parse(str);
+        },
+        _setItems: function(items) {
+            localStorage.setItem(globalStageKey, this._serialize(items));
+        },
+        _addItems: function(items) {
+            for (var item in items) {
+                if (items.hasOwnProperty(item)) this._addItem(item, items[item]);
+            }
+        },
+        _addItem: function(key, value) {
+            var allItems = this._getItems();
+            allItems[key] = value;
+            this._setItems(allItems);
+        },
+        _getItems: function() {
+            return this._unserialize(localStorage.getItem(globalStageKey)) || {};
+        },
+        _getItem: function(key) {
+            return this._getItems()[key];
+        },
+        _removeItems: function() {
+            localStorage.setItem(globalStageKey, '');
+        },
+        _removeItem: function(key) {
+            var allItems = this._getItems();
+            delete allItems[key];
+            this._setItems(allItems);
+        },
+        items: function() {
+            var isSetItem = (typeof arguments[0] == 'string' && arguments[1]);
+            var isGetItem = (typeof arguments[0] == 'string' && !arguments[1]);
+            var isSetItems = (typeof arguments[0] == 'object');
+            var isRemoveItem = (typeof arguments[0] == 'string' && arguments[1] === null);
+            var isRemoveItems = (typeof arguments[0] === null);
+            if (isRemoveItem) {
+                return this._removeItem(arguments[0]);
+            } else if (isRemoveItems) {
+                return this._removeItems();
+            } else if (isSetItem) {
+                return this._addItem(arguments[0], arguments[1]);
+            } else if (isSetItems) {
+                return this._setItems(arguments[0]);
+            } else if (isGetItem) {
+                return this._getItem(arguments[0]);
+            } else {
+                return this._getItems();
+            }
+        }
+    };
+})();
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
@@ -463,7 +523,6 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $body.data('overflow-y', $body.css('overflow-y'));
             $layout = $('<div/>')
                 .addClass('box-layout')
                 .appendTo($body)
@@ -472,7 +531,6 @@ var Box = (function() {
                         boxesHistory[boxesHistory.length-1].hide();
                         if (!boxesHistory.length) {
                             $(this).hide();
-                            //$body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
                         }
                     }
                 })
@@ -501,7 +559,7 @@ var Box = (function() {
         })).appendTo($layout).hide();
 
         if (params.closeBtn) {
-            $box.find('> .title').click(function() {
+            $box.find('> .title > .close').click(function() {
                 box.hide();
             });
         }
@@ -509,41 +567,40 @@ var Box = (function() {
         setHTML(params.html);
         setButtons(params.buttons);
 
-        box.$box = $box;
+        box.$el = box.$box = $box;
         box.show = show;
         box.hide = hide;
+        box.remove = remove;
         box.setHTML = setHTML;
         box.setTitle = setTitle;
         box.setButtons = setButtons;
         box.refreshTop = refreshTop;
+        box.visible = false;
 
         function show() {
+            box.visible = true;
             if (boxesHistory.length) {
                 boxesHistory[boxesHistory.length-1].$box.hide();
             }
 
             $box.show();
             $layout.show();
-            //$body.css({overflowY: 'hidden', paddingRight: 17});
             refreshTop();
 
             try {
                 params.onshow.call(box, $box);
-            } catch(e) {
-                //console.log(e);
-            }
+            } catch(e) {}
 
             boxesHistory.push(box);
             return box;
         }
         function hide() {
+            box.visible = false;
             $box.hide();
 
             try {
                 params.onhide.call(box, $box);
-            } catch(e) {
-                //console.log(e);
-            }
+            } catch(e) {}
 
             boxesHistory.pop();
             if (boxesHistory.length) {
@@ -553,6 +610,11 @@ var Box = (function() {
             }
 
             return box;
+        }
+        function remove() {
+            if (box.visible) hide();
+            delete boxesCollection[params.id];
+            $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
@@ -619,6 +681,7 @@ var Box = (function() {
     var TRIGGER_CHANGE = 'change';
     var TRIGGER_CREATE = 'create';
     var TRIGGER_UPDATE = 'update';
+    var dropdownId = 0;
 
     var methods = {
         init: function(parameters) {
@@ -634,7 +697,7 @@ var Box = (function() {
                     openEvent: 'mousedown', // Собитие элемента, при котором открывается меню. click, mousedown
                     closeEvent: 'mousedown', // Собитие document при котором закрывается меню. click, mousedown
                     itemDataKey: 'item', // Ключ привязки данных к пункту меню
-                    emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
+                    emptyMenuText: '', // Текст, который появляется, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
                     // На все события можно подписаться по имени события. Пример: $dropdown.on('change', callback)
                     oncreate: function() {},
@@ -655,72 +718,6 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).on('resize.' + EVENTS_NAMESPACE, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            $el.dropdown('refreshPosition');
-                        }
-                    });
-                    $(document).on(options.closeEvent + '.' + EVENTS_NAMESPACE, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        $el.dropdown('close');
-                        run(options.onclose, $el, $menu);
-                    });
-                    $(document).on('keydown.' + EVENTS_NAMESPACE, function(e) {
-                        if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + EVENTS_NAMESPACE);
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-
-                            switch(e.keyCode) {
-                                case KEY.UP:
-                                case KEY.DOWN:
-                                    var $hoverItem;
-                                    if (e.keyCode == KEY.UP) {
-                                        $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
-                                    } else if (e.keyCode == KEY.DOWN) {
-                                        $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
-                                    }
-                                    if (!$hoveringItem.length || !$hoverItem.length) {
-                                        if (e.keyCode == KEY.UP) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
-                                        } else if (e.keyCode == KEY.DOWN) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
-                                        }
-                                    }
-
-                                    if ($hoverItem.length) {
-                                        $hoveringItem.removeClass(CLASS_ITEM_HOVER);
-                                        $hoverItem.addClass(CLASS_ITEM_HOVER);
-                                        var positionTop = $hoverItem.position().top;
-                                        var scrollTop = $menu.scrollTop() + positionTop;
-                                        if (positionTop + $hoverItem.height() > $menu.height()) {
-                                            $menu.scrollTop(scrollTop);
-                                        } else if (positionTop < 0) {
-                                            $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
-                                        }
-                                        return false;
-                                    }
-                                break;
-                                case KEY.TAB:
-                                    $el.dropdown('close');
-                                    return true;
-                                break;
-                                case KEY.ENTER:
-                                    if ($hoveringItem.length) {
-                                        select($hoveringItem);
-                                    }
-                                    return false;
-                                break;
-                                case KEY.ESC:
-                                    $el.dropdown('close');
-                                    return false;
-                                break;
-                            }
-                        }
-                    });
                     $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
@@ -741,48 +738,22 @@ var Box = (function() {
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    select($(this));
+                    $el.dropdown('select', $(this));
                 });
                 $menu.on(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
                 $menu.hide();
 
-                function select($item) {
-                    var data = $item.data(options.itemDataKey);
-                    switch(options.type) {
-                        case TYPE_RADIO:
-                            $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
-                            $item.addClass(CLASS_ITEM_ACTIVE);
-                        break;
-                        case TYPE_CHECKBOX:
-                            $item.toggleClass(CLASS_ITEM_ACTIVE);
-                        break;
-                    }
-                    $el.dropdown('close');
-                    run(options.onchange, $el, data);
-                    run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, data);
-                    $el.trigger(TRIGGER_CHANGE);
-                }
-
                 $el.data(DATA_KEY, {
+                    id: dropdownId++,
                     $el: $el,
                     $menu: $menu,
                     $target: $target,
                     options: options
                 });
 
-                if (options.data.length || !options.emptyMenuText) {
-                    $.each(options.data, function(i, item) {
-                        $el.dropdown('appendItem', item);
-                    });
-                } else {
-                    $('<div/>')
-                        .text(options.emptyMenuText)
-                        .addClass(CLASS_EMPTY_MENU)
-                        .appendTo($menu)
-                    ;
-                }
+                $el.dropdown('setItems', options.data);
 
                 if (options.isShow && $el.is(':visible')) {
                     $el.dropdown('open');
@@ -796,6 +767,28 @@ var Box = (function() {
                 }
             });
         },
+        select: function($item) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var itemData = $item.data(options.itemDataKey);
+                switch(options.type) {
+                    case TYPE_RADIO:
+                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    break;
+                    case TYPE_CHECKBOX:
+                        $item.toggleClass(CLASS_ITEM_ACTIVE);
+                    break;
+                }
+                $el.dropdown('close');
+                run(options.onchange, $el, itemData);
+                run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, itemData);
+                $el.trigger(TRIGGER_CHANGE);
+            });
+        },
         open: function(notTrigger) {
             return this.each(function() {
                 var $el = $(this);
@@ -803,6 +796,12 @@ var Box = (function() {
                 var options = data.options;
                 var $menu = data.$menu;
                 var $target = data.$target;
+                var dropdownId = data.id;
+                var nameSpace = EVENTS_NAMESPACE + dropdownId;
+
+                if (!options.data.length && !options.emptyMenuText) {
+                    return;
+                }
 
                 $menu.css({
                     width: options.width || $target.outerWidth() - 2
@@ -810,6 +809,73 @@ var Box = (function() {
 
                 $el.dropdown('refreshPosition');
                 $menu.show();
+
+                $(window).on('resize.' + nameSpace + ' scroll.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        $el.dropdown('refreshPosition');
+                    }
+                });
+                $(document).on(options.closeEvent + '.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    $el.dropdown('close');
+                    run(options.onclose, $el, $menu);
+                });
+                $(document).on('keydown.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+
+                        switch(e.keyCode) {
+                            case KEY.UP:
+                            case KEY.DOWN:
+                                var $hoverItem;
+                                if (e.keyCode == KEY.UP) {
+                                    $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
+                                } else if (e.keyCode == KEY.DOWN) {
+                                    $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
+                                }
+                                if (!$hoveringItem.length || !$hoverItem.length) {
+                                    if (e.keyCode == KEY.UP) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
+                                    } else if (e.keyCode == KEY.DOWN) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
+                                    }
+                                }
+
+                                if ($hoverItem.length) {
+                                    $hoveringItem.removeClass(CLASS_ITEM_HOVER);
+                                    $hoverItem.addClass(CLASS_ITEM_HOVER);
+                                    var positionTop = $hoverItem.position().top;
+                                    var scrollTop = $menu.scrollTop() + positionTop;
+                                    if (positionTop + $hoverItem.height() > $menu.height()) {
+                                        $menu.scrollTop(scrollTop);
+                                    } else if (positionTop < 0) {
+                                        $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
+                                    }
+                                    return false;
+                                }
+                            break;
+                            case KEY.TAB:
+                                $el.dropdown('close');
+                                return true;
+                            break;
+                            case KEY.ENTER:
+                                if ($hoveringItem.length) {
+                                    $el.dropdown('select', $hoveringItem);
+                                }
+                                return false;
+                            break;
+                            case KEY.ESC:
+                                $el.dropdown('close');
+                                return false;
+                            break;
+                        }
+                    }
+                });
 
                 if (!notTrigger) {
                     run(options.onopen, $el, $menu);
@@ -823,9 +889,16 @@ var Box = (function() {
             var options = data.options;
             var $menu = data.$menu;
             var $target = data.$target;
+            var dropdownId = data.id;
+            var nameSpace = EVENTS_NAMESPACE + dropdownId;
 
             $target.removeClass(CLASS_ACTIVE);
             $menu.hide();
+
+            $(window).off('resize.' + nameSpace);
+            $(window).off('scroll.' + nameSpace);
+            $(document).off(options.closeEvent + '.' + nameSpace);
+            $(document).off('keydown.' + nameSpace);
 
             if (!notTrigger) {
                 run(options.onclose, $el, $menu);
@@ -848,6 +921,12 @@ var Box = (function() {
                 if (options.position == 'right') {
                     offsetLeft += ($target.width() - $menu.width())
                 }
+                if (options.position == 'top') {
+                    offsetTop -= $menu.outerHeight()
+                        + $el.outerHeight()
+                        + (parseFloat($menu.css('margin-top')) * 2)
+                        - (parseFloat($menu.css('margin-bottom')) * 2);
+                }
                 if (isFixed) {
                     offsetTop -= $(document).scrollTop();
                     offsetLeft -= $(document).scrollLeft();
@@ -867,6 +946,26 @@ var Box = (function() {
         },
         getItem: function(id) {
             return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
+        },
+        setItems: function(dataItems) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                options.data = dataItems;
+                if (options.data.length || !options.emptyMenuText) {
+                    $.each(options.data, function(i, item) {
+                        $el.dropdown('appendItem', item);
+                    });
+                } else {
+                    var $emptyItem = $('<div/>')
+                        .text(options.emptyMenuText)
+                        .addClass(CLASS_EMPTY_MENU)
+                    ;
+                    $menu.html($emptyItem);
+                }
+            });
         },
         appendItem: function(item) {
             return this.each(function() {
@@ -932,14 +1031,21 @@ var Box = (function() {
     var methods = {
         init: function(params) {
             return this.each(function() {
+                var t = this;
+                var $el = $(this);
                 var defaults = {
                     openEvent: 'mousedown',
-                    emptyMenuText: 'Ничего не найдено'
+                    notFoundText: 'Ничего не найдено',
+                    caseSensitive: false,
+                    data: [],
+                    getValue: function() {
+                        return $el.val();
+                    }
                 };
                 var options = $.extend(defaults, params);
-                var $el = $(this);
-                var defData = options.data.slice(0);
                 var searchTimeout;
+                options.notFoundText = options.emptyMenuText;
+                options.defData = options.data.slice(0);
 
                 $el.dropdown(options);
 
@@ -961,14 +1067,26 @@ var Box = (function() {
                         }
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            $el.dropdown($.extend(options, {
-                                isShow: $el.is(':focus'),
-                                data: !$el.val() ? defData : $.grep(defData, function(n, i) {
-                                    var str = $.trim(n.title).toLowerCase().split('ё').join('е');
-                                    var searchStr = $.trim($el.val()).toLowerCase().split('ё').join('е');
-                                    return !!(str.indexOf(searchStr) !== -1);
-                                })
-                            }));
+                            var elVal = options.getValue.apply(t) || '';
+                            var defData = options.defData;
+                            var data = !elVal ? defData : $.grep(defData, function(n, i) {
+                                var str = $.trim(n.title).split('ё').join('е');
+                                var searchStr = $.trim(elVal).split('ё').join('е');
+                                if (!options.caseSensitive) {
+                                    str = str.toLowerCase();
+                                    searchStr = searchStr.toLowerCase();
+                                }
+                                return !!(str.indexOf(searchStr) !== -1);
+                            });
+                            if (data.length || options.emptyMenuText) {
+                                $el.dropdown($.extend(options, {
+                                    isShow: $el.is(':focus'),
+                                    data: data,
+                                    emptyMenuText: options.notFoundText
+                                }));
+                            } else {
+                                $el.dropdown('close');
+                            }
                         }, 0);
                     });
 
@@ -977,6 +1095,17 @@ var Box = (function() {
                         options: options
                     });
                 }
+            });
+        },
+
+        setItems: function(dataItems) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                options.defData = dataItems;
+
+                $el.dropdown('setItems', dataItems);
             });
         }
     };
@@ -1015,7 +1144,7 @@ var Box = (function() {
                     border: $el.css('border'),
                     margin: $el.css('margin'),
                     background: $el.css('background'),
-                    width: $el.outerWidth() - (parseInt($el.css('border-width')) * 2)
+                    width: $el.outerWidth() - (intval($el.css('border-width')) * 2)
                 }));
 
                 $el.css({
@@ -1032,41 +1161,42 @@ var Box = (function() {
                     tags: {}
                 });
 
+                refreshPadding($el);
                 run(options.oncreate, $el);
             });
         },
-        addTag: function(id, params) {
+        addTag: function(params) {
             return this.each(function() {
+                var id = params.id;
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 var $wrap = data.$wrap;
                 var $tag = $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']');
+                var isAlready = !!$tag.length;
 
-                if ($tag.length) {
+                if (isAlready) {
                     $tag.remove();
                 }
 
-                $tag = $(
-                    '<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
-                        '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
-                        '<span class="' + CLASS_TAG_DELETE + '"></span>' +
-                    '</span>')
-                ;
+                $tag = $('<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
+                            '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
+                            '<span class="' + CLASS_TAG_DELETE + '"></span>' +
+                        '</span>');
 
                 $tag.find('.delete').click(function() {
-                        $tag.remove();
-                        refreshPadding($el);
-
-                        run(options.onremove, $el, id);
-                    })
-                ;
+                    $tag.remove();
+                    refreshPadding($el);
+                    run(options.onremove, $el, id);
+                });
 
                 $el.before($tag);
                 $el.data(DATA_KEY, data);
                 refreshPadding($el);
 
-                run(options.onadd, $el, params);
+                if (!isAlready) {
+                    run(options.onadd, $el, params);
+                }
             });
         },
         removeTag: function(id) {
@@ -1078,7 +1208,6 @@ var Box = (function() {
 
                 $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']').remove();
                 refreshPadding($el);
-
                 run(options.onremove, $el, id);
             });
         },
@@ -1091,7 +1220,6 @@ var Box = (function() {
 
             $tag.remove();
             refreshPadding($el);
-
             run(options.onremove, $el, $tag.data('id'));
         }
     };
@@ -1105,7 +1233,7 @@ var Box = (function() {
         var width = $wrap.width() - parseInt($el.css('padding')) * 2;
 
         $el.css({
-            width: (width - left) < 40 ? width : (width - left)
+            width: (width - left) < 40 ? width : (width - left - 1)
         });
     }
 
@@ -1235,3 +1363,69 @@ var Box = (function() {
         return methods.init.apply(this, arguments);
     };
 })(jQuery);
+
+/**
+ * Templating
+ */
+var tmpl = (function($) {
+    var cache = {};
+    var format = function(str) {
+        return str ? str
+            .replace(/[\r\t\n]/g, ' ')
+            .split('<?').join('\t')
+            .split("'").join("\\'")
+            .replace(/\t=(.*?)\?>/g, "',$1,'")
+            .split('?>').join("p.push('")
+            .split('\t').join("');")
+            .split('\r').join("\\'") : str;
+    };
+    var tmpl = function(str, data) {
+        try {
+            var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
+                ? function() {
+                return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
+            }
+                : (new Function('obj',
+                'var p=[],' +
+                    'print=function(){p.push.apply(p,arguments)},' +
+                    'isset=function(v){return !!obj[v]},' +
+                    'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
+                    "with(obj){p.push('" + format(str) + "');} return p.join('');"
+            ));
+            return (cache[str] = fn(data || {}));
+        }
+        catch(e) {
+            if (window.console && console.log) console.log(format(str));
+            throw e;
+        }
+    };
+
+    return tmpl;
+})(jQuery);
+
+var BOX_LAYOUT =
+'<div  class="box-layout"></div>';
+
+var BOX_WRAP =
+'<div class="box-wrap">' +
+    '<? if (isset("title")) { ?>' +
+        '<div class="title">' +
+            '<span class="text"><?=title?></span>' +
+            '<? if (isset("closeBtn")) { ?>' +
+                '<div class="close"></div>' +
+            '<? } ?>' +
+        '</div>' +
+    '<? } ?>' +
+    '<div class="body clear-fix"><?=body?></div>' +
+    '<? if (isset("buttons") && buttons.length) { ?>' +
+        '<div class="actions-wrap">' +
+            '<div class="actions"></div>' +
+        '</div>' +
+    '<? } ?>' +
+'</div>';
+
+var BOX_ACTION =
+'<button class="action button<?=isset("isWhite") ? " white" : ""?>"><?=label?></button>';
+
+var BOX_LOADING =
+'<div class="box-loading" style="<?=isset("height") ? "min-height: " + height + "px" : ""?>"></div>';

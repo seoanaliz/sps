@@ -29,11 +29,17 @@
                 return;
             }
 
-            if ($id) {
-                $o = new Article();
-                $o->statusId = 3;
-                ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $id));
+            AuditUtility::CreateEvent('articleDelete', 'article', $id, "Deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId);
+
+            //topface moderation failed
+            if ($object->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {
+                $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $id));
+                TopfaceUtility::DeclinePost($object, $articleRecord);
             }
+
+            $o = new Article();
+            $o->statusId = 3;
+            ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $id));
         }
     }
 ?>

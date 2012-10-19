@@ -85,7 +85,7 @@ sql;
 
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
-                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher);
+                        $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
                     } catch (ChangeSenderException $Ex) {
                         //ниче не делаем
@@ -101,12 +101,16 @@ sql;
          * @param ArticleRecord $articleRecord
          * @param Publisher $publisher
          */
-        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher) {
+        private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher, $article) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
             if ($isWithSmallPhoto) {
                 $articleRecord->photos = array();
             }
 
+            $link = $articleRecord->link;
+            if (strpos($link, 'topface.com') !== false) {
+                $link .= '?ref=pub';
+            }
             $post_data = array(
                 'text' => $articleRecord->content,
                 'group_id' => $targetFeed->externalId,
@@ -115,12 +119,16 @@ sql;
                 'photo_array' => array(),
                 'audio_id' => array(),
                 'video_id' => array(),
-                'link' => $articleRecord->link,
+                'link' => $link,
                 'header' => '',
             );
 
             if (!empty($articleRecord->photos)) {
-                foreach ($articleRecord->photos as $photoItem) {
+                /**
+                 * отправляем не более 10 фоток
+                 */
+                $articlePhotos = array_slice($articleRecord->photos, 0, 10);
+                foreach ($articlePhotos as $photoItem) {
                     $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
                     $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
 
@@ -136,6 +144,10 @@ sql;
                 $articleQueue->externalId = $sender->send_post();
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
+
+                if ($article->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {
+                    TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
+                }
             } catch (ChangeSenderException $Ex){
                 throw $Ex;
             } catch (Exception $Ex){

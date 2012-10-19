@@ -100,7 +100,7 @@ class getDialogsList
         foreach( $dialogs_array as &$dialog ) {
             $dialog->uid = $users_array[ $dialog->uid ];
         }
-        $dialogs_array['groupId'] = $group_id;
+//        $dialogs_array['groupId'] = $group_id;
 
         die( ObjectHelper::ToJSON( array( 'response' => $dialogs_array )));
     }

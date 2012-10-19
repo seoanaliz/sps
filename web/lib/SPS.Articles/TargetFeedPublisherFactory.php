@@ -22,7 +22,7 @@
             'class'       => 'TargetFeedPublisher'
             , 'table'     => 'targetFeedPublishers'
             , 'view'      => 'getTargetFeedPublishers'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array( 'targetFeeds', 'publishers' )
             , 'fields'    => array(
                 'targetFeedId' => array(

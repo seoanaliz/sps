@@ -163,8 +163,6 @@ $(document).ready(function(){
 
     // Вкладки "Источники", "Реклама" в левон меню
     $(".left-panel .type-selector a").click(function(e){
-        e.preventDefault();
-
         if (articlesLoading) {
             return;
         }
@@ -172,7 +170,153 @@ $(document).ready(function(){
         $(".left-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        Events.fire('rightcolumn_dropdown_change', []);
+        if ($(this).data('type') == 'authors-list') {
+             var BOX_AUTHOR =
+            '<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
+                '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+                    '<img src="<?=user.photo?>" alt="" />' +
+                '</a>' +
+            '</div>' +
+            '<div class="info">' +
+                '<?=text?>' +
+            '</div>';
+
+             var BOX_ADD_AUTHOR =
+            'Вы действительно хотите назначить ' +
+            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+                '<?=user.name?>' +
+            '</a>' +
+            ' автором?';
+
+             var BOX_DELETE_AUTHOR =
+            'Вы действительно хотите удалить ' +
+            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+                '<?=user.name?>' +
+            '</a>' +
+            ' из списка авторов?';
+
+           (function updatePage(method) {
+                Events.fire(method || 'authors_get', function(data) {
+                    $('body').addClass('editor-mode');
+                    var $container = $('#wall');
+                    $container.html(data);
+
+                    var $navigation = $container.find('.authors-types');
+                    $navigation.delegate('.tab', 'click', function() {
+                        $navigation.find('.tab.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                        updatePage('authors_get');
+                    });
+
+                    var $input = $container.find('.author-link');
+                    $input.placeholder();
+                    $input.keyup(function(e) {
+                        if (e.keyCode == KEY.ENTER) {
+                            $input.blur();
+                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                            var confirmBox = new Box({
+                                id: 'addAuthor' + authorId,
+                                title: 'Добавление автора',
+                                html: tmpl(BOX_LOADING, {height: 100}),
+                                buttons: [
+                                    {label: 'Добавить автора', onclick: addAuthor},
+                                    {label: 'Отменить', isWhite: true}
+                                ],
+                                onshow: function($box) {
+                                    var box = this;
+
+                                    VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                        if (!dataVK.response) {
+                                            return box.setHTML('Пользователь не найден');
+                                        }
+                                        var user = dataVK.response[0];
+                                        var clearUser = {
+                                            id: user.uid,
+                                            name: user.first_name + ' ' + user.last_name,
+                                            photo: user.photo_medium_rec
+                                        };
+                                        authorId = clearUser.id;
+                                        var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
+                                        box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                                    });
+                                }
+                            });
+                            confirmBox.show();
+                        }
+                        function addAuthor() {
+                            var box = this;
+                            box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                            box.setButtons([{label: 'Закрыть', isWhite: true}]);
+                            Events.fire('author_add', [authorId, function(data) {
+                                box.remove();
+                                updatePage();
+                            }]);
+                        }
+                    });
+
+                    if ($container.data('initedList')) return;
+                    $container.data('initedList', true);
+                    $container.delegate('.delete', 'click', function() {
+                        var $author = $(this).closest('.author');
+                        var authorId = $author.data('id');
+                        var confirmDeleteBox = new Box({
+                            id: 'confirmDeleteBox' + authorId,
+                            title: 'Удаление автора',
+                            html: tmpl(BOX_LOADING, {height: 100}),
+                            buttons: [
+                                {label: 'Удалить', onclick: function() {
+                                    Events.fire('author_remove', [authorId, function(data) {
+                                        $author.remove();
+                                        confirmDeleteBox.hide();
+                                    }]);
+                                }},
+                                {label: 'Отменить', isWhite: true}
+                            ],
+                            onshow: function($box) {
+                                var box = this;
+
+                                VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                    if (!dataVK.response) {
+                                        return box.setHTML('Пользователь не найден');
+                                    }
+                                    var user = dataVK.response[0];
+                                    var clearUser = {
+                                        id: user.uid,
+                                        name: user.first_name + ' ' + user.last_name,
+                                        photo: user.photo_medium_rec
+                                    };
+                                    authorId = clearUser.id;
+                                    var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
+                                    box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                                });
+                            }
+                        }).show();
+                    });
+
+                    $container.delegate('.description', 'click', function() {
+                        var $input = $(this);
+                        var $author = $(this).closest('.author');
+                        $input.attr('contenteditable', 'true').focus();
+                    });
+                    $container.delegate('.description', 'keyup', function(e) {
+                        if (!e.originalEvent) return;
+
+                        if (e.keyCode == KEY.ENTER) {
+                            var $input = $(this);
+                            var $author = $(this).closest('.author');
+                            var clearText = $input.text();
+
+                            $input.blur().removeAttr('contenteditable').html(clearText);
+                            Events.fire('author_edit_desc', [$author.data('id'), clearText, function() {}]);
+                        }
+                    });
+                });
+            })();
+        } else {
+            $('body').removeClass('editor-mode');
+            Events.fire('rightcolumn_dropdown_change', []);
+        }
+
     });
 
     // Вкладки в правом меню
@@ -466,8 +610,8 @@ $(document).ready(function(){
     (function(){
         var w = $(window),
             b = $("#wallloadmore");
-        w.scroll(function(){
-            if(w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
+        w.scroll(function() {
+            if (b.is(':visible') && w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
                 b.click();
             }
         });
@@ -1424,10 +1568,11 @@ var Elements = {
     initLinkLoader: function(obj, full){
         var container   = obj.parents('div.link-info-content');
         var link        = obj.attr('rel');
+
         $.ajax({
-            url: controlsRoot + 'parse-url/',
+            url: 'http://im.' + hostname + '/int/controls/parse-url/',
             type: 'GET',
-            dataType : "json",
+            dataType: 'jsonp',
             data: {
                 url: link
             },

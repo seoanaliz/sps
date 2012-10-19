@@ -8,11 +8,11 @@ body {
     width: 1100px;
     margin: 0 auto;
 
-    &>.left-column {
+    &>#left-column {
         float: left;
         width: 800px;
         border: 1px solid @border_main;
-        padding-top: 50px;
+        padding-top: 40px;
         position: relative;
 
         &>.header {
@@ -40,47 +40,134 @@ body {
                 color: @color_gray;
                 font-size: 16px;
                 height: 400px;
-                /*background: url('http://dribbble.s3.amazonaws.com/users/4826/screenshots/423457/404_bulb.jpg') no-repeat center;*/
                 background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
             }
 
-            &>.messages {
-                padding: 5px 0 110px;
+            &>#list-messages {
+                &>.messages {
+                    padding: 5px 0 110px;
 
-                .message.viewer + .message.viewer {
-                    &>.left-column {
-                        .photo {
-                            display: none;
+                    .message.viewer + .message.viewer {
+                        &>.left-column {
+                            .photo {
+                                display: none;
+                            }
+                        }
+                        &>.center-column {
+                            .title {
+                                display: none;
+                            }
                         }
                     }
-                    &>.center-column {
-                        .title {
-                            display: none;
+                    .message {
+                        padding: 5px 0;
+
+                        &.loading {
+                            background: url(http://st0.userapi.com/images/upload.gif) no-repeat 20px center;
+                        }
+
+                        &.new {
+                            background-color: @bg_light_hover;
+                        }
+
+                        &>div {
+                            min-height: 1px;
+                        }
+                        &>.left-column {
+                            width: 15%;
+                            float: left;
+                            text-align: right;
+
+                            &>.photo {
+                                width: 40px;
+                                height: 40px;
+                                display: inline-block;
+                                overflow: hidden;
+                                .border-radius(2px);
+
+                                img {
+                                    max-width: 100%;
+                                    .border-radius(2px);
+                                }
+                            }
+                        }
+                        &>.center-column {
+                            width: 70%;
+                            float: left;
+
+                            &>.content {
+                                margin: 0 10px;
+
+                                .title {
+                                    font-weight: bold;
+                                    margin-bottom: 0.4em;
+                                }
+                                .text {
+                                    overflow: hidden;
+                                }
+
+                                .attachments {
+                                    margin: .5em 0;
+
+                                    img {
+                                        position: relative;
+                                        outline: 3px solid #fff;
+                                        float: left;
+                                    }
+                                    img:first-child {
+                                        z-index: 1;
+                                    }
+                                    .photos {
+                                        margin: .5em 0;
+                                        width: 360px;
+                                        height: 300px;
+
+                                        img {
+                                            position: relative;
+                                            outline: 3px solid #fff;
+                                            float: left;
+                                        }
+                                        img:first-child {
+                                            z-index: 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        &>.right-column {
+                            width: 15%;
+                            float: left;
+
+                            &>.date {
+                                color: @color_gray;
+                            }
                         }
                     }
                 }
-                .message {
-                    padding: 5px 0;
+                &>.post-message {
+                    background-color: @bg_gray;
+                    border-top: 1px solid @border_inside;
+                    padding: 10px 0;
+                    position: absolute;
+                    bottom: 0;
+                    width: 800px;
+                    z-index: 1;
 
-                    &.loading {
-                        background: url(http://st0.userapi.com/images/upload.gif) no-repeat 20px center;
+                    &.fixed {
+                        position: fixed;
+                        box-shadow: 0 -2px 1px rgba(0,0,0, 0.1);
+
+                        .transition(box-shadow 0.5s);
                     }
 
-                    &.new {
-                        background-color: @bg_light_hover;
-                    }
-
-                    &>div {
-                        min-height: 1px;
-                    }
                     &>.left-column {
                         width: 15%;
                         float: left;
                         text-align: right;
 
                         &>.photo {
-                            width: 40px;
-                            height: 40px;
+                            width: 50px;
+                            height: 50px;
                             display: inline-block;
                             overflow: hidden;
                             .border-radius(2px);
@@ -98,38 +185,22 @@ body {
                         &>.content {
                             margin: 0 10px;
 
-                            .title {
-                                font-weight: bold;
-                                margin-bottom: 0.4em;
-                            }
-                            .text {
-                                overflow: hidden;
-                            }
+                            &>.textarea-wrap {
+                                margin-right: 10px;
 
-                            .attachments {
-                                margin: .5em 0;
-
-                                img {
-                                    position: relative;
-                                    outline: 3px solid #fff;
-                                    float: left;
+                                textarea {
+                                    width: 100%;
+                                    min-height: 40px;
+                                    max-height: 100px;
+                                    .border-radius(2px);
                                 }
-                                img:first-child {
-                                    z-index: 1;
-                                }
-                                .photos {
-                                    margin: .5em 0;
-                                    width: 360px;
-                                    height: 300px;
+                            }
 
-                                    img {
-                                        position: relative;
-                                        outline: 3px solid #fff;
-                                        float: left;
-                                    }
-                                    img:first-child {
-                                        z-index: 1;
-                                    }
+                            .actions {
+                                margin-top: 10px;
+
+                                &>.link {
+                                    float: right;
                                 }
                             }
                         }
@@ -138,118 +209,10 @@ body {
                         width: 15%;
                         float: left;
 
-                        &>.date {
-                            color: @color_gray;
-                        }
-                    }
-                }
-            }
-            &>.post-message {
-                background-color: @bg_gray;
-                border-top: 1px solid @border_inside;
-                padding: 10px 0;
-                position: absolute;
-                bottom: 0;
-                width: 800px;
-                z-index: 1;
-
-                &.fixed {
-                    position: fixed;
-                    box-shadow: 0 -2px 1px rgba(0,0,0, 0.1);
-
-                    .transition(box-shadow 0.5s);
-                }
-
-                &>.left-column {
-                    width: 15%;
-                    float: left;
-                    text-align: right;
-
-                    &>.photo {
-                        width: 50px;
-                        height: 50px;
-                        display: inline-block;
-                        overflow: hidden;
-                        .border-radius(2px);
-
-                        img {
-                            max-width: 100%;
-                            .border-radius(2px);
-                        }
-                    }
-                }
-                &>.center-column {
-                    width: 70%;
-                    float: left;
-
-                    &>.content {
-                        margin: 0 10px;
-                        margin-right: 20px;
-
-                        textarea {
-                            width: 100%;
-                            min-height: 40px;
-                            max-height: 100px;
-                            .border-radius(2px);
-                        }
-
-                        .actions {
-                            margin-top: 10px;
-                        }
-                    }
-                }
-                &>.right-column {
-                    width: 15%;
-                    float: left;
-
-                    &>.photo {
-                        width: 50px;
-                        height: 50px;
-                        display: inline-block;
-                        overflow: hidden;
-                        .border-radius(2px);
-
-                        img {
-                            max-width: 100%;
-                            .border-radius(2px);
-                        }
-                    }
-                }
-            }
-
-            &>.dialogs {
-                .dialog {
-                    border-bottom: 1px solid @border_inside;
-                    padding: 10px;
-                    cursor: pointer;
-
-                    &:hover {
-                        background: @bg_light_hover;
-
-                        &>.history > .from-me.new {
-                            background-color: @bg_hover;
-                        }
-                    }
-
-                    &.new {
-                        background-color: @bg_light_hover;
-
-                        &:hover {
-                            background-color: @bg_hover;
-                        }
-                    }
-
-                    &>.user {
-                        width: 25%;
-                        float: left;
-                        overflow: hidden;
-                        position: relative;
-                        min-height: 50px;
-
                         &>.photo {
-                            position: absolute;
                             width: 50px;
                             height: 50px;
+                            display: inline-block;
                             overflow: hidden;
                             .border-radius(2px);
 
@@ -258,76 +221,126 @@ body {
                                 .border-radius(2px);
                             }
                         }
-                        &>.info {
-                            margin-left: 60px;
+                    }
+                }
+            }
 
-                            &>.name {}
-                            &>.date,
-                            &>.status {
-                                font-size: .9em;
-                                color: @color_gray;
+            &>#list-dialogs {
+                &>.dialogs {
+                    .dialogs-block+.dialogs-block,
+                    .dialog+.dialog {
+                        border-top: 1px solid @border_inside;
+                    }
+                    .dialog {
+                        padding: 10px;
+                        cursor: pointer;
+
+                        &:hover {
+                            background: @bg_light_hover;
+
+                            &>.history > .from-me.new {
+                                background-color: @bg_hover;
                             }
                         }
-                    }
-                    &>.history {
-                        width: 70%;
-                        float: left;
-                        overflow: hidden;
-                        color: @color_link;
 
-                        &>.from-me {
-                            padding: 8px;
-                            min-height: 34px;
+                        &.new {
+                            background-color: @bg_light_hover;
 
-                            &.new {
-                                background-color: @bg_light_hover;
+                            &:hover {
+                                background-color: @bg_hover;
                             }
+                        }
+
+                        &>.user {
+                            width: 25%;
+                            float: left;
+                            overflow: hidden;
+                            position: relative;
+                            min-height: 50px;
 
                             &>.photo {
                                 position: absolute;
-                                width: 34px;
-                                height: 34px;
+                                width: 50px;
+                                height: 50px;
                                 overflow: hidden;
                                 .border-radius(2px);
 
-                                &>img {
+                                img {
                                     max-width: 100%;
                                     .border-radius(2px);
                                 }
                             }
-                            &>.body {
-                                margin-left: 44px;
+                            &>.info {
+                                margin-left: 60px;
+
+                                &>.name {}
+                                &>.date,
+                                &>.status {
+                                    font-size: .9em;
+                                    color: @color_gray;
+                                }
                             }
                         }
-                    }
-                    &>.actions {
-                        width: 5%;
-                        float: left;
-                        overflow: hidden;
-                        position: relative;
-                        min-height: 50px;
+                        &>.history {
+                            width: 70%;
+                            float: left;
+                            overflow: hidden;
+                            color: @color_link;
 
-                        &>.action.icon {
-                            position: absolute;
-                            padding: .4em;
-                            top: 50%;
-                            right: 50%;
-                            margin-top: -0.8em;
-                            margin-right: -0.8em;
-                            opacity: .5;
+                            &>.from-me {
+                                padding: 8px;
+                                min-height: 34px;
 
-                            &:hover {
-                                opacity: 1;
-                            }
-                            &.active {
-                                opacity: 1;
-                                background-color: @bg_active;
-
-                                &.plus {
-                                    background-image: url('../../images/common/add-white.png');
+                                &.new {
+                                    background-color: @bg_light_hover;
                                 }
-                                &.select {
-                                    background-image: url('../../images/common/select-white.png');
+
+                                &>.photo {
+                                    position: absolute;
+                                    width: 34px;
+                                    height: 34px;
+                                    overflow: hidden;
+                                    .border-radius(2px);
+
+                                    &>img {
+                                        max-width: 100%;
+                                        .border-radius(2px);
+                                    }
+                                }
+                                &>.body {
+                                    margin-left: 44px;
+                                }
+                            }
+                        }
+                        &>.actions {
+                            width: 5%;
+                            float: left;
+                            overflow: hidden;
+                            position: relative;
+                            min-height: 50px;
+
+                            &>.action.icon {
+                                position: absolute;
+                                padding: .4em;
+                                top: 50%;
+                                right: 50%;
+                                margin-top: -0.8em;
+                                margin-right: -0.8em;
+                                opacity: .5;
+
+                                &:hover {
+                                    opacity: 1;
+                                }
+                                &.active {
+                                    opacity: 1;
+                                    background-color: @bg_active;
+
+                                    &.plus {
+                                        background-image: url('../../images/common/add-white.png');
+                                    }
+                                    &.select {
+                                        background-image: url('../../images/common/select-white.png');
+                                    }
                                 }
                             }
                         }
@@ -337,7 +350,7 @@ body {
         }
     }
 
-    &>.right-column {
+    &>#right-column {
         position: fixed;
         top: 10px;
         bottom: 10px;
@@ -363,8 +376,21 @@ body {
             bottom: 0;
             width: 100%;
 
-            &>.item {
+            .drag-wrap {
+                position: relative;
+            }
+
+            .item {
                 .user-select(none);
+
+                &.drag {
+                    position: absolute;
+                    width: 100%;
+                    background-color: @bg_light_hover;
+                    cursor: pointer;
+
+                    .opacity(0.7);
+                }
 
                 &>.title {
                     padding: 5px 30px 5px 10px;
@@ -379,13 +405,36 @@ body {
                         background-color: @bg_light_hover;
                     }
 
-                    &.active {
+                    &>.counter {
+                        font-weight: bold;
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        margin-top: -10px;
+                        padding: 3px 5px 2px;
+                        font-size: 11px;
                         background-color: @bg_hover;
+
+                        .border-radius(3px);
+                        .transition(opacity 0.2s);
+
+                        &:empty {
+                            display: none;
+                        }
                     }
 
-                    &>.counter {
-                        margin-left: 1em;
-                        font-weight: bold;
+                    &.active {
+                        background-color: @bg_hover;
+
+                        &>.counter {
+                            background-color: @bg_dark_hover;
+                        }
+                    }
+                    &.new {
+                        &>.counter {
+                            background-color: @bg_active;
+                            color: #fff;
+                        }
                     }
 
                     &>.icon {
@@ -403,51 +452,6 @@ body {
                         }
                     }
                 }
-
-                &>.list {
-                    margin: 4px 0;
-
-                    &>.dialog + .dialog {
-                        margin-top: 4px;
-                    }
-                    &>.dialog {
-                        cursor: pointer;
-
-                        &:hover {
-                            background-color: @bg_light_hover;
-                        }
-
-                        &.active {
-                            background-color: @bg_hover;
-                        }
-
-                        &>div {
-                            display: inline-block;
-                            vertical-align: middle;
-                        }
-                        &>.icon {
-                            margin-left: 5px;
-                            width: 30px;
-                            height: 30px;
-                            overflow: hidden;
-                            .border-radius(2px);
-
-                            img {
-                                max-width: 100%;
-                                .border-radius(2px);
-                            }
-                        }
-                        &>.title {
-                            padding: 5px;
-                            margin-left: 5px;
-
-                            &>.counter {
-                                margin-left: 1em;
-                                font-weight: bold;
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -456,6 +460,9 @@ body {
 .ui-dropdown-add-to-list {
     margin-top: -0.1em;
     margin-right: -0.7em;
+}
+.ui-dropdown-add-to-list-tabs,
+.ui-dropdown-add-to-list {
     border-color: @bg_active;
 
     .ui-dropdown-menu-item {
@@ -483,6 +490,10 @@ body {
     background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
     padding: 30% 0;
 }
+.mini-load {
+    background: #fff url(http://st0.userapi.com/images/upload.gif) no-repeat center;
+    padding: 5% 0;
+}
 
 .scroll-like-mac {
     &::-webkit-scrollbar {
@@ -506,5 +517,72 @@ body {
     &:hover::-webkit-scrollbar-corner,
     &:hover::-webkit-scrollbar-track-piece {
         background: transparent;
+    }
+}
+
+.box-templates {
+    &>.title {
+        margin: 7px 0 4px;
+        color: #2B587A;
+        font-size: 1.18em;
+        font-weight: bold;
+    }
+
+    &>.input-wrap {
+        margin-right: 10px;
+        margin-bottom: 7px;
+
+        &>input[type="text"],
+        &>textarea {
+            width: 100%;
+        }
+        &>textarea {
+            height: 50px;
+        }
+    }
+}
+
+.tab-bar.messenger {
+    .tab {
+        .icon {
+            display: none;
+        }
+        &.selected {
+            .icon {
+                &.online {
+                    background-image: url('../../images/im/online.png');
+                    display: inline;
+                }
+                &.offline {
+                    background-image: url('../../images/im/offline.png');
+                    display: inline;
+                }
+                &.plus {
+                    background-image: url('../../images/common/add-white.png');
+                    display: none;
+                }
+                &.select {
+                    background-image: url('../../images/common/select-white.png');
+                    display: none;
+                }
+            }
+
+            &:hover {
+                .icon {
+                    &.online {
+                        display: none;
+                    }
+                    &.offline {
+                        display: none;
+                    }
+                    &.plus {
+                        display: inline;
+                    }
+                    &.select {
+                        display: inline;
+                    }
+                }
+            }
+        }
     }
 }

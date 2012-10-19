@@ -22,7 +22,7 @@
             'class'       => 'Article'
             , 'table'     => 'articles'
             , 'view'      => 'getArticles'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
             , 'cacheDeps' => array( 'sourceFeeds' )
             , 'fields'    => array(
                 'articleId' => array(

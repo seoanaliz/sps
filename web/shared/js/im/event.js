@@ -1,56 +1,92 @@
-var Event = Class.extend({
-    on: function(eventName, callback) {
-        var events = eventName.split(' ');
-        if (events.length > 1) {
-            for (var event in events) {
-                this.on(event, callback);
+var Event = (function() {
+    var eventSplitter = /\s+/;
+    var isDebug = false;
+
+    var Event = Class.extend({
+        on: function(events, callback, context) {
+            var calls, event, list;
+            if (!callback) return this;
+
+            events = events.split(eventSplitter);
+            calls = this._callbacks || (this._callbacks = {});
+
+            while (event = events.shift()) {
+                list = calls[event] || (calls[event] = []);
+                list.push(callback, context);
             }
-        } else {
-            eventName = events[0];
-        }
 
-        if (!this._callbacks) this._callbacks = {};
-        if (!this._callbacks[eventName]) this._callbacks[eventName] = [];
-        this._callbacks[eventName].push(callback);
+            return this;
+        },
 
-        return this;
-    },
+        off: function(events, callback, context) {
+            var event, calls, list, i;
 
-    off: function(eventName, callback) {
-        var events = eventName.split(' ');
-        if (events.length > 1) {
-            for (var event in events) {
-                this.off(event, callback);
+            if (!(calls = this._callbacks)) return this;
+            if (!(events || callback || context)) {
+                delete this._callbacks;
+                return this;
             }
-        } else {
-            eventName = events[0];
-        }
 
-        if (!this._callbacks) this._callbacks = {};
-        for (var i in this._callbacks[eventName]) {
-            if (this._callbacks[eventName][i] === callback) {
-                this._callbacks[eventName][i] = null;
+            events = events.split(eventSplitter);
+
+            while (event = events.shift()) {
+                if (!(list = calls[event]) || !(callback || context)) {
+                    delete calls[event];
+                    continue;
+                }
+
+                for (i = list.length - 2; i >= 0; i -= 2) {
+                    if (!(callback && list[i] !== callback || context && list[i + 1] !== context)) {
+                        list.splice(i, 2);
+                    }
+                }
             }
-        }
 
-        return this;
-    },
+            return this;
+        },
 
-    trigger: function(eventName) {
-        var events = eventName.split(' ');
-        if (events.length > 1) {
-            for (var event in events) {
-                this.trigger(event);
+        trigger: function(events) {
+            var event, calls, list, i, length, args, all, rest;
+            if (!(calls = this._callbacks)) return this;
+
+            rest = [];
+            events = events.split(eventSplitter);
+
+            for (i = 1, length = arguments.length; i < length; i++) {
+                rest[i - 1] = arguments[i];
             }
-        } else {
-            eventName = events[0];
-        }
 
-        if (!this._callbacks) this._callbacks = {};
-        for (var i in this._callbacks[eventName]) {
-            if (this._callbacks[eventName][i]) this._callbacks[eventName][i].apply(this, Array.prototype.slice.call(arguments, 1));
-        }
+            while (event = events.shift()) {
+                if (isDebug) {
+                    console.log(event);
+                }
 
-        return this;
-    }
-});
+                // Копируем список коллбэков, чтобы предотвратить их замену.
+                if (all = calls.all) all = all.slice();
+                if (list = calls[event]) list = list.slice();
+
+                // Запускаем коллбэки.
+                if (list) {
+                    for (i = 0, length = list.length; i < length; i += 2) {
+                        list[i].apply(list[i + 1] || this, rest);
+                    }
+                }
+
+                // Запускаем все коллбэки.
+                if (all) {
+                    args = [event].concat(rest);
+                    for (i = 0, length = all.length; i < length; i += 2) {
+                        all[i].apply(all[i + 1] || this, args);
+                    }
+                }
+            }
+
+            return this;
+        }
+    });
+
+    Event.prototype.bind = Event.on;
+    Event.prototype.unbind = Event.off;
+
+    return Event;
+})();

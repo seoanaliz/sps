@@ -532,7 +532,7 @@
                 $expires = 3600;
             }
             $expires = $expires * 2;
-            return MemcacheHelper::Set( $cacheKey, $cacheResult, MEMCACHE_COMPRESSED, $expires );
+            return MemcacheHelper::Set( $cacheKey, $cacheResult, 2, $expires );
         }
 
 

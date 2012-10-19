@@ -14,14 +14,12 @@
          */
         public function Execute()
         {
+
+            VkHelper::set_service_at( '155537426', '1522740c1c67241e1c67241e351c4f74e211c671c721c804ce60e280b3be15cdc42254c', '2642172' );
+            die();
 //            error_reporting( 0 );
-
-
-
-            set_time_limit(0);
-            $t = 0;
-            $line = '';
-            print_r( Oadmins::get_gen_editors_work());
+            $a = new ParserVkontakte( 35807213 );
+            print_r( $a->get_posts( 0 ));
             die();
 //                for ($i = 1090582; $i > 1085582; $i-- ) {
 //                   $line .= ',' . $i;
@@ -55,6 +53,7 @@
 //            echo microtime(1) . ' >>>>>>>>>>>>>>><br>' ;
 //
 //            echo '<br><<<<<<<<<<<<<<<' . microtime(1);
+
             die();
             foreach( $publics as $public_id ) {
                 echo 'public_id = ' . $public_id . '<br>';
@@ -113,6 +112,41 @@
 
             echo ObjectHelper::ToJSON(array( 'response' => true ));
         }
+
+        public function libxml_display_error($error)
+        {
+            $return = "<br/>\n";
+            switch ($error->level) {
+                case LIBXML_ERR_WARNING:
+                    $return .= "<b>Warning $error->code</b>: ";
+                    break;
+                case LIBXML_ERR_ERROR:
+                    $return .= "<b>Error $error->code</b>: ";
+                    break;
+                case LIBXML_ERR_FATAL:
+                    $return .= "<b>Fatal Error $error->code</b>: ";
+                    break;
+            }
+            $return .= trim($error->message);
+            if ($error->file) {
+                $return .= " in <b>$error->file</b>";
+            }
+            $return .= " on line <b>$error->line</b>\n";
+
+            return $return;
+        }
+
+        public function libxml_display_errors() {
+            $errors = libxml_get_errors();
+            foreach ($errors as $error) {
+                print libxml_display_error($error);
+            }
+            libxml_clear_errors();
+        }
+
+// Enable user error handling
+
+
 
         public static function delete_non_friends( $user_id )
         {
