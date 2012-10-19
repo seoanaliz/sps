@@ -140,24 +140,33 @@
         //              группы или посетителей(от последних отсеивается)
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
-        public function get_posts($page_number, $trig_inc = false)
+
+        public function get_posts_nv($page_number, $trig_inc = false)
         {
             $offset = $page_number * self::PAGE_SIZE;
             if (!isset($this->count))
                 $this->get_posts_count();
+
+            echo 'offset<br>';
+            print_r( $offset );
+            echo "offset<br>
+            $this->count";
 
             if ($offset > $this->count) {
                 throw new Exception("wall's end");
             }
 
             $a = $this->get_page($this->page_adr."?offset=$offset&own=1");
-
             if (!$a) {
                 throw new Exception('Не удалось скачать страницу '.$this->page_adr."?offset=$offset");
             }
-
-            $document = phpQuery::newDocument($a);
-            $hentry = $document->find('div.post_info');
+//            file_put_contents('1.txt', $a );
+            preg_match_all('/(?s)<body.*?>(.*)<script id/', $a, $matches);
+            $a = $matches[1][0] . '</div></div>';
+            file_put_contents('1.txt', $a );
+            $document = phpQuery::newDocument( $a );
+            echo '<br>1';
+            $hentry = $document->find('div.post');
 
             //разбираем страницу по постам
             $posts = array();
@@ -177,7 +186,7 @@
 
                 //контактовский номер поста
                 $id = $pq->find('div.reply_link_wrap')->attr('id');
-                if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
+                             if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
                     ' не удалось получить id поста со стены ' . $this->page_adr);
                 $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
 
@@ -374,11 +383,103 @@
             }
         }
 
+        public function get_posts( $page_number )
+        {
+            $offset = $page_number * self::PAGE_SIZE;
+            $params = array(
+                'owner_id'  =>  '-' . $this->page_id,
+                'offset'    =>  $offset,
+                'count'     =>  20,
+                'fileter'   =>  'owner'
+            );
+
+            $res = VkHelper::api_request( 'wall.get', $params );
+            unset( $res[0] );
+            $posts = $this->post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+
+            return $posts;
+        }
+
+        private function post_conv( $posts, $trig_inc = false )
+        {
+            $result_posts_array = array();
+
+            foreach( $posts as $post ) {
+                $id         =   $this->page_id . '_' . $post->id;
+                $likes      =   $post->likes->count;
+                $likes_tr   =   $likes;
+                $retweet    =   $post->reposts->count;
+                $time       =   $post->date;
+                $text       =   TextHelper::fromUTF8( $this->remove_tags( $post->text ));
+                $maps = '';
+                $doc  = '';
+                $link = '';
+                $poll = '';
+                $photo = array();
+                $video = array();
+                $audio = array();
+                $text_links = array();
+
+//                print_r($post->attachments);
+                if ( isset( $post->attachments )) {
+                    foreach( $post->attachments as $attachment )
+                    {
+
+                        switch( $attachment->type ) {
+                            case 'photo':
+                                 $photo[] =
+                                     array(
+                                         'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
+                                         'desc' =>  '',
+                                         'url'  =>  isset( $attachment->photo->big_src ) ?
+                                                                    $attachment->photo->big_src :
+                                                                    $attachment->photo->src
+                                     );
+                                 break;
+                            case 'graffiti':
+                                 $photo[] =
+                                     array(
+                                         'id'   =>  $attachment->graffiti->owner_id . '_' . $attachment->graffiti->gid,
+                                         'desc' =>  '',
+                                         'url'  =>  isset( $attachment->graffiti->big_src ) ?
+                                                                    $attachment->graffiti->big_src :
+                                                                    $attachment->graffiti->src
+                                     );
+                                 break;
+                            case 'audio':
+                                $audio[] = array( $attachment->audio->owner_id . '_' . $attachment->audio->aid );
+                                break;
+                            case 'video':
+                                $video[] = array( $attachment->video->owner_id . '_' . $attachment->video->vid );
+                                break;
+                            case 'link':
+                                $link =  $attachment->link->url;
+                                break;
+                            case 'poll':
+                                $poll = $attachment->poll->poll_id;
+                                 break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                $result_posts_array[] = array('id'      => $id,      'likes' => $likes, 'likes_tr' => $likes_tr,
+                                              'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
+                                              'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
+                                              'music'   => $audio,   'video' => $video, 'link'     => $link,
+                                              'poll'    => $poll,    'text_links'   =>  $text_links  );
+            }
+            print_r($result_posts_array);
+            return $result_posts_array;
+        }
+
         private function get_average(array &$a)
         {
             $q = count($a);
             $sum = 0;
-            foreach($a as $post){
+            foreach( $a as $post ){
 
                 if (substr_count($post['likes'], '%') > 0 ||
                     substr_count($post['likes'], '+') > 0 ||
@@ -389,7 +490,7 @@
                     $sum += $post['likes'];
             }
             //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
-            return ($sum/$q);
+            return ( $sum / $q );
         }
 
         private function kill_attritions($array)
@@ -472,7 +573,7 @@
 //                        $array[$i] = $array[$i]['id'];
 //                    else
 //                         unset($array[$i]);
-                elseif ($array[$i]['likes_tr'] < LIKES_LIMIT)
+                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT)
                     $array[$i]['likes'] = '-';
             }
 
@@ -489,10 +590,11 @@
                 'count'    =>  1,
                 'filter' => 'owner' );
             $res = VkHelper::api_request( 'wall.get', $params );
-            return $res[0];
+            $this->count = $res[0];
+            return (int) $res[0];
         }
 
-        private function u_w($str)
+        private function u_w( $str )
         {
             return iconv("utf-8", "windows-1251", $str);
         }
@@ -580,22 +682,18 @@
                         $matches[1] != 'едактировать описание' &&
                         $matches[1] != $this->u_w('Редактировать описание')) {
                         $pic['desc'] =  $matches[1];
-
-
                     }else  $pic['desc'] = '';
                 } else {
                     $pic['desc'] = '';
                 }
                 unset ($desc);
                 unset ($matches);
-
             }
             return true;
         }
 
         public function get_time($date)
         {
-            //            echo $date.'<br>';
             //начало сегодняшнего дня (для сегодняшних постов)
             $date = trim($date);
             $da = date("d,m,Y");
