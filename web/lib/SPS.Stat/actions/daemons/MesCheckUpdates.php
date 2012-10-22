@@ -41,20 +41,21 @@ class MesCheckUpdates
                     continue;
                 $dialog_id = MesDialogs::get_dialog_id( $user, $dialog->uid );
                 $group_ids = MesGroups::get_dialog_group( $dialog_id );
-                $old_ts = MesDialogs::get_dialog_ts( $user, $dialog->uid);
+                $old_ts    = MesDialogs::get_dialog_ts( $user, $dialog->uid );
+                $last_clear_time = MesGroups::get_last_clear_time( $group_ids[0], $user );
                 $act = '';
-                if ( !$dialog->read_state && !$dialog->out && $old_ts != $dialog->date )
+                if ( !$dialog->read_state && !$dialog->out && $old_ts != $dialog->date && $last_clear_time < $dialog->date )
                     $act = 'add';
                 elseif( $dialog->read_state && !$dialog->out || $dialog->out )
                     $act = 'del';
+
                 if ( $act )
+
                     MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
                 //если сообщение
                 $check_ts =  MesDialogs::get_dialog_ts( $user, $dialog->uid );
                 if ( $check_ts == $dialog->date )
                     continue;
-
-                echo 'hurray!!<br>';
                 MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, !$dialog->out, $dialog->read_state );
             }
             sleep(0.4);
