@@ -86,7 +86,7 @@
             );
         }
 
-        public static function get_groups( $userId )
+        public static function get_groups( $userId, $type_selector = 0 )
         {
             $sql = 'SELECT c.group_id, c.name, c.type, b.read_mark
                     FROM '
@@ -102,14 +102,15 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@user_id', $userId );
             $ds = $cmd->Execute();
+
             $res = array();
             $unread = MesGroups::get_unread_group_counters( $userId );
 
             while( $ds->Next()) {
                 $group_id = $ds->getInteger( 'group_id');
                 $type     = $ds->getInteger( 'type' );
-                if ( $type === 2 )
-                    continue;
+//                if ( $type === 2 && !$type_selector )
+//                    continue;
                 $res[] = array(
                     'group_id'  =>  $group_id,
                     'type'      =>  $type,
@@ -179,6 +180,8 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@group_id' ,  $group_id );
             $cmd->SetInteger( '@user_id',    $user_id);
+//             $cmd->getQuery();
+            $ds = $cmd->Execute();
             $ds = $cmd->Execute();
             $ds->Next();
             return $ds->GetInteger('quantity');
