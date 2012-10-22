@@ -976,7 +976,9 @@ var RightColumn = Widget.extend({
         var t = this;
         clearTimeout(t._timer);
         t._timer = setTimeout(function() {
-            t.run();
+            if (!t._isDragging) {
+                t.run();
+            }
         }, 200);
     }
 });
