@@ -10,7 +10,7 @@ class watchDog
 {
 
     public function Execute() {
-        error_reporting( 0 );
+//        error_reporting( 0 );
         header( "Content-Type: text/javascript; charset=" . LocaleLoader::$HtmlEncoding );
         $user_id   =   Request::getInteger( 'userId' );
         $cb        =   Request::getString ( 'callback' );
@@ -62,7 +62,7 @@ class watchDog
                         $attach = reset( $message )->attachments;
                     } elseif ( isset( $event[7]->fwd )) {
                         $mid     = array( $event[1] );
-                        $message =reset( MesDialogs::get_messages( $user_id, $mid ));
+                        $message = reset( MesDialogs::get_messages( $user_id, $mid ));
                         foreach ( $message->fwd_messages as $mess ) {
                             $fwd[] = array( 'body'      =>  $mess->body,
                                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $mess->uid, $user_id )),
@@ -74,6 +74,10 @@ class watchDog
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
                     if( !$dialog_id ) {
                         $dialog_id = MesDialogs::addDialog( $user_id, $from_id, time(), 4, '' );
+                    }
+
+                    if ( !( $event[2] & 2 ) ) {
+                        MesGroups::update_highlighted_list( $ids[ $from_id ], $user_id, 'add', $dialog_id );
                     }
                     $result[] = array(
                         'type'    => $event[2] & 2 ? 'outMessage' : 'inMessage',
