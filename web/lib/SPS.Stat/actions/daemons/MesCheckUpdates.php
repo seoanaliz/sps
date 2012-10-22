@@ -33,7 +33,7 @@ class MesCheckUpdates
     public static function check_new_messages( $im_users )
     {
         foreach( $im_users as $user ) {
-            $dialogs = MesDialogs::get_all_dialogs( $user, 200 );
+            $dialogs = MesDialogs::get_all_dialogs( $user, 50 );
             if ( !$dialogs )
                 continue;
             foreach( $dialogs as $dialog ) {
