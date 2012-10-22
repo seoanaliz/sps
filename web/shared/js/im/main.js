@@ -957,14 +957,20 @@ var RightColumn = Widget.extend({
         var t = this;
         var list = t.model().list();
         var item;
+        var setAsRead = false;
         for (var i in list) {
             if (!list.hasOwnProperty(i)) continue;
             item = list[i];
             item.isSelected(item.id() == listId);
-            item.isRead(true);
+            if (!item.isRead()) {
+                setAsRead = true;
+                item.isRead(true);
+            }
         }
         t.renderTemplate();
-        Events.fire('set_list_as_read', listId, function() {});
+        if (setAsRead) {
+            Events.fire('set_list_as_read', listId, function() {});
+        }
         if (isTrigger) t.trigger('setList', listId);
     },
     setDialog: function(dialogId, isTrigger) {
