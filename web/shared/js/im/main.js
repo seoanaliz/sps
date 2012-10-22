@@ -948,8 +948,10 @@ var RightColumn = Widget.extend({
             if (!list.hasOwnProperty(i)) continue;
             item = list[i];
             item.isSelected(item.id() == listId);
+            item.isRead(true);
         }
         t.renderTemplate();
+        Events.fire('set_list_as_read', listId, function() {});
         if (isTrigger) t.trigger('setList', listId);
     },
     setDialog: function(dialogId, isTrigger) {
