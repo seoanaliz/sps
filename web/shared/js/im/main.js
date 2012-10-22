@@ -61,7 +61,10 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
-            t._leftColumn.on('addList markAsRead', function() {
+            t._leftColumn.on('addList', function() {
+                t._rightColumn.update();
+            });
+            t._leftColumn.on('markAsRead', function() {
                 t._rightColumn.update();
             });
             t._rightColumn.on('changeDialog', function(dialogId) {
@@ -172,6 +175,10 @@ var LeftColumn = Widget.extend({
             t.showDialog(dialogId, true);
         });
 
+        t._dialogs.on('addList', function(e) {
+            t.trigger('addList');
+        });
+
         t._messages.on('hoverMessage', function(e) {
             var $message = $(e.currentTarget);
             var messageId = $message.data('id');
@@ -194,6 +201,10 @@ var LeftColumn = Widget.extend({
             var $tab = $(e.currentTarget);
             var listId = $tab.data('id');
             t.showList(listId, true);
+        });
+
+        t._tabs.on('addList', function() {
+            t.trigger('addList');
         });
     },
     onScroll: function(e) {
@@ -937,7 +948,9 @@ var RightColumn = Widget.extend({
             var listId = $(this).data('id');
             if (listId != Configs.commonDialogsList) listIds.push(listId);
         });
-        Events.fire('set_list_order', listIds.join(','), function() {});
+        Events.fire('set_list_order', listIds.join(','), function() {
+            t.update();
+        });
     },
 
     setList: function(listId, isTrigger) {
@@ -961,7 +974,10 @@ var RightColumn = Widget.extend({
     },
     update: function() {
         var t = this;
-        t.run();
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function() {
+            t.run();
+        }, 200);
     }
 });
 
