@@ -115,7 +115,7 @@
                     'type'      =>  $type,
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
-                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) - 1 ? false : true,
+                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) > 1 ? false : true,
                 );
             }
 
@@ -198,20 +198,20 @@
 
         public static function implement_group( $groupIds, $userIds )
         {
-            if ( !is_array( $userIds ) )
+            $conn = ConnectionFactory::Get('tst');
+            if ( !is_array( $userIds ))
                 $userIds = array ( $userIds );
-            if ( !is_array( $groupIds ) )
+            if ( !is_array( $groupIds ))
                 $groupIds = array ( $groupIds );
 
             $i = 0;
             foreach( $groupIds as $gr_id ) {
                 foreach ( $userIds as $id ) {
-
                     $query = 'INSERT INTO ' . TABLE_MES_GROUP_USER_REL . '(user_id,group_id)
                           VALUES (@user_id,@group_id)';
-                    $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                    $cmd->SetInteger('@group_id', $gr_id);
-                    $cmd->SetInteger('@user_id', $id);
+                    $cmd = new SqlCommand( $query, $conn );
+                    $cmd->SetInteger( '@group_id', $gr_id );
+                    $cmd->SetInteger( '@user_id', $id );
                     if ( $cmd->ExecuteNonQuery())
                         $i++;
                 }
