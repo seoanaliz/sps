@@ -35,7 +35,7 @@
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }
 
-	        MesCheckUpdates::
+	        MesCheckUpdates::check_new_messages( array( $user_id ));
 
             $users = StatUsers::get_vk_user_info( $user_id );
             foreach ( $users as $user ) {

@@ -15,7 +15,7 @@ class toggleReadRead
         if ( !$user_id || !$group_id ) {
             die(ERR_MISSING_PARAMS);
         }
-        MesGroups::delete_unread_unread_list( $user_id, $group_id );
+        MesGroups::delete_highlighted_list( $group_id, $user_id );
 
         echo ObjectHelper::ToJSON( array( 'response' => true ));
     }
