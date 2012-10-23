@@ -478,7 +478,22 @@ var Dialogs = EndlessPage.extend({
     },
 
     makeList: function($list) {
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     clickDialog: function(e) {
         var t = this;
@@ -722,7 +737,22 @@ var Messages = EndlessPage.extend({
         var t = this;
         $list.find('.videos').imageComposition({width: 500, height: 240});
         $list.find('.photos').imageComposition({width: 500, height: 300});
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     makeTextarea: function($textarea) {
         var t = this;
