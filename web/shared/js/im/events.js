@@ -241,7 +241,8 @@ var Cleaner = {
 
     longPollRead: function(rawContent) {
         return {
-            id: rawContent.mid
+            id: rawContent.mid,
+            dialogId: rawContent.dialog_id
         }
     },
 
