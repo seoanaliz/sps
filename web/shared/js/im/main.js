@@ -599,6 +599,12 @@ var Dialogs = EndlessPage.extend({
             }
         }
     },
+    onRender: function() {
+        var t = this;
+        if (t.checkAtBottom()) {
+            $(window).trigger('scroll');
+        }
+    },
     addDialog: function(dialogModel) {
         var t = this;
         if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
@@ -708,6 +714,9 @@ var Messages = EndlessPage.extend({
         var t = this;
         t.onShow();
         t.makeTextarea(t.el().find('textarea:first'));
+        if (t.checkAtTop()) {
+            $(window).trigger('scroll');
+        }
     },
     makeList: function($list) {
         var t = this;
