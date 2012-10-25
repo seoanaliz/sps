@@ -105,7 +105,7 @@ var Main = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-            case 'outMessage': {
+            case 'outMessage':
                 (function() {
                     var isViewer = (event.type == 'outMessage');
                     var message = Cleaner.longPollMessage(event.content, isViewer);
@@ -118,17 +118,15 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
-            case 'read': {
+            case 'read':
                 (function() {
                     var message = Cleaner.longPollRead(event.content);
                     t._leftColumn.readMessage(message.id);
                     t._leftColumn.readDialog(message.dialogId);
                 })();
                 break;
-            }
             case 'online':
-            case 'offline': {
+            case 'offline':
                 (function() {
                     var online = Cleaner.longPollOnline(event.content);
                     if (online.isOnline) {
@@ -138,7 +136,6 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
         }
     }
 });
@@ -967,7 +964,7 @@ var RightColumn = Widget.extend({
             $target.removeClass('drag').css({top: 0});
             setTimeout(function() {
                 t._isDragging = false;
-                t.setOrder();
+                t.saveOrder();
             }, 0);
         });
     },
@@ -979,17 +976,20 @@ var RightColumn = Widget.extend({
         t.setList(listId, true);
     },
 
-    setOrder: function() {
+    saveOrder: function() {
         var t = this;
         var $el = t.el();
         var listIds = [];
+        var list = [];
         $el.find('.item').each(function() {
             var listId = $(this).data('id');
-            if (listId != Configs.commonDialogsList) listIds.push(listId);
+            if (listId != Configs.commonDialogsList) {
+                listIds.push(listId);
+            }
+            list.push(new ListModel(listCollection.get(listId).data()));
         });
-        Events.fire('set_list_order', listIds.join(','), function() {
-            t.update();
-        });
+        t.model().list(list);
+        Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
     setList: function(listId, isTrigger) {
