@@ -371,7 +371,6 @@
         //todo
         private function edit_post( $attaches, $post_id )
         {
-            $attaches[] = 'photo670456_285217131';
             $attaches = implode( ',', $attaches );
             sleep(0.3);
             $params = array(
