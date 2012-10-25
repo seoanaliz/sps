@@ -21,6 +21,7 @@
 				<path name="appControls" value="/app/controls" />
 				<path name="tools" value="/tools" />
 				<path name="im" value="/im" />
+				<path name="reports" value="/int/reports" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
