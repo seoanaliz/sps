@@ -986,7 +986,9 @@ var RightColumn = Widget.extend({
             if (listId != Configs.commonDialogsList) {
                 listIds.push(listId);
             }
-            list.push(new ListModel(listCollection.get(listId).data()));
+            if (listCollection.get(listId)) {
+                list.push(new ListModel(listCollection.get(listId).data()));
+            }
         });
         t.model().list(list);
         Events.fire('set_list_order', listIds.join(','), function() {});
