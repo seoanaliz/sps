@@ -36,13 +36,11 @@ define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 
     define ( 'TABLE_MES_GROUP_DIALOG_REL', 'mes_group_dialog_relation' );  #принадлежность даилога группам
     define ( 'TABLE_MES_QUEUES', 'mes_queue' ); #очередь сообщений
     define ( 'TABLE_MES_TEXTS', 'mes_texts' ); #сами сообщения
-    define ( 'TABLE_MES_ACTIVITY_LOG', 'mes_activity_log');//статистика работы оператора
-    define ( 'TABLE_MES_DIALOG_TEMPLATES', 'mes_dialog_templates');//таблица с шаблонами
+    define ( 'TABLE_MES_ACTIVITY_LOG', 'mes_activity_log');
+    define ( 'TABLE_MES_DIALOG_TEMPLATES', 'mes_dialog_templates');
 
 //статистика по юзерам пабликов
     define( 'TABLE_TEMPL_USER_IDS',          'temp_user_ids'); //здесь хранятся юзеры 1 паблика. Только на время работы
     define( 'TABLE_TEMPL_PUBLIC_SHORTNAMES', 'temp_public_shortnames');//здесь - данные о популярности пабликов
-//альбомы
-    define( 'TABLE_ALBUMS', 'albums' );//данные об альбомах
-    define( 'TABLE_ALBUM_POINTS', 'albums_points' );//ежедневные(?) снапшоты альбомов
+
 ?>

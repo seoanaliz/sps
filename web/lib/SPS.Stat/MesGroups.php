@@ -5,71 +5,15 @@
 
     class MesGroups
     {
-        //типы групп :
-        // 0 - обычная
-        // 1 - запросы в друзья
-        // 2 - не в списке
-        public static function check_group_type( $group_id )
+        public static function is_general( $groupId )
         {
-            $sql = 'SELECT type FROM '
-                        . TABLE_MES_GROUPS .
-                    ' WHERE group_id = @group_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id', $group_id );
-            $ds = $cmd->Execute();
-            $ds->Next();
-            return $ds->GetInteger('type');
+            $group = self::get_group( $groupId );
+            if ( $group['general'] == 1 )
+                return true;
+            return false;
         }
 
-        public static function get_unlist_dialogs_group( $user_id )
-        {
-            $group_id = MesGroups::get_groups_by_type( $user_id, 2 );
-            $group_id = $group_id[0];
-            if ( !$group_id ) {
-                $group_id =  MesGroups::setGroup( '', 'unlist', '' );
-                MesGroups::set_group_type( $group_id, 2 );
-                MesGroups::implement_group( $group_id, $user_id );
-            }
-            return $group_id;
-        }
-
-        public static function get_groups_by_type( $user_id, $type )
-        {
-            $sql = 'SELECT a.group_id
-                    FROM
-                    '   . TABLE_MES_GROUP_USER_REL . ' as a
-                    , ' . TABLE_MES_GROUPS . ' as b
-                    WHERE
-                        a.group_id    = b.group_id
-                        AND a.user_id = @user_id
-                        AND b.type    = @group_type';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
-            $cmd->SetInteger( '@user_id',    $user_id);
-            $cmd->SetInteger( '@group_type', $type);
-            $ds = $cmd->Execute();
-            $res = array();
-            while( $ds->Next()) {
-                $res[] = $ds->GetInteger( 'group_id' );
-            }
-            return $res;
-        }
-
-        public static function set_group_type( $group_id, $type )
-        {
-            $sql =  'UPDATE '
-                     . TABLE_MES_GROUPS .
-                    ' SET
-                        type=@type
-                     WHERE
-                        group_id = @group_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id', $group_id );
-            $cmd->SetInteger( '@type', $type );
-            $ds = $cmd->Execute();
-
-        }
-
-        public static function get_group( $groupId )
+        private static function get_group( $groupId )
         {
             $sql = 'SELECT group_id, name, general, name FROM ' .
                         TABLE_MES_GROUPS
@@ -88,7 +32,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.type, b.read_mark
+            $sql = 'SELECT c.group_id, c.name, c.general, b.read_mark
                     FROM '
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
@@ -106,81 +50,20 @@
             $unread = MesGroups::get_unread_group_counters( $userId );
 
             while( $ds->Next()) {
-                $group_id = $ds->getInteger( 'group_id');
-                $type     = $ds->getInteger( 'type' );
-                if ( $type === 2 )
-                    continue;
+
+                $group_id = $ds->getValue( 'group_id', TYPE_INTEGER );
                 $res[] = array(
                     'group_id'  =>  $group_id,
-                    'type'      =>  $type,
+                    'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
-                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) - 1 ? false : true,
+                    'isRead'    =>  $ds->GetBoolean( 'read_mark' ),
                 );
             }
 
             ksort( $res );
             $res['ungrouped_unread'] = MesGroups::get_unread_ungr_counters( $userId );
             return $res;
-        }
-
-        public static function update_highlighted_list( $group_ids, $user_id, $act, $dialog_ids )
-        {
-
-            $act = strtolower( $act ) == 'del' ? '-' : '+';
-            if ( is_array( $dialog_ids ))
-                $dialog_ids = implode( ',', $dialog_ids );
-            if ( is_array( $group_ids ))
-                $group_ids = implode( ',', $group_ids );
-            $dialog_ids = '{' . $dialog_ids . '}';
-            $group_ids  = '{' . $group_ids  . '}';
-            $sql = 'UPDATE '
-                        . TABLE_MES_GROUP_USER_REL .
-                   ' SET
-                         unread_dailogs_list =uniq(sort(unread_dailogs_list ' . $act . ' @dialog_ids))
-                    WHERE
-                        group_id= any(@group_id)
-                        AND user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetString ( '@dialog_ids', $dialog_ids);
-            $cmd->SetString( '@group_id' ,  $group_ids);
-            $cmd->SetInteger( '@user_id',    $user_id);
-            echo '<br>' . $cmd->GetQuery() . '<br>';
-            $cmd->Execute();
-        }
-
-        public static function delete_highlighted_list( $user_id, $group_id )
-        {
-            $sql = 'UPDATE '
-                    . TABLE_MES_GROUP_USER_REL .
-                  ' SET
-                         unread_dailogs_list = @dialogs_list
-                    WHERE
-                        group_id=@group_id
-                        AND user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetString ( '@dialog_ids', '{0}' );
-            $cmd->SetInteger( '@group_id' ,  $group_id );
-            $cmd->SetInteger( '@user_id',    $user_id);
-            $cmd->Execute();
-        }
-
-        public static function get_highlighted_dialogs_quantity( $group_id, $user_id )
-        {
-            $sql = 'SELECT
-                        #unread_dailogs_list as quantity
-                   FROM '
-
-                    .   TABLE_MES_GROUP_USER_REL .
-                '  WHERE
-                        group_id=@group_id
-                        AND user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id' ,  $group_id );
-            $cmd->SetInteger( '@user_id',    $user_id);
-            $ds = $cmd->Execute();
-            $ds->Next();
-            return $ds->GetInteger('quantity');
         }
 
         public static function implement_group( $groupIds, $userIds )
@@ -199,7 +82,7 @@
                     $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $gr_id);
                     $cmd->SetInteger('@user_id', $id);
-                    if ( $cmd->ExecuteNonQuery())
+                    if ($cmd->ExecuteNonQuery())
                         $i++;
                 }
             }
@@ -410,19 +293,17 @@
             return $res;
         }
 
-        //delete
         public static function get_ungroup_dialogs( $user_id,  $limit, $offset = 0, $only_unr_out = 0 )
         {
             $where = $only_unr_out ? ' AND state=4' : '';
             $sql = 'SELECT
-                        rec_id, id
+                        rec_id
                     FROM '
                         . TABLE_MES_DIALOGS . ' as b
                     LEFT JOIN '
-                        . TABLE_MES_GROUP_DIALOG_REL . ' as a
-                    ON b.id = a.dialog_id
+                        . TABLE_MES_GROUP_DIALOG_REL . ' as a ON b.id = a.dialog_id
                     WHERE
-                        a.group_id IS NULL AND b.user_id=@user_id ' . $where . '
+                        a.dialog_id IS NULL AND b.user_id=@user_id ' . $where . '
                     ORDER BY
                         last_update DESC
                     OFFSET
@@ -437,7 +318,7 @@
             $ds = $cmd->Execute();
             $res = array();
             while ( $ds->Next() ) {
-                $res[$ds->GetInteger( 'id')] =  $ds->GetInteger( 'rec_id' );
+                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
             }
             return $res;
         }
@@ -462,7 +343,6 @@
             return $res;
         }
 
-        //delete
         public static function get_unread_ungr_counters( $user_id )
         {
             $sql = 'SELECT
@@ -482,9 +362,9 @@
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
         }
 
-        //delete
         public static function toggle_read_unread_gr( $user_id, $group_id, $read )
         {
+
             $sql = 'UPDATE '
                         . TABLE_MES_GROUP_USER_REL . '
                     SET
@@ -520,19 +400,9 @@
         public static function set_lists_order( $user_id, $group_ids )
         {
             $group_ids = explode( ',', $group_ids );
-            $i = 2;
+            $i = 0;
             foreach( $group_ids as $group_id ) {
-                $type = MesGroups::check_group_type( $group_id );
-                switch( $type) {
-                    case 1:
-                        MesGroups::set_list_place( $user_id, $group_id, 1 );
-                        break;
-                    case 2:
-                        MesGroups::set_list_place( $user_id, $group_id, 0 );
-                        break;
-                    default:
-                        MesGroups::set_list_place( $user_id, $group_id, $i++ );
-                }
+                MesGroups::set_list_place( $user_id, $group_id, $i++ );
             }
         }
     }

@@ -17,12 +17,6 @@
         <action name="MessageSender">
             <path>daemons/MessageSender</path>
         </action>
-        <action name="AlbumUpdate">
-            <path>daemons/AlbumUpdate</path>
-        </action>
-        <action name="PublicsGrowFixer">
-            <path>daemons/PublicsGrowFixer</path>
-        </action>
 
     </group>
 

@@ -37,9 +37,11 @@
             }
 
             //todo не уверен, нужна ли проверка на "главность"
-            if ( !$general
+            if (    !$general
                     || ( $general && StatUsers::is_Sadmin( $userId ))) {
+
                 $m_class::extricate_entry( $groupId, $entry_id);
+
                 echo  ObjectHelper::ToJSON(array('response' => true));
 
             } else {

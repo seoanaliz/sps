@@ -103,10 +103,11 @@
         public static function addDialog( $user_id, $rec_id, $last_update, $state, $status )
         {
             $sql = 'INSERT INTO '
-                        . TABLE_MES_DIALOGS . '( user_id, rec_id, status, last_update, state )
+                        . TABLE_MES_DIALOGS . '( id,user_id, rec_id, status, last_update, state )
                     VALUES
-                            ( @user_id,@rec_id,@status,@last_update, @state )
+                            ( DEFAULT, @user_id,@rec_id,@status,@last_update, @state )
                     RETURNING id';
+
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $user_id );
             $cmd->SetInteger( '@rec_id', $rec_id );
@@ -116,11 +117,6 @@
             $ds = $cmd->Execute();
             $ds->Next();
             $dialog_id = $ds->GetValue( 'id', TYPE_INTEGER );
-
-            $group_id = MesGroups::get_unlist_dialogs_group( $user_id);
-            if ( $dialog_id )
-                MesGroups::implement_entry( $group_id, $dialog_id );
-
             return ( $dialog_id ? $dialog_id : false );
         }
 
@@ -348,31 +344,15 @@
                     SET
                         last_update = @time, state = @state
                     WHERE
-                        user_id = @user_id AND rec_id = @rec_id
-                    ';
+                        user_id = @user_id AND rec_id = @rec_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInt( '@user_id', $user_id );
-            $cmd->SetInt( '@rec_id' , $rec_id  );
-            $cmd->SetInt( '@time'   , $time );
-            $cmd->SetInt( '@state'  , MesDialogs::calculate_state( $read, $in ));
-            $cmd->Execute();
-        }
-
-        public static function get_dialog_ts( $user_id, $rec_id )
-        {
-            $sql = 'SELECT
-                        last_update
-                    FROM '
-                        . TABLE_MES_DIALOGS . '
-                    WHERE
-                        user_id = @user_id AND rec_id = @rec_id ';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
-            $cmd->SetInt( '@user_id', $user_id );
-            $cmd->SetInt( '@rec_id' , $rec_id  );
+            $cmd->SetInt( '@rec_id',  $rec_id  );
+            $cmd->SetInt( '@time', $time );
+            $cmd->SetInt( '@state', MesDialogs::calculate_state( $read, $in ));
             $ds = $cmd->Execute();
+
             $ds->Next();
-            $ts = $ds->GetInteger( 'last_update' );
-            return  $ts;
         }
 
         public static function calculate_state( $read, $in )
@@ -381,17 +361,16 @@
         }
 
         //устанавливает статус диалога в нашей бд
-        public static function set_state( $dialogs_id, $state, $change_time = 1 )
+        public static function set_state( $dialogs_id, $state )
         {
-            $time = $change_time ? ',last_update=@now' : '';
             $now = time();
             $dialogs_id = explode( ',', $dialogs_id );
             foreach( $dialogs_id as $dialog ) {
                 $sql = 'UPDATE '
                             . TABLE_MES_DIALOGS .
                        ' SET
-                            state=@state
-                            ' . $time . '
+                            state=@state,
+                            last_update=@now
                         WHERE
                             id=@dialog_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
@@ -400,17 +379,6 @@
                 $cmd->SetInt( '@now',   $now );
                 $cmd->Execute();
             }
-        }
-
-        public static function get_state( $dialog_id )
-        {
-            $sql = 'SELECT state FROM ' . TABLE_MES_DIALOGS .
-                    ' WHERE  id=@dialog_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInt( '@dialog_id', $dialog_id );
-            $ds = $cmd->Execute();
-            $ds->Next();
-            return $ds->GetInteger( 'state' );
         }
 
         //поиск по именам
@@ -424,7 +392,6 @@
                 'q'             =>  $search,
                 'fields'        =>  'photo,online,counters',
             );
-
 
             $res = VkHelper::api_request( 'messages.searchDialogs', $params, 0 );
             $result = array();
@@ -458,6 +425,7 @@
             $cmd->SetInteger( '@user_id',      $user_id );
             $cmd->SetInteger( '@created_time', $now );
             $cmd->Execute();
+
         }
 
         public static function add_text( $text )
@@ -489,32 +457,23 @@
         }
 
         //проверяет наличие завявок на добавление в друзья, конвертит их в диалоги
-        public static function check_friend_requests( $user_id )
+        public static  function check_friend_requests( $user_id )
         {
             $requests = MesDialogs::get_friend_requests( $user_id );
-
             if ( $requests == 'no access_token' )
                 return false;
-            $group_id = MesGroups::get_groups_by_type( $user_id, 1 );
-
-            $group_id = $group_id[0];
+            $group_id = MesGroups::check_group_name_used( $user_id, 'Заявки в друзья' );
             if ( !$group_id ) {
-                $group_id =  MesGroups::setGroup( '', 'friends', '' );
-                MesGroups::set_group_type( $group_id, 1 );
+                $group_id =  MesGroups::setGroup( '', 'Заявки в друзья', '' );
                 MesGroups::implement_group( $group_id, $user_id );
             }
-            $ids = MesGroups::get_group_dialogs( $user_id, $group_id, 200 );
+
             foreach( $requests as $request ) {
                 $dialog_id = MesDialogs::addDialog( $user_id, $request->uid, time(), 0, '' );
-
                 if ( !$dialog_id )
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $request->uid );
-                if  ( $key !== false )
-                    unset( $ids[$key] );
                 MesGroups::implement_entry( $group_id, $dialog_id );
             }
-            $ids = implode( ',', $ids );
-            $res = StatUsers::get_friendship_state( $user_id, $ids );
         }
 
         //
@@ -564,7 +523,7 @@
         {
             $groups = '{' . $groups . '}';
             $sql = 'INSERT INTO ' . TABLE_MES_DIALOG_TEMPLATES . '
-                        (text, groups )
+                        (text, groups)
                     VALUES
                         (@text, @groups)
                     RETURNING id
@@ -590,7 +549,7 @@
             ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetString ( '@text'   , $text );
+            $cmd->SetString ( '@text'    , $text );
             $cmd->SetInteger( '@tmpl_id', $tmpl_id );
             $ds = $cmd->Execute();
             $ds->Next();
@@ -633,20 +592,6 @@
             $cmd->SetString( '@id', $tmpl_id );
 
             return $cmd->ExecuteNonQuery() ? true : false;
-        }
-
-        public static function delete_dialog( $user_id, $rec_id )
-        {
-            $dialog_id = MesDialogs::get_dialog_id( $user_id, $rec_id );
-            $sql = 'DELETE FROM ' . TABLE_MES_DIALOGS . ' WHERE id=@dialog_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger( '@dialog_id', $dialog_id );
-            $cmd->Execute();
-
-            $sql = 'DELETE FROM ' . TABLE_MES_GROUP_DIALOG_REL . ' WHERE dialog_id=@dialog_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger( '@dialog_id', $dialog_id );
-            $cmd->Execute();
         }
     }
 ?>

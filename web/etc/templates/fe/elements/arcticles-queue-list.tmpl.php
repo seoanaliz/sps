@@ -12,7 +12,6 @@
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
-                        <span class="delete-time"></span>
                     </div>
                 </div>
             <?
@@ -29,7 +28,6 @@
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
-                        <span class="delete-time"></span>
 
                         {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                     </div>
