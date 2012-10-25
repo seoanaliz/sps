@@ -789,7 +789,7 @@
 
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
 
-            if (property_exists($res, 'error')) {
+            if ( !empty( $res->error )) {
                 throw new Exception('wall.getById::'.$res->error->error_msg);
             }
 
