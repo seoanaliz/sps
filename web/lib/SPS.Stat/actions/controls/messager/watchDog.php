@@ -52,7 +52,7 @@ class watchDog
                             'groups'    =>  $ids[ $from_id ],
                         )
                     );
-                    MesDialogs::set_state( $dialog_id, 0 );
+                    MesDialogs::set_state( $dialog_id, 0, 0 );
                     break;
                 case 4:
                     $from_id  = isset( $event[3] ) ? $event[3] : $event['uid'];

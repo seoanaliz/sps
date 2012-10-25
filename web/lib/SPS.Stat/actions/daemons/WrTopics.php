@@ -2,16 +2,16 @@
 //обновление данных по топу пабликов, раз в день ~6 ночи
     Package::Load( 'SPS.Stat' );
 
-    set_time_limit(600);
-    error_reporting( 0 );
+    set_time_limit( 1200 );
+//    error_reporting( 0 );
     class WrTopics extends wrapper
     {
         private $ids;
 
         public function Execute()
         {
-            if (! $this->check_time())
-                die('Не сейчас');
+//            if (! $this->check_time())
+//                die('Не сейчас');
 
             $this->get_id_arr();
             $this->update_quantity();
@@ -37,11 +37,11 @@
             $ds = $cmd->Execute();
             $ds->Next();
             $diff =  time() - $ds->getValue('max', TYPE_INTEGER);
-            if (self::TESTING)
-                echo '<br>differing = ' . $diff . '<br>';
-            if ($diff < 86400 )
+            if ( self::TESTING )
+//                echo '<br>differing = ' . $diff . '<br>';
+            if ( $diff < 86400 )
                 return false;
-            if ($diff > 86400 * 2 )
+            if ( $diff > 86400 * 2 )
                 return ($diff / 86400);
             return 1;
 
@@ -51,7 +51,7 @@
         public function update_public_info()
         {
             if (self::TESTING)
-                echo '<br>update_public_info<br>';
+//                echo '<br>update_public_info<br>';
             $i = 0;
             $ids = '';
             $count = count($this->ids);
@@ -79,7 +79,6 @@
                    $count -= 450;
                    $ids = '';
                    $i = 0;
-
                 }
                 $i ++;
                 $ids .=  $id . ',';
@@ -145,7 +144,6 @@
 //            echo $cmd->GetQuery();
 //            die();
             $cmd->Execute();
-
         }
 
         //собирает количество поситителей в пабликах
@@ -156,6 +154,7 @@
             $return = "return{";
             $code = '';
             $timeTo = StatPublics::get_last_update_time();
+
             foreach($this->ids as $b) {
 
                 if ( $i == 25 or !next( $this->ids ) ) {
@@ -167,11 +166,10 @@
                     $code .= trim( $return, ',' ) . "};";
 
                     if (self::TESTING)
-                        echo '<br>' . $code;
+                        echo '<br>' . $code . '<br>';
                     $res = $this->vk_api_wrap('execute', array('code' =>  $code));
-
+                    print_r($res);
                     foreach($res as $key => $entry) {
-
                         $key = str_replace( 'a', '', $key );
                         $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
                         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
@@ -179,24 +177,20 @@
                         $cmd->SetInteger( '@time',      $time );
                         $cmd->SetInteger( '@quantity',  $entry->count );
                         $cmd->Execute();
-
-
+                        print_r($entry);
+                        echo 'id: ' . $key . ', quantity: ' . $entry->count .  '<br>';
                         $this->set_public_grow( $key, $entry->count, $timeTo );
-//
-
                     }
-
                     sleep(0.3);
                     $i = 0;
                     $return = "return{";
                     $code = '';
                 }
-
                 $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                 $return .= "\" a$b\":a$b,";
                 $i++;
             }
-
+            die();
         }
 }
 

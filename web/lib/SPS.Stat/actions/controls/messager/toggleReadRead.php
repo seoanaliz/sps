@@ -11,11 +11,11 @@ class toggleReadRead
         $group_id       =   Request::getInteger( 'groupId' );
         $read           =   Request::getBoolean( 'read' );
 
+
         if ( !$user_id || !$group_id ) {
             die(ERR_MISSING_PARAMS);
         }
-
-        MesGroups::toggle_read_unread_gr( $user_id, $group_id, $read );
+        MesGroups::delete_unread_unread_list( $user_id, $group_id );
 
         echo ObjectHelper::ToJSON( array( 'response' => true ));
     }
