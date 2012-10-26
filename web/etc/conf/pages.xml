@@ -581,6 +581,15 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="stat://">
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
+                <page uri="stat://reports/" boot="">
+                    <template>tmpl://st/reports.tmpl.php</template>
+                </page>
+            </pageGroup>
+
             <pageGroup name="publicControls" boot="">
                 <page uri="controls://upload-user-to-public/">
                     <actions>SPS.Site.UploadUserToPublic</actions>
