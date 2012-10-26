@@ -824,10 +824,9 @@
                 'extended'  =>  1,
             );
             $res = VkHelper::api_request( 'photos.getById', $params );
-//            print_r($res);
             $posts = VkAlbums::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
-            print_r($posts);
+            return $posts;
         }
     }
 ?>
