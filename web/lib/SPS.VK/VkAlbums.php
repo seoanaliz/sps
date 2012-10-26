@@ -129,17 +129,14 @@
                 $photo[] = array(
                     'id'   =>  $post->owner_id . '_' . $post->pid,
                     'desc' =>  '',
-                    'url'  =>  isset( $post->big_src ) ? $post->big_src : $post->src
+                    'url'  =>  isset( $post->src_big ) ? $post->src_big : $post->src
                 );
-
 
                 $result_posts_array[] = array( 'id' => $id,    'likes'  => $likes, 'likes_tr'=> $likes_tr,
                     'retweet' => $retweet, 'time'   => $time,  'text'   => $text, 'photo'    => $photo );
             }
             return $result_posts_array;
         }
-
-
 
     }
 ?>
