@@ -596,6 +596,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="reports" boot="">
+                <page uri="reports://topface-user-posts/">
+                    <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>

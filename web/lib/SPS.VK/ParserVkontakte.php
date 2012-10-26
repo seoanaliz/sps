@@ -1,5 +1,5 @@
 <?php
-   
+
     class ParserVkontakte {
 
         private $page_adr;
@@ -425,7 +425,6 @@
                 $audio = array();
                 $text_links = array();
 
-//                print_r($post->attachments);
                 if ( isset( $post->attachments )) {
                     foreach( $post->attachments as $attachment )
                     {
@@ -436,8 +435,8 @@
                                      array(
                                          'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
                                          'desc' =>  '',
-                                         'url'  =>  isset( $attachment->photo->big_src ) ?
-                                                                    $attachment->photo->big_src :
+                                         'url'  =>  isset( $attachment->photo->src_big ) ?
+                                                                    $attachment->photo->src_big :
                                                                     $attachment->photo->src
                                      );
                                  break;
@@ -790,7 +789,7 @@
 
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
 
-            if (property_exists($res, 'error')) {
+            if ( !empty( $res->error )) {
                 throw new Exception('wall.getById::'.$res->error->error_msg);
             }
 
