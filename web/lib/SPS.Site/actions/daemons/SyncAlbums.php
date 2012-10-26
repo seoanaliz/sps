@@ -10,7 +10,7 @@ Package::Load('SPS.VK');
  * @subpackage Site
  * @author     pavlenko.roman.spb@gmail.com
  */
-class SyncSources
+class SyncAlbums
 {
 
     /**
@@ -28,11 +28,11 @@ class SyncSources
 
         $this->daemon = new Daemon();
         $this->daemon->package = 'SPS.Site';
-        $this->daemon->method = 'SyncSources';
+        $this->daemon->method = 'SyncAlbums';
         $this->daemon->maxExecutionTime = '01:00:00';
 
         //get sources
-        $sources = SourceFeedFactory::Get(array('type' => SourceFeedUtility::Source));
+        $sources = SourceFeedFactory::Get(array('type' => SourceFeedUtility::Albums));
 
         foreach ($sources as $source) {
             //пропускаем специальные источники
@@ -40,53 +40,13 @@ class SyncSources
                 continue;
             }
 
+            list($public_id, $album_id) = explode('-', $source->externalId);
+
             //инитим парсер
-            $parser = new ParserVkontakte(trim($source->externalId));
-
-            try {
-                $count = $parser->get_posts_count();
-            } catch (Exception $Ex) {
-                $message = $Ex->getMessage();
-
-                //wall's end exclude
-                if (strpos($message, "wall's end") === false) {
-                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $message);
-                }
-
-                if (strpos($message, 'access denied') !== false) {
-                    $source->statusId = 2;
-                    SourceFeedFactory::Update($source);
-                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, 'auto disabled');
-                }
-                break;
-            }
-
-            $pagesCountTotal = ceil($count / ParserVkontakte::PAGE_SIZE);
-
-            $pagesCountProcessed = Convert::ToInt($source->processed);
-            //если кол-во обработанных страниц в source меньше $pagesCount - работаем
-            if ($pagesCountTotal > $pagesCountProcessed) {
-                //парсим одну нужную страницу
-                $targetPage = $pagesCountTotal - 1 - $pagesCountProcessed;
-
-                //пытаемся залочиться
-                $this->daemon->name = "source$source->externalId";
-                if (!$this->daemon->Lock()) {
-                    Logger::Warning("Failed to lock {$this->daemon->name}");
-                    continue; //переходим к следующему sorce
-                }
-
-                try {
-                    $posts = $parser->get_posts($targetPage, !empty($source->useFullExport));
-                } catch (Exception $Ex) {
-                    AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, $Ex->getMessage());
-                    continue; //переходим к следующему sorce
-                }
-
-                $posts = !empty($posts) ? $posts : array();
-
-                $this->saveFeedPosts($source, $posts);
-            }
+            $parser = new ParserVkontakte();
+            $posts = $parser->get_album_as_posts($public_id, $album_id);
+            var_dump($posts);
+            //$this->saveFeedPosts($source, $posts);
         }
     }
 
