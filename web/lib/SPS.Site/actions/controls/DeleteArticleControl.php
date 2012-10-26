@@ -29,7 +29,12 @@
                 return;
             }
 
-            AuditUtility::CreateEvent('articleDelete', 'article', $id, "Deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId);
+            AuditUtility::CreateEvent(
+                'articleDelete',
+                'article',
+                $id,
+                "Deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->editorId
+            );
 
             //topface moderation failed
             if ($object->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {

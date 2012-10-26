@@ -13,8 +13,7 @@ class MesCheckUpdates
         error_reporting(0);
 
         $im_users = StatUsers::get_im_users();
-        self::check_new_messages( $im_users );
-            die();
+        MesDialogs::check_new_messages( $im_users );
         foreach( $im_users as $user ) {
 //                $this->ungroup_transfer( $user );
             MesDialogs::check_friend_requests( $user );
@@ -30,34 +29,5 @@ class MesCheckUpdates
         }
     }
 
-    public static function check_new_messages( $im_users )
-    {
-        foreach( $im_users as $user ) {
-            $dialogs = MesDialogs::get_all_dialogs( $user, 200 );
-            if ( !$dialogs )
-                continue;
-            foreach( $dialogs as $dialog ) {
-                if ( isset( $dialog->chat_id ))
-                    continue;
-                $dialog_id = MesDialogs::get_dialog_id( $user, $dialog->uid );
-                $group_ids = MesGroups::get_dialog_group( $dialog_id );
-                $old_ts = MesDialogs::get_dialog_ts( $user, $dialog->uid);
-                $act = '';
-                if ( !$dialog->read_state && !$dialog->out && $old_ts != $dialog->date )
-                    $act = 'add';
-                elseif( $dialog->read_state && !$dialog->out || $dialog->out )
-                    $act = 'del';
-                if ( $act )
-                    MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
-                //если сообщение
-                $check_ts =  MesDialogs::get_dialog_ts( $user, $dialog->uid );
-                if ( $check_ts == $dialog->date )
-                    continue;
 
-                echo 'hurray!!<br>';
-                MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, !$dialog->out, $dialog->read_state );
-            }
-            sleep(0.4);
-        }
-    }
 }

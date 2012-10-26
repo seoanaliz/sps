@@ -31,7 +31,6 @@
                 }
                 else
                     return $res;
-
             return $res->response;
         }
 

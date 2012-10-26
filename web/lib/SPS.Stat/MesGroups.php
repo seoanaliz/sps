@@ -86,7 +86,7 @@
             );
         }
 
-        public static function get_groups( $userId )
+        public static function get_groups( $userId, $type_selector = 0 )
         {
             $sql = 'SELECT c.group_id, c.name, c.type, b.read_mark
                     FROM '
@@ -102,20 +102,21 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@user_id', $userId );
             $ds = $cmd->Execute();
+
             $res = array();
             $unread = MesGroups::get_unread_group_counters( $userId );
 
             while( $ds->Next()) {
                 $group_id = $ds->getInteger( 'group_id');
                 $type     = $ds->getInteger( 'type' );
-                if ( $type === 2 )
-                    continue;
+//                if ( $type === 2 && !$type_selector )
+//                    continue;
                 $res[] = array(
                     'group_id'  =>  $group_id,
                     'type'      =>  $type,
                     'name'      =>  $ds->getValue( 'name' ),
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
-                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) - 1 ? false : true,
+                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) > 1 ? false : true,
                 );
             }
 
@@ -126,7 +127,6 @@
 
         public static function update_highlighted_list( $group_ids, $user_id, $act, $dialog_ids )
         {
-
             $act = strtolower( $act ) == 'del' ? '-' : '+';
             if ( is_array( $dialog_ids ))
                 $dialog_ids = implode( ',', $dialog_ids );
@@ -137,7 +137,7 @@
             $sql = 'UPDATE '
                         . TABLE_MES_GROUP_USER_REL .
                    ' SET
-                         unread_dailogs_list =uniq(sort(unread_dailogs_list ' . $act . ' @dialog_ids))
+                         unread_dialogs_list = uniq(sort(unread_dialogs_list ' . $act . ' @dialog_ids))
                     WHERE
                         group_id= any(@group_id)
                         AND user_id=@user_id';
@@ -145,30 +145,32 @@
             $cmd->SetString ( '@dialog_ids', $dialog_ids);
             $cmd->SetString( '@group_id' ,  $group_ids);
             $cmd->SetInteger( '@user_id',    $user_id);
-            echo '<br>' . $cmd->GetQuery() . '<br>';
             $cmd->Execute();
         }
 
-        public static function delete_highlighted_list( $user_id, $group_id )
+        public static function delete_highlighted_list( $group_id, $user_id )
         {
             $sql = 'UPDATE '
-                    . TABLE_MES_GROUP_USER_REL .
+                       . TABLE_MES_GROUP_USER_REL .
                   ' SET
-                         unread_dailogs_list = @dialogs_list
+                         unread_dialogs_list =  @dialog_ids,
+                         last_clear_time     =  @time
                     WHERE
                         group_id=@group_id
                         AND user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString ( '@dialog_ids', '{0}' );
             $cmd->SetInteger( '@group_id' ,  $group_id );
-            $cmd->SetInteger( '@user_id',    $user_id);
+            $cmd->SetInteger( '@user_id',    $user_id  );
+            $cmd->SetInteger( '@time',       time());
             $cmd->Execute();
         }
 
+        //&&
         public static function get_highlighted_dialogs_quantity( $group_id, $user_id )
         {
             $sql = 'SELECT
-                        #unread_dailogs_list as quantity
+                        #unread_dialogs_list as quantity
                    FROM '
 
                     .   TABLE_MES_GROUP_USER_REL .
@@ -178,27 +180,41 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@group_id' ,  $group_id );
             $cmd->SetInteger( '@user_id',    $user_id);
+//             $cmd->getQuery();
+            $ds = $cmd->Execute();
             $ds = $cmd->Execute();
             $ds->Next();
             return $ds->GetInteger('quantity');
         }
 
+        public static function get_last_clear_time( $group_id, $user_id )
+        {
+            $sql = 'SELECT * FROM ' . TABLE_MES_GROUP_USER_REL . ' WHERE group_id=@group_id AND user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id', $group_id  );
+            $cmd->SetInteger( '@user_id',  $user_id  );
+            $ds = $cmd->Execute();
+            $ds->Next();
+
+            return $ds->GetInteger( 'last_clear_time' );
+        }
+
         public static function implement_group( $groupIds, $userIds )
         {
-            if ( !is_array( $userIds ) )
+            $conn = ConnectionFactory::Get('tst');
+            if ( !is_array( $userIds ))
                 $userIds = array ( $userIds );
-            if ( !is_array( $groupIds ) )
+            if ( !is_array( $groupIds ))
                 $groupIds = array ( $groupIds );
 
             $i = 0;
             foreach( $groupIds as $gr_id ) {
                 foreach ( $userIds as $id ) {
-
                     $query = 'INSERT INTO ' . TABLE_MES_GROUP_USER_REL . '(user_id,group_id)
                           VALUES (@user_id,@group_id)';
-                    $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
-                    $cmd->SetInteger('@group_id', $gr_id);
-                    $cmd->SetInteger('@user_id', $id);
+                    $cmd = new SqlCommand( $query, $conn );
+                    $cmd->SetInteger( '@group_id', $gr_id );
+                    $cmd->SetInteger( '@user_id', $id );
                     if ( $cmd->ExecuteNonQuery())
                         $i++;
                 }

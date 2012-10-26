@@ -56,9 +56,9 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
-                    self::Login($cookie_data['mid']);
+                    $logged = self::Login($cookie_data['mid']);
 
-                    return $cookie_data['mid'];
+                    return ($logged) ? $cookie_data['mid'] : false;
                 }
             }
 
@@ -72,6 +72,8 @@
 
             Session::setObject('Editor', $editor);
             Response::setObject('__Editor', $editor);
+
+            return !empty($editor);
         }
 
         /**
