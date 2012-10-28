@@ -557,7 +557,7 @@
                         if ( $ds->next() ) {
                             $key = ArrayHelper::GetFirstElement( BaseFactoryPrepare::GetPrimaryKeys( $mapping ) );
                             $object->$key = $ds->GetParameter( $key );
-                            $result = true;
+                            $result =  $object->$key;
                         }
                         break;
                 }
