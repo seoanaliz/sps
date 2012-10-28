@@ -35,17 +35,19 @@
 
         //(например, получение разгаданной капчи)
 
-        public function __construct( $post_data )
+        public function __construct( $post_data = null )
         {
-            $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
-            $this->post_text        =   $this->text_corrector( $post_data['text'] );
-            $this->vk_group_id      =   $post_data['group_id'] ;
-            $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
-            $this->vk_access_token  =   $post_data['vk_access_token'];
-            $this->audio_id         =   isset( $post_data['audio_id'] ) ? $post_data['audio_id'] : array();//массив вида array('videoXXXX_YYYYYYY','...')
-            $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
-            $this->link             =   $post_data['link'];
-            $this->header           =   $post_data['header'];
+            if (!is_null($post_data)) {
+                $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
+                $this->post_text        =   $this->text_corrector( $post_data['text'] );
+                $this->vk_group_id      =   $post_data['group_id'] ;
+                $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
+                $this->vk_access_token  =   $post_data['vk_access_token'];
+                $this->audio_id         =   isset( $post_data['audio_id'] ) ? $post_data['audio_id'] : array();//массив вида array('videoXXXX_YYYYYYY','...')
+                $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
+                $this->link             =   $post_data['link'];
+                $this->header           =   $post_data['header'];
+            }
         }
 
         private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
@@ -258,7 +260,7 @@
 
                 if (!empty ($fwd->error)) {
                     $fwd3 = $fwd->error;
-                    throw new exception("Error in wall.delete : $fwd->error_msg");
+                    throw new Exception("Error in wall.delete : $fwd->error_msg");
                 }
 
                 return true;

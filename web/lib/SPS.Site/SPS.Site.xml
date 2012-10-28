@@ -45,6 +45,9 @@
         <action name="SyncLikes">
             <path>daemons/SyncLikes</path>
         </action>
+        <action name="DeletePost">
+            <path>daemons/DeletePost</path>
+        </action>
     </group>
 
     <group name="Controls">
