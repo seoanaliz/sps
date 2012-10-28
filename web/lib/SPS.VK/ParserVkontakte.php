@@ -474,7 +474,6 @@
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
                                               'poll'    => $poll,    'text_links'   =>  $text_links  );
             }
-            print_r($result_posts_array);
             return $result_posts_array;
         }
 
@@ -584,6 +583,7 @@
             return $array;
 
         }
+
 
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
@@ -803,31 +803,29 @@
             return $result;
         }
 
-
-    public function get_album_as_posts( $public_id, $album_id )
-    {
-        $params = array(
-            'gid'       =>  $public_id,
-            'aid'       =>  $album_id,
-        );
-        $res = VkHelper::api_request( 'photos.get', $params );
-        $query_line = array();
-
-        foreach( $res as $photo )
+        public function get_album_as_posts( $public_id, $album_id )
         {
-            $query_line[]= $photo->owner_id . '_' . $photo->pid;
-        }
-        $query_line = implode( ',', $query_line );
-        sleep( 0.3 );
+            $params = array(
+                'gid'       =>  $public_id,
+                'aid'       =>  $album_id,
+            );
+            $res = VkHelper::api_request( 'photos.get', $params );
+            $query_line = array();
 
-        $params = array(
-            'photos'    =>  $query_line,
-            'extended'  =>  1,
-        );
-        $res = VkHelper::api_request( 'photos.getById', $params );
-        $posts = VkAlbums::post_conv( $res );
-        $posts = $this->kill_attritions( $posts );
-        return $posts;
-    }
+            foreach( $res as $photo )
+            {
+                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+            }
+            $query_line = implode( ',', $query_line );
+            sleep( 0.3 );
+
+            $params = array(
+                'photos'    =>  $query_line,
+                'extended'  =>  1,
+            );
+            $res = VkHelper::api_request( 'photos.getById', $params );
+            $posts = VkAlbums::post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+            return $posts;
+        }
 }
-?>
