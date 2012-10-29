@@ -13,12 +13,11 @@ class DeletePost
         ConnectionFactory::BeginTransaction();
 
         $sql = <<<sql
-                SELECT "articles".*, "articleQueues".*
-                FROM "articles", "articleQueues"
+                SELECT "articleQueues".*
+                FROM "articleQueues"
                 WHERE
-                "articles"."isDeleted" = FALSE
-                AND @now >= "articles"."deleteAt"
-                AND "articles"."articleId" = "articleQueues"."articleId"
+                "articleQueues"."isDeleted" = FALSE
+                AND @now >= "articleQueues"."deleteAt"
                 LIMIT 10 FOR UPDATE;
 sql;
         $sender = new SenderVkontakte();
@@ -29,8 +28,6 @@ sql;
         $ds = $cmd->Execute();
         $structure = BaseFactory::getObjectTree($ds->Columns);
         while ($ds->next()) {
-            /** @var $article Article */
-            $article = BaseFactory::GetObject($ds, ArticleFactory::$mapping, $structure);
             /** @var $articleQueue ArticleQueue */
             $articleQueue = BaseFactory::GetObject($ds, ArticleQueueFactory::$mapping, $structure);
 
@@ -50,8 +47,8 @@ sql;
                 continue;
             }
 
-            $article->isDeleted = true;
-            ArticleFactory::UpdateByMask($article, array('isDeleted'), array('articleId' => $article->articleId));
+            $articleQueue->isDeleted = true;
+            ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
         }
 
         ConnectionFactory::CommitTransaction(true);
