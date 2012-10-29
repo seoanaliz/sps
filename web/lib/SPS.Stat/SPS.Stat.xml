@@ -23,6 +23,15 @@
         <action name="PublicsGrowFixer">
             <path>daemons/PublicsGrowFixer</path>
         </action>
+        <action name="WrAlarm">
+            <path>daemons/WrAlarm</path>
+        </action>
+        <action name="CheckWalls">
+            <path>daemons/CheckWalls</path>
+        </action>
+        <action name="CheckPosts">
+            <path>daemons/CheckPosts</path>
+        </action>
 
     </group>
 
@@ -49,9 +58,17 @@
             <action name="setUserRank">
                 <path>controls/setUserRank</path>
             </action>
-
-
         </group>
+
+        <group name="Barter">
+            <action name="addReport">
+                <path>controls/barter/addReport</path>
+            </action>
+            <action name="getReportList">
+                <path>controls/barter/getReportList</path>
+            </action>
+        </group>
+
         <group name="Groups">
             <action name="shareGroup">
                 <path>controls/groups/shareGroup</path>
@@ -76,6 +93,11 @@
             </action>
             <action name="saveAt">
                 <path>controls/messager/saveAt</path>
+            </action>
+        </group>
+        <group name="Messenger">
+            <action name="getPublicMarks">
+                <path>controls/publics/getPublicsMarks</path>
             </action>
         </group>
         <group name="Messenger">

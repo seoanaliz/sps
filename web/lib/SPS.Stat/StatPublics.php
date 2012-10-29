@@ -7,6 +7,13 @@
     {
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
 
+        public static function get_id_by_shortname( $shortname )
+        {
+            $params = array( 'gids'  => $shortname );
+            $res = VkHelper::api_request( 'groups.getById', $params );
+            return $res[0]->gid;
+        }
+
         public static function get_our_publics_list()
         {
             $publics = TargetFeedFactory::Get();
@@ -26,9 +33,27 @@
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
+
                 $res[] = $a;
             }
             return $res;
+        }
+
+        public static function get_publics_info( $public_ids )
+        {
+            //todo exceptions
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0);
+            $result = array();
+            foreach( $res as $public ) {
+                $result[ $public->gid ] = array(
+                    'id'    =>  $public->gid,
+                    'ava'   =>  $public->photo,
+                    'name'  =>  $public->name,
+                    'link'  =>  'http://vk.com/public' . $public->gid
+                );
+            }
+
+            return $result;
         }
 
         public static function get_last_update_time()
@@ -208,7 +233,6 @@
                     ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString ( '@public_ids',     $vk_public_ids );
-            echo $cmd->getQuery();
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
@@ -216,7 +240,6 @@
             }
             return $res;
         }
-
 
         public static function save_conf( $c1,$c2,$c3,$c4,$lv )
         {
@@ -250,5 +273,195 @@
                 'lval_old'  =>  $ds->GetFloat( 'price'      ),
             );
         }
+
+        //todo sourceId -1 fuck!
+        public static function get_public_posts( $public_sb_id, $author_condition, $time_from = 0, $time_to = 0 )
+        {
+            $author_condition = $author_condition ? 'IS NOT NULL' : 'IS NULL' ;
+            if ( !$time_to )
+                $time_to = time();
+            $sql = 'SELECT
+                        COUNT(*),
+                        avg("externalLikes") as avg_likes,
+                        avg("externalRetweets") as avg_reposts
+                    FROM
+                        "articleQueues" as a LEFT JOIN "authorEvents" as b USING("articleId")
+                    WHERE
+                        b."authorId" ' . $author_condition . '
+                        AND a."sentAt" > @time_from
+                        AND a."sentAt" < @time_to
+                        AND "targetFeedId" = @targetFeedId
+                    ';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
+            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
+            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
+            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            $ds = $cmd->Execute();
+            $ds->next();
+            $res = array(
+               'likes'      =>  round( $ds->GetFloat( 'avg_likes' )),
+               'reposts'    =>  round( $ds->GetFloat( 'avg_reposts' )),
+               'count'      =>  round( $ds->GetFloat( 'count' )),
+            );
+            return $res;
+        }
+
+        public static function get_ad_public_posts( $public_sb_id, $time_from = 0, $time_to = 0 )
+        {
+            if ( !$time_to )
+                $time_to = time();
+            $sql = 'SELECT
+                        COUNT(*)
+                    FROM
+                        "articles" as a LEFT JOIN "sourceFeeds" as b USING("sourceFeedId")
+                    WHERE
+                         a."sentAt" > @time_from
+                        AND a."sentAt" < @time_to
+                        AND "targetFeedId" = @targetFeedId
+                        AND type = \'ads\'
+                    ';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
+            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
+            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
+            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            echo $cmd->GetQuery();
+            $ds = $cmd->Execute();
+            $ds->next();
+            return $ds->GetValue('count');
+        }
+
+        public static function get_views_visitors_from_base( $sb_id, $time_from, $time_to )
+        {
+            $public    = TargetFeedFactory::Get(array('targetFeedId' => $sb_id));
+            $sql = 'SELECT views,visitors
+                    FROM stat_our_publics_vis_vie
+                    WHERE   date >= @time_from
+                            AND date <= @time_to
+                            AND public_id = @public_id
+                    ORDER BY date';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@time_from', $time_from );
+            $cmd->SetInteger( '@time_to',   $time_to );
+            $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
+            $ds = $cmd->Execute();
+
+            $days = $ds->GetSize();
+            $requested_days = round(( $time_to - $time_from ) / 84600) + 1;
+            //проверка на наличие данных на этот период в бд. если нет - запрос в контакт
+            if( $days != $requested_days )
+                return false;
+
+            while( $ds->Next()) {
+                if ( isset( $temp_views )) {
+                    echo 1;
+                    $diff_views +=  $ds->GetInteger( 'views' )    - $temp_views;
+                    $diff_viss  +=  $ds->GetInteger( 'visitors' ) - $temp_viss;
+                }
+
+                $temp_views =   $ds->GetInteger( 'views' );
+                $temp_viss  =   $ds->GetInteger( 'visitors' );
+                $views      +=  $temp_views;
+                $visitors   +=  $temp_viss;
+            }
+            return  array(
+                'views'         =>  round( $views       / $days ),
+                'visitors'      =>  round( $visitors    / $days ),
+                'vievs_grouth'  =>  round( $diff_views  / ( $days - 1 )),
+                'vis_grouth'    =>  round( $diff_viss   / ( $days - 1 )),
+            );
+
+        }
+
+        public static function get_views_visitors_from_vk( $sb_id, $time_from, $time_to )
+        {
+            $publisher = TargetFeedPublisherFactory::Get( array('targetFeedId' => $sb_id ));
+            $public    = TargetFeedFactory::Get(array('targetFeedId' => $sb_id));
+            $params = array(
+                'gid'           =>  $public[$sb_id]->externalId,
+                'access_token'  =>  $publisher->publisher->vk_token,
+                'date_from'     =>  date( 'Y-m-d',$time_from),
+                'date_to'       =>  date( 'Y-m-d',$time_to)
+            );
+            $res = VkHelper::api_request( 'stats.get', $params, 0 );
+            if ( !empty ( $res->error))
+                return false;
+            $views      =   0;
+            $visitors   =   0;
+            $days = count( $res );
+            $connect = ConnectionFactory::Get( 'tst' );
+            foreach( $res as $day ) {
+                if ( isset( $temp_views )) {
+                    echo 1;
+                    $diff_views +=  $day->views     - $temp_views;
+                    $diff_viss  +=  $day->visitors  - $temp_viss;
+                }
+
+                $temp_views =   $day->views;
+                $temp_viss  =   $day->visitors;
+                $views      += $day->views;
+                $visitors   += $day->visitors;
+                $date = explode( '-', $day->day );
+                $date = mktime( '0', '0', '0', $date[1], $date[2], $date[0] );
+                StatPublics::save_view_visitor( $public[$sb_id]->externalId, $day->views, $day->visitors, $date, $connect );
+            }
+
+            sleep(0.2);
+            return array(
+                'views'         =>  round( $views       / $days ),
+                'visitors'      =>  round( $visitors    / $days ),
+                'vievs_grouth'  =>  round( $diff_views  / ( $days - 1 )),
+                'vis_grouth'    =>  round( $diff_viss   / ( $days - 1 )),
+            );
+
+        }
+
+        public static function get_average_rate( $sb_id, $time_from, $time_to ) {
+
+            if ( !$time_to )
+                $time_to = time();
+            $sql = 'SELECT
+                        rate
+                    FROM
+                        "articles"
+                    WHERE
+                        "sentAt" > @time_from
+                        AND "sentAt" < @time_to
+                        AND "targetFeedId" = @targetFeedId
+                        AND rate > 0
+                    ';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
+            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
+            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
+            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            $ds = $cmd->Execute();
+            while( $ds->next()) {
+                $tmp_rate = $ds->GetValue( 'rate' );
+                $rate += $tmp_rate < 100 ? $tmp_rate : 100;
+            }
+            return round( $rate / $ds->GetSize());
+        }
+
+        public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
+        {
+            $sql = 'INSERT INTO stat_our_publics_vis_vie
+                    VALUES (@public_id, @date, @views, @visitors)';
+            $cmd = new SqlCommand( $sql, $connect );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetInteger( '@visitors',  $visitors );
+            $cmd->SetInteger( '@views',     $views );
+            $cmd->SetInteger( '@date',      $date );
+            $cmd->Execute();
+        }
+
+        //barter
+        public static function save_barter_event()
+        {
+
+        }
+
+
     }
 ?>
