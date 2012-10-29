@@ -31,6 +31,7 @@
         width: 50px;
     }
 </style>
+<div id="this-is-reporter"></div>
 <div id="main" class="main">
     <div class="form">
         <input type="text" placeholder="id паблика" />
