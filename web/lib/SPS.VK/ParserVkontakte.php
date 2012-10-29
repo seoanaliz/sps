@@ -385,9 +385,13 @@
         {
             $offset = $page_number * self::PAGE_SIZE;
 
+            if (!isset($this->count))
+                $this->get_posts_count();
+
             if ($offset > $this->count) {
                 throw new Exception("wall's end");
             }
+
             $params = array(
                 'owner_id'  =>  '-' . $this->page_id,
                 'offset'    =>  $offset,
