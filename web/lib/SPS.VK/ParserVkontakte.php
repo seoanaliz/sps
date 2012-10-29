@@ -151,11 +151,6 @@
             if (!isset($this->count))
                 $this->get_posts_count();
 
-            echo 'offset<br>';
-            print_r( $offset );
-            echo "offset<br>
-            $this->count";
-
             if ($offset > $this->count) {
                 throw new Exception("wall's end");
             }
@@ -382,7 +377,6 @@
                 $posts = $this->kill_attritions($posts);
                 return $posts;
             } else{
-                //                echo '<br>zero<br>';
                 return false;
             }
         }
@@ -390,6 +384,10 @@
         public function get_posts( $page_number )
         {
             $offset = $page_number * self::PAGE_SIZE;
+
+            if ($offset > $this->count) {
+                throw new Exception("wall's end");
+            }
             $params = array(
                 'owner_id'  =>  '-' . $this->page_id,
                 'offset'    =>  $offset,
@@ -495,10 +493,10 @@
             return ( $sum / $q );
         }
 
-        private function kill_attritions($array)
+        private function kill_attritions( $array )
         {
             $res = array();
-            $sr =  $this->get_average($array);
+            $sr =  $this->get_average( $array );
 
             $i = 0;
             $t = 0;
@@ -507,7 +505,6 @@
                 if ($array[$i]['likes'] > ($sr * 2) ){
                     if ($sr > 1){
                         $array[$i]['likes'] = '+' ;
-
                     }else
                         $array[$i]['likes'] = '-';
 
@@ -790,6 +787,7 @@
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
 
             if ( !empty( $res->error )) {
+
                 throw new Exception('wall.getById::'.$res->error->error_msg);
             }
 
