@@ -92,6 +92,9 @@
                 <page uri="controls://author-delete/">
                     <actions>SPS.Site.DeleteAuthorControl</actions>
                 </page>
+                <page uri="controls://plan-post-delete/">
+                    <actions>SPS.Site.PostDeletePlanControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
