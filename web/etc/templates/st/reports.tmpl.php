@@ -28,7 +28,7 @@
         max-width: 100%;
     }
     .time {
-        width: 50px;
+        width: 90px;
     }
 </style>
 <script type="text/javascript" src="/shared/js/st/reports.js"></script>
@@ -38,7 +38,7 @@
     <div class="form">
         <input id="public-id" type="text" placeholder="id паблика" />
         <input id="our-public-id" type="text" placeholder="id нашего паблика" />
-        <input id="time" type="text" placeholder="Время начала наблюдения" />
+        <input id="time" type="text" placeholder="Время начала наблюдения" style="width: 200px" />
         <button id="addReport" class="button">+</button>
     </div>
     <h3>Результаты</h3>

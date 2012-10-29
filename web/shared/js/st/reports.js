@@ -20,7 +20,7 @@ var Configs = {
 //        ]}
 var REPORTS_ITEM =
 '<div class="row">' +
-    '<div class="public">' +
+    '<div class="public" title="Наш паблик">' +
         '<div class="photo">' +
             '<img src="<?=ad_public.ava?>" alt="" />' +
         '</div>' +
@@ -28,7 +28,7 @@ var REPORTS_ITEM =
             '<a target="_blank" href="http://vk.com/public<?=ad_public.id?>"><?=ad_public.name?></a>' +
         '</div>' +
     '</div>' +
-    '<div class="public">' +
+    '<div class="public" title="Партнер">' +
         '<div class="photo">' +
             '<img src="<?=published_at.ava?>" alt="" />' +
         '</div>' +
@@ -36,8 +36,8 @@ var REPORTS_ITEM =
             '<a target="_blank" href="http://vk.com/public<?=published_at.id?>"><?=published_at.name?></a>' +
         '</div>' +
     '</div>' +
-    '<div class="time"><?=isset("posted_at") ? posted_at : "???" ?></div>' +
-    '<div class="time"><?=isset("deleted_at") ? deleted_at : "???" ?></div>' +
+    '<div class="time" title="Время постинга"><?=isset("posted_at") ? posted_at : "Неизветсно" ?></div>' +
+    '<div class="time" title="Время удаления"><?=isset("deleted_at") ? deleted_at : "Неизветсно" ?></div>' +
 '</div>';
 
 $.mask.definitions['2']='[012]';
@@ -73,16 +73,32 @@ function updateList() {
 //        ]}
     Events.fire('get_report_list', Configs.limit, 0, function(data) {
         var $results = $('#results');
-        $results.html('');
+        var html = '';
         if (data && data.length) {
             for (var i = 0; i < data.length; i++) {
                 if (!data.hasOwnProperty(i)) continue;
                 var item = data[i];
-                console.log(item);
-                var html = tmpl(REPORTS_ITEM, item);
-                $results.append(html);
+                html += tmpl(REPORTS_ITEM, item);
             }
         }
+        $results.html(html);
+        $results.find('.time').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            if (!intval(timestamp)) return;
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     });
 }
 
