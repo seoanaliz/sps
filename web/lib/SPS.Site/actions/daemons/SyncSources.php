@@ -12,10 +12,7 @@
      */
     class SyncSources extends AbstractPostLoadDaemon {
 
-        /**
-         * @var Daemon
-         */
-        private $daemon;
+
 
         /**
          * Один вызов этого метода просинхронизирует только одну страницу каждого sourceFeed

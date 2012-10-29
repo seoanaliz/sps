@@ -7,6 +7,11 @@
 
 abstract class AbstractPostLoadDaemon {
     /**
+     * @var Daemon
+     */
+    protected $daemon;
+
+    /**
      * Метод синхронизации постов
      * @param SourceFeed    $source лента откуда получили посты
      * @param array         $posts массив постов
