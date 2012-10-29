@@ -500,17 +500,17 @@ var Box = (function() {
     var boxesCollection = {};
     var boxesHistory = [];
 
-    return function(params) {
-        if (typeof params != 'object') {
-            if (boxesCollection[params]) {
-                return boxesCollection[params];
+    return function(options) {
+        if (typeof options != 'object') {
+            if (boxesCollection[options]) {
+                return boxesCollection[options];
             } else {
                 return false;
             }
         }
 
         var box = {};
-        var options = $.extend({
+        var params = $.extend({
             id: false,
             title: '',
             html: '',
@@ -519,7 +519,7 @@ var Box = (function() {
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
-        }, params);
+        }, options);
 
         if (!$layout) {
             $body = $('body');
@@ -536,7 +536,7 @@ var Box = (function() {
                 })
             ;
             $(document).keydown(function(e) {
-                if (e.keyCode == KEY.ESC) {
+                if (e.keyCode == 27) {
                     $layout.click();
                 }
             });
@@ -544,18 +544,18 @@ var Box = (function() {
             $layout = $('body > .box-layout');
         }
 
-        if (options.id) {
-            if (boxesCollection[options.id]) {
-                return boxesCollection[options.id];
+        if (params.id) {
+            if (boxesCollection[params.id]) {
+                return boxesCollection[params.id];
             } else {
-                boxesCollection[options.id] = box;
+                boxesCollection[params.id] = box;
             }
         }
 
         var $box = $(tmpl(BOX_WRAP, {
-            title: options.title,
+            title: params.title,
             body: '',
-            closeBtn: options.closeBtn
+            closeBtn: params.closeBtn
         })).appendTo($layout).hide();
 
         if (params.closeBtn) {
@@ -564,8 +564,8 @@ var Box = (function() {
             });
         }
 
-        setHTML(options.html);
-        setButtons(options.buttons);
+        setHTML(params.html);
+        setButtons(params.buttons);
 
         box.$el = box.$box = $box;
         box.show = show;
@@ -651,7 +651,7 @@ var Box = (function() {
             return box;
         }
 
-        options.oncreate.call(box, $box);
+        params.oncreate.call(box, $box);
 
         return box;
     };
@@ -759,10 +759,10 @@ var Box = (function() {
                     $el.dropdown('open');
                 }
                 if (isUpdate) {
-                    runCallback(options.onupdate, $el);
+                    run(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
                 } else {
-                    runCallback(options.oncreate, $el);
+                    run(options.oncreate, $el);
                     $el.trigger(TRIGGER_CREATE);
                 }
             });
@@ -1007,7 +1007,7 @@ var Box = (function() {
         }
     };
 
-    function runCallback(f, context, argument) {
+    function run(f, context, argument) {
         if ($.isFunction(f)) {
             f.call(context, argument);
         }
@@ -1237,7 +1237,7 @@ var Box = (function() {
         });
     }
 
-    function runCallback(f, context, argument) {
+    function run(f, context, argument) {
         if ($.isFunction(f)) {
             f.call(context, argument);
         }
