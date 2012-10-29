@@ -1008,6 +1008,8 @@ var RightColumn = Widget.extend({
                     setAsRead = true;
                     item.isRead(true);
                 }
+            } else {
+                item.isSelected(false);
             }
         }
         t.renderTemplate();
