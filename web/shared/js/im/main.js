@@ -61,7 +61,10 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
-            t._leftColumn.on('addList markAsRead', function() {
+            t._leftColumn.on('addList', function() {
+                t._rightColumn.update();
+            });
+            t._leftColumn.on('markAsRead', function() {
                 t._rightColumn.update();
             });
             t._rightColumn.on('changeDialog', function(dialogId) {
@@ -102,7 +105,7 @@ var Main = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-            case 'outMessage': {
+            case 'outMessage':
                 (function() {
                     var isViewer = (event.type == 'outMessage');
                     var message = Cleaner.longPollMessage(event.content, isViewer);
@@ -115,17 +118,15 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
-            case 'read': {
+            case 'read':
                 (function() {
                     var message = Cleaner.longPollRead(event.content);
                     t._leftColumn.readMessage(message.id);
                     t._leftColumn.readDialog(message.dialogId);
                 })();
                 break;
-            }
             case 'online':
-            case 'offline': {
+            case 'offline':
                 (function() {
                     var online = Cleaner.longPollOnline(event.content);
                     if (online.isOnline) {
@@ -135,7 +136,6 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
         }
     }
 });
@@ -172,6 +172,10 @@ var LeftColumn = Widget.extend({
             t.showDialog(dialogId, true);
         });
 
+        t._dialogs.on('addList', function(e) {
+            t.trigger('addList');
+        });
+
         t._messages.on('hoverMessage', function(e) {
             var $message = $(e.currentTarget);
             var messageId = $message.data('id');
@@ -194,6 +198,10 @@ var LeftColumn = Widget.extend({
             var $tab = $(e.currentTarget);
             var listId = $tab.data('id');
             t.showList(listId, true);
+        });
+
+        t._tabs.on('addList', function() {
+            t.trigger('addList');
         });
     },
     onScroll: function(e) {
@@ -467,7 +475,22 @@ var Dialogs = EndlessPage.extend({
     },
 
     makeList: function($list) {
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     clickDialog: function(e) {
         var t = this;
@@ -588,6 +611,12 @@ var Dialogs = EndlessPage.extend({
             }
         }
     },
+    onRender: function() {
+        var t = this;
+        if (t.checkAtBottom()) {
+            $(window).trigger('scroll');
+        }
+    },
     addDialog: function(dialogModel) {
         var t = this;
         if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
@@ -697,12 +726,30 @@ var Messages = EndlessPage.extend({
         var t = this;
         t.onShow();
         t.makeTextarea(t.el().find('textarea:first'));
+        if (t.checkAtTop()) {
+            $(window).trigger('scroll');
+        }
     },
     makeList: function($list) {
         var t = this;
         $list.find('.videos').imageComposition({width: 500, height: 240});
         $list.find('.photos').imageComposition({width: 500, height: 300});
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     makeTextarea: function($textarea) {
         var t = this;
@@ -917,7 +964,7 @@ var RightColumn = Widget.extend({
             $target.removeClass('drag').css({top: 0});
             setTimeout(function() {
                 t._isDragging = false;
-                t.setOrder();
+                t.saveOrder();
             }, 0);
         });
     },
@@ -929,14 +976,21 @@ var RightColumn = Widget.extend({
         t.setList(listId, true);
     },
 
-    setOrder: function() {
+    saveOrder: function() {
         var t = this;
         var $el = t.el();
         var listIds = [];
+        var list = [];
         $el.find('.item').each(function() {
             var listId = $(this).data('id');
-            if (listId != Configs.commonDialogsList) listIds.push(listId);
+            if (listId != Configs.commonDialogsList) {
+                listIds.push(listId);
+            }
+            if (listCollection.get(listId)) {
+                list.push(new ListModel(listCollection.get(listId).data()));
+            }
         });
+        t.model().list(list);
         Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
@@ -944,12 +998,20 @@ var RightColumn = Widget.extend({
         var t = this;
         var list = t.model().list();
         var item;
+        var setAsRead = false;
         for (var i in list) {
             if (!list.hasOwnProperty(i)) continue;
             item = list[i];
             item.isSelected(item.id() == listId);
+            if (!item.isRead()) {
+                setAsRead = true;
+                item.isRead(true);
+            }
         }
         t.renderTemplate();
+        if (setAsRead) {
+            Events.fire('set_list_as_read', listId, function() {});
+        }
         if (isTrigger) t.trigger('setList', listId);
     },
     setDialog: function(dialogId, isTrigger) {
@@ -959,7 +1021,12 @@ var RightColumn = Widget.extend({
     },
     update: function() {
         var t = this;
-        t.run();
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function() {
+            if (!t._isDragging) {
+                t.run();
+            }
+        }, 200);
     }
 });
 
