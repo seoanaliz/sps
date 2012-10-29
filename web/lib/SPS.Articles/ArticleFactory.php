@@ -79,15 +79,6 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
-                )
-                ,'isDeleted' => array(
-                    'name'          => 'isDeleted'
-                    , 'type'        => TYPE_BOOLEAN
-                )
-                ,'deleteAt' => array(
-                    'name'          => 'deleteAt'
-                    , 'type'        => TYPE_DATETIME
-
                 ))
             , 'lists'     => array()
             , 'search'    => array(
