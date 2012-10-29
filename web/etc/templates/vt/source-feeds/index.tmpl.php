@@ -80,9 +80,11 @@
 			<tr data-object-id="{$id}">
                 <td class="header">{$object.title}</td>
                 <td>
-                    <? if ($object->type == SourceFeedUtility::Source) { ?>
+                    <? if ($object->type == SourceFeedUtility::Source) : ?>
                         <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</a>
-                    <? } ?>
+                    <? elseif ($object->type == SourceFeedUtility::Albums): ?>
+                        <a href="http://vk.com/album-{form:$object.externalId}" target="_blank">http://vk.com/album-{form:$object.externalId}</a>
+                    <? endif; ?>
                 </td>
                 <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>
                 <td class="left">

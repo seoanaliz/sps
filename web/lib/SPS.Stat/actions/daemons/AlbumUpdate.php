@@ -18,7 +18,7 @@ class AlbumUpdate
         $ts = wrapper::morning( time());
         foreach ( $publics as $public ) {
             //получаем 2 массива альбомов паблика - из базы и из вк
-           //сравниваем, 3 возможности
+            //сравниваем, 3 возможности
             $vk_albums  = VkAlbums::get_vk_public_albums(  $public['id'] );
             $our_albums = VkAlbums::get_public_album_list( $public['id'] );
             foreach( $vk_albums as $vk_album ) {
