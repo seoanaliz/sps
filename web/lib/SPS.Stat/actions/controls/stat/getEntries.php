@@ -17,13 +17,14 @@ class getEntries {
     public function Execute() {
 
         error_reporting( 0 );
+
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
-        $period     =   Request::getInteger( 'period' );
+        $period     =   Request::getInteger( 'period' );//
 
         $search     =   pg_escape_string(Request::getString( 'search' ));
         $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
@@ -74,6 +75,7 @@ class getEntries {
                         ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
                 WHERE
                       publ.vk_id=gprel.public_id
+                      AND publ.page=true
                       AND gprel.group_id=@group_id
                       AND publ.quantity >= @min_quantity
                       AND publ.quantity <= @max_quantity
@@ -98,6 +100,7 @@ class getEntries {
                         . TABLE_STAT_PUBLICS . ' as publ
                     WHERE
                         quantity > @min_quantity
+                        AND publ.page=true
                         AND quantity < @max_quantity '.
                         $search . $show_in_mainlist .
                   ' ORDER BY '
@@ -119,7 +122,7 @@ class getEntries {
         while ($ds->next()) {
             $row = $this->get_row( $ds, $structure );
 
-            $admins = $this->get_admins($row['vk_id'], $row['main_admin'] );
+            $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
             $groups = array();
             if ( isset( $userId ) ) {
                 $groups = $this->get_groups( $userId, $row['vk_id'] );

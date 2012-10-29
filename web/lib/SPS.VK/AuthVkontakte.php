@@ -56,9 +56,9 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
-                    self::Login($cookie_data['mid']);
+                    $logged = self::Login($cookie_data['mid']);
 
-                    return $cookie_data['mid'];
+                    return ($logged) ? $cookie_data['mid'] : false;
                 }
             }
 
@@ -72,15 +72,18 @@
 
             Session::setObject('Editor', $editor);
             Response::setObject('__Editor', $editor);
+
+            return !empty($editor);
         }
 
         /**
          * Производит разлогинивание
          */
         public static function Logout() {
-            Cookie::setCookie(  'vk_app_' . self::$AppId,    "", time() - 1024, '/' );
-            Cookie::setCookie(  'vk_app_trust' . self::$AppId, "", time() - 1024, '/' );
+            Cookie::setCookie( 'vk_app_' . self::$AppId,    "", time() - 1024, '/', '.' . Site::$Host->GetHostname() );
+            Cookie::setCookie( 'vk_app_trust' . self::$AppId, "", time() - 1024, '/' );
             Session::setObject('Editor', null);
+            Response::setObject('__Editor', null);
         }
     }
 ?>

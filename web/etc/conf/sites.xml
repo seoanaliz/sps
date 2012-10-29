@@ -20,6 +20,9 @@
 				<path name="app" value="/app" />
 				<path name="appControls" value="/app/controls" />
 				<path name="tools" value="/tools" />
+				<path name="im" value="/im" />
+                <path name="reports" value="/int/reports" />
+				<path name="stat" value="/stat" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
@@ -34,10 +37,6 @@
 				    <param name="senderEmail">admin@1adw.com</param>
 				    <param name="charset">utf-8</param>
     			</mailFactory>
-                <memcache class="MemcacheHelper">
-				    <param name="server">localhost</param>
-				    <param name="active">false</param>
-    			</memcache>
                 <vkapi class="AuthVkontakte">
                     <param name="appId">1868779</param>
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
@@ -63,6 +62,7 @@
 			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
+				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
                         <mediaServer class="MediaServerManager">
@@ -77,29 +77,41 @@
                     </modules>
                 </settings>
 			</host>
-            <host name="devel">
-                <hostname>mystery.vmkteam.ru</hostname>
+            <host name="beta">
+                <hostname>beta.socialboard.ru</hostname>
+                <hostname>im.beta.socialboard.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
-                            <param name="appId">2853330</param>
-                            <param name="password">1h2pQNcNMw54IwO6kuVi</param>
-                            <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
+                            <param name="appId">2879919</param>
+                            <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.mystery.vmkteam.ru</param>
+                            <param name="host">media.sps.verumnets.ru:8081</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
-                            <param name="uploadPort">80</param>
-                            <param name="uploadHost">media.mystery.vmkteam.ru</param>
+                            <param name="uploadPort">8001</param>
+                            <param name="uploadHost">127.0.0.1</param>
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
+                        <memcache class="MemcacheHelper">
+                            <servers compress="true" autocompress="true" active="false">
+                                <server host="127.0.0.1" port="40100" active="true" />
+                            </servers>
+                        </memcache>
                     </modules>
                     <databases>
                         <database driver="PgSql">
-                            <name>sps_devel</name>
-                            <user>postgres</user>
+                            <name>sps-beta</name>
+                            <user>sps</user>
+                            <password></password>
+                            <encoding>UTF8</encoding>
+                        </database>
+                        <database driver="PgSql" name="tst">
+                            <name>tst-beta</name>
+                            <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
                         </database>
@@ -109,6 +121,7 @@
             <host name="production">
                 <hostname>sps.verumnets.ru</hostname>
                 <hostname>socialboard.ru</hostname>
+                <hostname>im.socialboard.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
@@ -117,7 +130,7 @@
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.sps.verumnets.ru</param>
+                            <param name="host">media.sps.verumnets.ru:8081</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
@@ -125,6 +138,11 @@
                             <param name="resizeExec">/usr/local/bin/convert</param>
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
+                        <memcache class="MemcacheHelper">
+                            <servers compress="true" autocompress="true" active="true">
+                                <server host="127.0.0.1" port="40100" active="true" />
+                            </servers>
+                        </memcache>
                     </modules>
                     <databases>
                         <database driver="PgSql">

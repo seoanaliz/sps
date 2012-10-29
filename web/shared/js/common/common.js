@@ -13,33 +13,159 @@ var KEY = window.KEY = {
     SPACE: 32
 };
 
+if (!window.localStorage) {
+    window.localStorage = {
+        getItem: function(key) {},
+        setItem: function(key, value) {}
+    };
+}
+
+if (!window.console) {
+    window.console = {
+        log: function(params) {},
+        dir: function(params) {}
+    };
+}
+
+(function() {
+    var globalStageKey = 'globalStorage';
+
+    window.globalStorage = {
+        _serialize: function(obj) {
+            return JSON.stringify(obj);
+        },
+        _unserialize: function(str) {
+            return JSON.parse(str);
+        },
+        _setItems: function(items) {
+            localStorage.setItem(globalStageKey, this._serialize(items));
+        },
+        _addItems: function(items) {
+            for (var item in items) {
+                if (items.hasOwnProperty(item)) this._addItem(item, items[item]);
+            }
+        },
+        _addItem: function(key, value) {
+            var allItems = this._getItems();
+            allItems[key] = value;
+            this._setItems(allItems);
+        },
+        _getItems: function() {
+            return this._unserialize(localStorage.getItem(globalStageKey)) || {};
+        },
+        _getItem: function(key) {
+            return this._getItems()[key];
+        },
+        _removeItems: function() {
+            localStorage.setItem(globalStageKey, '');
+        },
+        _removeItem: function(key) {
+            var allItems = this._getItems();
+            delete allItems[key];
+            this._setItems(allItems);
+        },
+        items: function() {
+            var isSetItem = (typeof arguments[0] == 'string' && arguments[1]);
+            var isGetItem = (typeof arguments[0] == 'string' && !arguments[1]);
+            var isSetItems = (typeof arguments[0] == 'object');
+            var isRemoveItem = (typeof arguments[0] == 'string' && arguments[1] === null);
+            var isRemoveItems = (typeof arguments[0] === null);
+            if (isRemoveItem) {
+                return this._removeItem(arguments[0]);
+            } else if (isRemoveItems) {
+                return this._removeItems();
+            } else if (isSetItem) {
+                return this._addItem(arguments[0], arguments[1]);
+            } else if (isSetItems) {
+                return this._setItems(arguments[0]);
+            } else if (isGetItem) {
+                return this._getItem(arguments[0]);
+            } else {
+                return this._getItems();
+            }
+        }
+    };
+})();
+
 function intval(str) {
     return isNaN(parseInt(str)) ? 0 : parseInt(str);
 }
 
 // Парсинг URL
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+function getURLParameter(name, search) {
+    search = search || location.search;
+    return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
+
+(function($) {
+    // Выделение текста в инпутах
+    $.fn.selectRange = function(start, end) {
+        return this.each(function() {
+            if (this.setSelectionRange) {
+                this.focus();
+                this.setSelectionRange(start, end);
+            } else if (this.createTextRange) {
+                var range = this.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', end);
+                range.moveStart('character', start);
+                range.select();
+            }
+        });
+    };
+
+    // Добавляет триггер destroyed
+    var oldClean = jQuery.cleanData;
+    $.cleanData = function(elems) {
+        for (var i = 0, elem; (elem = elems[i]) !== undefined; i++) {
+            $(elem).triggerHandler('destroyed');
+        }
+        oldClean(elems);
+    };
+})(jQuery);
 
 // Кроссбраузерные плейсхолдеры
 (function($) {
-    $.fn.placeholder = function(para) {
-        return this.each(function(parameters) {
+    $.fn.placeholder = function(parameters) {
+        return this.each(function() {
             var defaults = {
                 el: this,
-                color: '#CCC',
                 text: false,
+                hide: true,
                 helperClass: 'placeholder'
             };
             var t = this;
-            var p = $.extend(defaults, parameters);
-            var $input = $(p.el);
-            var placeholderText = p.text || $input.attr('placeholder');
+            var settings = $.extend(defaults, parameters);
+            var $input = $(settings.el);
+            var placeholderText = settings.text || $input.attr('placeholder');
             var $wrapper = $('<div/>');
-            var $placeholder = $('<div/>').addClass(p.helperClass).text(placeholderText).css({
-                padding: $input.css('padding')
+            var $placeholder = $('<div/>').addClass(settings.helperClass).text(placeholderText).css({
+                position: 'absolute',
+                cursor: 'text',
+                font: $input.css('font'),
+                margin: $input.css('border-width'),
+                lineHeight: $input.css('line-height'),
+                paddingTop: $input.css('padding-top'),
+                paddingLeft: $input.css('padding-left'),
+                paddingRight: $input.css('padding-right'),
+                paddingBottom: $input.css('padding-bottom')
             });
+
+            var placeholderHide = function() {
+                if (settings.hide) {
+                    $placeholder.hide();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 0.5}, 200);
+                }
+            };
+
+            var placeholderShow = function() {
+                if (settings.hide) {
+                    $placeholder.show();
+                } else {
+                    $placeholder.stop(true).animate({opacity: 1}, 200);
+                }
+            };
 
             $input
                 .wrap($wrapper)
@@ -47,19 +173,32 @@ function getURLParameter(name) {
                 .removeAttr('placeholder')
                 .parent().prepend($placeholder)
             ;
-
-            $placeholder.bind('mouseup', function() {
-                $placeholder.hide();
+            $placeholder.on('mouseup', function() {
+                placeholderHide();
                 $input.focus();
             });
-            $input.bind('blur change', function() {
+            $input.on('blur change', function() {
                 if (!$input.val()) {
-                    $placeholder.show();
+                    placeholderShow();
                 }
             });
-            $input.bind('focus change', function() {
-                $placeholder.hide();
+            $input.on('focus change', function() {
+                placeholderHide();
             });
+            $input.on('destroyed', function() {
+                $placeholder.remove();
+            });
+            if (!settings.hide) {
+                $input.on('keyup keydown', function() {
+                    setTimeout(function() {
+                        if ($input.val()) {
+                            $placeholder.hide();
+                        } else {
+                            $placeholder.show();
+                        }
+                    }, 0);
+                });
+            }
         });
     };
 })(jQuery);
@@ -72,27 +211,27 @@ function getURLParameter(name) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $input.css({overflow: 'hidden'});
                 $autoResize
                     .css({
+                        position: 'absolute',
                         width: $input.width(),
                         minHeight: $input.height(),
-                        padding: $input.css('padding'),
-                        lineHeight: $input.css('line-height'),
                         font: $input.css('font'),
+                        padding: $input.css('padding'),
                         fontSize: $input.css('font-size'),
-                        position: 'absolute',
                         wordWrap: 'break-word',
+                        overflow: $input.css('overflow'),
+                        lineHeight: $input.css('line-height'),
                         top: -100000
                     })
                 ;
 
-                $input.bind('keyup keydown focus blur', function(e) {
+                $input.on('keyup keydown focus blur', function(e) {
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
                     if (e.type == 'keydown' && e.keyCode == KEY.ENTER && !e.ctrlKey) {
-                        val += '<br/>.'
+                        val += '<br/>.';
                     }
                     $autoResize.html(val);
                     $input.css({
@@ -101,6 +240,9 @@ function getURLParameter(name) {
                             maxHeight ? Math.min(maxHeight, $autoResize.height()) : $autoResize.height()
                          )
                     });
+                });
+                $input.on('destroyed', function() {
+                    $autoResize.remove();
                 });
 
                 $input.keyup();
@@ -111,212 +253,243 @@ function getURLParameter(name) {
 
 // Композиция картинок
 (function($) {
-    $.fn.imageComposition = function(hardPosition) {
-        return this.each(function() {
-            var CLASS_LOADING = 'image-compositing';
-            var VER = 'ver', HOR = 'hor';
-            hardPosition == 'right' ? VER : (hardPosition == 'bottom' ? HOR : false);
+    var PLUGIN_NAME = 'imageComposition';
+    var DATA_KEY = PLUGIN_NAME;
+    var CLASS_LOADING = 'image-compositing';
+    var VER = 'ver';
+    var HOR = 'hor';
 
-            var position = hardPosition;
-            var $wrap = $(this);
-            var $images = $wrap.find('img');
-            var num = $images.length;
-            var imagesPerColumn = 5;
-            var wrap = {
-                el: $wrap,
-                width: 0,
-                height: 0,
-                maxWidth: $wrap.width(),
-                maxHeight: $wrap.height(),
-                type: ''
-            };
-
-            if ($wrap.data('image-compositing')) return;
-
-            $wrap.data('image-compositing', true);
-            $wrap.addClass(CLASS_LOADING);
-            $images.each(function(i, image) {
-                var $img = $(image);
-
-                var img = new Image();
-                img.onload = function() {
-                    if (i == num - 1) {
-                        return onLoadImages();
-                    }
-                };
-                img.src = $img.attr('src');
-            });
-
-            // ======================== //
-            function isHor($image) {
-                var w = $image.width();
-                var h = $image.height();
-                return !!(w / h > 1.1);
-            }
-
-            function isVer($image) {
-                return !isHor($image);
-            }
-
-            function relativeResize(size, type, width) {
-                var w = (type == 'width') ? 'width' : 'height';
-                var h = (type == 'height') ? 'width' : 'height';
-                var coef = size[w] / size[h];
-
-                size[w] = width;
-                size[h] = size[w] / coef;
-
-                return size;
-            }
-
-            function onLoadImages() {
+    var methods = {
+        init: function(hardPosition) {
+            return this.each(function() {
+                var position = (hardPosition == 'right') ? VER : (hardPosition == 'bottom' ? HOR : false);
+                var $wrap = $(this);
+                var $images = $wrap.find('img');
+                var imagesNum = $images.length;
+                var imagesSizes = [];
+                var imagesPerColumn = 5;
                 var $firstImage;
-                var columns = [];
+                var firstImageSize;
+                var firstImageWidth;
+                var firstImageHeight;
+                var options = {};
 
-                if ((num - 1) % imagesPerColumn == 1) {
-                    imagesPerColumn++;
-                } else if ((num - 1) % imagesPerColumn == 2) {
-                    imagesPerColumn--;
-                }
-                if (num == 2 && !hardPosition) {
-                    position = VER;
-                    wrap.width = wrap.maxWidth;
-                    $firstImage = $wrap;
-                }
-
-                $images.each(function(i) {
-                    var $image = $(this);
-
-                    if (i == 0) {
-                        $firstImage = $image;
-                        if (!position && isHor($firstImage)) {
-                            position = HOR;
-                            $firstImage.width(Math.min(wrap.maxWidth, $firstImage.width()));
-                            wrap.width = $firstImage.width();
-                            $wrap.width(wrap.width);
-                        } else {
-                            position = VER;
-                            $firstImage.height(Math.min(wrap.maxHeight, $firstImage.height()));
-                            wrap.height = $firstImage.height();
-                            $wrap.height(wrap.height);
-                        }
-                    } else {
-                        var columnIndex = Math.floor((i - 1) / (position == HOR ? imagesPerColumn : 99));
-                        if (!columns[columnIndex]) columns[columnIndex] = {};
-
-                        var column = columns[columnIndex];
-                        if (!column.images) column.images = [];
-                        if (!column.columnHeight) column.columnHeight = 99999;
-                        if (position == HOR) {
-                            column.columnHeight = Math.min(column.columnHeight, $image.height());
-                        } else {
-                            column.columnHeight = Math.min(column.columnHeight, $image.width());
-                        }
-                        column.images.push($image);
-                    }
-                });
-
-                $(columns).each(function(columnIndex, column) {
-                    $(column.images).each(function(imageIndex, $image) {
-                        if (!column.columnWidth) column.columnWidth = 0;
-                        if (position == HOR) {
-                            $image.height(column.columnHeight);
-                            column.columnWidth += $image.width();
-                        } else {
-                            $image.width(column.columnHeight);
-                            column.columnWidth += $image.height();
-                        }
-                    });
-                });
-
-                var columnsHeight = 0;
-                $(columns).each(function(columnIndex, column) {
-                    var coef = 0;
-                    var columnHeight = 0;
-
-                    if (position == HOR) {
-                        coef = wrap.width / column.columnWidth;
-                    } else {
-                        coef = wrap.height / column.columnWidth;
-                    }
-
-                    $(column.images).each(function(imageIndex, $image) {
-                        var s = {};
-                        if (position == HOR) {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
-
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['height'];
-                        } else {
-                            s = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
-
-                            $image.width(s['width']);
-                            $image.height(s['height']);
-                            columnHeight = s['width'];
-                        }
-                    });
-                    columnsHeight += columnHeight;
-                });
-
-                var coef;
-                if (position == HOR) {
-                    wrap.height = $firstImage.height() + columnsHeight;
-
-                    if (wrap.height > wrap.maxHeight) {
-                        coef = wrap.maxHeight / wrap.height;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'height', ($image.height() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
-                    }
+                if (typeof hardPosition == 'object') {
+                    options = $.extend({
+                        width: $wrap.width(),
+                        height: $wrap.height()
+                    }, hardPosition);
                 } else {
-                    wrap.width = $firstImage.width() + columnsHeight;
-
-                    if (wrap.width > wrap.maxWidth) {
-                        coef = wrap.maxWidth / wrap.width;
-
-                        $images.each(function(i) {
-                            var $image = $(this);
-                            var size = relativeResize(
-                                {
-                                    'width': $image.width(),
-                                    'height': $image.height()
-                                },
-                                'width', ($image.width() * coef));
-                            $image.width(size['width']);
-                            $image.height(size['height']);
-                        });
-                        wrap.width *= coef;
-                        wrap.height *= coef;
+                    options = {
+                        width: $wrap.width(),
+                        height: $wrap.height()
                     }
                 }
 
-                $wrap.width(wrap.width + 2);
-                $wrap.height(wrap.height + 2);
-                $wrap.removeClass(CLASS_LOADING);
-            }
-        });
+                var columns = [];
+                var wrap = {
+                    width: 0,
+                    height: 0,
+                    maxWidth: options.width,
+                    maxHeight: options.height
+                };
+
+                if ($wrap.data(DATA_KEY) || !imagesNum) return;
+
+                $wrap.data(DATA_KEY, true);
+                $wrap.addClass(CLASS_LOADING);
+
+                (function loadImage(i) {
+                    var img = new Image();
+                    var src = $($images[i]).attr('src');
+
+                    img.onload = function() {
+                        imagesSizes.push([img.width, img.height]);
+                        if (i == imagesNum - 1) {
+                            return onLoadImages();
+                        } else {
+                            loadImage(i + 1);
+                        }
+                    };
+                    img.src = src;
+                })(0);
+
+                function onLoadImages() {
+                    if ((imagesNum - 1) % imagesPerColumn == 1) {
+                        imagesPerColumn++;
+                    } else if ((imagesNum - 1) % imagesPerColumn == 2) {
+                        imagesPerColumn--;
+                    }
+                    if (imagesNum == 2 && !position) {
+                        position = VER;
+                    }
+
+                    (function() {
+                        var imageIndex = 0;
+                        var $image = $($images[imageIndex]);
+                        var imageWidth = imagesSizes[imageIndex][0];
+                        var imageHeight = imagesSizes[imageIndex][1];
+
+                        $firstImage = $image;
+                        firstImageWidth = imageWidth;
+                        firstImageHeight = imageHeight;
+                        firstImageSize = [firstImageWidth, firstImageHeight];
+
+                        if (!position) {
+                            position = isHor([firstImageWidth, firstImageHeight]) ? HOR : VER;
+                        }
+
+                        if (position == HOR) {
+                            firstImageSize = relativeResize(firstImageSize, 'width', Math.min(imageWidth, wrap.maxWidth));
+                        } else {
+                            firstImageSize = relativeResize(firstImageSize, 'height', Math.min(imageHeight, wrap.maxHeight));
+                        }
+                        firstImageWidth = firstImageSize[0];
+                        firstImageHeight = firstImageSize[1];
+
+                        wrap.width = firstImageWidth;
+                        wrap.height = firstImageHeight;
+                    })();
+
+                    if (imagesNum <= 1) {
+                        return onComplete();
+                    }
+
+                    (function() {
+                        for (var imageIndex = 1; imageIndex < imagesNum; imageIndex++) {
+                            var $image = $($images[imageIndex]);
+                            var imageSize = imagesSizes[imageIndex];
+                            var imageWidth = imageSize[0];
+                            var imageHeight = imageSize[1];
+                            var columnIndex = Math.floor((imageIndex - 1) / (position == HOR ? imagesPerColumn : 99));
+                            var column = columns[columnIndex];
+
+                            if (!columns[columnIndex]) {
+                                column = columns[columnIndex] = {
+                                    images: [],
+                                    width: 0,
+                                    height: 0
+                                };
+                            }
+
+                            if (position == HOR) {
+                                imageSize = relativeResize(imageSize, 'height', 100);
+                                column.width += imageSize[0];
+                                column.height = imageSize[1];
+                            } else {
+                                imageSize = relativeResize(imageSize, 'width', 100);
+                                column.width = imageSize[0];
+                                column.height += imageSize[1];
+                            }
+                            imageWidth = imageSize[0];
+                            imageHeight = imageSize[1];
+
+                            column.images.push({
+                                el: $image,
+                                width: imageWidth,
+                                height: imageHeight
+                            });
+                        }
+                    })();
+
+                    (function() {
+                        for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                            var column = columns[columnIndex];
+                            var columnSize = [column.width, column.height];
+                            var images = column.images;
+
+                            if (position == HOR) {
+                                columnSize = relativeResize(columnSize, 'width', wrap.width);
+                                wrap.height += columnSize[1];
+                            } else {
+                                columnSize = relativeResize(columnSize, 'height', wrap.height);
+                                wrap.width += columnSize[0];
+                            }
+                            column.width = columnSize[0];
+                            column.height = columnSize[1];
+
+                            for (var imageIndex = 0; imageIndex < images.length; imageIndex++) {
+                                var image = images[imageIndex];
+                                var imageSize = [image.width, image.height];
+
+                                if (position == HOR) {
+                                    imageSize = relativeResize(imageSize, 'height', column.height);
+                                } else {
+                                    imageSize = relativeResize(imageSize, 'width', column.width);
+                                }
+                                image.width = imageSize[0];
+                                image.height = imageSize[1];
+                            }
+                        }
+                    })();
+
+                    (function() {
+                        var coef = 1;
+
+                        if (position == HOR && wrap.height > wrap.maxHeight) {
+                            coef = wrap.maxHeight / wrap.height;
+                        } else if (wrap.width > wrap.maxWidth) {
+                            coef = wrap.maxWidth / wrap.width;
+                        }
+
+                        wrap.width *= coef;
+                        wrap.height *= coef;
+                        firstImageWidth *= coef;
+                        firstImageHeight *= coef;
+
+                        for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+                            var column = columns[columnIndex];
+                            var images = column.images;
+                            column.width *= coef;
+                            column.height *= coef;
+
+                            for (var imageIndex = 0; imageIndex < images.length; imageIndex++) {
+                                var image = images[imageIndex];
+                                var $image = image.el;
+                                image.width *= coef;
+                                image.height *= coef;
+
+                                $image.width(image.width);
+                                $image.height(image.height);
+                            }
+                        }
+
+                        onComplete();
+                    })();
+                }
+
+                function onComplete() {
+                    $wrap.width(wrap.width + 2);
+                    $wrap.height(wrap.height + 2);
+                    $firstImage.width(firstImageWidth);
+                    $firstImage.height(firstImageHeight);
+                    $wrap.removeClass(CLASS_LOADING);
+                }
+            });
+        }
+    };
+
+    function relativeResize(size, type, width) {
+        var w = (type == 'width') ? 0 : 1;
+        var h = (type == 'height') ? 0 : 1;
+        var coef = size[w] / size[h];
+
+        size[w] = width;
+        size[h] = size[w] / coef;
+
+        return size;
+    }
+
+    function isHor(sizes) {
+        return !!(sizes[0] / sizes[1] > 1.1);
+    }
+
+    function isVer($image) {
+        return !isHor($image);
+    }
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        return methods.init.apply(this, arguments);
     };
 })(jQuery);
 
@@ -350,7 +523,6 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $body.data('overflow-y', $body.css('overflow-y'));
             $layout = $('<div/>')
                 .addClass('box-layout')
                 .appendTo($body)
@@ -359,7 +531,6 @@ var Box = (function() {
                         boxesHistory[boxesHistory.length-1].hide();
                         if (!boxesHistory.length) {
                             $(this).hide();
-                            //$body.css({overflowY: $body.data('overflow-y'), paddingRight: 0});
                         }
                     }
                 })
@@ -387,8 +558,8 @@ var Box = (function() {
             closeBtn: options.closeBtn
         })).appendTo($layout).hide();
 
-        if (options.closeBtn) {
-            $box.find('> .title').click(function() {
+        if (params.closeBtn) {
+            $box.find('> .title > .close').click(function() {
                 box.hide();
             });
         }
@@ -396,37 +567,40 @@ var Box = (function() {
         setHTML(options.html);
         setButtons(options.buttons);
 
-        box.$box = $box;
+        box.$el = box.$box = $box;
         box.show = show;
         box.hide = hide;
+        box.remove = remove;
         box.setHTML = setHTML;
         box.setTitle = setTitle;
         box.setButtons = setButtons;
         box.refreshTop = refreshTop;
+        box.visible = false;
 
         function show() {
+            box.visible = true;
             if (boxesHistory.length) {
                 boxesHistory[boxesHistory.length-1].$box.hide();
             }
 
             $box.show();
             $layout.show();
-            //$body.css({overflowY: 'hidden', paddingRight: 17});
             refreshTop();
 
             try {
-                options.onshow.call(box, $box);
-            } catch(e) {
-                console.log(e);
-            }
+                params.onshow.call(box, $box);
+            } catch(e) {}
 
             boxesHistory.push(box);
             return box;
         }
         function hide() {
+            box.visible = false;
             $box.hide();
 
-            options.onhide.call(box, $box);
+            try {
+                params.onhide.call(box, $box);
+            } catch(e) {}
 
             boxesHistory.pop();
             if (boxesHistory.length) {
@@ -436,6 +610,11 @@ var Box = (function() {
             }
 
             return box;
+        }
+        function remove() {
+            if (box.visible) hide();
+            delete boxesCollection[params.id];
+            $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
@@ -482,6 +661,10 @@ var Box = (function() {
 (function($) {
     var PLUGIN_NAME = 'dropdown';
     var DATA_KEY = PLUGIN_NAME;
+    var EVENTS_NAMESPACE = PLUGIN_NAME;
+    var TYPE_NORMAL = 'normal';
+    var TYPE_RADIO = 'radio';
+    var TYPE_CHECKBOX = 'checkbox';
     var CLASS_ACTIVE = 'active';
     var CLASS_MENU = 'ui-dropdown-menu';
     var CLASS_EMPTY_MENU = 'ui-dropdown-menu-empty';
@@ -498,13 +681,14 @@ var Box = (function() {
     var TRIGGER_CHANGE = 'change';
     var TRIGGER_CREATE = 'create';
     var TRIGGER_UPDATE = 'update';
+    var dropdownId = 0;
 
     var methods = {
         init: function(parameters) {
             return this.each(function() {
                 var defaults = {
                     target: $(this), // На какой элемент навесить меню
-                    type: 'normal', // normal, checkbox
+                    type: 'normal', // normal, checkbox, radio
                     width: '', // Ширина меню
                     isShow: false, // Показать при создании
                     addClass: '', // Добавить уникальный класс к меню
@@ -513,12 +697,14 @@ var Box = (function() {
                     openEvent: 'mousedown', // Собитие элемента, при котором открывается меню. click, mousedown
                     closeEvent: 'mousedown', // Собитие document при котором закрывается меню. click, mousedown
                     itemDataKey: 'item', // Ключ привязки данных к пункту меню
-                    emptyMenuText: '', // Текст, когда в меню нет ни одного пункта
+                    emptyMenuText: '', // Текст, который появляется, когда в меню нет ни одного пункта
                     data: [{}], // Список пунктов. Пример: {title: '', icon: '', isActive: true, anyParameter: {}}
-                    // На все события можно подписаться по имени события. Пример: $dropdown.bind('change', callback)
+                    // На все события можно подписаться по имени события. Пример: $dropdown.on('change', callback)
                     oncreate: function() {},
                     onupdate: function() {},
                     onchange: function() {},
+                    onselect: function() {},
+                    onunselect: function() {},
                     onopen: function() {},
                     onclose: function() {}
                 };
@@ -532,71 +718,7 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    $(window).resize(function() {
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            $el.dropdown('refreshPosition');
-                        }
-                    });
-                    $(document).bind(options.closeEvent, function(e) {
-                        var $menu = $el.dropdown('getMenu');
-                        $el.dropdown('close');
-                        runCallback(options.onclose, $el, $menu);
-                    });
-                    $(document).bind('keydown', function(e) {
-                        var $menu = $el.dropdown('getMenu');
-                        if ($menu.is(':visible')) {
-                            var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-
-                            switch(e.keyCode) {
-                                case KEY.UP:
-                                case KEY.DOWN:
-                                    var $hoverItem;
-                                    if (e.keyCode == KEY.UP) {
-                                        $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
-                                    } else if (e.keyCode == KEY.DOWN) {
-                                        $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
-                                    }
-                                    if (!$hoveringItem.length || !$hoverItem.length) {
-                                        if (e.keyCode == KEY.UP) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
-                                        } else if (e.keyCode == KEY.DOWN) {
-                                            $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
-                                        }
-                                    }
-
-                                    if ($hoverItem.length) {
-                                        $hoveringItem.removeClass(CLASS_ITEM_HOVER);
-                                        $hoverItem.addClass(CLASS_ITEM_HOVER);
-                                        var positionTop = $hoverItem.position().top;
-                                        var scrollTop = $menu.scrollTop() + positionTop;
-                                        if (positionTop + $hoverItem.height() > $menu.height()) {
-                                            $menu.scrollTop(scrollTop);
-                                        } else if (positionTop < 0) {
-                                            $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
-                                        }
-                                        return false;
-                                    }
-                                break;
-                                case KEY.TAB:
-                                    $el.dropdown('close');
-                                    return true;
-                                break;
-                                case KEY.ENTER:
-                                    if ($hoveringItem.length) {
-                                        select($hoveringItem);
-                                    }
-                                    $el.dropdown('close');
-                                    return false;
-                                break;
-                                case KEY.ESC:
-                                    $el.dropdown('close');
-                                    return false;
-                                break;
-                            }
-                        }
-                    });
-                    $el.bind(options.openEvent, function(e) {
+                    $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
                         var $menu = $el.dropdown('getMenu');
@@ -607,82 +729,35 @@ var Box = (function() {
                             $el.dropdown('close');
                         }
                     });
+                    $el.on('destroyed', function() {
+                        $el.dropdown('getMenu').remove();
+                    });
                 }
 
                 if (!$.isArray(options.data)) options.data = [];
-                if (options.data.length || !options.emptyMenuText) {
-                    $(options.data).each(function(i, item) {
-                        var $item = $('<div/>')
-                            .text(item.title)
-                            .addClass(CLASS_ITEM)
-                            .attr('data-id', item.id)
-                            .data(options.itemDataKey, item)
-                            .appendTo($menu)
-                        ;
-                        if (item.icon) {
-                            var $icon = $('<div><img src="' + item.icon + '" /></div>');
-                            $item.append($icon);
-                            if (options.iconPosition == 'left') {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_LEFT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
-                            } else {
-                                $icon.attr({class: CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
-                                $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
-                            }
-                        }
-                        if (item.isActive) {
-                            $item.addClass(CLASS_ITEM_ACTIVE);
-                        }
-                        $item.hover(function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).addClass(CLASS_ITEM_HOVER);
-                        }, function() {
-                            var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
-                            $activeItem.removeClass(CLASS_ITEM_HOVER);
-                            $(this).removeClass(CLASS_ITEM_HOVER);
-                        });
-                    });
-                } else {
-                    $('<div/>')
-                        .text(options.emptyMenuText)
-                        .addClass(CLASS_EMPTY_MENU)
-                        .appendTo($menu)
-                    ;
-                }
 
                 $menu.delegate('.' + CLASS_ITEM, 'mouseup', function(e) {
                     if (e.originalEvent && e.button != 0) return;
-                    $el.dropdown('close');
-                    select($(this));
+                    $el.dropdown('select', $(this));
                 });
-                $menu.bind(options.openEvent, function(e) {
+                $menu.on(options.openEvent, function(e) {
                     e.stopPropagation();
                 });
-
-                function select($item) {
-                    var data = $item.data(options.itemDataKey);
-                    if (options.type == 'checkbox') {
-                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
-                        $item.addClass(CLASS_ITEM_ACTIVE);
-                    }
-                    runCallback(options.onchange, $el, data);
-                    $el.trigger(TRIGGER_CHANGE);
-                }
+                $menu.hide();
 
                 $el.data(DATA_KEY, {
+                    id: dropdownId++,
                     $el: $el,
                     $menu: $menu,
                     $target: $target,
                     options: options
                 });
 
-                if (options.isShow && $el.is(':visible')) {
-                    $el.dropdown('open', true);
-                } else {
-                    $el.dropdown('close', true);
-                }
+                $el.dropdown('setItems', options.data);
 
+                if (options.isShow && $el.is(':visible')) {
+                    $el.dropdown('open');
+                }
                 if (isUpdate) {
                     runCallback(options.onupdate, $el);
                     $el.trigger(TRIGGER_UPDATE);
@@ -692,11 +767,143 @@ var Box = (function() {
                 }
             });
         },
-        getMenu: function() {
-            return this.data(DATA_KEY).$menu;
+        select: function($item) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var itemData = $item.data(options.itemDataKey);
+                switch(options.type) {
+                    case TYPE_RADIO:
+                        $menu.find('.' + CLASS_ITEM).removeClass(CLASS_ITEM_ACTIVE);
+                        $item.addClass(CLASS_ITEM_ACTIVE);
+                    break;
+                    case TYPE_CHECKBOX:
+                        $item.toggleClass(CLASS_ITEM_ACTIVE);
+                    break;
+                }
+                $el.dropdown('close');
+                run(options.onchange, $el, itemData);
+                run(($item.hasClass(CLASS_ITEM_ACTIVE) ? options.onselect : options.onunselect), $el, itemData);
+                $el.trigger(TRIGGER_CHANGE);
+            });
         },
-        getTarget: function() {
-            return this.data(DATA_KEY).$target;
+        open: function(notTrigger) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $target = data.$target;
+                var dropdownId = data.id;
+                var nameSpace = EVENTS_NAMESPACE + dropdownId;
+
+                if (!options.data.length && !options.emptyMenuText) {
+                    return;
+                }
+
+                $menu.css({
+                    width: options.width || $target.outerWidth() - 2
+                });
+
+                $el.dropdown('refreshPosition');
+                $menu.show();
+
+                $(window).on('resize.' + nameSpace + ' scroll.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        $el.dropdown('refreshPosition');
+                    }
+                });
+                $(document).on(options.closeEvent + '.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(options.closeEvent + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    $el.dropdown('close');
+                    run(options.onclose, $el, $menu);
+                });
+                $(document).on('keydown.' + nameSpace, function(e) {
+                    if (!$el.data(DATA_KEY)) return $(this).off(e.type + '.' + nameSpace);
+                    var $menu = $el.dropdown('getMenu');
+                    if ($menu.is(':visible')) {
+                        var $hoveringItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+
+                        switch(e.keyCode) {
+                            case KEY.UP:
+                            case KEY.DOWN:
+                                var $hoverItem;
+                                if (e.keyCode == KEY.UP) {
+                                    $hoverItem = $hoveringItem.prev('.' + CLASS_ITEM);
+                                } else if (e.keyCode == KEY.DOWN) {
+                                    $hoverItem = $hoveringItem.next('.' + CLASS_ITEM);
+                                }
+                                if (!$hoveringItem.length || !$hoverItem.length) {
+                                    if (e.keyCode == KEY.UP) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':last');
+                                    } else if (e.keyCode == KEY.DOWN) {
+                                        $hoverItem = $menu.find('.' + CLASS_ITEM + ':first');
+                                    }
+                                }
+
+                                if ($hoverItem.length) {
+                                    $hoveringItem.removeClass(CLASS_ITEM_HOVER);
+                                    $hoverItem.addClass(CLASS_ITEM_HOVER);
+                                    var positionTop = $hoverItem.position().top;
+                                    var scrollTop = $menu.scrollTop() + positionTop;
+                                    if (positionTop + $hoverItem.height() > $menu.height()) {
+                                        $menu.scrollTop(scrollTop);
+                                    } else if (positionTop < 0) {
+                                        $menu.scrollTop(scrollTop - $menu.outerHeight() + $hoverItem.outerHeight());
+                                    }
+                                    return false;
+                                }
+                            break;
+                            case KEY.TAB:
+                                $el.dropdown('close');
+                                return true;
+                            break;
+                            case KEY.ENTER:
+                                if ($hoveringItem.length) {
+                                    $el.dropdown('select', $hoveringItem);
+                                }
+                                return false;
+                            break;
+                            case KEY.ESC:
+                                $el.dropdown('close');
+                                return false;
+                            break;
+                        }
+                    }
+                });
+
+                if (!notTrigger) {
+                    run(options.onopen, $el, $menu);
+                    $el.trigger(TRIGGER_OPEN);
+                }
+            });
+        },
+        close: function(notTrigger) {
+            var $el = $(this);
+            var data = $el.data(DATA_KEY);
+            var options = data.options;
+            var $menu = data.$menu;
+            var $target = data.$target;
+            var dropdownId = data.id;
+            var nameSpace = EVENTS_NAMESPACE + dropdownId;
+
+            $target.removeClass(CLASS_ACTIVE);
+            $menu.hide();
+
+            $(window).off('resize.' + nameSpace);
+            $(window).off('scroll.' + nameSpace);
+            $(document).off(options.closeEvent + '.' + nameSpace);
+            $(document).off('keydown.' + nameSpace);
+
+            if (!notTrigger) {
+                run(options.onclose, $el, $menu);
+                $el.trigger(TRIGGER_CLOSE);
+            }
         },
         refreshPosition: function() {
             return this.each(function() {
@@ -714,6 +921,12 @@ var Box = (function() {
                 if (options.position == 'right') {
                     offsetLeft += ($target.width() - $menu.width())
                 }
+                if (options.position == 'top') {
+                    offsetTop -= $menu.outerHeight()
+                        + $el.outerHeight()
+                        + (parseFloat($menu.css('margin-top')) * 2)
+                        - (parseFloat($menu.css('margin-bottom')) * 2);
+                }
                 if (isFixed) {
                     offsetTop -= $(document).scrollTop();
                     offsetLeft -= $(document).scrollLeft();
@@ -725,41 +938,72 @@ var Box = (function() {
                 });
             });
         },
-        open: function(notTrigger) {
+        getMenu: function() {
+            return this.data(DATA_KEY).$menu;
+        },
+        getTarget: function() {
+            return this.data(DATA_KEY).$target;
+        },
+        getItem: function(id) {
+            return this.data(DATA_KEY).$menu.find('.' + CLASS_ITEM + '[data-id="' + id + '"]');
+        },
+        setItems: function(dataItems) {
             return this.each(function() {
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 var $menu = data.$menu;
-                var $target = data.$target;
-
-                $menu.css({
-                    width: options.width || $target.outerWidth() - 2
-                });
-
-                $el.dropdown('refreshPosition');
-                $menu.show();
-
-                if (notTrigger) {
-                    runCallback(options.onopen, $el, $menu);
-                    $el.trigger(TRIGGER_OPEN);
+                options.data = dataItems;
+                if (options.data.length || !options.emptyMenuText) {
+                    $.each(options.data, function(i, item) {
+                        $el.dropdown('appendItem', item);
+                    });
+                } else {
+                    var $emptyItem = $('<div/>')
+                        .text(options.emptyMenuText)
+                        .addClass(CLASS_EMPTY_MENU)
+                    ;
+                    $menu.html($emptyItem);
                 }
             });
         },
-        close: function(notTrigger) {
-            var $el = $(this);
-            var data = $el.data(DATA_KEY);
-            var options = data.options;
-            var $menu = data.$menu;
-            var $target = data.$target;
-
-            $target.removeClass(CLASS_ACTIVE);
-            $menu.hide();
-
-            if (notTrigger) {
-                runCallback(options.onclose, $el, $menu);
-                $el.trigger(TRIGGER_CLOSE);
-            }
+        appendItem: function(item) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                var $menu = data.$menu;
+                var $item = $('<div/>')
+                    .text(item.title)
+                    .attr('data-id', item.id)
+                    .addClass(CLASS_ITEM)
+                    .data(options.itemDataKey, item)
+                    .appendTo($menu)
+                ;
+                if (item.icon) {
+                    var $icon = $('<div><img src="' + item.icon + '" /></div>');
+                    $item.append($icon);
+                    if (options.iconPosition == 'left') {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_LEFT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_LEFT);
+                    } else {
+                        $icon.attr({'class': CLASS_ICON + ' ' + CLASS_ICON_RIGHT});
+                        $item.addClass(CLASS_ITEM_WITH_ICON_RIGHT);
+                    }
+                }
+                if (item.isActive) {
+                    $item.addClass(CLASS_ITEM_ACTIVE);
+                }
+                $item.hover(function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).addClass(CLASS_ITEM_HOVER);
+                }, function() {
+                    var $activeItem = $menu.find('.' + CLASS_ITEM + '.' + CLASS_ITEM_HOVER);
+                    $activeItem.removeClass(CLASS_ITEM_HOVER);
+                    $(this).removeClass(CLASS_ITEM_HOVER);
+                });
+            });
         }
     };
 
@@ -787,19 +1031,26 @@ var Box = (function() {
     var methods = {
         init: function(params) {
             return this.each(function() {
+                var t = this;
+                var $el = $(this);
                 var defaults = {
                     openEvent: 'mousedown',
-                    emptyMenuText: 'Ничего не найдено'
+                    notFoundText: 'Ничего не найдено',
+                    caseSensitive: false,
+                    data: [],
+                    getValue: function() {
+                        return $el.val();
+                    }
                 };
                 var options = $.extend(defaults, params);
-                var $el = $(this);
-                var defData = options.data.slice(0);
                 var searchTimeout;
+                options.notFoundText = options.emptyMenuText;
+                options.defData = options.data.slice(0);
 
                 $el.dropdown(options);
 
                 if (!$el.data(DATA_KEY)) {
-                    $el.bind('keyup', function(e) {
+                    $el.on('keyup', function(e) {
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -816,14 +1067,26 @@ var Box = (function() {
                         }
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            $el.dropdown($.extend(options, {
-                                isShow: $el.is(':focus'),
-                                data: !$el.val() ? defData : $.grep(defData, function(n, i) {
-                                    var str = $.trim(n.title).toLowerCase().split('ё').join('е');
-                                    var searchStr = $.trim($el.val()).toLowerCase().split('ё').join('е');
-                                    return !!(str.indexOf(searchStr) !== -1);
-                                })
-                            }));
+                            var elVal = options.getValue.apply(t) || '';
+                            var defData = options.defData;
+                            var data = !elVal ? defData : $.grep(defData, function(n, i) {
+                                var str = $.trim(n.title).split('ё').join('е');
+                                var searchStr = $.trim(elVal).split('ё').join('е');
+                                if (!options.caseSensitive) {
+                                    str = str.toLowerCase();
+                                    searchStr = searchStr.toLowerCase();
+                                }
+                                return !!(str.indexOf(searchStr) !== -1);
+                            });
+                            if (data.length || options.emptyMenuText) {
+                                $el.dropdown($.extend(options, {
+                                    isShow: $el.is(':focus'),
+                                    data: data,
+                                    emptyMenuText: options.notFoundText
+                                }));
+                            } else {
+                                $el.dropdown('close');
+                            }
                         }, 0);
                     });
 
@@ -832,6 +1095,17 @@ var Box = (function() {
                         options: options
                     });
                 }
+            });
+        },
+
+        setItems: function(dataItems) {
+            return this.each(function() {
+                var $el = $(this);
+                var data = $el.data(DATA_KEY);
+                var options = data.options;
+                options.defData = dataItems;
+
+                $el.dropdown('setItems', dataItems);
             });
         }
     };
@@ -870,7 +1144,7 @@ var Box = (function() {
                     border: $el.css('border'),
                     margin: $el.css('margin'),
                     background: $el.css('background'),
-                    width: $el.outerWidth() - (parseInt($el.css('border-width')) * 2)
+                    width: $el.outerWidth() - (intval($el.css('border-width')) * 2)
                 }));
 
                 $el.css({
@@ -887,41 +1161,42 @@ var Box = (function() {
                     tags: {}
                 });
 
-                runCallback(options.oncreate, $el);
+                refreshPadding($el);
+                run(options.oncreate, $el);
             });
         },
-        addTag: function(id, params) {
+        addTag: function(params) {
             return this.each(function() {
+                var id = params.id;
                 var $el = $(this);
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 var $wrap = data.$wrap;
                 var $tag = $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']');
+                var isAlready = !!$tag.length;
 
-                if ($tag.length) {
+                if (isAlready) {
                     $tag.remove();
                 }
 
-                $tag = $(
-                    '<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
-                        '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
-                        '<span class="' + CLASS_TAG_DELETE + '"></span>' +
-                    '</span>')
-                ;
+                $tag = $('<span data-id="' + id + '" class="' + CLASS_TAG + '">' +
+                            '<span class="' + CLASS_TAG_TEXT + '">' + params.title + '</span>' +
+                            '<span class="' + CLASS_TAG_DELETE + '"></span>' +
+                        '</span>');
 
                 $tag.find('.delete').click(function() {
-                        $tag.remove();
-                        refreshPadding($el);
-
-                        runCallback(options.onremove, $el, id);
-                    })
-                ;
+                    $tag.remove();
+                    refreshPadding($el);
+                    run(options.onremove, $el, id);
+                });
 
                 $el.before($tag);
                 $el.data(DATA_KEY, data);
                 refreshPadding($el);
 
-                runCallback(options.onadd, $el, params);
+                if (!isAlready) {
+                    run(options.onadd, $el, params);
+                }
             });
         },
         removeTag: function(id) {
@@ -933,8 +1208,7 @@ var Box = (function() {
 
                 $wrap.find('.' + CLASS_TAG + '[data-id=' + id + ']').remove();
                 refreshPadding($el);
-
-                runCallback(options.onremove, $el, id);
+                run(options.onremove, $el, id);
             });
         },
         removeLastTag: function() {
@@ -946,8 +1220,7 @@ var Box = (function() {
 
             $tag.remove();
             refreshPadding($el);
-
-            runCallback(options.onremove, $el, $tag.data('id'));
+            run(options.onremove, $el, $tag.data('id'));
         }
     };
 
@@ -960,7 +1233,7 @@ var Box = (function() {
         var width = $wrap.width() - parseInt($el.css('padding')) * 2;
 
         $el.css({
-            width: (width - left) < 40 ? width : (width - left)
+            width: (width - left) < 40 ? width : (width - left - 1)
         });
     }
 
@@ -981,7 +1254,7 @@ var Box = (function() {
     };
 })(jQuery);
 
-/* Счетчики */
+// Счетчики
 (function($) {
     var PLUGIN_NAME = 'counter';
     var DATA_KEY = PLUGIN_NAME;
@@ -1012,13 +1285,16 @@ var Box = (function() {
                 var data = $el.data(DATA_KEY);
                 var options = data.options;
                 num = intval(num);
+                if (options.nonNegative && num < 0) {
+                    num = 0;
+                }
 
                 $el.html(options.prefix + num);
 
-                if (!num || (num < 0 && options.nonNegative)) {
-                    $el.css('visibility', 'hidden');
+                if (num) {
+                    $el.show();
                 } else {
-                    $el.css('visibility', 'visible');
+                    $el.hide();
                 }
 
                 $el.data(DATA_KEY, $.extend(data, {
@@ -1052,3 +1328,104 @@ var Box = (function() {
         }
     };
 })(jQuery);
+
+// Запоминает введенный текст и вставляет при обновлении страницы
+(function($) {
+    var PLUGIN_NAME = 'inputMemory';
+
+    var methods = {
+        init: function(memoryKey) {
+            return this.each(function() {
+                if (!window.localStorage) return;
+
+                var $input = $(this);
+                var inputValue = $input.val();
+                var storageValue = localStorage.getItem(memoryKey);
+
+                if (storageValue) {
+                    $input.val(storageValue);
+                    $input.selectRange(storageValue.length, storageValue.length);
+                } else {
+                    localStorage.setItem(memoryKey, inputValue);
+                }
+
+                $input.on('keydown keyup keypress change blur', function() {
+                    if (inputValue != $input.val()) {
+                        inputValue = $input.val();
+                        localStorage.setItem(memoryKey, inputValue);
+                    }
+                });
+            });
+        }
+    };
+
+    $.fn[PLUGIN_NAME] = function(method) {
+        return methods.init.apply(this, arguments);
+    };
+})(jQuery);
+
+/**
+ * Templating
+ */
+var tmpl = (function($) {
+    var cache = {};
+    var format = function(str) {
+        return str ? str
+            .replace(/[\r\t\n]/g, ' ')
+            .split('<?').join('\t')
+            .split("'").join("\\'")
+            .replace(/\t=(.*?)\?>/g, "',$1,'")
+            .split('?>').join("p.push('")
+            .split('\t').join("');")
+            .split('\r').join("\\'") : str;
+    };
+    var tmpl = function(str, data) {
+        try {
+            var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
+                ? function() {
+                return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
+            }
+                : (new Function('obj',
+                'var p=[],' +
+                    'print=function(){p.push.apply(p,arguments)},' +
+                    'isset=function(v){return !!obj[v]},' +
+                    'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
+                    "with(obj){p.push('" + format(str) + "');} return p.join('');"
+            ));
+            return (cache[str] = fn(data || {}));
+        }
+        catch(e) {
+            if (window.console && console.log) console.log(format(str));
+            throw e;
+        }
+    };
+
+    return tmpl;
+})(jQuery);
+
+var BOX_LAYOUT =
+'<div  class="box-layout"></div>';
+
+var BOX_WRAP =
+'<div class="box-wrap">' +
+    '<? if (isset("title")) { ?>' +
+        '<div class="title">' +
+            '<span class="text"><?=title?></span>' +
+            '<? if (isset("closeBtn")) { ?>' +
+                '<div class="close"></div>' +
+            '<? } ?>' +
+        '</div>' +
+    '<? } ?>' +
+    '<div class="body clear-fix"><?=body?></div>' +
+    '<? if (isset("buttons") && buttons.length) { ?>' +
+        '<div class="actions-wrap">' +
+            '<div class="actions"></div>' +
+        '</div>' +
+    '<? } ?>' +
+'</div>';
+
+var BOX_ACTION =
+'<button class="action button<?=isset("isWhite") ? " white" : ""?>"><?=label?></button>';
+
+var BOX_LOADING =
+'<div class="box-loading" style="<?=isset("height") ? "min-height: " + height + "px" : ""?>"></div>';

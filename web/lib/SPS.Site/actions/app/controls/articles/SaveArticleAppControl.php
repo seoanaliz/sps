@@ -35,7 +35,7 @@
 
             if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
                 $result['message'] = 'emptyTargetFeedId';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
@@ -50,13 +50,13 @@
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
-            $articleRecord->content = $text;
+            $articleRecord->content = mb_substr($text, 0, 4100);
             $articleRecord->likes = 0;
             $articleRecord->photos = $this->getPhotos();
 
             if (empty($articleRecord->content) && empty($articleRecord->photos)) {
                 $result['message'] = 'emptyArticle';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 

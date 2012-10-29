@@ -24,12 +24,13 @@
             $sql = <<<eof
                 SELECT DISTINCT "targetFeedId"
                 FROM "getArticles"
-                WHERE "sourceFeedId" = -1
+                WHERE "sourceFeedId" = @sourceFeedId
                 AND "authorId" = @authorId
                 GROUP BY "targetFeedId"
 eof;
             $cmd = new SqlCommand($sql, ConnectionFactory::Get());
             $cmd->SetInteger('@authorId', $author->authorId);
+            $cmd->SetInteger('@sourceFeedId', SourceFeedUtility::FakeSourceAuthors);
             $ds = $cmd->Execute();
             while ($ds->Next()) {
                 $targetFeedIdsWithPosts[] = $ds->GetInteger('targetFeedId');
@@ -42,8 +43,9 @@ eof;
             Response::setArray( 'targetFeeds', $targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
             Response::setArray( 'targetFeedIdsWithPosts', $targetFeedIdsWithPosts );
-            Response::setInteger( 'authorCounter', $authorCounter );
+            Response::setArray( 'authorCounter', $authorCounter );
             Response::setArray( 'targetCounters', $targetCounters );
+            Response::setString('tabType', Session::getString( 'gaal_tabType' ));
         }
     }
 ?>

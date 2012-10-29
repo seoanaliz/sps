@@ -1,5 +1,5 @@
 <?php
-   
+
     class ParserVkontakte {
 
         private $page_adr;
@@ -16,6 +16,10 @@
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
+        /**
+         * Максимальное количество постов, для которых можно запросить лайки
+         */
+        const MAX_POST_LIKE_COUNT = 90;
 
         public function __construct($public_id = '')
         {
@@ -38,7 +42,6 @@
         //      name        :   имя/название паблика (паблик может не иметь названия)
         //      short_name  :   короткий адрес(берется из ссылки, то есть может быть вида id234242, vasyapupkin...)
         //      если страница удалена, вернет false. при проблемах с закачкой - exception
-
         public function get_info($url)
         {
             if (self::TESTING) echo '<br>get info'.$url . '<br>';
@@ -64,7 +67,7 @@
 
                 return array(
                     'type'      =>  'id',
-                    'id'        =>  $oid[1],
+                    'id'        =>  !empty($oid[1]) ? $oid[1] : null,
                     'avatara'   =>  $ava,
                     'name'      =>  $name,
                     'short_name' =>     $short_name
@@ -92,7 +95,7 @@
                 $short_name = str_replace('/', '', $short_name);
                 $short_name = str_replace('\\', '', $short_name);
                 preg_match('/(?s)id=\"public_followers\".*?span class=\"fl_r\".?>.*?(\d.*?)<\/div>/', $a, $population);
-                $population = str_replace('<span class="num_delim"> </span>', '', $population[1]);
+                $population = str_replace('<span class="num_delim"> </span>', '', (!empty($population[1]) ? $population[1] : ''));
                 $population =  (int)$population;
                 return array(
                     'type'       =>     $type,
@@ -105,7 +108,6 @@
             }
             return false;
         }
-
 
         //возвращает Json с постами. поля:
         //likes - относительные лайки. возможные значения:
@@ -143,24 +145,32 @@
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
 
-        public function get_posts($page_number, $trig_inc = false)
+        public function get_posts_nv($page_number, $trig_inc = false)
         {
             $offset = $page_number * self::PAGE_SIZE;
             if (!isset($this->count))
                 $this->get_posts_count();
+
+            echo 'offset<br>';
+            print_r( $offset );
+            echo "offset<br>
+            $this->count";
 
             if ($offset > $this->count) {
                 throw new Exception("wall's end");
             }
 
             $a = $this->get_page($this->page_adr."?offset=$offset&own=1");
-
             if (!$a) {
                 throw new Exception('Не удалось скачать страницу '.$this->page_adr."?offset=$offset");
             }
-
-            $document = phpQuery::newDocument($a);
-            $hentry = $document->find('div.post_info');
+//            file_put_contents('1.txt', $a );
+            preg_match_all('/(?s)<body.*?>(.*)<script id/', $a, $matches);
+            $a = $matches[1][0] . '</div></div>';
+            file_put_contents('1.txt', $a );
+            $document = phpQuery::newDocument( $a );
+            echo '<br>1';
+            $hentry = $document->find('div.post');
 
             //разбираем страницу по постам
             $posts = array();
@@ -180,7 +190,7 @@
 
                 //контактовский номер поста
                 $id = $pq->find('div.reply_link_wrap')->attr('id');
-                if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
+                             if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
                     ' не удалось получить id поста со стены ' . $this->page_adr);
                 $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
 
@@ -335,7 +345,6 @@
                         $posts[$t]['link'] = $link;
                         $posts[$t]['doc'] = $doc;
                     }
-
                 }
 
                 //получение описания каждой фотки, крайне сомнительная вещь
@@ -378,11 +387,101 @@
             }
         }
 
+        public function get_posts( $page_number )
+        {
+            $offset = $page_number * self::PAGE_SIZE;
+            $params = array(
+                'owner_id'  =>  '-' . $this->page_id,
+                'offset'    =>  $offset,
+                'count'     =>  20,
+                'fileter'   =>  'owner'
+            );
+
+            $res = VkHelper::api_request( 'wall.get', $params );
+            unset( $res[0] );
+            $posts = $this->post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+
+            return $posts;
+        }
+
+        private function post_conv( $posts, $trig_inc = false )
+        {
+            $result_posts_array = array();
+
+            foreach( $posts as $post ) {
+                $id         =   $this->page_id . '_' . $post->id;
+                $likes      =   $post->likes->count;
+                $likes_tr   =   $likes;
+                $retweet    =   $post->reposts->count;
+                $time       =   $post->date;
+                $text       =   TextHelper::fromUTF8( $this->remove_tags( $post->text ));
+                $maps = '';
+                $doc  = '';
+                $link = '';
+                $poll = '';
+                $photo = array();
+                $video = array();
+                $audio = array();
+                $text_links = array();
+
+                if ( isset( $post->attachments )) {
+                    foreach( $post->attachments as $attachment )
+                    {
+
+                        switch( $attachment->type ) {
+                            case 'photo':
+                                 $photo[] =
+                                     array(
+                                         'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
+                                         'desc' =>  '',
+                                         'url'  =>  isset( $attachment->photo->src_big ) ?
+                                                                    $attachment->photo->src_big :
+                                                                    $attachment->photo->src
+                                     );
+                                 break;
+                            case 'graffiti':
+                                 $photo[] =
+                                     array(
+                                         'id'   =>  $attachment->graffiti->owner_id . '_' . $attachment->graffiti->gid,
+                                         'desc' =>  '',
+                                         'url'  =>  isset( $attachment->graffiti->big_src ) ?
+                                                                    $attachment->graffiti->big_src :
+                                                                    $attachment->graffiti->src
+                                     );
+                                 break;
+                            case 'audio':
+                                $audio[] = array( $attachment->audio->owner_id . '_' . $attachment->audio->aid );
+                                break;
+                            case 'video':
+                                $video[] = array( $attachment->video->owner_id . '_' . $attachment->video->vid );
+                                break;
+                            case 'link':
+                                $link =  $attachment->link->url;
+                                break;
+                            case 'poll':
+                                $poll = $attachment->poll->poll_id;
+                                 break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                $result_posts_array[] = array('id'      => $id,      'likes' => $likes, 'likes_tr' => $likes_tr,
+                                              'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
+                                              'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
+                                              'music'   => $audio,   'video' => $video, 'link'     => $link,
+                                              'poll'    => $poll,    'text_links'   =>  $text_links  );
+            }
+            return $result_posts_array;
+        }
+
         private function get_average(array &$a)
         {
             $q = count($a);
             $sum = 0;
-            foreach($a as $post){
+            foreach( $a as $post ){
 
                 if (substr_count($post['likes'], '%') > 0 ||
                     substr_count($post['likes'], '+') > 0 ||
@@ -393,9 +492,8 @@
                     $sum += $post['likes'];
             }
             //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
-            return ($sum/$q);
+            return ( $sum / $q );
         }
-
 
         private function kill_attritions($array)
         {
@@ -477,7 +575,7 @@
 //                        $array[$i] = $array[$i]['id'];
 //                    else
 //                         unset($array[$i]);
-                elseif ($array[$i]['likes_tr'] < LIKES_LIMIT)
+                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT)
                     $array[$i]['likes'] = '-';
             }
 
@@ -486,39 +584,20 @@
 
         }
 
-        public function get_albums()
-        {
-
-        }
 
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
         public function get_posts_count($wall_url = '')
         {
-            if ($wall_url == ''){
-                $wall_url = $this->page_adr;
-            }
-
-            $a = $this->get_page($wall_url . '?own=1');
-
-            preg_match('/<div.*?class="summary".*?>(.*?)<\/div/', $a, $matches);
-            $matches = $matches[1];
-            //            echo 'matches : ' . $matches . '<br>';
-            if (    substr_count($matches, 'Нет записей') > 0 ||
-                substr_count($matches, $this->u_w('Нет записей')) > 0)
-                throw new exception("wall's end");
-            $matches = str_replace('<span class="num_delim"> </span>', '', $matches );
-            $count = explode(' ', $matches);
-
-            if (!$count[1] )
-                throw new Exception(__CLASS__.'::' .__FUNCTION__.' не удалось получить количество постов со стены ' . $this->page_adr);
-            $this -> count = $count[1];
-            //            echo "<br>posts: " . ((int)$count[1]). "<br>";
-            //            die();
-            return (int)$count[1];
+            $params = array( 'owner_id' => '-' . $this->page_id,
+                'count'    =>  1,
+                'filter' => 'owner' );
+            $res = VkHelper::api_request( 'wall.get', $params );
+            $this->count = $res[0];
+            return (int) $res[0];
         }
 
-        private function u_w($str)
+        private function u_w( $str )
         {
             return iconv("utf-8", "windows-1251", $str);
         }
@@ -563,7 +642,6 @@
         private function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
-
             $text = str_replace( '&#189;',  "½",    $text );
             $text = str_replace( '&#188;',  "¼",    $text );
             $text = str_replace( '&#190;',  "¾",    $text );
@@ -607,26 +685,18 @@
                         $matches[1] != 'едактировать описание' &&
                         $matches[1] != $this->u_w('Редактировать описание')) {
                         $pic['desc'] =  $matches[1];
-
-
                     }else  $pic['desc'] = '';
                 } else {
                     $pic['desc'] = '';
                 }
                 unset ($desc);
                 unset ($matches);
-
             }
-
-
-
             return true;
         }
 
         public function get_time($date)
         {
-
-            //            echo $date.'<br>';
             //начало сегодняшнего дня (для сегодняшних постов)
             $date = trim($date);
             $da = date("d,m,Y");
@@ -708,31 +778,86 @@
             return $month;
         }
 
-        //$post_id  = idпаблика_idпоста
-        public function get_post_likes($post_id)
+        //$post_ids  = массив idпаблика_idпоста
+        //ограничение - 90 постов
+        public static function get_post_likes( $post_ids )
         {
-            $post_id = trim($post_id, '-');
-
+            $post_ids = implode( ',', $post_ids );
             $params = array(
-                'posts'   =>   '-' . $post_id,
-                'access_token'  =>  $this->vk_access_token
+                'posts'   =>   $post_ids
             );
 
-            $url = self::METH . 'wall.getById';
-            $fwd = $this->qurl_request($url, $params);
-            $fwd = json_decode($fwd);
-            if (!empty ($fwd->error)) {
-                $fwd = $fwd->error;
-                throw new exception("Error in wall.delete : $fwd->error_msg");
+            $res = VkHelper::api_request( 'wall.getById', $params, 0 );
+
+            if ( !empty( $res->error )) {
+                throw new Exception('wall.getById::'.$res->error->error_msg);
             }
 
-            $res = array(
-                'likes'     =>  $fwd->response[0]->likes->count,
-                'reposts'   =>  $fwd->response[0]->reposts->count,
-            );
-            return $res;
-
+            $result = array();
+            foreach( $res as $post ) {
+                $result[ $post->to_id . '_' . $post->id ] = array(
+                      'likes'   =>     $post->likes->count,
+                      'reposts' =>     $post->reposts->count,
+                );
+            }
+            return $result;
         }
 
-    }
-?>
+        public function get_album_as_posts($public_id, $album_id, $limit = false, $offset = false)
+        {
+            $params = array(
+                'gid'       =>  $public_id,
+                'aid'       =>  $album_id,
+            );
+
+            if (is_numeric($limit))    $params['limit'] = $limit;
+            if (is_numeric($offset))    $params['offset'] = $offset;
+
+            $res = VkHelper::api_request( 'photos.get', $params );
+            $query_line = array();
+
+            foreach( $res as $photo )
+            {
+                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+            }
+            $query_line = implode( ',', $query_line );
+            sleep( 0.3 );
+
+            $params = array(
+                'photos'    =>  $query_line,
+                'extended'  =>  1,
+            );
+            $res = VkHelper::api_request( 'photos.getById', $params );
+            $posts = VkAlbums::post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+            return $posts;
+        }
+
+        /**
+         * Возвращает количество фото в альбоме
+         * @param $public_id
+         * @param $album_id
+         * @return int
+         * @throws Exception
+         */
+        public function get_photo_count_in_album($public_id, $album_id)
+        {
+            $params = array(
+                'gid' => $public_id,
+                'aids' => $album_id,
+            );
+
+            $res = VkHelper::api_request('photos.getAlbums', $params);
+
+            if (!empty($res->error)) {
+                throw new Exception('wall.getById::' . $res->error->error_msg);
+            } else {
+               if (count($res)) {
+                   $res = array_pop($res);
+                   return $res->size;
+               } else {
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+               }
+            }
+        }
+}

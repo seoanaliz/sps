@@ -24,16 +24,16 @@
 
             $article = ArticleFactory::GetById(Request::getInteger('id'), array(), array(BaseFactory::WithoutDisabled => false));
 
-            if (empty($article) || $article->sourceFeedId != -1) {
+            if (empty($article) || $article->sourceFeedId != SourceFeedUtility::FakeSourceAuthors) {
                 $result['message'] = 'accessError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             $__editorMode = Response::getBoolean('__editorMode');
             if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
                 $result['message'] = 'accessError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
@@ -52,7 +52,7 @@
             $errors = CommentFactory::Validate($comment);
             if (!empty($errors)) {
                 $result['message'] = 'saveError';
-                echo ObjectHelper::ToJSON($result);
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 

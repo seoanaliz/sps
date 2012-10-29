@@ -22,7 +22,7 @@
             'class'       => 'TargetFeedGrid'
             , 'table'     => 'targetFeedGrids'
             , 'view'      => 'getTargetFeedGrids'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array( 'targetFeeds' )
             , 'fields'    => array(
                 'targetFeedGridId' => array(

@@ -8,20 +8,20 @@
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
-        <action name="WrUnix">
-            <path>daemons/WrUnix</path>
-        </action>
-	    <action name="WrPosts">
-            <path>daemons/WrPosts</path>
-        </action>
-	    <action name="WrPoints">
-            <path>daemons/WrPoints</path>
-        </action>
-        <action name="WrCleaner">
-            <path>daemons/WrCleaner</path>
-        </action>
         <action name="OurAdminsStat">
             <path>daemons/OurAdminsStat</path>
+        </action>
+        <action name="MesCheckUpdates">
+            <path>daemons/MesCheckUpdates</path>
+        </action>
+        <action name="MessageSender">
+            <path>daemons/MessageSender</path>
+        </action>
+        <action name="AlbumUpdate">
+            <path>daemons/AlbumUpdate</path>
+        </action>
+        <action name="PublicsGrowFixer">
+            <path>daemons/PublicsGrowFixer</path>
         </action>
 
     </group>
@@ -56,6 +56,9 @@
             <action name="shareGroup">
                 <path>controls/groups/shareGroup</path>
             </action>
+            <action name="setGroupOrder">
+                <path>controls/groups/setGroupOrder</path>
+            </action>
             <action name="setGroup">
                 <path>controls/groups/setGroup</path>
             </action>
@@ -79,6 +82,15 @@
             <action name="getDialogsList">
                 <path>controls/messager/getDialogsList</path>
             </action>
+            <action name="findTemplate">
+                <path>controls/messager/findTemplate</path>
+            </action>
+            <action name="addTemplate">
+                <path>controls/messager/addTemplate</path>
+            </action>
+            <action name="deleteTemplate">
+                <path>controls/messager/deleteTemplate</path>
+            </action>
             <action name="getDialog">
                 <path>controls/messager/getDialog</path>
             </action>
@@ -88,6 +100,9 @@
             <action name="writeMes">
                 <path>controls/messager/writeMes</path>
             </action>
+            <action name="toggleReadRead">
+                <path>controls/messager/toggleReadRead</path>
+            </action>
             <action name="markMes">
                 <path>controls/messager/markMes</path>
             </action>
@@ -96,6 +111,15 @@
             </action>
             <action name="setStatus">
                 <path>controls/messager/setStatus</path>
+            </action>
+            <action name="watchDog">
+                <path>controls/messager/watchDog</path>
+            </action>
+            <action name="getGroupDialogs">
+                <path>controls/messager/getGroupDialogs</path>
+            </action>
+            <action name="searchDialog">
+                <path>controls/messager/searchDialog</path>
             </action>
         </group>
     </group>

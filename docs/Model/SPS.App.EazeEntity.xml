@@ -293,6 +293,13 @@
           <AttributeParameter Key="controlId" Value="isSent" />
         </Parameters>
       </TemplateAttribute>
+      <TemplateAttribute Name="isQueued" TitleKey="vt.authorEvent.isQueued" Type="HTML_CHECKBOX" CanEdit="false" CanShow="false" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="isQueued" />
+          <AttributeParameter Key="value" Value="isQueued" />
+          <AttributeParameter Key="controlId" Value="isQueued" />
+        </Parameters>
+      </TemplateAttribute>
     </Search>
     <Attributes>
       <TemplateAttribute Name="authorEventId" TitleKey="vt.authorEvent.authorEventId" Type="HTML_INPUT" CanEdit="false" CanShow="false" CanSearch="false">
@@ -332,6 +339,13 @@
           <AttributeParameter Key="name" Value="isSent" />
           <AttributeParameter Key="value" Value="isSent" />
           <AttributeParameter Key="controlId" Value="isSent" />
+        </Parameters>
+      </TemplateAttribute>
+      <TemplateAttribute Name="isQueued" TitleKey="vt.authorEvent.isQueued" TitleValue="isQueued" Type="HTML_CHECKBOX" CanEdit="true" CanShow="true" CanSearch="false">
+        <Parameters>
+          <AttributeParameter Key="name" Value="isQueued" />
+          <AttributeParameter Key="value" Value="isQueued" />
+          <AttributeParameter Key="controlId" Value="isQueued" />
         </Parameters>
       </TemplateAttribute>
     </Attributes>

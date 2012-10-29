@@ -112,6 +112,12 @@
                     AuthorEventUtility::EventQueue($article);
                 }
 
+                AuditUtility::CreateEvent(
+                    'articleQueue'
+                    , 'article'
+                    , $article->articleId
+                    , "Queued by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . ", queueId is " . $articleQueueRecord->articleQueueId);
+
                 $result = array(
                     'success' => true,
                     'id' => $articleQueueRecord->articleQueueId
@@ -121,7 +127,8 @@
                     //блокируем статью, чтобы ее больше никто не пытался отправить
                     $o = new Article();
                     $o->statusId = 2;
-                    ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $article->articleId));
+                    $o->queuedAt = DateTimeWrapper::Now();
+                    ArticleFactory::UpdateByMask($o, array('statusId', 'queuedAt'), array('articleId' => $article->articleId));
 
                     $result['moved'] = true;
                 } else {

@@ -67,8 +67,7 @@
         'js://fe/jquery.maskedinput-1.3.js',
         'js://fe/jquery.multiselect.min.js',
         'js://fe/edit-post.js',
-        'js://fe/main.js',
-        'js://fe/files.js',
+        'js://fe/files.js'
     );
 
     CssHelper::Init( false );
@@ -111,6 +110,6 @@
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
 
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>

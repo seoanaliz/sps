@@ -22,7 +22,7 @@
             'class'       => 'Article'
             , 'table'     => 'articles'
             , 'view'      => 'getArticles'
-            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => 'CanCache' )
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false )
             , 'cacheDeps' => array( 'sourceFeeds' )
             , 'fields'    => array(
                 'articleId' => array(
@@ -37,6 +37,14 @@
                 )
                 ,'createdAt' => array(
                     'name'          => 'createdAt'
+                    , 'type'        => TYPE_DATETIME
+                )
+                ,'queuedAt' => array(
+                    'name'          => 'queuedAt'
+                    , 'type'        => TYPE_DATETIME
+                )
+                ,'sentAt' => array(
+                    'name'          => 'sentAt'
                     , 'type'        => TYPE_DATETIME
                 )
                 ,'externalId' => array(

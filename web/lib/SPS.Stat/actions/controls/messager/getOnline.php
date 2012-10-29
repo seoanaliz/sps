@@ -8,7 +8,7 @@ class getOnline
     {
         error_reporting( 0 );
 
-        $user_id        =   Request::getInteger( 'userId' );
+        $user_id       =   Request::getInteger( 'userId' );
         $dialog_id     =   Request::getInteger( 'dialogId' );
 
         if ( !$user_id || !$dialog_id ) {
@@ -19,7 +19,7 @@ class getOnline
         if ( !$rec_id )
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' ) ) );
 
-        $res = MesDialogs::get_last_activity( $user_id, $rec_id );
+        $res = MesDialogs::get_last_online( $user_id, $rec_id );
         if ( is_array( $res ) )
              die( ObjectHelper::ToJSON( array( 'response' => $res ) ) );
         else

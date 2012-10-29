@@ -1,0 +1,534 @@
+body {
+  overflow-y: scroll;
+}
+#main {
+  width: 1100px;
+  margin: 0 auto;
+}
+#main > #left-column {
+  float: left;
+  width: 800px;
+  border: 1px solid #c4cde0;
+  padding-top: 40px;
+  position: relative;
+}
+#main > #left-column > .header {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  border: 1px solid #fff;
+  border-bottom: 1px solid #dae1e8;
+  background: #f1f1f1;
+  width: 798px;
+}
+#main > #left-column > .header.fixed {
+  position: fixed;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
+  -webkit-transition: box-shadow 0.5s;
+  -moz-transition: box-shadow 0.5s;
+  -o-transition: box-shadow 0.5s;
+  transition: box-shadow 0.5s;
+}
+#main > #left-column > .list {
+  position: relative;
+  -webkit-border-radius: 0 0 3px 3px;
+  -moz-border-radius: 0 0 3px 3px;
+  border-radius: 0 0 3px 3px;
+}
+#main > #left-column > .list:empty {
+  text-align: center;
+  color: #999999;
+  font-size: 16px;
+  height: 400px;
+  background: #ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+}
+#main > #left-column > .list > #list-messages > .messages {
+  padding: 5px 0 110px;
+}
+#main > #left-column > .list > #list-messages > .messages .message.user + .message.user > .left-column .photo,
+#main > #left-column > .list > #list-messages > .messages .message.viewer + .message.viewer > .left-column .photo {
+  display: none;
+}
+#main > #left-column > .list > #list-messages > .messages .message.user + .message.user > .center-column .title,
+#main > #left-column > .list > #list-messages > .messages .message.viewer + .message.viewer > .center-column .title {
+  display: none;
+}
+#main > #left-column > .list > #list-messages > .messages .message {
+  padding: 5px 0;
+}
+#main > #left-column > .list > #list-messages > .messages .message.loading {
+  background: url(http://st0.userapi.com/images/upload.gif) no-repeat 20px center;
+}
+#main > #left-column > .list > #list-messages > .messages .message.new {
+  background-color: #edf1f5;
+}
+#main > #left-column > .list > #list-messages > .messages .message > div {
+  min-height: 1px;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .left-column {
+  width: 15%;
+  float: left;
+  text-align: right;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .left-column > .photo {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .left-column > .photo img {
+  max-width: 100%;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column {
+  width: 70%;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content {
+  margin: 0 10px;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .title {
+  font-weight: bold;
+  margin-bottom: 0.4em;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .text {
+  overflow: hidden;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments {
+  margin: .5em 0;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments img {
+  position: relative;
+  outline: 3px solid #fff;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments img:first-child {
+  z-index: 1;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments .photos {
+  margin: .5em 0;
+  width: 360px;
+  height: 300px;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments .photos img {
+  position: relative;
+  outline: 3px solid #fff;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .center-column > .content .attachments .photos img:first-child {
+  z-index: 1;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .right-column {
+  width: 15%;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .messages .message > .right-column > .date {
+  color: #999999;
+}
+#main > #left-column > .list > #list-messages > .post-message {
+  background-color: #f1f1f1;
+  border-top: 1px solid #dae1e8;
+  padding: 10px 0;
+  position: absolute;
+  bottom: 0;
+  width: 800px;
+  z-index: 1;
+}
+#main > #left-column > .list > #list-messages > .post-message.fixed {
+  position: fixed;
+  box-shadow: 0 -2px 1px rgba(0, 0, 0, 0.1);
+  -webkit-transition: box-shadow 0.5s;
+  -moz-transition: box-shadow 0.5s;
+  -o-transition: box-shadow 0.5s;
+  transition: box-shadow 0.5s;
+}
+#main > #left-column > .list > #list-messages > .post-message > .left-column {
+  width: 15%;
+  float: left;
+  text-align: right;
+}
+#main > #left-column > .list > #list-messages > .post-message > .left-column > .photo {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .left-column > .photo img {
+  max-width: 100%;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column {
+  width: 70%;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column > .content {
+  margin: 0 10px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column > .content > .textarea-wrap {
+  margin-right: 10px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column > .content > .textarea-wrap textarea {
+  width: 100%;
+  min-height: 40px;
+  max-height: 100px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column > .content .actions {
+  margin-top: 10px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .center-column > .content .actions > .link {
+  float: right;
+}
+#main > #left-column > .list > #list-messages > .post-message > .right-column {
+  width: 15%;
+  float: left;
+}
+#main > #left-column > .list > #list-messages > .post-message > .right-column > .photo {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-messages > .post-message > .right-column > .photo img {
+  max-width: 100%;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialogs-block + .dialogs-block,
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog + .dialog {
+  border-top: 1px solid #dae1e8;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog {
+  padding: 10px;
+  cursor: pointer;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog:hover {
+  background: #edf1f5;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog:hover > .history > .from-me.new {
+  background-color: #e1e7ed;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog.new {
+  background-color: #edf1f5;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog.new:hover {
+  background-color: #e1e7ed;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user {
+  width: 25%;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  min-height: 50px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user > .photo {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user > .photo img {
+  max-width: 100%;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user > .info {
+  margin-left: 60px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user > .info > .date,
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .user > .info > .status {
+  font-size: .9em;
+  color: #999999;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history {
+  width: 70%;
+  float: left;
+  overflow: hidden;
+  color: #2b587a;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history > .from-me {
+  padding: 8px;
+  min-height: 34px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history > .from-me.new {
+  background-color: #edf1f5;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history > .from-me > .photo {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history > .from-me > .photo > img {
+  max-width: 100%;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .history > .from-me > .body {
+  margin-left: 44px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions {
+  width: 5%;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  min-height: 50px;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions > .action.icon {
+  position: absolute;
+  padding: .4em;
+  top: 50%;
+  right: 50%;
+  margin-top: -0.8em;
+  margin-right: -0.8em;
+  opacity: .5;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions > .action.icon:hover {
+  opacity: 1;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions > .action.icon.active {
+  opacity: 1;
+  background-color: #587da1;
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions > .action.icon.active.plus {
+  background-image: url('../../images/common/add-white.png');
+}
+#main > #left-column > .list > #list-dialogs > .dialogs .dialog > .actions > .action.icon.active.select {
+  background-image: url('../../images/common/select-white.png');
+}
+#main > #right-column {
+  position: fixed;
+  top: 10px;
+  bottom: 10px;
+  width: 286px;
+  border: 1px solid #c4cde0;
+  margin-left: 812px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+#main > #right-column > .header {
+  border: 1px solid #fff;
+  border-bottom: 1px solid #dae1e8;
+  background: #f1f1f1;
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+}
+#main > #right-column > .list {
+  color: #2b587a;
+  padding: 5px 0;
+  overflow-y: auto;
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  width: 100%;
+}
+#main > #right-column > .list .drag-wrap {
+  position: relative;
+}
+#main > #right-column > .list .item {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+#main > #right-column > .list .item.drag {
+  position: absolute;
+  width: 100%;
+  background-color: #edf1f5;
+  cursor: pointer;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=(70));
+  filter: alpha(opacity = (70));
+  opacity: 0.7;
+}
+#main > #right-column > .list .item > .title {
+  padding: 5px 30px 5px 10px;
+  cursor: pointer;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+#main > #right-column > .list .item > .title:hover {
+  background-color: #edf1f5;
+}
+#main > #right-column > .list .item > .title > .counter {
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -10px;
+  padding: 3px 5px 2px;
+  font-size: 11px;
+  background-color: #e1e7ed;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-transition: opacity 0.2s;
+  -moz-transition: opacity 0.2s;
+  -o-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+}
+#main > #right-column > .list .item > .title > .counter:empty {
+  display: none;
+}
+#main > #right-column > .list .item > .title.active {
+  background-color: #e1e7ed;
+}
+#main > #right-column > .list .item > .title.active > .counter {
+  background-color: #bbc7d3;
+}
+#main > #right-column > .list .item > .title.new > .counter {
+  background-color: #587da1;
+  color: #fff;
+}
+#main > #right-column > .list .item > .title > .icon {
+  position: absolute;
+  right: 0;
+  opacity: 0.5;
+  top: 50%;
+  margin-top: -1em;
+  padding: 0.5em;
+  -webkit-transition: opacity 0.2s;
+  -moz-transition: opacity 0.2s;
+  -o-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+}
+#main > #right-column > .list .item > .title > .icon:hover {
+  opacity: 1;
+}
+.ui-dropdown-add-to-list {
+  margin-top: -0.1em;
+  margin-right: -0.7em;
+}
+.ui-dropdown-add-to-list-tabs,
+.ui-dropdown-add-to-list {
+  border-color: #587da1;
+}
+.ui-dropdown-add-to-list-tabs .ui-dropdown-menu-item,
+.ui-dropdown-add-to-list .ui-dropdown-menu-item {
+  padding: 2px 6px;
+}
+.ui-dropdown-add-to-list-tabs .wrap,
+.ui-dropdown-add-to-list .wrap {
+  margin-right: 8px;
+}
+.ui-dropdown-add-to-list-tabs input,
+.ui-dropdown-add-to-list input {
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+}
+.empty {
+  color: #777;
+  text-align: center;
+  padding: 30% 0;
+  line-height: 0;
+}
+.load {
+  background: #ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+  padding: 30% 0;
+}
+.mini-load {
+  background: #ffffff url(http://st0.userapi.com/images/upload.gif) no-repeat center;
+  padding: 5% 0;
+}
+.scroll-like-mac::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-like-mac::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+.scroll-like-mac:hover::-webkit-scrollbar-thumb,
+.scroll-like-mac:focus::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.4);
+}
+.scroll-like-mac::-webkit-resizer,
+.scroll-like-mac::-webkit-scrollbar-corner,
+.scroll-like-mac::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+.scroll-like-mac:hover::-webkit-resizer,
+.scroll-like-mac:hover::-webkit-scrollbar-corner,
+.scroll-like-mac:hover::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+.box-templates > .title {
+  margin: 7px 0 4px;
+  color: #2B587A;
+  font-size: 1.18em;
+  font-weight: bold;
+}
+.box-templates > .input-wrap {
+  margin-right: 10px;
+  margin-bottom: 7px;
+}
+.box-templates > .input-wrap > input[type="text"],
+.box-templates > .input-wrap > textarea {
+  width: 100%;
+}
+.box-templates > .input-wrap > textarea {
+  height: 50px;
+}
+.tab-bar.messenger .tab .icon {
+  display: none;
+}
+.tab-bar.messenger .tab.selected .icon.online {
+  background-image: url('../../images/im/online.png');
+  display: inline;
+}
+.tab-bar.messenger .tab.selected .icon.offline {
+  background-image: url('../../images/im/offline.png');
+  display: inline;
+}
+.tab-bar.messenger .tab.selected .icon.plus {
+  background-image: url('../../images/common/add-white.png');
+  display: none;
+}
+.tab-bar.messenger .tab.selected .icon.select {
+  background-image: url('../../images/common/select-white.png');
+  display: none;
+}
+.tab-bar.messenger .tab.selected:hover .icon.online {
+  display: none;
+}
+.tab-bar.messenger .tab.selected:hover .icon.offline {
+  display: none;
+}
+.tab-bar.messenger .tab.selected:hover .icon.plus {
+  display: inline;
+}
+.tab-bar.messenger .tab.selected:hover .icon.select {
+  display: inline;
+}

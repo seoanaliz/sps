@@ -8,11 +8,12 @@
            LocaleLoader::Translate( "vt.targetFeed.title" )
             , LocaleLoader::Translate( "vt.common.externalId" )
             , LocaleLoader::Translate( "vt.targetFeed.vkIds" )
+            , LocaleLoader::Translate( "vt.targetFeed.publishers" )
             , LocaleLoader::Translate( "vt.sourceFeed.type" )
             , LocaleLoader::Translate( "vt.targetFeed.statusId" )
         )
         , "colspans"	=> array()
-        , "sorts"		=> array(0 => "title", 1 => "externalId", 3 => "type", 4 => "statusId")
+        , "sorts"		=> array(0 => "title", 1 => "externalId", 4 => "type", 5 => "statusId")
         , "operations"	=> true
         , "allowAdd"	=> true
         , "canPages"	=> TargetFeedFactory::CanPages()
@@ -91,6 +92,20 @@
                             $links = array_map(function($val){
                                 return "<a href='http://vk.com/id$val' target='_blank'>$val</a>";
                             }, explode(',',$object->vkIds));
+
+                            $links = implode(', ', $links);
+                            echo $links;
+                        } else {
+                            ?><span class="status red" title="Нет">Нет</span><?
+                        }
+                    ?>
+                </td>
+                <td class="left">
+                    <?
+                        if(!empty($object->publishers)) {
+                            $links = array_map(function($val){
+                                return "<a href='" . Site::GetWebPath('vt://publishers/edit/' . $val->publisherId) . "' target='_blank'>" . $val->publisher->name . "</a>";
+                            }, $object->publishers);
 
                             $links = implode(', ', $links);
                             echo $links;

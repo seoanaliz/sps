@@ -18,7 +18,7 @@
         public function Execute() {
             error_reporting( 0 );
 
-            $user_id     =   Request::getInteger( 'userId' );
+            $user_id    =   Request::getInteger( 'userId' );
             $rank       =   Request::getInteger( 'rank' );
             $comments   =   Request::getString ( 'uComments' );
 
@@ -30,19 +30,28 @@
 
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
-                echo  ObjectHelper::ToJSON(array('response' => $user));
-                die();
+                $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                MesDialogs::check_friend_requests( $user_id );
+                MesDialogs::check_new_messages( array( $user_id ));
+                die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }
 
-            $user = StatUsers::get_vk_user_info( $user_id );
-            $user = $user[0];
-            $user['rank']     = $rank;
-            $user['comments'] = $comments;
-            $user = StatUsers::add_user( $user );
-            if ($user)
+            $users = StatUsers::get_vk_user_info( $user_id );
+            foreach ( $users as $user ) {
+                $user['rank']     = $rank;
+                $user['comments'] = $comments;
+                $user = StatUsers::add_user( $user );
+                $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+            }
+
+            if ( $user ){
+                MesDialogs::check_friend_requests( $user_id );
+                MesDialogs::check_new_messages( array( $user_id ));
                 echo  ObjectHelper::ToJSON(array('response' => $user));
+            }
+
             else
-                echo  ObjectHelper::ToJSON(array('response' => false));
+                echo  ObjectHelper::ToJSON( array( 'response' => false ) );
 
         }
     }

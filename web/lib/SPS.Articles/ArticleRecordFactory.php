@@ -22,7 +22,7 @@
             'class'       => 'ArticleRecord'
             , 'table'     => 'articleRecords'
             , 'view'      => 'getArticleRecords'
-            , 'flags'     => array( 'CanCache' => 'CanCache', 'WithoutTemplates' => 'WithoutTemplates' )
+            , 'flags'     => array( 'CanCache' => false, 'WithoutTemplates' => 'WithoutTemplates' )
             , 'cacheDeps' => array( 'articles', 'articleQueues' )
             , 'fields'    => array(
                 'articleRecordId' => array(
@@ -86,6 +86,11 @@
                     'name'          => 'doc'
                     , 'type'        => TYPE_STRING
                     , 'max'         => 500
+                )
+                ,'topfaceData' => array(
+                    'name'          => 'topfaceData'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'php'
                 )
                 ,'articleId' => array(
                     'name'          => 'articleId'

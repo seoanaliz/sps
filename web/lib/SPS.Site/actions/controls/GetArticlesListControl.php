@@ -64,6 +64,11 @@
          */
         private $options = array();
 
+        /**
+         * @var string
+         */
+        private $articleLinkPrefix = 'http://vk.com/wall-';
+
         private function processRequest() {
             $sourceFeedIds  = Request::getArray('sourceFeedIds');
             $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
@@ -97,8 +102,8 @@
             }
 
             //не авторские посты
-            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors)) {
-                $this->search['_sourceFeedId'] = array(-2 => -2);
+            if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
+                $this->search['_sourceFeedId'] = array(-999 => -999);
                 return;
             }
 
@@ -106,12 +111,12 @@
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
                 if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                    return;
+                    $this->search['targetFeedId'] = -999;
                 }
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
-                $this->search['_sourceFeedId'] = array(-1 => -1);
+                $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
                 $this->search['targetFeedId'] = $targetFeedId;
 
                 //фильтр источников выступает как фильтр авторов
@@ -120,6 +125,22 @@
                 } else {
                     $this->search['_authorId'] = array(-1 => -1);
                 }
+            }
+
+            if ($type == SourceFeedUtility::Topface) {
+                $targetFeedId = Request::getInteger( 'targetFeedId' );
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                    $this->search['targetFeedId'] = -999;
+                }
+
+                $this->search['rateGE'] = null;
+                $this->search['rateLE'] = null;
+                $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
+                $this->search['targetFeedId'] = $targetFeedId;
+            }
+
+            if ($type == SourceFeedUtility::Albums) {
+                $this->articleLinkPrefix = 'http://vk.com/photo';
             }
         }
 
@@ -171,6 +192,7 @@
             Response::setArray( 'sourceFeeds', $this->sourceFeeds );
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
             Response::setArray( 'commentsData', $this->commentsData );
+            Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         }
 
         /**

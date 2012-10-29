@@ -33,6 +33,14 @@
             <label>{lang:vt.article.createdAt}</label>
             <?= FormHelper::FormDateTime( $prefix . '[createdAt]', $object->createdAt, 'd.m.Y G:i' ); ?>
         </div>
+        <div data-row="queuedAt" class="row required">
+            <label>{lang:vt.article.queuedAt}</label>
+            <?= FormHelper::FormDateTime( $prefix . '[queuedAt]', $object->queuedAt, 'd.m.Y G:i' ); ?>
+        </div>
+        <div data-row="sentAt" class="row required">
+            <label>{lang:vt.article.sentAt}</label>
+            <?= FormHelper::FormDateTime( $prefix . '[sentAt]', $object->sentAt, 'd.m.Y G:i' ); ?>
+        </div>
         <div data-row="externalId" class="row required">
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>

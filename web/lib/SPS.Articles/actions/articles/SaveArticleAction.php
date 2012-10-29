@@ -58,8 +58,9 @@
                 $object->articleId = $originalObject->articleId;
             }
 
+            $objectData = Request::getArray('article');
             if (empty($object->sourceFeedId)) {
-                $object->sourceFeedId = -1;
+                $object->sourceFeedId = !empty($objectData['sourceFeedId']) ? $objectData['sourceFeedId'] : SourceFeedUtility::FakeSourceAuthors;
             }
 
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
@@ -70,11 +71,14 @@
             if ( $originalObject != null ) {
                 $originalArticleRecord = ArticleRecordFactory::GetOne(
                     array('articleId' => $this->originalObject->articleId)
-                    , array(BaseFactory::WithColumns => '"articleRecordId"')
                 );
 
                 if (!empty($originalArticleRecord) && !empty($originalArticleRecord->articleRecordId)) {
                     $this->articleRecord->articleRecordId = $originalArticleRecord->articleRecordId;
+                }
+
+                if (!empty($originalArticleRecord)) {
+                    $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
                 }
             }
             Response::setParameter( "articleRecord", $this->articleRecord );
@@ -93,7 +97,7 @@
                 $value = ObjectHelper::FromJSON($value);
                 $this->articleRecord->$arrayName = $value;
             }
-            
+
             return $object;
         }
         
@@ -115,7 +119,7 @@
                 }
             }
 
-            if ($object->sourceFeedId == -1) {
+            if ($object->sourceFeedId == SourceFeedUtility::FakeSourceAuthors) {
                 if (empty($object->authorId)) {
                     $errors['fields']['authorId']['null'] = 'null';
                 }

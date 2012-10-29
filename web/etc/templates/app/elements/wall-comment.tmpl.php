@@ -2,6 +2,7 @@
     /** @var $comment Comment */
     if (!empty($comment)) {
         $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
+        $isEditor = !empty($comment->authorId) ? false : true;
 
         $showDelete = false;
         if (!empty($__Author) && !empty($comment->authorId) && $comment->authorId == $__Author->authorId) {
@@ -11,7 +12,7 @@
         }
 
         $asNew = '';
-        if (!empty($article) && !empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId = $__Author->authorId) {
+        if (!empty($article) && !empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
             if (!empty($authorEvents[$article->articleId]->commentIds) && in_array($comment->commentId, $authorEvents[$article->articleId]->commentIds)) {
                 $asNew = 'new';
             }
@@ -28,9 +29,32 @@
     </div>
     <div class="content">
         <div class="title">
-            <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">{$commentAuthor->FullName()}</a>
+            <? if (!empty($commentAuthor)) { ?>
+                <a target="_blank" href="http://vk.com/id{$commentAuthor->vkId}">{$commentAuthor->FullName()}</a>
+            <? } ?>
+            <? if ($isEditor) { ?>
+                <span class="mark-editor">— редактор</span>
+            <? } ?>
         </div>
-        <div class="text"><?= nl2br(HtmlHelper::RenderToForm($comment->text)) ?></div>
+        <div class="text">
+            <?
+            $content = $comment->text;
+            $contentPart = mb_substr($content, 0, 300);
+            $contentPart = ($contentPart != $content) ? $contentPart . '...' : '';
+            ?>
+            <div class="shortcut">
+                <? if ($contentPart) { ?>
+                <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
+                <a href="javascript:;" class="show-cut">Показать полностью...</a>
+                <? } else { ?>
+                <?= nl2br(HtmlHelper::RenderToForm($content)) ?>
+                <? } ?>
+            </div>
+            <? if ($contentPart) { ?>
+            <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($content)) ?></div>
+            <? } ?>
+        </div>
+
         <span class="date">{$comment->createdAt->defaultFormat()}</span>
     </div>
 </div>

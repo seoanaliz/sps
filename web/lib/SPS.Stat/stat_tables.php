@@ -7,7 +7,8 @@
 
 define('ADMIN_RANK', 2);
 
-define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, 'err_mes'    =>  'parameters missing ' ) ));
+define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'parameters missing '    )));
+define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
 
 ###tables
 
@@ -25,6 +26,7 @@ define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, '
 //статистика по нашим админам
     define( 'TABLE_OADMINS_POSTS', 'oadmins_posts' );  #посты на
     define( 'TABLE_OADMINS', 'oadmins' );              #на
+    define( 'TABLE_OADMINS_CONF', 'oadmins_conf' );
 
 //messeger
     define ( 'TABLE_MES_DIALOGS', 'mes_dialogs' ); #список диалогов, статус для каждого
@@ -32,5 +34,15 @@ define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON(array( 'response' => false, '
     define ( 'TABLE_MES_GROUPS', 'mes_dialogs_groups' );  #группы диалогов
     define ( 'TABLE_MES_GROUP_USER_REL', 'mes_group_user_relation' );  #принадлежность группы диалогов юзерам
     define ( 'TABLE_MES_GROUP_DIALOG_REL', 'mes_group_dialog_relation' );  #принадлежность даилога группам
+    define ( 'TABLE_MES_QUEUES', 'mes_queue' ); #очередь сообщений
+    define ( 'TABLE_MES_TEXTS', 'mes_texts' ); #сами сообщения
+    define ( 'TABLE_MES_ACTIVITY_LOG', 'mes_activity_log');//статистика работы оператора
+    define ( 'TABLE_MES_DIALOG_TEMPLATES', 'mes_dialog_templates');//таблица с шаблонами
 
+//статистика по юзерам пабликов
+    define( 'TABLE_TEMPL_USER_IDS',          'temp_user_ids'); //здесь хранятся юзеры 1 паблика. Только на время работы
+    define( 'TABLE_TEMPL_PUBLIC_SHORTNAMES', 'temp_public_shortnames');//здесь - данные о популярности пабликов
+//альбомы
+    define( 'TABLE_ALBUMS', 'albums' );//данные об альбомах
+    define( 'TABLE_ALBUM_POINTS', 'albums_points' );//ежедневные(?) снапшоты альбомов
 ?>

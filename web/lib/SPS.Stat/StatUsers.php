@@ -15,31 +15,36 @@
             return false;
         }
 
-        public static function is_our_user( $userId )
+        public static function is_our_user( $user_id )
         {
-            $user = self::get_user( $userId );
+            $user = self::get_user( $user_id );
             if ( $user['userId'] )
                 return $user;
             return false;
         }
 
-        public static function get_vk_user_info( $ids )
+        public static function get_vk_user_info( $ids, $user_id = '' )
         {
-
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
+            if ( !trim( $ids ))
+                return array();
+            if( $user_id )
+                $acc_tok = StatUsers::get_access_token( $user_id );
             $users  =   array();
             $params = array(
                 'uids'   =>  $ids,
                 'fields' =>  'photo,online',
             );
+            if( isset( $acc_tok ) && $acc_tok )
+                $params['access_token'] =   $acc_tok;
 
-            $result = VkHelper::api_request( 'users.get', $params );
-
-
+            $result = VkHelper::api_request( 'users.get', $params, 0 );
+            if ( isset( $result->error ))
+                die( ERR_NO_ACC_TOK );
             foreach( $result as $user )
             {
-                $users[$user->uid] = array(
+                $users[ $user->uid ] = array(
                                     'userId'    =>  $user->uid,
                                     'ava'       =>  $user->photo,
                                     'name'      =>  $user->first_name . ' ' . $user->last_name,
@@ -50,35 +55,33 @@
             return $users;
         }
 
-
-
-        public static function add_user( $user )
+        public static function add_user( $users )
         {
-
-
-            if ( !is_array( $user ) )
-                $users = self::get_vk_user_info( $user );
-
-            foreach($users as $user) {
-            $sql = 'INSERT INTO ' . TABLE_STAT_USERS .
-                    '( user_id, name, ava,  comments )
-                        VALUES
-                             ( @userId, @name, @ava, @comments )';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger( '@userId',      $user['userId']);
-
-                $cmd->SetString ( '@name',        $user['name'] );
-                $cmd->SetString ( '@ava',         $user['ava'] );
-                $cmd->SetString ( '@comments',    $user['comments'] );
-                $res = $cmd->ExecuteNonQuery();
+            if ( !isset( $users['userId'] )) {
+                $users = self::get_vk_user_info( $users );
+                $users = reset( $users );
             }
+
+            $users['comment'] = isset( $users['comment'] ) ? $users['comment'] : '';
+		    $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
+                        '    ( user_id, name, ava,  comments )
+                         VALUES
+                             ( @userId, @name, @ava, @comments )';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@userId',      $users['userId']);
+            $cmd->SetString ( '@name',        $users['name'] );
+            $cmd->SetString ( '@ava',         $users['ava'] );
+            $cmd->SetString ( '@comments',    $users['comments'] );
+            echo
+            $res = $cmd->ExecuteNonQuery();
+
             if ( !$res )
                 return false;
             else
-                return $user;
+                return $users;
         }
 
-        public static function get_user($user_id)
+        public static function get_user( $user_id )
         {
             $sql = 'SELECT user_id,name,rank,ava,comments FROM ' . TABLE_STAT_USERS
                  . ' WHERE user_id=@user_id';
@@ -113,40 +116,80 @@
 
         public static function get_access_token( $id )
         {
-
-
-            $id = $id ? $id : AuthVkontakte::IsAuth();;
-            //$token = Session::getString( 'access_token' );
-
-//            if ( $token ) {
-//                echo 'from seession';
-//                return $token;
-//            }
+            $id = $id ? $id : AuthVkontakte::IsAuth();
             $sql = 'SELECT access_token FROM ' . TABLE_STAT_USERS . ' WHERE user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $id );
             $ds = $cmd->Execute();
             $ds->Next();
-
             $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
 
-//            if ( $acc_tok ) {
-//                print_r( Session::setString( 'access_token', $acc_tok ) );
-//                print_r($acc_tok);
-//            }
             return $acc_tok ? $acc_tok : false;
         }
 
-        public static function set_access_token( $user_id, $acess_token )
+        public static function set_access_token( $user_id, $access_token )
         {
+            str_replace( '"', '', $access_token);
             $sql = 'UPDATE ' . TABLE_STAT_USERS . ' SET access_token=@access_token WHERE user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@user_id', $user_id );
-            $cmd->SetString(  '@access_token', $acess_token );
+            $cmd->SetString(  '@access_token', $access_token );
+            $cmd->ExecuteNonQuery();
+        }
+
+        public static function get_im_users()
+        {
+            $sql = 'SELECT user_id,access_token FROM ' . TABLE_STAT_USERS . ' WHERE access_token<>\'\'';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $ds = $cmd->Execute();
+            $usersIds = array();
+            while ( $ds->Next() )
+                $usersIds[] = $ds->getValue( 'user_id', TYPE_INTEGER );
+
+            return $usersIds;
+        }
+
+        public static function set_mes_limit_ts( $user_id, $forced = 0 )
+        {
+            $now = time();
+            if ( !$forced )
+                $now -= 86700;
+            $sql = 'UPDATE
+                    ' . TABLE_STAT_USERS . '
+                    SET
+                        mes_block_ts=@now
+                    WHERE
+                        user_id=@user_id
+                        AND mes_block_ts < @now
+                    ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id );
+            $cmd->SetInteger('@now', $now );
+            $cmd->Execute();
+            $sql = 'SELECT mes_block_ts FROM
+                    ' . TABLE_STAT_USERS . '
+                    WHERE
+                        user_id=@user_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger('@user_id', $user_id );
+            $cmd->SetInteger('@now', $now );
             $ds = $cmd->Execute();
             $ds->Next();
 
-            $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
+            return $ds->GetInteger('mes_block_ts');
+        }
+
+        public static function get_friendship_state( $user_id, $rec_ids )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                return 'no access_token';
+            $params = array(
+                'access_token'  =>  $access_token,
+                'uids'          =>  $rec_ids
+            );
+            $res = VkHelper::api_request( 'friends.areFriends', $params, 0 );
+            return $res;
         }
     }
 ?>

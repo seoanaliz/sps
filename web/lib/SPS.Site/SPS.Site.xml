@@ -36,11 +36,17 @@
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
         </action>
+        <action name="SyncAlbums">
+            <path>daemons/SyncAlbums</path>
+        </action>
         <action name="SyncTop">
             <path>daemons/SyncTop</path>
         </action>
         <action name="SyncUserpics">
             <path>daemons/SyncUserpics</path>
+        </action>
+        <action name="SyncLikes">
+            <path>daemons/SyncLikes</path>
         </action>
     </group>
 
@@ -57,7 +63,6 @@
         <action name="SaveLinkInfoControl">
             <path>controls/SaveLinkInfoControl</path>
         </action>
-
         <group name="Articles">
             <action name="GetArticlesListControl">
                 <path>controls/GetArticlesListControl</path>
@@ -102,6 +107,25 @@
                 <path>controls/grid/SaveGridLineItemControl</path>
             </action>
         </group>
+
+        <group name="Author">
+            <action name="GetAuthorsListControl">
+                <path>controls/authors/GetAuthorsListControl</path>
+            </action>
+            <action name="AddAuthorControl">
+                <path>controls/authors/AddAuthorControl</path>
+            </action>
+            <action name="DeleteAuthorControl">
+                <path>controls/authors/DeleteAuthorControl</path>
+            </action>
+        </group>
+    </group>
+
+
+    <group name="publicControls">
+        <action name="UploadUserToPublic">
+            <path>controls/public/UploadUserToPublic</path>
+        </action>
     </group>
 
     <group name="Site">

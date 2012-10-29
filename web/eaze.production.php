@@ -1,7 +1,7 @@
 <?php
     /* Don't Forget to turn on mod_rewrite!  */
 
-    define( 'WITH_PACKAGE_COMPILE', true  );
+    define( 'WITH_PACKAGE_COMPILE', false  );
 
     if ( !WITH_PACKAGE_COMPILE ) {
         include_once 'lib/Eaze.Core/Logger.php';
@@ -35,6 +35,7 @@
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
+    ini_set('display_errors', '0');
 
     BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
 

@@ -17,10 +17,20 @@
 
         const Authors = 'authors';
 
+        const Topface = 'topface';
+
+        const Albums = 'albums';
+
+        const FakeSourceAuthors = -1;
+
+        const FakeSourceTopface = -2;
+
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
             self::Authors => 'Авторские',
+            self::Albums => 'Альбомы',
+            self::Topface => 'Topface',
         );
 
         public static function IsTopFeed($sourceFeed) {
@@ -77,10 +87,19 @@
 
         public static function GetAll() {
             $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
-            $sourceFeed = new SourceFeed();
-            $sourceFeed->sourceFeedId = -1;
-            $sourceFeed->title = 'Авторские';
-            $sourceFeeds = array(-1 => $sourceFeed) + $sourceFeeds;
+            $sourceFeedAuthors = new SourceFeed();
+            $sourceFeedAuthors->sourceFeedId = self::FakeSourceAuthors;
+            $sourceFeedAuthors->title = 'Авторские';
+
+            $sourceFeedTopface = new SourceFeed();
+            $sourceFeedTopface->sourceFeedId = self::FakeSourceTopface;
+            $sourceFeedTopface->title = 'Topface';
+
+            $sourceFeeds = 
+                array(
+                    self::FakeSourceAuthors => $sourceFeedAuthors,
+                    self::FakeSourceTopface => $sourceFeedTopface,
+                ) + $sourceFeeds;
             return $sourceFeeds;
         }
     }
