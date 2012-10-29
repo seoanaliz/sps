@@ -89,7 +89,7 @@
             <? } ?>
             <span class="original">
                 <? if($article->externalId != -1){ ?>
-                    <a href="http://vk.com/wall-{$article->externalId}" target="_blank">Оригинал</a>
+                    <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
                 <? } else { ?>
                     Добавлена вручную
                 <? } ?>

@@ -482,6 +482,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-albums/">
+                    <actions>SPS.Site.SyncAlbums</actions>
+                </page>
                 <page uri="daemons://process-queue/">
                     <actions>SPS.Site.ProcessQueue</actions>
                 </page>
