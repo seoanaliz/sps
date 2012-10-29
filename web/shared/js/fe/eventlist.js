@@ -260,6 +260,9 @@ var Eventlist = {
             }
         });
     },
+    rightcolumn_removal_time_edit: function(gridLineId, gridLineItemId, time, qid, callback) {
+        console.log([gridLineId, gridLineItemId, time, qid, callback]);
+    },
     leftcolumn_dropdown_change: function(){
         var targetFeedId = Elements.rightdd();
         var leftType = Elements.leftType();
