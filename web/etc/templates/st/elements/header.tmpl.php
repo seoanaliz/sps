@@ -42,6 +42,7 @@ $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
+    'js://fe/jquery.maskedinput-1.3.js',
     'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
     'js://st/events.js',

@@ -12,7 +12,7 @@
         vertical-align: middle;
     }
     .public {
-        width: 150px;
+        width: 250px;
     }
     .public > div {
         display: inline-block;
@@ -31,36 +31,17 @@
         width: 50px;
     }
 </style>
+<script type="text/javascript" src="/shared/js/st/reports.js"></script>
+
 <div id="this-is-reporter"></div>
 <div id="main" class="main">
     <div class="form">
-        <input type="text" placeholder="id паблика" />
-        <input type="text" placeholder="id нашего паблика" />
-        <input type="text" placeholder="Время" />
-        <button class="button">+</button>
+        <input id="public-id" type="text" placeholder="id паблика" />
+        <input id="our-public-id" type="text" placeholder="id нашего паблика" />
+        <input id="time" type="text" placeholder="Время начала наблюдения" />
+        <button id="addReport" class="button">+</button>
     </div>
     <h3>Результаты</h3>
-    <div class="results">
-        <div class="row">
-            <div class="public">
-                <div class="photo">
-                    <img src="http://cs411822.userapi.com/g40391948/e_46daee48.jpg" alt="" />
-                </div>
-                <div class="name">
-                    <a href="http://vk.com">Public</a>
-                </div>
-            </div>
-            <div class="public">
-                <div class="photo">
-                    <img src="http://cs421416.userapi.com/g43888952/d_1d0fc9c4.jpg" alt="" />
-                </div>
-                <div class="name">
-                    <a href="http://vk.com">Public</a>
-                </div>
-            </div>
-            <div class="time">15:30</div>
-            <div class="time">15:58</div>
-        </div>
-    </div>
+    <div id="results">...</div>
 </div>
 {increal:tmpl://st/elements/footer.tmpl.php}
