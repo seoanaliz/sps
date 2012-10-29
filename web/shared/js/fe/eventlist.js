@@ -277,7 +277,7 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
-        if (sourceType != 'source') {
+        if (sourceType != 'source' && sourceType != 'albums') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list a').hide();
