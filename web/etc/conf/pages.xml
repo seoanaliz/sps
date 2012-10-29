@@ -82,6 +82,16 @@
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
+                <page uri="controls://authors-list/">
+                    <actions>SPS.Site.GetAuthorsListControl</actions>
+                    <template>tmpl://fe/elements/authors-list.tmpl.php</template>
+                </page>
+                <page uri="controls://author-add/">
+                    <actions>SPS.Site.AddAuthorControl</actions>
+                </page>
+                <page uri="controls://author-delete/">
+                    <actions>SPS.Site.DeleteAuthorControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -484,6 +494,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-albums/">
+                    <actions>SPS.Site.SyncAlbums</actions>
+                </page>
                 <page uri="daemons://process-queue/">
                     <actions>SPS.Site.ProcessQueue</actions>
                 </page>
@@ -589,9 +602,24 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="stat://">
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
+                <page uri="stat://reports/" boot="">
+                    <template>tmpl://st/reports.tmpl.php</template>
+                </page>
+            </pageGroup>
+
             <pageGroup name="publicControls" boot="">
                 <page uri="controls://upload-user-to-public/">
                     <actions>SPS.Site.UploadUserToPublic</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="reports" boot="">
+                <page uri="reports://topface-user-posts/">
+                    <actions>SPS.Reports.TopfaceUserPosts</actions>
                 </page>
             </pageGroup>
 

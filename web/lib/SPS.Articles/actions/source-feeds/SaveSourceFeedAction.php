@@ -33,7 +33,7 @@
              * @var SourceFeed $object
              */
             $object = parent::$factory->GetFromRequest();
-            
+
             if ( $originalObject != null ) {
                 $object->sourceFeedId = $originalObject->sourceFeedId;
                 $object->processed = $originalObject->processed;
@@ -45,7 +45,16 @@
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
             $object->targetFeedIds = implode(',', $targetFeedIds);
 
-            if ($object->type != SourceFeedUtility::Source) {
+            if ($object->type == SourceFeedUtility::Source) {
+                // do nothing
+            } else if ($object->type == SourceFeedUtility::Albums)   {
+                preg_match('/(\d+)_(\d+)$/', $object->externalId, $matches);
+                if (count($matches) == 3) {
+                    $object->externalId = $matches[0];
+                } else {
+                    $object->externalId = '-';
+                }
+            } else {
                 $object->externalId = '-';
             }
 

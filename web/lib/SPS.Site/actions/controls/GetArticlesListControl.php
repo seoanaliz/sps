@@ -64,6 +64,11 @@
          */
         private $options = array();
 
+        /**
+         * @var string
+         */
+        private $articleLinkPrefix = 'http://vk.com/wall-';
+
         private function processRequest() {
             $sourceFeedIds  = Request::getArray('sourceFeedIds');
             $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
@@ -133,6 +138,10 @@
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
                 $this->search['targetFeedId'] = $targetFeedId;
             }
+
+            if ($type == SourceFeedUtility::Albums) {
+                $this->articleLinkPrefix = 'http://vk.com/photo';
+            }
         }
 
         private function getObjects() {
@@ -183,6 +192,7 @@
             Response::setArray( 'sourceFeeds', $this->sourceFeeds );
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
             Response::setArray( 'commentsData', $this->commentsData );
+            Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         }
 
         /**
