@@ -402,16 +402,22 @@ $(document).ready(function(){
                     .val($time.text())
                     .mask('29:59')
                     .appendTo($post);
-                $time.data('input', $input);
+                $time.data('time-edit', $input);
             } else {
-                $time.data('input').show();
+                $input.show();
             }
             $input.focus().select();
         })
         .delegate('.time-edit', 'blur keydown', function(e) {
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) return;
-
             var $input = $(this);
+
+            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+            if (e.type == 'focusout' && !e.originalEvent) {
+                return;
+            }
+
             var $post = $input.closest('.slot');
             var $time = $post.find('.time');
             var gridLineId = $post.data('grid-id');
@@ -419,7 +425,7 @@ $(document).ready(function(){
 
             var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
             var qid = $post.find('.post').data('queue-id');
-            $input.hide().val(time);
+            $input.blur().hide().val(time);
 
             if (time && time != $time.text()) {
                 $time.text(time);
@@ -448,24 +454,29 @@ $(document).ready(function(){
                     .width($time.width() + 2)
                     .mask('29:59')
                     .appendTo($post);
-                $time.data('input', $input);
+                $time.data('time-of-removal-edit', $input);
             } else {
-                $time.data('input').show();
+                $input.show();
             }
             $input.focus().select();
         })
         .delegate('.time-of-removal-edit', 'blur keydown', function(e) {
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) return;
-
             var $input = $(this);
+
+            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+            if (e.type == 'focusout' && !e.originalEvent) {
+                return;
+            }
+
             var $post = $input.closest('.slot');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
 
-
             var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
             var qid = $post.find('.post').data('queue-id');
-            $input.hide().val(time);
+            $input.blur().hide().val(time);
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
