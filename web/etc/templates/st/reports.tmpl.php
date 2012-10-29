@@ -30,6 +30,12 @@
     .time {
         width: 90px;
     }
+    .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
+    }
 </style>
 <script type="text/javascript" src="/shared/js/st/reports.js"></script>
 
