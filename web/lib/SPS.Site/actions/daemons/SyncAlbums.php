@@ -11,13 +11,9 @@ include_once('AbstractPostLoadDaemon.php');
  * @subpackage Site
  * @author     pavlenko.roman.spb@gmail.com
  */
-class SyncAlbums extends AbstractPostLoadDaemon
-{
+class SyncAlbums extends AbstractPostLoadDaemon {
 
-    /**
-     * @var Daemon
-     */
-    private $daemon;
+    const PHOTO_COUNT_PER_REQUEST = 20;
 
     /**
      * Один вызов этого метода просинхронизирует только одну страницу каждого sourceFeed
@@ -45,8 +41,9 @@ class SyncAlbums extends AbstractPostLoadDaemon
 
             //инитим парсер
             $parser = new ParserVkontakte();
-            $posts = $parser->get_album_as_posts($public_id, $album_id);
-            //var_dump($posts);
+            $offset = $source->processed * self::PHOTO_COUNT_PER_REQUEST;
+            $posts = $parser->get_album_as_posts($public_id, $album_id, self::PHOTO_COUNT_PER_REQUEST, $offset);
+
             $this->saveFeedPosts($source, $posts);
         }
     }
