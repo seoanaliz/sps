@@ -17,14 +17,23 @@ class PostDeletePlanControl
 
         if (is_null($articleQueueId) || is_null($time)) {
             $result['success'] = false;
+            $result['error'] = 'Need more data';
         } else {
-            list($hour, $minutes) = explode(':', $time);
+
             $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
-            $ts = $articleQueue->startDate->getTimestamp();
-            $articleQueue->deleteAt = new DateTimeWrapper(null);
-            $articleQueue->deleteAt->setTimestamp($ts)->setTime($hour, $minutes);
-            ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
-            $result['success'] = true;
+
+            //check access
+            if (!AccessUtility::HasAccessToTargetFeedId($articleQueue->targetFeedId)) {
+                $result['success'] = false;
+                $result['error'] = 'Access Denied';
+            } else {
+                list($hour, $minutes) = explode(':', $time);
+                $ts = $articleQueue->startDate->getTimestamp();
+                $articleQueue->deleteAt = new DateTimeWrapper(null);
+                $articleQueue->deleteAt->setTimestamp($ts)->setTime($hour, $minutes);
+                ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
+                $result['success'] = true;
+            }
         }
 
         echo ObjectHelper::ToJSON($result);
