@@ -19,12 +19,15 @@ class DeletePost
                 "articleQueues"."isDeleted" = FALSE
                 AND @now >= "articleQueues"."deleteAt"
                 AND "articleQueues"."deleteAt" IS NOT NULL
+                AND "articleQueues"."statusId" = @status
+                AND "articleQueues"."sentAt" IS NOT NULL
                 LIMIT 10 FOR UPDATE;
 sql;
         $sender = new SenderVkontakte();
 
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $cmd->SetDateTime('@now', DateTimeWrapper::Now());
+        $cmd->SetDateTime('@status', StatusUtility::Finished);
 
         $ds = $cmd->Execute();
         $structure = BaseFactory::getObjectTree($ds->Columns);
