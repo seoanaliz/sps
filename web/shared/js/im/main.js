@@ -356,7 +356,7 @@ var EndlessPage = Page.extend({
 
         t.onShow();
         t.lock();
-            Events.fire(t._service, pageId, offset, limit, function(data) {
+        Events.fire(t._service, pageId, offset, limit, function(data) {
             t.unlock();
 
             if (pageId == t._pageId) {
@@ -615,6 +615,7 @@ var Dialogs = EndlessPage.extend({
     },
     onRender: function() {
         var t = this;
+        t.model().list([]);
         if (t.checkAtBottom()) {
             $(window).trigger('scroll');
         }
@@ -692,11 +693,12 @@ var Messages = EndlessPage.extend({
         var dialogId = t._pageId;
         var messageId = dialogCollection.get(dialogId).messageId();
         var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
-        t.model().viewer(userCollection.get(Configs.vkId));
         t.model().user(userCollection.get(userId));
+        t.model().viewer(userCollection.get(Configs.vkId));
         if (messageCollection.get(messageId)) {
-            t.model().list().push(messageCollection.get(messageId).data());
+            t.model().preloadList([messageCollection.get(messageId).data()]);
         }
+
         t._super.apply(this, Array.prototype.slice.call(arguments, 0));
         t.makeList(t.el().find(t._itemsSelector));
     },
