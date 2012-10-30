@@ -23,7 +23,7 @@ class PostDeletePlanControl
             $ts = $articleQueue->startDate->getTimestamp();
             $articleQueue->deleteAt = new DateTimeWrapper(null);
             $articleQueue->deleteAt->setTimestamp($ts)->setTime($hour, $minutes);
-            ArticleQueueFactory::Update($articleQueue, array('deleteAt'));
+            ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
             $result['success'] = true;
         }
 

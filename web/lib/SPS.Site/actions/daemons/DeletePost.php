@@ -18,6 +18,7 @@ class DeletePost
                 WHERE
                 "articleQueues"."isDeleted" = FALSE
                 AND @now >= "articleQueues"."deleteAt"
+                AND "articleQueues"."deleteAt" IS NOT NULL
                 LIMIT 10 FOR UPDATE;
 sql;
         $sender = new SenderVkontakte();
