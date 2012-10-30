@@ -255,12 +255,12 @@
                 );
 
                 $url = self::METH . 'wall.delete';
-                $fwd = $this->qurl_request($url, $params);
+                $fwd = $raw_json = $this->qurl_request($url, $params);
                 $fwd = json_decode($fwd);
 
                 if (!empty ($fwd->error)) {
                     $fwd3 = $fwd->error;
-                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg");
+                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg ::" . $raw_json);
                 }
 
                 return true;
