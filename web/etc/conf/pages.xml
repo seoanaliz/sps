@@ -98,6 +98,10 @@
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+
+                <page uri="controls://getPublicMarks/">
+                    <actions>SPS.Stat.getPublicMarks</actions>
+                </page>
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
                 </page>
@@ -141,6 +145,14 @@
                     <actions>SPS.Stat.setGroupOrder</actions>
                 </page>
 
+            </pageGroup>
+            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://addReport/">
+                    <actions>SPS.Stat.addReport</actions>
+                </page>
+                <page uri="controls://getReportList/">
+                    <actions>SPS.Stat.getReportList</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -503,8 +515,8 @@
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
-                <page uri="daemons://wr-oadmins/">
-                    <actions>SPS.Stat.OurAdminsStat</actions>
+                <page uri="daemons://WrAlarm/">
+                    <actions>SPS.Stat.WrAlarm</actions>
                 </page>
                 <page uri="daemons://MesCheckUpdates/">
                     <actions>SPS.Stat.MesCheckUpdates</actions>
@@ -520,6 +532,12 @@
                 </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
+                 </page>
+                <page uri="daemons://CheckWalls/">
+                     <actions>SPS.Stat.CheckWalls</actions>
+                 </page>
+                <page uri="daemons://CheckPosts/">
+                     <actions>SPS.Site.CheckPosts</actions>
                  </page>
 
             </pageGroup>

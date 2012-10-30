@@ -38,11 +38,21 @@ sql;
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
 
             if ($targetFeed->type == TargetFeedUtility::VK) {
-                try {
-                    $sender->delete_post($articleQueue->externalId);
-                } catch(Exception $exception) {
-                    Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
+
+                if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleQueue)) {
                     continue;
+                }
+
+                foreach ($targetFeed->publishers as $publisher) {
+                    try {
+                        $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
+                        $sender->vk_access_token = $publisher->publisher->vk_token;
+                        $sender->delete_post($articleQueue->externalId);
+                        break;
+                    } catch(Exception $exception) {
+                        Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
+                        continue 2;
+                    }
                 }
             } else if ($targetFeed->type == TargetFeedUtility::FB) {
                 // TODO

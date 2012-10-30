@@ -16,10 +16,10 @@
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
-        private $vk_access_token;
+        public  $vk_access_token;
         private $vk_group_id;                   //id паблика, куда постим
         private $vk_aplication_id;              //id аппа, с которого постим
-        private $vk_app_seckey;
+        public  $vk_app_seckey;
         private $link;                          //ссылка на источник
         private $sign;                          //ссыль на пользователя, пока неактивно
         private $header;                        //заголовок ссылки
@@ -249,18 +249,18 @@
                 $post_id = trim($post_id, '-');
                 $id = explode('_', $post_id);
                 $params = array(
-                    'owner_id'      =>  $id[0],
+                    'owner_id'      =>  '-' . $id[0],
                     'post_id'       =>  $id[1],
                     'access_token'  =>  $this->vk_access_token
                 );
 
                 $url = self::METH . 'wall.delete';
-                $fwd = $this->qurl_request($url, $params);
+                $fwd = $raw_json = $this->qurl_request($url, $params);
                 $fwd = json_decode($fwd);
 
                 if (!empty ($fwd->error)) {
                     $fwd3 = $fwd->error;
-                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg");
+                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg ::" . $raw_json);
                 }
 
                 return true;
