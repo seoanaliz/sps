@@ -11,23 +11,23 @@ Package::Load( 'SPS.Site' );
 class PostDeletePlanControl
 {
     public function Execute() {
+        $result = array();
+        $articleQueueId = Request::getInteger('queueId');
+        $time = Request::getString('time');
 
-        $articleQueueId = Request::getInteger('articleQueueId');
-        $deleteDateTime = Request::getInteger('articleQueueId');
-
-        $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
-        $articleQueue->deleteAt = new DateTimeWrapper($deleteDateTime);
-        ArticleQueueFactory::Update($articleQueue, array('deleteAt'));
-        //ArticleQueueFactory::UpdateByMask($articleQueue,  array('articleQueueId' => $articleQueue->articleQueueId));
-
-        $result = UrlParser::Parse(Request::getString('url'));
-        $callback = Request::getString('callback');
-
-        if (!empty($callback)) {
-            echo "$callback (" . ObjectHelper::ToJSON($result) . ");";
+        if (is_null($articleQueueId) || is_null($time)) {
+            $result['success'] = false;
         } else {
-            echo ObjectHelper::ToJSON($result);
+            list($hour, $minutes) = explode(':', $time);
+            $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
+            $ts = $articleQueue->startDate->getTimestamp();
+            $articleQueue->deleteAt = new DateTimeWrapper(null);
+            $articleQueue->deleteAt->setTimestamp($ts)->setTime($hour, $minutes);
+            ArticleQueueFactory::Update($articleQueue, array('deleteAt'));
+            $result['success'] = true;
         }
+
+        echo ObjectHelper::ToJSON($result);
     }
 }
 ?>
