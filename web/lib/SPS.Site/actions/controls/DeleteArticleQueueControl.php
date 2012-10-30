@@ -31,7 +31,9 @@
 
             $o = new ArticleQueue();
             $o->statusId = 3;
-            ArticleQueueFactory::UpdateByMask($o, array('statusId'), array('articleQueueId' => $id));
+            $o->deleteAt = null;
+            $o->isDeleted = false;
+            ArticleQueueFactory::UpdateByMask($o, array('statusId', 'deleteAt', 'isDeleted'), array('articleQueueId' => $id));
 
             //пытаемся восстановить статью, которую заблокировали
             if (!empty($object)) {
