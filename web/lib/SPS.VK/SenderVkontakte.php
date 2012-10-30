@@ -16,10 +16,10 @@
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
-        private $vk_access_token;
+        public  $vk_access_token;
         private $vk_group_id;                   //id паблика, куда постим
         private $vk_aplication_id;              //id аппа, с которого постим
-        private $vk_app_seckey;
+        public  $vk_app_seckey;
         private $link;                          //ссылка на источник
         private $sign;                          //ссыль на пользователя, пока неактивно
         private $header;                        //заголовок ссылки

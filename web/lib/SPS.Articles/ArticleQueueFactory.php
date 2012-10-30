@@ -94,7 +94,6 @@
                 ,'isDeleted' => array(
                     'name'          => 'isDeleted'
                     , 'type'        => TYPE_BOOLEAN
-                    , 'default'    => false
                     )
                 ,'deleteAt' => array(
                     'name'          => 'deleteAt'
