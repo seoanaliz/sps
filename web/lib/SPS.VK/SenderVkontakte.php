@@ -249,7 +249,7 @@
                 $post_id = trim($post_id, '-');
                 $id = explode('_', $post_id);
                 $params = array(
-                    'owner_id'      =>  '-' . $id[0],
+                    'owner_id'      =>  $id[0],
                     'post_id'       =>  $id[1],
                     'access_token'  =>  $this->vk_access_token
                 );
@@ -260,7 +260,7 @@
 
                 if (!empty ($fwd->error)) {
                     $fwd3 = $fwd->error;
-                    throw new Exception("Error in wall.delete : $fwd->error_msg");
+                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg");
                 }
 
                 return true;
