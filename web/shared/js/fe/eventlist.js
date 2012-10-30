@@ -261,7 +261,21 @@ var Eventlist = {
         });
     },
     rightcolumn_removal_time_edit: function(gridLineId, gridLineItemId, time, qid, callback) {
-        console.log([gridLineId, gridLineItemId, time, qid, callback]);
+        $.ajax({
+            url: controlsRoot + 'plan-post-delete/',
+            dataType : "json",
+            data: {
+                time: time,
+                queueId: qid
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
     },
     leftcolumn_dropdown_change: function(){
         var targetFeedId = Elements.rightdd();
