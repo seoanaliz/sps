@@ -249,7 +249,7 @@
                 $post_id = trim($post_id, '-');
                 $id = explode('_', $post_id);
                 $params = array(
-                    'owner_id'      =>  $id[0],
+                    'owner_id'      =>  '-' . $id[0],
                     'post_id'       =>  $id[1],
                     'access_token'  =>  $this->vk_access_token
                 );
