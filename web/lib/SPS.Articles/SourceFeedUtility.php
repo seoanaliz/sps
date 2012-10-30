@@ -19,6 +19,8 @@
 
         const Topface = 'topface';
 
+        const Albums = 'albums';
+
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
@@ -27,6 +29,7 @@
             self::Source => 'Источники',
             self::Ads => 'Реклама',
             self::Authors => 'Авторские',
+            self::Albums => 'Альбомы',
             self::Topface => 'Topface',
         );
 

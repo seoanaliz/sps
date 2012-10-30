@@ -392,32 +392,40 @@ $(document).ready(function(){
         .delegate('.time', 'click', function(e) {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
-            var $input = $time.data('input');
+            var $input = $time.data('time-edit');
 
             if (!$input) {
                 $input = $('<input />')
-                    .attr({class: "time-edit", type: "text"})
-                    .css({width: $time.width() + 2})
+                    .attr('type', 'text')
+                    .attr('class', 'time-edit')
+                    .width($time.width() + 2)
                     .val($time.text())
+                    .mask('29:59')
                     .appendTo($post);
-                $time.data('input', $input);
+                $time.data('time-edit', $input);
             } else {
-                $time.data('input').show();
+                $input.show();
             }
-            $input.mask("29:59").focus().select();
+            $input.focus().select();
         })
         .delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
+
+            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+            if (e.type == 'focusout' && !e.originalEvent) {
+                return;
+            }
+
             var $post = $input.closest('.slot');
             var $time = $post.find('.time');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
 
-            if (e.type == 'keydown' && e.keyCode != 13) return;
-
             var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
             var qid = $post.find('.post').data('queue-id');
-            $input.hide().val(time);
+            $input.blur().hide().val(time);
 
             if (time && time != $time.text()) {
                 $time.text(time);
@@ -432,6 +440,48 @@ $(document).ready(function(){
                 if ($post.hasClass('new')) {
                     $post.animate({height: 0}, 200, function() {$(this).remove()});
                 }
+            }
+        })
+        .delegate('.time-of-removal', 'click', function(e) {
+            var $time = $(this);
+            var $post = $time.closest('.slot-header');
+            var $input = $time.data('time-of-removal-edit');
+
+            if (!$input) {
+                $input = $('<input />')
+                    .attr('type', 'text')
+                    .attr('class', 'time-of-removal-edit')
+                    .width($time.width() + 2)
+                    .mask('29:59')
+                    .appendTo($post);
+                $time.data('time-of-removal-edit', $input);
+            } else {
+                $input.show();
+            }
+            $input.focus().select();
+        })
+        .delegate('.time-of-removal-edit', 'blur keydown', function(e) {
+            var $input = $(this);
+
+            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                return;
+            }
+            if (e.type == 'focusout' && !e.originalEvent) {
+                return;
+            }
+
+            var $post = $input.closest('.slot');
+            var gridLineId = $post.data('grid-id');
+            var gridLineItemId = $post.data('grid-item-id');
+
+            var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
+            var qid = $post.find('.post').data('queue-id');
+            $input.blur().hide().val(time);
+
+            if (time) {
+                Events.fire('rightcolumn_removal_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                    if (state) {}
+                }]);
             }
         })
         .delegate('.datepicker', 'click', function() {
@@ -642,7 +692,7 @@ $(document).ready(function(){
             })
             .autoResize()
             .keyup(function (e) {
-                if (e.ctrlKey && e.keyCode == 13) {
+                if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                     form.find('.save').click();
                 }
             }).keyup()
@@ -1215,7 +1265,7 @@ $(document).ready(function(){
                                     }, 0);
                                 })
                                 .bind('keyup', function(e) {
-                                    if (e.ctrlKey && e.keyCode == 13) {
+                                    if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                                         onSave();
                                     }
                                 })
@@ -1255,7 +1305,7 @@ $(document).ready(function(){
         $newComment.addClass('open');
     });
     $('.left-panel').delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
-        if (e.ctrlKey && e.keyCode == 13) {
+        if (e.ctrlKey && e.keyCode == KEY.ENTER) {
             var $newComment = $(this).closest('.new-comment');
             var $sendBtn = $newComment.find('.send');
             $sendBtn.click();
@@ -1415,19 +1465,20 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
             </div>';
 
 var Events = {
+    isDebug: false,
     delay: 0,
     eventList: Eventlist,
     fire: function(name, args){
         var t = this;
-        if(typeof args != "undefined") {
-            if(!$.isArray(args)) args = [args];
+        if (typeof args != "undefined") {
+            if (!$.isArray(args)) args = [args];
         } else {
             args = [];
         }
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    if(window.console && console.log) {
+                    if (window.console && console.log && t.isDebug) {
                         console.log(name + ':');
                         console.log(args.slice(0, -1));
                         console.log('-------');

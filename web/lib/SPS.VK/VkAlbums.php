@@ -113,5 +113,31 @@
             return $ds->GetInteger( 'ts' );
         }
 
+        public static function post_conv( $posts, $trig_inc = false )
+        {
+            $result_posts_array = array();
+
+            foreach( $posts as $post )
+            {
+                $id         =   $post->owner_id . '_' . $post->pid;
+                $likes      =   $post->likes->count;
+                $likes_tr   =   $likes;
+                $retweet    =   0;
+                $time       =   $post->created;
+                $text       =   TextHelper::fromUTF8( $post->text );
+                $photo = array();
+                $photo[] = array(
+                    'id'   =>  $post->owner_id . '_' . $post->pid,
+                    'desc' =>  '',
+                    'url'  =>  isset( $post->src_big ) ? $post->src_big : $post->src
+                );
+
+                $result_posts_array[] = array( 'id' => $id,    'likes'  => $likes, 'likes_tr'=> $likes_tr,
+                    'retweet' => $retweet, 'time'   => $time,  'text'   => $text, 'photo'    => $photo, 'link' => '',
+                'text_links' => '', 'video' => '', 'music' => '', 'poll' => '', 'map' => '', 'doc' => '');
+            }
+            return $result_posts_array;
+        }
+
     }
 ?>

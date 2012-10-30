@@ -474,7 +474,6 @@
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
                                               'poll'    => $poll,    'text_links'   =>  $text_links  );
             }
-            print_r($result_posts_array);
             return $result_posts_array;
         }
 
@@ -584,6 +583,7 @@
             return $array;
 
         }
+
 
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
@@ -802,5 +802,62 @@
             }
             return $result;
         }
-    }
-?>
+
+        public function get_album_as_posts($public_id, $album_id, $limit = false, $offset = false)
+        {
+            $params = array(
+                'gid'       =>  $public_id,
+                'aid'       =>  $album_id,
+            );
+
+            if (is_numeric($limit))    $params['limit'] = $limit;
+            if (is_numeric($offset))    $params['offset'] = $offset;
+
+            $res = VkHelper::api_request( 'photos.get', $params );
+            $query_line = array();
+
+            foreach( $res as $photo )
+            {
+                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+            }
+            $query_line = implode( ',', $query_line );
+            sleep( 0.3 );
+
+            $params = array(
+                'photos'    =>  $query_line,
+                'extended'  =>  1,
+            );
+            $res = VkHelper::api_request( 'photos.getById', $params );
+            $posts = VkAlbums::post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+            return $posts;
+        }
+
+        /**
+         * Возвращает количество фото в альбоме
+         * @param $public_id
+         * @param $album_id
+         * @return int
+         * @throws Exception
+         */
+        public function get_photo_count_in_album($public_id, $album_id)
+        {
+            $params = array(
+                'gid' => $public_id,
+                'aids' => $album_id,
+            );
+
+            $res = VkHelper::api_request('photos.getAlbums', $params);
+
+            if (!empty($res->error)) {
+                throw new Exception('wall.getById::' . $res->error->error_msg);
+            } else {
+               if (count($res)) {
+                   $res = array_pop($res);
+                   return $res->size;
+               } else {
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+               }
+            }
+        }
+}
