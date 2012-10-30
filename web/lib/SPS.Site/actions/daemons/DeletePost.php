@@ -27,7 +27,7 @@ sql;
 
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $cmd->SetDateTime('@now', DateTimeWrapper::Now());
-        $cmd->SetDateTime('@status', StatusUtility::Finished);
+        $cmd->SetInt('@status', StatusUtility::Finished);
 
         $ds = $cmd->Execute();
         $structure = BaseFactory::getObjectTree($ds->Columns);
