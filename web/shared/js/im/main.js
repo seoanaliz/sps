@@ -593,7 +593,9 @@ var Dialogs = EndlessPage.extend({
         if (!dialogs.length) {
             t._isEnded = true;
         }
-        t.model().data(data);
+        t.model().id(t._pageId);
+        t.model().list(t.model().list().concat(dialogs));
+
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
@@ -706,11 +708,16 @@ var Messages = EndlessPage.extend({
     onLoad: function(data) {
         var t = this;
         var user = data.user;
+        var lists = data.lists;
         var messages = data.list;
         if (!messages.length) {
             t._isEnded = true;
         }
-        t.model().data(data);
+        t.model().id(t._pageId);
+        t.model().user(user);
+        t.model().viewer(user);
+        t.model().list(messages);
+        t.model().lists(t.model().lists().concat(lists));
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.id(), userModel);
