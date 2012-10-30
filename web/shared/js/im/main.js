@@ -1002,10 +1002,14 @@ var RightColumn = Widget.extend({
         for (var i in list) {
             if (!list.hasOwnProperty(i)) continue;
             item = list[i];
-            item.isSelected(item.id() == listId);
-            if (!item.isRead()) {
-                setAsRead = true;
-                item.isRead(true);
+            if (item.id() == listId) {
+                item.isSelected(true);
+                if (!item.isRead()) {
+                    setAsRead = true;
+                    item.isRead(true);
+                }
+            } else {
+                item.isSelected(false);
             }
         }
         t.renderTemplate();
