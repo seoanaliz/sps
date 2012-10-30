@@ -92,6 +92,9 @@
                 <page uri="controls://author-delete/">
                     <actions>SPS.Site.DeleteAuthorControl</actions>
                 </page>
+                <page uri="controls://plan-post-delete/">
+                    <actions>SPS.Site.PostDeletePlanControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -481,6 +484,9 @@
             <pageGroup name="daemons" boot="">
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
+                </page>
+                <page uri="daemons://delete-post/">
+                    <actions>SPS.Site.DeletePost</actions>
                 </page>
                 <page uri="daemons://sync-albums/">
                     <actions>SPS.Site.SyncAlbums</actions>

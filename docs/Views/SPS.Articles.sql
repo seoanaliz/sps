@@ -64,6 +64,8 @@ SELECT "public"."articleQueues"."articleQueueId"
 	, "public"."articleQueues"."externalRetweets"
 	, "public"."articleQueues"."articleId"
 	, "public"."articleQueues"."targetFeedId"
+	, "public"."articleQueues"."deleteAt"
+	, "public"."articleQueues"."isDeleted"
 	, "public"."articleQueues"."statusId"
  FROM "public"."articleQueues"
 	WHERE "public"."articleQueues"."statusId" != 3

@@ -69,6 +69,14 @@
             <label>{lang:vt.articleQueue.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Queue[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
+        <div data-row="deleteAt" class="row">
+            <label>{lang:vt.articleQueue.deleteAt}</label>
+            <?= FormHelper::FormDateTime( $prefix . '[deleteAt]', $object->deleteAt, 'd.m.Y G:i' ); ?>
+        </div>
+        <div data-row="isDeleted" class="row">
+            <label>{lang:vt.articleQueue.isDeleted}</label>
+            <?= FormHelper::FormCheckBox( $prefix . '[isDeleted]', "TRUE", "", "", $object->isDeleted); ?>
+        </div>
 	</div>
     <div id="page-1" class="tab-page rows">
         {increal:tmpl://vt/articles/record.tmpl.php}

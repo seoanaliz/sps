@@ -59,5 +59,11 @@
 
         /** @var Status */
         public $status;
+
+        /** @var DateTimeWrapper */
+        public $deleteAt;
+
+        /** @var boolean */
+        public $isDeleted;
     }
 ?>

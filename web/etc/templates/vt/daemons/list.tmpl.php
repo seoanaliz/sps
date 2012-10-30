@@ -1,6 +1,6 @@
 <?
     $__pageTitle = LocaleLoader::Translate( "vt.daemons.header");
-    $daemons = array( 'sync-sources', 'sync-albums', 'process-queue', 'sync-top', 'sync-userpics' );
+    $daemons = array( 'sync-sources', 'sync-albums', 'delete-post', 'process-queue', 'sync-top', 'sync-userpics' );
 
     $__breadcrumbs = array( array( 'link' => Site::GetWebPath( "vt://daemons/list/" ), 'title' => $__pageTitle ) );
 ?>
