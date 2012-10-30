@@ -258,7 +258,7 @@ var Page = Widget.extend({
     _pageId: null,
     _cache: null,
     _service: 'get_dialogs',
-    _isBlock: false,
+    _isLock: false,
     _isCache: true,
     _scroll: null,
     _isBottom: false,
@@ -316,13 +316,13 @@ var Page = Widget.extend({
         return this;
     },
     isLock: function() {
-        return !!this._isBlock;
+        return !!this._isLock;
     },
     lock: function() {
-        this._isBlock = true;
+        this._isLock = true;
     },
     unlock: function() {
-        this._isBlock = false;
+        this._isLock = false;
     }
 });
 
@@ -600,7 +600,7 @@ var Dialogs = EndlessPage.extend({
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
             var messageModel = new MessageModel(dialogs[i]);
-            var userModel = dialogModel.user();
+            var userModel = new UserModel(dialogModel.user());
 
             if (dialogModel) {
                 dialogCollection.add(dialogModel.id(), dialogModel);
@@ -691,7 +691,7 @@ var Messages = EndlessPage.extend({
         var t = this;
         var dialogId = t._pageId;
         var messageId = dialogCollection.get(dialogId).messageId();
-        var userId = dialogCollection.get(dialogId).user().id();
+        var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
         t.model().viewer(userCollection.get(Configs.vkId));
         t.model().user(userCollection.get(userId));
         if (messageCollection.get(messageId)) {
@@ -708,16 +708,15 @@ var Messages = EndlessPage.extend({
     onLoad: function(data) {
         var t = this;
         var user = data.user;
-        var lists = data.lists;
+        var viewer = data.viewer;
         var messages = data.list;
         if (!messages.length) {
             t._isEnded = true;
         }
         t.model().id(t._pageId);
         t.model().user(user);
-        t.model().viewer(user);
-        t.model().list(messages);
-        t.model().lists(t.model().lists().concat(lists));
+        t.model().viewer(viewer);
+        t.model().list(t.model().list().concat(messages));
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.id(), userModel);
@@ -870,7 +869,6 @@ var Messages = EndlessPage.extend({
 var RightColumn = Widget.extend({
     _template: RIGHT_COLUMN,
     _modelClass: ListsModel,
-    _isEditMode: true,
     _isDragging: false,
     _isFirstRun: true,
 
@@ -929,22 +927,22 @@ var RightColumn = Widget.extend({
 
     mouseDownList: function(e) {
         var t = this;
-        if (!t._isEditMode) return;
         var $placeholder = $(e.currentTarget);
         var $target = $placeholder.find('.item:first');
+        var startY = 0;
         var timeout = setTimeout(function() {
             t._isDragging = true;
+            startY = e.pageY;
             $target.addClass('drag');
             $placeholder.height($target.height());
-            $('html, body').addClass('no-select');
-        }, 300);
-        var startY = e.clientY;
+        }, 200);
+        $('body').addClass('no-select');
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
-                var top = e.clientY - startY;
+                var top = e.pageY - startY;
                 var height = $placeholder.height();
-                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
                 var $prev = $placeholder.prev('.drag-wrap');
 
@@ -955,7 +953,7 @@ var RightColumn = Widget.extend({
                     $placeholder.after($prev);
                     startY -= height;
                 }
-                top = e.clientY - startY;
+                top = e.pageY - startY;
                 $target.css({top: top});
             }
 
@@ -963,11 +961,11 @@ var RightColumn = Widget.extend({
         })(e));
 
         $(window).on('mouseup.list', function(e) {
-            $(this).off('mousemove.list mouseup.list');
+            $(window).off('mousemove.list mouseup.list');
+            $('body').removeClass('no-select');
             clearTimeout(timeout);
 
             if (!t._isDragging) return;
-            $('html, body').removeClass('no-select');
             $target.removeClass('drag').css({top: 0});
             setTimeout(function() {
                 t._isDragging = false;
@@ -1182,7 +1180,7 @@ var Tabs = Widget.extend({
     setDialog: function(dialogId) {
         var t = this;
         var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
-        var userModel = dialogModel.user();
+        var userModel = new UserModel(dialogModel.user());
         t._userId = userModel.id();
         var label = userModel.name();
         var isOnline = userModel.isOnline();
