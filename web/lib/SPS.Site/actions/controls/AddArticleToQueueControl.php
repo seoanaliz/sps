@@ -87,6 +87,8 @@
             $object->type = $type;
             $object->author = AuthVkontakte::IsAuth();
             ArticleUtility::BuildDates($object, $timestamp);
+            $object->isDeleted = false;
+            $object->deleteAt = null;
 
             $object->statusId = 1;
 
