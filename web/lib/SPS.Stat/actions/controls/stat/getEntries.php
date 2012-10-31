@@ -193,18 +193,18 @@ class getEntries {
     }
 
     //возвращает данные о наших пабликах
-    private function get_our_publics_state( $group_id, $time_start, $time_stop )
+    private function get_our_publics_state( $time_start, $time_stop )
     {
         $publics = StatPublics::get_our_publics_list();
         $res = array();
+        $ret = array();
         foreach( $publics as $public ) {
             $res['ava'] = $this->get_ava($public['id']);
-            $res['is']  = $public['id'];
+            $res['id']  = $public['id'];
             $res['name']= $public['title'];
             $authors_posts      = StatPublics::get_public_posts( $public['sb_id'], 1, $time_start, $time_stop );
             $non_authors_posts  = StatPublics::get_public_posts( $public['sb_id'], 0, $time_start, $time_stop  );
             $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
-
             //всего постов
             $res['overall_posts'] = $posts_quantity;
             $days = round( ( $time_stop - $time_start ) / 84600 );
@@ -229,17 +229,17 @@ class getEntries {
             $res['avg_vis_grouth'] = $guests['vis_grouth'];
             $res['views']    = $guests['views'];
             $res['avg_vie_grouth'] = $guests['vievs_grouth'];
-
-            unset ($public['sb_id']);
+            $ret[] = $res;
         }
-        return $res;
+
+        return $ret;
     }
 
     private function get_ava( $public_id )
     {
         $sql = 'SELECT ava
-                FROM ' . TABLE_STAT_GROUPS .
-               ' WHERE vk_id=@public_id';
+                FROM ' . TABLE_STAT_PUBLICS .
+               ' WHERE vk_id=@publ_id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger('@publ_id', $public_id);
         $ds = $cmd->Execute();
