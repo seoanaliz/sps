@@ -33,7 +33,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT c.group_id, c.type, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
@@ -48,13 +48,14 @@
             $ds = $cmd->Execute();
             $res = array();
 
-            while($ds->Next()) {
+            while( $ds->Next() ) {
                 $res[] = array(
                     'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
                     'comments'  =>  $ds->getValue( 'comments' ),
                     'fave'      =>  $ds->GetBoolean( 'fave' ),
+                    'group_type'=>  $ds->GetInteger( 'type'),
                 );
             }
 
@@ -225,6 +226,33 @@
             return false;
         }
 
+        public static function get_group_publics( $group_id, $limit, $offset = 0 )
+        {
+            $limit =  $limit ? $limit : 1000;
+
+            $sql = 'SELECT vk_id,ava,name FROM '
+                        . TABLE_STAT_GROUPS . ' as a, '
+                        . TABLE_STAT_GROUP_PUBLIC_REL . ' as bs
+                    WHERE
+                        a.group_id=@group_id AND
+                        a.vk_id=b.public_id AND
+                    ORDER BY
+                        quantity
+                    OFFSET @offset
+                    LIMIT  @limit';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@group_id', $group_id );
+            $cmd->SetInteger( '@limit', $limit );
+            $cmd->SetInteger( '@offset', $offset );
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds = $cmd->Execute();
+
+            $res = array();
+            while ( $ds->Next() ) {
+                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
+            }
+            return $res;
+        }
 
 
     }
