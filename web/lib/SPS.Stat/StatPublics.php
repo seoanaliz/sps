@@ -421,7 +421,6 @@
             $cmd->SetInteger( '@targetFeedId', $sb_id );
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
-            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             while( $ds->next()) {
                 $tmp_rate = $ds->GetValue( 'rate' );
