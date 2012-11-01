@@ -23,13 +23,13 @@ var TABLE =
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
     '<div class="item is-active">' +
-        'активен<span class="icon arrow"></span>' +
+        'активен' +
     '</div>' +
     '<div class="item in-search">' +
-        'в поиске<span class="icon arrow"></span>' +
+        'в поиске' +
     '</div>' +
     '<div class="item visitors">' +
-        'посетители<span class="icon arrow"></span>' +
+        'посетители' +
     '</div>' +
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
