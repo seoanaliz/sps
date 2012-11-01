@@ -49,7 +49,7 @@ table,tr,td{vertical-align:top;}
 #main .left-column>.content .list-body.edit-mode .public.not-editable{display:block;}#main .left-column>.content .list-body.edit-mode .public.not-editable .public-actions>.action.delete-public{display:none;}
 #main .left-column>.content .list-body.edit-mode .public.not-editable .public-actions>.action.restore-public{display:block;}
 #main .left-column>.content .list-head .publics,#main .left-column>.content .public-info{width:30%;}
-#main .left-column>.content .list-head .followers,#main .left-column>.content .list-head .is-active,#main .left-column>.content .list-head .in-search,#main .left-column>.content .list-head .visitors,#main .left-column>.content .list-head .growth,#main .left-column>.content .public-followers,#main .left-column>.content .public-is-active,#main .left-column>.content .public-in-search,#main .left-column>.content .public-visitors,#main .left-column>.content .public-growth{width:10%;text-align:center;}
+#main .left-column>.content .list-head .followers,#main .left-column>.content .list-head .is-active,#main .left-column>.content .list-head .in-search,#main .left-column>.content .list-head .visitors,#main .left-column>.content .list-head .growth,#main .left-column>.content .public-followers,#main .left-column>.content .public-is-active,#main .left-column>.content .public-in-search,#main .left-column>.content .public-visitors,#main .left-column>.content .public-growth{width:9%;text-align:center;}
 #main .left-column>.content .list-head .contacts,#main .left-column>.content .public-contacts{width:20%;}
 .contact{position:relative;font-weight:normal;}.contact:hover{outline:1px solid #C4CDE0;background-color:#fff;}
 .contact.selected{outline:1px solid #597DA3;background-color:#fff;}
