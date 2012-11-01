@@ -24,7 +24,9 @@
         public static function ChangeQueueDates($queueId, $timestamp) {
             $object = new ArticleQueue();
             self::BuildDates($object, $timestamp);
-            ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate'), array('articleQueueId' => $queueId, 'statusId' => 1));
+            $object->isDeleted = false;
+            $object->deleteAt = null;
+            ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate', 'isDeleted', 'deleteAt'), array('articleQueueId' => $queueId, 'statusId' => 1));
         }
 
         public static function BuildDates($object, $timestamp) {

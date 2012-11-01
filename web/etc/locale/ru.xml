@@ -368,6 +368,8 @@
       <author><![CDATA[Автор]]></author>
       <externalLikes><![CDATA[Получено лайков]]></externalLikes>
       <externalRetweets><![CDATA[Получено ретвитов]]></externalRetweets>
+      <deleteAt><![CDATA[Когда удалить]]></deleteAt>
+      <isDeleted><![CDATA[Удалено]]></isDeleted>
       <type><![CDATA[Тип]]></type>
       <externalId><![CDATA[externalId]]></externalId>
     </articleQueue>
