@@ -10,12 +10,12 @@ class WrTopics extends wrapper
 
     public function Execute()
     {
-//        if (! $this->check_time())
-//            die('Не сейчас');
+        if (! $this->check_time())
+            die('Не сейчас');
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i') . '<br>';
-//        $this->update_quantity();
-//        $this->update_public_info();
+        $this->update_quantity();
+        $this->update_public_info();
         $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
 
@@ -23,7 +23,10 @@ class WrTopics extends wrapper
 
     public function get_id_arr()
     {
-        $sql = "select vk_id FROM ". TABLE_STAT_PUBLICS ." ORDER BY vk_id";
+        $sql = "select vk_id
+                FROM ". TABLE_STAT_PUBLICS ."
+                WHERE quanity > 500000
+                ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
 
         $ds = $cmd->Execute();
