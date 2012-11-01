@@ -15,6 +15,14 @@ var LIST_ITEM =
 '<? } ?>';
 
 var TABLE =
+'<?=tmpl(TABLE_HEADER)?>' +
+'<?=tmpl(TABLE_BODY, {rows: rows})?>';
+
+var OUR_TABLE =
+'<?=tmpl(OUR_TABLE_HEADER)?>' +
+'<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>';
+
+var TABLE_HEADER =
 '<div class="list-head clear-fix">' +
     '<div class="item publics">' +
         '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -37,13 +45,12 @@ var TABLE =
     '<div class="item contacts">' +
         'контакты' +
     '</div>' +
-'</div>' +
-'<div class="list-body">' +
-    '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var TABLE_BODY =
-'<? each(TABLE_ROW, rows); ?>';
+'<div class="list-body">' +
+    '<? each(TABLE_ROW, rows); ?>' +
+'</div>';
 
 var TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
@@ -78,6 +85,25 @@ var TABLE_ROW =
             '<span class="icon plus"></span>' +
         '</span>' +
     '</div>' +
+'</div>';
+
+var OUR_TABLE_HEADER =
+'<div class="list-head clear-fix">' +
+    '<div class="item is-active">активен</div>' +
+    '<div class="item in-search">в поиске</div>' +
+    '<div class="item visitors">посетители</div>' +
+'</div>';
+
+var OUR_TABLE_BODY =
+'<div class="list-body">' +
+    '<? each(OUR_TABLE_ROW, rows); ?>' +
+'</div>';
+
+var OUR_TABLE_ROW =
+'<div class="public clear-fix" data-id="<?=publicId?>">' +
+    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
+    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
+    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
 '</div>';
 
 var CONTACT =

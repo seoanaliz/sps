@@ -624,27 +624,39 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentListId = listId;
-                currentSearch = newSearch;
-                currentSortBy = newSortBy;
-                currentSortReverse = newSortReverse;
-                $container.html(tmpl(TABLE, {rows: data}));
-                $container.find('.' + currentSortBy).addClass('active');
-                $('#global-loader').fadeOut(200);
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentListId = listId;
+                    currentSearch = newSearch;
+                    currentSortBy = newSortBy;
+                    currentSortReverse = newSortReverse;
+                    $container.html(tmpl(TABLE, {rows: data}));
+                    $container.find('.' + currentSortBy).addClass('active');
+                    if (!currentListId) {
+                        $container.removeClass('no-list-id');
+                    } else {
+                        $container.addClass('no-list-id');
+                    }
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
+                    Filter.setSliderMin(maxPeriod[0]);
+                    Filter.setSliderMax(maxPeriod[1]);
                 } else {
-                    $container.addClass('no-list-id');
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentListId = listId;
+                    currentSearch = newSearch;
+                    currentSortBy = newSortBy;
+                    currentSortReverse = newSortReverse;
+                    $container.html(tmpl(OUR_TABLE, {rows: data}));
+                    $('#global-loader').fadeOut(200);
+                    Filter.setSliderMin(maxPeriod[0]);
+                    Filter.setSliderMax(maxPeriod[1]);
                 }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(maxPeriod[0]);
-                Filter.setSliderMax(maxPeriod[1]);
             }
         );
     }

@@ -109,32 +109,7 @@ var Eventlist = {
             var clearList = [];
             var clearPeriod = [];
             var clearListType = 0;
-            if ($.isArray(dirtyData.list)) {
-                $.each(dirtyData.list, function(i, publicItem) {
-                    var users = [];
-                    $.each(publicItem.admins, function(i, data) {
-                        users.push({
-                            userId: data.vk_id,
-                            userName: data.name,
-                            userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
-                            userDescription: data.role || '&nbsp;'
-                        });
-                    });
-                    clearList.push({
-                        publicId: publicItem.id,
-                        publicImg: publicItem.ava,
-                        publicName: publicItem.name,
-                        publicFollowers: publicItem.quantity,
-                        publicGrowthNum: publicItem.diff_abs,
-                        publicGrowthPer: publicItem.diff_rel,
-                        publicIsActive: !!publicItem.active,
-                        publicInSearch: !!publicItem.in_search,
-                        publicVisitors: publicItem.visitors,
-                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
-                        users: users
-                    });
-                });
-            }
+
             if (dirtyData.min_max) {
                 clearPeriod = [
                     dirtyData.min_max.min,
@@ -143,6 +118,36 @@ var Eventlist = {
             }
             if (dirtyData.group_type == 2) {
                 clearListType = 1;
+            }
+            if (!clearListType) {
+                if ($.isArray(dirtyData.list)) {
+                    $.each(dirtyData.list, function(i, publicItem) {
+                        var users = [];
+                        $.each(publicItem.admins, function(i, data) {
+                            users.push({
+                                userId: data.vk_id,
+                                userName: data.name,
+                                userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                                userDescription: data.role || '&nbsp;'
+                            });
+                        });
+                        clearList.push({
+                            publicId: publicItem.id,
+                            publicImg: publicItem.ava,
+                            publicName: publicItem.name,
+                            publicFollowers: publicItem.quantity,
+                            publicGrowthNum: publicItem.diff_abs,
+                            publicGrowthPer: publicItem.diff_rel,
+                            publicIsActive: !!publicItem.active,
+                            publicInSearch: !!publicItem.in_search,
+                            publicVisitors: publicItem.visitors,
+                            lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                            users: users
+                        });
+                    });
+                }
+            } else {
+                //@todo
             }
 
             callback(clearList, clearPeriod, clearListType);
