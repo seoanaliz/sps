@@ -13,20 +13,20 @@
             return false;
         }
 
-        private static function get_group( $groupId )
+        public static  function get_group( $groupId )
         {
-            $sql = 'SELECT group_id, name, general, name, comments, group_admin FROM ' . TABLE_STAT_GROUPS
+            $sql = 'SELECT group_id, name, general, name, comments,type, group_admin FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
             $cmd->SetInteger('@group_id', $groupId);
             $ds = $cmd->Execute();
             $ds->Next();
-
             return array (
-                'groupId'   =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
-                'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
-                'name'      =>  $ds->getValue( 'name',     TYPE_STRING  ),
-                'comments'  =>  $ds->getValue( 'comments', TYPE_STRING  ),
+                'groupId'   =>  $ds->getInteger( 'group_id' ),
+                'general'   => $ds->getInteger( 'general'),
+                'name'      =>  $ds->getValue( 'name' ),
+                'comments'  =>  $ds->getValue( 'comments' ),
+                'type'  =>  $ds->getInteger( 'type' ),
             );
 
         }

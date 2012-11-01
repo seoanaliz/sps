@@ -146,10 +146,14 @@ class getEntries {
             $resul = $this->get_our_publics_state( $groupId, $time_from, $time_to );
         }
 
+        $group  = StatGroups::get_group($groupId);
+
+
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(
-                                                            'list'      =>  $resul,
-                                                            'min_max'   =>  $this->get_min_max()
+                                                            'list'       =>  $resul,
+                                                            'min_max'    =>  $this->get_min_max(),
+                                                            'group_type' =>  empty($group) ? null : $group['type']
                                                             )
                                         )
                                     );
@@ -240,7 +244,7 @@ class getEntries {
                 FROM ' . TABLE_STAT_PUBLICS .
                ' WHERE vk_id=@publ_id';
         $cmd = new SqlCommand( $sql, $this->conn );
-        $cmd->SetInteger('@publ_id', $public_id);
+        $cmd->SetInteger( '@publ_id', $public_id);
         $ds = $cmd->Execute();
         $ds->Next();
         return $ds->getValue('ava');
