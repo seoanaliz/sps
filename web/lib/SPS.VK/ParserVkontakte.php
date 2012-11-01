@@ -805,12 +805,16 @@
             return $result;
         }
 
-        public function get_album_as_posts( $public_id, $album_id )
+        public function get_album_as_posts($public_id, $album_id, $limit = false, $offset = false)
         {
             $params = array(
                 'gid'       =>  $public_id,
                 'aid'       =>  $album_id,
             );
+
+            if (is_numeric($limit))    $params['limit'] = $limit;
+            if (is_numeric($offset))    $params['offset'] = $offset;
+
             $res = VkHelper::api_request( 'photos.get', $params );
             $query_line = array();
 
@@ -830,5 +834,32 @@
             $posts = $this->kill_attritions( $posts );
             return $posts;
         }
-    }
-?>
+
+        /**
+         * Возвращает количество фото в альбоме
+         * @param $public_id
+         * @param $album_id
+         * @return int
+         * @throws Exception
+         */
+        public function get_photo_count_in_album($public_id, $album_id)
+        {
+            $params = array(
+                'gid' => $public_id,
+                'aids' => $album_id,
+            );
+
+            $res = VkHelper::api_request('photos.getAlbums', $params);
+
+            if (!empty($res->error)) {
+                throw new Exception('wall.getById::' . $res->error->error_msg);
+            } else {
+               if (count($res)) {
+                   $res = array_pop($res);
+                   return $res->size;
+               } else {
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+               }
+            }
+        }
+}
