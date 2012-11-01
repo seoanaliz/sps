@@ -63,6 +63,29 @@
             return $res;
         }
 
+        public static function check_group_name_used( $user_id, $group_name )
+        {
+            $sql = 'SELECT a.group_id
+                    FROM
+                    '  . TABLE_MES_GROUP_USER_REL . ' as a
+                    , ' . TABLE_MES_GROUPS . ' as b
+                    WHERE
+                        a.group_id = b.group_id
+                        AND a.user_id = @user_id
+                        AND b.name = @group_name';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@user_id',      $user_id);
+            $cmd->SetString ( '@group_name',   $group_name);
+            $ds = $cmd->Execute();
+
+            $ds->Next();
+            $a = $ds->GetInteger( 'group_id' );
+            if ( $a )
+                return $a;
+
+            return false;
+        }
+
         public static function implement_group( $groupIds, $userIds )
         {
             if ( !is_array( $userIds ) )

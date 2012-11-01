@@ -2,7 +2,7 @@
 //обновление данных по топу пабликов, раз в день ~6 ночи
 Package::Load( 'SPS.Stat' );
 
-set_time_limit(600);
+set_time_limit(13600);
 error_reporting( 0 );
 class WrTopics extends wrapper
 {
@@ -10,12 +10,15 @@ class WrTopics extends wrapper
 
     public function Execute()
     {
-        if (! $this->check_time())
-            die('Не сейчас');
+//        if (! $this->check_time())
+//            die('Не сейчас');
         $this->get_id_arr();
-        $this->update_quantity();
+        echo "start_time = " . date( 'H:i') . '<br>';
+//        $this->update_quantity();
+//        $this->update_public_info();
+        $this->update_visitors();
+        echo "end_time = " . date( 'H:i') . '<br>';
 
-        $this->update_public_info();
     }
 
     public function get_id_arr()
@@ -33,18 +36,15 @@ class WrTopics extends wrapper
 
     public function check_time()
     {
-        $sql = 'SELECT MAX(time) FROM ' . TABLE_STAT_PUBLICS_POINTS . ' LIMIT 1';
+        $sql = 'SELECT time
+                FROM ' . TABLE_STAT_PUBLICS_POINTS . '
+                WHERE time >= current_date-interval \'1 day\'
+                LIMIT 1';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $ds = $cmd->Execute();
         $ds->Next();
-        $diff =  time() - $ds->getValue('max', TYPE_INTEGER);
-        if (self::TESTING)
-            echo '<br>differing = ' . $diff . '<br>';
-        if ($diff < 86400 )
+        if( $ds->GetValue( 'time' ))
             return false;
-        if ($diff > 86400 * 2 )
-            return ($diff / 86400);
-        return 1;
 
     }
 
@@ -94,8 +94,8 @@ class WrTopics extends wrapper
             ' WHERE
                         id=@publ_id
                         AND (
-                                time = @time - 86400 * 7
-                            OR  time = @time - 86400 * 30
+                                time=CURRENT_DATE - interval \'3 day\'
+                                or time=CURRENT_DATE - interval \'7 day\'
                             )
                    ORDER BY time DESC';
 
@@ -143,13 +143,11 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@diff_rel_week',      $diff_rel_week );
         $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
         $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
-//            echo $cmd->GetQuery();
-//            die();
         $cmd->Execute();
 
     }
 
-    //собирает количество поситителей в пабликах
+    //собирает количество посетителей в пабликах
     public function update_quantity()
     {
         $time = $this->morning(time());
@@ -157,7 +155,8 @@ class WrTopics extends wrapper
         $return = "return{";
         $code = '';
         $timeTo = StatPublics::get_last_update_time();
-        foreach($this->ids as $b) {
+        $conn = ConnectionFactory::Get( 'tst' );
+        foreach( $this->ids as $b ) {
 
             if ( $i == 25 or !next( $this->ids ) ) {
                 if ( !next( $this->ids ) ) {
@@ -172,19 +171,13 @@ class WrTopics extends wrapper
                 $res = VkHelper::api_request( 'execute', array('code' =>  $code), 0);
 
                 foreach($res as $key => $entry) {
-
                     $key = str_replace( 'a', '', $key );
-                    $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,@time,@quantity)";
-                    $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                    $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,current_timestamp - interval '1 day',@quantity)";
+                    $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@id',        $key );
-                    $cmd->SetInteger( '@time',      $time );
                     $cmd->SetInteger( '@quantity',  $entry->count );
                     $cmd->Execute();
-
-
                     $this->set_public_grow( $key, $entry->count, $timeTo );
-//
-
                 }
 
                 sleep(0.3);
@@ -192,12 +185,91 @@ class WrTopics extends wrapper
                 $return = "return{";
                 $code = '';
             }
-
             $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
             $return .= "\" a$b\":a$b,";
             $i++;
         }
     }
+
+    public function get_all_visitors()
+    {
+        $time_start = time() - 75600 ;
+        $time_stop  = time() - 86400 * 30;
+        foreach( $this->ids as $public_id ) {
+            StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_stop );
+            die();
+        }
+    }
+    public function update_visitors()
+    {
+        $time_start = time() - 75600 ;
+        foreach( $this->ids as $public_id ) {
+            StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_start );
+        }
+    }
+
+//возвращает данные о наших пабликах
+    private function get_our_publics_state()
+    {
+        $publics    =   StatPublics::get_our_publics_list();
+        foreach( $publics as &$public ) {
+//            $authors_posts      = StatPublics::get_ad_public_posts( 10, $time_start, $time_stop );
+            $authors_posts      = StatPublics::get_public_posts( $public['sb_id'], 1, $time_start, $time_stop );
+            $non_authors_posts  = StatPublics::get_public_posts( $public['sb_id'], 0, $time_start, $time_stop  );
+
+            $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
+
+            //всего постов
+            $public['overall_posts'] = $posts_quantity;
+            $days = round( ( $time_stop - $time_start ) / 84600 );
+            $public['posts_days_rel'] = round( $posts_quantity / $days );
+            print_r($public);
+
+            //постов из источников
+            $public['sb_posts_count'] = $non_authors_posts['count'];
+            // средний rate спарсенных постов
+            $public['sb_posts_rate'] = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
+            //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
+
+            //процент авторских постов
+            $guests = StatPublics::get_views_visitors_from_base( $public['sb_id'], $time_start, $time_stop );
+            if ( !$guests ){
+                $guests = StatPublics::get_views_visitors_from_vk( $public['id'], $time_start, $time_stop );
+            }
+            if ( $guests ) {
+                $public['views'] = $guests['views'];
+                $public['visitors'] = $guests['visitors'];
+                $public['avg_vie_grouth'] = $guests['vievs_grouth'];
+                $public['avg_vis_grouth'] = $guests['vis_grouth'];
+
+            }
+
+            if ( !$authors_posts['count'] && !$non_authors_posts['count'] ) {
+                $public['auth_posts'] = 'какой-то косяк, данных нет';
+                $public['auth_reposts_eff'] = 'данных нет';
+                $$public['auth_likes_eff'] = 'данных нет';
+            } elseif( !$authors_posts['count'] ) {
+                $public['auth_posts'] = "авторских постов нет (всего постов - $posts_quantity)";
+                $public['auth_likes_eff'] = 'с лайками та же история, средний неавторский по паблику - ' . $non_authors_posts['likes'];
+                $public['auth_reposts_eff'] = 'репосты туда же, среднее - ' . $non_authors_posts['reposts']
+                    . ', среднее относительное - ' . ( round( 100 * $non_authors_posts['reposts'] / $non_authors_posts['likes'], 1 ) . '%');
+            }
+            elseif( !$non_authors_posts['count'] ) {
+                $public['auth_posts'] = "неавторских постов нет (всего постов - $posts_quantity)";
+
+                $public['auth_likes_eff'] = 'с лайками та же история, средний по паблику - ' . $authors_posts['likes'];
+                $public['auth_reposts_eff'] = 'репосты туда же, среднее - ' . $authors_posts['reposts']
+                    . ', среднее относительное - ' . ( round( 100 * $authors_posts['reposts'] / $authors_posts['likes'], 1 ) . '%');
+            } else {
+                $public['auth_posts'] = ( $authors_posts['count'] / $posts_quantity ) * 100;
+                $public['auth_posts'] = round( $public['auth_posts'], 2 ) . '%';
+                $public['auth_likes_eff']   = (round( $authors_posts['likes']   / $non_authors_posts['likes'], 4 ) * 100) . '%';
+                $public['auth_reposts_eff'] = (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) . '%';
+            }
+        }
+        $this->show_publics( $publics );
+    }
+
 }
 
 ?>
