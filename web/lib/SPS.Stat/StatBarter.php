@@ -12,7 +12,7 @@
       const TIME_INTERVAL = 3600;
 
       /** какое время ищем бартерный пост*/
-      const DEFAULT_SEARCH_DURATION = 84600;
+      const DEFAULT_SEARCH_DURATION = 86400;
 
       public static function form_response( $query_result )
       {

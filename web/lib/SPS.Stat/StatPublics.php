@@ -33,7 +33,6 @@
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
-                $a['ava']   = $public->avatar;
                 $res[] = $a;
             }
             return $res;
@@ -399,6 +398,7 @@
                 StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
             }
 
+
             sleep(0.3);
         }
 
@@ -447,9 +447,49 @@
             $cmd->Execute();
         }
 
-        //barter
-        public static function save_barter_event()
+        //возвращает стены до 25 пабликов
+        public static function get_publics_walls( $barter_events_array )
         {
+            $code = '';
+            $return = "return{";
+            //запрашиваем стены пабликов по 25 пабликов, 15 постов
+            $i = 0;
+            foreach( $barter_events_array as $public ) {
+                $id = trim( $public->barter_public );
+                $code   .= 'var id' . $i . ' = API.wall.get({"owner_id":-' . $id . ',"count":15 });';
+                $return .=  "\"id$i\":id$i,";
+                $i++;
+            }
+            $code .= trim( $return, ',' ) . "};";
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
+                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
+            return $res;
+        }
+
+        public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
+        {
+            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
+            if ( !empty( $public )) {
+                $public     = reset( $public );
+                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+                $publisher  = reset( $publisher );
+            }
+
+            $params = array(
+                'gid'           =>  $public_id,
+                'date_from'     =>  date( 'Y-m-d', $time_from ),
+                'date_to'       =>  date( 'Y-m-d', $time_to )
+            );
+            if ( isset( $publisher->publisher->vk_token ))
+                $params['access_token']  =  $publisher->publisher->vk_token;
+
+            $res = VkHelper::api_request( 'stats.get', $params, 0 );
+            if ( !empty ( $res->error ))
+                return false;
+            return array(
+                'visitors'  =>  $res[0]->visitors,
+                'viewers'   =>  $res[0]->views
+            );
 
         }
 

@@ -10,30 +10,27 @@ class CheckWalls
 {
     public function Execute()
     {
-        //получить список активных эвентов (статус = 2 или статус = 1 и время начала поиска подошло )
-        //проставить статус 2 нужным
-        //проверить конец поиска, проставить статус 5 нужным
-        //прогнать нужные стены, поиск search_string
-        //найдено - статус 3
-        //для найденных собрать визиторов и население
 //        error_reporting(0);
         $this->kill_overtimed();
         $this->turn_on_search();
 
-        $bartets_for_search = BarterEventFactory::Get( array('_status' => 2 ), null, 'tst' );
-        $search_results = $this->wall_search( $bartets_for_search );
+        $barters_for_search = BarterEventFactory::Get( array('_status' => 2 ), null, 'tst' );
+        $search_results = $this->wall_search( $barters_for_search );
+
         $search_results = $this->get_population( $search_results );
-        foreach( $publics_for_search as &$public )
+        print_r($search_results);
+        foreach( $barters_for_search as $barter_event )
         {
-            if( isset( $search_results[ $public->barter_event_id ])) {
-                $public->posted_at  =   date('Y-m-d H:m:s', $search_results[ $public->barter_event_id ]['time']);
-                $public->post_id    =   $search_results[ $public->barter_event_id ]['post_id'];
-                $public->status     =   3;
+            if( isset( $search_results[ $barter_event->barter_event_id ])) {
+                $barter_event->posted_at  =   date('Y-m-d H:m:s', $search_results[ $barter_event->barter_event_id ]['time']);
+                $barter_event->post_id    =   $search_results[ $barter_event->barter_event_id ]['post_id'];
+                $barter_event->status     =   3;
+                $barter_event->start_visitors   =   $search_results[ $barter_event->barter_event_id ]['start_visitors'];
+                $barter_event->start_subscribers     =   $search_results[ $barter_event->barter_event_id ]['start_subscribers'];
             }
         }
-        BarterEventFactory::UpdateRange( $publics_for_search, null, 'tst' );
+        BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
-
 
     public function kill_overtimed()
     {
@@ -59,23 +56,14 @@ class CheckWalls
         $publics_chunks = array_chunk( $publics, 25 );
 
         foreach( $publics_chunks as $public_chunk ) {
-            $code = '';
-            $return = "return{";
-            //запрашиваем стены пабликов по 25 пабликов, 15 постов
-            foreach( $public_chunk as $public ) {
-                $id = trim( $public->barter_public ) ;
-                $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count":15 });';
-                $return .=  "\"id$id\":id$id,";
-            }
-            $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
-                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
-//            print_r( $res );
-            //todo ошибки, подумать над уникальностью
+
+            $res = StatPublics::get_publics_walls( $public_chunk );
             $public = reset( $public_chunk );
             //обработка стенок, поиск нужного поста
+
             foreach( $res as $public_wall ) {
                 foreach( $public_wall as $post ) {
+                    print_r($post);
                     $barter_post = $this->find_barter( $post->text, $public->search_string, $public->target_public );
                     //если в тексте есть вики ссылка, или это репост с нашего паблика
                     if ( $barter_post
@@ -107,18 +95,27 @@ class CheckWalls
     {
         foreach( $publics as &$public ) {
             $now =  time();
-            $id = $public[ 'target_public' ];
+            $id = $public[ 'target_id' ];
 
-            $res = StatPublics::get_views_visitors_from_vk( $id, $now, $now);
-
+            $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+            print_r($res);
             $public['start_visitors'] =  $res[ 'visitors' ];
             sleep(0.3);
 
             $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0 );
+
             $public[ 'start_subscribers' ] = $res->count;
             sleep(0.3);
         }
 
         return $publics;
     }
+
+    public function get_search_array()
+    {
+        $our_publics = StatPublics::get_our_publics_list();
+    }
+
+
+
 }
