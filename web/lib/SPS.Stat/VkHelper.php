@@ -22,7 +22,7 @@
         public static function api_request( $method, $request_params, $throw_exc_on_errors = 1 )
         {
             if ( !isset( $request_params['access_token'] ))
-                $request_params['access_token']  =  ACC_TOK_WRK;
+                $request_params['access_token']  =  self::get_service_access_token();
             $url = VK_API_URL . $method;
             $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
             if ( isset( $res->error ) )
@@ -151,8 +151,10 @@
                 $ds  = $cmd->Execute();
                 $ds->Next();
                 $at  = $ds->GetString( 'access_token' );
-                if ( !$at )
-                    return false;
+                if ( !$at ) {
+                    wrapper::mailer( 'закончились сервисные токены!');
+                    throw new Exception ('закончились сервисные токены!');
+                }
                 if ( self::check_at( $at ))
                     return $at;
             }
@@ -186,7 +188,6 @@
             $cmd->SetString ( '@access_token ', $access_token );
             $cmd->SetInteger( '@user_id ',      $user_id );
             $cmd->SetInteger( '@app_id',        $app_id );
-            echo $cmd->GetQuery();
             $cmd->Execute();
         }
 

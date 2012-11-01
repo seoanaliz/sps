@@ -217,6 +217,16 @@ var Eventlist = {
         }, function() {
             callback(true);
         });
+    },
+    get_report_list: function(limit, offset, callback) {
+        simpleAjax('getReportList', {limit: limit, offset: offset}, function(data) {
+            callback(data);
+        });
+    },
+    add_report: function(ourPublicId, publicId, time, callback) {
+        simpleAjax('addReport', {targetPublicId: ourPublicId, barterPublicId: publicId, startTime: time}, function() {
+            callback(true);
+        })
     }
 };
 $.extend(Events.eventList, Eventlist);

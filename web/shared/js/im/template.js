@@ -140,9 +140,9 @@ var MESSAGES =
 
 var MESSAGES_LOADING =
 '<div class="messages">' +
-    '<? if (isset("list") && list.length) { ?>' +
+    '<? if (isset("preloadList") && preloadList.length) { ?>' +
         '<div class="mini-load"></div>' +
-        '<? each(MESSAGES_ITEM, list); ?>' +
+        '<? each(MESSAGES_ITEM, preloadList); ?>' +
     '<? } else { ?>' +
         '<div class="load"></div>' +
     '<? } ?>' +

@@ -1,0 +1,55 @@
+@import "../common/mixins.less";
+
+#main {
+    &> .header {
+        padding: 10px;
+    }
+
+    h3 {
+        margin: 0;
+        padding: 10px 10px 0;
+    }
+
+    #results {
+        padding: 0 10px;
+
+        .row + .row {
+            border-top: 1px solid @border_inside;
+        }
+        .row {
+            padding: 10px 0;
+
+            &> div {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+        .public {
+            width: 250px;
+
+            &> div {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+        .photo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            overflow: hidden;
+
+            img {
+                max-width: 100%;
+            }
+        }
+        .time {
+            width: 90px;
+        }
+        .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 160px;
+        }
+    }
+}
