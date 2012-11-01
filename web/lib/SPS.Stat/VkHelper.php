@@ -36,7 +36,7 @@
 
             public static function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '')
             {
-                if ( empty( $url )) {
+                if (empty( $url )) {
                     return false;
                 }
 
@@ -192,4 +192,4 @@
             }
 
         }
-?>
+    ?>
