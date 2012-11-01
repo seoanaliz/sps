@@ -107,6 +107,8 @@ var Eventlist = {
             show: 1
         }, function(dirtyData) {
             var clearList = [];
+            var clearPeriod = [];
+            var clearListType = 0;
             if ($.isArray(dirtyData.list)) {
                 $.each(dirtyData.list, function(i, publicItem) {
                     var users = [];
@@ -133,15 +135,17 @@ var Eventlist = {
                     });
                 });
             }
-            var clearPeriod = [];
             if (dirtyData.min_max) {
                 clearPeriod = [
                     dirtyData.min_max.min,
                     dirtyData.min_max.max
                 ];
             }
+            if (dirtyData.group_type == 2) {
+                clearListType = 1;
+            }
 
-            callback(clearList, clearPeriod);
+            callback(clearList, clearPeriod, clearListType);
         });
     },
     add_list: function(title, callback) {
