@@ -39,8 +39,8 @@ class getEntries {
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
-
-        if ( $group_type != 2 ) {
+        $group  = StatGroups::get_group($groupId);
+        if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel' );
             $sortBy  = $sortBy && in_array($sortBy, $allowed_sort_values, 1)  ? $sortBy  : 'diff_abs';
 
@@ -146,7 +146,7 @@ class getEntries {
             $resul = $this->get_our_publics_state( $groupId, $time_from, $time_to );
         }
 
-        $group  = StatGroups::get_group($groupId);
+
 
 
         echo ObjectHelper::ToJSON(array(
