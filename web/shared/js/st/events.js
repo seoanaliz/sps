@@ -125,6 +125,9 @@ var Eventlist = {
                         publicFollowers: publicItem.quantity,
                         publicGrowthNum: publicItem.diff_abs,
                         publicGrowthPer: publicItem.diff_rel,
+                        publicIsActive: !!publicItem.active,
+                        publicInSearch: !!publicItem.in_search,
+                        publicVisitors: publicItem.visitors,
                         lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                         users: users
                     });
