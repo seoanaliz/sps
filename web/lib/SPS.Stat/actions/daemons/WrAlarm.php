@@ -118,6 +118,7 @@ class WrAlarm
     {
         $sql = 'SELECT vk_id,name FROM stat_publics_50k where active=1 and quantity>500000';
         $cmd = new SqlCommand( $sql, $this->connect );
+        echo $cmd->getQuery();
         $ds  = $cmd->Execute();
         $res = array();
         while ( $ds->Next()) {

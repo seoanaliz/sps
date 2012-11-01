@@ -10,8 +10,8 @@ class WrTopics extends wrapper
 
     public function Execute()
     {
-        if (! $this->check_time())
-            die('Не сейчас');
+//        if (! $this->check_time())
+//            die('Не сейчас');
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i') . '<br>';
         $this->update_quantity();
