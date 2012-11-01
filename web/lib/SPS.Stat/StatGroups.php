@@ -162,7 +162,7 @@
                 $sql = 'UPDATE
                             ' . TABLE_STAT_GROUPS .
                     ' SET
-                                "name"=@name, comments=@comments, ava=@ava
+                                "name"=@name, comments=@comments, ava=@ava,type=1
                           WHERE group_id=@group_id';
 
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
