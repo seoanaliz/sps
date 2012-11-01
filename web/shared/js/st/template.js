@@ -22,6 +22,15 @@ var TABLE =
     '<div class="item followers">' +
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
+    '<div class="item is-active">' +
+        'активен<span class="icon arrow"></span>' +
+    '</div>' +
+    '<div class="item in-search">' +
+        'в поиске<span class="icon arrow"></span>' +
+    '</div>' +
+    '<div class="item visitors">' +
+        'посетители<span class="icon arrow"></span>' +
+    '</div>' +
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
     '</div>' +
@@ -45,6 +54,9 @@ var TABLE_ROW =
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
     '<div class="public-followers"><?=publicFollowers?></div>' +
+    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
+    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
+    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
     '<div class="public-growth">' +
         '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
