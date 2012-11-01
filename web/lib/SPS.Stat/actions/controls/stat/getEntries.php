@@ -35,13 +35,12 @@ class getEntries {
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
 
-        $group_type     =   $group_type ? 1 : 0;
         $quant_max      =   $quant_max ? $quant_max : 100000000;
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
 
-        if ( !$group_type ) {
+        if ( $group_type != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel' );
             $sortBy  = $sortBy && in_array($sortBy, $allowed_sort_values, 1)  ? $sortBy  : 'diff_abs';
 
