@@ -33,7 +33,7 @@
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
-
+                $a['ava']   = $public->avatar;
                 $res[] = $a;
             }
             return $res;
@@ -334,12 +334,12 @@
 
         public static function get_views_visitors_from_base( $sb_id, $time_from, $time_to )
         {
-            $public    = TargetFeedFactory::Get(array('targetFeedId' => $sb_id));
+            $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
             $sql = 'SELECT views,visitors
-                    FROM stat_our_publics_vis_vie
+                    FROM stat_publics_50k_points
                     WHERE   date >= @time_from
                             AND date <= @time_to
-                            AND public_id = @public_id
+                            AND id = @public_id
                     ORDER BY date';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@time_from', $time_from );
@@ -374,47 +374,32 @@
 
         }
 
-        public static function get_views_visitors_from_vk( $sb_id, $time_from, $time_to )
+        public static function get_views_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-            $publisher = TargetFeedPublisherFactory::Get( array('targetFeedId' => $sb_id ));
-            $public    = TargetFeedFactory::Get(array('targetFeedId' => $sb_id));
+            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
+            if ( !empty( $public )) {
+                $public = reset( $public );
+                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+                $publisher = reset( $publisher );
+            }
+
             $params = array(
-                'gid'           =>  $public[$sb_id]->externalId,
-                'access_token'  =>  $publisher->publisher->vk_token,
-                'date_from'     =>  date( 'Y-m-d',$time_from),
-                'date_to'       =>  date( 'Y-m-d',$time_to)
+                'gid'           =>  $public_id,
+                'date_from'     =>  date( 'Y-m-d', $time_from ),
+                'date_to'       =>  date( 'Y-m-d', $time_to )
             );
+            if ( isset( $publisher->publisher->vk_token ))
+                $params['access_token']  =  $publisher->publisher->vk_token;
+
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error))
                 return false;
-            $views      =   0;
-            $visitors   =   0;
-            $days = count( $res );
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-                if ( isset( $temp_views )) {
-                    echo 1;
-                    $diff_views +=  $day->views     - $temp_views;
-                    $diff_viss  +=  $day->visitors  - $temp_viss;
-                }
-
-                $temp_views =   $day->views;
-                $temp_viss  =   $day->visitors;
-                $views      += $day->views;
-                $visitors   += $day->visitors;
-                $date = explode( '-', $day->day );
-                $date = mktime( '0', '0', '0', $date[1], $date[2], $date[0] );
-                StatPublics::save_view_visitor( $public[$sb_id]->externalId, $day->views, $day->visitors, $date, $connect );
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
             }
 
-            sleep(0.2);
-            return array(
-                'views'         =>  round( $views       / $days ),
-                'visitors'      =>  round( $visitors    / $days ),
-                'vievs_grouth'  =>  round( $diff_views  / ( $days - 1 )),
-                'vis_grouth'    =>  round( $diff_viss   / ( $days - 1 )),
-            );
-
+            sleep(0.3);
         }
 
         public static function get_average_rate( $sb_id, $time_from, $time_to ) {
@@ -433,7 +418,7 @@
                     ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
-            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
+            $cmd->SetInteger( '@targetFeedId', $sb_id );
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
@@ -446,13 +431,19 @@
 
         public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
         {
-            $sql = 'INSERT INTO stat_our_publics_vis_vie
-                    VALUES (@public_id, @date, @views, @visitors)';
+            $sql = 'UPDATE
+                        stat_publics_50k_points
+                    SET
+                        visitors=@visitors,
+                        views   =@views
+                    WHERE
+                      id=@public_id
+                      AND time=@date';
             $cmd = new SqlCommand( $sql, $connect );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetInteger( '@visitors',  $visitors );
             $cmd->SetInteger( '@views',     $views );
-            $cmd->SetInteger( '@date',      $date );
+            $cmd->SetString ( '@date',      $date );
             $cmd->Execute();
         }
 
