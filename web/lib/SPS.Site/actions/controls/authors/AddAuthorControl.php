@@ -40,7 +40,7 @@
             }
 
             AuthorFactory::$mapping['view'] = 'authors';
-            $exists = AuthorFactory::GetOne(array('vkId' => $vkId));
+            $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
 
             if (empty($exists)) {
                 $object->targetFeedIds = array($targetFeedId);
