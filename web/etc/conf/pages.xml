@@ -537,7 +537,7 @@
                      <actions>SPS.Stat.CheckWalls</actions>
                  </page>
                 <page uri="daemons://CheckPosts/">
-                     <actions>SPS.Site.CheckPosts</actions>
+                     <actions>SPS.Stat.CheckPosts</actions>
                  </page>
 
             </pageGroup>

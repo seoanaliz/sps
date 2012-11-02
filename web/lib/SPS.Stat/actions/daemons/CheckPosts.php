@@ -8,10 +8,12 @@
  */
 class CheckPosts
 {
+    const time_shift = 10800;
     private $now;
+
     public function Execute()
     {
-        $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time()+ 10800));
+        $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time() + self::time_shift));
         //получить список активных эвентов (статус = 3 )
         //прогнать нужные стены(10 записей), поиск search_string
         //не найдено - статус 5, собрать визиторов и население
@@ -48,11 +50,12 @@ class CheckPosts
                         $barter->deleted_at = $this->now;
                         break;
                     } else {
-                        $overposts .= $post->id . ',';
+                        if( $barter->stop_search_at->compareTo( date( 'Y-m-d H:i:s', $post->date + self::time_shift )) > 0 )
+                            $overposts .= date( 'Y-m-d H:i:s', $post->date + self::time_shift ) . ',';
                     }
                 }
 
-                $barter->barter_overlaps = rtrim( $overposts, ',');
+                $barter->barter_overlaps = rtrim( $overposts, ',' );
 
                 if ( !$trig && !$this->check_post_existence( $barter ) ) {
                     $barter->status = 5;
@@ -80,7 +83,7 @@ class CheckPosts
     {
         foreach( $barter_events_array as $barter_event ) {
             if ( $barter_event->status != 3 ) {
-                $time = time() + 10800;
+                $time = time() + self::time_shift;
                 $res =  StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
                 print_r($res);
                 $barter_event->end_visitors = $res['visitors'];

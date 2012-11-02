@@ -8,6 +8,7 @@
  */
 class CheckWalls
 {
+    const time_shift = 10800;
     public function Execute()
     {
 //        error_reporting(0);
@@ -35,7 +36,7 @@ class CheckWalls
     public function kill_overtimed()
     {
         //ищем просроченные
-        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:m:s',time() + 10800 + StatBarter::TIME_INTERVAL),'_statusNE' => 5 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:m:s',time() + self::time_shift + StatBarter::TIME_INTERVAL),'_status' => 2 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 5;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
@@ -44,7 +45,7 @@ class CheckWalls
     public function turn_on_search()
     {
         //ищем записи, которые включаются в поиск
-        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:m:s',time() + 10800 + StatBarter::TIME_INTERVAL), '_status' => 1 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:m:s',time() + self::time_shift + StatBarter::TIME_INTERVAL), '_status' => 1 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 2;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
@@ -63,13 +64,12 @@ class CheckWalls
 
             foreach( $res as $public_wall ) {
                 foreach( $public_wall as $post ) {
-                    print_r($post);
                     $barter_post = $this->find_barter( $post->text, $public->search_string, $public->target_public );
                     //если в тексте есть вики ссылка, или это репост с нашего паблика
                     if ( $barter_post
                         || ( isset( $post->copy_owner_id ) && ltrim( $post->copy_owner_id, '-' ) == $public->target_public )) {
                         $barters[ $public->barter_event_id ] = array(
-                            'time'      =>  $post->date,
+                            'time'      =>  $post->date + self::time_shift,
                             'post_id'   =>  $post->id,
                             'target_id' =>  trim( $public->target_public )
                         );

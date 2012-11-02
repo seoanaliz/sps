@@ -31,7 +31,7 @@
                   'ad_public'     =>  $publics_data[ $barter_event->target_public ],
                   'posted_at'     =>  $publics_data->posted_at,
                   'deleted_at'    =>  $publics_data->deleted_at,
-                  'overlaps'      =>  $publics_data->overlaps,
+                  'overlaps'      =>  explode(',', $publics_data->overlaps),
                   'subscribers'   =>  $publics_data->end_subscribers - $publics_data->start_subscribers,
                   'visitors'      =>  $publics_data->end_visitors    - $publics_data->start_visitors
               );
