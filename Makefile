@@ -10,8 +10,9 @@ sync:
 	@echo "[GIT] Synchronizing with GIT server..."
 	@git reset --hard origin
 	@git fetch
-	@git checkout -t origin/$(branch)
+	@git checkout $(branch)
 	@git pull
+	@git status
 
 deploy:
 	@echo "[SSH] Deploying to server..."
