@@ -493,6 +493,24 @@
 
         }
 
-
+        public function get_publics_info_from_base( $public_ids )
+        {
+            $public_ids = implode( ',', $public_ids );
+            $sql = 'SELECT vk_id, name, ava
+                    FROM ' . TABLE_STAT_PUBLICS . '
+                    WHERE vk_id IN (' . $public_ids . ')';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetString( '@public_ids', '\'{' . $public_ids . '}\'' );
+            echo $cmd->getQuery();
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[ $ds->GetInteger( 'vk_id' )] = array(
+                    'name'  =>   $ds->GetString( 'name' ),
+                    'ava'   =>   $ds->GetString( 'ava' )
+                );
+            }
+            return $res;
+        }
     }
 ?>
