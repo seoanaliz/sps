@@ -40,7 +40,7 @@
             }
 
             AuthorFactory::$mapping['view'] = 'authors';
-            $exists = AuthorFactory::GetOne(array('vkId' => $vkId));
+            $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
 
             if (empty($exists)) {
                 $object->targetFeedIds = array($targetFeedId);
@@ -58,6 +58,14 @@
 
                 $result['success'] = AuthorFactory::UpdateByMask($exists, array('targetFeedIds', 'statusId'), array('vkId' => $exists->vkId));
             }
+
+            $manageEvent = new AuthorManage();
+            $manageEvent->createdAt = DateTimeWrapper::Now();
+            $manageEvent->authorVkId = $vkId;
+            $manageEvent->editorVkId = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $manageEvent->action = 'add';
+            $manageEvent->targetFeedId = $targetFeedId;
+            AuthorManageFactory::Add($manageEvent);
 
             echo ObjectHelper::ToJSON($result);
         }
