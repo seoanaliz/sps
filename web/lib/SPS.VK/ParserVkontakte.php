@@ -417,7 +417,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
-                $text       =   TextHelper::fromUTF8( $this->remove_tags( $post->text ));
+                $text       =   $this->remove_tags( $post->text );
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -805,7 +805,7 @@
             return $result;
         }
 
-        public function get_album_as_posts($public_id, $album_id, $limit = false, $offset = false)
+        public function get_album_as_posts( $public_id, $album_id, $limit = false, $offset = false)
         {
             $params = array(
                 'gid'       =>  $public_id,
