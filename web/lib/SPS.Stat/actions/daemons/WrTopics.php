@@ -3,7 +3,7 @@
 Package::Load( 'SPS.Stat' );
 
 set_time_limit(13600);
-error_reporting( 0 );
+//error_reporting( 0 );
 class WrTopics extends wrapper
 {
     private $ids;
@@ -18,21 +18,20 @@ class WrTopics extends wrapper
         $this->update_public_info();
         $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
-
     }
 
     public function get_id_arr()
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quanity > 500000
+                WHERE quantity > 100000
                 ORDER BY vk_id";
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+        echo $cmd->getQuery();
         $ds = $cmd->Execute();
         $res = array();
         while ( $ds->Next() ) {
-            $res[] = $ds->getValue('vk_id', TYPE_INTEGER);
+            $res[] = $ds->getValue( 'vk_id', TYPE_INTEGER );
         }
         $this->ids = $res;
     }
@@ -43,12 +42,12 @@ class WrTopics extends wrapper
                 FROM ' . TABLE_STAT_PUBLICS_POINTS . '
                 WHERE time >= current_date-interval \'1 day\'
                 LIMIT 1';
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
         $ds = $cmd->Execute();
         $ds->Next();
         if( $ds->GetValue( 'time' ))
             return false;
-
+        return true;
     }
 
     //проверяет изменения в пабликах(название и ава)
@@ -203,6 +202,7 @@ class WrTopics extends wrapper
             die();
         }
     }
+
     public function update_visitors()
     {
         $time_start = time() - 75600 ;
@@ -244,7 +244,6 @@ class WrTopics extends wrapper
                 $public['visitors'] = $guests['visitors'];
                 $public['avg_vie_grouth'] = $guests['vievs_grouth'];
                 $public['avg_vis_grouth'] = $guests['vis_grouth'];
-
             }
 
             if ( !$authors_posts['count'] && !$non_authors_posts['count'] ) {
