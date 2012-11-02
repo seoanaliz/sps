@@ -10,8 +10,16 @@
     class VKCheckAuth {
 
         public function Execute() {
-            $vk_auth = AuthVkontakte::IsAuth();
-            if ($vk_auth === false) return 'login';
+            $checkEditor = Request::getBoolean( 'checkEditor' );
+
+            $vk_auth = AuthVkontakte::IsAuth($checkEditor);
+            if ($vk_auth === false) {
+                if (!$checkEditor) {
+                    return 'login';
+                } else {
+                    return 'empty';
+                }
+            }
         }
     }
 ?>
