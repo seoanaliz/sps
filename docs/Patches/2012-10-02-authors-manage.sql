@@ -15,6 +15,7 @@ SELECT
     "public"."authorManages"."authorVkId",
     "public"."authorManages"."editorVkId",
     "public"."authorManages"."createdAt",
-    "public"."authorManages"."action"
+    "public"."authorManages"."action",
+    "public"."authorManages"."targetFeedId"
  FROM "public"."authorManages"
 ORDER BY "public"."authorManages"."createdAt";
