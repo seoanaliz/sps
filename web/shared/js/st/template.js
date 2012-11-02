@@ -16,11 +16,9 @@ var LIST_ITEM =
 
 var TABLE =
 '<?=tmpl(TABLE_HEADER)?>' +
-'<?=tmpl(TABLE_BODY, {rows: rows})?>';
-
-var OUR_TABLE =
-'<?=tmpl(OUR_TABLE_HEADER)?>' +
-'<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>';
+'<div class="list-body">' +
+    '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
+'</div>';
 
 var TABLE_HEADER =
 '<div class="list-head clear-fix">' +
@@ -48,11 +46,6 @@ var TABLE_HEADER =
 '</div>';
 
 var TABLE_BODY =
-'<div class="list-body">' +
-    '<? each(TABLE_ROW, rows); ?>' +
-'</div>';
-
-var TABLE_ROWS =
 '<? each(TABLE_ROW, rows); ?>';
 
 var TABLE_ROW =
@@ -90,6 +83,12 @@ var TABLE_ROW =
     '</div>' +
 '</div>';
 
+var OUR_TABLE =
+'<?=tmpl(OUR_TABLE_HEADER)?>' +
+'<div class="list-body">' +
+    '<? each(OUR_TABLE_ROW, rows); ?>' +
+'</div>';
+
 var OUR_TABLE_HEADER =
 '<div class="list-head clear-fix">' +
     '<div class="item is-active">активен</div>' +
@@ -101,9 +100,6 @@ var OUR_TABLE_BODY =
 '<div class="list-body">' +
     '<? each(OUR_TABLE_ROW, rows); ?>' +
 '</div>';
-
-var OUR_TABLE_ROWS =
-'<? each(OUR_TABLE_ROW, rows); ?>';
 
 var OUR_TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
