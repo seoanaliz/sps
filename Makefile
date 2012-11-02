@@ -8,7 +8,6 @@ all: sync
 
 sync:
 	@echo "[GIT] Synchronizing with GIT server..."
-	@git reset --hard origin
 	@git fetch
 	@git checkout $(branch)
 	@git pull
