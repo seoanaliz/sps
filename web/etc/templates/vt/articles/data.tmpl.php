@@ -61,6 +61,10 @@
             <label>{lang:vt.article.authorId}</label>
             <?= FormHelper::FormInput( $prefix . '[authorId]', $object->authorId, 'authorId', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="editor" class="row">
+            <label>{lang:vt.article.editor}</label>
+            <?= FormHelper::FormInput( $prefix . '[editor]', $object->editor, 'editor', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.article.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
