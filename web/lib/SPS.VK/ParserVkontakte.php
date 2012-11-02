@@ -417,7 +417,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
-                $text       =   TextHelper::ToUTF8( $this->remove_tags( $post->text ));
+                $text       =    $this->remove_tags( $post->text);
                 $maps = '';
                 $doc  = '';
                 $link = '';
