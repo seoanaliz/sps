@@ -52,6 +52,9 @@ var TABLE_BODY =
     '<? each(TABLE_ROW, rows); ?>' +
 '</div>';
 
+var TABLE_ROWS =
+'<? each(TABLE_ROW, rows); ?>';
+
 var TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
     '<div class="public-info clear-fix" data-id="<?=publicId?>">' +
@@ -98,6 +101,9 @@ var OUR_TABLE_BODY =
 '<div class="list-body">' +
     '<? each(OUR_TABLE_ROW, rows); ?>' +
 '</div>';
+
+var OUR_TABLE_ROWS =
+'<? each(OUR_TABLE_ROW, rows); ?>';
 
 var OUR_TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +

@@ -506,7 +506,7 @@ var Table = (function() {
                 pagesLoaded += 1;
                 if (data.length) {
                     dataTable = $.merge(dataTable, data);
-                    $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
+                    $tableBody.append(tmpl(TABLE_ROWS, {rows: data}));
                     $el.removeClass('loading');
                 } else {
                     $el.removeClass('loading');
