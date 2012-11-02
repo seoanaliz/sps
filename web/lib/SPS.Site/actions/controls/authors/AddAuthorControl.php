@@ -59,6 +59,14 @@
                 $result['success'] = AuthorFactory::UpdateByMask($exists, array('targetFeedIds', 'statusId'), array('vkId' => $exists->vkId));
             }
 
+            $manageEvent = new AuthorManage();
+            $manageEvent->createdAt = DateTimeWrapper::Now();
+            $manageEvent->authorVkId = $vkId;
+            $manageEvent->editorVkId = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $manageEvent->action = 'add';
+            $manageEvent->targetFeedId = $targetFeedId;
+            AuthorManageFactory::Add($manageEvent);
+
             echo ObjectHelper::ToJSON($result);
         }
     }
