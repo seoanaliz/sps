@@ -645,6 +645,7 @@ var Table = (function() {
                     }
                     Filter.setSliderMin(maxPeriod[0]);
                     Filter.setSliderMax(maxPeriod[1]);
+                    $('#global-loader').fadeOut(200);
                 } else {
                     pagesLoaded = 1;
                     dataTable = data;
@@ -653,9 +654,9 @@ var Table = (function() {
                     currentSortBy = newSortBy;
                     currentSortReverse = newSortReverse;
                     $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    $('#global-loader').fadeOut(200);
                     Filter.setSliderMin(maxPeriod[0]);
                     Filter.setSliderMax(maxPeriod[1]);
+                    $('#global-loader').fadeOut(200);
                 }
             }
         );
