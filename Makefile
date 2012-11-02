@@ -9,7 +9,9 @@ all: sync
 sync:
 	@echo "[GIT] Synchronizing with GIT server..."
 	@git reset --hard origin
-	@git checkout $(branch) && git pull
+	@git fetch
+	@git checkout -t origin/$(branch)
+	@git pull
 
 deploy:
 	@echo "[SSH] Deploying to server..."
