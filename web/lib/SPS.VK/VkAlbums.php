@@ -124,7 +124,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   0;
                 $time       =   $post->created;
-                $text       =   TextHelper::fromUTF8( $post->text );
+                $text       =   TextHelper::ToUTF8( $post->text );
                 $photo = array();
                 $photo[] = array(
                     'id'   =>  $post->owner_id . '_' . $post->pid,

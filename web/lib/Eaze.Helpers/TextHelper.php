@@ -118,7 +118,7 @@
          * @return string
          */
         public static function ToUTF8( $string, $sourceCharset = 'CP1251' ) {
-            return iconv( $sourceCharset, 'UTF-8', $string );
+            return iconv( $sourceCharset, 'UTF-8' . '//TRANSLIT//IGNORE', $string );
         }
 
 
