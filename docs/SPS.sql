@@ -374,6 +374,17 @@ Create table "authorFeedViews"
 ) Without Oids;
 
 
+Create table "authorManages"
+(
+    "authorManageId" Serial NOT NULL,
+    "authorVkId" Varchar(1000) NOT NULL,
+    "editorVkId" Varchar(1000) NOT NULL,
+    "createdAt" Timestamp NOT NULL Default now(),
+    "action" Varchar(1000) NOT NULL Default 'add',
+    "targetFeedId" Integer NOT NULL,
+ primary key ("authorManageId")
+) Without Oids;
+
 /* Create Tab 'Others' for Selected Tables */
 
 
