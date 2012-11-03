@@ -496,18 +496,87 @@
         public function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
-            $sql = 'SELECT vk_id, name, ava
+            $sql = 'SELECT vk_id, name, ava, quantity
                     FROM ' . TABLE_STAT_PUBLICS . '
                     WHERE vk_id IN (' . $public_ids . ')';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
             $cmd->SetString( '@public_ids', '\'{' . $public_ids . '}\'' );
-            echo $cmd->getQuery();
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
                 $res[ $ds->GetInteger( 'vk_id' )] = array(
-                    'name'  =>   $ds->GetString( 'name' ),
-                    'ava'   =>   $ds->GetString( 'ava' )
+                    'name'      =>   $ds->GetString( 'name' ),
+                    'ava'       =>   $ds->GetString( 'ava' ),
+                    'quantity'  =>   $ds->GetInteger( 'quantity' )
+                );
+            }
+            return $res;
+        }
+
+        //проверяет изменения в пабликах(название и ава)
+        public static function update_public_info( $publics, $conn )
+        {
+            $public_chunks = array_chunk( $publics, 500 );
+
+            foreach( $public_chunks as $ids ) {
+                $line = implode( ',', $ids );
+                $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
+                sleep(0.3);
+                foreach( $res as $public ) {
+                    //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
+                    $sql = '
+                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar);
+                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar) RETURNS varchar AS $$
+                    DECLARE
+                        curr_name CHARACTER VARYING := \'_\';
+                    BEGIN
+                        SELECT name INTO curr_name FROM stat_publics_50k WHERE vk_id=$1;
+                        IF( curr_name=p_name )
+                        THEN
+                            curr_name := \'\';
+                        ELSE
+                            INSERT INTO stat_public_audit(public_id,name,changed_at,act) VALUES ($1,curr_name,CURRENT_TIMESTAMP,\'name\');
+                        END IF;
+                        UPDATE stat_publics_50k SET name = $2, ava=$3 WHERE vk_id=$1;
+
+                        RETURN curr_name;
+                    END
+                    $$ lANGUAGE plpgsql;
+                    SELECT update_public_info( @public_id, @name, @photo ) AS old_name;';
+                    $cmd = new SqlCommand( $sql, $conn );
+                    $cmd->SetInteger( '@public_id', $public->gid );
+                    $cmd->SetString(  '@name', $public->name );
+                    $cmd->SetString(  '@photo', $public->photo);
+                    $cmd->Execute();
+                }
+            }
+        }
+
+        public static function get_public_changes( $time_from, $time_to, $conn = 0 )
+        {
+            if ( !$conn )
+                $conn = ConnectionFactory::Get('tst');
+
+            $sql = 'SELECT
+                        public_id, a.name as old_name, changed_at, b.name
+                    FROM '
+                        . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
+                   'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
+                   'ON
+                        public_id=vk_id
+                    WHERE
+                        changed_at > @time_from
+                        AND changed_at > @time_to
+                        AND act = \'name\'';
+            $cmd = new SqlCommand( $sql, $conn );
+            $cmd->SetString( '@time_from', date( 'r', $time_from ));
+            $cmd->SetString( '@time_to', date( 'r', $time_to ));
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[$ds->GetInteger( 'public_id')] = array(
+                    'old_name'  => $ds->GetValue( 'old_name' ),
+                    'new_name'  => $ds->GetValue( 'name' )
                 );
             }
             return $res;

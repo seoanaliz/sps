@@ -18,13 +18,16 @@ class WrAlarm
         set_time_limit(0);
         $this->connect = ConnectionFactory::Get( 'tst' );
 
+        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
+
         $publics = $this->get_monitoring_publs(1);
-//        $publics = array( array( 'public_id'=>35807216,'name' => "Теория успеха | ВКурсе"));
         $this->check_in_search( $publics );
+
         $publics = $this->get_monitoring_publs();
-        $this->check_block( array( array( 'public' => 36959959)));
-        print_r($this->wasted_array );
+        $this->check_block( $publics );
+
         $report = $this->form_report();
+        print_R($report);
         if ( $report )
             $this->send_report( $report );
     }
@@ -147,6 +150,21 @@ class WrAlarm
         return $res;
     }
 
+    public function get_id_arr()
+    {
+        $sql = "select vk_id
+                FROM ". TABLE_STAT_PUBLICS ."
+                WHERE quantity > 1000000
+                ORDER BY vk_id";
+        $cmd = new SqlCommand( $sql, $this->connect);
+        $ds = $cmd->Execute();
+        $res = array();
+        while ( $ds->Next() ) {
+            $res[] = $ds->getInteger( 'vk_id' );
+        }
+        return $res;
+    }
+
     public function reset_search()
     {
 //            $sql = "UPDATE publics SET in_search=1 WHERE in_search=0";
@@ -161,19 +179,35 @@ class WrAlarm
 
     public function form_report()
     {
+        $now = time();
         $message = '';
         $search_line = array();
         foreach( $this->wasted_array as $k=>$v ) {
             $search_line[] = $k;
         }
-        $publics_info = StatPublics::get_publics_info_from_base( $search_line );
-        foreach( $this->wasted_array as $k=>$v ) {
-            if( $v = 'search')
-                $line = ' пропал из поиска';
-            else
-                $line = ' заблокирован';
-            $message .= "[public$k|" . $publics_info[$k]['name'] . "] " . $line . "\n";
+
+        if ( !empty( $search_line )) {
+            $publics_info = StatPublics::get_publics_info_from_base( $search_line );
+            foreach( $this->wasted_array as $k=>$v ) {
+
+                if( $v = 'search'   )
+                    $line = ' Убрали из поиска - ';
+                else
+                    $line = ' Заблокировали - ';
+                $message .= $line . "[public$k|" . $publics_info[$k]['name'] . "] " .  "\n";
+                $message .= "Количество подписчиков: " . $publics_info[$k]['quantity'] .  " .\n";
+                $message .= "Место в рейтинге: " . $this->get_public_place($k).  " .\n";
+            }
         }
+
+        $changed_names = StatPublics::get_public_changes( $now - 3400, $now, $this->connect );
+        if ( !empty( $changed_names )) {
+            $message .= "\nПоменяли название:\n";
+            foreach( $changed_names as $public_id => $names) {
+                $message .= "[public". $public_id ."|" . $names['new_name'] . "] ( бывшый \"" . $names['old_name'] . "\")\n";
+            }
+        }
+
         return $message;
     }
 
@@ -189,5 +223,28 @@ class WrAlarm
         $res = VkHelper::api_request( 'wall.post', $params , 0 );
     }
 
-
+    public function get_public_place( $public_id)
+    {
+        $sql = '
+            DROP FUNCTION IF EXISTS find_public_place(id int);
+            CREATE FUNCTION find_public_place( id INT ) RETURNS INT AS $$
+            DECLARE
+                i INT := 0;
+                curr INT;
+            BEGIN
+                FOR curr IN select vk_id from stat_publics_50k order by quantity desc
+                LOOP
+                i := i+1;
+                    IF (curr = id ) THEN return i; END IF;
+                END LOOP;
+                RETURN i;
+            END
+            $$ lANGUAGE plpgsql;
+            SELECT find_public_place( @public_id ) AS place;';
+        $cmd = new SqlCommand( $sql, $this->connect);
+        $cmd->SetInteger( '@public_id', $public_id );
+        $ds = $cmd->Execute();
+        $ds->Next();
+        return $ds->GetInteger( 'place' );
+    }
 }
