@@ -36,6 +36,9 @@
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
         </action>
+        <action name="SyncAlbums">
+            <path>daemons/SyncAlbums</path>
+        </action>
         <action name="SyncTop">
             <path>daemons/SyncTop</path>
         </action>
@@ -44,6 +47,9 @@
         </action>
         <action name="SyncLikes">
             <path>daemons/SyncLikes</path>
+        </action>
+        <action name="DeletePost">
+            <path>daemons/DeletePost</path>
         </action>
     </group>
 
@@ -93,6 +99,9 @@
             </action>
             <action name="GetSourceFeedsListControl">
                 <path>controls/GetSourceFeedsListControl</path>
+            </action>
+            <action name="PostDeletePlanControl">
+                <path>controls/PostDeletePlanControl</path>
             </action>
         </group>
 

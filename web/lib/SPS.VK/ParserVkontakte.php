@@ -151,11 +151,6 @@
             if (!isset($this->count))
                 $this->get_posts_count();
 
-            echo 'offset<br>';
-            print_r( $offset );
-            echo "offset<br>
-            $this->count";
-
             if ($offset > $this->count) {
                 throw new Exception("wall's end");
             }
@@ -382,7 +377,6 @@
                 $posts = $this->kill_attritions($posts);
                 return $posts;
             } else{
-                //                echo '<br>zero<br>';
                 return false;
             }
         }
@@ -390,6 +384,14 @@
         public function get_posts( $page_number )
         {
             $offset = $page_number * self::PAGE_SIZE;
+
+            if (!isset($this->count))
+                $this->get_posts_count();
+
+            if ($offset > $this->count) {
+                throw new Exception("wall's end");
+            }
+
             $params = array(
                 'owner_id'  =>  '-' . $this->page_id,
                 'offset'    =>  $offset,
@@ -415,7 +417,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
-                $text       =   TextHelper::fromUTF8( $this->remove_tags( $post->text ));
+                $text       =    $this->remove_tags( $post->text);
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -474,7 +476,6 @@
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
                                               'poll'    => $poll,    'text_links'   =>  $text_links  );
             }
-            print_r($result_posts_array);
             return $result_posts_array;
         }
 
@@ -496,10 +497,10 @@
             return ( $sum / $q );
         }
 
-        private function kill_attritions($array)
+        private function kill_attritions( $array )
         {
             $res = array();
-            $sr =  $this->get_average($array);
+            $sr =  $this->get_average( $array );
 
             $i = 0;
             $t = 0;
@@ -508,7 +509,6 @@
                 if ($array[$i]['likes'] > ($sr * 2) ){
                     if ($sr > 1){
                         $array[$i]['likes'] = '+' ;
-
                     }else
                         $array[$i]['likes'] = '-';
 
@@ -584,6 +584,7 @@
             return $array;
 
         }
+
 
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
@@ -790,6 +791,7 @@
             $res = VkHelper::api_request( 'wall.getById', $params, 0 );
 
             if ( !empty( $res->error )) {
+
                 throw new Exception('wall.getById::'.$res->error->error_msg);
             }
 
@@ -802,5 +804,62 @@
             }
             return $result;
         }
-    }
-?>
+
+        public function get_album_as_posts($public_id, $album_id, $limit = false, $offset = false)
+        {
+            $params = array(
+                'gid'       =>  $public_id,
+                'aid'       =>  $album_id,
+            );
+
+            if (is_numeric($limit))    $params['limit'] = $limit;
+            if (is_numeric($offset))    $params['offset'] = $offset;
+
+            $res = VkHelper::api_request( 'photos.get', $params );
+            $query_line = array();
+
+            foreach( $res as $photo )
+            {
+                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+            }
+            $query_line = implode( ',', $query_line );
+            sleep( 0.3 );
+
+            $params = array(
+                'photos'    =>  $query_line,
+                'extended'  =>  1,
+            );
+            $res = VkHelper::api_request( 'photos.getById', $params );
+            $posts = VkAlbums::post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
+            return $posts;
+        }
+
+        /**
+         * Возвращает количество фото в альбоме
+         * @param $public_id
+         * @param $album_id
+         * @return int
+         * @throws Exception
+         */
+        public function get_photo_count_in_album($public_id, $album_id)
+        {
+            $params = array(
+                'gid' => $public_id,
+                'aids' => $album_id,
+            );
+
+            $res = VkHelper::api_request('photos.getAlbums', $params);
+
+            if (!empty($res->error)) {
+                throw new Exception('wall.getById::' . $res->error->error_msg);
+            } else {
+               if (count($res)) {
+                   $res = array_pop($res);
+                   return $res->size;
+               } else {
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+               }
+            }
+        }
+}

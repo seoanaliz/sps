@@ -1,17 +1,17 @@
 # Default Parameters
 layout=local
+branch=master
 
 include build.properties
 
 all: sync
 
 sync:
-	@echo "[SVN] Synchronizing with SVN server..."
-	@git checkout master && git pull
-
-sync-only:
-	@echo "[SVN] Synchronizing with SVN server... (omit externals)"
-	@git checkout master && git pull
+	@echo "[GIT] Synchronizing with GIT server..."
+	@git fetch
+	@git checkout $(branch)
+	@git pull
+	@git status
 
 deploy:
 	@echo "[SSH] Deploying to server..."

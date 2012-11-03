@@ -39,6 +39,6 @@
             </tr>
         </tbody>
     </table>
-    <div id="go-to-top">Наверх</div>
 </div>
+<div id="go-to-top">Наверх</div>
 {increal:tmpl://st/elements/footer.tmpl.php}

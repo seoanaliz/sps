@@ -74,6 +74,11 @@
                     , 'type'        => TYPE_INTEGER
                     , 'foreignKey'  => 'Author'
                 )
+                ,'editor' => array(
+                    'name'          => 'editor'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 100
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER

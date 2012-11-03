@@ -5,7 +5,6 @@ var Collection = Class.extend({
     init: function() {
         this._models = {};
     },
-
     get: function(key) {
         return arguments.length ? this._models[key] : this._models;
     },
@@ -26,6 +25,9 @@ var Collection = Class.extend({
     },
     has: function(key) {
         return !!this._models[key];
+    },
+    clear: function() {
+        this._models = {};
     }
 });
 

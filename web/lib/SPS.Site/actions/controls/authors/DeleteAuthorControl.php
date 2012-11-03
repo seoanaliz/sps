@@ -31,6 +31,14 @@ sql;
                 $cmd->SetInt('@vkId', $o->vkId);
                 $cmd->ExecuteNonQuery();
             }
+
+            $manageEvent = new AuthorManage();
+            $manageEvent->createdAt = DateTimeWrapper::Now();
+            $manageEvent->authorVkId = $o->vkId;
+            $manageEvent->editorVkId = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $manageEvent->action = 'delete';
+            $manageEvent->targetFeedId = $targetFeedId;
+            AuthorManageFactory::Add($manageEvent);
         }
     }
 

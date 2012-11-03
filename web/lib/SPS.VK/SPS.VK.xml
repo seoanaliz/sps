@@ -15,6 +15,18 @@
             <redirect name="login" path="/login/" />
         </redirects>
     </action>
+    <action name="VKCheckAuthEditor">
+        <path>VKCheckAuth</path>
+        <parameters>
+            <request>
+                <param name="checkEditor">true</param>
+            </request>
+        </parameters>
+        <redirects>
+            <redirect name="login" path="/login/" />
+            <redirect name="empty" path="/landing/" />
+        </redirects>
+    </action>
     <action name="VKCheckAppAuth">
         <path>VKCheckAppAuth</path>
         <redirects>

@@ -17,6 +17,8 @@ var cur = {
 };
 
 $(document).ready(function() {
+    if ($('#this-is-reporter').length) return;
+
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {
@@ -500,7 +502,7 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data) {
+            function(data, maxPeriod, listType) {
                 pagesLoaded += 1;
                 if (data.length) {
                     dataTable = $.merge(dataTable, data);
@@ -525,7 +527,7 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data) {
+            function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentSortBy = field;
@@ -548,7 +550,7 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data) {
+            function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentSearch = text;
@@ -575,7 +577,7 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data) {
+            function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentPeriod = period;
@@ -597,7 +599,7 @@ var Table = (function() {
                 audienceMin: audience[0],
                 audienceMax: audience[1]
             },
-            function(data) {
+            function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
                 dataTable = data;
                 currentAudience = audience;
@@ -621,28 +623,41 @@ var Table = (function() {
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
-            function(data, period) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentListId = listId;
-                currentSearch = newSearch;
-                currentSortBy = newSortBy;
-                currentSortReverse = newSortReverse;
-                $container.html(tmpl(TABLE, {rows: data}));
-                $container.find('.' + currentSortBy).addClass('active');
-                $('#global-loader').fadeOut(200);
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
+            function(data, maxPeriod, listType) {
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentListId = listId;
+                    currentSearch = newSearch;
+                    currentSortBy = newSortBy;
+                    currentSortReverse = newSortReverse;
+                    $container.html(tmpl(TABLE, {rows: data}));
+                    $container.find('.' + currentSortBy).addClass('active');
+                    if (!currentListId) {
+                        $container.removeClass('no-list-id');
+                    } else {
+                        $container.addClass('no-list-id');
+                    }
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
+                    Filter.setSliderMin(maxPeriod[0]);
+                    Filter.setSliderMax(maxPeriod[1]);
+                    $('#global-loader').fadeOut(200);
                 } else {
-                    $container.addClass('no-list-id');
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentListId = listId;
+                    currentSearch = newSearch;
+                    currentSortBy = newSortBy;
+                    currentSortReverse = newSortReverse;
+                    $container.html(tmpl(OUR_TABLE, {rows: data}));
+                    Filter.setSliderMin(maxPeriod[0]);
+                    Filter.setSliderMax(maxPeriod[1]);
+                    $('#global-loader').fadeOut(200);
                 }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(period[0]);
-                Filter.setSliderMax(period[1]);
             }
         );
     }

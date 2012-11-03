@@ -199,7 +199,8 @@ var MessagesModel = Model.extend({
             id: null,
             user: new UserModel(),
             viewer: new UserModel(),
-            list: []
+            list: [],
+            preloadList: []
         };
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
@@ -218,6 +219,10 @@ var MessagesModel = Model.extend({
     list: function(list) {
         if (arguments.length) list = list || [];
         return this.data('list', list);
+    },
+    preloadList: function(preloadList) {
+        if (arguments.length) preloadList = preloadList || [];
+        return this.data('preloadList', preloadList);
     }
 });
 

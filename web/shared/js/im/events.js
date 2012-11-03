@@ -111,7 +111,7 @@ var Eventlist = {
             });
             clearData = {
                 user: clearUser,
-                viewer: userCollection.get(Configs.vkId),
+                viewer: userCollection.get(Configs.vkId).data(),
                 list: clearMessages,
                 lists: rawData.groupIds
             };
@@ -195,8 +195,8 @@ $.extend(Events.eventList, Eventlist);
  */
 var Cleaner = {
     longPollMessage: function(rawContent, isOut) {
-        var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
-        var viewer = userCollection.get(Configs.vkId);
+        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var viewerModel = userCollection.get(Configs.vkId);
 
         return {
             id: rawContent.mid,
@@ -205,16 +205,16 @@ var Cleaner = {
             text: rawContent.body,
             attachments: [],
             timestamp: rawContent.date,
-            user: user,
-            viewer: viewer,
+            user: userModel.data(),
+            viewer: viewerModel.data(),
             lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
             dialogId: rawContent.dialog_id
         };
     },
 
     longPollDialog: function(rawContent, isOut) {
-        var user = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
-        var viewer = userCollection.get(Configs.vkId);
+        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var viewerModel = userCollection.get(Configs.vkId);
 
         return {
             id: rawContent.dialog_id,
@@ -223,8 +223,8 @@ var Cleaner = {
             text: makeDlg(rawContent.body || rawContent.title),
             attachments: [],
             timestamp: rawContent.date,
-            user: user,
-            viewer: viewer,
+            user: userModel.data(),
+            viewer: viewerModel.data(),
             lists: (rawContent.groups == '-1') ? [Configs.commonDialogsList] : rawContent.groups,
             messageId: rawContent.mid
         };
@@ -241,7 +241,8 @@ var Cleaner = {
 
     longPollRead: function(rawContent) {
         return {
-            id: rawContent.mid
+            id: rawContent.mid,
+            dialogId: rawContent.dialog_id
         }
     },
 
@@ -279,15 +280,15 @@ var Cleaner = {
     },
 
     message: function(rawMessage) {
-        var user = userCollection.get(rawMessage.from_id) || new UserModel();
-        var viewer = userCollection.get(Configs.vkId) || new UserModel();
+        var userModel = userCollection.get(rawMessage.from_id) || new UserModel();
+        var viewerModel = userCollection.get(Configs.vkId) || new UserModel();
 
         return {
             id: rawMessage.mid,
             isNew: (rawMessage.read_state != 1),
             isViewer: (rawMessage.out != 0),
-            user: user,
-            viewer: viewer,
+            user: userModel.data(),
+            viewer: viewerModel.data(),
             text: makeMsg(rawMessage.body.split('<br>').join('\n'), true),
             timestamp: rawMessage.date,
             attachments: this.attachments(rawMessage.attachments),
@@ -296,15 +297,15 @@ var Cleaner = {
     },
 
     dialog: function(rawDialog) {
-        var user = new UserModel(this.user(rawDialog.uid));
-        var viewer = userCollection.get(Configs.vkId) || new UserModel();
+        var userModel = new UserModel(this.user(rawDialog.uid));
+        var viewerModel = userCollection.get(Configs.vkId) || new UserModel();
 
         return {
             id: rawDialog.id,
             isNew: (rawDialog.read_state != 1),
             isViewer: (rawDialog.out != 0),
-            user: user,
-            viewer: viewer,
+            user: userModel.data(),
+            viewer: viewerModel.data(),
             text: makeDlg(rawDialog.body || rawDialog.title),
             timestamp: rawDialog.date,
             attachments: [],

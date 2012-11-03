@@ -10,6 +10,8 @@
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
             $targetFeed     = !empty($targetFeeds[$article->targetFeedId]) ? $targetFeeds[$article->targetFeedId] : null;
+
+            if (empty($articleRecord) || empty($author) || empty($targetFeed)) continue;
             ?>{increal:tmpl://app/elements/wall-post.tmpl.php}<?
         }
     }

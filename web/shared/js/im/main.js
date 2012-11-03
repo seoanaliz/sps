@@ -61,7 +61,10 @@ var Main = Widget.extend({
             t._leftColumn.on('changeList', function(listId) {
                 t._rightColumn.setList(listId);
             });
-            t._leftColumn.on('addList markAsRead', function() {
+            t._leftColumn.on('addList', function() {
+                t._rightColumn.update();
+            });
+            t._leftColumn.on('markAsRead', function() {
                 t._rightColumn.update();
             });
             t._rightColumn.on('changeDialog', function(dialogId) {
@@ -102,7 +105,7 @@ var Main = Widget.extend({
 
         switch (event.type) {
             case 'inMessage':
-            case 'outMessage': {
+            case 'outMessage':
                 (function() {
                     var isViewer = (event.type == 'outMessage');
                     var message = Cleaner.longPollMessage(event.content, isViewer);
@@ -115,17 +118,15 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
-            case 'read': {
+            case 'read':
                 (function() {
                     var message = Cleaner.longPollRead(event.content);
                     t._leftColumn.readMessage(message.id);
                     t._leftColumn.readDialog(message.dialogId);
                 })();
                 break;
-            }
             case 'online':
-            case 'offline': {
+            case 'offline':
                 (function() {
                     var online = Cleaner.longPollOnline(event.content);
                     if (online.isOnline) {
@@ -135,7 +136,6 @@ var Main = Widget.extend({
                     }
                 })();
                 break;
-            }
         }
     }
 });
@@ -172,6 +172,10 @@ var LeftColumn = Widget.extend({
             t.showDialog(dialogId, true);
         });
 
+        t._dialogs.on('addList', function(e) {
+            t.trigger('addList');
+        });
+
         t._messages.on('hoverMessage', function(e) {
             var $message = $(e.currentTarget);
             var messageId = $message.data('id');
@@ -194,6 +198,10 @@ var LeftColumn = Widget.extend({
             var $tab = $(e.currentTarget);
             var listId = $tab.data('id');
             t.showList(listId, true);
+        });
+
+        t._tabs.on('addList', function() {
+            t.trigger('addList');
         });
     },
     onScroll: function(e) {
@@ -250,7 +258,7 @@ var Page = Widget.extend({
     _pageId: null,
     _cache: null,
     _service: 'get_dialogs',
-    _isBlock: false,
+    _isLock: false,
     _isCache: true,
     _scroll: null,
     _isBottom: false,
@@ -308,13 +316,13 @@ var Page = Widget.extend({
         return this;
     },
     isLock: function() {
-        return !!this._isBlock;
+        return !!this._isLock;
     },
     lock: function() {
-        this._isBlock = true;
+        this._isLock = true;
     },
     unlock: function() {
-        this._isBlock = false;
+        this._isLock = false;
     }
 });
 
@@ -348,7 +356,7 @@ var EndlessPage = Page.extend({
 
         t.onShow();
         t.lock();
-            Events.fire(t._service, pageId, offset, limit, function(data) {
+        Events.fire(t._service, pageId, offset, limit, function(data) {
             t.unlock();
 
             if (pageId == t._pageId) {
@@ -467,7 +475,22 @@ var Dialogs = EndlessPage.extend({
     },
 
     makeList: function($list) {
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     clickDialog: function(e) {
         var t = this;
@@ -570,12 +593,14 @@ var Dialogs = EndlessPage.extend({
         if (!dialogs.length) {
             t._isEnded = true;
         }
-        t.model().data(data);
+        t.model().id(t._pageId);
+        t.model().list(t.model().list().concat(dialogs));
+
         for (var i in dialogs) {
             if (!dialogs.hasOwnProperty(i)) continue;
             var dialogModel = new DialogModel(dialogs[i]);
             var messageModel = new MessageModel(dialogs[i]);
-            var userModel = dialogModel.user();
+            var userModel = new UserModel(dialogModel.user());
 
             if (dialogModel) {
                 dialogCollection.add(dialogModel.id(), dialogModel);
@@ -586,6 +611,13 @@ var Dialogs = EndlessPage.extend({
             if (dialogModel.messageId()) {
                 messageCollection.add(dialogModel.messageId(), messageModel);
             }
+        }
+    },
+    onRender: function() {
+        var t = this;
+        t.model().list([]);
+        if (t.checkAtBottom()) {
+            $(window).trigger('scroll');
         }
     },
     addDialog: function(dialogModel) {
@@ -660,12 +692,13 @@ var Messages = EndlessPage.extend({
         var t = this;
         var dialogId = t._pageId;
         var messageId = dialogCollection.get(dialogId).messageId();
-        var userId = dialogCollection.get(dialogId).user().id();
-        t.model().viewer(userCollection.get(Configs.vkId));
+        var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
         t.model().user(userCollection.get(userId));
+        t.model().viewer(userCollection.get(Configs.vkId));
         if (messageCollection.get(messageId)) {
-            t.model().list().push(messageCollection.get(messageId).data());
+            t.model().preloadList([messageCollection.get(messageId).data()]);
         }
+
         t._super.apply(this, Array.prototype.slice.call(arguments, 0));
         t.makeList(t.el().find(t._itemsSelector));
     },
@@ -677,11 +710,15 @@ var Messages = EndlessPage.extend({
     onLoad: function(data) {
         var t = this;
         var user = data.user;
+        var viewer = data.viewer;
         var messages = data.list;
         if (!messages.length) {
             t._isEnded = true;
         }
-        t.model().data(data);
+        t.model().id(t._pageId);
+        t.model().user(user);
+        t.model().viewer(viewer);
+        t.model().list(t.model().list().concat(messages));
 
         var userModel = new UserModel(user);
         userCollection.add(userModel.id(), userModel);
@@ -697,12 +734,30 @@ var Messages = EndlessPage.extend({
         var t = this;
         t.onShow();
         t.makeTextarea(t.el().find('textarea:first'));
+        if (t.checkAtTop()) {
+            $(window).trigger('scroll');
+        }
     },
     makeList: function($list) {
         var t = this;
         $list.find('.videos').imageComposition({width: 500, height: 240});
         $list.find('.photos').imageComposition({width: 500, height: 300});
-        $list.find('.date').easydate(Configs.easyDateParams);
+        $list.find('.date').each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            var currentDate = new Date();
+            var date = new Date(timestamp * 1000);
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear() + '';
+            var d = date.getDate() + '';
+            var h = date.getHours() + '';
+            var min = date.getMinutes() + '';
+            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+            if (currentDate.getDate() != d) {
+                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
+            }
+            $date.html(text);
+        });
     },
     makeTextarea: function($textarea) {
         var t = this;
@@ -816,7 +871,6 @@ var Messages = EndlessPage.extend({
 var RightColumn = Widget.extend({
     _template: RIGHT_COLUMN,
     _modelClass: ListsModel,
-    _isEditMode: true,
     _isDragging: false,
     _isFirstRun: true,
 
@@ -875,22 +929,22 @@ var RightColumn = Widget.extend({
 
     mouseDownList: function(e) {
         var t = this;
-        if (!t._isEditMode) return;
         var $placeholder = $(e.currentTarget);
         var $target = $placeholder.find('.item:first');
+        var startY = 0;
         var timeout = setTimeout(function() {
             t._isDragging = true;
+            startY = e.pageY;
             $target.addClass('drag');
             $placeholder.height($target.height());
-            $('html, body').addClass('no-select');
-        }, 300);
-        var startY = e.clientY;
+        }, 200);
+        $('body').addClass('no-select');
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
-                var top = e.clientY - startY;
+                var top = e.pageY - startY;
                 var height = $placeholder.height();
-                var position = intval((e.clientY - $placeholder.offset().top) / height);
+                var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
                 var $prev = $placeholder.prev('.drag-wrap');
 
@@ -901,7 +955,7 @@ var RightColumn = Widget.extend({
                     $placeholder.after($prev);
                     startY -= height;
                 }
-                top = e.clientY - startY;
+                top = e.pageY - startY;
                 $target.css({top: top});
             }
 
@@ -909,15 +963,15 @@ var RightColumn = Widget.extend({
         })(e));
 
         $(window).on('mouseup.list', function(e) {
-            $(this).off('mousemove.list mouseup.list');
+            $(window).off('mousemove.list mouseup.list');
+            $('body').removeClass('no-select');
             clearTimeout(timeout);
 
             if (!t._isDragging) return;
-            $('html, body').removeClass('no-select');
             $target.removeClass('drag').css({top: 0});
             setTimeout(function() {
                 t._isDragging = false;
-                t.setOrder();
+                t.saveOrder();
             }, 0);
         });
     },
@@ -929,14 +983,21 @@ var RightColumn = Widget.extend({
         t.setList(listId, true);
     },
 
-    setOrder: function() {
+    saveOrder: function() {
         var t = this;
         var $el = t.el();
         var listIds = [];
+        var list = [];
         $el.find('.item').each(function() {
             var listId = $(this).data('id');
-            if (listId != Configs.commonDialogsList) listIds.push(listId);
+            if (listId != Configs.commonDialogsList) {
+                listIds.push(listId);
+            }
+            if (listCollection.get(listId)) {
+                list.push(new ListModel(listCollection.get(listId).data()));
+            }
         });
+        t.model().list(list);
         Events.fire('set_list_order', listIds.join(','), function() {});
     },
 
@@ -944,12 +1005,24 @@ var RightColumn = Widget.extend({
         var t = this;
         var list = t.model().list();
         var item;
+        var setAsRead = false;
         for (var i in list) {
             if (!list.hasOwnProperty(i)) continue;
             item = list[i];
-            item.isSelected(item.id() == listId);
+            if (item.id() == listId) {
+                item.isSelected(true);
+                if (!item.isRead()) {
+                    setAsRead = true;
+                    item.isRead(true);
+                }
+            } else {
+                item.isSelected(false);
+            }
         }
         t.renderTemplate();
+        if (setAsRead) {
+            Events.fire('set_list_as_read', listId, function() {});
+        }
         if (isTrigger) t.trigger('setList', listId);
     },
     setDialog: function(dialogId, isTrigger) {
@@ -959,7 +1032,12 @@ var RightColumn = Widget.extend({
     },
     update: function() {
         var t = this;
-        t.run();
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function() {
+            if (!t._isDragging) {
+                t.run();
+            }
+        }, 200);
     }
 });
 
@@ -1104,7 +1182,7 @@ var Tabs = Widget.extend({
     setDialog: function(dialogId) {
         var t = this;
         var dialogModel = dialogCollection.get(dialogId) || new DialogModel();
-        var userModel = dialogModel.user();
+        var userModel = new UserModel(dialogModel.user());
         t._userId = userModel.id();
         var label = userModel.name();
         var isOnline = userModel.isOnline();

@@ -20,9 +20,10 @@
 
         /**
          * Проверяет, залогинен пользователь. Если да - возвращает его ID ВКонтакте, в противном случае - false.
+         * @param bool $checkEditor проверять наличие юзера в таблице editors
          * @return mixed
          */
-        public static function IsAuth() {
+        public static function IsAuth($checkEditor = false) {
             $vk_cookie = Cookie::getString('vk_app_trust' . self::$AppId);
             if (empty($vk_cookie)) {
                 if (!isset($_COOKIE['vk_app_' . self::$AppId]))
@@ -56,7 +57,11 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
-                    $logged = self::Login($cookie_data['mid']);
+                    if ($checkEditor) {
+                        $logged = self::Login($cookie_data['mid']);
+                    } else {
+                        $logged = true;
+                    }
 
                     return ($logged) ? $cookie_data['mid'] : false;
                 }

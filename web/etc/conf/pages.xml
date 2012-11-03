@@ -2,7 +2,7 @@
 <sites>
     <site name="sps">
         <pages>
-            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
                 <page uri="/">
                     <actions>SPS.Site.GetIndexPage</actions>
                     <template>tmpl://fe/index.tmpl.php</template>
@@ -10,6 +10,9 @@
                 <page uri="/login/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLogoutSilent</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
+                </page>
+                <page uri="/landing/" boot="SPS.Site.GetSiteParams">
+                    <template>tmpl://fe/landing.tmpl.php</template>
                 </page>
                 <page uri="/logout/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLogout</actions>
@@ -27,7 +30,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
                 <page uri="controls://arcticles-list/">
                     <actions>SPS.Site.GetArticlesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
@@ -92,9 +95,16 @@
                 <page uri="controls://author-delete/">
                     <actions>SPS.Site.DeleteAuthorControl</actions>
                 </page>
+                <page uri="controls://plan-post-delete/">
+                    <actions>SPS.Site.PostDeletePlanControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+
+                <page uri="controls://getPublicMarks/">
+                    <actions>SPS.Stat.getPublicMarks</actions>
+                </page>
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
                 </page>
@@ -138,6 +148,14 @@
                     <actions>SPS.Stat.setGroupOrder</actions>
                 </page>
 
+            </pageGroup>
+            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://addReport/">
+                    <actions>SPS.Stat.addReport</actions>
+                </page>
+                <page uri="controls://getReportList/">
+                    <actions>SPS.Stat.getReportList</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -482,6 +500,12 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://delete-post/">
+                    <actions>SPS.Site.DeletePost</actions>
+                </page>
+                <page uri="daemons://sync-albums/">
+                    <actions>SPS.Site.SyncAlbums</actions>
+                </page>
                 <page uri="daemons://process-queue/">
                     <actions>SPS.Site.ProcessQueue</actions>
                 </page>
@@ -494,8 +518,8 @@
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
-                <page uri="daemons://wr-oadmins/">
-                    <actions>SPS.Stat.OurAdminsStat</actions>
+                <page uri="daemons://WrAlarm/">
+                    <actions>SPS.Stat.WrAlarm</actions>
                 </page>
                 <page uri="daemons://MesCheckUpdates/">
                     <actions>SPS.Stat.MesCheckUpdates</actions>
@@ -511,6 +535,12 @@
                 </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
+                 </page>
+                <page uri="daemons://CheckWalls/">
+                     <actions>SPS.Stat.CheckWalls</actions>
+                 </page>
+                <page uri="daemons://CheckPosts/">
+                     <actions>SPS.Site.CheckPosts</actions>
                  </page>
 
             </pageGroup>
@@ -578,6 +608,15 @@
                 </page>
                 <page uri="im://login/" boot="">
                     <template>tmpl://im/login.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="stat://">
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
+                <page uri="stat://reports/" boot="">
+                    <template>tmpl://st/reports.tmpl.php</template>
                 </page>
             </pageGroup>
 

@@ -354,6 +354,7 @@
       <rate><![CDATA[rate]]></rate>
       <authorId><![CDATA[Автор]]></authorId>
       <targetFeedId><![CDATA[targetFeedId]]></targetFeedId>
+      <editor><![CDATA[Редактор (vkId)]]></editor>
     </article>
     <articleQueue>
       <deleteString><![CDATA[Вы действительно хотите удалить очередь?]]></deleteString>
@@ -368,6 +369,8 @@
       <author><![CDATA[Автор]]></author>
       <externalLikes><![CDATA[Получено лайков]]></externalLikes>
       <externalRetweets><![CDATA[Получено ретвитов]]></externalRetweets>
+      <deleteAt><![CDATA[Когда удалить]]></deleteAt>
+      <isDeleted><![CDATA[Удалено]]></isDeleted>
       <type><![CDATA[Тип]]></type>
       <externalId><![CDATA[externalId]]></externalId>
     </articleQueue>

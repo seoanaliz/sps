@@ -73,6 +73,7 @@
             $article->sourceFeedId = $sourceFeedId;
             $article->externalId = -1;
             $article->rate = 100;
+            $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
