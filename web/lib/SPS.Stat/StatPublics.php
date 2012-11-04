@@ -351,7 +351,11 @@
             //проверка на наличие данных на этот период в бд. если нет - запрос в контакт
             if( $days != $requested_days )
                 return false;
-
+            $diff_views =   0;
+            $diff_viss  =   0;
+            $views      =   0;
+            $visitors   =   0;
+            $temp_viss  =   0;
             while( $ds->Next()) {
                 if ( isset( $temp_views )) {
                     echo 1;
@@ -422,6 +426,7 @@
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
+            $rate = 0;
             while( $ds->next()) {
                 $tmp_rate = $ds->GetValue( 'rate' );
                 $rate += $tmp_rate < 100 ? $tmp_rate : 100;
@@ -496,7 +501,7 @@
         public function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
-            $sql = 'SELECT vk_id, name, ava, quantity
+            $sql = 'SELECT vk_id, name, ava, quantity, page
                     FROM ' . TABLE_STAT_PUBLICS . '
                     WHERE vk_id IN (' . $public_ids . ')';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -505,9 +510,10 @@
             $res = array();
             while( $ds->Next()) {
                 $res[ $ds->GetInteger( 'vk_id' )] = array(
-                    'name'      =>   $ds->GetString( 'name' ),
-                    'ava'       =>   $ds->GetString( 'ava' ),
-                    'quantity'  =>   $ds->GetInteger( 'quantity' )
+                    'name'      =>   $ds->GetString ( 'name' ),
+                    'ava'       =>   $ds->GetString ( 'ava' ),
+                    'quantity'  =>   $ds->GetInteger( 'quantity' ),
+                    'page'      =>   $ds->GetBoolean( 'page')
                 );
             }
             return $res;
@@ -525,8 +531,8 @@
                 foreach( $res as $public ) {
                     //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
                     $sql = '
-                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar);
-                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar) RETURNS varchar AS $$
+                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar, page boolean);
+                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar, page boolean) RETURNS varchar AS $$
                     DECLARE
                         curr_name CHARACTER VARYING := \'_\';
                     BEGIN
@@ -537,16 +543,16 @@
                         ELSE
                             INSERT INTO stat_public_audit(public_id,name,changed_at,act) VALUES ($1,curr_name,CURRENT_TIMESTAMP,\'name\');
                         END IF;
-                        UPDATE stat_publics_50k SET name = $2, ava=$3 WHERE vk_id=$1;
-
+                        UPDATE stat_publics_50k SET name = $2, ava=$3, page=$4 WHERE vk_id=$1;
                         RETURN curr_name;
                     END
                     $$ lANGUAGE plpgsql;
-                    SELECT update_public_info( @public_id, @name, @photo ) AS old_name;';
+                    SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name', $public->name );
                     $cmd->SetString(  '@photo', $public->photo);
+                    $cmd->SetBoolean( '@page', ( $public->type =='page' ? true : false));
                     $cmd->Execute();
                 }
             }
@@ -571,6 +577,7 @@
             $cmd = new SqlCommand( $sql, $conn );
             $cmd->SetString( '@time_from', date( 'r', $time_from ));
             $cmd->SetString( '@time_to', date( 'r', $time_to ));
+            echo $cmd->getQuery();
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {

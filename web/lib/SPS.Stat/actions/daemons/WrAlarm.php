@@ -18,6 +18,13 @@ class WrAlarm
         set_time_limit(0);
         $this->connect = ConnectionFactory::Get( 'tst' );
 
+//        $publics = array(array('public_id' => 533718));
+//        $this->check_block( $publics );
+//        print_R($this->wasted_array);
+//        $report = $this->form_report();
+//        print_R($report);
+//        die();
+
         StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
 
         $publics = $this->get_monitoring_publs(1);
@@ -26,8 +33,9 @@ class WrAlarm
         $publics = $this->get_monitoring_publs();
         $this->check_block( $publics );
 
+//        print_R($this-zwasted_array);
         $report = $this->form_report();
-        print_R($report);
+//        print_R($report);
         if ( $report )
             $this->send_report( $report );
     }
@@ -46,19 +54,32 @@ class WrAlarm
             }
 
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
-                'access_token' => VkHelper::get_service_access_token()), 0 );
-
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
             sleep(0.3);
             foreach( $res as $apublic_id => $body ) {
                 $public_id =  trim( $apublic_id, 'a');
                 if ( empty( $body) )
                 {
-
-                    $this->wasted_array[$public_id] = 'block';
-                    $this->mark_blocked( $public_id );
+                    $susp_ids[] = $public_id;
                 }
+            }
 
+
+            foreach( $susp_ids as $id ) {
+                $res = VkHelper::api_request( 'wall.get', array(
+                    'owner_id'  =>   '-' . $id,
+                    'count'     =>   1
+                ), 0 );
+                print_r($res);
+                if( !isset($res->error))
+                    continue;
+                if ( substr_count( $res->error->error_msg, 'members' ) > 0 ) {
+                    $this->mark_closed( $id );
+                    $this->wasted_array[$public_id] = 'closed';
+                } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
+                    $this->mark_blocked( $id );
+                    $this->wasted_array[$public_id] = 'blocked';
+                }
             }
         }
     }
@@ -76,6 +97,7 @@ class WrAlarm
 
                 $name = str_replace( '"', ' ', $public['name']);
                 $name = str_replace( "'", ' ', $name);
+                $name = htmlspecialchars_decode( $name );
                 $code   .= 'var a' . $id . ' = API. groups.search({"q":"' . $name . '","count":50});';
                 $return .=  "\"a$id\":a$id,";
 
@@ -94,7 +116,6 @@ class WrAlarm
                     if( (int)$entry->gid == (int)$public_id ) {
                         continue(2);
                     }
-
                 }
                 $this->wasted_array[$public_id] = 'search';
                 $this->mark_not_in_search( $public_id );
@@ -105,6 +126,14 @@ class WrAlarm
     public function mark_blocked( $public_id )
     {
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET active = 0 WHERE vk_id=@public_id';
+        $cmd = new SqlCommand( $sql, $this->connect );
+        $cmd->SetInteger( '@public_id', $public_id );
+        $cmd->Execute();
+    }
+
+    public function mark_closed( $public_id )
+    {
+        $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET closed = TRUE WHERE vk_id=@public_id';
         $cmd = new SqlCommand( $sql, $this->connect );
         $cmd->SetInteger( '@public_id', $public_id );
         $cmd->Execute();
@@ -135,7 +164,8 @@ class WrAlarm
             $in_search = ' AND in_search is TRUE';
         $sql = 'SELECT vk_id,name
                 FROM stat_publics_50k WHERE active=1
-                AND  quantity>100000
+                AND  quantity>200000000
+                AND closed = FALSE
                 ' . $in_search;
         $cmd = new SqlCommand( $sql, $this->connect );
         echo $cmd->getQuery();
@@ -154,7 +184,7 @@ class WrAlarm
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quantity > 1000000
+                WHERE quantity > 2000000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->connect);
         $ds = $cmd->Execute();
@@ -190,13 +220,17 @@ class WrAlarm
             $publics_info = StatPublics::get_publics_info_from_base( $search_line );
             foreach( $this->wasted_array as $k=>$v ) {
 
-                if( $v = 'search'   )
-                    $line = ' Убрали из поиска - ';
+                $type =  $publics_info[$k]['page'] ? ' страницу ' : ' группу ';
+
+                if( $v == 'search'   )
+                    $line = ' Убрали из поиска' . $type . ' ';
+                elseif( $v == 'closed' )
+                    $line = ' Закрыли ' . $type . ' ';
                 else
-                    $line = ' Заблокировали - ';
+                    $line = ' Заблокировали' . $type . ' ';
                 $message .= $line . "[public$k|" . $publics_info[$k]['name'] . "] " .  "\n";
                 $message .= "Количество подписчиков: " . $publics_info[$k]['quantity'] .  " .\n";
-                $message .= "Место в рейтинге: " . $this->get_public_place($k).  " .\n";
+                $message .= "Место в рейтинге " . substr( $type, 0, -3 ) . " : " . $this->get_public_place( $k, $publics_info[$k]['page']  ).  " .\n";
             }
         }
 
@@ -204,7 +238,7 @@ class WrAlarm
         if ( !empty( $changed_names )) {
             $message .= "\nПоменяли название:\n";
             foreach( $changed_names as $public_id => $names) {
-                $message .= "[public". $public_id ."|" . $names['new_name'] . "] ( бывшый \"" . $names['old_name'] . "\")\n";
+                $message .= "[public". $public_id ."|" . $names['new_name'] . "] ( бывший \"" . $names['old_name'] . "\")\n";
             }
         }
 
@@ -223,7 +257,7 @@ class WrAlarm
         $res = VkHelper::api_request( 'wall.post', $params , 0 );
     }
 
-    public function get_public_place( $public_id)
+    public function get_public_place( $public_id, $page )
     {
         $sql = '
             DROP FUNCTION IF EXISTS find_public_place(id int);
@@ -232,17 +266,18 @@ class WrAlarm
                 i INT := 0;
                 curr INT;
             BEGIN
-                FOR curr IN select vk_id from stat_publics_50k order by quantity desc
+                FOR curr IN select vk_id from stat_publics_50k WHERE page IS @page order by quantity desc
                 LOOP
                 i := i+1;
                     IF (curr = id ) THEN return i; END IF;
                 END LOOP;
-                RETURN i;
+                RETURN 0;
             END
             $$ lANGUAGE plpgsql;
             SELECT find_public_place( @public_id ) AS place;';
         $cmd = new SqlCommand( $sql, $this->connect);
         $cmd->SetInteger( '@public_id', $public_id );
+        $cmd->SetBoolean( '@page', $page ? true : false );
         $ds = $cmd->Execute();
         $ds->Next();
         return $ds->GetInteger( 'place' );

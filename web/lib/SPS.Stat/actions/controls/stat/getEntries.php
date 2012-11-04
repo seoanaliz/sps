@@ -137,17 +137,14 @@ class getEntries {
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
                                 'visitors'  =>  $this->get_visitors( $row['vk_id'] ,$period ),
-                                'in_search' =>  $row['in_search'],
-                                'active'    =>  $row['active'],
+                                'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
+                                'active'    =>  $row['active'] ? true : false
                             );
             }
         }
         else {
             $resul = $this->get_our_publics_state( $groupId, $time_from, $time_to );
         }
-
-
-
 
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(
