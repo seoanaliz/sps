@@ -51,6 +51,9 @@
         /** @var Author */
         public $author;
 
+        /** @var string */
+        public $editor;
+
         /** @var int */
         public $statusId;
 

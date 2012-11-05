@@ -46,6 +46,7 @@ SELECT "public"."articles"."articleId"
 	, "public"."articles"."sourceFeedId"
 	, "public"."articles"."targetFeedId"
 	, "public"."articles"."authorId"
+	, "public"."articles"."editor"
 	, "public"."articles"."statusId"
  FROM "public"."articles"
 	WHERE "public"."articles"."statusId" != 3

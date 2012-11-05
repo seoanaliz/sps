@@ -81,7 +81,16 @@
          * @return bool
          */
         protected function add( $object ) {
-            $result = parent::$factory->Add( $object );
+            AuthorFactory::$mapping['view'] = 'authors';
+            $exists = AuthorFactory::GetOne(array('vkId' => $object->vkId), array(BaseFactory::WithoutDisabled => false));
+
+            if (empty($exists)) {
+                $result = parent::$factory->Add( $object );
+            } else {
+                //update
+                $object->authorId = $exists->authorId;
+                $result = parent::$factory->Update( $object );
+            }
             
             return $result;
         }

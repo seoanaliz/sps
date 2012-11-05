@@ -49,3 +49,14 @@ SELECT "public"."authorFeedViews"."targetFeedId"
 	, "public"."authorFeedViews"."authorId"
 	, "public"."authorFeedViews"."lastViewDate"
  FROM "public"."authorFeedViews";
+
+CREATE OR REPLACE VIEW "getAuthorManages" AS
+SELECT
+    "public"."authorManages"."authorManageId",
+    "public"."authorManages"."authorVkId",
+    "public"."authorManages"."editorVkId",
+    "public"."authorManages"."createdAt",
+    "public"."authorManages"."action",
+    "public"."authorManages"."targetFeedId"
+ FROM "public"."authorManages"
+ORDER BY "public"."authorManages"."createdAt";
