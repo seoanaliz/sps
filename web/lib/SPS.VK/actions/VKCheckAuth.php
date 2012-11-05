@@ -14,9 +14,10 @@
 
             $vk_auth = AuthVkontakte::IsAuth($checkEditor);
             if ($vk_auth === false) {
-                if (!$checkEditor) {
-                    return 'login';
-                } else {
+                return 'login';
+            } else if ($checkEditor) {
+                $logged = AuthVkontakte::Login($vk_auth);
+                if (empty($logged)) {
                     return 'empty';
                 }
             }
