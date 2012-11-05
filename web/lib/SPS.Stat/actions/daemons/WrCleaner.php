@@ -40,9 +40,6 @@
                 }
                 sleep(0.3);
             }
-
-
-
         }
 
         public function get_offset($public_id) {
@@ -82,7 +79,6 @@
                     echo '<a href="http://vk.com/wall-' . $public_id . '_' . $post_id . '"><br>' . $comment->text;
                     //print_r($res);
                     echo '<br><br>';
-
                 }
             }
         }

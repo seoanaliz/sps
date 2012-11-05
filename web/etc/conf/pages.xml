@@ -2,7 +2,7 @@
 <sites>
     <site name="sps">
         <pages>
-            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
                 <page uri="/">
                     <actions>SPS.Site.GetIndexPage</actions>
                     <template>tmpl://fe/index.tmpl.php</template>
@@ -10,6 +10,9 @@
                 <page uri="/login/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLogoutSilent</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
+                </page>
+                <page uri="/landing/" boot="SPS.Site.GetSiteParams">
+                    <template>tmpl://fe/landing.tmpl.php</template>
                 </page>
                 <page uri="/logout/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLogout</actions>
@@ -27,7 +30,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
                 <page uri="controls://arcticles-list/">
                     <actions>SPS.Site.GetArticlesListControl</actions>
                     <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>

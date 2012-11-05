@@ -15,10 +15,13 @@ table, tr, td {
 }
 
 #main {
-    width: 870px;
+    width: 1070px;
     margin: 10px auto;
     border: 1px solid #C4CDE0;
     border-radius: 3px;
+    background-color: white;
+    position: relative;
+    z-index: 1;
 
     &>.header {
         background: #f1f1f1;
@@ -137,7 +140,7 @@ table, tr, td {
     }
 
     .left-column > .content {
-        width: 700px;
+        width: 900px;
 
         .list-head {
             background-color: #DEE5EB;
@@ -153,6 +156,9 @@ table, tr, td {
 
             .publics,
             .followers,
+            .in-search,
+            .is-active,
+            .visitors,
             .growth,
             .contacts {
                 float: left;
@@ -165,6 +171,9 @@ table, tr, td {
                 text-align: left;
                 cursor: default;
             }
+            .in-search,
+            .is-active,
+            .visitors,
             .contacts {
                 cursor: default;
             }
@@ -227,10 +236,15 @@ table, tr, td {
             .public-info,
             .public-growth,
             .public-followers,
+            .public-is-active,
+            .public-in-search,
+            .public-visitors,
             .public-contacts,
             .public-actions {
                 float: left;
                 height: 100%;
+                white-space: nowrap;
+                overflow: hidden;
             }
 
             .public-info {
@@ -377,20 +391,27 @@ table, tr, td {
 
         .list-head .publics,
         .public-info {
-            width: 40%;
+            width: 30%;
         }
 
         .list-head .followers,
+        .list-head .is-active,
+        .list-head .in-search,
+        .list-head .visitors,
         .list-head .growth,
         .public-followers,
+        .public-is-active,
+        .public-in-search,
+        .public-visitors,
         .public-growth {
-            width: 15%;
+            width: 9%;
             text-align: center;
         }
 
         .list-head .contacts,
         .public-contacts {
-            width: 25%;
+            width: 20%;
+            overflow: visible !important;
         }
     }
 }
@@ -536,6 +557,7 @@ table, tr, td {
     min-width: 150px;
     display: none;
     box-shadow: 0 2px 4px rgba(0,0,0,.25);
+    z-index: 10;
 
     &>.add-item,
     &>.item {
@@ -599,6 +621,7 @@ table, tr, td {
     background-color: #fff;
     display: none;
     box-shadow: 0 2px 4px rgba(0,0,0,.25);
+    z-index: 10;
 
     &>.item {
         position: relative;
