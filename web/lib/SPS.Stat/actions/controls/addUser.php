@@ -30,9 +30,11 @@
 
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
-                $user['at']       = StatUsers::get_access_token( $user_id ) ? 1 : 0;
-                MesDialogs::check_friend_requests( $user_id );
-                MesDialogs::check_new_messages( array( $user_id ));
+                $user['at'] = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                if ( $user['at']) {
+//                    MesDialogs::check_friend_requests( $user_id );
+                    MesDialogs::check_new_messages( array( $user_id ));
+                }
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }
 
@@ -45,11 +47,8 @@
             }
 
             if ( $user ){
-                MesDialogs::check_friend_requests( $user_id );
-                MesDialogs::check_new_messages( array( $user_id ));
                 echo  ObjectHelper::ToJSON(array('response' => $user));
             }
-
             else
                 echo  ObjectHelper::ToJSON( array( 'response' => false ) );
 
