@@ -29,13 +29,13 @@ var TABLE_HEADER =
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
     '<div class="item is-active">' +
-        'активен' +
+        'бан<span class="icon arrow">' +
     '</div>' +
     '<div class="item in-search">' +
-        'в поиске' +
+        'в поиске<span class="icon arrow">' +
     '</div>' +
     '<div class="item visitors">' +
-        'посетители' +
+        'посетители<span class="icon arrow">' +
     '</div>' +
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
@@ -50,27 +50,31 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
-    '<div class="public-info clear-fix" data-id="<?=publicId?>">' +
+    '<div class="column public-info clear-fix" data-id="<?=publicId?>">' +
         '<div class="photo">' +
             '<img src="<?=publicImg?>" alt="" />' +
         '</div>' +
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
-    '<div class="public-followers"><?=publicFollowers?></div>' +
-    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
-    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
-    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
-    '<div class="public-growth">' +
+    '<div class="column public-followers"><?=publicFollowers?></div>' +
+    '<div class="column public-is-active"><span class="<?=publicIsActive ? "true" : "false"?>">●</span></div>' +
+    '<div class="column public-in-search"><span class="<?=publicInSearch ? "true" : "false"?>">●</span></div>' +
+    '<div class="column public-visitors">' +
+        '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
+            '<?=publicVisitors ? publicVisitors : "-"?>' +
+        '</a>' +
+    '</div>' +
+    '<div class="column public-growth">' +
         '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
         '</span>' +
     '</div>' +
-    '<div class="public-contacts">' +
+    '<div class="column public-contacts">' +
         '<? if (isset("users") && users.length) { ?>' +
             '<?=tmpl(CONTACT, users[0])?>' +
         '<? } ?>' +
     '</div>' +
-    '<div class="public-actions">' +
+    '<div class="column public-actions">' +
         '<span class="action add-to-list">' +
             '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
         '</span>' +
@@ -86,26 +90,39 @@ var TABLE_ROW =
 var OUR_TABLE =
 '<?=tmpl(OUR_TABLE_HEADER)?>' +
 '<div class="list-body">' +
-    '<? each(OUR_TABLE_ROW, rows); ?>' +
+    '<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var OUR_TABLE_HEADER =
 '<div class="list-head clear-fix">' +
-    '<div class="item is-active">активен</div>' +
-    '<div class="item in-search">в поиске</div>' +
-    '<div class="item visitors">посетители</div>' +
+    '<div class="item publics">' +
+        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
+    '</div>' +
+    '<div class="item visitors">посетители<span class="icon arrow"></div>' +
+    '<div class="item views">просмотры<span class="icon arrow"></div>' +
+    '<div class="item posts">посты<span class="icon arrow"></div>' +
+    '<div class="item authors">авторы<span class="icon arrow"></div>' +
+    '<div class="item sb">SB<span class="icon arrow"></div>' +
 '</div>';
 
 var OUR_TABLE_BODY =
-'<div class="list-body">' +
-    '<? each(OUR_TABLE_ROW, rows); ?>' +
-'</div>';
+'<? each(OUR_TABLE_ROW, rows); ?>';
 
 var OUR_TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
-    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
-    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
-    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
+    '<div class="column public-info clear-fix" data-id="<?=publicId?>">' +
+        '<div class="photo">' +
+            '<img src="<?=publicImg?>" alt="" />' +
+        '</div>' +
+        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
+    '</div>' +
+    '<div class="column public-visitors">' +
+        '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank"><?=publicVisitors ? publicVisitors : "-"?></a>' +
+    '</div>' +
+    '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
+    '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
+    '<div class="column public-authors"><?=publicAuthorsPosts ? publicAuthorsPosts : "-"?></div>' +
+    '<div class="column public-sb"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
 '</div>';
 
 var CONTACT =

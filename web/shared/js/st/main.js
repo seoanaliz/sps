@@ -504,13 +504,19 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded += 1;
-                if (data.length) {
-                    dataTable = $.merge(dataTable, data);
-                    $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
-                    $el.removeClass('loading');
+                if (!listType) {
+                    if (data.length) {
+                        dataTable = $.merge(dataTable, data);
+                        $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
+                    }
                 } else {
-                    $el.removeClass('loading');
+                    /* Пока не рабоает =\ */
+                    /*if (data.length) {
+                        dataTable = $.merge(dataTable, data);
+                        $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
+                    }*/
                 }
+                $el.removeClass('loading');
             }
         );
     }
@@ -529,11 +535,19 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                dataTable = data;
-                currentSortBy = field;
-                currentSortReverse = reverse;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    dataTable = data;
+                    currentSortBy = field;
+                    currentSortReverse = reverse;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    dataTable = data;
+                    currentSortBy = field;
+                    currentSortReverse = reverse;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                }
             }
         );
     }
@@ -552,14 +566,26 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                dataTable = data;
-                currentSearch = text;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
+                if (!listType) {
+                    dataTable = data;
+                    currentSearch = text;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
                 } else {
-                    $('#load-more-table').show();
+                    dataTable = data;
+                    currentSearch = text;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
                 }
             }
         );
@@ -579,10 +605,17 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                dataTable = data;
-                currentPeriod = period;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    dataTable = data;
+                    currentPeriod = period;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    dataTable = data;
+                    currentPeriod = period;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                }
             }
         );
     }
@@ -601,10 +634,17 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                dataTable = data;
-                currentAudience = audience;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    dataTable = data;
+                    currentAudience = audience;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    dataTable = data;
+                    currentAudience = audience;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                }
             }
         );
     }
@@ -624,8 +664,8 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentListId = listId;
                     currentSearch = newSearch;
@@ -647,7 +687,6 @@ var Table = (function() {
                     Filter.setSliderMax(maxPeriod[1]);
                     $('#global-loader').fadeOut(200);
                 } else {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentListId = listId;
                     currentSearch = newSearch;
@@ -725,6 +764,45 @@ var Table = (function() {
                 $target.addClass('active');
                 $target.removeClass('reverse');
                 sort('growth', false);
+            }
+        });
+
+        $container.delegate('.is-active', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('isActive', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('isActive', false);
+            }
+        });
+
+        $container.delegate('.in-search', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('inSearch', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('inSearch', false);
+            }
+        });
+
+        $container.delegate('.visitors', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('visitors', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('visitors', false);
             }
         });
 
