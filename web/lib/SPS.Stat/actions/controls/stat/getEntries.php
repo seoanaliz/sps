@@ -49,12 +49,14 @@ class getEntries {
 
 
             if ( $period == 7 ) {
-                $sortBy   .= '_week';
+                if ( $sortBy == 'diff_abs' )
+                    $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
                 $diff_vis = 'diff_vis_week';
             } else if( $period == 30 ) {
-                $sortBy   .= '_month';
+                if ( $sortBy == 'diff_abs' )
+                    $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
                 $diff_vis = 'diff_vis_week';
