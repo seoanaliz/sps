@@ -15,6 +15,12 @@ var LIST_ITEM =
 '<? } ?>';
 
 var TABLE =
+'<?=tmpl(TABLE_HEADER)?>' +
+'<div class="list-body">' +
+    '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
+'</div>';
+
+var TABLE_HEADER =
 '<div class="list-head clear-fix">' +
     '<div class="item publics">' +
         '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -23,13 +29,13 @@ var TABLE =
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
     '<div class="item is-active">' +
-        'активен<span class="icon arrow"></span>' +
+        'активен' +
     '</div>' +
     '<div class="item in-search">' +
-        'в поиске<span class="icon arrow"></span>' +
+        'в поиске' +
     '</div>' +
     '<div class="item visitors">' +
-        'посетители<span class="icon arrow"></span>' +
+        'посетители' +
     '</div>' +
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
@@ -37,9 +43,6 @@ var TABLE =
     '<div class="item contacts">' +
         'контакты' +
     '</div>' +
-'</div>' +
-'<div class="list-body">' +
-    '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var TABLE_BODY =
@@ -78,6 +81,31 @@ var TABLE_ROW =
             '<span class="icon plus"></span>' +
         '</span>' +
     '</div>' +
+'</div>';
+
+var OUR_TABLE =
+'<?=tmpl(OUR_TABLE_HEADER)?>' +
+'<div class="list-body">' +
+    '<? each(OUR_TABLE_ROW, rows); ?>' +
+'</div>';
+
+var OUR_TABLE_HEADER =
+'<div class="list-head clear-fix">' +
+    '<div class="item is-active">активен</div>' +
+    '<div class="item in-search">в поиске</div>' +
+    '<div class="item visitors">посетители</div>' +
+'</div>';
+
+var OUR_TABLE_BODY =
+'<div class="list-body">' +
+    '<? each(OUR_TABLE_ROW, rows); ?>' +
+'</div>';
+
+var OUR_TABLE_ROW =
+'<div class="public clear-fix" data-id="<?=publicId?>">' +
+    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
+    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
+    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
 '</div>';
 
 var CONTACT =

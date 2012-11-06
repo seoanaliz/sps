@@ -195,7 +195,7 @@ $.extend(Events.eventList, Eventlist);
  */
 var Cleaner = {
     longPollMessage: function(rawContent, isOut) {
-        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : new UserModel(this.user(rawContent.from_id));
         var viewerModel = userCollection.get(Configs.vkId);
 
         return {
@@ -213,7 +213,7 @@ var Cleaner = {
     },
 
     longPollDialog: function(rawContent, isOut) {
-        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : this.user(rawContent.from_id);
+        var userModel = typeof rawContent.from_id == 'number' ? userCollection.get(rawContent.from_id) : new UserModel(this.user(rawContent.from_id));
         var viewerModel = userCollection.get(Configs.vkId);
 
         return {

@@ -107,41 +107,50 @@ var Eventlist = {
             show: 1
         }, function(dirtyData) {
             var clearList = [];
-            if ($.isArray(dirtyData.list)) {
-                $.each(dirtyData.list, function(i, publicItem) {
-                    var users = [];
-                    $.each(publicItem.admins, function(i, data) {
-                        users.push({
-                            userId: data.vk_id,
-                            userName: data.name,
-                            userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
-                            userDescription: data.role || '&nbsp;'
-                        });
-                    });
-                    clearList.push({
-                        publicId: publicItem.id,
-                        publicImg: publicItem.ava,
-                        publicName: publicItem.name,
-                        publicFollowers: publicItem.quantity,
-                        publicGrowthNum: publicItem.diff_abs,
-                        publicGrowthPer: publicItem.diff_rel,
-                        publicIsActive: !!publicItem.active,
-                        publicInSearch: !!publicItem.in_search,
-                        publicVisitors: publicItem.visitors,
-                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
-                        users: users
-                    });
-                });
-            }
             var clearPeriod = [];
+            var clearListType = 0;
+
             if (dirtyData.min_max) {
                 clearPeriod = [
                     dirtyData.min_max.min,
                     dirtyData.min_max.max
                 ];
             }
+            if (dirtyData.group_type == 2) {
+                clearListType = 1;
+            }
+            if (!clearListType) {
+                if ($.isArray(dirtyData.list)) {
+                    $.each(dirtyData.list, function(i, publicItem) {
+                        var users = [];
+                        $.each(publicItem.admins, function(i, data) {
+                            users.push({
+                                userId: data.vk_id,
+                                userName: data.name,
+                                userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                                userDescription: data.role || '&nbsp;'
+                            });
+                        });
+                        clearList.push({
+                            publicId: publicItem.id,
+                            publicImg: publicItem.ava,
+                            publicName: publicItem.name,
+                            publicFollowers: publicItem.quantity,
+                            publicGrowthNum: publicItem.diff_abs,
+                            publicGrowthPer: publicItem.diff_rel,
+                            publicIsActive: !!publicItem.active,
+                            publicInSearch: !!publicItem.in_search,
+                            publicVisitors: publicItem.visitors,
+                            lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                            users: users
+                        });
+                    });
+                }
+            } else {
+                //@todo
+            }
 
-            callback(clearList, clearPeriod);
+            callback(clearList, clearPeriod, clearListType);
         });
     },
     add_list: function(title, callback) {

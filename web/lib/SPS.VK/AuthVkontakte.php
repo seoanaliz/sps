@@ -56,16 +56,14 @@
 
                     Cookie::setCookie('vk_app_trust' . self::$AppId, $newCookie, $cookie_data['expire'], '/');
 
-                    $logged = self::Login($cookie_data['mid']);
-
-                    return ($logged) ? $cookie_data['mid'] : false;
+                    return $cookie_data['mid'];
                 }
             }
 
             return false;
         }
 
-        private static function Login($vkId) {
+        public static function Login($vkId) {
             $editor = EditorFactory::GetOne(
                 array('vkId' => $vkId)
             );

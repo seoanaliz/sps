@@ -58,7 +58,7 @@ function VK_onGetInitData(data) {
             $.cookie('photo_medium', r.me.photo_medium ,options);
             $.cookie('photo_big',r.me.photo_big,options);
 
-            window.location = '/' + btoa(location.search.substr(1));
+            window.location = '/' + decodeURIComponent(location.search.substr(1));
         } else {
             VK_getInitData();
         }
