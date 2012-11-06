@@ -25,19 +25,19 @@ class WrAlarm
 //        print_R($report);
 //        die();
 
-        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
+//        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
 
-        $publics = $this->get_monitoring_publs(1);
-        $this->check_in_search( $publics );
+//        $publics = $this->get_monitoring_publs(1);
+//        $this->check_in_search( $publics );
 
         $publics = $this->get_monitoring_publs();
         $this->check_block( $publics );
 
-//        print_R($this-zwasted_array);
-        $report = $this->form_report();
+        print_R($this->wasted_array);
+//        $report = $this->form_report();
 //        print_R($report);
-        if ( $report )
-            $this->send_report( $report );
+//        if ( $report )
+//            $this->send_report( $report );
     }
 
     public function check_block( $publics_array )
@@ -70,10 +70,9 @@ class WrAlarm
                     'owner_id'  =>   '-' . $id,
                     'count'     =>   1
                 ), 0 );
-                print_r($res);
                 if( !isset($res->error))
                     continue;
-                if ( substr_count( $res->error->error_msg, 'members' ) > 0 ) {
+                if ( substr_count( $res->error->error_msg, 'community members' ) > 0 ) {
                     $this->mark_closed( $id );
                     $this->wasted_array[$public_id] = 'closed';
                 } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
@@ -164,7 +163,7 @@ class WrAlarm
             $in_search = ' AND in_search is TRUE';
         $sql = 'SELECT vk_id,name
                 FROM stat_publics_50k WHERE active=1
-                AND  quantity>200000000
+                AND  quantity>200000
                 AND closed = FALSE
                 ' . $in_search;
         $cmd = new SqlCommand( $sql, $this->connect );
@@ -184,7 +183,7 @@ class WrAlarm
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quantity > 2000000
+                WHERE quantity > 200000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->connect);
         $ds = $cmd->Execute();

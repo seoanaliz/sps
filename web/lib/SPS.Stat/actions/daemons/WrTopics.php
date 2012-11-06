@@ -41,7 +41,7 @@ class WrTopics extends wrapper
     {
         $sql = 'SELECT time
                 FROM ' . TABLE_STAT_PUBLICS_POINTS . '
-                WHERE time >= current_date
+                WHERE time >= current_date  - interval \'1 day\'
                 LIMIT 1';
         $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
