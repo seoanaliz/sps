@@ -1,8 +1,9 @@
 var articlesLoading = false;
 
-function initSlider(targetFeedId) {
-    var cookie = $.cookie('sourceFeedRange' + targetFeedId);
-    var from = 50;
+function initSlider(targetFeedId, sourceType) {
+
+    var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
+    var from = sourceType == 'albums' ? 0 : 50;
     var to = 100;
     if (cookie) {
         var ranges = cookie.split(':');
@@ -18,9 +19,11 @@ function initSlider(targetFeedId) {
             }
         }
     }
+    var sliderRange = $("#slider-range");
+    sliderRange.data('sourceType', sourceType)
 
-    if (!$("#slider-range").data('slider')) {
-        $("#slider-range").slider({
+    if (!sliderRange.data('slider')) {
+        sliderRange.slider({
             range: true,
             min: 0,
             max: 100,
@@ -38,19 +41,20 @@ function initSlider(targetFeedId) {
             }
         });
     } else {
-        $("#slider-range").slider("values", 0, from);
-        $("#slider-range").slider("values", 1, to);
+        sliderRange.slider("values", 0, from);
+        sliderRange.slider("values", 1, to);
     }
 }
 
 function changeRange() {
-    var top = $("#slider-range").slider("values", 1);
-    $("#slider-range").find('a:first').html($("#slider-range").slider("values", 0));
-    $("#slider-range").find('a:last').html(top == 100 ? 'TOP' : top);
+    var sliderRange = $("#slider-range");
+    var top = sliderRange.slider("values", 1);
+    sliderRange.find('a:first').html(sliderRange.slider("values", 0));
+    sliderRange.find('a:last').html(top == 100 ? 'TOP' : top);
 
     var targetFeedId = Elements.rightdd();
     if (targetFeedId) {
-        $.cookie('sourceFeedRange' + targetFeedId, $("#slider-range").slider("values", 0) + ':' + $("#slider-range").slider("values", 1), { expires: 7, path: '/', secure: false });
+        $.cookie(sliderRange.data('sourceType') + 'FeedRange' + targetFeedId, sliderRange.slider("values", 0) + ':' + sliderRange.slider("values", 1), { expires: 7, path: '/', secure: false });
     }
 }
 
@@ -291,7 +295,7 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
 
-        if (sourceType != 'source') {
+        if (sourceType != 'source' && sourceType != 'albums') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list a').hide();
@@ -304,7 +308,7 @@ var Eventlist = {
         $.cookie('sourceTypes' + targetFeedId, sourceType);
 
         //init slider
-        initSlider(targetFeedId);
+        initSlider(targetFeedId, sourceType);
 
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
