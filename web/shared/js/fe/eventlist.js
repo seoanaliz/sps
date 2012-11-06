@@ -6,7 +6,6 @@ function initSlider(targetFeedId, sourceType) {
     var from = sourceType == 'albums' ? 0 : 50;
     var to = 100;
     if (cookie) {
-        console.log('readfromcoockie', cookie);
         var ranges = cookie.split(':');
         if (ranges.length == 2) {
             from = parseInt(ranges[0]);
@@ -22,7 +21,6 @@ function initSlider(targetFeedId, sourceType) {
     }
     var sliderRange = $("#slider-range");
     sliderRange.data('sourceType', sourceType)
-    console.log('initSlider', sourceType, from, to);
 
     if (!sliderRange.data('slider')) {
         sliderRange.slider({
