@@ -1226,14 +1226,14 @@ $(document).ready(function() {
     }
 
     if (!Configs.vkId) {
-        location.replace('/login/?' + btoa('im'));
+        location.href = '/login/?' + encodeURIComponent('im/');
         return;
     } else {
         $.cookie('uid', Configs.vkId, {expires: 30});
     }
 
     if (!Configs.token) {
-        location.replace('/im/login/? ' + btoa('im'));
+        location.href = '/im/login/?' + encodeURIComponent('im/');
         return;
     }
 
