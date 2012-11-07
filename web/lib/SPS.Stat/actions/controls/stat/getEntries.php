@@ -27,8 +27,8 @@ class getEntries {
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
         $group_type =   Request::getInteger( 'groupType');
-        $search     =   pg_escape_string(Request::getString( 'search' ));
-        $sortBy     =   pg_escape_string(Request::getString( 'sortBy' ));
+        $search     =   pg_escape_string( Request::getString( 'search' ));
+        $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom');
         $time_to    =   Request::getInteger( 'timeTo');
 
@@ -41,8 +41,8 @@ class getEntries {
         $limit          =   $limit  ?  $limit  :   25;
         $group  = StatGroups::get_group($groupId);
         if ( empty( $group) || $group['type'] != 2 ) {
-            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel' );
-            $sortBy  = $sortBy && in_array($sortBy, $allowed_sort_values, 1)  ? $sortBy  : 'diff_abs';
+            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
+            $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
 
             $sortReverse    =   $sortReverse? '' : ' DESC ';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
@@ -137,17 +137,14 @@ class getEntries {
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
                                 'visitors'  =>  $this->get_visitors( $row['vk_id'] ,$period ),
-                                'in_search' =>  $row['in_search'],
-                                'active'    =>  $row['active'],
+                                'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
+                                'active'    =>  $row['active'] ? true : false
                             );
             }
         }
         else {
             $resul = $this->get_our_publics_state( $groupId, $time_from, $time_to );
         }
-
-
-
 
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(

@@ -33,10 +33,9 @@ class AddReport
         $barter_event->barter_type   = 1;
         $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $start_looking_time );
         $stop_looking_time  = $stop_looking_time ?
-            $stop_looking_time : StatBarter::DEFAULT_SEARCH_DURATION + $start_looking_time;
+            $stop_looking_time : 2 * StatBarter::DEFAULT_SEARCH_DURATION + $start_looking_time;
         $barter_event->stop_search_at  =  date( 'Y-m-d H:i:s', $stop_looking_time );
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
-
         $barter_event_id = BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
 
         if ( $barter_event_id ) {
