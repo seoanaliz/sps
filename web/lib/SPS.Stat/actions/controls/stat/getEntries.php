@@ -105,7 +105,8 @@ class getEntries {
                         WHERE
                             quantity > @min_quantity
                             AND publ.page=true
-                            AND quantity < @max_quantity '.
+                            AND quantity < @max_quantity
+                            AND quantity > 50000'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy . $sortReverse .
