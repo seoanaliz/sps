@@ -26,7 +26,7 @@ class WrTopics extends wrapper
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quantity > 50000
+                WHERE quantity > 10000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
