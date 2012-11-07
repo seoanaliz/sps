@@ -503,13 +503,17 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded += 1;
-                if (data.length) {
-                    dataTable = $.merge(dataTable, data);
-                    $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
-                    $el.removeClass('loading');
+                if (!listType) {
+                    pagesLoaded += 1;
+                    if (data.length) {
+                        dataTable = $.merge(dataTable, data);
+                        $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
+                        $el.removeClass('loading');
+                    } else {
+                        $el.removeClass('loading');
+                    }
                 } else {
-                    $el.removeClass('loading');
+                    //@todo
                 }
             }
         );
@@ -528,12 +532,16 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentSortBy = field;
-                currentSortReverse = reverse;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentSortBy = field;
+                    currentSortReverse = reverse;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    //@todo
+                }
             }
         );
     }
@@ -551,15 +559,19 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentSearch = text;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentSearch = text;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
                 } else {
-                    $('#load-more-table').show();
+                    //@todo
                 }
             }
         );
@@ -578,11 +590,15 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentPeriod = period;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentPeriod = period;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    //@todo
+                }
             }
         );
     }
@@ -600,11 +616,15 @@ var Table = (function() {
                 audienceMax: audience[1]
             },
             function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                dataTable = data;
-                currentAudience = audience;
-                $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                if ($.isFunction(callback)) callback(data);
+                if (!listType) {
+                    pagesLoaded = 1;
+                    dataTable = data;
+                    currentAudience = audience;
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                } else {
+                    //@todo
+                }
             }
         );
     }

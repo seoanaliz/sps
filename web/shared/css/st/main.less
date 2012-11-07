@@ -217,89 +217,83 @@ table, tr, td {
                 }
             }
 
-            .public-info,
-            .public-growth,
-            .public-followers,
-            .public-is-active,
-            .public-in-search,
-            .public-visitors,
-            .public-contacts,
-            .public-actions {
+            .column {
                 float: left;
                 height: 100%;
                 white-space: nowrap;
                 overflow: hidden;
+
+                &.public-info {
+                    a, .photo {
+                        vertical-align: middle;
+                        display: inline-block;
+                    }
+                    a {
+                        line-height: 1.5em;
+                        max-width: 228px;
+                    }
+                    .photo {
+                        width: 32px;
+                        height: 32px;
+                        overflow: hidden;
+                        margin: 3px 10px;
+
+                        img {
+                            max-width: 100%;
+                        }
+                    }
+                }
+
+                &.public-actions {
+                    width: 5%;
+                    float: right;
+                    text-align: center;
+
+                    &>.action {
+                        cursor: pointer;
+                        display: inline-block;
+                        padding: 4px;
+                        margin: 8px 0;
+
+                        &.delete-public {
+                            display: none;
+                        }
+                        &.restore-public {
+                            display: none;
+                        }
+
+                        .icon.plus {
+                            opacity: .3;
+                        }
+                    }
+
+                    &>.action.selected .icon,
+                    &>.action.active .icon,
+                    &>.action:hover .icon {
+                        opacity: 1;
+                    }
+
+                    &>.action.selected {
+                        background-color: #597DA3;
+
+                        .icon {
+                            &.arrow {
+                                background-image: url('../../images/common/select-white.png');
+                            }
+                            &.plus {
+                                background-image: url('../../images/common/add-white.png');
+                            }
+                            &.select {
+                                background-image: url('../../images/common/select-white.png');
+                            }
+                            &.delete {
+                                background-image: url('../../images/common/delete.png');
+                            }
+                        }
+                    }
+                }
             }
 
-            .public-info {
-                a, .photo {
-                    vertical-align: middle;
-                    display: inline-block;
-                }
-                a {
-                    line-height: 1.5em;
-                    max-width: 228px;
-                }
-                .photo {
-                    width: 32px;
-                    height: 32px;
-                    overflow: hidden;
-                    margin: 3px 10px;
-
-                    img {
-                        max-width: 100%;
-                    }
-                }
-            }
-
-            .public-actions {
-                width: 5%;
-                float: right;
-                text-align: center;
-
-                &>.action {
-                    cursor: pointer;
-                    display: inline-block;
-                    padding: 4px;
-                    margin: 8px 0;
-
-                    &.delete-public {
-                        display: none;
-                    }
-                    &.restore-public {
-                        display: none;
-                    }
-
-                    .icon.plus {
-                        opacity: .3;
-                    }
-                }
-
-                &>.action.selected .icon,
-                &>.action.active .icon,
-                &>.action:hover .icon {
-                    opacity: 1;
-                }
-
-                &>.action.selected {
-                    background-color: #597DA3;
-
-                    .icon {
-                        &.arrow {
-                            background-image: url('../../images/common/select-white.png');
-                        }
-                        &.plus {
-                            background-image: url('../../images/common/add-white.png');
-                        }
-                        &.select {
-                            background-image: url('../../images/common/select-white.png');
-                        }
-                        &.delete {
-                            background-image: url('../../images/common/delete.png');
-                        }
-                    }
-                }
-            }
         }
 
         .table.no-list-id {
