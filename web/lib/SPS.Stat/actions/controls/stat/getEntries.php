@@ -82,6 +82,7 @@ class getEntries {
                           AND gprel.group_id=@group_id
                           AND publ.quantity >= @min_quantity
                           AND publ.quantity <= @max_quantity
+                          AND publ.quantity >= 50000
                           ' . $search . '
                     ORDER BY '
                         . $sortBy . $sortReverse .
@@ -299,7 +300,7 @@ class getEntries {
 
     private function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS ;
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 50000' ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
         $ds = $cmd->Execute();
         $ds->Next();
