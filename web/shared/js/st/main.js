@@ -728,6 +728,45 @@ var Table = (function() {
             }
         });
 
+        $container.delegate('.is-active', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('active', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('isActive', false);
+            }
+        });
+
+        $container.delegate('.in-search', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('inSearch', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('inSearch', false);
+            }
+        });
+
+        $container.delegate('.visitors', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('visitors', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('visitors', false);
+            }
+        });
+
         (function() {
             var timeout;
 

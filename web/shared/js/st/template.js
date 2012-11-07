@@ -29,13 +29,13 @@ var TABLE_HEADER =
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
     '<div class="item is-active">' +
-        'активен' +
+        'бан<span class="icon arrow">' +
     '</div>' +
     '<div class="item in-search">' +
-        'в поиске' +
+        'в поиске<span class="icon arrow">' +
     '</div>' +
     '<div class="item visitors">' +
-        'посетители' +
+        'посетители<span class="icon arrow">' +
     '</div>' +
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
@@ -57,9 +57,13 @@ var TABLE_ROW =
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
     '<div class="public-followers"><?=publicFollowers?></div>' +
-    '<div class="public-is-active"><?=publicIsActive ? "да" : "нет"?></div>' +
-    '<div class="public-in-search"><?=publicInSearch ? "да" : "нет"?></div>' +
-    '<div class="public-visitors"><?=publicVisitors ? publicVisitors : 0?></div>' +
+    '<div class="public-is-active"><span class="<?=publicIsActive ? "plus" : "minus"?>">●</span></div>' +
+    '<div class="public-in-search"><span class="<?=publicInSearch ? "plus" : "minus"?>">●</span></div>' +
+    '<div class="public-visitors">' +
+        '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
+            '<?=publicVisitors ? publicVisitors : "-"?>' +
+        '</a>' +
+    '</div>' +
     '<div class="public-growth">' +
         '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
@@ -91,7 +95,7 @@ var OUR_TABLE =
 
 var OUR_TABLE_HEADER =
 '<div class="list-head clear-fix">' +
-    '<div class="item is-active">активен</div>' +
+    '<div class="item is-active">бан</div>' +
     '<div class="item in-search">в поиске</div>' +
     '<div class="item visitors">посетители</div>' +
 '</div>';

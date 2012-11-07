@@ -92,7 +92,10 @@ var Eventlist = {
         var sortByClear = {
             followers: 'quantity',
             contacts: '',
-            growth: 'diff_abs'
+            growth: 'diff_abs',
+            isActive: 'active',
+            inSearch: 'in_search',
+            visitors: 'visitors'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
