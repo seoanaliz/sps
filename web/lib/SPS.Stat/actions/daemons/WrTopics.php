@@ -12,13 +12,14 @@ class WrTopics extends wrapper
     public function Execute()
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
-        if (! $this->check_time())
-            die('Не сейчас');
+//        if (! $this->check_time())
+//            die('Не сейчас');
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i') . '<br>';
         $this->update_quantity();
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
+        $this->find_admins();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
 
@@ -106,7 +107,6 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
         $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
         $cmd->Execute();
-
     }
 
     //собирает количество посетителей в пабликах
@@ -177,11 +177,108 @@ class WrTopics extends wrapper
                     LIMIT 1)';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
-
     }
 
-//возвращает данные о наших пабликах
+    //поиск админов пабликов
+    public function find_admins(  )
+    {
+        foreach ( $this->ids as $id ) {
+            sleep(0.3);
+            echo $id . '<br>';
 
+            $params = array(
+                'act'   =>  'a_get_contacts',
+                'al'    =>  1,
+                'oid'   =>  $id
+            );
+
+            $url = 'http://vk.com/al_page.php';
+            $k = $this->qurl_request( $url, $params );
+            $k = explode( '<div class="image">' ,$k );
+            unset( $k[0] );
+
+            foreach( $k as $admin_html ) {
+                $admin = $this->get_admin('a href="/' . $admin_html);
+                $this->delete_admins( $id );
+                if ( !empty( $admin )) {
+                    $this->save_admin( $id, $admin );
+                }
+                $admin = array();
+            }
+            if ( !empty( $k ))
+                die();
+        }
+        return true;
+    }
+
+    private function get_admin( $contact_html )
+    {
+        $desk = '';
+        $cont = '';
+        if (preg_match('/href="\/(.+?)"/', $contact_html, $matches))
+            $link = $matches[1];
+        if (preg_match('/<div class="extra_info.+?>(.+?)<\/div>/', $contact_html, $matches))
+            $cont = $matches[1];
+        if (preg_match('/<div class="desc.+?>(.+?)<\/div>/', $contact_html, $matches))
+            $desc = $matches[1];
+        if (preg_match('/<img src="(.+?)"/', $contact_html, $matches))
+            $ava = $this->$matches[1];
+
+        if ( isset( $ava ) && substr_count( $ava, 'deactivated' ))
+            return false;
+
+        if( !$link && !$desc && !$cont ){
+            return false;
+        }
+        $k = array();
+        if ( $link ) {
+            $link = trim( $link, '/' );
+            $k = StatUsers::get_vk_user_info( $link );
+            $k = reset( $k );
+        }
+        $res = array(
+            'role'  =>  TextHelper::ToUTF8( $desc . ' ' . $cont ),
+            'name'  =>   $k[ 'name' ],
+            'vk_id' =>  $k['userId'],
+            'ava'   =>  isset( $ava )? $ava : $k['ava']
+        );
+        return $res;
+    }
+
+    private function save_admin( $public_id, $admin_data )
+    {
+        $sql = "INSERT INTO " . TABLE_STAT_ADMINS . "
+                                   (
+                                    vk_id,
+                                    role,
+                                    name,
+                                    ava,
+                                    publ_id
+                                    )
+                            VALUES (
+                                    @vk_id,
+                                    @role,
+                                    @name,
+                                    @ava,
+                                    @public_id
+                                  )";
+        //                $this->db_wrap('query', $query);
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger('@vk_id', $admin_data['vk_id']);
+        $cmd->SetInteger('@public_id', $public_id );
+        $cmd->SetString( '@role',  $admin_data['role']);
+        $cmd->SetString( '@name',  $admin_data['name']);
+        $cmd->SetString( '@ava',   $admin_data['ava']);
+        $cmd->Execute();
+    }
+
+    private function delete_admins( $public_id )
+    {
+        $sql = 'DELETE FROM ' . TABLE_STAT_ADMINS . '
+                WHERE publ_id = @public_id';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger('@public_id', $public_id );
+        $cmd->Execute();
+    }
 }
-
 ?>
