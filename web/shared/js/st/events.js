@@ -172,17 +172,17 @@ var Eventlist = {
                             publicId: publicItem.id,
                             publicImg: publicItem.ava,
                             publicName: publicItem.name,
-                            publicAuthorsLikes: publicItem.auth_likes_eff,
-                            publicAuthorsPosts: publicItem.auth_posts,
-                            publicAuthorsReposts: publicItem.auth_reposts_eff,
-                            publicGrowthVisitors: publicItem.avg_vis_grouth,
-                            publicGrowthViews: publicItem.avg_vie_grouth,
                             publicPosts: publicItem.overall_posts,
+                            publicViews: publicItem.views,
+                            publicVisitors: publicItem.visitors,
                             publicPostsPerDay: publicItem.posts_days_rel,
                             publicSbPosts: publicItem.sb_posts_count,
                             publicSbLikes: publicItem.sb_posts_rate,
-                            publicVisitors: publicItem.visitors,
-                            publicViews: publicItem.views
+                            publicAuthorsPosts: publicItem.auth_posts,
+                            publicAuthorsLikes: publicItem.auth_likes_eff,
+                            publicAuthorsReposts: publicItem.auth_reposts_eff,
+                            publicGrowthViews: publicItem.avg_vie_grouth,
+                            publicGrowthVisitors: publicItem.avg_vis_grouth
                         });
                     });
                 }

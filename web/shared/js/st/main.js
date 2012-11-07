@@ -503,18 +503,20 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded += 1;
                 if (!listType) {
-                    pagesLoaded += 1;
                     if (data.length) {
                         dataTable = $.merge(dataTable, data);
                         $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
-                        $el.removeClass('loading');
-                    } else {
-                        $el.removeClass('loading');
                     }
                 } else {
-                    //@todo
+                    /* Пока не рабоает =\ */
+                    /*if (data.length) {
+                        dataTable = $.merge(dataTable, data);
+                        $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
+                    }*/
                 }
+                $el.removeClass('loading');
             }
         );
     }
@@ -532,15 +534,19 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentSortBy = field;
                     currentSortReverse = reverse;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                     if ($.isFunction(callback)) callback(data);
                 } else {
-                    //@todo
+                    dataTable = data;
+                    currentSortBy = field;
+                    currentSortReverse = reverse;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
                 }
             }
         );
@@ -559,8 +565,8 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentSearch = text;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
@@ -571,7 +577,15 @@ var Table = (function() {
                         $('#load-more-table').show();
                     }
                 } else {
-                    //@todo
+                    dataTable = data;
+                    currentSearch = text;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
+                    if (dataTable.length < Configs.tableLoadOffset) {
+                        $('#load-more-table').hide();
+                    } else {
+                        $('#load-more-table').show();
+                    }
                 }
             }
         );
@@ -590,14 +604,17 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentPeriod = period;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                     if ($.isFunction(callback)) callback(data);
                 } else {
-                    //@todo
+                    dataTable = data;
+                    currentPeriod = period;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
                 }
             }
         );
@@ -616,14 +633,17 @@ var Table = (function() {
                 audienceMax: audience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentAudience = audience;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                     if ($.isFunction(callback)) callback(data);
                 } else {
-                    //@todo
+                    dataTable = data;
+                    currentAudience = audience;
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                    if ($.isFunction(callback)) callback(data);
                 }
             }
         );
@@ -644,8 +664,8 @@ var Table = (function() {
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
                 if (!listType) {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentListId = listId;
                     currentSearch = newSearch;
@@ -667,7 +687,6 @@ var Table = (function() {
                     Filter.setSliderMax(maxPeriod[1]);
                     $('#global-loader').fadeOut(200);
                 } else {
-                    pagesLoaded = 1;
                     dataTable = data;
                     currentListId = listId;
                     currentSearch = newSearch;

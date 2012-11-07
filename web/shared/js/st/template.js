@@ -90,22 +90,23 @@ var TABLE_ROW =
 var OUR_TABLE =
 '<?=tmpl(OUR_TABLE_HEADER)?>' +
 '<div class="list-body">' +
-    '<? each(OUR_TABLE_ROW, rows); ?>' +
+    '<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var OUR_TABLE_HEADER =
 '<div class="list-head clear-fix">' +
     '<div class="item publics">' +
-        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
+        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
     '</div>' +
-    '<div class="item views">просмотры<span class="icon arrow"></div>' +
     '<div class="item visitors">посетители<span class="icon arrow"></div>' +
+    '<div class="item views">просмотры<span class="icon arrow"></div>' +
+    '<div class="item posts">посты<span class="icon arrow"></div>' +
+    '<div class="item authors">авторы<span class="icon arrow"></div>' +
+    '<div class="item sb">SB<span class="icon arrow"></div>' +
 '</div>';
 
 var OUR_TABLE_BODY =
-'<div class="list-body">' +
-    '<? each(OUR_TABLE_ROW, rows); ?>' +
-'</div>';
+'<? each(OUR_TABLE_ROW, rows); ?>';
 
 var OUR_TABLE_ROW =
 '<div class="public clear-fix" data-id="<?=publicId?>">' +
@@ -115,10 +116,13 @@ var OUR_TABLE_ROW =
         '</div>' +
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
-    '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
     '<div class="column public-visitors">' +
         '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank"><?=publicVisitors ? publicVisitors : "-"?></a>' +
     '</div>' +
+    '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
+    '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
+    '<div class="column public-authors"><?=publicAuthorsPosts ? publicAuthorsPosts : "-"?></div>' +
+    '<div class="column public-sb"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
 '</div>';
 
 var CONTACT =
