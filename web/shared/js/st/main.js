@@ -772,7 +772,7 @@ var Table = (function() {
             $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
             if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                 $target.addClass('reverse');
-                sort('active', true);
+                sort('isActive', true);
             } else {
                 $target.addClass('active');
                 $target.removeClass('reverse');
