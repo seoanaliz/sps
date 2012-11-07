@@ -16,7 +16,7 @@
             'Article' => array(
                 'photos' => array(
                     'folder'            => 'article-photos'
-                    , 'maxSize'         => 2097152 //2MB (1024*1024*2)
+                    , 'maxSize'         => 10485760 //10MB (1024*1024*10)
                     , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
                     , 'isImage'         => true
                     , 'resizes'     => array(
@@ -29,6 +29,10 @@
                         )
                         , 'original' => array(
                             'name'      => 'original'
+                            , 'width'   => 1280
+                            , 'height'  => 1024
+                            , 'quality' => 100
+                            , 'scale'   => true
                         )
                     )
                 )
@@ -36,7 +40,7 @@
             , 'Link' => array(
                 'photos' => array(
                     'folder'            => 'link-photos'
-                    , 'maxSize'         => 2097152 //2MB (1024*1024*2)
+                    , 'maxSize'         => 10485760 //10MB (1024*1024*10)
                     , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
                     , 'isImage'         => true
                     , 'resizes'         => array(
@@ -211,7 +215,8 @@
             }
 
             //local temp filename
-            $localTempFileName = Site::GetRealPath( 'temp://' . $remoteFileName );
+            $_t = 'temp://';
+            $localTempFileName = Site::GetRealPath( $_t . $remoteFileName );
 
             //creating copy of image for resize
             if( !empty( $mapping['initDimensions'] ) ) {

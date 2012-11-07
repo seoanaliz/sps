@@ -92,7 +92,10 @@ var Eventlist = {
         var sortByClear = {
             followers: 'quantity',
             contacts: '',
-            growth: 'diff_abs'
+            growth: 'diff_abs',
+            isActive: 'active',
+            inSearch: 'in_search',
+            visitors: 'visitors'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
@@ -147,7 +150,42 @@ var Eventlist = {
                     });
                 }
             } else {
-                //@todo
+                /*
+                id - id
+                name - name
+                ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+                auth_likes_eff: 0 - Авторское/спарсенное: лайки
+                auth_posts: 0 - авторских постов
+                auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+                avg_vie_grouth: null - средний суточный прирост просмотров
+                avg_vis_grouth: null - средний суточный прирост уников
+                overall_posts: 68 - общее количество постов за период
+                posts_days_rel: 0 - в среднем постов за сутки
+                sb_posts_count: 56 - постов из источников
+                sb_posts_rate: 0 - средний рейтинг постов из источников
+                views: null - просмотры
+                visitors: null - посетители
+                */
+                if ($.isArray(dirtyData.list)) {
+                    $.each(dirtyData.list, function(i, publicItem) {
+                        clearList.push({
+                            publicId: publicItem.id,
+                            publicImg: publicItem.ava,
+                            publicName: publicItem.name,
+                            publicPosts: publicItem.overall_posts,
+                            publicViews: publicItem.views,
+                            publicVisitors: publicItem.visitors,
+                            publicPostsPerDay: publicItem.posts_days_rel,
+                            publicSbPosts: publicItem.sb_posts_count,
+                            publicSbLikes: publicItem.sb_posts_rate,
+                            publicAuthorsPosts: publicItem.auth_posts,
+                            publicAuthorsLikes: publicItem.auth_likes_eff,
+                            publicAuthorsReposts: publicItem.auth_reposts_eff,
+                            publicGrowthViews: publicItem.avg_vie_grouth,
+                            publicGrowthVisitors: publicItem.avg_vis_grouth
+                        });
+                    });
+                }
             }
 
             callback(clearList, clearPeriod, clearListType);
