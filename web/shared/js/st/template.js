@@ -57,8 +57,8 @@ var TABLE_ROW =
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
     '<div class="column public-followers"><?=publicFollowers?></div>' +
-    '<div class="column public-is-active"><span class="<?=publicIsActive ? "plus" : "minus"?>">●</span></div>' +
-    '<div class="column public-in-search"><span class="<?=publicInSearch ? "plus" : "minus"?>">●</span></div>' +
+    '<div class="column public-is-active"><span class="<?=publicIsActive ? "true" : "false"?>">●</span></div>' +
+    '<div class="column public-in-search"><span class="<?=publicInSearch ? "true" : "false"?>">●</span></div>' +
     '<div class="column public-visitors">' +
         '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
             '<?=publicVisitors ? publicVisitors : "-"?>' +
