@@ -478,6 +478,8 @@ var Table = (function() {
     var currentSortReverse = false;
     var currentPeriod = 1;
     var currentAudience = [];
+    var currentInterval = [];
+    var currentType = 0;
 
     function init(callback) {
         $container = $('#table');
@@ -535,19 +537,16 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentType = listType;
+                currentSortBy = field;
+                currentSortReverse = reverse;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentSortBy = field;
-                    currentSortReverse = reverse;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentSortBy = field;
-                    currentSortReverse = reverse;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
@@ -566,27 +565,20 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentType = listType;
+                currentSearch = text;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentSearch = text;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
                 } else {
-                    dataTable = data;
-                    currentSearch = text;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
                 }
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
@@ -605,17 +597,15 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentType = listType;
+                currentPeriod = period;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentPeriod = period;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentPeriod = period;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
@@ -634,69 +624,87 @@ var Table = (function() {
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentType = listType;
+                dataTable = data;
+                currentAudience = audience;
                 if (!listType) {
-                    dataTable = data;
-                    currentAudience = audience;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentAudience = audience;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
-    function changeList(listId) {
-        var newSearch = '';
-        var newSortBy = 'growth';
-        var newSortReverse = false;
+    function setInterval(interval, callback) {
+        var $tableBody = $('.list-body');
 
         Events.fire('load_table', {
-                listId: listId,
+                listId: currentListId,
                 limit: Configs.tableLoadOffset,
-                search: newSearch,
-                sortBy: newSortBy,
-                sortReverse: newSortReverse,
+                search: currentSearch,
+                sortBy: currentSortBy,
+                sortReverse: currentSortReverse,
                 period: currentPeriod,
                 audienceMin: currentAudience[0],
                 audienceMax: currentAudience[1]
             },
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentType = listType;
+                currentInterval = interval;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentListId = listId;
-                    currentSearch = newSearch;
-                    currentSortBy = newSortBy;
-                    currentSortReverse = newSortReverse;
-                    $container.html(tmpl(TABLE, {rows: data}));
-                    $container.find('.' + currentSortBy).addClass('active');
-                    if (!currentListId) {
-                        $container.removeClass('no-list-id');
-                    } else {
-                        $container.addClass('no-list-id');
-                    }
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
-                    Filter.setSliderMin(maxPeriod[0]);
-                    Filter.setSliderMax(maxPeriod[1]);
-                    $('#global-loader').fadeOut(200);
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                 } else {
-                    dataTable = data;
-                    currentListId = listId;
-                    currentSearch = newSearch;
-                    currentSortBy = newSortBy;
-                    currentSortReverse = newSortReverse;
-                    $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.setSliderMin(maxPeriod[0]);
-                    Filter.setSliderMax(maxPeriod[1]);
-                    $('#global-loader').fadeOut(200);
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
                 }
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
+    function changeList(listId) {
+        var defSearch = '';
+        var defSortBy = 'growth';
+        var defSortReverse = false;
+
+        Events.fire('load_table', {
+                listId: listId,
+                limit: Configs.tableLoadOffset,
+                search: defSearch,
+                sortBy: defSortBy,
+                sortReverse: defSortReverse,
+                period: currentPeriod,
+                audienceMin: currentAudience[0],
+                audienceMax: currentAudience[1]
+            },
+            function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
+                currentType = listType;
+                currentListId = listId;
+                currentSearch = defSearch;
+                currentSortBy = defSortBy;
+                currentSortReverse = defSortReverse;
+                dataTable = data;
+                if (!listType) {
+                    $container.html(tmpl(TABLE, {rows: data}));
+                } else {
+                    $container.html(tmpl(OUR_TABLE, {rows: data}));
+                }
+                $container.find('.' + currentSortBy).addClass('active');
+                if (!currentListId) {
+                    $container.removeClass('no-list-id');
+                } else {
+                    $container.addClass('no-list-id');
+                }
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
+                Filter.setSliderMin(maxPeriod[0]);
+                Filter.setSliderMax(maxPeriod[1]);
+                $('#global-loader').fadeOut(200);
             }
         );
     }
