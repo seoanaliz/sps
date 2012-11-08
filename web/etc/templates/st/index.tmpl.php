@@ -22,20 +22,24 @@
                                 <input placeholder="по" class="timeTo" type="text" />
                             </div>
                         </div>
-                        <div class="title">Аудитория</div>
-                        <div class="audience">
-                            <div class="slider-range clear-fix">
-                                <div class="value-min"></div>
-                                -
-                                <div class="value-max"></div>
+                        <div class="audience-wrapper">
+                            <div class="title">Аудитория</div>
+                            <div class="audience">
+                                <div class="slider-range clear-fix">
+                                    <div class="value-min"></div>
+                                    -
+                                    <div class="value-max"></div>
+                                </div>
+                                <div class="slider-wrap"></div>
                             </div>
-                            <div class="slider-wrap"></div>
                         </div>
-                        <div class="title">Период</div>
-                        <div class="period">
-                            <label><input name="period" type="radio" value="day" checked="checked"><span>День</span></label>
-                            <label><input name="period" type="radio" value="week"><span>Неделя</span></label>
-                            <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
+                        <div class="period-wrapper">
+                            <div class="title">Период</div>
+                            <div class="period">
+                                <label><input name="period" type="radio" value="day" checked="checked"><span>День</span></label>
+                                <label><input name="period" type="radio" value="week"><span>Неделя</span></label>
+                                <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
+                            </div>
                         </div>
                         <div class="list">
                             <div class="item selected">List1</div>

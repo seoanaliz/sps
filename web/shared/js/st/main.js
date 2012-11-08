@@ -290,7 +290,9 @@ var List = (function() {
 
 var Filter = (function() {
     var $container;
+    var $audienceWrapper;
     var $audience;
+    var $periodWrapper;
     var $period;
     var $list;
     var $intervalWrapper;
@@ -298,9 +300,11 @@ var Filter = (function() {
 
     function init(callback) {
         $container = $('td > .filter');
-        $audience = $('> .audience', $container);
-        $period = $('> .period', $container);
         $list = $('> .list', $container);
+        $audienceWrapper = $('> .audience-wrapper', $container);
+        $audience = $('> .audience', $audienceWrapper);
+        $periodWrapper = $('> .period-wrapper', $container);
+        $period = $('> .period', $periodWrapper);
         $intervalWrapper = $('> .interval-wrapper', $container);
         $interval = $('> .interval', $intervalWrapper);
 
@@ -480,10 +484,14 @@ var Filter = (function() {
     }
 
     function showInterval() {
+        $audienceWrapper.slideUp(400);
+        $periodWrapper.slideUp(400);
         $intervalWrapper.slideDown(200);
     }
     function hideInterval() {
-        $intervalWrapper.slideUp(200);
+        $audienceWrapper.slideDown(200);
+        $periodWrapper.slideDown(200);
+        $intervalWrapper.slideUp(400);
     }
 
     return {

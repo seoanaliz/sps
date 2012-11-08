@@ -41,24 +41,25 @@ table, tr, td {
 
         &>.interval-wrapper {
             display: none;
-
-            &>.interval {
-                padding: 10px 10px 0;
-
-                &>.timeFrom,
-                &>.timeTo {
-                    width: 63px;
-                }
-                &>.timeFrom {}
-                &>.timeTo {}
-            }
         }
-        &>.interval-wrapper > .title,
+        &>div > .title,
         &>.title {
             color: #555;
             font-weight: bold;
             padding: 10px 10px 0;
         }
+        &>div > .interval,
+        &>.interval {
+            padding: 10px 10px 0;
+
+            &>.timeFrom,
+            &>.timeTo {
+                width: 63px;
+            }
+            &>.timeFrom {}
+            &>.timeTo {}
+        }
+        &>div > .audience,
         &>.audience {
             padding: 10px 10px 0;
 
@@ -93,6 +94,7 @@ table, tr, td {
                 }
             }
         }
+        &>div > .period,
         &>.period {
             padding: 7px 7px 0;
 
