@@ -65,7 +65,7 @@
                 <path>controls/barter/AddReport</path>
             </action>
             <action name="getReportList">
-                <path>controls/barter/GetReportList</path>
+                <path>controls/barter/getReportList</path>
             </action>
         </group>
 
