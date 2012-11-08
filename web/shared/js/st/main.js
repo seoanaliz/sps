@@ -480,10 +480,10 @@ var Filter = (function() {
     }
 
     function showInterval() {
-        $intervalWrapper.show();
+        $intervalWrapper.slideDown(200);
     }
     function hideInterval() {
-        $intervalWrapper.hide();
+        $intervalWrapper.slideUp(200);
     }
 
     return {
@@ -520,7 +520,6 @@ var Table = (function() {
     function loadMore() {
         var $el = $("#load-more-table");
         if ($el.hasClass('loading')) return;
-        if (currentListType == 1) return;
         $el.addClass('loading');
 
         var $tableBody = $('.list-body');
@@ -535,6 +534,13 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+            /* Пока не работает =\ */
+            return;
+        }
+
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded += 1;
@@ -544,11 +550,10 @@ var Table = (function() {
                         $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
                     }
                 } else {
-                    /* Пока не рабоает =\ */
-                    /*if (data.length) {
+                    if (data.length) {
                         dataTable = $.merge(dataTable, data);
                         $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
-                    }*/
+                    }
                 }
                 $el.removeClass('loading');
             }
@@ -566,6 +571,10 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -595,6 +604,10 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -628,6 +641,10 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -656,13 +673,17 @@ var Table = (function() {
             audienceMin: audience[0],
             audienceMax: audience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
                 currentListType = listType;
-                dataTable = data;
                 currentAudience = audience;
+                dataTable = data;
                 if (!listType) {
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
                 } else {
@@ -718,6 +739,10 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1]
         };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
