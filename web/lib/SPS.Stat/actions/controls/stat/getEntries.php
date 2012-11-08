@@ -31,7 +31,7 @@ class getEntries {
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
-        if( $time_to = 0 )
+        if( $time_to == 0 )
             $time_to = time();
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
