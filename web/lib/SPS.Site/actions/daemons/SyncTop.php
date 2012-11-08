@@ -134,8 +134,6 @@
                 } else {
                     $conn->rollback();
                 }
-
-                break;
             }
         }
 
