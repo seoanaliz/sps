@@ -62,10 +62,10 @@
 
         <group name="Barter">
             <action name="addReport">
-                <path>controls/barter/addReport</path>
+                <path>controls/barter/AddReport</path>
             </action>
             <action name="getReportList">
-                <path>controls/barter/getReportList</path>
+                <path>controls/barter/GetReportList</path>
             </action>
         </group>
 
