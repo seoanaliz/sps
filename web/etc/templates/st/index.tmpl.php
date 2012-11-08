@@ -15,6 +15,13 @@
                 </td>
                 <td class="right-column">
                     <div class="filter">
+                        <div class="interval-wrapper">
+                            <div class="title">Интервал</div>
+                            <div class="interval">
+                                <input placeholder="В период с" class="timeFrom" type="text" />
+                                <input placeholder="по" class="timeTo" type="text" />
+                            </div>
+                        </div>
                         <div class="title">Аудитория</div>
                         <div class="audience">
                             <div class="slider-range clear-fix">

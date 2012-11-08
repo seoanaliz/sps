@@ -89,7 +89,7 @@ var Eventlist = {
             period: ''
         }, options);
 
-        var sortByClear = {
+        var clearSortBy = {
             followers: 'quantity',
             contacts: '',
             growth: 'diff_abs',
@@ -101,12 +101,14 @@ var Eventlist = {
             groupId: params.listId,
             offset: params.offset,
             limit: params.limit,
-            sortBy: sortByClear[params.sortBy],
+            sortBy: clearSortBy[params.sortBy],
             sortReverse: params.sortReverse ? 1 : 0,
             search: params.search,
             period: params.period,
             min: params.audienceMin,
             max: params.audienceMax,
+            timeFrom: params.timeFrom,
+            timeTo: params.timeTo,
             show: 1
         }, function(dirtyData) {
             var clearList = [];

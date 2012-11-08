@@ -293,12 +293,16 @@ var Filter = (function() {
     var $audience;
     var $period;
     var $list;
+    var $intervalWrapper;
+    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
         $audience = $('> .audience', $container);
         $period = $('> .period', $container);
         $list = $('> .list', $container);
+        $intervalWrapper = $('> .interval-wrapper', $container);
+        $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
         listRefresh(callback);
@@ -358,6 +362,23 @@ var Filter = (function() {
                     notRender = false;
                     changeRange(event);
                 }
+            });
+            $interval.find('.timeFrom, .timeTo').datepicker ({
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                firstDay: 1,
+                showAnim: '',
+                dateFormat: "d MM"
+            }).change(function(e) {
+                var dateFrom = $interval.find('.timeFrom').datepicker('getDate');
+                var dateTo = $interval.find('.timeTo').datepicker('getDate');
+                Table.setInterval([
+                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
+                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
+                ]);
             });
             function renderRange() {
                 var audience = [
@@ -458,12 +479,21 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
+    function showInterval() {
+        $intervalWrapper.show();
+    }
+    function hideInterval() {
+        $intervalWrapper.hide();
+    }
+
     return {
         init: init,
         listRefresh: listRefresh,
         listSelect: listSelect,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax
+        setSliderMax: setSliderMax,
+        showInterval: showInterval,
+        hideInterval: hideInterval
     };
 })();
 
@@ -479,7 +509,7 @@ var Table = (function() {
     var currentPeriod = 1;
     var currentAudience = [];
     var currentInterval = [];
-    var currentType = 0;
+    var currentListType = 0;
 
     function init(callback) {
         $container = $('#table');
@@ -489,21 +519,23 @@ var Table = (function() {
     }
     function loadMore() {
         var $el = $("#load-more-table");
-        var $tableBody = $('.list-body');
         if ($el.hasClass('loading')) return;
-
+        if (currentListType == 1) return;
         $el.addClass('loading');
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                offset: pagesLoaded * Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+
+        var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            offset: pagesLoaded * Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded += 1;
                 if (!listType) {
@@ -524,20 +556,21 @@ var Table = (function() {
     }
     function sort(field, reverse, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: field,
+            sortReverse: reverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: field,
-                sortReverse: reverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 currentSortBy = field;
                 currentSortReverse = reverse;
                 dataTable = data;
@@ -552,20 +585,21 @@ var Table = (function() {
     }
     function search(text, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: text,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: text,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 currentSearch = text;
                 dataTable = data;
                 if (!listType) {
@@ -584,20 +618,21 @@ var Table = (function() {
     }
     function setPeriod(period, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: period,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: period,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 currentPeriod = period;
                 dataTable = data;
                 if (!listType) {
@@ -611,20 +646,21 @@ var Table = (function() {
     }
     function setAudience(audience, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: audience[0],
+            audienceMax: audience[1]
+        };
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: audience[0],
-                audienceMax: audience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 dataTable = data;
                 currentAudience = audience;
                 if (!listType) {
@@ -638,20 +674,25 @@ var Table = (function() {
     }
     function setInterval(interval, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = interval[0];
+            params.timeTo = interval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 currentInterval = interval;
                 dataTable = data;
                 if (!listType) {
@@ -667,20 +708,21 @@ var Table = (function() {
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
+        var params = {
+            listId: listId,
+            limit: Configs.tableLoadOffset,
+            search: defSearch,
+            sortBy: defSortBy,
+            sortReverse: defSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
 
-        Events.fire('load_table', {
-                listId: listId,
-                limit: Configs.tableLoadOffset,
-                search: defSearch,
-                sortBy: defSortBy,
-                sortReverse: defSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
-                currentType = listType;
+                currentListType = listType;
                 currentListId = listId;
                 currentSearch = defSearch;
                 currentSortBy = defSortBy;
@@ -688,8 +730,10 @@ var Table = (function() {
                 dataTable = data;
                 if (!listType) {
                     $container.html(tmpl(TABLE, {rows: data}));
+                    Filter.hideInterval();
                 } else {
                     $container.html(tmpl(OUR_TABLE, {rows: data}));
+                    Filter.showInterval();
                 }
                 $container.find('.' + currentSortBy).addClass('active');
                 if (!currentListId) {
@@ -1026,6 +1070,7 @@ var Table = (function() {
         setPeriod: setPeriod,
         setAudience: setAudience,
         editMode: editMode,
-        toggleEditMode: toggleEditMode
+        toggleEditMode: toggleEditMode,
+        setInterval: setInterval
     };
 })();
