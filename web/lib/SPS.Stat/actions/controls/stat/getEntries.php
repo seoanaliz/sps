@@ -201,7 +201,6 @@ class getEntries {
     //возвращает данные о наших пабликах
     private function get_our_publics_state( $time_start, $time_stop )
     {
-        print_r(array($time_start, $time_stop));
         $publics = StatPublics::get_our_publics_list();
         $res = array();
         $ret = array();
@@ -215,7 +214,6 @@ class getEntries {
             //всего постов
             $res['overall_posts'] = $posts_quantity;
             $days = round(( $time_stop - $time_start ) / 84600 );
-            echo $days . '<br>';
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
@@ -225,7 +223,7 @@ class getEntries {
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
                 (( $authors_posts['count'] / $posts_quantity ) * 100 ) : 0 ;
-            $res['auth_posts']      =  round( $public['auth_posts'], 2 );
+            $res['auth_posts']      =  round( $res['auth_posts'] );
 
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
