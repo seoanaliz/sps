@@ -102,9 +102,9 @@ var OUR_TABLE_HEADER =
     '<div class="item views">просмотры<span class="icon arrow"></div>' +
     '<div class="item posts" title="посты">...<span class="icon arrow"></div>' +
     '<div class="item posts-per-day" title="постов в день">...<span class="icon arrow"></div>' +
-    '<div class="item authors-posts" title="авторсие посты">...<span class="icon arrow"></div>' +
-    '<div class="item authors-likes" title="авторсие лайки">...<span class="icon arrow"></div>' +
-    '<div class="item authors-reposts" title="авторсие репосты">...<span class="icon arrow"></div>' +
+    '<div class="item authors-posts" title="авторские посты">...<span class="icon arrow"></div>' +
+    '<div class="item authors-likes" title="авторские лайки">...<span class="icon arrow"></div>' +
+    '<div class="item authors-reposts" title="авторские репосты">...<span class="icon arrow"></div>' +
     '<div class="item sb-posts" title="SB посты">...<span class="icon arrow"></div>' +
     '<div class="item sb-likes" title="SB лайки">...<span class="icon arrow"></div>' +
     '<div class="item growth-views" title="рост просмотров">...<span class="icon arrow"></div>' +
