@@ -96,7 +96,6 @@
                 'ava'       =>  $ds->getValue('ava', TYPE_STRING),
                 'name'      =>  $ds->getValue('name', TYPE_STRING),
                 'comments'  =>  $ds->getValue('comments', TYPE_STRING)
-
             );
 
         }
@@ -123,7 +122,7 @@
             $ds = $cmd->Execute();
             $ds->Next();
             $acc_tok = $ds->getValue( 'access_token', TYPE_STRING );
-
+            $acc_tok = $acc_tok && VkHelper::check_at( $acc_tok ) ? $acc_tok : false ;
             return $acc_tok ? $acc_tok : false;
         }
 

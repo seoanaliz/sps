@@ -38,10 +38,8 @@
                 die();
             }
 	     
-            if ( $m_class::implement_group( $group_ids, $recipients_id ) )
-                die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
-            else
-                die( ObjectHelper::ToJSON( array( 'response' => false ) ) );
+            $m_class::implement_group( $group_ids, $recipients_id );
+            die( ObjectHelper::ToJSON( array( 'response' => true )));
 
         }
 
