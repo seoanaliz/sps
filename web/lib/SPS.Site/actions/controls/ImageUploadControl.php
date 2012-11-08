@@ -1,10 +1,16 @@
 <?php
     Package::Load( 'SPS.Site' );
 
+    interface UploadedFile{
+        function getName();
+        function getSize();
+        function save($path);
+    }
+
     /**
      * Handle file uploads via XMLHttpRequest
      */
-    class qqUploadedFileXhr {
+    class qqUploadedFileXhr implements UploadedFile {
         /**
          * Save the file to the specified path
          * @return boolean TRUE on success
@@ -41,7 +47,7 @@
     /**
      * Handle file uploads via regular form post (uses the $_FILES array)
      */
-    class qqUploadedFileForm {
+    class qqUploadedFileForm implements UploadedFile {
         /**
          * Save the file to the specified path
          * @return boolean TRUE on success
@@ -67,7 +73,9 @@
      * @author     Shuler
      */
     class ImageUploadControl {
-
+        /**
+         * @var UploadedFile
+         */
         private $file;
 
         /**

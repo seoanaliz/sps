@@ -49,12 +49,14 @@ class getEntries {
 
 
             if ( $period == 7 ) {
-                $sortBy   .= '_week';
+                if ( $sortBy == 'diff_abs' )
+                    $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
                 $diff_vis = 'diff_vis_week';
             } else if( $period == 30 ) {
-                $sortBy   .= '_month';
+                if ( $sortBy == 'diff_abs' )
+                    $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
                 $diff_vis = 'diff_vis_week';
@@ -80,6 +82,7 @@ class getEntries {
                           AND gprel.group_id=@group_id
                           AND publ.quantity >= @min_quantity
                           AND publ.quantity <= @max_quantity
+                          AND publ.quantity >= 50000
                           ' . $search . '
                     ORDER BY '
                         . $sortBy . $sortReverse .
@@ -102,7 +105,8 @@ class getEntries {
                         WHERE
                             quantity > @min_quantity
                             AND publ.page=true
-                            AND quantity < @max_quantity '.
+                            AND quantity < @max_quantity
+                            AND quantity > 50000'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy . $sortReverse .
@@ -297,7 +301,7 @@ class getEntries {
 
     private function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS ;
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 50000' ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
         $ds = $cmd->Execute();
         $ds->Next();

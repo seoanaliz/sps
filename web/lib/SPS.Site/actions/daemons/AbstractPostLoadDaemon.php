@@ -72,7 +72,7 @@ abstract class AbstractPostLoadDaemon {
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
-            $articleRecord->content = TextHelper::ToUTF8($post['text']);
+            $articleRecord->content = $post['text'];
             $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
             $articleRecord->link = Convert::ToString($post['link']);
             ;

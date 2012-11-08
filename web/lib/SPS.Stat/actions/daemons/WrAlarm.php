@@ -25,19 +25,19 @@ class WrAlarm
 //        print_R($report);
 //        die();
 
-//        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
+        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
 
-//        $publics = $this->get_monitoring_publs(1);
-//        $this->check_in_search( $publics );
+        $publics = $this->get_monitoring_publs(1);
+        $this->check_in_search( $publics );
 
         $publics = $this->get_monitoring_publs();
         $this->check_block( $publics );
 
-        print_R($this->wasted_array);
-//        $report = $this->form_report();
+//        print_R($this->wasted_array);
+        $report = $this->form_report();
 //        print_R($report);
-//        if ( $report )
-//            $this->send_report( $report );
+        if ( $report )
+            $this->send_report( $report );
     }
 
     public function check_block( $publics_array )
@@ -56,6 +56,7 @@ class WrAlarm
             $code .= trim( $return, ',' ) . "};";
             $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
             sleep(0.3);
+            $susp_ids = array();
             foreach( $res as $apublic_id => $body ) {
                 $public_id =  trim( $apublic_id, 'a');
                 if ( empty( $body) )
@@ -63,7 +64,6 @@ class WrAlarm
                     $susp_ids[] = $public_id;
                 }
             }
-
 
             foreach( $susp_ids as $id ) {
                 $res = VkHelper::api_request( 'wall.get', array(
