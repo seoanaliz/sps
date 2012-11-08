@@ -41,15 +41,15 @@ class getEntries {
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
+
         $group  = StatGroups::get_group($groupId);
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
 
-            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
+
 //            $sortReverse    =   $sortReverse? '' : ' DESC ';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
-
 
             if ( $period == 7 ) {
                 if ( $sortBy == 'diff_abs' )
@@ -68,6 +68,7 @@ class getEntries {
                 $diff_abs = 'diff_abs';
                 $diff_vis = 'diff_vis';
             }
+            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
 
             if ( isset( $groupId ) ) {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
