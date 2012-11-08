@@ -55,7 +55,7 @@ var Eventlist = {
     },
     get_viewer: function(callback) {
         simpleAjax('addUser', function(rawUser) {
-            callback(Cleaner.user(rawUser));
+            callback((rawUser && rawUser.at) ? Cleaner.user(rawUser) : false);
         });
     },
     get_lists: function(callback) {

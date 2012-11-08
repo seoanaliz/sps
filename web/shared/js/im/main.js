@@ -37,7 +37,7 @@ var Main = Widget.extend({
         t.el().hide();
 
         Events.fire('get_viewer', function(data) {
-            if (!data || !data.at) {
+            if (!data) {
                 location.href = '/im/login/?' + encodeURIComponent('im/');
                 return;
             }
