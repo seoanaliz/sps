@@ -219,13 +219,13 @@ class getEntries {
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
-            $res['sb_posts_count'] = $non_authors_posts['count'];
+            $res['sb_posts_count'] = $posts_quantity ?
+                round( $non_authors_posts['count'] * 100 / $posts_quantity ) . '%' : 0 ;
             // средний rate спарсенных постов
             $res['sb_posts_rate'] = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
-                (( $authors_posts['count'] / $posts_quantity ) * 100 ) : 0 ;
-            $res['auth_posts']      =  round( $res['auth_posts'] );
+                round( 100 * $authors_posts['count'] / $posts_quantity   ) . '%' : 0 ;
 
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
