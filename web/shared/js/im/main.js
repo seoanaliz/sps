@@ -37,6 +37,11 @@ var Main = Widget.extend({
         t.el().hide();
 
         Events.fire('get_viewer', function(data) {
+            if (!data || !data.at) {
+                location.href = '/im/login/?' + encodeURIComponent('im/');
+                return;
+            }
+
             var viewer = new UserModel(data);
             userCollection.add(viewer.id(), viewer);
 
@@ -1230,11 +1235,6 @@ $(document).ready(function() {
         return;
     } else {
         $.cookie('uid', Configs.vkId, {expires: 30});
-    }
-
-    if (!Configs.token) {
-        location.href = '/im/login/?' + encodeURIComponent('im/');
-        return;
     }
 
     var main = new Main({
