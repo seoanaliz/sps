@@ -33,7 +33,6 @@
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
-                $a['ava']   = $public->avatar;
                 $res[] = $a;
             }
             return $res;
@@ -352,7 +351,11 @@
             //проверка на наличие данных на этот период в бд. если нет - запрос в контакт
             if( $days != $requested_days )
                 return false;
-
+            $diff_views =   0;
+            $diff_viss  =   0;
+            $views      =   0;
+            $visitors   =   0;
+            $temp_viss  =   0;
             while( $ds->Next()) {
                 if ( isset( $temp_views )) {
                     echo 1;
@@ -399,6 +402,7 @@
                 StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
             }
 
+
             sleep(0.3);
         }
 
@@ -422,6 +426,7 @@
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
+            $rate = 0;
             while( $ds->next()) {
                 $tmp_rate = $ds->GetValue( 'rate' );
                 $rate += $tmp_rate < 100 ? $tmp_rate : 100;
@@ -447,12 +452,141 @@
             $cmd->Execute();
         }
 
-        //barter
-        public static function save_barter_event()
+        //возвращает стены до 25 пабликов
+        public static function get_publics_walls( $barter_events_array )
         {
+            $code = '';
+            $return = "return{";
+            //запрашиваем стены пабликов по 25 пабликов, 15 постов
+            $i = 0;
+            foreach( $barter_events_array as $public ) {
+                $id = trim( $public->barter_public );
+                $code   .= 'var id' . $i . ' = API.wall.get({"owner_id":-' . $id . ',"count":15 });';
+                $return .=  "\"id$i\":id$i,";
+                $i++;
+            }
+            $code .= trim( $return, ',' ) . "};";
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
+                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
+            return $res;
+        }
+
+        public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
+        {
+            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
+            if ( !empty( $public )) {
+                $public     = reset( $public );
+                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+                $publisher  = reset( $publisher );
+            }
+
+            $params = array(
+                'gid'           =>  $public_id,
+                'date_from'     =>  date( 'Y-m-d', $time_from ),
+                'date_to'       =>  date( 'Y-m-d', $time_to )
+            );
+            if ( isset( $publisher->publisher->vk_token ))
+                $params['access_token']  =  $publisher->publisher->vk_token;
+
+            $res = VkHelper::api_request( 'stats.get', $params, 0 );
+            if ( !empty ( $res->error ))
+                return false;
+            return array(
+                'visitors'  =>  $res[0]->visitors,
+                'viewers'   =>  $res[0]->views
+            );
 
         }
 
+        public function get_publics_info_from_base( $public_ids )
+        {
+            $public_ids = implode( ',', $public_ids );
+            $sql = 'SELECT vk_id, name, ava, quantity, page
+                    FROM ' . TABLE_STAT_PUBLICS . '
+                    WHERE vk_id IN (' . $public_ids . ')';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetString( '@public_ids', '\'{' . $public_ids . '}\'' );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[ $ds->GetInteger( 'vk_id' )] = array(
+                    'name'      =>   $ds->GetString ( 'name' ),
+                    'ava'       =>   $ds->GetString ( 'ava' ),
+                    'quantity'  =>   $ds->GetInteger( 'quantity' ),
+                    'page'      =>   $ds->GetBoolean( 'page')
+                );
+            }
+            return $res;
+        }
 
+        //проверяет изменения в пабликах(название и ава)
+        public static function update_public_info( $publics, $conn )
+        {
+            $public_chunks = array_chunk( $publics, 500 );
+
+            foreach( $public_chunks as $ids ) {
+                $line = implode( ',', $ids );
+                $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
+                sleep(0.3);
+                foreach( $res as $public ) {
+                    //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
+                    $sql = '
+                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar, page boolean);
+                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar, page boolean) RETURNS varchar AS $$
+                    DECLARE
+                        curr_name CHARACTER VARYING := \'_\';
+                    BEGIN
+                        SELECT name INTO curr_name FROM stat_publics_50k WHERE vk_id=$1;
+                        IF( curr_name=p_name )
+                        THEN
+                            curr_name := \'\';
+                        ELSE
+                            INSERT INTO stat_public_audit(public_id,name,changed_at,act) VALUES ($1,curr_name,CURRENT_TIMESTAMP,\'name\');
+                        END IF;
+                        UPDATE stat_publics_50k SET name = $2, ava=$3, page=$4 WHERE vk_id=$1;
+                        RETURN curr_name;
+                    END
+                    $$ lANGUAGE plpgsql;
+                    SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
+                    $cmd = new SqlCommand( $sql, $conn );
+                    $cmd->SetInteger( '@public_id', $public->gid );
+                    $cmd->SetString(  '@name', $public->name );
+                    $cmd->SetString(  '@photo', $public->photo);
+                    $cmd->SetBoolean( '@page', ( $public->type =='page' ? true : false));
+                    $cmd->Execute();
+                }
+            }
+        }
+
+        public static function get_public_changes( $time_from, $time_to, $conn = 0 )
+        {
+            if ( !$conn )
+                $conn = ConnectionFactory::Get('tst');
+
+            $sql = 'SELECT
+                        public_id, a.name as old_name, changed_at, b.name
+                    FROM '
+                        . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
+                   'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
+                   'ON
+                        public_id=vk_id
+                    WHERE
+                        changed_at > @time_from
+                        AND changed_at > @time_to
+                        AND act = \'name\'';
+            $cmd = new SqlCommand( $sql, $conn );
+            $cmd->SetString( '@time_from', date( 'r', $time_from ));
+            $cmd->SetString( '@time_to', date( 'r', $time_to ));
+            echo $cmd->getQuery();
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[$ds->GetInteger( 'public_id')] = array(
+                    'old_name'  => $ds->GetValue( 'old_name' ),
+                    'new_name'  => $ds->GetValue( 'name' )
+                );
+            }
+            return $res;
+        }
     }
 ?>

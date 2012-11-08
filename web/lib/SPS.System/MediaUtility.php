@@ -16,7 +16,7 @@
             'Article' => array(
                 'photos' => array(
                     'folder'            => 'article-photos'
-                    , 'maxSize'         => 2097152 //2MB (1024*1024*2)
+                    , 'maxSize'         => 31457280 //30MB (1024*1024*30)
                     , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
                     , 'isImage'         => true
                     , 'resizes'     => array(
@@ -29,6 +29,10 @@
                         )
                         , 'original' => array(
                             'name'      => 'original'
+                            , 'width'   => 1920
+                            , 'height'  => 1280
+                            , 'quality' => 100
+                            , 'scale'   => true
                         )
                     )
                 )
@@ -36,7 +40,7 @@
             , 'Link' => array(
                 'photos' => array(
                     'folder'            => 'link-photos'
-                    , 'maxSize'         => 2097152 //2MB (1024*1024*2)
+                    , 'maxSize'         => 31457280 //10MB (1024*1024*10)
                     , 'ext'             => array( 'jpeg', 'jpg', 'gif', 'png' )
                     , 'isImage'         => true
                     , 'resizes'         => array(

@@ -80,7 +80,7 @@ class tf_parcer
 
     }
 
-    private function tf_api_wrap($service,$request_params)
+    private function tf_api_wrap( $service,$request_params )
     {
         if (self::TESTING) {
             echo 'враппер, ' . $service . '<br>';
@@ -120,7 +120,7 @@ class tf_parcer
     //остальных нет
     //в поле id - идентификатор юзера в topface
     //$sex: 0 - ж, 1 - м
-    public function get_top($sex = 0)
+    public function get_top( $sex = 0 )
     {
 
         $this->auth();

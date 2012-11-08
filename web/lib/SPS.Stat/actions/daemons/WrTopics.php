@@ -3,36 +3,37 @@
 Package::Load( 'SPS.Stat' );
 
 set_time_limit(13600);
-error_reporting( 0 );
+//error_reporting( 0 );
 class WrTopics extends wrapper
 {
     private $ids;
+    private $conn;
 
     public function Execute()
     {
+        $this->conn = ConnectionFactory::Get( 'tst' );
 //        if (! $this->check_time())
 //            die('Не сейчас');
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i') . '<br>';
         $this->update_quantity();
-        $this->update_public_info();
+        StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
+        $this->find_admins();
         echo "end_time = " . date( 'H:i') . '<br>';
-
     }
 
     public function get_id_arr()
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quanity > 500000
+                WHERE quantity > 50000
                 ORDER BY vk_id";
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-
+        $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
         $res = array();
         while ( $ds->Next() ) {
-            $res[] = $ds->getValue('vk_id', TYPE_INTEGER);
+            $res[] = $ds->getInteger( 'vk_id' );
         }
         $this->ids = $res;
     }
@@ -41,57 +42,18 @@ class WrTopics extends wrapper
     {
         $sql = 'SELECT time
                 FROM ' . TABLE_STAT_PUBLICS_POINTS . '
-                WHERE time >= current_date-interval \'1 day\'
+                WHERE time >= current_date  - interval \'1 day\'
                 LIMIT 1';
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
         $ds->Next();
         if( $ds->GetValue( 'time' ))
             return false;
-
-    }
-
-    //проверяет изменения в пабликах(название и ава)
-    public function update_public_info()
-    {
-        if (self::TESTING)
-            echo '<br>update_public_info<br>';
-        $i = 0;
-        $ids = '';
-        $count = count($this->ids);
-        foreach($this->ids as $id) {
-            if ($i == 450 || $i == $count - 1)
-            {
-                $params  = array(
-                    'gids'  =>  $ids
-                );
-
-                $res = VkHelper::api_request('groups.getById', $params, 0);
-                foreach($res as $public) {
-                    $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET
-                                                name=@name,
-                                                ava=@photo
-                                WHERE
-                                                vk_id=@vk_id';
-                    $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                    $cmd->SetInteger('@vk_id', $public->gid);
-                    $cmd->SetString('@name', $public->name );
-                    $cmd->SetString('@photo', $public->photo);
-                    $cmd->Execute();
-                }
-
-                $count -= 450;
-                $ids = '';
-                $i = 0;
-
-            }
-            $i ++;
-            $ids .=  $id . ',';
-        }
+        return true;
     }
 
     //обновление данных по каждому паблику(текущее количество, разница со вчерашним днем)
-    public function set_public_grow( $publ_id, $quantity, $last_up_time )
+    public function set_public_grow( $publ_id, $quantity )
     {
         $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS .
             ' WHERE
@@ -102,9 +64,7 @@ class WrTopics extends wrapper
                             )
                    ORDER BY time DESC';
 
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
-
-        $cmd->SetInteger( '@time',     $last_up_time );
+        $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',  $publ_id );
         $ds = $cmd->Execute();
         $time = array();
@@ -139,7 +99,7 @@ class WrTopics extends wrapper
                 diff_rel_month  =   @diff_rel_month
             WHERE vk_id=@publ_id';
 
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+        $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',          $publ_id );
         $cmd->SetInteger( '@diff_abs_week',    $diff_abs_week );
         $cmd->SetInteger( '@diff_abs_month',   $diff_abs_mon );
@@ -147,7 +107,6 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
         $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
         $cmd->Execute();
-
     }
 
     //собирает количество посетителей в пабликах
@@ -158,10 +117,9 @@ class WrTopics extends wrapper
         $return = "return{";
         $code = '';
         $timeTo = StatPublics::get_last_update_time();
-        $conn = ConnectionFactory::Get( 'tst' );
         foreach( $this->ids as $b ) {
 
-            if ( $i == 25 or !next( $this->ids ) ) {
+            if ( $i == 25 or !next( $this->ids )) {
                 if ( !next( $this->ids ) ) {
                     $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                     $return .= "\" a$b\":a$b,";
@@ -176,7 +134,7 @@ class WrTopics extends wrapper
                 foreach($res as $key => $entry) {
                     $key = str_replace( 'a', '', $key );
                     $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,current_timestamp - interval '1 day',@quantity)";
-                    $cmd = new SqlCommand( $sql, $conn );
+                    $cmd = new SqlCommand( $sql, $this->conn );
                     $cmd->SetInteger( '@id',        $key );
                     $cmd->SetInteger( '@quantity',  $entry->count );
                     $cmd->Execute();
@@ -200,79 +158,127 @@ class WrTopics extends wrapper
         $time_stop  = time() - 86400 * 30;
         foreach( $this->ids as $public_id ) {
             StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_stop );
-            die();
         }
     }
+
     public function update_visitors()
     {
         $time_start = time() - 75600 ;
         foreach( $this->ids as $public_id ) {
             StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_start );
         }
+
+        $sql = 'UPDATE stat_publics_50k as a
+                SET visitors=(
+                    SELECT b.visitors
+                    FROM stat_publics_50k_points as b
+                    WHERE a.vk_id=b.id
+                    ORDER BY time DESC
+                    LIMIT 1)';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->Execute();
     }
 
-//возвращает данные о наших пабликах
-    private function get_our_publics_state()
+    //поиск админов пабликов
+    public function find_admins(  )
     {
-        $publics    =   StatPublics::get_our_publics_list();
-        foreach( $publics as &$public ) {
-//            $authors_posts      = StatPublics::get_ad_public_posts( 10, $time_start, $time_stop );
-            $authors_posts      = StatPublics::get_public_posts( $public['sb_id'], 1, $time_start, $time_stop );
-            $non_authors_posts  = StatPublics::get_public_posts( $public['sb_id'], 0, $time_start, $time_stop  );
+        foreach ( $this->ids as $id ) {
+            sleep(0.3);
+            echo $id . '<br>';
 
-            $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
+            $params = array(
+                'act'   =>  'a_get_contacts',
+                'al'    =>  1,
+                'oid'   =>  $id
+            );
 
-            //всего постов
-            $public['overall_posts'] = $posts_quantity;
-            $days = round( ( $time_stop - $time_start ) / 84600 );
-            $public['posts_days_rel'] = round( $posts_quantity / $days );
-            print_r($public);
+            $url = 'http://vk.com/al_page.php';
+            $k = $this->qurl_request( $url, $params );
+            $k = explode( '<div class="image">' ,$k );
+            unset( $k[0] );
 
-            //постов из источников
-            $public['sb_posts_count'] = $non_authors_posts['count'];
-            // средний rate спарсенных постов
-            $public['sb_posts_rate'] = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
-            //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
-
-            //процент авторских постов
-            $guests = StatPublics::get_views_visitors_from_base( $public['sb_id'], $time_start, $time_stop );
-            if ( !$guests ){
-                $guests = StatPublics::get_views_visitors_from_vk( $public['id'], $time_start, $time_stop );
+            foreach( $k as $admin_html ) {
+                $admin = $this->get_admin('a href="/' . $admin_html);
+                $this->delete_admins( $id );
+                if ( !empty( $admin )) {
+                    $this->save_admin( $id, $admin );
+                }
+                $admin = array();
             }
-            if ( $guests ) {
-                $public['views'] = $guests['views'];
-                $public['visitors'] = $guests['visitors'];
-                $public['avg_vie_grouth'] = $guests['vievs_grouth'];
-                $public['avg_vis_grouth'] = $guests['vis_grouth'];
-
-            }
-
-            if ( !$authors_posts['count'] && !$non_authors_posts['count'] ) {
-                $public['auth_posts'] = 'какой-то косяк, данных нет';
-                $public['auth_reposts_eff'] = 'данных нет';
-                $$public['auth_likes_eff'] = 'данных нет';
-            } elseif( !$authors_posts['count'] ) {
-                $public['auth_posts'] = "авторских постов нет (всего постов - $posts_quantity)";
-                $public['auth_likes_eff'] = 'с лайками та же история, средний неавторский по паблику - ' . $non_authors_posts['likes'];
-                $public['auth_reposts_eff'] = 'репосты туда же, среднее - ' . $non_authors_posts['reposts']
-                    . ', среднее относительное - ' . ( round( 100 * $non_authors_posts['reposts'] / $non_authors_posts['likes'], 1 ) . '%');
-            }
-            elseif( !$non_authors_posts['count'] ) {
-                $public['auth_posts'] = "неавторских постов нет (всего постов - $posts_quantity)";
-
-                $public['auth_likes_eff'] = 'с лайками та же история, средний по паблику - ' . $authors_posts['likes'];
-                $public['auth_reposts_eff'] = 'репосты туда же, среднее - ' . $authors_posts['reposts']
-                    . ', среднее относительное - ' . ( round( 100 * $authors_posts['reposts'] / $authors_posts['likes'], 1 ) . '%');
-            } else {
-                $public['auth_posts'] = ( $authors_posts['count'] / $posts_quantity ) * 100;
-                $public['auth_posts'] = round( $public['auth_posts'], 2 ) . '%';
-                $public['auth_likes_eff']   = (round( $authors_posts['likes']   / $non_authors_posts['likes'], 4 ) * 100) . '%';
-                $public['auth_reposts_eff'] = (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) . '%';
-            }
+            if ( !empty( $k ))
+                die();
         }
-        $this->show_publics( $publics );
+        return true;
     }
 
-}
+    private function get_admin( $contact_html )
+    {
+        $desk = '';
+        $cont = '';
+        if (preg_match('/href="\/(.+?)"/', $contact_html, $matches))
+            $link = $matches[1];
+        if (preg_match('/<div class="extra_info.+?>(.+?)<\/div>/', $contact_html, $matches))
+            $cont = $matches[1];
+        if (preg_match('/<div class="desc.+?>(.+?)<\/div>/', $contact_html, $matches))
+            $desc = $matches[1];
+        if (preg_match('/<img src="(.+?)"/', $contact_html, $matches))
+            $ava = $this->$matches[1];
 
+        if ( isset( $ava ) && substr_count( $ava, 'deactivated' ))
+            return false;
+
+        if( !$link && !$desc && !$cont ){
+            return false;
+        }
+        $k = array();
+        if ( $link ) {
+            $link = trim( $link, '/' );
+            $k = StatUsers::get_vk_user_info( $link );
+            $k = reset( $k );
+        }
+        $res = array(
+            'role'  =>  TextHelper::ToUTF8( $desc . ' ' . $cont ),
+            'name'  =>   $k[ 'name' ],
+            'vk_id' =>  $k['userId'],
+            'ava'   =>  isset( $ava )? $ava : $k['ava']
+        );
+        return $res;
+    }
+
+    private function save_admin( $public_id, $admin_data )
+    {
+        $sql = "INSERT INTO " . TABLE_STAT_ADMINS . "
+                                   (
+                                    vk_id,
+                                    role,
+                                    name,
+                                    ava,
+                                    publ_id
+                                    )
+                            VALUES (
+                                    @vk_id,
+                                    @role,
+                                    @name,
+                                    @ava,
+                                    @public_id
+                                  )";
+        //                $this->db_wrap('query', $query);
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger('@vk_id', $admin_data['vk_id']);
+        $cmd->SetInteger('@public_id', $public_id );
+        $cmd->SetString( '@role',  $admin_data['role']);
+        $cmd->SetString( '@name',  $admin_data['name']);
+        $cmd->SetString( '@ava',   $admin_data['ava']);
+        $cmd->Execute();
+    }
+
+    private function delete_admins( $public_id )
+    {
+        $sql = 'DELETE FROM ' . TABLE_STAT_ADMINS . '
+                WHERE publ_id = @public_id';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger('@public_id', $public_id );
+        $cmd->Execute();
+    }
+}
 ?>

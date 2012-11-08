@@ -70,7 +70,7 @@ class BarterEventFactory
         )
         ,'barter_overlaps' => array(
           'name'        => 'barter_overlaps'
-        , 'type'        => TYPE_INTEGER
+        , 'type'        => TYPE_STRING
         )
         ,'start_visitors'   => array(
               'name'        => 'start_visiters'

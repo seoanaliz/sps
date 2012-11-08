@@ -51,7 +51,7 @@ $(document).ready(function(){
         var i = d[1];
         d[1] = d[0];
         d[0] = i;
-        var date = d.join('.');
+        var date = d.join('/');
         $("#calendar").datepicker('setDate', new Date(date).getTime()).trigger('change');
     })();
 
