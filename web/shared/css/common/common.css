@@ -26,6 +26,7 @@ input[type="checkbox"]:after{content:'';background:url('../../images/common/chec
 input[type="checkbox"]:hover:after{background-position:0 -28px;}
 input[type="checkbox"]:checked:hover:after{background-position:0 -42px;}
 input[type="checkbox"]:checked:after{background-position:0 -14px;}
+input[disabled]{background-color:#f7f7f7;}
 .ui-dropdown-menu{position:absolute;display:none;background-color:#fff;max-height:300px;border:1px solid #C4CDE0;margin-top:-1px;z-index:99;overflow-y:auto;}.ui-dropdown-menu .ui-dropdown-menu-empty{color:#777;padding:.5em 1em;background-color:#f7f7f7;}
 .ui-dropdown-menu .ui-dropdown-menu-item{padding:.5em 1em;cursor:pointer;color:#2b587a;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;line-height:150%;}.ui-dropdown-menu .ui-dropdown-menu-item.hover{background-color:#e1e7ed;}
 .ui-dropdown-menu .ui-dropdown-menu-item.active{color:#fff;background-color:#587da1;}
