@@ -29,8 +29,8 @@ class getEntries {
         $group_type =   Request::getInteger( 'groupType');
         $search     =   pg_escape_string( Request::getString( 'search' ));
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
-        $time_from  =   Request::getInteger( 'timeFrom');
-        $time_to    =   Request::getInteger( 'timeTo');
+        $time_from  =   Request::getInteger( 'timeFrom' );
+        $time_to    =   Request::getInteger( 'timeTo' );
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
@@ -44,7 +44,8 @@ class getEntries {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
 
-            $sortReverse    =   $sortReverse? '' : ' DESC ';
+            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
+//            $sortReverse    =   $sortReverse? '' : ' DESC ';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
 
@@ -69,7 +70,7 @@ class getEntries {
             if ( isset( $groupId ) ) {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
-            $sql = 'SELECT
+             $sql = 'SELECT
                         publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
                         publ.' . $diff_rel . ', publ.visitors,  publ.quantity, gprel.main_admin,
                         publ.in_search,publ.active
@@ -85,7 +86,7 @@ class getEntries {
                           AND publ.quantity >= 50000
                           ' . $search . '
                     ORDER BY '
-                        . $sortBy . $sortReverse .
+                        . $sortBy . #$sortReverse .
                   ' OFFSET '
                         . $offset .
                   ' LIMIT '
@@ -109,7 +110,7 @@ class getEntries {
                             AND quantity > 50000'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
-                            . $sortBy . $sortReverse .
+                            . $sortBy . #$sortReverse .
                       ' OFFSET '
                             . $offset .
                       ' LIMIT '
@@ -125,9 +126,11 @@ class getEntries {
             $resul = array();
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
-                $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
+                $admins = array();
+                if ( isset( $row[ 'main_admins' ]))
+                    $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
-                if ( isset( $userId ) ) {
+                if ( isset( $userId )) {
                     $groups = $this->get_groups( $userId, $row['vk_id'] );
                 }
                 $resul[] =  array(
@@ -140,14 +143,14 @@ class getEntries {
                                 'admins'    =>  $admins,
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
-                                'visitors'  =>  $this->get_visitors( $row['vk_id'] ,$period ),
+                                'visitors'  =>  $row['visitors'],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
                                 'active'    =>  $row['active'] ? true : false
                             );
             }
         }
         else {
-            $resul = $this->get_our_publics_state( $groupId, $time_from, $time_to );
+            $resul = $this->get_our_publics_state( $time_from, $time_to );
         }
 
         echo ObjectHelper::ToJSON(array(
@@ -188,10 +191,9 @@ class getEntries {
 
     private function get_row( $ds, $structure )
     {
-
         $res = array();
-        foreach($structure as $field) {
-            $res[$field] = $ds->getValue($field);
+        foreach( $structure as $field ) {
+            $res[ $field ] = $ds->getValue( $field );
         }
         return $res;
     }
@@ -211,7 +213,7 @@ class getEntries {
             $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
             //всего постов
             $res['overall_posts'] = $posts_quantity;
-            $days = round( ( $time_stop - $time_start ) / 84600 );
+            $days = round(( $time_stop - $time_start ) / 84600 );
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
@@ -221,7 +223,7 @@ class getEntries {
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
                 (( $authors_posts['count'] / $posts_quantity ) * 100 ) : 0 ;
-            $res['auth_posts']      =  round( $public['auth_posts'], 2 );
+            $res['auth_posts']      =  round( $res['auth_posts'] );
 
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
@@ -235,7 +237,6 @@ class getEntries {
             $res['avg_vie_grouth'] = $guests['vievs_grouth'];
             $ret[] = $res;
         }
-
         return $ret;
     }
 
@@ -268,7 +269,7 @@ class getEntries {
 
                 $resul[0] = $this->get_row($ds, $structure);
 
-                if ($k)
+                if ( $k )
                     $resul[] = $k;
             } else
                  $resul[] = $this->get_row($ds, $structure);
