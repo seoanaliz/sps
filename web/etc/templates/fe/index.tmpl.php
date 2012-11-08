@@ -63,6 +63,9 @@
                     <span class="user-name">
                         <a target="_blank"></a>
                     </span>
+                    <span class="logout">
+                        <a href="/login/">Выход</a>
+                    </span>
 <!--                    <span class="counter">11000</span>-->
 <!--                    <span class="counter">68%</span>-->
                 </div>

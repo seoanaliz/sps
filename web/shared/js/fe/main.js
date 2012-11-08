@@ -1440,7 +1440,7 @@ $(document).ready(function(){
                 if (r.me) {
                     var $userInfo = $('.user-info');
                     $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
-                    $('a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
+                    $('.user-name a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
                     $('.user-photo img', $userInfo).attr('src', r.me.photo);
                 }
             }
