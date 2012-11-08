@@ -128,9 +128,9 @@ var OUR_TABLE_ROW =
     '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
     '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
     '<div class="column public-posts-per-day"><?=publicPostsPerDay ? publicPostsPerDay : "-"?></div>' +
-    '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts : "-"?></div>' +
-    '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes : "-"?></div>' +
-    '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts : "-"?></div>' +
+    '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
+    '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?></div>' +
+    '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
     '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
     '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
     '<div class="column public-growth-views"><?=publicGrowthViews ? publicGrowthViews : "-"?></div>' +

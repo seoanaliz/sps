@@ -377,8 +377,12 @@ var Filter = (function() {
                 showAnim: '',
                 dateFormat: "d MM"
             }).change(function(e) {
-                var dateFrom = $interval.find('.timeFrom').datepicker('getDate');
-                var dateTo = $interval.find('.timeTo').datepicker('getDate');
+                var $timeFrom = $interval.find('.timeFrom');
+                var $timeTo = $interval.find('.timeTo');
+                var dateFrom = $timeFrom.datepicker('getDate');
+                var dateTo = $timeTo.datepicker('getDate');
+                $timeTo.datepicker('option', 'minDate', dateFrom);
+                $timeFrom.datepicker('option', 'maxDate', dateTo);
                 Table.setInterval([
                     Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
                     Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
