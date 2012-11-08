@@ -17,7 +17,7 @@ class getEntries {
 
     public function Execute()
     {
-        error_reporting( 0 );
+//        error_reporting( 0 );
         $this->conn =   ConnectionFactory::Get('tst');
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
@@ -213,7 +213,7 @@ class getEntries {
             $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
             //всего постов
             $res['overall_posts'] = $posts_quantity;
-            $days = round(( $time_stop - $time_start ) / 84600 );
+            $days = 1;//round(( $time_stop - $time_start ) / 84600 );
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
