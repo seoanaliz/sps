@@ -546,6 +546,7 @@ var Table = (function() {
             params.timeFrom = currentInterval[0];
             params.timeTo = currentInterval[1];
             /* Пока не работает =\ */
+            $el.removeClass('loading');
             return;
         }
 
