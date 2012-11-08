@@ -20,22 +20,26 @@ var Configs = {
 //        ]}
 var REPORTS_ITEM =
 '<div class="row">' +
-    '<div class="public" title="Наш паблик">' +
-        '<div class="photo">' +
-            '<img src="<?=ad_public.ava?>" alt="" />' +
+    '<? if (isset("ad_public") && ad_public) { ?>' +
+        '<div class="public" title="Наш паблик">' +
+            '<div class="photo">' +
+                '<img src="<?=ad_public.ava?>" alt="" />' +
+            '</div>' +
+            '<div class="name">' +
+                '<a target="_blank" href="http://vk.com/public<?=ad_public.id?>"><?=ad_public.name?></a>' +
+            '</div>' +
         '</div>' +
-        '<div class="name">' +
-            '<a target="_blank" href="http://vk.com/public<?=ad_public.id?>"><?=ad_public.name?></a>' +
+    '<? } ?>' +
+    '<? if (isset("published_at") && published_at) { ?>' +
+        '<div class="public" title="Партнер">' +
+            '<div class="photo">' +
+                '<img src="<?=published_at.ava?>" alt="" />' +
+            '</div>' +
+            '<div class="name">' +
+                '<a target="_blank" href="http://vk.com/public<?=published_at.id?>"><?=published_at.name?></a>' +
+            '</div>' +
         '</div>' +
-    '</div>' +
-    '<div class="public" title="Партнер">' +
-        '<div class="photo">' +
-            '<img src="<?=published_at.ava?>" alt="" />' +
-        '</div>' +
-        '<div class="name">' +
-            '<a target="_blank" href="http://vk.com/public<?=published_at.id?>"><?=published_at.name?></a>' +
-        '</div>' +
-    '</div>' +
+    '<? } ?>' +
     '<div class="time" title="Время постинга"><?=isset("posted_at") ? posted_at : "Неизветсно" ?></div>' +
     '<div class="time" title="Время удаления"><?=isset("deleted_at") ? deleted_at : "Неизветсно" ?></div>' +
     '<div class="time" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
