@@ -2,7 +2,7 @@
 
 class tf_parcer
 {
-    const TOKEN = '7770233f7f7460a97f7460a96c7f5cc82477f747f7140af4eaf4fcadc9b46dd';
+    const TOKEN = '4c0c4be547064c2747064c2777472ee4aa4470647074c21179ccaa53e1c7019d18410f3';
     const API_URL = 'api.topface.ru';
     const TESTING = false;
     public $counter = 0;
@@ -68,7 +68,7 @@ class tf_parcer
             'locale'    =>  'ru',
             'platform'  =>  'vk',
             'sandbox'   =>  1,
-            'sid'       =>  134497174,
+            'sid'       =>  185206722,
             'token'     =>  self::TOKEN,
             'clienttype'=>  'sdasd'
         );

@@ -27,7 +27,8 @@
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
 //                    $public->externalId ==  38000555  ||
-                    $public->externalId ==  35807078 )
+                    $public->externalId ==  35807078  ||
+                    $public->externalId ==  25817269 )
                     continue;
 
                 $a['id']    = $public->externalId;
@@ -325,7 +326,7 @@
             $cmd->SetInteger( '@targetFeedId', $public_sb_id );
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
-            echo $cmd->GetQuery();
+//            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             $ds->next();
             return $ds->GetValue('count');
@@ -336,13 +337,13 @@
             $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
             $sql = 'SELECT views,visitors
                     FROM stat_publics_50k_points
-                    WHERE   date >= @time_from
-                            AND date <= @time_to
+                    WHERE   time >= @time_from
+                            AND time <= @time_to
                             AND id = @public_id
-                    ORDER BY date';
+                    ORDER BY time';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger( '@time_from', $time_from );
-            $cmd->SetInteger( '@time_to',   $time_to );
+            $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
+            $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
             $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
             $ds = $cmd->Execute();
 
@@ -358,7 +359,6 @@
             $temp_viss  =   0;
             while( $ds->Next()) {
                 if ( isset( $temp_views )) {
-                    echo 1;
                     $diff_views +=  $ds->GetInteger( 'views' )    - $temp_views;
                     $diff_viss  +=  $ds->GetInteger( 'visitors' ) - $temp_viss;
                 }
@@ -401,8 +401,6 @@
             foreach( $res as $day ) {
                 StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
             }
-
-
             sleep(0.3);
         }
 
@@ -411,20 +409,20 @@
             if ( !$time_to )
                 $time_to = time();
             $sql = 'SELECT
-                        rate
+                        b.rate
                     FROM
-                        "articles"
+                      "articleQueues" AS a INNER JOIN articles AS b USING("articleId")
                     WHERE
-                        "sentAt" > @time_from
-                        AND "sentAt" < @time_to
-                        AND "targetFeedId" = @targetFeedId
-                        AND rate > 0
+                        a."sentAt" > @time_from
+                    AND a."sentAt" < @time_to
+                    AND a."targetFeedId" = @targetFeedId
+                    AND b.rate > 0
                     ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
             $cmd->SetInteger( '@targetFeedId', $sb_id );
-            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
-            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            $cmd->SetString ( '@time_from', date( 'Y-m-d H:i:00', $time_from ));
+            $cmd->SetString ( '@time_to',   date( 'Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
             $rate = 0;
             while( $ds->next()) {
@@ -442,8 +440,8 @@
                         visitors=@visitors,
                         views   =@views
                     WHERE
-                      id=@public_id
-                      AND time=@date';
+                        id=@public_id
+                        AND time=@date';
             $cmd = new SqlCommand( $sql, $connect );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetInteger( '@visitors',  $visitors );
@@ -577,7 +575,7 @@
             $cmd = new SqlCommand( $sql, $conn );
             $cmd->SetString( '@time_from', date( 'r', $time_from ));
             $cmd->SetString( '@time_to', date( 'r', $time_to ));
-            echo $cmd->getQuery();
+//            echo $cmd->getQuery();
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
