@@ -130,8 +130,8 @@ class getEntries {
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
                 $admins = array();
-                if ( isset( $row[ 'main_admins' ]))
-                    $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
+//                if ( isset( $row[ 'main_admins' ]))
+                $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
                     $groups = $this->get_groups( $userId, $row['vk_id'] );
@@ -256,7 +256,7 @@ class getEntries {
     }
 
     //выбирает админов, в 0 элемент помещает "главного" для этой выборки
-    private function get_admins($publ, $sadmin)
+    private function get_admins( $publ, $sadmin ='' )
     {
         $resul = array();
         $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
