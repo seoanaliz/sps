@@ -13,15 +13,17 @@ class CheckPosts
 
     public function Execute()
     {
-        $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time() + self::time_shift));
+        $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time()));
         //получить список активных эвентов (статус = 3 )
         //прогнать нужные стены(10 записей), поиск search_string
         //не найдено - статус 5, собрать визиторов и население
 //        error_reporting(0);
-
         $barters_for_search = BarterEventFactory::Get( array( 'status' => 3 ), null, 'tst' );
+
         $this->search_for_posts( $barters_for_search );
+
         $this->update_population( $barters_for_search );
+        print_r($barters_for_search);
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -34,15 +36,19 @@ class CheckPosts
             $barter = reset( $chunk );
             $overposts = '';
             foreach( $res as $wall ) {
-                unset($wall[0]);
-                $trig = false;
-                foreach( $wall as $post ) {
 
+                unset($wall[0]);
+
+                $trig = false;
+
+                foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
+                        echo $post->id .' AND '. $barter->post_id . '<br>';
                         if( $barter->stop_search_at->compareTo( $this->now ) < 0 ) {
                             $barter->status = 4;
                             $barter->deletedAt = 0;
                         }
+
                         $trig = true;
                         break;
                     } elseif( $post->id < $barter->post_id  ) {
@@ -50,7 +56,7 @@ class CheckPosts
                         $barter->deleted_at = $this->now;
                         break;
                     } else {
-                        if( $barter->stop_search_at->compareTo( date( 'Y-m-d H:i:s', $post->date + self::time_shift )) > 0 )
+                        if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + self::time_shift )))> 0  )
                             $overposts .= date( 'Y-m-d H:i:s', $post->date + self::time_shift ) . ',';
                     }
                 }
@@ -85,7 +91,6 @@ class CheckPosts
             if ( $barter_event->status != 3 ) {
                 $time = time() + self::time_shift;
                 $res =  StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
-                print_r($res);
                 $barter_event->end_visitors = $res['visitors'];
                 $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
                 $barter_event->end_subscribers = $res->count;

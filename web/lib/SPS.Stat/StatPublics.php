@@ -348,7 +348,8 @@
             $ds = $cmd->Execute();
 
             $days = $ds->GetSize();
-            $requested_days = round(( $time_to - $time_from ) / 84600) + 1;
+
+            $requested_days = round(( $time_to - $time_from ) / 86400) + 1;
             //проверка на наличие данных на этот период в бд. если нет - запрос в контакт
             if( $days != $requested_days )
                 return false;
@@ -434,7 +435,18 @@
 
         public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
         {
-            $sql = 'UPDATE
+            $sql = 'select * from
+                stat_publics_50k_points
+            WHERE
+                id=@public_id
+                AND time=@date';
+            $cmd = new SqlCommand( $sql, $connect );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetString ( '@date',      $date );
+            $ds = $cmd->Execute();
+
+            if ( $ds->GetSize()) {
+                $sql = 'UPDATE
                         stat_publics_50k_points
                     SET
                         visitors=@visitors,
@@ -442,12 +454,31 @@
                     WHERE
                         id=@public_id
                         AND time=@date';
-            $cmd = new SqlCommand( $sql, $connect );
-            $cmd->SetInteger( '@public_id', $public_id );
-            $cmd->SetInteger( '@visitors',  $visitors );
-            $cmd->SetInteger( '@views',     $views );
-            $cmd->SetString ( '@date',      $date );
-            $cmd->Execute();
+                $cmd = new SqlCommand( $sql, $connect );
+                $cmd->SetInteger( '@public_id', $public_id );
+                $cmd->SetInteger( '@visitors',  $visitors );
+                $cmd->SetInteger( '@views',     $views );
+                $cmd->SetString ( '@date',      $date );
+
+                $cmd->Execute();
+            } else {
+                $sql = 'INSERT INTO
+                        stat_publics_50k_points
+                    VALUES(
+                           @public_id,
+                           @date,
+                           0,
+                           @visitors,
+                           @views
+                    )';
+                $cmd = new SqlCommand( $sql, $connect );
+                $cmd->SetInteger( '@public_id', $public_id );
+                $cmd->SetInteger( '@visitors',  $visitors );
+                $cmd->SetInteger( '@views',     $views );
+                $cmd->SetString ( '@date',      $date );
+                $cmd->Execute();
+            }
+
         }
 
         //возвращает стены до 25 пабликов

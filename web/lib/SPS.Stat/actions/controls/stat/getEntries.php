@@ -41,15 +41,15 @@ class getEntries {
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit  :   25;
+
         $group  = StatGroups::get_group($groupId);
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
 
-            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
+
 //            $sortReverse    =   $sortReverse? '' : ' DESC ';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
-
 
             if ( $period == 7 ) {
                 if ( $sortBy == 'diff_abs' )
@@ -68,6 +68,7 @@ class getEntries {
                 $diff_abs = 'diff_abs';
                 $diff_vis = 'diff_vis';
             }
+            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
 
             if ( isset( $groupId ) ) {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
@@ -129,8 +130,8 @@ class getEntries {
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
                 $admins = array();
-                if ( isset( $row[ 'main_admins' ]))
-                    $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
+//                if ( isset( $row[ 'main_admins' ]))
+                $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
                     $groups = $this->get_groups( $userId, $row['vk_id'] );
@@ -219,13 +220,13 @@ class getEntries {
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
-            $res['sb_posts_count'] = $non_authors_posts['count'];
+            $res['sb_posts_count'] = $posts_quantity ?
+                round( $non_authors_posts['count'] * 100 / $posts_quantity ) . '%' : 0 ;
             // средний rate спарсенных постов
             $res['sb_posts_rate'] = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
-                (( $authors_posts['count'] / $posts_quantity ) * 100 ) : 0 ;
-            $res['auth_posts']      =  round( $res['auth_posts'] );
+                round( 100 * $authors_posts['count'] / $posts_quantity   ) . '%' : 0 ;
 
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
@@ -255,7 +256,7 @@ class getEntries {
     }
 
     //выбирает админов, в 0 элемент помещает "главного" для этой выборки
-    private function get_admins($publ, $sadmin)
+    private function get_admins( $publ, $sadmin ='' )
     {
         $resul = array();
         $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";

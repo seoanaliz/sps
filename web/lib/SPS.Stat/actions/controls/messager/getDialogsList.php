@@ -6,11 +6,13 @@ class getDialogsList
     public function execute()
     {
         error_reporting( 0 );
+
         $user_id        =   Request::getInteger( 'userId' );
         $group_id       =   Request::getInteger( 'groupId' );
         $only_new       =   Request::getInteger( 'unreadIn' );
         $offset         =   Request::getInteger( 'offset' );
         $limit          =   Request::getInteger( 'limit' );
+
 //        $in_mess        =   Request::getInteger( 'inMess' );
 //        $out_mess       =   Request::getInteger( 'outMess' );
 //        $ungrouped      =   Request::getInteger( 'ungrouped');
@@ -33,9 +35,17 @@ class getDialogsList
             $group_id  = MesGroups::get_groups_by_type( $user_id, 2 );
             $group_id  = $group_id[0];
         }
-        $res_ids            = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
-        $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
+        $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
 
+        //проверка на новые сообщения в группе
+        $row_dialog_array = array();
+
+//        $sql = 'select  a.rec_id,a.last_update,b.out, b.text,a.state from mes_dialogs as a join mes_texts as b on a.text_id=b.id where a.id in (
+//        ) order by last_update'
+
+//        $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
+        print_r($row_dialog_array);
+        die();
         if( $row_dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
         $user_ids = array();

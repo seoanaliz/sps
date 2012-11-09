@@ -21,19 +21,25 @@
           foreach( $query_result as $barter_event ) {
               $request_line .= $barter_event->barter_public . ',' . $barter_event->target_public . ',';
           }
+
           $request_line = rtrim( $request_line, ',' );
           $publics_data = StatPublics::get_publics_info( $request_line );
 
           $barter_events_res = array();
           foreach( $query_result as $barter_event ) {
+              $overlaps = array();
+              if ( $barter_event->overlaps )
+                 $overlaps = explode( ',', $barter_event->overlaps );
               $barter_events_res[] = array(
                   'published_at'  =>  $publics_data[ $barter_event->barter_public ],
                   'ad_public'     =>  $publics_data[ $barter_event->target_public ],
-                  'posted_at'     =>  $publics_data->posted_at,
-                  'deleted_at'    =>  $publics_data->deleted_at,
-                  'overlaps'      =>  explode(',', $publics_data->overlaps),
-                  'subscribers'   =>  $publics_data->end_subscribers - $publics_data->start_subscribers,
-                  'visitors'      =>  $publics_data->end_visitors    - $publics_data->start_visitors
+                  'posted_at'     =>  isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0,
+                  'deleted_at'    =>  isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : 0,
+                  'overlaps'      =>  $overlaps,
+                  'subscribers'   =>   $barter_event->end_subscribers ?
+                        $barter_event->end_subscribers - $barter_event->start_subscribers : 0,
+                  'visitors'      =>  $barter_event->end_visitors ?
+                        $barter_event->end_visitors    - $barter_event->start_visitors : 0
               );
           }
           return $barter_events_res;
