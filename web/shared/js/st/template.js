@@ -100,9 +100,15 @@ var OUR_TABLE_HEADER =
     '</div>' +
     '<div class="item visitors">посетители<span class="icon arrow"></div>' +
     '<div class="item views">просмотры<span class="icon arrow"></div>' +
-    '<div class="item posts">посты<span class="icon arrow"></div>' +
-    '<div class="item authors">авторы<span class="icon arrow"></div>' +
-    '<div class="item sb">SB<span class="icon arrow"></div>' +
+    '<div class="item posts" title="посты">...<span class="icon arrow"></div>' +
+    '<div class="item posts-per-day" title="постов в день">...<span class="icon arrow"></div>' +
+    '<div class="item authors-posts" title="авторские посты">...<span class="icon arrow"></div>' +
+    '<div class="item authors-likes" title="авторские лайки">...<span class="icon arrow"></div>' +
+    '<div class="item authors-reposts" title="авторские репосты">...<span class="icon arrow"></div>' +
+    '<div class="item sb-posts" title="SB посты">...<span class="icon arrow"></div>' +
+    '<div class="item sb-likes" title="SB лайки">...<span class="icon arrow"></div>' +
+    '<div class="item growth-views" title="рост просмотров">...<span class="icon arrow"></div>' +
+    '<div class="item growth-visitors" title="рост посетителей">...<span class="icon arrow"></div>' +
 '</div>';
 
 var OUR_TABLE_BODY =
@@ -121,8 +127,14 @@ var OUR_TABLE_ROW =
     '</div>' +
     '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
     '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
-    '<div class="column public-authors"><?=publicAuthorsPosts ? publicAuthorsPosts : "-"?></div>' +
-    '<div class="column public-sb"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
+    '<div class="column public-posts-per-day"><?=publicPostsPerDay ? publicPostsPerDay : "-"?></div>' +
+    '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
+    '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?></div>' +
+    '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
+    '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
+    '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
+    '<div class="column public-growth-views"><?=publicGrowthViews ? publicGrowthViews : "-"?></div>' +
+    '<div class="column public-growth-visitors"><?=publicGrowthVisitors ? publicGrowthVisitors : "-"?></div>' +
 '</div>';
 
 var CONTACT =

@@ -4,5 +4,5 @@
 #main #results .row{padding:10px 0;}#main #results .row>div{display:inline-block;vertical-align:middle;}
 #main #results .public{width:250px;}#main #results .public>div{display:inline-block;vertical-align:middle;}
 #main #results .photo{width:40px;height:40px;margin-right:10px;overflow:hidden;}#main #results .photo img{max-width:100%;}
-#main #results .time{width:90px;}
 #main #results .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+#main #results .time,#main #results .subscribers,#main #results .visitors{width:90px;text-align:center;}

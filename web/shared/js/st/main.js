@@ -290,15 +290,23 @@ var List = (function() {
 
 var Filter = (function() {
     var $container;
+    var $audienceWrapper;
     var $audience;
+    var $periodWrapper;
     var $period;
     var $list;
+    var $intervalWrapper;
+    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
-        $audience = $('> .audience', $container);
-        $period = $('> .period', $container);
         $list = $('> .list', $container);
+        $audienceWrapper = $('> .audience-wrapper', $container);
+        $audience = $('> .audience', $audienceWrapper);
+        $periodWrapper = $('> .period-wrapper', $container);
+        $period = $('> .period', $periodWrapper);
+        $intervalWrapper = $('> .interval-wrapper', $container);
+        $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
         listRefresh(callback);
@@ -358,6 +366,27 @@ var Filter = (function() {
                     notRender = false;
                     changeRange(event);
                 }
+            });
+            $interval.find('.timeFrom, .timeTo').datepicker ({
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                firstDay: 1,
+                showAnim: '',
+                dateFormat: "d MM"
+            }).change(function(e) {
+                var $timeFrom = $interval.find('.timeFrom');
+                var $timeTo = $interval.find('.timeTo');
+                var dateFrom = $timeFrom.datepicker('getDate');
+                var dateTo = $timeTo.datepicker('getDate');
+                $timeTo.datepicker('option', 'minDate', dateFrom);
+                $timeFrom.datepicker('option', 'maxDate', dateTo);
+                Table.setInterval([
+                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
+                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
+                ]);
             });
             function renderRange() {
                 var audience = [
@@ -458,12 +487,25 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
+    function showInterval() {
+        $audienceWrapper.slideUp(400);
+        $periodWrapper.slideUp(400);
+        $intervalWrapper.slideDown(200);
+    }
+    function hideInterval() {
+        $audienceWrapper.slideDown(200);
+        $periodWrapper.slideDown(200);
+        $intervalWrapper.slideUp(400);
+    }
+
     return {
         init: init,
         listRefresh: listRefresh,
         listSelect: listSelect,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax
+        setSliderMax: setSliderMax,
+        showInterval: showInterval,
+        hideInterval: hideInterval
     };
 })();
 
@@ -478,6 +520,8 @@ var Table = (function() {
     var currentSortReverse = false;
     var currentPeriod = 1;
     var currentAudience = [];
+    var currentInterval = [];
+    var currentListType = 0;
 
     function init(callback) {
         $container = $('#table');
@@ -487,21 +531,30 @@ var Table = (function() {
     }
     function loadMore() {
         var $el = $("#load-more-table");
-        var $tableBody = $('.list-body');
         if ($el.hasClass('loading')) return;
-
         $el.addClass('loading');
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                offset: pagesLoaded * Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+
+        var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            offset: pagesLoaded * Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+            /* Пока не работает =\ */
+            $el.removeClass('loading');
+            return;
+        }
+
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded += 1;
                 if (!listType) {
@@ -510,11 +563,10 @@ var Table = (function() {
                         $tableBody.append(tmpl(TABLE_BODY, {rows: data}));
                     }
                 } else {
-                    /* Пока не рабоает =\ */
-                    /*if (data.length) {
+                    if (data.length) {
                         dataTable = $.merge(dataTable, data);
                         $tableBody.append(tmpl(OUR_TABLE_BODY, {rows: data}));
-                    }*/
+                    }
                 }
                 $el.removeClass('loading');
             }
@@ -522,181 +574,219 @@ var Table = (function() {
     }
     function sort(field, reverse, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: field,
+            sortReverse: reverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: field,
-                sortReverse: reverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentListType = listType;
+                currentSortBy = field;
+                currentSortReverse = reverse;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentSortBy = field;
-                    currentSortReverse = reverse;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentSortBy = field;
-                    currentSortReverse = reverse;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
     function search(text, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: text,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: text,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentListType = listType;
+                currentSearch = text;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentSearch = text;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
                 } else {
-                    dataTable = data;
-                    currentSearch = text;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
                 }
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
     function setPeriod(period, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: period,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: period,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentListType = listType;
+                currentPeriod = period;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentPeriod = period;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentPeriod = period;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
     function setAudience(audience, callback) {
         var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: audience[0],
+            audienceMax: audience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: currentListId,
-                limit: Configs.tableLoadOffset,
-                search: currentSearch,
-                sortBy: currentSortBy,
-                sortReverse: currentSortReverse,
-                period: currentPeriod,
-                audienceMin: audience[0],
-                audienceMax: audience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentListType = listType;
+                currentAudience = audience;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentAudience = audience;
                     $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 } else {
-                    dataTable = data;
-                    currentAudience = audience;
                     $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
-                    if ($.isFunction(callback)) callback(data);
                 }
+                if ($.isFunction(callback)) callback(data);
+            }
+        );
+    }
+    function setInterval(interval, callback) {
+        var $tableBody = $('.list-body');
+        var params = {
+            listId: currentListId,
+            limit: Configs.tableLoadOffset,
+            search: currentSearch,
+            sortBy: currentSortBy,
+            sortReverse: currentSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = interval[0];
+            params.timeTo = interval[1];
+        }
+
+        Events.fire('load_table', params,
+            function(data, maxPeriod, listType) {
+                pagesLoaded = 1;
+                currentListType = listType;
+                currentInterval = interval;
+                dataTable = data;
+                if (!listType) {
+                    $tableBody.html(tmpl(TABLE_BODY, {rows: dataTable}));
+                } else {
+                    $tableBody.html(tmpl(OUR_TABLE_BODY, {rows: dataTable}));
+                }
+                if ($.isFunction(callback)) callback(data);
             }
         );
     }
     function changeList(listId) {
-        var newSearch = '';
-        var newSortBy = 'growth';
-        var newSortReverse = false;
+        var defSearch = '';
+        var defSortBy = 'growth';
+        var defSortReverse = false;
+        var params = {
+            listId: listId,
+            limit: Configs.tableLoadOffset,
+            search: defSearch,
+            sortBy: defSortBy,
+            sortReverse: defSortReverse,
+            period: currentPeriod,
+            audienceMin: currentAudience[0],
+            audienceMax: currentAudience[1]
+        };
+        if (currentListType) {
+            params.timeFrom = currentInterval[0];
+            params.timeTo = currentInterval[1];
+        }
 
-        Events.fire('load_table', {
-                listId: listId,
-                limit: Configs.tableLoadOffset,
-                search: newSearch,
-                sortBy: newSortBy,
-                sortReverse: newSortReverse,
-                period: currentPeriod,
-                audienceMin: currentAudience[0],
-                audienceMax: currentAudience[1]
-            },
+        Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
                 pagesLoaded = 1;
+                currentListType = listType;
+                currentListId = listId;
+                currentSearch = defSearch;
+                currentSortBy = defSortBy;
+                currentSortReverse = defSortReverse;
+                dataTable = data;
                 if (!listType) {
-                    dataTable = data;
-                    currentListId = listId;
-                    currentSearch = newSearch;
-                    currentSortBy = newSortBy;
-                    currentSortReverse = newSortReverse;
                     $container.html(tmpl(TABLE, {rows: data}));
-                    $container.find('.' + currentSortBy).addClass('active');
-                    if (!currentListId) {
-                        $container.removeClass('no-list-id');
-                    } else {
-                        $container.addClass('no-list-id');
-                    }
-                    if (dataTable.length < Configs.tableLoadOffset) {
-                        $('#load-more-table').hide();
-                    } else {
-                        $('#load-more-table').show();
-                    }
-                    Filter.setSliderMin(maxPeriod[0]);
-                    Filter.setSliderMax(maxPeriod[1]);
-                    $('#global-loader').fadeOut(200);
+                    Filter.hideInterval();
                 } else {
-                    dataTable = data;
-                    currentListId = listId;
-                    currentSearch = newSearch;
-                    currentSortBy = newSortBy;
-                    currentSortReverse = newSortReverse;
                     $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.setSliderMin(maxPeriod[0]);
-                    Filter.setSliderMax(maxPeriod[1]);
-                    $('#global-loader').fadeOut(200);
+                    Filter.showInterval();
                 }
+                $container.find('.' + currentSortBy).addClass('active');
+                if (!currentListId) {
+                    $container.removeClass('no-list-id');
+                } else {
+                    $container.addClass('no-list-id');
+                }
+                if (dataTable.length < Configs.tableLoadOffset) {
+                    $('#load-more-table').hide();
+                } else {
+                    $('#load-more-table').show();
+                }
+                Filter.setSliderMin(maxPeriod[0]);
+                Filter.setSliderMax(maxPeriod[1]);
+                $('#global-loader').fadeOut(200);
             }
         );
     }
@@ -1018,6 +1108,7 @@ var Table = (function() {
         setPeriod: setPeriod,
         setAudience: setAudience,
         editMode: editMode,
-        toggleEditMode: toggleEditMode
+        toggleEditMode: toggleEditMode,
+        setInterval: setInterval
     };
 })();

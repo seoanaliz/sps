@@ -194,6 +194,7 @@ i{font-style:italic;}
 .popup-image-edit .right-column{overflow:hidden;padding-left:0;}
 .popup-image-edit .preview{width:130px;height:63px;overflow:hidden;margin:0 auto 10px;}
 .header .user-info{color:#45688E;font-weight:bold;padding:10px;padding-left:40px;border-bottom:1px solid #D8DFEA;height:22px;line-height:22px;}.header .user-info img{position:absolute;top:10px;left:10px;}
+.header .user-info .logout{float:right;}
 .header .user-info .counter{border-left:12px solid #CCC;padding-left:5px;margin-left:10px;}
 .header .filter{height:28px;padding:10px;border-top:1px solid #fff;}
 .header .filter .type-selector{margin-top:10px;}

@@ -39,11 +39,27 @@ table, tr, td {
         width: 169px;
         padding-bottom: 10px;
 
+        &>.interval-wrapper {
+            display: none;
+        }
+        &>div > .title,
         &>.title {
             color: #555;
             font-weight: bold;
             padding: 10px 10px 0;
         }
+        &>div > .interval,
+        &>.interval {
+            padding: 10px 10px 0;
+
+            &>.timeFrom,
+            &>.timeTo {
+                width: 63px;
+            }
+            &>.timeFrom {}
+            &>.timeTo {}
+        }
+        &>div > .audience,
         &>.audience {
             padding: 10px 10px 0;
 
@@ -78,6 +94,7 @@ table, tr, td {
                 }
             }
         }
+        &>div > .period,
         &>.period {
             padding: 7px 7px 0;
 
@@ -144,7 +161,6 @@ table, tr, td {
 
         .list-head {
             background-color: #DEE5EB;
-            cursor: pointer;
             color: #45688E;
 
             .user-select(none);
@@ -155,6 +171,8 @@ table, tr, td {
                 font-weight: bold;
                 padding: 6px 0;
                 line-height: 27px;
+                cursor: pointer;
+                white-space: nowrap;
 
                 .icon {
                     opacity: 0;
@@ -372,21 +390,42 @@ table, tr, td {
         .list-head .in-search,
         .list-head .visitors,
         .list-head .growth,
-        .list-head .posts,
-        .list-head .views,
-        .list-head .authors,
-        .list-head .sb,
         .public-followers,
         .public-is-active,
         .public-in-search,
         .public-visitors,
-        .public-growth,
-        .public-posts,
-        .public-views,
-        .public-authors,
-        .public-sb {
+        .public-growth {
             width: 11%;
             text-align: center;
+        }
+
+        .list-head .posts,
+        .list-head .posts-per-day,
+        .list-head .views,
+        .list-head .authors-posts,
+        .list-head .authors-likes,
+        .list-head .authors-reposts,
+        .list-head .sb-posts,
+        .list-head .sb-likes,
+        .list-head .growth-views,
+        .list-head .growth-visitors,
+        .public-posts,
+        .public-posts-per-day,
+        .public-views,
+        .public-authors-posts,
+        .public-authors-likes,
+        .public-authors-reposts,
+        .public-sb-posts,
+        .public-sb-likes,
+        .public-growth-views,
+        .public-growth-visitors, {
+            width: 5.9%;
+            text-align: center;
+            cursor: default !important;
+
+            &>.icon {
+                display: none !important;
+            }
         }
 
         .list-head .contacts,
