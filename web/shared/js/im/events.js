@@ -202,7 +202,7 @@ var Cleaner = {
             id: rawContent.mid,
             isNew: (rawContent.read_state != 1),
             isViewer: isOut,
-            text: rawContent.body,
+            text: makeMsg(rawContent.body),
             attachments: [],
             timestamp: rawContent.date,
             user: userModel.data(),
@@ -337,8 +337,7 @@ function makeMsg(msg, isNotClean) {
     function clean(str) {
         if (isNotClean) {
             return str;
-        }
-        else {
+        } else {
             return str ? str
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')

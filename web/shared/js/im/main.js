@@ -369,15 +369,15 @@ var EndlessPage = Page.extend({
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
                 t.onRender();
-
-                if (t._isPreload) {
-                    t.preloadData(1);
-                }
+                t.preloadData(1);
             }
         });
     },
     preloadData: function(pageNumber) {
         var t = this;
+        if (!t._isPreload || t._isEnded) {
+            return;
+        }
         var limit = t._itemsLimit;
         var offset = pageNumber * limit;
         var pageId = t._pageId;
@@ -440,9 +440,7 @@ var EndlessPage = Page.extend({
                 }
                 t.makeList($block);
                 t._pageLoaded = nextPage;
-                if (t._isPreload) {
-                    t.preloadData(nextPage + 1);
-                }
+                t.preloadData(nextPage + 1);
             }
         }
     },
@@ -482,19 +480,8 @@ var Dialogs = EndlessPage.extend({
     makeList: function($list) {
         $list.find('.date').each(function() {
             var $date = $(this);
-            var timestamp = $date.text();
-            var currentDate = new Date();
-            var date = new Date(timestamp * 1000);
-            var m = date.getMonth() + 1;
-            var y = date.getFullYear() + '';
-            var d = date.getDate() + '';
-            var h = date.getHours() + '';
-            var min = date.getMinutes() + '';
-            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
-            if (currentDate.getDate() != d) {
-                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
-            }
-            $date.html(text);
+            var timestamp = intval($date.text());
+            $date.html(makeDate(timestamp));
         });
     },
     clickDialog: function(e) {
@@ -749,19 +736,8 @@ var Messages = EndlessPage.extend({
         $list.find('.photos').imageComposition({width: 500, height: 300});
         $list.find('.date').each(function() {
             var $date = $(this);
-            var timestamp = $date.text();
-            var currentDate = new Date();
-            var date = new Date(timestamp * 1000);
-            var m = date.getMonth() + 1;
-            var y = date.getFullYear() + '';
-            var d = date.getDate() + '';
-            var h = date.getHours() + '';
-            var min = date.getMinutes() + '';
-            var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
-            if (currentDate.getDate() != d) {
-                text += ', ' + d + '.' + m + '.' + (y.substr(-2));
-            }
-            $date.html(text);
+            var timestamp = intval($date.text());
+            $date.html(makeDate(timestamp));
         });
     },
     makeTextarea: function($textarea) {
@@ -825,7 +801,6 @@ var Messages = EndlessPage.extend({
             });
             var $newMessage = t.addMessage(newMessageModel);
             $newMessage.addClass('loading');
-            t.scrollBottom();
             $textarea.focus();
             Events.fire('send_message', t._pageId, text, function(messageId) {
                 if (!messageId) {
@@ -833,12 +808,7 @@ var Messages = EndlessPage.extend({
                     $newMessage.remove();
                     return;
                 }
-                var $oldMessage = $el.find('[data-id=' + messageId + ']');
-                if ($oldMessage.length) {
-                    $newMessage.remove();
-                } else {
-                    $newMessage.removeClass('loading').attr('data-id', messageId);
-                }
+                $newMessage.removeClass('loading').attr('data-id', messageId);
             });
         } else {
             $textarea.focus();
@@ -1337,4 +1307,20 @@ function CreateTemplateBox(listId, text, onSuccess) {
         }
     });
     return box;
+}
+
+function makeDate(timestamp) {
+    var monthNames = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+    var currentDate = new Date();
+    var date = new Date(timestamp * 1000);
+    var m = date.getMonth();
+    var y = date.getFullYear() + '';
+    var d = date.getDate() + '';
+    var h = date.getHours() + '';
+    var min = date.getMinutes() + '';
+    var text = (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
+    if (currentDate.getDate() != d || currentDate.getMonth() != m || currentDate.getFullYear() != y) {
+        text = d + ' ' + monthNames[m].toLowerCase() + ' ' + y + ' в ' + text;
+    }
+    return text;
 }
