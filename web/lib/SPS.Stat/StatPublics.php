@@ -23,6 +23,13 @@
                 if( $public->type != 'vk'             ||
                     $public->externalId ==  25678227  ||
                     $public->externalId ==  26776509  ||
+                    $public->externalId ==  43503789  ||
+                    $public->externalId ==  346191  ||
+                    $public->externalId ==  33704958  ||
+                    $public->externalId ==  35806378  ||
+                    $public->externalId ==  38000341  ||
+                    $public->externalId ==  38000521  ||
+                    $public->externalId ==  1792796  ||
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
@@ -42,7 +49,7 @@
         public static function get_publics_info( $public_ids )
         {
             //todo exceptions
-            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0);
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
             $result = array();
             foreach( $res as $public ) {
                 $result[ $public->gid ] = array(
