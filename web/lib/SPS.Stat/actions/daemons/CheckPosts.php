@@ -36,19 +36,15 @@ class CheckPosts
             $barter = reset( $chunk );
             $overposts = '';
             foreach( $res as $wall ) {
-
                 unset($wall[0]);
-
                 $trig = false;
 
                 foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
-                        echo $post->id .' AND '. $barter->post_id . '<br>';
-                        if( $barter->stop_search_at->compareTo( $this->now ) < 0 ) {
+                        if( time() >= StatBarter::TIME_INTERVAL + $post->date ) {
                             $barter->status = 4;
-                            $barter->deletedAt = 0;
+                            $barter->deletedAt = StatBarter::TIME_INTERVAL + $post->date;
                         }
-
                         $trig = true;
                         break;
                     } elseif( $post->id < $barter->post_id  ) {
