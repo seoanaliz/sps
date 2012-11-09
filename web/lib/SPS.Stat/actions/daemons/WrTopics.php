@@ -154,8 +154,8 @@ class WrTopics extends wrapper
 
     public function get_all_visitors()
     {
-        $time_start = time() - 75600 ;
-        $time_stop  = time() - 86400 * 30;
+        $time_start = time() - 86400 * 30;
+        $time_stop  = time() - 75600;
         foreach( $this->ids as $public_id ) {
             StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_stop );
         }
