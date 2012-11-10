@@ -153,7 +153,22 @@ class getEntries {
             }
         }
         else {
+            $allowed_sort_values = array(   'views',
+                                            'overall_posts',
+                                            'posts_days_rel',
+                                            'sb_posts_count',
+                                            'sb_posts_rate',
+                                            'auth_posts',
+                                            'auth_likes_eff',
+                                            'auth_reposts_eff',
+                                            'visitors',
+                                            'avg_vis_grouth',
+                                            'avg_vie_grouth'
+            );
             $resul = $this->get_our_publics_state( $time_from, $time_to );
+            $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'visitors';
+            $a = $this->compare( $sortBy, $sortReverse );
+            usort( $resul, $a );
         }
 
         echo ObjectHelper::ToJSON(array(
@@ -221,12 +236,12 @@ class getEntries {
 
             //постов из источников
             $res['sb_posts_count'] = $posts_quantity ?
-                round( $non_authors_posts['count'] * 100 / $posts_quantity ) . '%' : 0 ;
+                round( $non_authors_posts['count'] * 100 / $posts_quantity ) : 0 ;
             // средний rate спарсенных постов
-            $res['sb_posts_rate'] = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
+            $res['sb_posts_rate']   = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
-                round( 100 * $authors_posts['count'] / $posts_quantity   ) . '%' : 0 ;
+                round( 100 * $authors_posts['count'] / $posts_quantity   )  : 0 ;
 
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
@@ -234,13 +249,24 @@ class getEntries {
                 (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) : 0;
 
             $guests = StatPublics::get_views_visitors_from_base( $public['sb_id'], $time_start, $time_stop );
-            $res['visitors'] = $guests['visitors'];
+            $res['visitors']       = $guests['visitors'];
             $res['avg_vis_grouth'] = $guests['vis_grouth'];
-            $res['views']    = $guests['views'];
+            $res['views']          = $guests['views'];
             $res['avg_vie_grouth'] = $guests['vievs_grouth'];
             $ret[] = $res;
+
         }
         return $ret;
+    }
+
+    private function compare( $field, $rev )
+    {
+        $rev = $rev ? 1 : -1 ;
+        $code = "
+        if ( $rev > 0 && \$a['$field'] == null ) return  1;
+        if ( $rev > 0 && \$b['$field'] == null ) return -1;
+        return  $rev * strnatcmp(\$a['$field'], \$b['$field']);";
+        return create_function('$a,$b', $code );
     }
 
     private function get_ava( $public_id )
