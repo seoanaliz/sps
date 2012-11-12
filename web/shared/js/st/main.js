@@ -384,6 +384,8 @@ var Filter = (function() {
                     Table.setAudience(audience);
                 }
             }
+        })();
+        (function() {
             var $timeFrom = $interval.find('.timeFrom');
             var $timeTo = $interval.find('.timeTo');
             $($timeFrom).add($timeTo).datepicker({
