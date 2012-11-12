@@ -409,6 +409,10 @@ var Filter = (function() {
             });
             $timeTo.datepicker('setDate', new Date().getTime());
             $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - (24 * 60 * 60 * 1000)));
+            var dateFrom = $timeFrom.datepicker('getDate');
+            var dateTo = $timeTo.datepicker('getDate');
+            $timeTo.datepicker('option', 'minDate', dateFrom);
+            $timeFrom.datepicker('option', 'maxDate', dateTo);
             Table.setCurrentInterval([
                 intval($timeFrom.datepicker('getDate').getTime() / 1000),
                 intval($timeTo.datepicker('getDate') / 1000)
