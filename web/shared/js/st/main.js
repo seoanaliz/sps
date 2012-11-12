@@ -394,7 +394,7 @@ var Filter = (function() {
                 monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 firstDay: 1,
                 showAnim: '',
-                dateFormat: "d MM"
+                dateFormat: 'd MM'
             }).change(function(e) {
                 var $timeFrom = $interval.find('.timeFrom');
                 var $timeTo = $interval.find('.timeTo');
@@ -897,9 +897,112 @@ var Table = (function() {
             }
         });
 
+        $container.delegate('.views', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('views', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('views', false);
+            }
+        });
+
+        $container.delegate('.posts', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('posts', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('posts', false);
+            }
+        });
+
+        $container.delegate('.posts-per-day', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('postsPerDay', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('postsPerDay', false);
+            }
+        });
+
+        $container.delegate('.authors-posts', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('authorsPosts', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('authorsPosts', false);
+            }
+        });
+
+        $container.delegate('.authors-likes', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('authorsLikes', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('authorsLikes', false);
+            }
+        });
+
+        $container.delegate('.authors-reposts', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('authorsReposts', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('authorsReposts', false);
+            }
+        });
+
+        $container.delegate('.sb-posts', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('sbPosts', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('sbPosts', false);
+            }
+        });
+
+        $container.delegate('.sb-likes', 'click', function(e) {
+            var $target = $(this);
+            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                $target.addClass('reverse');
+                sort('sbLikes', true);
+            } else {
+                $target.addClass('active');
+                $target.removeClass('reverse');
+                sort('sbLikes', false);
+            }
+        });
+
         (function() {
             var timeout;
-
             $container.delegate('#filter', 'keyup', function(e) {
                 var $filter = $(this);
                 clearTimeout(timeout);
