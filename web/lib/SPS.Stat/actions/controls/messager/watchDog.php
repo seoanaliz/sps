@@ -20,11 +20,11 @@ class watchDog
 
         if ( !$user_id ) {
             if( $cb )
-                die ($cb . '(' . ERR_MISSING_PARAMS . ');');
+                die ( $cb . '(' . ERR_MISSING_PARAMS . ');');
             die( ERR_MISSING_PARAMS );
         }
 
-        $events  = MesDialogs::watch_dog( $user_id, $timeout, $times );
+        $events = MesDialogs::watch_dog( $user_id, $timeout, $times );
         if ( $events == 'no access_token' ) {
             if( $cb )
                 die ( $cb . '(' . ERR_NO_ACC_TOK . ');');
@@ -75,21 +75,23 @@ class watchDog
                     if( !$dialog_id ) {
                         $dialog_id = MesDialogs::addDialog( $user_id, $from_id, time(), 4, '' );
                     }
-
+                    $text = isset( $event[6] )? $event[6] : $event['body'];
+                    $mid  =  isset( $event[1] )? $event[1] : $event['mid'];
+                    MesDialogs::save_last_line( $dialog_id, $text, !( $event[2] & 2 ), $mid, 0 );
                     if ( !( $event[2] & 2 ) ) {
                         MesGroups::update_highlighted_list( $ids[ $from_id ], $user_id, 'add', $dialog_id );
                     }
                     $result[] = array(
                         'type'    => $event[2] & 2 ? 'outMessage' : 'inMessage',
                         'content' => array(
-                            'body'      =>  isset( $event[6] )? $event[6] : $event['body'],
-                            'mid'       =>  isset( $event[1] )? $event[1] : $event['mid'],
+                            'body'      =>  $text,
+                            'mid'       =>  $mid,
                             'date'      =>  time(),
                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id, $user_id )),
                             'dialog_id' =>  $dialog_id,
                             'groups'    =>  $ids[ $from_id ],
                             'attachments'=>  $attach,
-                            'fwd'       =>  $fwd,
+                            'fwd'       =>  isset( $fwd ) ? $fwd : array(),
                         )
                     );
                     break;

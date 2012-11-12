@@ -93,7 +93,7 @@
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
                     WHERE
-                       c.group_id = b.group_id
+                        c.group_id = b.group_id
                         AND b.user_id = @user_id
                     ORDER BY
                         b.seq_number
@@ -105,23 +105,26 @@
 
             $res = array();
             $unread = MesGroups::get_unread_group_counters( $userId );
-
+            $tmp_unread = 0;
             while( $ds->Next()) {
+                $name = $ds->getValue( 'name' );
                 $group_id = $ds->getInteger( 'group_id');
                 $type     = $ds->getInteger( 'type' );
-//                if ( $type === 2 && !$type_selector )
-//                    continue;
+                if ( $type === 2 && !$type_selector ) {
+                    $name = "Не в списке mkII";
+                    $tmp_unread = isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0;
+                }
                 $res[] = array(
                     'group_id'  =>  $group_id,
                     'type'      =>  $type,
-                    'name'      =>  $ds->getValue( 'name' ),
+                    'name'      =>  $name,
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
                     'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) > 1 ? false : true,
                 );
             }
 
             ksort( $res );
-            $res['ungrouped_unread'] = MesGroups::get_unread_ungr_counters( $userId );
+            $res['ungrouped_unread'] = $tmp_unread;
             return $res;
         }
 
@@ -407,6 +410,7 @@
                     WHERE
                         a.group_id=@group_id AND
                         a.dialog_id=b.id AND
+                        rec_id is not NULL AND
                         b.user_id=@user_id  ' . $where . '
                     ORDER BY
                         last_update DESC
@@ -418,7 +422,6 @@
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
-
             $res = array();
             while ( $ds->Next() ) {
                 $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
