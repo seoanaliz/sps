@@ -367,7 +367,26 @@ var Filter = (function() {
                     changeRange(event);
                 }
             });
-            $interval.find('.timeFrom, .timeTo').datepicker ({
+            function renderRange() {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                $valMin.html(audience[0]);
+                $valMax.html(audience[1]);
+            }
+            function changeRange(e) {
+                var audience = [
+                    $slider.slider('values', 0),
+                    $slider.slider('values', 1)
+                ];
+                if (e.originalEvent) {
+                    Table.setAudience(audience);
+                }
+            }
+            var $timeFrom = $interval.find('.timeFrom');
+            var $timeTo = $interval.find('.timeTo');
+            $($timeFrom).add($timeTo).datepicker({
                 dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
                 dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
                 dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
@@ -388,23 +407,12 @@ var Filter = (function() {
                     Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
                 ]);
             });
-            function renderRange() {
-                var audience = [
-                    $slider.slider('values', 0),
-                    $slider.slider('values', 1)
-                ];
-                $valMin.html(audience[0]);
-                $valMax.html(audience[1]);
-            }
-            function changeRange(e) {
-                var audience = [
-                    $slider.slider('values', 0),
-                    $slider.slider('values', 1)
-                ];
-                if (e.originalEvent) {
-                    Table.setAudience(audience);
-                }
-            }
+            $timeTo.datepicker('setDate', new Date().getTime());
+            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - (24 * 60 * 60 * 1000)));
+            Table.setCurrentInterval([
+                intval($timeFrom.datepicker('getDate').getTime() / 1000),
+                intval($timeTo.datepicker('getDate') / 1000)
+            ]);
         })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
@@ -544,12 +552,11 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
         if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-            /* Пока не работает =\ */
             $el.removeClass('loading');
             return;
         }
@@ -582,12 +589,10 @@ var Table = (function() {
             sortReverse: reverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -615,12 +620,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -652,12 +655,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: period,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -686,7 +687,7 @@ var Table = (function() {
             audienceMin: audience[0],
             audienceMax: audience[1]
         };
-        if (currentListType) {
+        if (currentInterval[0] && currentInterval[1]) {
             params.timeFrom = currentInterval[0];
             params.timeTo = currentInterval[1];
         }
@@ -716,12 +717,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: interval[0],
+            timeTo: interval[1]
         };
-        if (currentListType) {
-            params.timeFrom = interval[0];
-            params.timeTo = interval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -750,12 +749,10 @@ var Table = (function() {
             sortReverse: defSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -1099,6 +1096,10 @@ var Table = (function() {
         }
     }
 
+    function setCurrentInterval(interval) {
+        currentInterval = interval;
+    }
+
     return {
         init: init,
         changeList: changeList,
@@ -1109,6 +1110,7 @@ var Table = (function() {
         setAudience: setAudience,
         editMode: editMode,
         toggleEditMode: toggleEditMode,
-        setInterval: setInterval
+        setInterval: setInterval,
+        setCurrentInterval: setCurrentInterval
     };
 })();
