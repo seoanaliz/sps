@@ -832,173 +832,35 @@ var Table = (function() {
             });
         });
 
-        $container.delegate('.followers', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('followers', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('followers', false);
-            }
-        });
+        var sortFields = {
+            followers: '.followers',
+            growth: '.growth',
+            isActive: '.is-active',
+            inSearch: '.in-search',
+            visitors: '.visitors',
+            views: '.views',
+            posts: '.posts',
+            postsPerDay: '.posts-per-day',
+            authorsPosts: '.authors-posts',
+            authorsLikes: '.authors-likes',
+            authorsReposts: '.authors-reposts',
+            sbPosts: '.sb-posts',
+            sbLikes: '.sb-likes'
+        };
 
-        $container.delegate('.growth', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('growth', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('growth', false);
-            }
-        });
-
-        $container.delegate('.is-active', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('isActive', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('isActive', false);
-            }
-        });
-
-        $container.delegate('.in-search', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('inSearch', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('inSearch', false);
-            }
-        });
-
-        $container.delegate('.visitors', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('visitors', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('visitors', false);
-            }
-        });
-
-        $container.delegate('.views', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('views', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('views', false);
-            }
-        });
-
-        $container.delegate('.posts', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('posts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('posts', false);
-            }
-        });
-
-        $container.delegate('.posts-per-day', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('postsPerDay', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('postsPerDay', false);
-            }
-        });
-
-        $container.delegate('.authors-posts', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('authorsPosts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('authorsPosts', false);
-            }
-        });
-
-        $container.delegate('.authors-likes', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('authorsLikes', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('authorsLikes', false);
-            }
-        });
-
-        $container.delegate('.authors-reposts', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('authorsReposts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('authorsReposts', false);
-            }
-        });
-
-        $container.delegate('.sb-posts', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('sbPosts', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('sbPosts', false);
-            }
-        });
-
-        $container.delegate('.sb-likes', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('sbLikes', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('sbLikes', false);
-            }
+        $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
+            $container.delegate(sortFieldSelector, 'click', function(e) {
+                var $target = $(this);
+                $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+                if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                    $target.addClass('reverse');
+                    sort(sortFieldKey, true);
+                } else {
+                    $target.addClass('active');
+                    $target.removeClass('reverse');
+                    sort(sortFieldKey, false);
+                }
+            });
         });
 
         (function() {
