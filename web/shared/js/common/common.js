@@ -1,4 +1,4 @@
-var KEY = window.KEY = {
+var KEY = {
     LEFT: 37,
     UP: 38,
     RIGHT: 39,
@@ -11,6 +11,12 @@ var KEY = window.KEY = {
     PAGEUP: 33,
     PAGEDOWN: 34,
     SPACE: 32
+};
+var TIME = {
+    SEC: 1000,
+    MIN: 60000,
+    HOUR: 3600000,
+    DAY: 86400000
 };
 
 if (!window.localStorage) {
