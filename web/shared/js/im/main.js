@@ -879,9 +879,10 @@ var RightColumn = Widget.extend({
                 $el.fadeIn(500);
             }
             var list = data.list;
-            var counter = data.counter;
+            var commonList = data.commonList;
             var isSetCommonList = false;
             var isSetSelectedList = false;
+
             for (var i in list) {
                 if (!list.hasOwnProperty(i)) continue;
                 list[i] = new ListModel(list[i]);
@@ -903,9 +904,10 @@ var RightColumn = Widget.extend({
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
                     title: 'Не в списке',
-                    counter: counter,
+                    counter: commonList.counter,
                     isSelected: !isSetSelectedList,
-                    isDraggable: false
+                    isDraggable: false,
+                    isRead: true
                 });
                 list.unshift(commonListModel);
                 listCollection.add(commonListModel.id(), commonListModel);
@@ -931,6 +933,7 @@ var RightColumn = Widget.extend({
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
+                var top = e.pageY - startY;
                 var height = $placeholder.height();
                 var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
