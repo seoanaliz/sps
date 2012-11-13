@@ -33,7 +33,6 @@ class getDialog
         }
         $users_info = StatUsers::get_vk_user_info( $users, $user_id );
         $dialog_array = array_reverse( $dialog_array );
-
         if ( !$dialog_array )
             $dialog_array = array();
         elseif ( $dialog_array == 'no access_token' )

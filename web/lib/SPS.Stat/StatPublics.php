@@ -23,6 +23,13 @@
                 if( $public->type != 'vk'             ||
                     $public->externalId ==  25678227  ||
                     $public->externalId ==  26776509  ||
+                    $public->externalId ==  43503789  ||
+                    $public->externalId ==  346191  ||
+                    $public->externalId ==  33704958  ||
+                    $public->externalId ==  35806378  ||
+                    $public->externalId ==  38000341  ||
+                    $public->externalId ==  38000521  ||
+                    $public->externalId ==  1792796  ||
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
@@ -42,7 +49,7 @@
         public static function get_publics_info( $public_ids )
         {
             //todo exceptions
-            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0);
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
             $result = array();
             foreach( $res as $public ) {
                 $result[ $public->gid ] = array(
@@ -585,6 +592,36 @@
                     $cmd->Execute();
                 }
             }
+        }
+
+        //проверяет, оменялось ли конкретное булево состояние паблика(active, in_search, closed)
+        //возвращает true , если были изменения, false - нет
+        //записывает изменения в
+        public static function set_state( $public_id, $parameter, $state, $conn )
+        {
+            $sql =
+                "DROP FUNCTION IF EXISTS set_state( id integer, column_name varchar , new_value boolean );
+                CREATE FUNCTION set_state( id integer, column_name varchar , state boolean ) RETURNS boolean AS $$
+                DECLARE
+                old_value boolean    := 0;
+                curr_state boolean := false;
+                BEGIN
+                execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
+                IF $3=old_value THEN
+                    return false;
+                ELSE
+                    execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
+                    execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
+                    return true;
+                END IF;
+                END
+                $$ LANGUAGE plpgsql;
+                SELECT set_state( @public_id, @name, @state) AS cnanged;";
+                $cmd = new SqlCommand( $sql, $conn );
+                $cmd->SetInteger( '@public_id', $public_id );
+                $cmd->SetString(  '@name',      $parameter );
+                $cmd->SetBoolean( '@state',     $state);
+                $cmd->Execute();
         }
 
         public static function get_public_changes( $time_from, $time_to, $conn = 0 )
