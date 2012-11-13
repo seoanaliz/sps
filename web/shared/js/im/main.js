@@ -880,8 +880,13 @@ var RightColumn = Widget.extend({
             }
             var list = data.list;
             var counter = data.counter;
+            var commonListId = data.commonListId;
             var isSetCommonList = false;
             var isSetSelectedList = false;
+
+            if (commonListId) {
+                Configs.commonDialogsList = commonListId;
+            }
             for (var i in list) {
                 if (!list.hasOwnProperty(i)) continue;
                 list[i] = new ListModel(list[i]);
