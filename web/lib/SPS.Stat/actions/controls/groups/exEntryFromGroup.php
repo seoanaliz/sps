@@ -17,7 +17,7 @@
         public function Execute() {
             error_reporting( 0 );
 
-            $userId   = Request::getInteger ( 'userId'  );
+            $user_id   = Request::getInteger ( 'userId'  );
             $groupId  = Request::getInteger ( 'groupId' );
             $entry_id = Request::getInteger ( 'publId'  );
             if ( !$entry_id )
@@ -31,15 +31,15 @@
             $m_class = $type . 'Groups';
             $general = $general ? $general : 0;
 
-            if (!$groupId || !$userId || !$entry_id) {
+            if (!$groupId || !$user_id || !$entry_id) {
 
                 die(ERR_MISSING_PARAMS);
             }
 
             //todo не уверен, нужна ли проверка на "главность"
             if ( !$general
-                    || ( $general && StatUsers::is_Sadmin( $userId ))) {
-                $m_class::extricate_entry( $groupId, $entry_id);
+                    || ( $general && StatUsers::is_Sadmin( $user_id ))) {
+                $m_class::extricate_entry( $groupId, $entry_id, $user_id );
                 echo  ObjectHelper::ToJSON(array('response' => true));
 
             } else {

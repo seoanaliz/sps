@@ -31,6 +31,8 @@ class watchDog
             die( ERR_NO_ACC_TOK );
         }
 
+        $unl_group = MesGroups::get_unlist_dialogs_group( $user_id );
+
         $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
         $result = array();
         foreach( $events->updates as $event ) {
@@ -49,7 +51,7 @@ class watchDog
                             'mid'       =>  isset( $event[1] ) ? $event[1] : $event['mid'],
                             'from_id'   =>  $user_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  $ids[ $from_id ],
+                            'groups'    =>  in_array( $unl_group, $ids[ $from_id ]) ? array() : $ids[ $from_id ],
                         )
                     );
                     MesDialogs::set_state( $dialog_id, 0, 0 );
@@ -89,7 +91,7 @@ class watchDog
                             'date'      =>  time(),
                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id, $user_id )),
                             'dialog_id' =>  $dialog_id,
-                            'groups'    =>  $ids[ $from_id ],
+                            'groups'    =>  in_array( $unl_group, $ids[ $from_id ]) ? array() : $ids[ $from_id ],
                             'attachments'=>  $attach,
                             'fwd'       =>  isset( $fwd ) ? $fwd : array(),
                         )

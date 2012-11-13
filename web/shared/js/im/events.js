@@ -61,15 +61,14 @@ var Eventlist = {
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(rawData) {
             var clearData = [];
-            var count = rawData.ungrouped_unread;
-            var commonListId = rawData.ungrouped_group_id;
-            $.each(rawData, function(i, rawListItem) {
+            var commonList = Cleaner.listItem(rawData.unlist);
+            $.each(rawData.allGroups, function(i, rawListItem) {
                 if (rawListItem && rawListItem.group_id) {
                     clearData.push(Cleaner.listItem(rawListItem));
                 }
             });
 
-            callback({list: clearData, counter: count, commonListId: commonListId});
+            callback({commonList: commonList, list: clearData});
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {

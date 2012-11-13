@@ -879,8 +879,7 @@ var RightColumn = Widget.extend({
                 $el.fadeIn(500);
             }
             var list = data.list;
-            var counter = data.counter;
-            var commonListId = data.commonListId;
+            var commonList = data.commonList;
             var isSetCommonList = false;
             var isSetSelectedList = false;
 
@@ -905,7 +904,7 @@ var RightColumn = Widget.extend({
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
                     title: 'Не в списке',
-                    counter: counter,
+                    counter: commonList.counter,
                     isSelected: !isSetSelectedList,
                     isDraggable: false,
                     isRead: true
