@@ -5,9 +5,55 @@
         padding: 10px;
     }
 
-    h3 {
-        margin: 0;
-        padding: 10px 10px 0;
+    .list-head {
+        padding: 0 10px;
+        background-color: #DEE5EB;
+        color: #45688E;
+
+        .user-select(none);
+
+        .item {
+            float: left;
+            text-align: center;
+            font-weight: bold;
+            padding: 6px 0;
+            line-height: 27px;
+            cursor: pointer;
+            white-space: nowrap;
+
+            .icon {
+                opacity: 0;
+                margin-right: -1.5em;
+                background-position: center .5em;
+            }
+            .filter {
+                padding: 5px;
+                width: 200px;
+                margin-left: 10px;
+
+                &.loading {
+                    background-image: url('../../images/common/upload.gif');
+                    background-repeat: no-repeat;
+                    background-position: 95%;
+                }
+            }
+            &:hover .icon {
+                opacity: .5;
+            }
+            &.active .icon {
+                opacity: 1;
+            }
+            &.reverse .icon {
+                background-image: url('../../images/common/arrow-top.png');
+            }
+            &.contacts {
+                cursor: default;
+            }
+            &.publics {
+                text-align: left;
+                cursor: default;
+            }
+        }
     }
 
     #results {
@@ -24,35 +70,45 @@
                 vertical-align: middle;
             }
         }
-        .public {
-            width: 250px;
+        .column {
+            &.public {
+                &> div {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                .photo {
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 10px;
+                    overflow: hidden;
 
-            &> div {
-                display: inline-block;
-                vertical-align: middle;
+                    img {
+                        max-width: 100%;
+                    }
+                }
+                .name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    max-width: 160px;
+                }
             }
         }
-        .photo {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-            overflow: hidden;
 
-            img {
-                max-width: 100%;
-            }
-        }
-        .name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 160px;
-        }
-        .time,
-        .subscribers,
-        .visitors {
-            width: 90px;
-            text-align: center;
-        }
+    }
+    .item.our-public,
+    .item.partner,
+    .column.public {
+        width: 250px;
+    }
+    .item.post-time,
+    .item.delete-time,
+    .item.visitors,
+    .item.subscribers,
+    .column.time,
+    .column.visitors,
+    .column.subscribers {
+        width: 110px;
+        text-align: center;
     }
 }
