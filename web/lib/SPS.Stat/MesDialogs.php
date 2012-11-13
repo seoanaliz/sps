@@ -6,7 +6,6 @@
 
     class MesDialogs
     {
-
         //слить с  get_all_dialogs
         public static function get_last_dialogs( $id, $offset, $limit )
         {
@@ -665,8 +664,8 @@
                     continue;
                 $i = 0;
                 foreach( $dialogs as $dialog ) {
-                    if ( $i++ > $count )
-                        return;
+                    if ( $count && $i++ > $count )
+                        break;
                     if ( isset( $dialog->chat_id ))
                         continue;
 
@@ -680,7 +679,6 @@
                         $act = 'add';
                     elseif( $dialog->read_state && !$dialog->out || $dialog->out )
                         $act = 'del';
-                    self::save_last_line( $dialog_id, $dialog->body, !$dialog->out, $dialog->mid, $dialog->read_state );
 
                     if ( $act )
                         MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
