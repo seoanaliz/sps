@@ -177,14 +177,14 @@ var LeftColumn = Widget.extend({
             t.showDialog(dialogId, true);
         });
 
-        t._dialogs.on('addList', function(e) {
+        t._dialogs.on('addList', function() {
             t.trigger('addList');
         });
 
         t._messages.on('hoverMessage', function(e) {
             var $message = $(e.currentTarget);
             var messageId = $message.data('id');
-            var dialogId = t._messages._pageId;
+            var dialogId = t._messages.pageId();
             if ($message.hasClass('viewer')) return;
             t._messages.readMessage(messageId);
             t._dialogs.readDialog(dialogId);
@@ -270,14 +270,14 @@ var Page = Widget.extend({
 
     run: function() {
         var t = this;
-        if (t._pageId) {
-            t.changePage(t._pageId, true);
+        if (t.pageId()) {
+            t.changePage(t.pageId(), true);
         }
     },
     changePage: function(pageId, force) {
         var t = this;
-        if (force || (t._isCache && t._pageId != pageId)) {
-            t._pageId = pageId;
+        if (force || (t._isCache && t.pageId() != pageId)) {
+            t.pageId(pageId);
             t.renderTemplateLoading();
             t.getData();
         }
@@ -298,12 +298,9 @@ var Page = Widget.extend({
             });
         }
     },
-    isVisible: function() {
-        return !!this._isVisible;
-    },
     show: function() {
         var t = this;
-        t._isVisible = true;
+        t.visible(true);
         t.el().show();
         if (t._isBottom) {
             $(window).scrollTop($(document).height() - $(window).height());
@@ -314,7 +311,7 @@ var Page = Widget.extend({
     },
     hide: function() {
         var t = this;
-        t._isVisible = false;
+        t.visible(false);
         t._scroll = $(window).scrollTop();
         t._isBottom = $(window).scrollTop() + $(window).height() == $(document).height();
         t.el().hide();
@@ -328,6 +325,25 @@ var Page = Widget.extend({
     },
     unlock: function() {
         this._isLock = false;
+    },
+    isVisible: function() {
+        return this.visible();
+    },
+    visible: function(visible) {
+        if (arguments.length) {
+            this._isVisible = visible;
+            return this;
+        } else {
+            return !!this._isVisible;
+        }
+    },
+    pageId: function(pageId) {
+        if (arguments.length) {
+            this._pageId = pageId;
+            return this;
+        } else {
+            return this._pageId;
+        }
     }
 });
 
@@ -343,7 +359,7 @@ var EndlessPage = Page.extend({
 
     changePage: function(pageId, force) {
         var t = this;
-        if (force || (t._isCache && t._pageId != pageId)) {
+        if (force || (t._isCache && t.pageId() != pageId)) {
             t._pageLoaded = 0;
             t._preloadData = {};
             t._isEnded = false;
@@ -357,14 +373,14 @@ var EndlessPage = Page.extend({
         var t = this;
         var limit = t._itemsLimit;
         var offset = t._pageLoaded * limit;
-        var pageId = t._pageId;
+        var pageId = t.pageId();
 
         t.onShow();
         t.lock();
         Events.fire(t._service, pageId, offset, limit, function(data) {
             t.unlock();
 
-            if (pageId == t._pageId) {
+            if (pageId == t.pageId()) {
                 t.onLoad(data);
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
@@ -380,12 +396,12 @@ var EndlessPage = Page.extend({
         }
         var limit = t._itemsLimit;
         var offset = pageNumber * limit;
-        var pageId = t._pageId;
+        var pageId = t.pageId();
         var preloadData = t._preloadData || {};
 
         if (!preloadData[pageNumber] && !t.isLock()) {
             Events.fire(t._service, pageId, offset, limit, function(data) {
-                if (pageId == t._pageId) {
+                if (pageId == t.pageId()) {
                     preloadData[pageNumber] = data;
                 }
             });
@@ -401,7 +417,7 @@ var EndlessPage = Page.extend({
         var nextPage = currentPage + 1;
         var limit = t._itemsLimit;
         var offset = nextPage * limit;
-        var pageId = t._pageId;
+        var pageId = t.pageId();
         var preloadData = t._preloadData || {};
 
         if (t._isEnded) {
@@ -421,7 +437,7 @@ var EndlessPage = Page.extend({
 
         function setData(data) {
             t.unlock();
-            if (pageId == t._pageId) {
+            if (pageId == t.pageId()) {
                 t.onLoad(data);
                 var $list = t.el().find(t._itemsSelector);
                 var $block;
@@ -497,15 +513,9 @@ var Dialogs = EndlessPage.extend({
             (function updateDropdown() {
 
                 function onCreate() {
-                    var dialogs = t.model().list();
-
-                    $.each(dialogs, function(i, dialog) {
-                        if (dialog.id == dialogId) {
-                            $.each(dialog.lists, function(i, listId) {
-                                $target.dropdown('getItem', listId).addClass('active');
-                            });
-                            return false;
-                        }
+                    var dialog = dialogCollection.get(dialogId).data();
+                    $.each(dialog.lists, function(i, listId) {
+                        $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
 
@@ -585,7 +595,7 @@ var Dialogs = EndlessPage.extend({
         if (!dialogs.length) {
             t._isEnded = true;
         }
-        t.model().id(t._pageId);
+        t.model().id(t.pageId());
         t.model().list(t.model().list().concat(dialogs));
 
         for (var i in dialogs) {
@@ -607,15 +617,18 @@ var Dialogs = EndlessPage.extend({
     },
     onRender: function() {
         var t = this;
-        t.model().list([]);
         if (t.checkAtBottom()) {
             $(window).trigger('scroll');
         }
     },
     addDialog: function(dialogModel) {
         var t = this;
+        var isCommonList = (t.pageId() == Configs.commonDialogsList);
         if (!(dialogModel instanceof DialogModel)) throw new TypeError('Dialog is not correct');
-        if ($.inArray(t._pageId, dialogModel.lists()) == -1) return false;
+        if ($.inArray(t.pageId(), dialogModel.lists()) == -1) {
+            if (!isCommonList) return false;
+            else if (dialogModel.lists().length) return false;
+        }
 
         var $el = t.el();
         var $dialog = $(t.tmpl()(t._templateItem, dialogModel));
@@ -655,7 +668,7 @@ var Messages = EndlessPage.extend({
         'keydown: textarea': 'keyDownTextarea'
     },
 
-    clickSend: function(e) {
+    clickSend: function() {
         var t = this;
         t.sendMessage();
     },
@@ -665,9 +678,9 @@ var Messages = EndlessPage.extend({
             t.sendMessage();
         }
     },
-    clickSaveTmpl: function(e) {
+    clickSaveTmpl: function() {
         var t = this;
-        var dialogId = t._pageId;
+        var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
         var listId = dialogModel.lists()[0];
         var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), function() {
@@ -682,7 +695,7 @@ var Messages = EndlessPage.extend({
 
     renderTemplateLoading: function() {
         var t = this;
-        var dialogId = t._pageId;
+        var dialogId = t.pageId();
         var messageId = dialogCollection.get(dialogId).messageId();
         var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
         t.model().user(userCollection.get(userId));
@@ -707,7 +720,7 @@ var Messages = EndlessPage.extend({
         if (!messages.length) {
             t._isEnded = true;
         }
-        t.model().id(t._pageId);
+        t.model().id(t.pageId());
         t.model().user(user);
         t.model().viewer(viewer);
         t.model().list(t.model().list().concat(messages));
@@ -731,7 +744,6 @@ var Messages = EndlessPage.extend({
         }
     },
     makeList: function($list) {
-        var t = this;
         $list.find('.videos').imageComposition({width: 500, height: 240});
         $list.find('.photos').imageComposition({width: 500, height: 300});
         $list.find('.date').each(function() {
@@ -744,7 +756,7 @@ var Messages = EndlessPage.extend({
         var t = this;
         $textarea.placeholder();
         $textarea.autoResize();
-        $textarea.inputMemory('message' + t._pageId);
+        $textarea.inputMemory('message' + t.pageId());
         $textarea.focus();
         $textarea[0].scrollTop = $textarea[0].scrollHeight;
         t.updateAutocomplite();
@@ -752,7 +764,7 @@ var Messages = EndlessPage.extend({
     updateAutocomplite: function() {
         var t = this;
         var $textarea = t.el().find('textarea:first');
-        var dialogId = t._pageId;
+        var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
         var listId = dialogModel.lists()[0];
         Events.fire('get_templates', listId, function(data) {
@@ -797,12 +809,12 @@ var Messages = EndlessPage.extend({
                 text: makeMsg(text),
                 timestamp: Math.floor(new Date().getTime() / 1000),
                 viewer: userCollection.get(Configs.vkId),
-                dialogId: t._pageId
+                dialogId: t.pageId()
             });
             var $newMessage = t.addMessage(newMessageModel);
             $newMessage.addClass('loading');
             $textarea.focus();
-            Events.fire('send_message', t._pageId, text, function(messageId) {
+            Events.fire('send_message', t.pageId(), text, function(messageId) {
                 if (!messageId) {
                     $textarea.val(text);
                     $newMessage.remove();
@@ -817,7 +829,7 @@ var Messages = EndlessPage.extend({
     addMessage: function(messageModel) {
         var t = this;
         if (!(messageModel instanceof MessageModel)) throw new TypeError('Message is not correct');
-        if (messageModel.dialogId() != t._pageId) return false;
+        if (messageModel.dialogId() != t.pageId()) return false;
 
         var $el = t.el();
         var $message = $(t.tmpl()(t._templateItem, messageModel));
@@ -867,6 +879,7 @@ var RightColumn = Widget.extend({
                 $el.fadeIn(500);
             }
             var list = data.list;
+            var counter = data.counter;
             var isSetCommonList = false;
             var isSetSelectedList = false;
             for (var i in list) {
@@ -890,6 +903,7 @@ var RightColumn = Widget.extend({
                 var commonListModel = new ListModel({
                     id: Configs.commonDialogsList,
                     title: 'Не в списке',
+                    counter: counter,
                     isSelected: !isSetSelectedList,
                     isDraggable: false
                 });
@@ -917,7 +931,6 @@ var RightColumn = Widget.extend({
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
-                var top = e.pageY - startY;
                 var height = $placeholder.height();
                 var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
@@ -937,7 +950,7 @@ var RightColumn = Widget.extend({
             return update;
         })(e));
 
-        $(window).on('mouseup.list', function(e) {
+        $(window).on('mouseup.list', function() {
             $(window).off('mousemove.list mouseup.list');
             $('body').removeClass('no-select');
             clearTimeout(timeout);
