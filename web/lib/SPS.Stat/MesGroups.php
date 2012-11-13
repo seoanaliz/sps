@@ -113,6 +113,7 @@
                 if (( $type === 2  )  && !$type_selector ) {
                     $name = "Не в списке mkII";
                     $tmp_unread = isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0;
+                    $ungroup_id = $group_id;
                     continue;
                 }
                 if (( $type === 1  )  && !$type_selector ) {
@@ -129,6 +130,7 @@
 
             ksort( $res );
             $res['ungrouped_unread'] = $tmp_unread;
+            $res['ungrouped_group_id'] = $ungroup_id;
             return $res;
         }
 
