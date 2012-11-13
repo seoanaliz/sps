@@ -884,9 +884,6 @@ var RightColumn = Widget.extend({
             var isSetCommonList = false;
             var isSetSelectedList = false;
 
-            if (commonListId) {
-                Configs.commonDialogsList = commonListId;
-            }
             for (var i in list) {
                 if (!list.hasOwnProperty(i)) continue;
                 list[i] = new ListModel(list[i]);
@@ -910,7 +907,8 @@ var RightColumn = Widget.extend({
                     title: 'Не в списке',
                     counter: counter,
                     isSelected: !isSetSelectedList,
-                    isDraggable: false
+                    isDraggable: false,
+                    isRead: true
                 });
                 list.unshift(commonListModel);
                 listCollection.add(commonListModel.id(), commonListModel);
