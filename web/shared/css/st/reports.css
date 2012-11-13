@@ -13,3 +13,4 @@
 #main #results .column.public .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
 #main .item.our-public,#main .item.partner,#main .column.public{width:250px;}
 #main .item.post-time,#main .item.delete-time,#main .item.visitors,#main .item.subscribers,#main .column.time,#main .column.visitors,#main .column.subscribers{width:110px;text-align:center;}
+#main .item{cursor:default !important;}#main .item .icon{display:none !important;}
