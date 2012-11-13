@@ -936,6 +936,7 @@ var RightColumn = Widget.extend({
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
+                var top = e.pageY - startY;
                 var height = $placeholder.height();
                 var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
