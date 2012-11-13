@@ -804,7 +804,7 @@ var Box = (function() {
                 }
 
                 $menu.css({
-                    width: options.width || $target.outerWidth() - 2
+                    width: options.width || $target.outerWidth() - (intval($target.css('border-left-width')) + intval($target.css('border-right-width')))
                 });
 
                 $el.dropdown('refreshPosition');
