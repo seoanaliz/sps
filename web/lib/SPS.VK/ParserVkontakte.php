@@ -145,242 +145,6 @@
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
 
-        public function get_posts_nv($page_number, $trig_inc = false)
-        {
-            $offset = $page_number * self::PAGE_SIZE;
-            if (!isset($this->count))
-                $this->get_posts_count();
-
-            if ($offset > $this->count) {
-                throw new Exception("wall's end");
-            }
-
-            $a = $this->get_page($this->page_adr."?offset=$offset&own=1");
-            if (!$a) {
-                throw new Exception('Не удалось скачать страницу '.$this->page_adr."?offset=$offset");
-            }
-//            file_put_contents('1.txt', $a );
-            preg_match_all('/(?s)<body.*?>(.*)<script id/', $a, $matches);
-            $a = $matches[1][0] . '</div></div>';
-            file_put_contents('1.txt', $a );
-            $document = phpQuery::newDocument( $a );
-            echo '<br>1';
-            $hentry = $document->find('div.post');
-
-            //разбираем страницу по постам
-            $posts = array();
-            $t = 0;
-            foreach ($hentry as $el) {
-                $pq = pq($el);
-
-                //определение авторства поста. Нужно только для групп
-                //                $author =  $pq->find('a.author')->attr('href');
-                //                $author = str_replace('/',  '', $author);
-                //                $author = str_replace('\\', '', $author);
-                //
-                //                if ( $author != $this->page_short_name) {
-                //                    echo '<br>несовпадение!<br>';
-                //                    continue;
-                //                }
-
-                //контактовский номер поста
-                $id = $pq->find('div.reply_link_wrap')->attr('id');
-                             if (!$id) throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                    ' не удалось получить id поста со стены ' . $this->page_adr);
-                $posts[$t]['id'] = str_replace('wpe_bottom-', '', $id);
-
-                //голосования
-                $poll = $pq->find('div.page_media_poll')->attr('id');
-                $poll = str_replace('post_poll', '', $poll);
-                if (!$poll) $poll = '';
-                $posts[$t]['poll'] = $poll;
-
-                //карты
-                $maps  =  $pq->find('img.page_media_map')->attr('src');
-                $maps  = str_replace(self::MAP_SIZE, self::MAP_NEW_SIZE, $maps);
-                if (!$maps) $maps= '';
-                $posts[$t]['map'] = $maps;
-
-
-                //лайки
-                $likes = $pq->find('div.post_like')->text();
-                if (!$likes) $likes = 0;
-                $posts[$t]['likes'] = (int)$likes;
-                $posts[$t]['likes_tr'] = (int)$likes;
-
-                //время
-                $time = $pq->find('div.replies > div.reply_link_wrap');
-                $time = $time->find('span')->text();
-                $time = $this->get_time($time);
-
-                if (!$time)
-                    throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                        " не удалось получить time поста $id со стены " . $this->page_adr);
-                $posts[$t]['time'] = $time;
-
-                //ретвит
-                $retweet = $pq->find('a.published_by')->attr('href');
-                if ($retweet){
-
-                    $posts[$t]['retweet'] = $this->get_info(self::VK_URL.$retweet);
-                } else $posts[$t]['retweet'] = array();
-
-
-                //текст
-                $text = $pq->find('div.wall_post_text')->html();
-                if (substr_count($text, '<span style="display: none">') > 0){
-                    $text = explode('<span style="display: none">', $text);
-                    $text = end($text);
-                }
-                //                    if (substr_count($text, 'section=search') > 0){
-                //                        preg_match_all('/>#.*?</', $text, $matches);
-                //                        print_r($matches);
-                //                        $text = preg_replace('/(?s)(.*?)(<a onclick.*?href.*?\&amp.*?\/a>)(.*)/','$1<<###>>$3', $text);
-                //
-                //                    }
-
-                $text = $this->remove_tags($text);
-                $posts[$t]['text'] = $text;
-
-                //ссылки, хештеги
-                //в текст будут вставлятся 'якоря', к которым будут привязыватся ссылки и хеши
-                $posts[$t]['text_links'] = array();
-
-
-                //изображения, видео, аудио
-                $img_arr = array();
-                $vid_arr = array();
-                $mus_arr = array();
-                $image = 0;
-                $video = 0;
-                $music = 0;
-                $posts[$t]['link'] = '';
-                $posts[$t]['doc'] = '';
-
-                foreach($pq->find('a') as $link){
-                    $oncl = pq($link)->attr('onclick');
-
-                    //фото
-                    if (substr_count($oncl, 'showPhoto') > 0){
-                        preg_match("/showPhoto\('(.*?)',/", $oncl, $match);
-                        if (!isset($match[1])) continue;
-
-                        $img_arr[$image]['id'] = $match[1];
-                        $img_arr[$image]['desc'] = '';
-
-                        //продгоняем инфу о фото под формат json
-                        preg_match("/temp:({.*?})/", $oncl, $match);
-                        if (isset($match[1])){
-                            $match[1] = str_replace('x_:', '"x_":', $match[1]);
-                            $match[1] = str_replace('y_:', '"y_":', $match[1]);
-                            $match[1] = str_replace('z_:', '"z_":', $match[1]);
-                            $match[1] = str_replace('base', '"base"', $match[1]);
-                            $match =  (array)json_decode($match[1]);
-                            //выбираем фото с макс разрешением
-                            $link = $match['base'];
-                            if (isset($match['z_'])) $postlink = $match['z_'][0];
-                            else
-                                if (isset($match['y_'])) $postlink = $match['y_'][0];
-                                else
-                                    if (isset($match['x_'])) $postlink = $match['x_'][0];
-                                    else  {
-                                        throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                                            " не удалось получить фото поста $id со стены " . $this->page_adr."?offset=$offset");
-                                    }
-
-                            if (substr_count($postlink, 'http') > 0 )
-                                $img_arr[$image]['url']  = $postlink . '.jpg';
-                            else {
-                                $img_arr[$image]['url']  = $link . $postlink . '.jpg';
-                            }
-                            $image++;
-                        }
-
-                    //видео
-                    }elseif (substr_count($oncl, "act: 'graffiti'") > 0){
-                        $img_arr[$image]['id'] = pq($link)->attr('href');
-                        $img_arr[$image]['desc'] = '';
-                        $img_arr[$image]['url'] = pq($link)->find('img')->attr('src');;
-                        if (self::TESTING) print_r($img_arr[$image]);
-                        if (!$img_arr[$image]['id'] || !$img_arr[$image]['url'])
-                            throw new Exception(__CLASS__.'::' .__FUNCTION__.
-                                " не удалось получить данные поста (гаффити)
-                                            $id со стены " . $this->page_adr."?offset=$offset");
-                        $image++;
-
-                    }elseif (substr_count($oncl, 'showVideo') > 0){
-                        preg_match("/showVideo\('(.*?)',/", $oncl, $match);
-                        if (!isset($match[1])) continue;
-                        $vid_arr[$video]['id'] = $match[1];
-                        $video++;
-
-                    //музыка
-                    }elseif(substr_count($oncl, 'playAudio') > 0){
-                        preg_match("/playAudioNew\('(.*?)'/", $oncl, $match);
-                        if (!isset($match[1])) continue;
-                        $mus_arr[$music]['id'] = $match[1];
-                        $music++;
-
-                    //линки и документы
-                    }elseif (pq($link)->attr('class') == 'lnk') {
-                        $link = pq($link)->attr('href');
-
-                        $doc = '';
-                        if (substr_count($link, '/away.php?to=') > 0){
-                            $link = str_replace('/away.php?to=', '', $link);
-                            $link = urldecode($link);
-                        }elseif (substr_count($link, '/doc') > 0){
-                            $doc = $link;
-                            $link = '';
-                        }else{
-                            $link = '';
-                            $doc = '';
-                        }
-
-                        $posts[$t]['link'] = $link;
-                        $posts[$t]['doc'] = $doc;
-                    }
-                }
-
-                //получение описания каждой фотки, крайне сомнительная вещь
-                if ( count($img_arr) > 0 and $trig_inc) {
-                    $this->get_photo_desc($img_arr, $text);//спорно
-                }
-
-                $posts[$t]['photo'] = $img_arr;
-                $posts[$t]['video'] = $vid_arr;
-                $posts[$t]['music'] = $mus_arr;
-                unset($img_arr);
-                unset($vid_arr);
-                unset($mus_arr);
-                unset($id);
-                unset($poll);
-                unset($maps);
-                unset($retweet);
-                unset($time);
-                unset($text_links);
-                unset($doc);
-
-                if (self::TESTING){
-                    echo '<br>---------------------------------<br>';
-                    foreach ($posts[$t] as $k=>$v){
-                        echo $k.' = ';
-                        print_r($v);
-                        echo '<br>';
-                    }
-                }
-
-                $t++;
-            }
-
-            if (count($posts) > 0){
-                $posts = $this->kill_attritions($posts);
-                return $posts;
-            } else{
-                return false;
-            }
-        }
-
         public function get_posts( $page_number )
         {
             $offset = $page_number * self::PAGE_SIZE;
@@ -403,6 +167,7 @@
             unset( $res[0] );
             $posts = $this->post_conv( $res );
             $posts = $this->kill_attritions( $posts );
+
 
             return $posts;
         }
@@ -474,64 +239,67 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links  );
+                                              'poll'    => $poll,    'text_links'   =>  $text_links
+                );
             }
             return $result_posts_array;
         }
 
-        private function get_average(array &$a)
+        private function get_average( array &$a )
         {
-            $q = count($a);
-            $sum = 0;
+            $q = count( $a );
+            $sum_likes = 0;
+            $sum_reposts = 0;
             foreach( $a as $post ){
-
                 if (substr_count($post['likes'], '%') > 0 ||
                     substr_count($post['likes'], '+') > 0 ||
                     $post['likes'] == -1){
                     $q--;
                 }
-                else
-                    $sum += $post['likes'];
+                else {
+                    $sum_likes   += $post['likes'];
+                    $sum_reposts += $post['retweet'] / $post['likes_tr'];
+                }
             }
             //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
-            return ( $sum / $q );
+            return ( array(
+                'avg_likes' => $sum_likes / $q,
+                'avg_retweet' => $sum_reposts / $q
+            ));
         }
 
         private function kill_attritions( $array )
         {
             $res = array();
             $sr =  $this->get_average( $array );
-
+            $lte = $sr['avg_retweet'];
             $i = 0;
             $t = 0;
             //отсев крупных
             while(isset($array[$i]['likes'])){
-                if ($array[$i]['likes'] > ($sr * 2) ){
-                    if ($sr > 1){
+                if ( $array[$i]['likes'] > ( $sr['avg_likes'] * 2 )){
+                    if ( $sr['avg_likes'] > 1){
                         $array[$i]['likes'] = '+' ;
                     }else
                         $array[$i]['likes'] = '-';
-
                     $t ++;
                 }
                 $i++;
             }
 
             $sr =  $this->get_average($array);
-
             $i = 0;
             $t = 0;
 
             //отсев мелких
             while(isset($array[$i]['likes'])){
-
                 if (substr_count($array[$i]['likes'], '+') > 0
                     || substr_count($array[$i]['likes'], '-') > 0){
                     $i++;
                     continue;
                 }
 
-                if ($array[$i]['likes'] < $sr / 2 ) {
+                if ($array[$i]['likes'] < $sr['avg_likes'] / 2 ) {
                     $t ++;
                     $array[$i]['likes'] = -1;
                 }
@@ -539,14 +307,13 @@
             }
 
             $sr = $this->get_average($array);
-            $ed = $sr * 2;
+            $ed = $sr['avg_likes'] * 2;
             unset($t);
 
             $t = 0;
 
             //отсев значений ниже порога, оценка оставшихся в %
             while (isset($array[$t]['likes'])){
-                #
                 if (    substr_count($array[$t]['likes'], '%') > 0 ||
                     # substr_count($array[$t]['likes'], '+') > 0 ||
                     $array[$t]['likes'] == '-1'
@@ -565,26 +332,32 @@
                 else {
                     $array[$t]['likes'] = -1;
                 }
-
                 $t++;
+            }
+
+            foreach( $array as &$post ) {
+                if( $post['likes'] != -1 && $post['likes'] != '-' && $sr['avg_retweet'] ) {
+                    $als = ( $post['retweet'] / rtrim($post['likes_tr'], '%')) /  $sr['avg_retweet'] ;
+                    $als = $als > 2 ? 2 : $als;
+                    $als = $als < 0.5 ? 0.5 : $als;
+                    $post['likes'] = round( rtrim($post['likes'], '%') *  $als ) . '%';
+                }
             }
             //удаление ненужных постов
             $dre = count($array);
             for ( $i = 0 ; $i < $dre ; $i++ ){
-                if ( $array[$i]['likes'] == -1);
-//                    if (self::SAVE_POST_ID)
-//                        $array[$i] = $array[$i]['id'];
-//                    else
-//                         unset($array[$i]);
-                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT)
+
+                if ( $array[$i]['likes'] == -1 )
+                    ;
+                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT) {
                     $array[$i]['likes'] = '-';
+                }
             }
 
-            $array = array_values($array);
+            $array = array_values( $array );
             return $array;
 
         }
-
 
         //возвращает количество постов паблика(
         //если указать wall_url, вернет количество постов с этого )
@@ -657,128 +430,6 @@
             return trim($text);
         }
 
-        private function get_photo_desc(&$picsArr, $text)
-        {
-            $old_text = $text;
-            $text = substr($text, 0, 255);
-            if(count($picsArr)<=0) return false;
-
-            foreach($picsArr as &$pic){
-                //                    echo '<br>torture  '.$pic['id'] . '<br>';
-                $id = $pic['id'];
-                $h = curl_init();
-                curl_setopt($h,CURLOPT_URL,'http://vk.com/photo' . $pic['id']);
-                curl_setopt($h,CURLOPT_HEADER,0);
-                curl_setopt($h,CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($h, CURLOPT_FOLLOWLOCATION, true);
-                $desc = curl_exec($h);
-
-                $desc = str_replace('"id":"'.$id.'"','i#d',$desc);
-                $desc = str_replace('id','#', $desc);
-
-                preg_match("/\{i\#d[^\#]*?desc\":\"(.*?)\"/", $desc, $matches);
-
-                if (!empty($matches[1])) {
-                    $matches[1] = $this->remove_tags($matches[1]);
-                    if (isset($matches[1]) && substr_count($matches[1], "href") == 0 &&
-                        $matches[1] != $text &&
-                        $matches[1] != $old_text &&
-                        $matches[1] != 'едактировать описание' &&
-                        $matches[1] != $this->u_w('Редактировать описание')) {
-                        $pic['desc'] =  $matches[1];
-                    }else  $pic['desc'] = '';
-                } else {
-                    $pic['desc'] = '';
-                }
-                unset ($desc);
-                unset ($matches);
-            }
-            return true;
-        }
-
-        public function get_time($date)
-        {
-            //начало сегодняшнего дня (для сегодняшних постов)
-            $date = trim($date);
-            $da = date("d,m,Y");
-            $da = explode(',' ,$da);
-            $today_zero = mktime(0, 0, 0, $da[1], $da[0], $da[2]);
-            $result = false;
-            if (is_numeric($date) && strlen($date) == 10) return $date;
-            $nowtime = time() + 10800;
-            //случай с недавним постом(в пределах 5 минут)
-            if (substr_count($date, 'одну') > 0 || substr_count($date, 'две') > 0
-                ||  substr_count($date, 'три') > 0
-                ||  substr_count($date, 'олько что') > 0
-                ||  substr_count($date, 'секун') > 0 ){
-
-                $result = $nowtime;
-                //случай с недавним постом(до 3 часов](точность в пределах часа ))
-            } elseif (substr_count($date, 'назад') > 0){
-                if (substr_count($date, 'час '))
-                    $result = $nowtime - 3600;
-
-                elseif (substr_count($date, 'часа'))
-                    $result = $nowtime - reset(explode(' ', trim($date)))*3600;
-
-                elseif (substr_count($date, 'минут'))
-                    $result = $nowtime - reset(explode(' ', trim($date)))*60;
-
-                //случай с постом этого года, точность в пределах минут
-            } elseif(substr_count($date, ' в ') > 0) {
-                $tmp = explode(' в ', trim($date));
-
-                //разбор времени
-                $time = explode(':', $tmp[1]);
-                $time = $time[0] * 3600 + $time[1] * 60;
-
-                //разбор даты
-                $tmp[0] = trim($tmp[0]);
-                if(substr_count($tmp[0], 'сегодня') > 0){
-                    $result = $today_zero + $time;
-
-                } elseif (substr_count($tmp[0], 'вчера') > 0){
-                    $result = $today_zero + $time - 86400;
-
-                } elseif(substr_count($tmp[0], ' ') > 0){
-                    $tmp2 = explode(' ', $tmp[0]);
-                    if (!$month = $this->get_month ($tmp2[1])) return false;
-                    $result = mktime(0, 0, 0, $month, $tmp2[0], 2012) + $time;
-                }
-
-                //случай с постом до этого года, точность - в пределах суток
-            } elseif(substr_count($date, ' ') == 2){
-
-                $date = explode(' ', $date);
-                if (!$date[1] = $this->get_month(trim($date[1]))) return false;
-                $result = mktime(12, 0, 0, $date[1], $date[0], $date[2]);
-            }
-            return $result;
-
-        }
-
-        private function get_month($text_mon)
-        {
-            //омфг
-            $text_mon = (string)$text_mon;
-            switch ($text_mon){
-                case 'янв': $month = 1; break;
-                case 'фев': $month = 2; break;
-                case 'мар': $month = 3; break;
-                case 'апр': $month = 4; break;
-                case 'мая': $month = 5; break;
-                case 'июн': $month = 6; break;
-                case 'июл': $month = 7; break;
-                case 'авг': $month = 8; break;
-                case 'сен': $month = 9; break;
-                case 'окт': $month = 10; break;
-                case 'ноя': $month = 11; break;
-                case 'дек': $month = 12; break;
-                default: return false;
-            }
-            return $month;
-        }
-
         //$post_ids  = массив idпаблика_idпоста
         //ограничение - 90 постов
         public static function get_post_likes( $post_ids )
@@ -842,7 +493,7 @@
          * @return int
          * @throws Exception
          */
-        public function get_photo_count_in_album($public_id, $album_id)
+        public function get_photo_count_in_album( $public_id, $album_id )
         {
             $params = array(
                 'gid' => $public_id,
