@@ -129,8 +129,15 @@
             }
 
             ksort( $res );
-            $res['ungrouped_unread'] = $tmp_unread;
-            $res['ungrouped_group_id'] = $ungroup_id;
+            $res = array(
+                'allGroups'     =>  $res,
+                'unlist'        =>  array(
+                    'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) > 1 ? false : true,
+                    'type'      =>  2,
+                    'group_id'  =>  $ungroup_id,
+                    'unread'    =>  $tmp_unread
+                )
+            );
             return $res;
         }
 
