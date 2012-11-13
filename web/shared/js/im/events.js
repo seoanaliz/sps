@@ -61,16 +61,14 @@ var Eventlist = {
     get_lists: function(callback) {
         simpleAjax('getGroupList', function(rawData) {
             var clearData = [];
-            var count = 0;
-            $.each(rawData, function(i, rawListItem) {
-                if (typeof rawListItem == 'number') {
-                    count = rawListItem;
-                } else {
+            var commonList = Cleaner.listItem(rawData.unlist);
+            $.each(rawData.allGroups, function(i, rawListItem) {
+                if (rawListItem && rawListItem.group_id) {
                     clearData.push(Cleaner.listItem(rawListItem));
                 }
             });
 
-            callback({list: clearData, counter: count});
+            callback({commonList: commonList, list: clearData});
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
@@ -202,7 +200,7 @@ var Cleaner = {
             id: rawContent.mid,
             isNew: (rawContent.read_state != 1),
             isViewer: isOut,
-            text: rawContent.body,
+            text: makeMsg(rawContent.body),
             attachments: [],
             timestamp: rawContent.date,
             user: userModel.data(),
@@ -337,8 +335,7 @@ function makeMsg(msg, isNotClean) {
     function clean(str) {
         if (isNotClean) {
             return str;
-        }
-        else {
+        } else {
             return str ? str
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
