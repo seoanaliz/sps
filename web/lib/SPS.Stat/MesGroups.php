@@ -93,7 +93,7 @@
                           . TABLE_MES_GROUP_USER_REL . ' as b,
                         ' . TABLE_MES_GROUPS . ' as c
                     WHERE
-                       c.group_id = b.group_id
+                        c.group_id = b.group_id
                         AND b.user_id = @user_id
                     ORDER BY
                         b.seq_number
@@ -105,23 +105,30 @@
 
             $res = array();
             $unread = MesGroups::get_unread_group_counters( $userId );
-
+            $tmp_unread = 0;
             while( $ds->Next()) {
+                $name = $ds->getValue( 'name' );
                 $group_id = $ds->getInteger( 'group_id');
                 $type     = $ds->getInteger( 'type' );
-//                if ( $type === 2 && !$type_selector )
-//                    continue;
+                if (( $type === 2  )  && !$type_selector ) {
+                    $name = "Не в списке mkII";
+                    $tmp_unread = isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0;
+                    continue;
+                }
+                if (( $type === 1  )  && !$type_selector ) {
+                    continue;
+                }
                 $res[] = array(
                     'group_id'  =>  $group_id,
                     'type'      =>  $type,
-                    'name'      =>  $ds->getValue( 'name' ),
+                    'name'      =>  $name,
                     'unread'    =>  isset( $unread[ $group_id ]) ? $unread[ $group_id ] : 0,
                     'isRead'    =>  MesGroups::get_highlighted_dialogs_quantity( $group_id, $userId ) > 1 ? false : true,
                 );
             }
 
             ksort( $res );
-            $res['ungrouped_unread'] = MesGroups::get_unread_ungr_counters( $userId );
+            $res['ungrouped_unread'] = $tmp_unread;
             return $res;
         }
 
@@ -224,7 +231,6 @@
                 return true;
             else
                 return false;
-
         }
 
         public static function extricate_group( $group_id, $user_id )
@@ -246,7 +252,7 @@
         {
             $sql = 'INSERT INTO ' . TABLE_MES_GROUP_DIALOG_REL . '(dialog_id,group_id)
                        VALUES (@dialog_id,@group_id)';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $groupId);
             $cmd->SetInteger('@dialog_id', $entry_id);
             $cmd->Execute();
@@ -255,7 +261,7 @@
         public static function get_group_users( $group_id )
         {
             $sql = 'SELECT * FROM ' . TABLE_MES_GROUP_USER_REL . ' WHERE group_id=@group_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
             $cmd->SetInteger( '@group_id', $group_id  );
             $ds = $cmd->Execute();
 
@@ -407,6 +413,7 @@
                     WHERE
                         a.group_id=@group_id AND
                         a.dialog_id=b.id AND
+                        rec_id is not NULL AND
                         b.user_id=@user_id  ' . $where . '
                     ORDER BY
                         last_update DESC
@@ -418,7 +425,6 @@
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
-
             $res = array();
             while ( $ds->Next() ) {
                 $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
@@ -427,7 +433,7 @@
         }
 
         //delete
-        public static function get_ungroup_dialogs( $user_id,  $limit, $offset = 0, $only_unr_out = 0 )
+        public static function get_ungroup_dialogs( $user_id, $limit, $offset = 0, $only_unr_out = 0 )
         {
             $where = $only_unr_out ? ' AND state=4' : '';
             $sql = 'SELECT
@@ -454,6 +460,7 @@
             $res = array();
             while ( $ds->Next() ) {
                 $res[$ds->GetInteger( 'id')] =  $ds->GetInteger( 'rec_id' );
+
             }
             return $res;
         }

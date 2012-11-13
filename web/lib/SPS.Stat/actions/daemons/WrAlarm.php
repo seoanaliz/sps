@@ -17,9 +17,9 @@ class WrAlarm
     {
         set_time_limit(0);
         $this->connect = ConnectionFactory::Get( 'tst' );
-
-//        $publics = array(array('public_id' => 533718));
-//        $this->check_block( $publics );
+//         $publics = $this->get_monitoring_publs();
+//         print_r($publics);
+//         $this->check_block( $publics );
 //        print_R($this->wasted_array);
 //        $report = $this->form_report();
 //        print_R($report);
@@ -59,12 +59,11 @@ class WrAlarm
             $susp_ids = array();
             foreach( $res as $apublic_id => $body ) {
                 $public_id =  trim( $apublic_id, 'a');
-                if ( empty( $body) )
+                if ( isset( $body ) )
                 {
                     $susp_ids[] = $public_id;
                 }
             }
-
             foreach( $susp_ids as $id ) {
                 $res = VkHelper::api_request( 'wall.get', array(
                     'owner_id'  =>   '-' . $id,
@@ -74,10 +73,10 @@ class WrAlarm
                     continue;
                 if ( substr_count( $res->error->error_msg, 'community members' ) > 0 ) {
                     $this->mark_closed( $id );
-                    $this->wasted_array[$public_id] = 'closed';
+                    $this->wasted_array[$id] = 'closed';
                 } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
                     $this->mark_blocked( $id );
-                    $this->wasted_array[$public_id] = 'blocked';
+                    $this->wasted_array[$id] = 'blocked';
                 }
             }
         }
@@ -127,7 +126,7 @@ class WrAlarm
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET active = 0 WHERE vk_id=@public_id';
         $cmd = new SqlCommand( $sql, $this->connect );
         $cmd->SetInteger( '@public_id', $public_id );
-        $cmd->Execute();
+//        $cmd->Execute();
     }
 
     public function mark_closed( $public_id )
