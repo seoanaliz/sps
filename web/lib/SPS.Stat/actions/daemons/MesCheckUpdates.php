@@ -9,8 +9,8 @@
 class MesCheckUpdates
 {
     public function execute() {
-        set_time_limit( 300 );
-        error_reporting(0);
+        set_time_limit( 0 );
+//        error_reporting(0);
 
         $im_users = StatUsers::get_im_users();
         MesDialogs::check_new_messages( $im_users );

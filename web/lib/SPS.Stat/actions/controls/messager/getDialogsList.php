@@ -32,47 +32,29 @@ class getDialogsList
 
         $dialogs_array = array();
         if ( !$group_id ) {
-            $group_id  = MesGroups::get_groups_by_type( $user_id, 2 );
-            $group_id  = $group_id[0];
+            $group_id  = MesGroups::get_unlist_dialogs_group( $user_id );
         }
+
         $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
 
+        if ( empty( $res_ids )) {
+            $res_ids = MesGroups::get_ungroup_dialogs( $user_id, 10000 );
+            foreach( $res_ids as $k=>$v ) {
+                MesGroups::implement_entry( $group_id, $k );
+            }
+        }
+        $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
         //проверка на новые сообщения в группе
-        $row_dialog_array = array();
+        $row_dialog_array   = MesDialogs::get_dialogs_from_db( $user_id, $res_ids );
+//        print_r($row_dialog_array);
+//        print_r( MesDialogs::get_group_dilogs_list( $user_id, $res_ids ));
 
-//        $sql = 'select  a.rec_id,a.last_update,b.out, b.text,a.state from mes_dialogs as a join mes_texts as b on a.text_id=b.id where a.id in (
-//        ) order by last_update'
-
-//        $row_dialog_array   = MesDialogs::get_group_dilogs_list( $user_id, $res_ids );
-        print_r($row_dialog_array);
-        die();
+//        print_r($row_dialog_array);
+//        print_r( );
+//        die();
         if( $row_dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
         $user_ids = array();
-        //костыли вы мои, костыли...
-        //добавляет псевдодиалоги(заявки в друзья)
-        foreach( $res_ids as $res_id ) {
-            foreach( $row_dialog_array as $dialog ) {
-                $dialog->uid ;
-                if ( $dialog->uid == $res_id ) {
-                    continue(2);
-                }
-            }
-
-            MesDialogs::delete_dialog( $user_id, $res_id );
-//            $new_dialog = (object) array(
-//                    'mid'           =>  '',
-//                    'date'          =>  '',
-//                    'out'           =>  '',
-//                    'uid'           =>  $res_id,
-//                    'read_state'    =>  '',
-//                    'out'           =>  '',
-//                    'title'         =>  '',
-//                    'body'          =>  'Этот пользователь добавил Вас в друзья, но пока ничего не написал'
-//            );
-//            $row_dialog_array[] = $new_dialog;
-        }
-
         $statuses = MesDialogs::get_statuses($user_id, $res_ids);
 
         foreach ( $row_dialog_array as $dialog ) {

@@ -61,12 +61,16 @@
 
                 if ( count ( $res->a0 ) < 200 || $offset > $max_offset )
                     break;
-                sleep(0.4);
+                sleep(0.2);
             }
+            $j = 0;
             foreach( $dialog_array as $dialog )
             {
                 $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
-                MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '');
+                if ( !MesDialogs::addDialog( $user_id, $dialog->uid, $dialog->date, $state, '' ))
+                    $j++;
+                if ( $j > $max_offset )
+                    break;
             }
             return $dialog_array;
         }
@@ -102,6 +106,7 @@
 
         public static function addDialog( $user_id, $rec_id, $last_update, $state, $status )
         {
+            $default_group_id = MesGroups::get_groups_by_type( $user_id, 2 );
             $sql = 'INSERT INTO '
                         . TABLE_MES_DIALOGS . '( user_id, rec_id, status, last_update, state )
                     VALUES
@@ -121,7 +126,7 @@
             if ( $dialog_id ) {
                 MesGroups::implement_entry( $group_id, $dialog_id );
             }
-            return ( $dialog_id ? $dialog_id : false );
+            return $dialog_id  ;
         }
 
         //возвращает id диалога
@@ -460,16 +465,18 @@
             $cmd->Execute();
         }
 
-        public static function add_text( $text )
+        public static function add_text( $text, $out = true, $mid = null, $read = null )
         {
             $sql = 'INSERT INTO '
-                . TABLE_MES_TEXTS . ' ( text )
+                . TABLE_MES_TEXTS . ' ( text, out, mid, read )
                     VALUES
-                        ( @text )
+                        ( @text, @out, @mid, @read )
                     RETURNING id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-
-            $cmd->SetString ( '@text', $text );
+            $cmd->SetInteger( '@mid', $mid );
+            $cmd->SetBoolean( '@read', $read ? 'true' : 'false' );
+            $cmd->SetString  ( '@text', $text );
+            $cmd->SetBoolean ( '@out', $out ? 'true' : 'false' );
             $ds = $cmd->Execute();
             $ds->Next();
             return  $ds->GetInteger('id');
@@ -509,12 +516,13 @@
 
                 if ( !$dialog_id )
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $request->uid );
-                if  ( $key !== false )
-                    unset( $ids[$key] );
+//                if  ( $key !== false )
+//                    unset( $ids[$key] );
                 MesGroups::implement_entry( $group_id, $dialog_id );
             }
             $ids = implode( ',', $ids );
             $res = StatUsers::get_friendship_state( $user_id, $ids );
+            return;
         }
 
         //
@@ -649,13 +657,16 @@
             $cmd->Execute();
         }
 
-        public static function check_new_messages( $im_users )
+        public static function check_new_messages( $im_users, $count = 0 )
         {
             foreach( $im_users as $user ) {
-                $dialogs = MesDialogs::get_all_dialogs( $user, 50 );
+                $dialogs = MesDialogs::get_all_dialogs( $user, $count );
                 if ( !$dialogs )
                     continue;
+                $i = 0;
                 foreach( $dialogs as $dialog ) {
+                    if ( $i++ > $count )
+                        return;
                     if ( isset( $dialog->chat_id ))
                         continue;
 
@@ -669,17 +680,86 @@
                         $act = 'add';
                     elseif( $dialog->read_state && !$dialog->out || $dialog->out )
                         $act = 'del';
+                    self::save_last_line( $dialog_id, $dialog->body, !$dialog->out, $dialog->mid, $dialog->read_state );
 
                     if ( $act )
                         MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
-
                     //обновление статуса
                     if ( $old_ts == $dialog->date )
                         continue;
+
+                    //если в диалоге появились более поздние линии, сохраняем их и время
+                    self::save_last_line( $dialog_id, $dialog->body, !$dialog->out, $dialog->mid, $dialog->read_state );
                     MesDialogs::set_dialog_ts( $user, $dialog->uid, $dialog->date, !$dialog->out, $dialog->read_state );
+                    MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
                 }
-                sleep(0.4);
             }
+        }
+
+        public static function save_last_line( $dialog_id, $text, $out, $mid, $read )
+        {
+            $text_id = self::add_text( $text, $out, $mid, $read );
+            $sql = 'UPDATE ' . TABLE_MES_DIALOGS . '
+                    SET
+                        text_id=@text_id
+                    WHERE
+                        id=@dialog_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@text_id', $text_id );
+            $cmd->SetInteger( '@dialog_id', $dialog_id );
+
+            $cmd->Execute();
+        }
+
+        public static function get_dialogs_from_db( $user_id, $res_ids )
+        {
+            $res_ids = implode( ',', $res_ids );
+            $sql = 'SELECT
+                        a.id, rec_id,state,text,out,mid,last_update, read
+                    FROM '
+                        . TABLE_MES_DIALOGS . ' AS a
+                    JOIN '
+                        . TABLE_MES_TEXTS . ' as b on( a.text_id=b.id )
+                    WHERE
+                            user_id = @user_id
+                        AND rec_id IN (' . $res_ids . ')
+                    ORDER BY last_update DESC';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[] = (object) array(
+                    'mid'           =>  $ds->GetInteger('mid'),
+                    'date'          =>  $ds->GetInteger('last_update'),
+                    'out'           =>  !$ds->GetBoolean('out'),
+                    'uid'           =>  $ds->GetInteger('rec_id'),
+                    'read_state'    =>  $ds->GetBoolean('read') ? 1 : 0,
+                    'mid'           =>  $ds->GetInteger('mid'),
+                    'title'         =>  $ds->GetString( 'text'),
+                    'body'          =>  $ds->GetString( 'text')
+                );
+            }
+            return $res;
+        }
+
+        public static function set_text_read( $dialog_id )
+        {
+            $sql = 'SELECT text_id FROM '
+                        . TABLE_MES_DIALOGS . '
+                    WHERE id = @dialog_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@dialog_id', $dialog_id );
+            $ds = $cmd->Execute();
+            $ds->Next();
+            $text_id = $ds->GetInteger( 'text_id' );
+            $sql = 'UPDATE '
+                        . TABLE_MES_TEXTS . '
+                    SET read = NOT read
+                    WHERE id = @text_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@text_id', $text_id );
+            $cmd->Execute();
         }
     }
 ?>
