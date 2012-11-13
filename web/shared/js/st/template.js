@@ -98,17 +98,13 @@ var OUR_TABLE_HEADER =
     '<div class="item publics">' +
         '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
     '</div>' +
-    '<div class="item visitors">посетители<span class="icon arrow"></div>' +
-    '<div class="item views">просмотры<span class="icon arrow"></div>' +
-    '<div class="item posts" title="посты">...<span class="icon arrow"></div>' +
-    '<div class="item posts-per-day" title="постов в день">...<span class="icon arrow"></div>' +
-    '<div class="item authors-posts" title="авторские посты">...<span class="icon arrow"></div>' +
-    '<div class="item authors-likes" title="авторские лайки">...<span class="icon arrow"></div>' +
-    '<div class="item authors-reposts" title="авторские репосты">...<span class="icon arrow"></div>' +
-    '<div class="item sb-posts" title="SB посты">...<span class="icon arrow"></div>' +
-    '<div class="item sb-likes" title="SB лайки">...<span class="icon arrow"></div>' +
-    '<div class="item growth-views" title="рост просмотров">...<span class="icon arrow"></div>' +
-    '<div class="item growth-visitors" title="рост посетителей">...<span class="icon arrow"></div>' +
+    '<div class="item posts" title="всего постов">посты<span class="icon arrow"></div>' +
+    '<div class="item posts-per-day" title="постов в день">постов в день<span class="icon arrow"></div>' +
+    '<div class="item authors-posts" title="авторские посты">авт. посты<span class="icon arrow"></div>' +
+    '<div class="item authors-likes" title="авторские лайки">авт. лайки<span class="icon arrow"></div>' +
+    '<div class="item authors-reposts" title="авторские репосты">авт. репосты<span class="icon arrow"></div>' +
+    '<div class="item sb-posts" title="SB посты">SB посты<span class="icon arrow"></div>' +
+    '<div class="item sb-likes" title="SB лайки">SB лайки<span class="icon arrow"></div>' +
 '</div>';
 
 var OUR_TABLE_BODY =
@@ -122,10 +118,6 @@ var OUR_TABLE_ROW =
         '</div>' +
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
-    '<div class="column public-visitors">' +
-        '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank"><?=publicVisitors ? publicVisitors : "-"?></a>' +
-    '</div>' +
-    '<div class="column public-views"><?=publicViews ? publicViews : "-"?></div>' +
     '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
     '<div class="column public-posts-per-day"><?=publicPostsPerDay ? publicPostsPerDay : "-"?></div>' +
     '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
@@ -133,8 +125,6 @@ var OUR_TABLE_ROW =
     '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
     '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
     '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
-    '<div class="column public-growth-views"><?=publicGrowthViews ? publicGrowthViews : "-"?></div>' +
-    '<div class="column public-growth-visitors"><?=publicGrowthVisitors ? publicGrowthVisitors : "-"?></div>' +
 '</div>';
 
 var CONTACT =
