@@ -367,27 +367,6 @@ var Filter = (function() {
                     changeRange(event);
                 }
             });
-            $interval.find('.timeFrom, .timeTo').datepicker ({
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: "d MM"
-            }).change(function(e) {
-                var $timeFrom = $interval.find('.timeFrom');
-                var $timeTo = $interval.find('.timeTo');
-                var dateFrom = $timeFrom.datepicker('getDate');
-                var dateTo = $timeTo.datepicker('getDate');
-                $timeTo.datepicker('option', 'minDate', dateFrom);
-                $timeFrom.datepicker('option', 'maxDate', dateTo);
-                Table.setInterval([
-                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
-                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
-                ]);
-            });
             function renderRange() {
                 var audience = [
                     $slider.slider('values', 0),
@@ -405,6 +384,41 @@ var Filter = (function() {
                     Table.setAudience(audience);
                 }
             }
+        })();
+        (function() {
+            var $timeFrom = $interval.find('.timeFrom');
+            var $timeTo = $interval.find('.timeTo');
+            $($timeFrom).add($timeTo).datepicker({
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                firstDay: 1,
+                showAnim: '',
+                dateFormat: 'd MM'
+            }).change(function(e) {
+                var $timeFrom = $interval.find('.timeFrom');
+                var $timeTo = $interval.find('.timeTo');
+                var dateFrom = $timeFrom.datepicker('getDate');
+                var dateTo = $timeTo.datepicker('getDate');
+                $timeTo.datepicker('option', 'minDate', dateFrom);
+                $timeFrom.datepicker('option', 'maxDate', dateTo);
+                Table.setInterval([
+                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
+                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
+                ]);
+            });
+            $timeTo.datepicker('setDate', new Date().getTime());
+            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - (24 * 60 * 60 * 1000)));
+            var dateFrom = $timeFrom.datepicker('getDate');
+            var dateTo = $timeTo.datepicker('getDate');
+            $timeTo.datepicker('option', 'minDate', dateFrom);
+            $timeFrom.datepicker('option', 'maxDate', dateTo);
+            Table.setCurrentInterval([
+                intval($timeFrom.datepicker('getDate').getTime() / 1000),
+                intval($timeTo.datepicker('getDate') / 1000)
+            ]);
         })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
@@ -544,12 +558,11 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
         if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-            /* Пока не работает =\ */
             $el.removeClass('loading');
             return;
         }
@@ -582,12 +595,10 @@ var Table = (function() {
             sortReverse: reverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -615,12 +626,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -652,12 +661,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: period,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -686,7 +693,7 @@ var Table = (function() {
             audienceMin: audience[0],
             audienceMax: audience[1]
         };
-        if (currentListType) {
+        if (currentInterval[0] && currentInterval[1]) {
             params.timeFrom = currentInterval[0];
             params.timeTo = currentInterval[1];
         }
@@ -716,12 +723,10 @@ var Table = (function() {
             sortReverse: currentSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: interval[0],
+            timeTo: interval[1]
         };
-        if (currentListType) {
-            params.timeFrom = interval[0];
-            params.timeTo = interval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -750,12 +755,10 @@ var Table = (function() {
             sortReverse: defSortReverse,
             period: currentPeriod,
             audienceMin: currentAudience[0],
-            audienceMax: currentAudience[1]
+            audienceMax: currentAudience[1],
+            timeFrom: currentInterval[0],
+            timeTo: currentInterval[1]
         };
-        if (currentListType) {
-            params.timeFrom = currentInterval[0];
-            params.timeTo = currentInterval[1];
-        }
 
         Events.fire('load_table', params,
             function(data, maxPeriod, listType) {
@@ -831,74 +834,39 @@ var Table = (function() {
             });
         });
 
-        $container.delegate('.followers', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('followers', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('followers', false);
-            }
-        });
+        var sortFields = {
+            followers: '.followers',
+            growth: '.growth',
+            isActive: '.is-active',
+            inSearch: '.in-search',
+            visitors: '.visitors',
+            views: '.views',
+            posts: '.posts',
+            postsPerDay: '.posts-per-day',
+            authorsPosts: '.authors-posts',
+            authorsLikes: '.authors-likes',
+            authorsReposts: '.authors-reposts',
+            sbPosts: '.sb-posts',
+            sbLikes: '.sb-likes'
+        };
 
-        $container.delegate('.growth', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('growth', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('growth', false);
-            }
-        });
-
-        $container.delegate('.is-active', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('isActive', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('isActive', false);
-            }
-        });
-
-        $container.delegate('.in-search', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('inSearch', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('inSearch', false);
-            }
-        });
-
-        $container.delegate('.visitors', 'click', function(e) {
-            var $target = $(this);
-            $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
-            if ($target.hasClass('active') && !$target.hasClass('reverse')) {
-                $target.addClass('reverse');
-                sort('visitors', true);
-            } else {
-                $target.addClass('active');
-                $target.removeClass('reverse');
-                sort('visitors', false);
-            }
+        $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
+            $container.delegate(sortFieldSelector, 'click', function(e) {
+                var $target = $(this);
+                $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+                if ($target.hasClass('active') && !$target.hasClass('reverse')) {
+                    $target.addClass('reverse');
+                    sort(sortFieldKey, true);
+                } else {
+                    $target.addClass('active');
+                    $target.removeClass('reverse');
+                    sort(sortFieldKey, false);
+                }
+            });
         });
 
         (function() {
             var timeout;
-
             $container.delegate('#filter', 'keyup', function(e) {
                 var $filter = $(this);
                 clearTimeout(timeout);
@@ -1099,6 +1067,10 @@ var Table = (function() {
         }
     }
 
+    function setCurrentInterval(interval) {
+        currentInterval = interval;
+    }
+
     return {
         init: init,
         changeList: changeList,
@@ -1109,6 +1081,7 @@ var Table = (function() {
         setAudience: setAudience,
         editMode: editMode,
         toggleEditMode: toggleEditMode,
-        setInterval: setInterval
+        setInterval: setInterval,
+        setCurrentInterval: setCurrentInterval
     };
 })();

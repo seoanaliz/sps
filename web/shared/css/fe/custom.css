@@ -183,7 +183,6 @@ div.type-selector a:hover {
 .ui-dropdown-menu {
     position: absolute;
     background-color: #fff;
-    max-width: 250px;
     border: 1px solid #97A4C4;
     border-top: 1px solid #C4CDE0;
     max-height: 500px;

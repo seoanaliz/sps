@@ -89,13 +89,36 @@ var Eventlist = {
             period: ''
         }, options);
 
+        /*
+        'views',
+        'overall_posts',
+        'posts_days_rel',
+        'sb_posts_count',
+        'sb_posts_rate',
+        'auth_posts',
+        'auth_likes_eff',
+        'auth_reposts_eff',
+        'visitors',
+        'avg_vis_grouth',
+        'avg_vie_grouth'
+        */
         var clearSortBy = {
             followers: 'quantity',
             contacts: '',
             growth: 'diff_abs',
             isActive: 'active',
             inSearch: 'in_search',
-            visitors: 'visitors'
+            visitors: 'visitors',
+            views: 'views',
+            posts: 'overall_posts',
+            postsPerDay: 'posts_days_rel',
+            sbPosts: 'sb_posts_count',
+            sbLikes: 'sb_posts_rate',
+            authorsPosts: 'auth_posts',
+            authorsLikes: 'auth_likes_eff',
+            authorsReposts: 'auth_reposts_eff',
+            growthViews: 'avg_vie_grouth',
+            growthVisitors: 'avg_vis_grouth'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
