@@ -248,14 +248,41 @@
             return false;
         }
 
-        public static function implement_entry( $groupId, $entry_id )
+        public static function implement_entry( $group_id, $entry_id, $user_id )
         {
             $sql = 'INSERT INTO ' . TABLE_MES_GROUP_DIALOG_REL . '(dialog_id,group_id)
                        VALUES (@dialog_id,@group_id)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetInteger('@group_id', $groupId);
+            $cmd->SetInteger('@group_id', $group_id );
             $cmd->SetInteger('@dialog_id', $entry_id);
             $cmd->Execute();
+            $unlist = self::get_unlist_dialogs_group( $user_id );
+            self::extricate_entry( $unlist, $entry_id, $user_id );
+        }
+
+        public static function extricate_entry( $group_id, $entry_id, $user_id )
+        {
+            if (isset( $no_loops ))
+                return true;
+            //проверка на повторный вызов функции(без нее было бы кольцо)
+            static $no_loops = 1;
+            $sql =  'DELETE FROM '
+                . TABLE_MES_GROUP_DIALOG_REL . '
+                       WHERE
+                            group_id=@group_id AND dialog_id=@dialog_id';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@group_id',  $group_id  );
+            $cmd->SetInteger( '@dialog_id', $entry_id );
+            $cmd->Execute();
+
+
+            //проверяем, состоит ли группа еще в каких-либо листах. Нет - заносим ее в unlist
+            $all_entry_groups = self::get_dialog_group( $entry_id );
+            if ( empty($all_entry_groups)) {
+                $unlist = self::get_unlist_dialogs_group( $user_id );
+                self::implement_entry( $unlist, $entry_id, $user_id );
+            }
         }
 
         public static function get_group_users( $group_id )
@@ -273,18 +300,7 @@
             return $group_users;
         }
 
-        public static function extricate_entry( $group_id, $entry_id )
-        {
-            $sql =  'DELETE FROM '
-                . TABLE_MES_GROUP_DIALOG_REL . '
-                       WHERE
-                            group_id=@group_id AND dialog_id=@dialog_id';
 
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger( '@group_id',  $group_id  );
-            $cmd->SetInteger( '@dialog_id', $entry_id );
-            $cmd->Execute();
-        }
 
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {

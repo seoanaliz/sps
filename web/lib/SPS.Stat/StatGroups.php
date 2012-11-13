@@ -132,7 +132,7 @@
             return false;
         }
 
-        public static function implement_entry( $groupId, $publicId )
+        public static function implement_entry( $groupId, $publicId, $user_id = 0 )
         {
             $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(public_id,group_id)
                        VALUES (@public_id,@group_id)';
@@ -142,7 +142,7 @@
             $cmd->Execute();
         }
 
-        public static function extricate_entry( $group_id, $entry_id )
+        public static function extricate_entry( $group_id, $entry_id, $user_id = 0 )
         {
             $query =  'DELETE FROM '
                 . TABLE_STAT_GROUP_PUBLIC_REL . '
