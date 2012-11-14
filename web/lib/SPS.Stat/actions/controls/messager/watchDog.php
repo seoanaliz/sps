@@ -32,8 +32,6 @@ class watchDog
         }
 
         $unl_group = MesGroups::get_unlist_dialogs_group( $user_id );
-
-        $ids = MesGroups::get_dialog_groups_ids_array( $user_id );
         $result = array();
         foreach( $events->updates as $event ) {
             $status = 'offline';
@@ -45,18 +43,20 @@ class watchDog
                 case 3:
                     $from_id   = isset( $event[3] )? $event[3] :    $event['uid'];
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $from_id );
+                    $groups_aray = MesGroups::get_dialog_group( $dialog_id );
                     $result[]  = array(
                         'type'    => 'read',
                         'content' => array(
                             'mid'       =>  isset( $event[1] ) ? $event[1] : $event['mid'],
                             'from_id'   =>  $user_id,
                             'dialog_id' =>  MesDialogs::get_dialog_id( $user_id, $from_id ),
-                            'groups'    =>  in_array( $unl_group, $ids[ $from_id ]) ? array() : $ids[ $from_id ],
+                            'groups'    =>  in_array( $unl_group, $groups_aray ) ? array() : $groups_aray,
                         )
                     );
                     MesDialogs::set_state( $dialog_id, 0, 0 );
                     break;
                 case 4:
+                    $groups_aray = MesGroups::get_dialog_group( $dialog_id );
                     $from_id  = isset( $event[3] ) ? $event[3] : $event['uid'];
                     MesDialogs::set_dialog_ts( $user_id, $from_id, time(), !( $event[2] & 2 ), 0 );
                     if ( isset( $event[7]->attach1_type )) {
@@ -81,7 +81,7 @@ class watchDog
                     $mid  =  isset( $event[1] )? $event[1] : $event['mid'];
                     MesDialogs::save_last_line( $dialog_id, $text, !( $event[2] & 2 ), $mid, 0 );
                     if ( !( $event[2] & 2 ) ) {
-                        MesGroups::update_highlighted_list( $ids[ $from_id ], $user_id, 'add', $dialog_id );
+                        MesGroups::update_highlighted_list( $groups_aray, $user_id, 'add', $dialog_id );
                     }
                     $result[] = array(
                         'type'    => $event[2] & 2 ? 'outMessage' : 'inMessage',
@@ -91,7 +91,7 @@ class watchDog
                             'date'      =>  time(),
                             'from_id'   =>  reset( StatUsers::get_vk_user_info( $from_id, $user_id )),
                             'dialog_id' =>  $dialog_id,
-                            'groups'    =>  in_array( $unl_group, $ids[ $from_id ]) ? array() : $ids[ $from_id ],
+                            'groups'    =>  in_array( $groups_aray ) ? array() : $groups_aray,
                             'attachments'=>  $attach,
                             'fwd'       =>  isset( $fwd ) ? $fwd : array(),
                         )
