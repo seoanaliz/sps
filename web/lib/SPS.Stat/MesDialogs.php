@@ -123,7 +123,7 @@
 
             $group_id = MesGroups::get_unlist_dialogs_group( $user_id);
             if ( $dialog_id ) {
-                MesGroups::implement_entry( $group_id, $dialog_id );
+                MesGroups::implement_entry( $group_id, $dialog_id, $user_id );
             }
             return $dialog_id  ;
         }
