@@ -46,9 +46,6 @@ class getEntries {
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
-
-
-//            $sortReverse    =   $sortReverse? '' : ' DESC ';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
             if ( $period == 7 ) {
@@ -226,8 +223,9 @@ class getEntries {
             $res['ava'] = $this->get_ava($public['id']);
             $res['id']  = $public['id'];
             $res['name']= $public['title'];
-            $authors_posts      = StatPublics::get_public_posts( $public['sb_id'], 1, $time_start, $time_stop );
-            $non_authors_posts  = StatPublics::get_public_posts( $public['sb_id'], 0, $time_start, $time_stop  );
+            $authors_posts      =   StatPublics::get_public_posts( $public['sb_id'], 'authors', $time_start, $time_stop );
+            $non_authors_posts  =   StatPublics::get_public_posts( $public['sb_id'], 'sb', $time_start, $time_stop );
+            $ad_posts           =   StatPublics::get_public_posts( $public['sb_id'], 'ads', $time_start, $time_stop );
             $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
             //всего постов
             $res['overall_posts'] = $posts_quantity;
@@ -235,14 +233,13 @@ class getEntries {
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
             //постов из источников
-            $res['sb_posts_count'] = $posts_quantity ?
-                round( $non_authors_posts['count'] * 100 / $posts_quantity ) : 0 ;
+            $res['sb_posts_count'] = $non_authors_posts['count'];
             // средний rate спарсенных постов
             $res['sb_posts_rate']   = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
             //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
             $res['auth_posts']      = $posts_quantity ?
                 round( 100 * $authors_posts['count'] / $posts_quantity   )  : 0 ;
-
+            $res['ad_posts_count']  =   $ad_posts['count'];
             $res['auth_likes_eff']  = $non_authors_posts['likes'] ?
                 ((round( $authors_posts['likes'] / $non_authors_posts['likes'], 4 ) * 100) ) : 0;
             $res['auth_reposts_eff']= $non_authors_posts['reposts'] ?

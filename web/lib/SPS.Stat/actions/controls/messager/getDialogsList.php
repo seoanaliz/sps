@@ -40,7 +40,7 @@ class getDialogsList
         if ( empty( $res_ids )) {
             $res_ids = MesGroups::get_ungroup_dialogs( $user_id, 10000 );
             foreach( $res_ids as $k=>$v ) {
-                MesGroups::implement_entry( $group_id, $k );
+                MesGroups::implement_entry( $group_id, $k, $user_id );
             }
         }
         $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );

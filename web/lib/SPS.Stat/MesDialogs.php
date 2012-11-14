@@ -517,7 +517,7 @@
                     $dialog_id = MesDialogs::get_dialog_id( $user_id, $request->uid );
 //                if  ( $key !== false )
 //                    unset( $ids[$key] );
-                MesGroups::implement_entry( $group_id, $dialog_id );
+                MesGroups::implement_entry( $group_id, $dialog_id, $user_id );
             }
             $ids = implode( ',', $ids );
             $res = StatUsers::get_friendship_state( $user_id, $ids );

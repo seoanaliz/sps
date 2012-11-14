@@ -249,27 +249,31 @@
                          WHERE
                                 group_id=@group_id
                                 AND user_id=@user_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $group_id);
             $cmd->SetInteger('@user_id', $user_id);
-            if ($cmd->ExecuteNonQuery())
+            if ( $cmd->ExecuteNonQuery())
                 return true;
             return false;
         }
 
         public static function implement_entry( $group_id, $entry_id, $user_id )
         {
+            $all_entry_groups = self::get_dialog_group( $entry_id );
+            foreach( $all_entry_groups as $group_to_delete_from ) {
+                self::extricate_entry( $group_to_delete_from, $entry_id, $user_id, 0 );
+            }
+
             $sql = 'INSERT INTO ' . TABLE_MES_GROUP_DIALOG_REL . '(dialog_id,group_id)
                        VALUES (@dialog_id,@group_id)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $group_id );
             $cmd->SetInteger('@dialog_id', $entry_id);
             $cmd->Execute();
-            $unlist = self::get_unlist_dialogs_group( $user_id );
-            self::extricate_entry( $unlist, $entry_id, $user_id );
+
         }
 
-        public static function extricate_entry( $group_id, $entry_id, $user_id )
+        public static function extricate_entry( $group_id, $entry_id, $user_id, $with_check = 1 )
         {
             if (isset( $no_loops ))
                 return true;
@@ -285,12 +289,13 @@
             $cmd->SetInteger( '@dialog_id', $entry_id );
             $cmd->Execute();
 
-
-            //проверяем, состоит ли группа еще в каких-либо листах. Нет - заносим ее в unlist
-            $all_entry_groups = self::get_dialog_group( $entry_id );
-            if ( empty($all_entry_groups)) {
-                $unlist = self::get_unlist_dialogs_group( $user_id );
-                self::implement_entry( $unlist, $entry_id, $user_id );
+            if ( $with_check ) {
+                //проверяем, состоит ли группа еще в каких-либо листах. Нет - заносим ее в unlist
+                $all_entry_groups = self::get_dialog_group( $entry_id );
+                if ( empty($all_entry_groups)) {
+                    $unlist = self::get_unlist_dialogs_group( $user_id );
+                    self::implement_entry( $unlist, $entry_id, $user_id );
+                }
             }
         }
 
@@ -413,18 +418,6 @@
             }
 
             return $res;
-        }
-
-        //возвращает массив, ключи - id юзеров, значения - id групп
-        public static function get_dialog_groups_ids_array( $user_id )
-        {
-            $ids = self::get_users_dialogs( $user_id );
-
-            foreach( $ids as $k => &$v ) {
-               $group_id = self::get_dialog_group( $v );
-                $v = $group_id ? $group_id : '-1';
-            }
-            return $ids;
         }
 
         public static function get_group_dialogs( $user_id, $group_id, $limit, $offset = 0, $only_unr_out = 0 )
