@@ -27,9 +27,7 @@
 
           $barter_events_res = array();
           foreach( $query_result as $barter_event ) {
-              $overlaps = array();
-              if ( $barter_event->overlaps )
-                 $overlaps = explode( ',', $barter_event->overlaps );
+              $overlaps = isset( $barter_event->overlaps ) ? explode( ',', $barter_event->overlaps ) : array();
               $barter_events_res[] = array(
                   'published_at'  =>  $publics_data[ $barter_event->barter_public ],
                   'ad_public'     =>  $publics_data[ $barter_event->target_public ],
@@ -39,7 +37,8 @@
                   'subscribers'   =>   $barter_event->end_subscribers ?
                         $barter_event->end_subscribers - $barter_event->start_subscribers : 0,
                   'visitors'      =>  $barter_event->end_visitors ?
-                        $barter_event->end_visitors    - $barter_event->start_visitors : 0
+                        $barter_event->end_visitors    - $barter_event->start_visitors : 0,
+                  'status'        =>   $barter_event->status
               );
           }
           return $barter_events_res;
