@@ -36,7 +36,6 @@ class AddReport
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
 
         BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
-        print_r($barter_event);
         if ( $barter_event->barter_event_id ) {
             die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( array( $barter_event )))));
         } else
