@@ -15,6 +15,7 @@ class getReportList
         $limit  =   Request::getInteger( 'limit' ) ? Request::getInteger( 'limit' ) : 25;
 
         $search =   array(
+            '_statusNE' =>   6,
             'page'     =>   round( $offset / $limit ),
             'pageSize' =>   $limit
         );
