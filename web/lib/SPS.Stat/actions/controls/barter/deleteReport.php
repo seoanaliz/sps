@@ -11,8 +11,7 @@ class deleteReport
 
     public function execute()
     {
-//        error_reporting(0);
-        $now = time();
+        error_reporting(0);
 
         $barter_event_id   =   Request::getInteger( 'barterId' );
         if ( !$barter_event_id ) {
