@@ -25,19 +25,19 @@ class WrAlarm
 //        print_R($report);
 //        die();
 
-        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
-
-        $publics = $this->get_monitoring_publs(1);
-        $this->check_in_search( $publics );
+//        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
 
         $publics = $this->get_monitoring_publs();
+        $this->check_in_search( $publics );
+
+
         $this->check_block( $publics );
 
-//        print_R($this->wasted_array);
+        print_R($this->wasted_array);
         $report = $this->form_report();
 //        print_R($report);
-        if ( $report )
-            $this->send_report( $report );
+//        if ( $report )
+//            $this->send_report( $report );
     }
 
     public function check_block( $publics_array )
@@ -59,11 +59,19 @@ class WrAlarm
             $susp_ids = array();
             foreach( $res as $apublic_id => $body ) {
                 $public_id =  trim( $apublic_id, 'a');
-                if ( isset( $body ) )
-                {
+                if ( empty( $body )) {
                     $susp_ids[] = $public_id;
+                } else {
+                    if(!$public_id)
+                    {
+                        print_r($res);
+                        die();
+                    }
+                    StatPublics::set_state( $public_id, 'active', true, $this->connect );
+
                 }
             }
+
             foreach( $susp_ids as $id ) {
                 $res = VkHelper::api_request( 'wall.get', array(
                     'owner_id'  =>   '-' . $id,
@@ -72,10 +80,10 @@ class WrAlarm
                 if( !isset($res->error))
                     continue;
                 if ( substr_count( $res->error->error_msg, 'community members' ) > 0 ) {
-                    $this->mark_closed( $id );
+                    StatPublics::set_state( $id, 'closed', true, $this->connect );
                     $this->wasted_array[$id] = 'closed';
                 } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
-                    $this->mark_blocked( $id );
+                    StatPublics::set_state( $id, 'active', false, $this->connect );
                     $this->wasted_array[$id] = 'blocked';
                 }
             }
@@ -112,39 +120,14 @@ class WrAlarm
                 unset( $search_result[0]);
                 foreach( $search_result as $entry ){
                     if( (int)$entry->gid == (int)$public_id ) {
+                        StatPublics::set_state( $public_id, 'in_search', true, $this->connect );
                         continue(2);
                     }
                 }
                 $this->wasted_array[$public_id] = 'search';
-                $this->mark_not_in_search( $public_id );
+                StatPublics::set_state( $public_id, 'in_search', false, $this->connect );
             }
         }
-    }
-
-    public function mark_blocked( $public_id )
-    {
-        $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET active = 0 WHERE vk_id=@public_id';
-        $cmd = new SqlCommand( $sql, $this->connect );
-        $cmd->SetInteger( '@public_id', $public_id );
-//        $cmd->Execute();
-    }
-
-    public function mark_closed( $public_id )
-    {
-        $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET closed = TRUE WHERE vk_id=@public_id';
-        $cmd = new SqlCommand( $sql, $this->connect );
-        $cmd->SetInteger( '@public_id', $public_id );
-        $cmd->Execute();
-    }
-
-    public function mark_not_in_search( $public_id )
-    {
-        $ts = time();
-        $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . ' SET in_search = false WHERE vk_id=@public_id AND in_search is true ';
-        $cmd = new SqlCommand( $sql, $this->connect );
-        $cmd->SetInteger( '@public_id', $public_id );
-        $cmd->SetInteger( '@ts', $ts );
-        $cmd->Execute();
     }
 
     public function save_name( $public_id, $name )
@@ -161,10 +144,8 @@ class WrAlarm
         if ( $in_search )
             $in_search = ' AND in_search is TRUE';
         $sql = 'SELECT vk_id,name
-                FROM stat_publics_50k WHERE active=1
-                AND  quantity>200000
-                AND closed = FALSE
-                ' . $in_search;
+                FROM stat_publics_50k
+                WHERE   quantity>100000';
         $cmd = new SqlCommand( $sql, $this->connect );
         echo $cmd->getQuery();
         $ds  = $cmd->Execute();
@@ -182,12 +163,12 @@ class WrAlarm
     {
         $sql = "select vk_id
                 FROM ". TABLE_STAT_PUBLICS ."
-                WHERE quantity > 200000
+                WHERE quantity > 50000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->connect);
         $ds = $cmd->Execute();
         $res = array();
-        while ( $ds->Next() ) {
+        while ( $ds->Next()) {
             $res[] = $ds->getInteger( 'vk_id' );
         }
         return $res;
@@ -217,9 +198,7 @@ class WrAlarm
         if ( !empty( $search_line )) {
             $publics_info = StatPublics::get_publics_info_from_base( $search_line );
             foreach( $this->wasted_array as $k=>$v ) {
-
                 $type =  $publics_info[$k]['page'] ? ' страницу ' : ' группу ';
-
                 if( $v == 'search'   )
                     $line = ' Убрали из поиска' . $type . ' ';
                 elseif( $v == 'closed' )
@@ -247,7 +226,7 @@ class WrAlarm
     {
         //todo нормальное обращение к паблику
         $params = array(
-            'access_token'  =>  '80f5187f8bda1f858bda1f85188bf24f7988bda8bcf271bdb4e18c8e2d27aa46ff9b69d',
+            'access_token'  =>  '5caf485657804fac57804fac4357a81f5055780579577320723c7cbdb34b7418c582746',
             'message'       =>  $message,
             'owner_id'      =>  '-' . 43503789
         );

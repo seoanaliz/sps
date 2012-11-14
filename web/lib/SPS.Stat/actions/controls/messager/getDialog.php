@@ -25,13 +25,11 @@ class getDialog
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'    =>  'dialog missing' )));
 
         $dialog_array  =  MesDialogs::get_specific_dialog( $user_id, $rec_id, $offset, $limit );
-        $users = array();
         foreach( $dialog_array as &$message )
         {
             unset( $message->uid );
-            $users[] = $message->from_id;
         }
-        $users_info = StatUsers::get_vk_user_info( $users, $user_id );
+        $users_info = StatUsers::get_vk_user_info( array_unique( array( $rec_id, $user_id )), $user_id );
         $dialog_array = array_reverse( $dialog_array );
         if ( !$dialog_array )
             $dialog_array = array();
