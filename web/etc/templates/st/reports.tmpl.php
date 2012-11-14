@@ -6,15 +6,15 @@
 <div id="main" class="main">
     <div class="header">
         <div class="form">
-            <input id="public-id" type="text" placeholder="id паблика" />
-            <input id="our-public-id" type="text" placeholder="id нашего паблика" />
+            <input id="public-id" type="text" placeholder="Кого рекламируем" />
+            <input id="our-public-id" type="text" placeholder="Где размещаем" />
             <input id="time" type="text" placeholder="Время начала наблюдения" style="width: 200px" />
             <button id="addReport" class="button">+</button>
         </div>
     </div>
     <div class="list-head clear-fix">
-        <div class="item our-public">наш паблик<span class="icon arrow"></div>
-        <div class="item partner">партнер<span class="icon arrow"></div>
+        <div class="item our-public">Кого рекламируем<span class="icon arrow"></div>
+        <div class="item partner">Где размещаем<span class="icon arrow"></div>
         <div class="item post-time">вромя поста<span class="icon arrow"></div>
         <div class="item delete-time">время удаления<span class="icon arrow"></div>
         <div class="item visitors">посетители<span class="icon arrow"></div>
