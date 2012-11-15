@@ -156,6 +156,9 @@
                 <page uri="controls://getReportList/">
                     <actions>SPS.Stat.getReportList</actions>
                 </page>
+                <page uri="controls://deleteReport/">
+                    <actions>SPS.Stat.deleteReport</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -209,6 +212,12 @@
                 </page>
                 <page uri="controls://searchDialog/">
                     <actions>SPS.Stat.searchDialog</actions>
+                </page>
+                <page uri="controls://getFriends/">
+                    <actions>SPS.Stat.getFriends</actions>
+                </page>
+                <page uri="controls://manageFriend/">
+                    <actions>SPS.Stat.manageFriend</actions>
                 </page>
 
             </pageGroup>
@@ -530,8 +539,8 @@
                 <page uri="daemons://AlbumUpdate/">
                     <actions>SPS.Stat.AlbumUpdate</actions>
                 </page>
-                <page uri="daemons://PublicsGrowFixer/">
-                    <actions>SPS.Stat.PublicsGrowFixer</actions>
+                <page uri="daemons://OurAdminsStat/">
+                    <actions>SPS.Stat.OurAdminsStat</actions>
                 </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
