@@ -140,8 +140,11 @@
             <action name="getGroupDialogs">
                 <path>controls/messager/getGroupDialogs</path>
             </action>
-            <action name="searchDialog">
-                <path>controls/messager/searchDialog</path>
+            <action name="getFriends">
+                <path>controls/messager/getFriends</path>
+            </action>
+            <action name="manageFriend">
+                <path>controls/messager/manageFriend</path>
             </action>
         </group>
     </group>

@@ -282,23 +282,41 @@
         }
 
         //todo sourceId -1 fuck!
-        public static function get_public_posts( $public_sb_id, $author_condition, $time_from = 0, $time_to = 0 )
+        public static function get_public_posts( $public_sb_id, $search_param, $time_from, $time_to )
         {
-            $author_condition = $author_condition ? 'IS NOT NULL' : 'IS NULL' ;
+            //выбор, какие посты ищем:
+            switch ( $search_param ) {
+                case 'authors':
+                    $type = "";
+                    $operator = ' = ';
+                    break;
+                case 'sb':
+                    $type = " AND c.type<>'ads' ";
+                    $operator = ' <> ';
+                    break;
+                //по умолчанию - рекламные
+                default:
+                    $type = " AND c.type='ads' ";
+                    $operator = ' <> ';
+            }
             if ( !$time_to )
                 $time_to = time();
-            $sql = 'SELECT
-                        COUNT(*),
-                        avg("externalLikes") as avg_likes,
-                        avg("externalRetweets") as avg_reposts
-                    FROM
-                        "articleQueues" as a LEFT JOIN "authorEvents" as b USING("articleId")
-                    WHERE
-                        b."authorId" ' . $author_condition . '
-                        AND a."sentAt" > @time_from
-                        AND a."sentAt" < @time_to
-                        AND "targetFeedId" = @targetFeedId
-                    ';
+            $sql = '
+            SELECT
+                COUNT(*),
+                avg("externalLikes") as avg_likes,
+                avg("externalRetweets") as avg_reposts
+            FROM
+              "articles" as a LEFT JOIN "articleQueues" as b
+                  USING("articleId") LEFT JOIN "sourceFeeds" as c
+                  USING("sourceFeedId")
+            WHERE
+                  b."sentAt" > @time_from
+              AND b."sentAt" < @time_to
+              AND "sourceFeedId" ' . $operator . ' -1
+              AND b."targetFeedId" = @targetFeedId
+              AND b."externalId" IS NOT NULL'
+              . $type ;
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
             $cmd->SetInteger( '@targetFeedId', $public_sb_id );
@@ -318,22 +336,22 @@
         {
             if ( !$time_to )
                 $time_to = time();
+
             $sql = 'SELECT
-                        COUNT(*)
-                    FROM
-                        "articles" as a LEFT JOIN "sourceFeeds" as b USING("sourceFeedId")
-                    WHERE
-                         a."sentAt" > @time_from
-                        AND a."sentAt" < @time_to
-                        AND "targetFeedId" = @targetFeedId
-                        AND type = \'ads\'
-                    ';
+                COUNT(*)
+            FROM
+                "articles" as a
+                LEFT JOIN "sourceFeeds"   AS b USING("sourceFeedId")
+                LEFT JOIN "articleQueues" AS c USING("articleId")
+            WHERE
+                c."sentAt" > @time_from
+                AND c."sentAt" < @time_to
+                AND b.type = \'ads\'';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
             $cmd->SetInteger( '@targetFeedId', $public_sb_id );
             $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
-//            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             $ds->next();
             return $ds->GetValue('count');

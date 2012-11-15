@@ -189,5 +189,19 @@
             $res = VkHelper::api_request( 'friends.areFriends', $params, 0 );
             return $res;
         }
+
+        public static function manage_friend( $user_id, $rec_id, $add )
+        {
+            $access_token = StatUsers::get_access_token( $user_id );
+            if ( !$access_token )
+                die( ERR_NO_ACC_TOK );
+            $res = VkHelper::api_request( $add ? 'friends.add' : 'friends.delete', array(
+                'uid'           =>  $rec_id,
+                'access_token'  =>  $access_token
+            ), 0 );
+            if (isset( $res->error ))
+                return false;
+            return true;
+        }
     }
 ?>

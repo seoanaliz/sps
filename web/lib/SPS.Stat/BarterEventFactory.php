@@ -9,7 +9,7 @@
 class BarterEventFactory
 {
     /** Default Connection Name */
-    const DefaultConnection = null;
+    const DefaultConnection = 'tst';
 
     /** VfsFile instance mapping  */
     public static $mapping = array (
@@ -53,12 +53,12 @@ class BarterEventFactory
         , 'nullable'    => 'CheckEmpty'
         )
         ,'start_search_at' => array(
-                'name'          => 'start_search_at'
-                , 'type'        => TYPE_DATETIME
-            )
+          'name' => 'start_search_at'
+        , 'type' => TYPE_DATETIME
+        )
         ,'stop_search_at' => array(
-           'name'          => 'stop_search_at'
-        , 'type'        => TYPE_DATETIME
+          'name' => 'stop_search_at'
+        , 'type' => TYPE_DATETIME
         )
         ,'posted_at' => array(
           'name'          => 'posted_at'
