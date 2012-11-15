@@ -213,7 +213,7 @@ var Cleaner = {
             id: rawContent.mid,
             isNew: (rawContent.read_state != 1),
             isViewer: isOut,
-            text: makeMsg(rawContent.body),
+            text: makeMsg(rawContent.body.split('<br>').join('\n'), true),
             attachments: [],
             timestamp: rawContent.date,
             user: userModel.data(),

@@ -518,7 +518,9 @@ var Dialogs = EndlessPage.extend({
     },
     clickDialog: function(e) {
         var t = this;
-        t.trigger('clickDialog', e);
+        if (!$(e.target).closest('a').length) {
+            t.trigger('clickDialog', e);
+        }
     },
     clickPlus: function(e) {
         var t = this;
