@@ -673,7 +673,7 @@ var Dialogs = EndlessPage.extend({
             t.pageId('unread' + t.pageId());
             t.renderTemplateLoading();
             t.lock();
-            Events.fire(t._service, {listId: t.pageId(), offset: 0, limit: 40, filter: true}, function(data) {
+            Events.fire(t._service, {listId: t.pageId().substr('unread'.length), offset: 0, limit: 40, filter: true}, function(data) {
                 t.model().list(data.list);
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
