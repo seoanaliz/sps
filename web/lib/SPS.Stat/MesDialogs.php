@@ -676,7 +676,7 @@
                     $last_clear_time = MesGroups::get_last_clear_time( $group_ids[0], $user );
                     $act = '';
                     if ( $dialog->read_state )
-                        self::set_state( $dialog_id, 0 );
+                        self::set_state( $dialog_id, 0, 0 );
                     if ( !$dialog->read_state && !$dialog->out && $old_ts != $dialog->date && $last_clear_time < $dialog->date )
                         $act = 'add';
                     elseif( $dialog->read_state && !$dialog->out || $dialog->out )
