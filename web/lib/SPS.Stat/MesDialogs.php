@@ -567,16 +567,18 @@
         }
 
         //templates
-        public static function add_template( $text, $groups )
+        public static function add_template( $user_id, $text, $groups )
         {
             $groups = '{' . $groups . '}';
             $sql = 'INSERT INTO ' . TABLE_MES_DIALOG_TEMPLATES . '
-                        (text, groups )
+                        ( text, groups, user_id, created_at )
                     VALUES
-                        (@text, @groups)
+                        ( @text, @groups, @user_id, @created_at )
                     RETURNING id
             ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger ( '@user_id', $user_id );
+            $cmd->SetInteger ( '@created_at', time());
             $cmd->SetString  ( '@text', $text );
             $cmd->SetString  ( '@groups', $groups );
             $ds = $cmd->Execute();
@@ -585,27 +587,59 @@
         }
 
         //templates
-        public static function edit_template( $tmpl_id, $text )
+        public static function edit_template( $user_id, $tmpl_id, $text, $group_ids )
         {
             $sql = 'UPDATE '
                         . TABLE_MES_DIALOG_TEMPLATES . '
                     SET
-                        text=@text
+                        text=@text,
+                        groups = @group_ids
                     WHERE
                         id=@tmpl_id
+                        and user_id = @user_id
                     RETURNING id
             ';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString ( '@text'   , $text );
+            $cmd->SetString ( '@group_ids'   , "{" . $group_ids . "}" );
             $cmd->SetInteger( '@tmpl_id', $tmpl_id );
+            $cmd->SetInteger ( '@user_id',  $user_id );
             $ds = $cmd->Execute();
             $ds->Next();
             return $ds->GetInteger( 'id');
         }
 
         //templates
-        public static function search_template( $search, $group )
+        public static function get_templates( $user_id, $group_id, $offset = 0, $limit = 20 ) {
+            $sql = 'SELECT *
+                    FROM ' . TABLE_MES_DIALOG_TEMPLATES . '
+                    WHERE user_id = @user_id
+                    AND @group_id = any(groups)
+                    ORDER BY created_at DESC
+                    OFFSET  @offset
+                    LIMIT   @limit
+                    ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger ( '@user_id',  $user_id );
+            $cmd->SetInteger ( '@group_id', $group_id );
+            $cmd->SetInteger ( '@offset',   $offset );
+            $cmd->SetInteger ( '@limit',    $limit );
+            $ds = $cmd->Execute();
+            $res  = array();
+            while( $ds->Next()) {
+                $res[] = array(
+                    'text'      =>  $ds->GetValue( 'text' ),
+                    'tmpl_id'   =>  $ds->Getinteger( 'id' ),
+                    'groups'    =>  explode(',', trim( $ds->GetString( 'groups' ),'{}' ))
+                );
+            }
+            return $res;
+
+        }
+
+        //templates
+        public static function search_template( $search, $group_id )
         {
             $text   = pg_escape_string( $search );
             $search = $search ? " text ILIKE '%" . $text . "%' " : ' 1 = 1' ;
@@ -616,9 +650,9 @@
                         . TABLE_MES_DIALOG_TEMPLATES . '
                     WHERE '
                         . $search .
-                        ' AND @group = ANY(groups)';
+                        ' AND @group_id = ANY(groups)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetString ( '@group', $group );
+            $cmd->SetString ( '@group_id', $group_id );
             $ds = $cmd->Execute();
             $res = array();
             while($ds->Next()) {

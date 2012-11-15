@@ -5,7 +5,7 @@ class manageFriend
 {
     public function execute()
     {
-//        error_reporting( 0 );
+        error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $act            =   Request::getString( 'act' );
         $rec_id         =   Request::getInteger( 'recId' );
