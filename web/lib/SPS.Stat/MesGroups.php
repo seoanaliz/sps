@@ -338,7 +338,8 @@
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@group_id',   $groupId);
                 $cmd->SetString('@name',        $groupName);
-                $cmd->ExecuteNonQuery();
+                if ( $cmd->ExecuteNonQuery())
+                    return true;
 
             //create new
             } elseif( $groupName ) {
