@@ -10,6 +10,7 @@ var TABS =
     '<? if (isset("dialogTab")) { ?>' +
         '<? each(TABS_ITEM_DIALOG, [dialogTab]); ?>' +
     '<? } ?>' +
+    '<div class="filter"><a data-filtered="Показать все диалоги" data-not-filtered="Показать только непрочитанные">Показать только непрочитанные</a></div>' +
 '</div>';
 
 var TABS_ITEM_LIST =
