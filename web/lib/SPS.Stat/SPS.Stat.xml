@@ -67,6 +67,9 @@
             <action name="getReportList">
                 <path>controls/barter/getReportList</path>
             </action>
+            <action name="deleteReport">
+                <path>controls/barter/deleteReport</path>
+            </action>
         </group>
 
         <group name="Groups">
@@ -101,7 +104,7 @@
             </action>
         </group>
         <group name="Messenger">
-            <action name="getDialogsList">
+           <action name="getDialogsList">
                 <path>controls/messager/getDialogsList</path>
             </action>
             <action name="findTemplate">
