@@ -847,7 +847,8 @@ var Table = (function() {
             authorsLikes: '.authors-likes',
             authorsReposts: '.authors-reposts',
             sbPosts: '.sb-posts',
-            sbLikes: '.sb-likes'
+            sbLikes: '.sb-likes',
+            growthVisitors: '.growth-visitors'
         };
 
         $.each(sortFields, function(sortFieldKey, sortFieldSelector) {

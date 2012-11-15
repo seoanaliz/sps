@@ -244,6 +244,14 @@
 
         public static function extricate_group( $group_id, $user_id )
         {
+            $unlist_group = self::get_unlist_dialogs_group( $user_id );
+            if ( $group_id == $unlist_group )
+                return false;
+            //заносим все диалоги из удаляемой группы в unlist
+            $dialogs = self::get_group_dialogs( $user_id, $group_id, 50000 );
+            foreach( $dialogs as $k=>$v ) {
+                self::implement_entry( $unlist_group, $k, $user_id );
+            }
             $sql = 'DELETE FROM
                             ' . TABLE_MES_GROUP_USER_REL . '
                          WHERE
@@ -270,7 +278,6 @@
             $cmd->SetInteger('@group_id', $group_id );
             $cmd->SetInteger('@dialog_id', $entry_id);
             $cmd->Execute();
-
         }
 
         public static function extricate_entry( $group_id, $entry_id, $user_id, $with_check = 1 )
@@ -278,7 +285,7 @@
             if (isset( $no_loops ))
                 return true;
             //проверка на повторный вызов функции(без нее было бы кольцо)
-            static $no_loops = 1;
+
             $sql =  'DELETE FROM '
                 . TABLE_MES_GROUP_DIALOG_REL . '
                        WHERE
@@ -290,10 +297,12 @@
             $cmd->Execute();
 
             if ( $with_check ) {
+                static $no_loops = 1;
                 //проверяем, состоит ли группа еще в каких-либо листах. Нет - заносим ее в unlist
                 $all_entry_groups = self::get_dialog_group( $entry_id );
-                if ( empty($all_entry_groups)) {
+                if ( empty( $all_entry_groups )) {
                     $unlist = self::get_unlist_dialogs_group( $user_id );
+//                    var_dump($unlist);
                     self::implement_entry( $unlist, $entry_id, $user_id );
                 }
             }
@@ -329,7 +338,8 @@
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetInteger('@group_id',   $groupId);
                 $cmd->SetString('@name',        $groupName);
-                $cmd->ExecuteNonQuery();
+                if ( $cmd->ExecuteNonQuery())
+                    return true;
 
             //create new
             } elseif( $groupName ) {
@@ -425,7 +435,7 @@
             $where = $only_unr_out ? ' AND state=4' : '';
             $limit =  $limit ? $limit : 1000;
 
-            $sql = 'SELECT rec_id FROM '
+            $sql = 'SELECT rec_id,b.id FROM '
                         . TABLE_MES_GROUP_DIALOG_REL . ' as a, '
                         . TABLE_MES_DIALOGS . ' as b
                     WHERE
@@ -442,10 +452,11 @@
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
+//            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             $res = array();
             while ( $ds->Next() ) {
-                $res[] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
+                $res[$ds->GetInteger( 'id')] =  $ds->GetValue( 'rec_id', TYPE_INTEGER );
             }
             return $res;
         }
