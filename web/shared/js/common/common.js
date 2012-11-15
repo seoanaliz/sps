@@ -93,8 +93,8 @@ if (!window.console) {
     };
 })();
 
-function intval(str) {
-    return isNaN(parseInt(str)) ? 0 : parseInt(str);
+function intval(value) {
+    return (value === true) ? 1 : (parseInt(value) || 0);
 }
 
 // Парсинг URL

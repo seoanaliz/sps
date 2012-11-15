@@ -72,11 +72,23 @@ var Eventlist = {
         });
     },
     get_dialogs: function(listId, offset, limit, callback) {
-        var params = {
-            groupId: listId == Configs.commonDialogsList ? undefined : listId,
-            offset: offset,
-            limit: limit
-        };
+        var params = {};
+        if (typeof arguments[0] == 'object') {
+            var options = listId;
+            callback = arguments[1];
+            params = {
+                groupId: options.listId == Configs.commonDialogsList ? undefined : options.listId,
+                offset: options.offset,
+                limit: options.limit,
+                unreadIn: intval(options.filter)
+            }
+        } else {
+            params = {
+                groupId: listId == Configs.commonDialogsList ? undefined : listId,
+                offset: offset,
+                limit: limit
+            };
+        }
         simpleAjax('getDialogsList', params, function(rawData) {
             var clearData = [];
             $.each(rawData, function(i, rawDialog) {
@@ -87,7 +99,8 @@ var Eventlist = {
         });
     },
     get_messages: function(dialogId, offset, limit, callback) {
-        var params = {
+        var params = {};
+        params = {
             dialogId: dialogId,
             offset: offset,
             limit: limit
