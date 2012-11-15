@@ -208,6 +208,10 @@ var LeftColumn = Widget.extend({
         t._tabs.on('addList', function() {
             t.trigger('addList');
         });
+
+        t._tabs.on('clickFilter', function() {
+            t._dialogs.toggleFilter();
+        });
     },
     onScroll: function(e) {
         var t = this;
@@ -254,6 +258,12 @@ var LeftColumn = Widget.extend({
     readDialog: function(dialogId) {
         var t = this;
         t._dialogs.readDialog(dialogId);
+    }
+});
+
+var PageNew = Widget.extend({
+    run: function() {
+
     }
 });
 
@@ -487,12 +497,18 @@ var Dialogs = EndlessPage.extend({
     _service: 'get_dialogs',
     _pageLoaded: null,
     _pageId: Configs.commonDialogsList,
+    _isFiltered: false,
 
     _events: {
         'click: .dialog': 'clickDialog',
         'click: .action.icon': 'clickPlus'
     },
 
+    changePage: function() {
+        var t = this;
+        t._isFiltered = false;
+        t._super.apply(this, Array.prototype.slice.call(arguments, 0));
+    },
     makeList: function($list) {
         $list.find('.date').each(function() {
             var $date = $(this);
@@ -647,6 +663,24 @@ var Dialogs = EndlessPage.extend({
         var $dialogMessage = $dialog.find('.from-me');
         $dialog.removeClass('new');
         $dialogMessage.removeClass('new');
+    },
+    toggleFilter: function() {
+        var t = this;
+        if (t._isFiltered) {
+            t.changePage(t.pageId().substr('unread'.length));
+        } else {
+            t._isFiltered = true;
+            t.pageId('unread' + t.pageId());
+            t.renderTemplateLoading();
+            t.lock();
+            Events.fire(t._service, {listId: t.pageId().substr('unread'.length), offset: 0, limit: 40, filter: true}, function(data) {
+                t.model().list([]);
+                t.onLoad(data);
+                t.renderTemplate();
+                t.makeList(t.el().find(t._itemsSelector));
+                t.onRender();
+            });
+        }
     }
 });
 
@@ -696,7 +730,8 @@ var Messages = EndlessPage.extend({
     renderTemplateLoading: function() {
         var t = this;
         var dialogId = t.pageId();
-        var messageId = dialogCollection.get(dialogId).messageId();
+        var messageModel = dialogCollection.get(dialogId);
+        var messageId = messageModel ? messageModel.messageId() : false;
         var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
         t.model().user(userCollection.get(userId));
         t.model().viewer(userCollection.get(Configs.vkId));
@@ -1040,7 +1075,8 @@ var Tabs = Widget.extend({
     _events: {
         'click: .tab.dialog': 'clickDialog',
         'click: .tab.list': 'clickList',
-        'click: .icon': 'clickPlus'
+        'click: .icon': 'clickPlus',
+        'click: .filter > a': 'clickFilter'
     },
 
     clickDialog: function(e) {
@@ -1154,6 +1190,19 @@ var Tabs = Widget.extend({
         return false;
     },
 
+    clickFilter: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        if (!$target.data('is-filtered')) {
+            $target.html($target.data('filtered'));
+            $target.data('is-filtered', true);
+        } else {
+            $target.html($target.data('not-filtered'));
+            $target.data('is-filtered', false);
+        }
+        t.trigger('clickFilter');
+    },
+
     setList: function(listId) {
         var t = this;
         var listModel = listCollection.get(listId) || new ListModel({
@@ -1168,6 +1217,8 @@ var Tabs = Widget.extend({
         }
         t.model().listTab(listTab);
         t.renderTemplate();
+        //@todo привести к нормальному виду
+        t.el().find('.filter').show();
     },
 
     setDialog: function(dialogId) {
@@ -1190,6 +1241,8 @@ var Tabs = Widget.extend({
         }
         t.model().dialogTab(dialogTab);
         t.renderTemplate();
+        //@todo привести к нормальному виду
+        t.el().find('.filter').hide();
     },
 
     setOnline: function(userId) {
