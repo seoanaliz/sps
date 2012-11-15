@@ -674,7 +674,8 @@ var Dialogs = EndlessPage.extend({
             t.renderTemplateLoading();
             t.lock();
             Events.fire(t._service, {listId: t.pageId().substr('unread'.length), offset: 0, limit: 40, filter: true}, function(data) {
-                t.model().list(data.list);
+                t.model().list([]);
+                t.onLoad(data);
                 t.renderTemplate();
                 t.makeList(t.el().find(t._itemsSelector));
                 t.onRender();
@@ -729,7 +730,8 @@ var Messages = EndlessPage.extend({
     renderTemplateLoading: function() {
         var t = this;
         var dialogId = t.pageId();
-        var messageId = dialogCollection.get(dialogId).messageId();
+        var messageModel = dialogCollection.get(dialogId);
+        var messageId = messageModel ? messageModel.messageId() : false;
         var userId = new UserModel(dialogCollection.get(dialogId).user()).id();
         t.model().user(userCollection.get(userId));
         t.model().viewer(userCollection.get(Configs.vkId));
