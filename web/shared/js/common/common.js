@@ -522,6 +522,7 @@ var Box = (function() {
             html: '',
             closeBtn: true,
             buttons: [],
+            width: 400,
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
@@ -562,7 +563,7 @@ var Box = (function() {
             title: params.title,
             body: '',
             closeBtn: params.closeBtn
-        })).appendTo($layout).hide();
+        })).appendTo($layout).width(params.width).hide();
 
         if (params.closeBtn) {
             $box.find('> .title > .close').click(function() {

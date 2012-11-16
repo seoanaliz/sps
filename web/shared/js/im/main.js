@@ -1357,28 +1357,10 @@ $(document).ready(function() {
 });
 
 function CreateTemplateBox(listId, text, onSuccess) {
-    var SAVE_TEMPLATE_BOX =
-    '<div class="box-templates">' +
-        '<div class="title">' +
-            'Выберите списки' +
-        '</div>' +
-        '<div class="input-wrap">' +
-            '<input class="lists" type="text"/>' +
-        '</div>' +
-        '<div class="title">' +
-            'Введите текст шаблона' +
-        '</div>' +
-        '<div class="input-wrap">' +
-            '<textarea class="template-text"><?=text?></textarea>' +
-        '</div>' +
-    '</div>';
-
     var box = new Box({
         title: 'Добавление нового шаблона',
         html: tmpl(BOX_LOADING, {height: 100}),
-        buttons: [
-            {label: 'Закрыть'}
-        ],
+        width: 600,
         onshow: function() {
             Events.fire('get_lists', function(data) {
                 var list = data.list;
@@ -1395,14 +1377,15 @@ function CreateTemplateBox(listId, text, onSuccess) {
                 });
 
                 box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
-                box.setButtons([
-                    {label: 'Сохранить', onclick: saveTemplate},
-                    {label: 'Отменить', isWhite: true}
-                ]);
 
                 var $input = box.$el.find('.lists');
                 var $textarea = box.$el.find('.template-text');
                 var templateText = $textarea.val();
+                var $templateList = box.$el.find('.template-list');
+                var $addTemplateBtn = box.$el.find('.save-template');
+
+                $addTemplateBtn.click(saveTemplate);
+
                 $textarea.focus();
                 $textarea.selectRange(templateText.length, templateText.length);
 
@@ -1441,6 +1424,19 @@ function CreateTemplateBox(listId, text, onSuccess) {
                         if ($.isFunction(onSuccess)) onSuccess();
                     });
                 }
+
+                Events.fire('get_templates', null, function(data) {
+                    var clearData = [];
+                    $.each(data, function(i, template) {
+                        clearData.push({
+                            id: template.id,
+                            text: template.title,
+                            timestamp: '12:21',
+                            user: userCollection.get(Configs.vkId).data()
+                        });
+                    });
+                    $templateList.html(tmpl(TEMPLATE_LIST, {list: clearData}));
+                });
             });
         },
         onhide: function() {

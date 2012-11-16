@@ -168,7 +168,7 @@ var Eventlist = {
         });
     },
     get_templates: function(listId, callback) {
-        simpleAjax('findTemplate', {groupId: listId, search: ''}, function(data) {
+        simpleAjax('getTemplates', {groupId: listId}, function(data) {
             var clearTemplates = [];
             $.each(data, function(i, rawTemplate) {
                 clearTemplates.push(Cleaner.template(rawTemplate));

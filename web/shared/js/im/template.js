@@ -287,3 +287,48 @@ var LIST_ITEM =
         '</div>' +
     '<? } ?>' +
 '</div>';
+
+var SAVE_TEMPLATE_BOX =
+'<div class="box-templates">' +
+    '<div class="title">' +
+        'Выберите списки' +
+    '</div>' +
+    '<div class="input-wrap">' +
+        '<input class="lists" type="text"/>' +
+    '</div>' +
+    '<div class="title">' +
+        'Введите текст шаблона' +
+    '</div>' +
+    '<div class="input-wrap">' +
+        '<textarea class="template-text"><?=text?></textarea>' +
+    '</div>' +
+    '<div class="actions">' +
+        '<button class="button save-template">Сохранить</button>' +
+    '</div>' +
+    '<div class="template-list"></div>' +
+'</div>';
+
+var TEMPLATE_LIST =
+'<? each(TEMPLATE_LIST_ITEM, list); ?>';
+
+var TEMPLATE_LIST_ITEM =
+'<div class="message clear-fix" data-id="<?=id?>">' +
+    '<div class="left-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+                '<img src="<?=user.photo?>" alt="">' +
+            '</a>' +
+        '</div>' +
+    '</div>' +
+    '<div class="center-column">' +
+        '<div class="content">' +
+            '<div class="title">' +
+                '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
+            '</div>' +
+            '<div class="text"><?=text?></div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="right-column">' +
+        '<div class="date"><?=timestamp?></div>' +
+    '</div>' +
+'</div>';
