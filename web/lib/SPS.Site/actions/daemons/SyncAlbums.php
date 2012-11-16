@@ -42,7 +42,12 @@ class SyncAlbums extends AbstractPostLoadDaemon {
             //инитим парсер
             $parser = new ParserVkontakte();
             $offset = $source->processed * self::PHOTO_COUNT_PER_REQUEST;
-            $posts = $parser->get_album_as_posts($public_id, $album_id, self::PHOTO_COUNT_PER_REQUEST, $offset);
+            try {
+                $posts = $parser->get_album_as_posts($public_id, $album_id, self::PHOTO_COUNT_PER_REQUEST, $offset);
+            } catch (AlbumEndException $exception) {
+                Logger::Info('Album ' . $source->externalId . '  end at ' . $offset . ' offset');
+                continue;
+            }
 
             $this->saveFeedPosts($source, $posts);
         }
