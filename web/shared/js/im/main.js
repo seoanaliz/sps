@@ -1043,7 +1043,9 @@ var RightColumn = Widget.extend({
         function deleteList() {
             this.hide();
             $list.closest('.drag-wrap').slideUp(200);
-            Events.fire('remove_list', listId, function() {});
+            Events.fire('remove_list', listId, function() {
+                t.update();
+            });
         }
         return false;
     },
