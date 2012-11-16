@@ -1027,6 +1027,7 @@ var RightColumn = Widget.extend({
         t.setList(listId, true);
     },
     clickIconDelete: function(e) {
+        var t = this;
         var $target = $(e.currentTarget);
         var $list = $target.closest('.item');
         var listId = $list.data('id');
