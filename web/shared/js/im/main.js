@@ -1056,7 +1056,7 @@ var RightColumn = Widget.extend({
         var $list = $target.closest('.item');
         var listId = $list.data('id');
         var $text = $list.find('.text');
-        var input = $('<input type="text" />').width($text.width()).val($text.text());
+        var input = $('<input type="text" />').width($text.width() + 20).val($text.text());
 
         $text.replaceWith(input);
         input.focus().on('keyup.editList', saveList);
