@@ -20,10 +20,10 @@ class addTemplate
         }
 
         if ( $tmpl_id )
-            $res = MesDialogs::edit_template( $tmpl_id, $text );
+            $res = MesDialogs::edit_template( $user_id, $tmpl_id, $text, $group_ids );
         else
-            $res = MesDialogs::add_template( $text, $group_ids);
+            $res = MesDialogs::add_template( $user_id, $text, $group_ids );
 
-        echo ObjectHelper::ToJSON( array( 'response' => $res ));
+        echo ObjectHelper::ToJSON( array( 'response' => $res ? $res : false ));
     }
 }

@@ -16,7 +16,7 @@ class MesCheckUpdates
         MesDialogs::check_new_messages( $im_users );
         foreach( $im_users as $user ) {
 //                $this->ungroup_transfer( $user );
-            MesDialogs::check_friend_requests( $user );
+          // MesDialogs::check_friend_requests( $user );
         }
     }
 
@@ -25,7 +25,7 @@ class MesCheckUpdates
         $ungr_dialogs =  MesGroups::get_ungroup_dialogs( $im_user, 10000 );
         $group_id     = MesGroups::get_unlist_dialogs_group( $im_user );
         foreach( $ungr_dialogs as $dialog_id => $rec_id ) {
-            MesGroups::implement_entry( $group_id, $dialog_id );
+            MesGroups::implement_entry( $group_id, $dialog_id, $user_id );
         }
     }
 
