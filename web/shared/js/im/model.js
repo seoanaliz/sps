@@ -337,5 +337,9 @@ var ListModel = Model.extend({
     isDraggable: function(isDraggable) {
         if (arguments.length) isDraggable = !!isDraggable;
         return this.data('isDraggable', isDraggable);
+    },
+    isEditable: function(isEditable) {
+        if (arguments.length) isEditable = !!isEditable;
+        return this.data('isEditable', isEditable);
     }
 });

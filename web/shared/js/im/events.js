@@ -340,7 +340,8 @@ var Cleaner = {
             counter: rawList.unread,
             isRead: rawList.isRead,
             isSelected: false,
-            isDraggable: true
+            isDraggable: true,
+            isEditable: true
         };
     },
 

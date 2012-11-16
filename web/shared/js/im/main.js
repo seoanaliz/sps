@@ -915,7 +915,8 @@ var RightColumn = Widget.extend({
         'mousedown: .drag-wrap': 'mouseDownList',
         'click: .item': 'clickList',
         'click: .icon.delete': 'clickIconDelete',
-        'click: .icon.edit': 'clickIconEdit'
+        'click: .icon.edit': 'clickIconEdit',
+        'click: input': 'clickInput'
     },
 
     run: function() {
@@ -1052,21 +1053,24 @@ var RightColumn = Widget.extend({
         var $list = $target.closest('.item');
         var listId = $list.data('id');
         var $text = $list.find('.text');
-        var $textarea = $('<input type="text" />').width($text.width()).val($text.text());
+        var input = $('<input type="text" />').width($text.width()).val($text.text());
 
-        $text.replaceWith($textarea);
-        $textarea.focus().on('keyup.editList', saveList);
+        $text.replaceWith(input);
+        input.focus().on('keyup.editList', saveList);
 
         function saveList(e) {
-            var listName = $.trim($text.text());
+            var listName = $.trim(input.val());
             if (e.keyCode == KEY.ENTER && listName) {
-                $textarea.replaceWith($text).off('keyup.editList');
-                $text.text($textarea.val());
+                input.replaceWith($text).off('keyup.editList');
+                $text.text(input.val());
                 Events.fire('update_list', listId, listName, function() {
                     t.update();
                 });
             }
         }
+        return false;
+    },
+    clickInput: function() {
         return false;
     },
 
