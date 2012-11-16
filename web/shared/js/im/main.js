@@ -221,16 +221,22 @@ var LeftColumn = Widget.extend({
 
     showList: function(listId, isTrigger) {
         var t = this;
-        t._messages.hide();
-        t._dialogs.show().changePage(listId);
+        if (!t._dialogs.isVisible()) {
+            t._messages.hide();
+            t._dialogs.show();
+        }
+        t._dialogs.changePage(listId);
         t._tabs.setList(listId);
         if (isTrigger) t.trigger('changeList', listId);
     },
 
     showDialog: function(dialogId, isTrigger) {
         var t = this;
-        t._dialogs.hide();
-        t._messages.show().changePage(dialogId);
+        if (!t._messages.isVisible()) {
+            t._dialogs.hide();
+            t._messages.show();
+        }
+        t._messages.changePage(dialogId);
         t._tabs.setDialog(dialogId);
         if (isTrigger) t.trigger('changeDialog', dialogId);
     },
@@ -261,12 +267,6 @@ var LeftColumn = Widget.extend({
     }
 });
 
-var PageNew = Widget.extend({
-    run: function() {
-
-    }
-});
-
 var Page = Widget.extend({
     _isVisible: false,
     _templateLoading: '',
@@ -289,6 +289,7 @@ var Page = Widget.extend({
         if (force || (t._isCache && t.pageId() != pageId)) {
             t.pageId(pageId);
             t.renderTemplateLoading();
+            t.scrollTop();
             t.getData();
         }
     },
@@ -308,12 +309,18 @@ var Page = Widget.extend({
             });
         }
     },
+    scrollTop: function() {
+        $(window).scrollTop(0);
+    },
+    scrollBottom: function() {
+        $(window).scrollTop($(document).height() - $(window).height());
+    },
     show: function() {
         var t = this;
         t.visible(true);
         t.el().show();
         if (t._isBottom) {
-            $(window).scrollTop($(document).height() - $(window).height());
+            t.scrollBottom();
         } else {
             $(window).scrollTop(t._scroll);
         }
@@ -518,19 +525,21 @@ var Dialogs = EndlessPage.extend({
     },
     clickDialog: function(e) {
         var t = this;
-        t.trigger('clickDialog', e);
+        if (!$(e.target).closest('a').length) {
+            t.trigger('clickDialog', e);
+        }
     },
     clickPlus: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
         var $dialog = $target.closest('.dialog');
         var dialogId = $dialog.data('id');
+        var dialogModel = dialogCollection.get(dialogId);
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
 
                 function onCreate() {
-                    var dialog = dialogCollection.get(dialogId).data();
-                    $.each(dialog.lists, function(i, listId) {
+                    $.each(dialogModel.lists(), function(i, listId) {
                         $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
@@ -586,13 +595,19 @@ var Dialogs = EndlessPage.extend({
                                 }
                             } else {
                                 Events.fire('add_to_list', dialogId, item.id, function() {
-                                    t.trigger('addToList');
+                                    var index = $.inArray(item.id, dialogModel.lists());
+                                    if (index == -1) {
+                                        dialogModel.lists().push(item.id);
+                                    }
                                 });
                             }
                         },
                         onunselect: function(item) {
                             Events.fire('remove_from_list', dialogId, item.id, function() {
-                                t.trigger('removeFromList');
+                                var index = $.inArray(item.id, dialogModel.lists());
+                                if (index != -1) {
+                                    dialogModel.lists().splice(index, 1);
+                                }
                             });
                         },
                         data: $.merge(list, [
@@ -898,7 +913,10 @@ var RightColumn = Widget.extend({
 
     _events: {
         'mousedown: .drag-wrap': 'mouseDownList',
-        'click: .item': 'clickList'
+        'click: .item': 'clickList',
+        'click: .icon.delete': 'clickIconDelete',
+        'click: .icon.edit': 'clickIconEdit',
+        'click: input': 'clickInput'
     },
 
     run: function() {
@@ -968,7 +986,7 @@ var RightColumn = Widget.extend({
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
-                var top = e.pageY - startY;
+                var top;
                 var height = $placeholder.height();
                 var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
@@ -1007,6 +1025,56 @@ var RightColumn = Widget.extend({
         var $list = $(e.currentTarget);
         var listId = $list.data('id');
         t.setList(listId, true);
+    },
+    clickIconDelete: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var $list = $target.closest('.item');
+        var listId = $list.data('id');
+        var box = new Box({
+            id: 'deleteList' + listId,
+            title: 'Удаление',
+            html: 'Вы уверены, что хотите удалить список?',
+            buttons: [
+                {label: 'Удалить', onclick: deleteList},
+                {label: 'Отмена', isWhite: true}
+            ]
+        }).show();
+
+        function deleteList() {
+            this.hide();
+            $list.closest('.drag-wrap').slideUp(200);
+            Events.fire('remove_list', listId, function() {
+                t.update();
+            });
+        }
+        return false;
+    },
+    clickIconEdit: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var $list = $target.closest('.item');
+        var listId = $list.data('id');
+        var $text = $list.find('.text');
+        var input = $('<input type="text" />').width($text.width() + 20).val($text.text());
+
+        $text.replaceWith(input);
+        input.focus().on('keyup.editList', saveList);
+
+        function saveList(e) {
+            var listName = $.trim(input.val());
+            if (e.keyCode == KEY.ENTER && listName) {
+                input.replaceWith($text).off('keyup.editList');
+                $text.text(input.val());
+                Events.fire('update_list', listId, listName, function() {
+                    t.update();
+                });
+            }
+        }
+        return false;
+    },
+    clickInput: function() {
+        return false;
     },
 
     saveOrder: function() {
@@ -1104,9 +1172,7 @@ var Tabs = Widget.extend({
             (function updateDropdown() {
 
                 function onCreate() {
-                    var lists = dialogModel.lists();
-
-                    $.each(lists, function(i, listId) {
+                    $.each(dialogModel.lists(), function(i, listId) {
                         $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
@@ -1170,13 +1236,19 @@ var Tabs = Widget.extend({
                                 }
                             } else {
                                 Events.fire('add_to_list', dialogId, item.id, function() {
-                                    t.trigger('addToList');
+                                    var index = $.inArray(item.id, dialogModel.lists());
+                                    if (index == -1) {
+                                        dialogModel.lists().push(item.id);
+                                    }
                                 });
                             }
                         },
                         onunselect: function(item) {
                             Events.fire('remove_from_list', dialogId, item.id, function() {
-                                t.trigger('removeFromList');
+                                var index = $.inArray(item.id, dialogModel.lists());
+                                if (index != -1) {
+                                    dialogModel.lists().splice(index, 1);
+                                }
                             });
                         },
                         data: $.merge(list, [

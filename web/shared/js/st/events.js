@@ -112,7 +112,7 @@ var Eventlist = {
             views: 'views',
             posts: 'overall_posts',
             postsPerDay: 'posts_days_rel',
-            sbPosts: 'avg_vis_grouth',
+            sbPosts: 'sb_posts_count',
             sbLikes: 'sb_posts_rate',
             authorsPosts: 'auth_posts',
             authorsLikes: 'auth_likes_eff',

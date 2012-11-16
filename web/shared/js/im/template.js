@@ -277,7 +277,11 @@ var LIST_ITEM =
     '<? if (isset("title")) { ?>' +
         '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
             '<div class="title<?=isset("isRead") && isRead ? "" : " new"?><?=isset("isSelected") && isSelected ? " active" : ""?>">' +
-                '<?=title?>' +
+                '<span class="text"><?=title?></span>' +
+                '<? if (isset("isEditable") && isEditable) { ?>' +
+                    '<span class="icon edit"></span>' +
+                    '<span class="icon delete"></span>' +
+                '<? } ?>' +
                 '<span class="counter"><?=isset("counter") && counter ? "+" + counter : ""?></span>' +
             '</div>' +
         '</div>' +

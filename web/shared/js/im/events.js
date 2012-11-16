@@ -144,6 +144,14 @@ var Eventlist = {
             callback(true);
         });
     },
+    update_list: function(list_id, list_name, callback) {
+        simpleAjax('setGroup', {
+            groupId: list_id,
+            groupName: list_name
+        }, function() {
+            callback(true);
+        });
+    },
     remove_list: function(listId, callback) {
         simpleAjax('deleteGroup', {groupId: listId}, function() {
             callback(true);
@@ -213,7 +221,7 @@ var Cleaner = {
             id: rawContent.mid,
             isNew: (rawContent.read_state != 1),
             isViewer: isOut,
-            text: makeMsg(rawContent.body),
+            text: makeMsg(rawContent.body.split('<br>').join('\n'), true),
             attachments: [],
             timestamp: rawContent.date,
             user: userModel.data(),
@@ -332,7 +340,8 @@ var Cleaner = {
             counter: rawList.unread,
             isRead: rawList.isRead,
             isSelected: false,
-            isDraggable: true
+            isDraggable: true,
+            isEditable: true
         };
     },
 
