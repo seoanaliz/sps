@@ -144,6 +144,14 @@ var Eventlist = {
             callback(true);
         });
     },
+    update_list: function(list_id, list_name, callback) {
+        simpleAjax('setGroup', {
+            groupId: list_id,
+            groupName: list_name
+        }, function() {
+            callback(true);
+        });
+    },
     remove_list: function(listId, callback) {
         simpleAjax('deleteGroup', {groupId: listId}, function() {
             callback(true);
