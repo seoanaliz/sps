@@ -611,11 +611,13 @@
         }
 
         //templates
-        public static function get_templates( $user_id, $group_id, $offset = 0, $limit = 20 ) {
+        public static function get_templates( $user_id, $group_id = 0, $offset = 0, $limit = 20 ) {
+            $ad = '';
+            if ( $group_id )
+                $add = ' AND @group_id = any(groups) ';
             $sql = 'SELECT *
                     FROM ' . TABLE_MES_DIALOG_TEMPLATES . '
-                    WHERE user_id = @user_id
-                    AND @group_id = any(groups)
+                    WHERE user_id = @user_id '. $add . '
                     ORDER BY created_at DESC
                     OFFSET  @offset
                     LIMIT   @limit

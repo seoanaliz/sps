@@ -12,7 +12,7 @@ class getTemplates
         $offset         =   Request::getInteger( 'offset' );
         $limit          =   Request::getInteger( 'limit' );
 
-        if ( !$group_id || !$user_id ) {
+        if ( !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
 
