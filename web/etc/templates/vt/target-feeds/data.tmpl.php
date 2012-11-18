@@ -9,6 +9,8 @@
     if ( !empty($errors["fatal"] ) ) {
 		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
 	}
+
+JsHelper::PushFile('js://vt/targetFeedEdit.js');
 ?>
 <div class="tabs">
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
@@ -52,6 +54,57 @@
             </div>
             <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 ) ); ?>
         </div>
+
+        <div class="row user_list" data-row="owner">
+            <label for="targetFeedOwner">Владелец</label>
+            <input type="text" name="" value="" id="targetFeedOwner" class="editors">
+            <ul id="targetFeedOwner_values" data-input_name="UserFeed[<?=UserFeed::ROLE_OWNER?>][]">
+                <?
+                if (isset($UserFeeds[UserFeed::ROLE_OWNER])) {
+                    foreach ($UserFeeds[UserFeed::ROLE_OWNER] as $vkId=>$UserFeed) {
+                        /** @var  $UserFeed UserFeed */
+                        ?>
+                        <li>
+                            <input type="hidden" name="UserFeed[<?=UserFeed::ROLE_OWNER?>][]" value="<?=$vkId?>">
+                            <? if (isset($editors[$vkId])) :?>
+                            <?=$editors[$vkId]?>
+                            <? else: ?>
+                            <strong>нет пользователя (<?=$vkId?>)</strong>
+                            <? endif; ?>
+                            <span class="button remove" onclick="removeUser(this)"></span>
+                        </li>
+                        <?
+                    }
+                }
+                ?>
+            </ul>
+        </div>
+        <div class="row user_list" data-row="editors">
+            <label for="targetFeedEditor">Редакторы</label>
+            <input type="text" name="" value="" id="targetFeedEditor" class="editors">
+            <ul id="targetFeedEditor_values" data-input_name="UserFeed[<?=UserFeed::ROLE_EDITOR?>][]">
+                <?
+                if (isset($UserFeeds[UserFeed::ROLE_EDITOR])) {
+                    foreach ($UserFeeds[UserFeed::ROLE_EDITOR] as $vkId=>$UserFeed) {
+                        /** @var  $UserFeed UserFeed */
+                        ?>
+                        <li>
+                            <input type="hidden" name="UserFeed[<?=UserFeed::ROLE_EDITOR?>][]" value="<?=$vkId?>">
+                            <? if (isset($editors[$vkId])) :?>
+                                <?=$editors[$vkId]?>
+                            <? else: ?>
+                                <strong>нет пользователя (<?=$vkId?>)</strong>
+                            <? endif; ?>
+                            <span class="button remove" onclick="removeUser(this)"></span>
+                        </li>
+                        <?
+                    }
+                }
+                ?>
+            </ul>
+        </div>
+
+
         <div data-row="publishers" class="row">
             <label>{lang:vt.targetFeed.publishers}</label>
             <?= FormHelper::FormSelectMultiple( 'publisherIds[]', $publishers, 'publisherId', 'name', $publisherIds, 'publisherIds', null, null, array('style' => 'height: 200px;') ) ?>
