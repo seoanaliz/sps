@@ -1362,7 +1362,7 @@ $(document).ready(function() {
 
 function CreateTemplateBox(listId, text, isFocused, onUpdate) {
     var box = new Box({
-        title: 'Добавление нового шаблона',
+        title: 'Готовые ответы',
         html: tmpl(BOX_LOADING, {height: 100}),
         width: 600,
         onshow: function() {

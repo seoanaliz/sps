@@ -296,17 +296,11 @@ var SAVE_TEMPLATE_BOX =
         '</div>' +
     '</div>' +
     '<div class="add-template-opened">' +
-        '<div class="title">' +
-            'Выберите списки' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text" placeholder="Введите текст шаблона..."><?=text?></textarea>' +
         '</div>' +
         '<div class="input-wrap">' +
-            '<input class="lists" type="text"/>' +
-        '</div>' +
-        '<div class="title">' +
-            'Введите текст шаблона' +
-        '</div>' +
-        '<div class="input-wrap">' +
-            '<textarea class="template-text"><?=text?></textarea>' +
+            '<input class="lists" type="text" placeholder="Выберите списки диалогов..." />' +
         '</div>' +
         '<div class="actions">' +
             '<button class="button save-template">Сохранить</button>' +
