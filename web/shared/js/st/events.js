@@ -4,6 +4,7 @@
 var Events = {
     url: Configs.controlsRoot,
     delay: Configs.eventsDelay,
+    isDebug: false,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -11,7 +12,7 @@ var Events = {
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    if(window.console && console.log) {
+                    if (window.console && console.log && t.isDebug) {
                         console.log(name + ':');
                         console.log(args.slice(0, -1));
                         console.log('-------');
@@ -19,7 +20,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if(window.console && console.log) {
+                if (window.console && console.log && t.isDebug) {
                     console.log(e);
                 }
             }

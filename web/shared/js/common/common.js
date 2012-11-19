@@ -724,6 +724,7 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
+                    dropdownId++;
                     $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
@@ -752,17 +753,18 @@ var Box = (function() {
                 $menu.hide();
 
                 $el.data(DATA_KEY, {
-                    id: dropdownId++,
+                    id: dropdownId,
                     $el: $el,
                     $menu: $menu,
                     $target: $target,
-                    options: options
+                    options: options,
+                    isVisible: false
                 });
 
                 $el.dropdown('setItems', options.data);
 
                 if (options.isShow && $el.is(':visible')) {
-                    $el.dropdown('open');
+                    $el.dropdown('open', isUpdate);
                 }
                 if (isUpdate) {
                     run(options.onupdate, $el);
@@ -808,6 +810,10 @@ var Box = (function() {
                 if (!options.data.length && !options.emptyMenuText) {
                     return;
                 }
+                if ($menu.data('isVisible')) {
+                    return;
+                }
+                $menu.data('isVisible', true);
 
                 $menu.css({
                     width: options.width || $target.outerWidth() - (intval($target.css('border-left-width')) + intval($target.css('border-right-width')))
@@ -900,6 +906,7 @@ var Box = (function() {
 
             $target.removeClass(CLASS_ACTIVE);
             $menu.hide();
+            $menu.data('isVisible', false);
 
             $(window).off('resize.' + nameSpace);
             $(window).off('scroll.' + nameSpace);
@@ -1049,14 +1056,37 @@ var Box = (function() {
                     }
                 };
                 var options = $.extend(defaults, params);
-                var searchTimeout;
-                options.notFoundText = options.emptyMenuText;
                 options.defData = options.data.slice(0);
+                options.notFoundText = options.emptyMenuText;
+                var searchTimeout;
+                var data = options.defData.slice(0);
 
                 $el.dropdown(options);
+                $el.on('open', function() {
+                    var tags = [];
+                    if (!$el.tags) {
+                        return;
+                    }
+                    tags = $el.tags('getTags');
+                    data = $.grep(options.defData, function(item) {
+                        var isNotFound = true;
+                        $.each(tags, function(i, tag) {
+                            if (tag.id == item.id) {
+                                isNotFound = false;
+                                return false;
+                            }
+                        });
+                        return isNotFound;
+                    });
+                    $el.dropdown($.extend(options, {
+                        isShow: true,
+                        data: data,
+                        emptyMenuText: options.notFoundText
+                    }));
+                });
 
                 if (!$el.data(DATA_KEY)) {
-                    $el.on('keyup', function(e) {
+                    $el.on('keydown', function(e) {
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -1073,11 +1103,10 @@ var Box = (function() {
                         }
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            var elVal = options.getValue.apply(t) || '';
-                            var defData = options.defData;
-                            var data = !elVal ? defData : $.grep(defData, function(n, i) {
-                                var str = $.trim(n.title).split('ё').join('е');
-                                var searchStr = $.trim(elVal).split('ё').join('е');
+                            var searchStr = $.trim(options.getValue.apply(t) || '').split('ё').join('е');
+                            data = !searchStr ? data : [];
+                            data = $.grep(options.defData, function(item) {
+                                var str = $.trim(item.title).split('ё').join('е');
                                 if (!options.caseSensitive) {
                                     str = str.toLowerCase();
                                     searchStr = searchStr.toLowerCase();
@@ -1093,7 +1122,7 @@ var Box = (function() {
                             } else {
                                 $el.dropdown('close');
                             }
-                        }, 0);
+                        }, 100);
                     });
 
                     $el.data(DATA_KEY, {
@@ -1163,13 +1192,30 @@ var Box = (function() {
                 $el.data(DATA_KEY, {
                     $el: $el,
                     $wrap: $el.closest('.' + CLASS_WRAP),
-                    options: options,
-                    tags: {}
+                    options: options
                 });
 
                 refreshPadding($el);
                 run(options.oncreate, $el);
             });
+        },
+        getTags: function() {
+            var $el = this;
+            var data = $el.data(DATA_KEY);
+            if (!data) {
+                return;
+            }
+            var options = data.options;
+            var $wrap = data.$wrap;
+            var $tags = $wrap.find('.' + CLASS_TAG);
+            var tags = [];
+            $.each($tags, function() {
+                tags.push({
+                    id: $(this).data('id'),
+                    title: $(this).find('.' + CLASS_TAG_TEXT).text()
+                });
+            });
+            return tags;
         },
         addTag: function(params) {
             return this.each(function() {
