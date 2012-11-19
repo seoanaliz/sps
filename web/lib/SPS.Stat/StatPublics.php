@@ -48,15 +48,20 @@
 
         public static function get_publics_info( $public_ids )
         {
-            //todo exceptions
+            if( is_array( $public_ids ))
+                $public_ids = implode( ',', $public_ids );
+            $result = array();
             $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
+            if( isset( $res->error ))
+                return false;
             $result = array();
             foreach( $res as $public ) {
                 $result[ $public->gid ] = array(
                     'id'    =>  $public->gid,
                     'ava'   =>  $public->photo,
                     'name'  =>  $public->name,
-                    'link'  =>  'http://vk.com/public' . $public->gid
+                    'link'  =>  'http://vk.com/public' . $public->gid,
+                    'shortname' => $public->screen_name
                 );
             }
 
@@ -145,6 +150,7 @@
             return $res;
         }
 
+        //собирает топ 5 пабликов пользователей
         public static function collect_fave_publics( $users_array )
         {
             set_time_limit(0);
@@ -153,7 +159,6 @@
             $url_array = array();
             foreach( $users_array as $user ) {
                 $url_array[] = self::FAVE_PUBLS_URL . $user;
-//                echo self::FAVE_PUBLS_URL . $user . '<br>';
                 $i++;
                 if ( $i == 20 ) {
 //                    echo '1 <br>';
@@ -248,6 +253,7 @@
             return $res;
         }
 
+        //сохраняет настройки для oadmins
         public static function save_conf( $c1,$c2,$c3,$c4,$lv )
         {
             $sql = 'UPDATE oadmins_conf SET complicate = @1,
@@ -281,7 +287,7 @@
             );
         }
 
-        //todo sourceId -1 fuck!
+        //собирает инфу о постах(рекламных, авторских или из источников) из sb за период
         public static function get_public_posts( $public_sb_id, $search_param, $time_from, $time_to )
         {
             //выбор, какие посты ищем:
@@ -332,35 +338,30 @@
             return $res;
         }
 
-        public static function get_ad_public_posts( $public_sb_id, $time_from = 0, $time_to = 0 )
-        {
-            if ( !$time_to )
-                $time_to = time();
+        public static function get_average_visitors( $sb_id, $time_from, $time_to ) {
+            $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
 
-            $sql = 'SELECT
-                COUNT(*)
-            FROM
-                "articles" as a
-                LEFT JOIN "sourceFeeds"   AS b USING("sourceFeedId")
-                LEFT JOIN "articleQueues" AS c USING("articleId")
-            WHERE
-                c."sentAt" > @time_from
-                AND c."sentAt" < @time_to
-                AND b.type = \'ads\'';
-
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
-            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
-            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
-            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            $sql = 'SELECT avg(visitors)
+                      FROM ' . TABLE_STAT_PUBLICS_POINTS . '
+                      WHERE time >= @time_from
+                            AND time <= @time_to
+                            AND id = @public_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
+            $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
+            $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
             $ds = $cmd->Execute();
-            $ds->next();
-            return $ds->GetValue('count');
+            if ( $ds->GetSize() ) {
+                $ds->Next();
+                return $ds->GetInteger( 'avg' );
+            }
+
         }
 
         public static function get_views_visitors_from_base( $sb_id, $time_from, $time_to )
         {
             $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
-            $sql = 'SELECT views,visitors
+            $sql = 'SELECT views,visitors,avg()
                     FROM stat_publics_50k_points
                     WHERE   time >= @time_from
                             AND time <= @time_to

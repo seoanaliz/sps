@@ -159,8 +159,8 @@ class getEntries {
                                             'auth_likes_eff',
                                             'auth_reposts_eff',
                                             'visitors',
-                                            'avg_vis_grouth',
-                                            'avg_vie_grouth'
+                                            'abs_vis_grow',
+                                            'rel_vis_grow'
             );
             $resul = $this->get_our_publics_state( $time_from, $time_to );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'visitors';
@@ -245,11 +245,24 @@ class getEntries {
             $res['auth_reposts_eff']= $non_authors_posts['reposts'] ?
                 (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) : 0;
 
-            $guests = StatPublics::get_views_visitors_from_base( $public['sb_id'], $time_start, $time_stop );
-            $res['visitors']       = $guests['visitors'];
-            $res['avg_vis_grouth'] = $guests['vis_grouth'];
-            $res['views']          = $guests['views'];
-            $res['avg_vie_grouth'] = $guests['vievs_grouth'];
+            $vis_now = StatPublics::get_average_visitors( $public['sb_id'], $time_start, $time_stop );
+            $vis_prev_period = StatPublics::get_average_visitors( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
+            if ( $vis_now && $vis_prev_period ) {
+                $abs_vis_grow = $vis_now - $vis_prev_period;
+                $rel_vis_grow = round( $abs_vis_grow * 100 / $vis_prev_period, 2 );
+            } else {
+                $rel_vis_grow = 0;
+                $abs_vis_grow = 0;
+            }
+
+            $res['rel_vis_grow']  = $rel_vis_grow;
+            $res['abs_vis_grow']  = $abs_vis_grow;
+//            print_r
+//            $guests = StatPublics::get_views_visitors_from_base( $public['sb_id'], $time_start, $time_stop );
+//            $res['visitors']       = $guests['visitors'];
+//            $res['avg_vis_grouth'] = $guests['vis_grouth'];
+//            $res['views']          = $guests['views'];
+//            $res['avg_vie_grouth'] = $guests['vievs_grouth'];
             $ret[] = $res;
 
         }
