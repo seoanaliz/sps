@@ -1,4 +1,5 @@
 <?php
+    class AlbumEndException extends Exception{}
 
     class ParserVkontakte {
 
@@ -258,7 +259,8 @@
                 }
                 else {
                     $sum_likes   += $post['likes'];
-                    $sum_reposts += $post['retweet'] / $post['likes_tr'];
+                    if ( $post['likes_tr'] )
+                        $sum_reposts += $post['retweet'] / $post['likes_tr'];
                 }
             }
             //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
@@ -467,6 +469,7 @@
             if (is_numeric($offset))    $params['offset'] = $offset;
 
             $res = VkHelper::api_request( 'photos.get', $params );
+            if ( $res)
             $query_line = array();
 
             foreach( $res as $photo )
@@ -474,6 +477,8 @@
                 $query_line[]= $photo->owner_id . '_' . $photo->pid;
             }
             $query_line = implode( ',', $query_line );
+            if( !$query_line )
+                      throw new AlbumEndException('End of album');
             sleep( 0.3 );
 
             $params = array(
@@ -481,6 +486,7 @@
                 'extended'  =>  1,
             );
             $res = VkHelper::api_request( 'photos.getById', $params );
+
             $posts = VkAlbums::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
             return $posts;
