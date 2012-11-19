@@ -290,22 +290,30 @@ var LIST_ITEM =
 
 var SAVE_TEMPLATE_BOX =
 '<div class="box-templates">' +
-    '<div class="title">' +
-        'Выберите списки' +
+    '<div class="add-template-closed">' +
+        '<div class="input-wrap">' +
+            '<input type="text" placeholder="Написать новый ответ..." />' +
+        '</div>' +
     '</div>' +
-    '<div class="input-wrap">' +
-        '<input class="lists" type="text"/>' +
+    '<div class="add-template-opened">' +
+        '<div class="title">' +
+            'Выберите списки' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<input class="lists" type="text"/>' +
+        '</div>' +
+        '<div class="title">' +
+            'Введите текст шаблона' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text"><?=text?></textarea>' +
+        '</div>' +
+        '<div class="actions">' +
+            '<button class="button save-template">Сохранить</button>' +
+            '<button class="button cancel">Отменить</button>' +
+        '</div>' +
     '</div>' +
-    '<div class="title">' +
-        'Введите текст шаблона' +
-    '</div>' +
-    '<div class="input-wrap">' +
-        '<textarea class="template-text"><?=text?></textarea>' +
-    '</div>' +
-    '<div class="actions">' +
-        '<button class="button save-template">Сохранить</button>' +
-    '</div>' +
-    '<div class="template-list"></div>' +
+    '<div class="template-list loading"></div>' +
 '</div>';
 
 var TEMPLATE_LIST =
@@ -324,11 +332,18 @@ var TEMPLATE_LIST_ITEM =
         '<div class="content">' +
             '<div class="title">' +
                 '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
+                '<? each(TEMPLATE_LIST_ITEM_LISTS, lists); ?>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
         '</div>' +
     '</div>' +
     '<div class="right-column">' +
-        '<div class="date"><?=timestamp?></div>' +
+        '<div class="actions">' +
+            //'<div class="icon edit"></div>' +
+            '<div class="icon delete"></div>' +
+        '</div>' +
     '</div>' +
 '</div>';
+
+var TEMPLATE_LIST_ITEM_LISTS =
+'<span class="tag"><?=title?></span>';

@@ -505,6 +505,7 @@ var Box = (function() {
     var $layout;
     var boxesCollection = {};
     var boxesHistory = [];
+    var bodyOverflow;
 
     return function(options) {
         if (typeof options != 'object') {
@@ -530,18 +531,15 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $layout = $('<div/>')
-                .addClass('box-layout')
-                .appendTo($body)
-                .click(function(e) {
-                    if (e.target == e.currentTarget) {
-                        boxesHistory[boxesHistory.length-1].hide();
-                        if (!boxesHistory.length) {
-                            $(this).hide();
-                        }
+            $layout = $('<div/>').click(function(e) {
+                if (e.target == e.currentTarget) {
+                    boxesHistory[boxesHistory.length-1].hide();
+                    if (!boxesHistory.length) {
+                        $(this).hide();
                     }
-                })
-            ;
+                }
+            }).addClass('box-layout').appendTo($body);
+
             $(document).keydown(function(e) {
                 if (e.keyCode == 27) {
                     $layout.click();
@@ -571,9 +569,6 @@ var Box = (function() {
             });
         }
 
-        setHTML(params.html);
-        setButtons(params.buttons);
-
         box.$el = box.$box = $box;
         box.show = show;
         box.hide = hide;
@@ -584,48 +579,57 @@ var Box = (function() {
         box.refreshTop = refreshTop;
         box.visible = false;
 
+        box.setHTML(params.html);
+        box.setButtons(params.buttons);
+
         function show() {
             box.visible = true;
-            if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.hide();
-            }
-
             $box.show();
-            $layout.show();
             refreshTop();
 
-            try {
-                params.onshow.call(box, $box);
-            } catch(e) {}
+            if (boxesHistory.length) {
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.hide();
+                }
+            } else {
+                bodyOverflow = $body.css('overflow-y');
+                $body.width($body.width());
+                $body.css('overflow-y', 'hidden');
+                $layout.show();
+            }
 
             boxesHistory.push(box);
+            params.onshow.call(box, $box);
             return box;
         }
         function hide() {
             box.visible = false;
             $box.hide();
-
-            try {
-                params.onhide.call(box, $box);
-            } catch(e) {}
-
             boxesHistory.pop();
+
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.show();
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.show();
+                }
             } else {
+                $body.css('overflow-y', bodyOverflow);
+                $body.width('auto');
                 $layout.hide();
             }
 
+            params.onhide.call(box, $box);
             return box;
         }
         function remove() {
-            if (box.visible) hide();
+            if (box.visible) {
+                box.hide();
+            }
             delete boxesCollection[params.id];
             $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
-            refreshTop();
+            box.refreshTop();
             return box;
         }
         function setTitle(title) {
@@ -641,11 +645,9 @@ var Box = (function() {
                 }
                 $box.find('> .actions-wrap .actions').empty();
                 $.each(buttons, function(i, button) {
-                    var $button = $(tmpl(BOX_ACTION, button))
-                        .appendTo($box.find('> .actions-wrap .actions'))
-                        .click(function() {
-                            button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
-                        });
+                    var $button = $(tmpl(BOX_ACTION, button)).click(function() {
+                        button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
+                    }).appendTo($box.find('> .actions-wrap .actions'));
                 });
             }
             return box;
@@ -659,7 +661,6 @@ var Box = (function() {
         }
 
         params.oncreate.call(box, $box);
-
         return box;
     };
 })();

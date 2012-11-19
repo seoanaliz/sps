@@ -460,23 +460,81 @@ body {
 }
 
 .box-templates {
-    &>.title {
-        margin: 7px 0 4px;
-        color: #2B587A;
-        font-size: 1.18em;
-        font-weight: bold;
+    &>.add-template-closed {
+        margin: -14px -14px 0 -14px ;
+        padding: 14px;
+        border-bottom: 1px solid @border_inside;
+        background-color: #f7f7f7;
+
+        &>.input-wrap {
+            margin-right: 10px;
+
+            &>input[type="text"] {
+                width: 100%;
+            }
+        }
     }
 
-    &>.input-wrap {
-        margin-right: 10px;
-        margin-bottom: 7px;
+    &>.add-template-opened {
+        margin: -14px -14px 0 -14px ;
+        padding: 14px;
+        background-color: #f7f7f7;
+        border-bottom: 1px solid @border_inside;
+        display: none;
 
-        &>input[type="text"],
-        &>textarea {
-            width: 100%;
+        &>.title {
+            margin: 0 0 4px;
+            color: #2B587A;
+            font-size: 1.1em;
+            font-weight: bold;
         }
-        &>textarea {
-            height: 50px;
+
+        &>.input-wrap {
+            margin-right: 10px;
+            margin-bottom: 10px;
+
+            &>input[type="text"],
+            &>textarea {
+                width: 100%;
+            }
+            &>textarea {
+                height: 50px;
+            }
+        }
+        &>.actions {
+            .button + .button {
+                margin-left: 10px;
+            }
+        }
+    }
+
+    &>.template-list {
+        margin-top: 7px;
+
+        .message {
+            &>.left-column {
+                width: 40px;
+            }
+            &>.center-column {
+                width: 77%;
+
+                &>.content {
+                    &>.title {
+                        &>.tag {
+                            font-weight: normal;
+                            background: @bg_hover;
+                            margin-left: 10px;
+                            padding: 2px 4px;
+                            font-size: 0.9em;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.loading {
+            background: url(http://st0.userapi.com/images/upload.gif) no-repeat center;
+            height: 30px;
         }
     }
 }
@@ -567,15 +625,15 @@ body {
             &>.content {
                 margin: 0 10px;
 
-                .title {
+                &>.title {
                     font-weight: bold;
                     margin-bottom: 0.4em;
                 }
-                .text {
+                &>.text {
                     overflow: hidden;
                 }
 
-                .attachments {
+                &>.attachments {
                     margin: .5em 0;
 
                     img {
@@ -608,8 +666,32 @@ body {
             float: left;
 
             &>.date {
+                float: left;
                 color: @color_gray;
                 font-size: .9em;
+            }
+
+            &>.actions {
+                float: right;
+
+                &>.icon {
+                    padding: 5px;
+                    cursor: pointer;
+                    .opacity(0);
+
+                    &:hover {
+                        .opacity(1) !important;
+                    }
+                }
+            }
+        }
+    }
+    &>.message:hover {
+        &>.right-column {
+            &>.actions {
+                &>.icon {
+                    .opacity(0.5);
+                }
             }
         }
     }

@@ -348,7 +348,8 @@ var Cleaner = {
     template: function(rawTemplate) {
         return {
             id: rawTemplate.tmpl_id,
-            title: rawTemplate.text
+            title: rawTemplate.text,
+            lists: rawTemplate.groups
         };
     }
 };
