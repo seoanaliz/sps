@@ -1409,11 +1409,13 @@ function CreateTemplateBox(listId, text, isFocused) {
                 $openAdditionFormTrigger.focus(openAdditionForm);
                 $closeAdditionFormTrigger.click(closeAdditionForm);
                 $addTemplateBtn.click(addTemplate);
+
                 $textarea.keydown(function(e) {
                     if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
                         addTemplate();
                     }
                 });
+
                 $templateList.delegate('.icon.delete', 'click', function() {
                     var $target = $(this);
                     var $message = $target.closest('.message');
@@ -1430,7 +1432,13 @@ function CreateTemplateBox(listId, text, isFocused) {
                         ]
                     }).show();
                 });
+
                 $templateList.delegate('.icon.edit', 'click', function() {
+                    var ACTIONS =
+                    '<div class="actions">' +
+                        '<button class="button save-template">Сохранить</button>' +
+                        '<button class="button cancel">Отменить</button>' +
+                    '</div>';
                     var $target = $(this);
                     var $message = $target.closest('.message');
                     var $tags = $message.find('.title > .tag');
@@ -1438,35 +1446,61 @@ function CreateTemplateBox(listId, text, isFocused) {
                     var messageId = $message.data('id');
                     var $text = $message.find('.content > .text');
                     var $textarea;
+                    var $actions;
                     if (!$text.data('textarea')) {
                         $textarea = $('<textarea />');
-                        $textarea.on('blur', function() {
-                            $text.show();
-                            $textarea.hide();
-                        });
+                        $actions = $(tmpl(ACTIONS, {}));
                         $textarea.on('keydown', function(e) {
                             if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
-                                $textarea.hide();
-                                $text.html(makeMsg($textarea.val())).show();
-                                $.each($tags, function() {
-                                    var $tag = $(this);
-                                    if ($tag.data('id')) {
-                                        tags.push($tag.data('id'));
-                                    }
-                                });
-                                Events.fire('edit_template', messageId, $textarea.val(), tags.join(','), function() {});
+                                saveTemplate();
                             }
+                        });
+                        $actions.find('.button.save-template').click(function(e) {
+                            saveTemplate();
+                        });
+                        $actions.find('.button.cancel').click(function(e) {
+                            editModeOff();
                         });
                         $text.after($textarea);
                         $textarea.autoResize().wrap('<div class="input-wrap" />');
+                        $textarea.after($actions);
                         $text.data('textarea', $textarea);
+                        $text.data('actions', $actions);
                     } else {
                         $textarea = $text.data('textarea');
+                        $actions = $text.data('actions');
                     }
-                    $text.hide();
-                    $textarea.show();
-                    $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
+
+                    editModeOn();
+
+                    function editModeOn() {
+                        $text.hide();
+                        $textarea.show();
+                        $actions.show();
+                        $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
+                    }
+                    function editModeOff() {
+                        $text.show();
+                        $textarea.hide();
+                        $actions.hide();
+                    }
+                    function saveTemplate() {
+                        if (!$textarea.val()) {
+                            $textarea.focus();
+                            return;
+                        }
+                        editModeOff();
+                        $text.html(makeMsg($textarea.val())).show();
+                        $.each($tags, function() {
+                            var $tag = $(this);
+                            if ($tag.data('id')) {
+                                tags.push($tag.data('id'));
+                            }
+                        });
+                        Events.fire('edit_template', messageId, $textarea.val(), tags.join(','), function() {});
+                    }
                 });
+
                 $templateList.delegate('.tag > .delete', 'click', function() {
                     var $target = $(this);
                     var $message = $target.closest('.message');
