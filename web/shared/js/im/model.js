@@ -3,12 +3,19 @@ var Model = Event.extend({
     _defData: null,
 
     init: function(data) {
-        this._data = {};
         this.setData(data);
     },
+    defaultData: function(defaultData) {
+        if (arguments.length) {
+            this._defData = defaultData;
+            return this;
+        } else {
+            this._defData = this._defData || {};
+            return this._defData;
+        }
+    },
     setData: function(data) {
-        this._defData = this._defData || {};
-        this._data = $.extend(this._defData, data);
+        this._data = $.extend(this.defaultData(), data);
     },
     get: function(key) {
         return this._data[key];
@@ -25,7 +32,7 @@ var Model = Event.extend({
             key += '';
             return this.set(key, value);
         } else if (key) {
-            key = key.toString();
+            key += '';
             return this.get(key);
         } else {
             return this._data;
@@ -35,12 +42,12 @@ var Model = Event.extend({
 
 var UserModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             name: '...',
             photo: 'http://vk.com/images/camera_c.gif',
             isOnline: false
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
@@ -63,15 +70,15 @@ var UserModel = Model.extend({
 
 var TabsModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             listTab: null,
             dialogTab: null
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     listTab: function(listTab) {
@@ -86,17 +93,17 @@ var TabsModel = Model.extend({
 
 var TabModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             label: '...',
             isSelected: false,
             isOnline: false,
             isOnList: false
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     label: function(label) {
@@ -119,14 +126,14 @@ var TabModel = Model.extend({
 
 var DialogsModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             list: []
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     list: function(list) {
@@ -137,7 +144,7 @@ var DialogsModel = Model.extend({
 
 var DialogModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             isNew: false,
             isViewer: false,
@@ -148,11 +155,11 @@ var DialogModel = Model.extend({
             attachments: [],
             lists: [],
             messageId: null
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     messageId: function(messageId) {
@@ -195,17 +202,17 @@ var DialogModel = Model.extend({
 
 var MessagesModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             user: new UserModel(),
             viewer: new UserModel(),
             list: [],
             preloadList: []
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     user: function(user) {
@@ -228,7 +235,7 @@ var MessagesModel = Model.extend({
 
 var MessageModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             isNew: false,
             isViewer: false,
@@ -238,11 +245,11 @@ var MessageModel = Model.extend({
             timestamp: 0,
             attachments: [],
             dialogId: null
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     dialogId: function(dialogId) {
@@ -281,15 +288,15 @@ var MessageModel = Model.extend({
 
 var ListsModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             list: [],
             counter: null
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     list: function(list) {
@@ -304,18 +311,18 @@ var ListsModel = Model.extend({
 
 var ListModel = Model.extend({
     init: function() {
-        this._defData = {
+        this.defaultData({
             id: null,
             title: '...',
             counter: null,
             isRead: false,
             isSelected: false,
             isDraggable: true
-        };
+        });
         this._super.apply(this, Array.prototype.slice.call(arguments, 0));
     },
     id: function(id) {
-        if (arguments.length) id = intval(id);
+        if (arguments.length) id += '';
         return this.data('id', id);
     },
     title: function(title) {
