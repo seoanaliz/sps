@@ -507,12 +507,20 @@ body {
 
                 &>.content {
                     &>.title {
-                        &>.tag {
+                        &>a {
+                            margin-right: 10px;
+                        }
+                        &>.tag,
+                        &>.tag-plus {
                             font-weight: normal;
-                            background-color: @bg_hover;
-                            margin-left: 10px;
-                            padding: 2px 4px;
                             font-size: 0.9em;
+                            background-color: @bg_hover;
+                            display: inline-block;
+                            margin-top: 2px;
+                        }
+                        &>.tag {
+                            margin-right: 7px;
+                            padding: 2px 4px;
 
                             &>.delete {
                                 display: inline-block;
@@ -523,8 +531,18 @@ body {
                                 background: url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;
                                 width: 0;
 
-                                .transition(0.2s);
+                                .transition(0.2s all);
                             }
+                        }
+                        &>.tag-plus {
+                            background: @bg_hover url(http://st0.userapi.com/images/pics/im_plus.gif) center no-repeat;
+                            display: none;
+                            width: 18px;
+                            height: 18px;
+                            vertical-align: bottom;
+                            cursor: pointer;
+                            .opacity(0);
+                            .transition(0.2s all);
                         }
                     }
                     &>.input-wrap {
@@ -572,6 +590,10 @@ body {
                                 &>.delete {
                                     width: 1em;
                                 }
+                            }
+                            &>.tag-plus {
+                                display: inline-block;
+                                .opacity(1);
                             }
                         }
                         &>.text {

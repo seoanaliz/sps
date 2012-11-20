@@ -1436,8 +1436,6 @@ function CreateTemplateBox(listId, text, isFocused) {
                 $templateList.delegate('.icon.edit', 'click', function() {
                     var $target = $(this);
                     var $message = $target.closest('.message');
-                    var $tags = $message.find('.title > .tag');
-                    var tags = [];
                     var messageId = $message.data('id');
                     var $text = $message.find('.content > .text');
                     var $textarea = $message.find('.content textarea');
@@ -1460,6 +1458,29 @@ function CreateTemplateBox(listId, text, isFocused) {
                         $textarea.autoResize().wrap('<div class="input-wrap" />');
                     }
 
+                    $templateList.delegate('.tag-plus', 'click', function() {
+                        var tags = getTags($message);
+                        $target = $(this);
+                        $target.dropdown({
+                            isShow: true,
+                            addClass: 'ui-dropdown-add-to-list-tabs',
+                            data: $.grep(clearLists, function(u) {
+                                var isFound = false;
+                                $.each(tags, function(i, tag) {
+                                    if (tag == u.id) {
+                                        isFound = true;
+                                        return false;
+                                    }
+                                });
+                                return !isFound;
+                            }),
+                            width: 200,
+                            onchange: function(item) {
+                                $target.before($(tmpl(TEMPLATE_LIST_ITEM_LISTS, item)));
+                            }
+                        });
+                    });
+
                     editModeOn();
 
                     function editModeOn() {
@@ -1476,13 +1497,7 @@ function CreateTemplateBox(listId, text, isFocused) {
                         }
                         editModeOff();
                         $text.html(makeMsg($textarea.val())).show();
-                        $.each($tags, function() {
-                            var $tag = $(this);
-                            if ($tag.data('id')) {
-                                tags.push($tag.data('id'));
-                            }
-                        });
-                        Events.fire('edit_template', messageId, $textarea.val(), tags.join(','), function() {});
+                        Events.fire('edit_template', messageId, $textarea.val(), getTags($message).join(','), function() {});
                     }
                 });
 
@@ -1491,18 +1506,24 @@ function CreateTemplateBox(listId, text, isFocused) {
                     var $message = $target.closest('.message');
                     var $tag = $target.closest('.tag');
                     $tag.remove();
-                    var $tags = $message.find('.title > .tag');
-                    var tags = [];
+                    var tags = getTags($message);
                     var messageId = $message.data('id');
                     var $text = $message.find('.content > .text');
+                    Events.fire('edit_template', messageId, $text[0].innerText, tags.join(','), function() {});
+                });
+
+
+                function getTags($message) {
+                    var $tags = $message.find('.title > .tag');
+                    var tags = [];
                     $.each($tags, function() {
                         var $tag = $(this);
                         if ($tag.data('id')) {
                             tags.push($tag.data('id'));
                         }
                     });
-                    Events.fire('edit_template', messageId, $text[0].innerText, tags.join(','), function() {});
-                });
+                    return tags;
+                }
 
                 function addTemplate() {
                     var text = $.trim($textarea.val());

@@ -328,6 +328,7 @@ var TEMPLATE_LIST_ITEM =
             '<div class="title">' +
                 '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
                 '<? each(TEMPLATE_LIST_ITEM_LISTS, lists); ?>' +
+                '<span class="tag-plus"></span>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
             '<div class="input-wrap">' +
