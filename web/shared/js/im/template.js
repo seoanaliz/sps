@@ -333,11 +333,11 @@ var TEMPLATE_LIST_ITEM =
     '</div>' +
     '<div class="right-column">' +
         '<div class="actions">' +
-            //'<div class="icon edit"></div>' +
+            '<div class="icon edit"></div>' +
             '<div class="icon delete"></div>' +
         '</div>' +
     '</div>' +
 '</div>';
 
 var TEMPLATE_LIST_ITEM_LISTS =
-'<span class="tag"><?=title?></span>';
+'<span data-id="<?=id?>" class="tag"><?=title?></span>';

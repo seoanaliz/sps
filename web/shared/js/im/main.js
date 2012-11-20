@@ -1396,7 +1396,7 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
 
                 $openAdditionFormTrigger.focus(openAdditionForm);
                 $closeAdditionFormTrigger.click(closeAdditionForm);
-                $addTemplateBtn.click(saveTemplate);
+                $addTemplateBtn.click(addTemplate);
                 $templateList.delegate('.icon.delete', 'click', function() {
                     var $target = $(this);
                     var $message = $target.closest('.message');
@@ -1414,10 +1414,45 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                     }).show();
                 });
                 $templateList.delegate('.icon.edit', 'click', function() {
-                    console.log('edit');
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var $tags = $message.find('.title > .tag');
+                    var tags = [];
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    var $textarea;
+                    if (!$text.data('textarea')) {
+                        $textarea = $('<textarea />');
+                        $textarea.on('blur', function() {
+                            $text.show();
+                            $textarea.hide();
+                        });
+                        $textarea.on('keydown', function(e) {
+                            if (e.keyCode == KEY.ENTER && e.ctrlKey) {
+                                $textarea.hide();
+                                $text.html(makeMsg($textarea.val())).show();
+                                $.each($tags, function() {
+                                    console.log(this);
+                                    var $tag = $(this);
+                                    if ($tag.data('id')) {
+                                        tags.push($tag.data('id'));
+                                    }
+                                });
+                                Events.fire('edit_template', messageId, $textarea.val(), tags.join(','), function() {});
+                            }
+                        });
+                        $text.after($textarea);
+                        $textarea.autoResize().wrap('<div class="input-wrap" />');
+                        $text.data('textarea', $textarea);
+                    } else {
+                        $textarea = $text.data('textarea');
+                    }
+                    $text.hide();
+                    $textarea.show();
+                    $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
                 });
 
-                function saveTemplate() {
+                function addTemplate() {
                     var text = $.trim($textarea.val());
                     if (!text) {
                         $textarea.focus();

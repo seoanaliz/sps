@@ -103,8 +103,8 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+// Выделение текста в инпутах
 (function($) {
-    // Выделение текста в инпутах
     $.fn.selectRange = function(start, end) {
         return this.each(function() {
             if (this.setSelectionRange) {
@@ -217,22 +217,26 @@ function getURLParameter(name, search) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $autoResize
-                    .css({
-                        position: 'absolute',
-                        width: $input.width(),
-                        minHeight: $input.height(),
-                        font: $input.css('font'),
-                        padding: $input.css('padding'),
-                        fontSize: $input.css('font-size'),
-                        wordWrap: 'break-word',
-                        overflow: $input.css('overflow'),
-                        lineHeight: $input.css('line-height'),
-                        top: -100000
-                    })
-                ;
+                $autoResize.css({
+                    position: 'absolute',
+                    width: $input.width(),
+                    minHeight: $input.height(),
+                    font: $input.css('font'),
+                    padding: $input.css('padding'),
+                    fontSize: $input.css('font-size'),
+                    wordWrap: 'break-word',
+                    overflow: $input.css('overflow'),
+                    lineHeight: $input.css('line-height'),
+                    top: -100000
+                });
 
                 $input.on('keyup keydown focus blur', function(e) {
+                    $autoResize.css({
+                        width: $input.width(),
+                        font: $input.css('font'),
+                        padding: $input.css('padding'),
+                        fontSize: $input.css('font-size')
+                    });
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
