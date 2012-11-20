@@ -31,7 +31,7 @@ body {
                 .transition(box-shadow 0.5s);
             }
 
-            .filter {
+            .links {
                 float: right;
                 padding: 11px;
             }
@@ -509,10 +509,19 @@ body {
                     &>.title {
                         &>.tag {
                             font-weight: normal;
-                            background: @bg_hover;
+                            background-color: @bg_hover;
                             margin-left: 10px;
                             padding: 2px 4px;
                             font-size: 0.9em;
+
+                            &>.delete {
+                                display: inline-block;
+                                vertical-align: middle;
+                                width: 1em;
+                                height: 1em;
+                                cursor: pointer;
+                                background: url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;
+                            }
                         }
                     }
                 }

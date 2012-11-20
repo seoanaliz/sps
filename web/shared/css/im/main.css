@@ -1,6 +1,6 @@
 body{overflow-y:scroll;}
 #main{width:1100px;margin:0 auto;}#main>#left-column{float:left;width:800px;border:1px solid #c4cde0;padding-top:40px;position:relative;}#main>#left-column>.header{position:absolute;top:0;z-index:2;border:1px solid #fff;border-bottom:1px solid #dae1e8;background:#f1f1f1;width:798px;}#main>#left-column>.header.fixed{position:fixed;box-shadow:0 2px 1px rgba(0, 0, 0, 0.1);-webkit-transition:box-shadow 0.5s;-moz-transition:box-shadow 0.5s;-o-transition:box-shadow 0.5s;transition:box-shadow 0.5s;}
-#main>#left-column>.header .filter{float:right;padding:11px;}
+#main>#left-column>.header .links{float:right;padding:11px;}
 #main>#left-column>.list{position:relative;-webkit-border-radius:0 0 3px 3px;-moz-border-radius:0 0 3px 3px;border-radius:0 0 3px 3px;}#main>#left-column>.list:empty{text-align:center;color:#999999;font-size:16px;height:400px;background:#ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;}
 #main>#left-column>.list>#list-messages>.messages{padding:5px 0 110px;}#main>#left-column>.list>#list-messages>.messages .message.user+.message.user>.left-column .photo,#main>#left-column>.list>#list-messages>.messages .message.viewer+.message.viewer>.left-column .photo{display:none;}
 #main>#left-column>.list>#list-messages>.messages .message.user+.message.user>.center-column .title,#main>#left-column>.list>#list-messages>.messages .message.viewer+.message.viewer>.center-column .title{display:none;}
@@ -49,7 +49,7 @@ body{overflow-y:scroll;}
 .box-templates>.add-template-opened>.input-wrap{margin-bottom:10px;}.box-templates>.add-template-opened>.input-wrap>textarea{height:50px;}
 .box-templates>.add-template-opened>.actions .button+.button{margin-left:10px;}
 .box-templates>.template-list{margin-top:7px;}.box-templates>.template-list .message>.left-column{width:40px;}
-.box-templates>.template-list .message>.center-column{width:77%;}.box-templates>.template-list .message>.center-column>.content>.title>.tag{font-weight:normal;background:#e1e7ed;margin-left:10px;padding:2px 4px;font-size:0.9em;}
+.box-templates>.template-list .message>.center-column{width:77%;}.box-templates>.template-list .message>.center-column>.content>.title>.tag{font-weight:normal;background-color:#e1e7ed;margin-left:10px;padding:2px 4px;font-size:0.9em;}.box-templates>.template-list .message>.center-column>.content>.title>.tag>.delete{display:inline-block;vertical-align:middle;width:1em;height:1em;cursor:pointer;background:url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;}
 .box-templates>.template-list.loading{background:url(http://st0.userapi.com/images/upload.gif) no-repeat center;height:30px;}
 .tab-bar.messenger .tab .icon{display:none;}
 .tab-bar.messenger .tab.selected .icon.online{background-image:url('../../images/im/online.png');display:inline;}

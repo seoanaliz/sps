@@ -10,7 +10,10 @@ var TABS =
     '<? if (isset("dialogTab")) { ?>' +
         '<? each(TABS_ITEM_DIALOG, [dialogTab]); ?>' +
     '<? } ?>' +
-    '<div class="filter"><a data-filtered="Показать все диалоги" data-not-filtered="Показать только непрочитанные">Показать только непрочитанные</a></div>' +
+    '<div class="links">' +
+        '<a class="filter" data-filtered="Показать все диалоги" data-not-filtered="Показать только непрочитанные">Показать только непрочитанные</a>' +
+        '<a class="show-templates">Готовые ответы</a>' +
+    '</div>' +
 '</div>';
 
 var TABS_ITEM_LIST =
@@ -126,7 +129,6 @@ var MESSAGES =
             '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
-                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -163,7 +165,6 @@ var MESSAGES_LOADING =
             '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
-                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -297,7 +298,7 @@ var SAVE_TEMPLATE_BOX =
     '</div>' +
     '<div class="add-template-opened">' +
         '<div class="input-wrap">' +
-            '<textarea class="template-text" placeholder="Введите текст шаблона..."><?=text?></textarea>' +
+            '<textarea class="template-text" placeholder="Введите текст шаблона..."><?=text ? text : ""?></textarea>' +
         '</div>' +
         '<div class="input-wrap">' +
             '<input class="lists" type="text" placeholder="Выберите списки диалогов..." />' +
@@ -340,4 +341,7 @@ var TEMPLATE_LIST_ITEM =
 '</div>';
 
 var TEMPLATE_LIST_ITEM_LISTS =
-'<span data-id="<?=id?>" class="tag"><?=title?></span>';
+'<span data-id="<?=id?>" class="tag">' +
+    '<span class="text"><?=title?></span>' +
+    '<span class="delete"></span>' +
+'</span>';

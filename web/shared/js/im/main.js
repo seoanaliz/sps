@@ -712,7 +712,6 @@ var Messages = EndlessPage.extend({
 
     _events: {
         'click: .button.send': 'clickSend',
-        'click: .save-template': 'clickSaveTmpl',
         'hover: .message.new': 'hoverMessage',
         'keydown: textarea': 'keyDownTextarea'
     },
@@ -1144,7 +1143,8 @@ var Tabs = Widget.extend({
         'click: .tab.dialog': 'clickDialog',
         'click: .tab.list': 'clickList',
         'click: .icon': 'clickPlus',
-        'click: .filter > a': 'clickFilter'
+        'click: .filter': 'clickFilter',
+        'click: .show-templates': 'clickShowTemplates'
     },
 
     clickDialog: function(e) {
@@ -1275,6 +1275,16 @@ var Tabs = Widget.extend({
         t.trigger('clickFilter');
     },
 
+    clickShowTemplates: function() {
+        var t = this;
+        var listTab = t.model().listTab();
+        var listId = listTab.id();
+        var box = new CreateTemplateBox(listId, false, false, function() {
+            //t.updateAutocomplite();
+        });
+        box.show();
+    },
+
     setList: function(listId) {
         var t = this;
         var listModel = listCollection.get(listId) || new ListModel({
@@ -1291,6 +1301,7 @@ var Tabs = Widget.extend({
         t.renderTemplate();
         //@todo привести к нормальному виду
         t.el().find('.filter').show();
+        t.el().find('.show-templates').hide();
     },
 
     setDialog: function(dialogId) {
@@ -1315,6 +1326,7 @@ var Tabs = Widget.extend({
         t.renderTemplate();
         //@todo привести к нормальному виду
         t.el().find('.filter').hide();
+        t.el().find('.show-templates').show();
     },
 
     setOnline: function(userId) {
@@ -1360,7 +1372,7 @@ $(document).ready(function() {
     });
 });
 
-function CreateTemplateBox(listId, text, isFocused, onUpdate) {
+function CreateTemplateBox(listId, text, isFocused) {
     var box = new Box({
         title: 'Готовые ответы',
         html: tmpl(BOX_LOADING, {height: 100}),
@@ -1397,6 +1409,11 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                 $openAdditionFormTrigger.focus(openAdditionForm);
                 $closeAdditionFormTrigger.click(closeAdditionForm);
                 $addTemplateBtn.click(addTemplate);
+                $textarea.keydown(function(e) {
+                    if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
+                        addTemplate();
+                    }
+                });
                 $templateList.delegate('.icon.delete', 'click', function() {
                     var $target = $(this);
                     var $message = $target.closest('.message');
@@ -1428,11 +1445,10 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                             $textarea.hide();
                         });
                         $textarea.on('keydown', function(e) {
-                            if (e.keyCode == KEY.ENTER && e.ctrlKey) {
+                            if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
                                 $textarea.hide();
                                 $text.html(makeMsg($textarea.val())).show();
                                 $.each($tags, function() {
-                                    console.log(this);
                                     var $tag = $(this);
                                     if ($tag.data('id')) {
                                         tags.push($tag.data('id'));
@@ -1450,6 +1466,23 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                     $text.hide();
                     $textarea.show();
                     $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
+                });
+                $templateList.delegate('.tag > .delete', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var $tag = $target.closest('.tag');
+                    $tag.remove();
+                    var $tags = $message.find('.title > .tag');
+                    var tags = [];
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    $.each($tags, function() {
+                        var $tag = $(this);
+                        if ($tag.data('id')) {
+                            tags.push($tag.data('id'));
+                        }
+                    });
+                    Events.fire('edit_template', messageId, $text[0].innerText, tags.join(','), function() {});
                 });
 
                 function addTemplate() {
@@ -1495,21 +1528,21 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                                 listsIds.push(parseInt(tag.id));
                             },
                             onremove: function(tagId) {
-                                listsIds = jQuery.grep(listsIds, function(listsIds) {
+                                listsIds = $.grep(listsIds, function(listsIds) {
                                     return listsIds != tagId;
                                 });
                             }
                         }).autocomplete({
-                                data: clearLists,
-                                target: $input.closest('.ui-tags'),
-                                onchange: function(item) {
-                                    $(this).tags('addTag', item).val('').focus();
-                                }
-                            }).keydown(function(e) {
-                                if (e.keyCode == KEY.DEL && !$(this).val()) {
-                                    $(this).tags('removeLastTag');
-                                }
-                            });
+                            data: clearLists,
+                            target: $input.closest('.ui-tags'),
+                            onchange: function(item) {
+                                $(this).tags('addTag', item).val('').focus();
+                            }
+                        }).keydown(function(e) {
+                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                $(this).tags('removeLastTag');
+                            }
+                        });
 
                         if (currentList.id) {
                             $input.tags('addTag', currentList);
@@ -1539,7 +1572,6 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                             clearData.push({
                                 id: template.id,
                                 text: template.title,
-                                timestamp: '12:21',
                                 user: userCollection.get(Configs.vkId).data(),
                                 lists: clearLists
                             });
@@ -1548,7 +1580,6 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
                         $templateList.html(tmpl(TEMPLATE_LIST, {list: clearData}));
                         box.refreshTop();
                     });
-                    if ($.isFunction(onUpdate)) onUpdate();
                 }
 
                 if (isFocused) {
@@ -1557,9 +1588,6 @@ function CreateTemplateBox(listId, text, isFocused, onUpdate) {
 
                 updateTemplateList();
             });
-        },
-        onhide: function() {
-            box.remove();
         }
     });
     return box;

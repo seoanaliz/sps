@@ -561,17 +561,11 @@ var Box = (function() {
             }
         }
 
-        var $box = $(tmpl(BOX_WRAP, {
-            title: params.title,
-            body: '',
-            closeBtn: params.closeBtn
-        })).appendTo($layout).width(params.width).hide();
+        var $box = $(tmpl(BOX_WRAP, {})).appendTo($layout).width(params.width).hide();
 
-        if (params.closeBtn) {
-            $box.find('> .title > .close').click(function() {
-                box.hide();
-            });
-        }
+        $box.delegate('.title > .close', 'click', function() {
+            box.hide();
+        });
 
         box.$el = box.$box = $box;
         box.show = show;
@@ -583,14 +577,11 @@ var Box = (function() {
         box.refreshTop = refreshTop;
         box.visible = false;
 
+        box.setTitle(params.title);
         box.setHTML(params.html);
         box.setButtons(params.buttons);
 
         function show() {
-            box.visible = true;
-            $box.show();
-            refreshTop();
-
             if (boxesHistory.length) {
                 if (boxesHistory[boxesHistory.length-1] != box) {
                     boxesHistory[boxesHistory.length-1].$box.hide();
@@ -603,6 +594,9 @@ var Box = (function() {
             }
 
             boxesHistory.push(box);
+            box.visible = true;
+            $box.show();
+            box.refreshTop();
             params.onshow.call(box, $box);
             return box;
         }
@@ -637,7 +631,17 @@ var Box = (function() {
             return box;
         }
         function setTitle(title) {
-            $box.find('> .title .text').text(title);
+            if (!title) {
+                $box.find('> .title').remove();
+            } else {
+                if (!$box.find('> .title').length) {
+                    $box.prepend('<div class="title"><span class="text"></span></div>');
+                    if (params.closeBtn) {
+                        $box.find('> .title').append('<div class="close"></div>');
+                    }
+                }
+                $box.find('> .title .text').text(title);
+            }
             return box;
         }
         function setButtons(buttons) {
@@ -1428,7 +1432,11 @@ var BOX_WRAP =
             '<? } ?>' +
         '</div>' +
     '<? } ?>' +
-    '<div class="body clear-fix"><?=body?></div>' +
+    '<div class="body clear-fix">' +
+        '<? if (isset("body")) { ?>' +
+            '<?=body?>' +
+        '<? } ?>' +
+    '</div>' +
     '<? if (isset("buttons") && buttons.length) { ?>' +
         '<div class="actions-wrap">' +
             '<div class="actions"></div>' +
