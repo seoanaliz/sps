@@ -168,17 +168,12 @@ var Eventlist = {
         });
     },
     get_templates: function(listId, callback) {
-        simpleAjax('findTemplate', {groupId: listId, search: ''}, function(data) {
+        simpleAjax('getTemplates', {groupId: listId}, function(data) {
             var clearTemplates = [];
             $.each(data, function(i, rawTemplate) {
                 clearTemplates.push(Cleaner.template(rawTemplate));
             });
             callback(clearTemplates);
-        });
-    },
-    edit_template: function(tmplId, text, listId, callback) {
-        simpleAjax('addTemplate', {tmplId: tmplId, text: text, groupIds: listId}, function() {
-            callback(true);
         });
     },
     add_template: function(text, listId, callback) {
@@ -188,6 +183,11 @@ var Eventlist = {
     },
     delete_template: function(tmplId, callback) {
         simpleAjax('deleteTemplate', {tmplId: tmplId}, function() {
+            callback(true);
+        });
+    },
+    edit_template: function(tmplId, text, listId, callback) {
+        simpleAjax('addTemplate', {tmplId: tmplId, text: text, groupIds: listId}, function() {
             callback(true);
         });
     },
@@ -348,7 +348,8 @@ var Cleaner = {
     template: function(rawTemplate) {
         return {
             id: rawTemplate.tmpl_id,
-            title: rawTemplate.text
+            title: rawTemplate.text.split('\n').join('<br>'),
+            lists: rawTemplate.groups
         };
     }
 };
