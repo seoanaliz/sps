@@ -1434,22 +1434,17 @@ function CreateTemplateBox(listId, text, isFocused) {
                 });
 
                 $templateList.delegate('.icon.edit', 'click', function() {
-                    var ACTIONS =
-                    '<div class="actions">' +
-                        '<button class="button save-template">Сохранить</button>' +
-                        '<button class="button cancel">Отменить</button>' +
-                    '</div>';
                     var $target = $(this);
                     var $message = $target.closest('.message');
                     var $tags = $message.find('.title > .tag');
                     var tags = [];
                     var messageId = $message.data('id');
                     var $text = $message.find('.content > .text');
-                    var $textarea;
-                    var $actions;
+                    var $textarea = $message.find('.content textarea');
+                    var $actions = $message.find('.content > .actions');
+
                     if (!$text.data('textarea')) {
-                        $textarea = $('<textarea />');
-                        $actions = $(tmpl(ACTIONS, {}));
+                        $text.data('textarea', true);
                         $textarea.on('keydown', function(e) {
                             if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
                                 saveTemplate();
@@ -1463,26 +1458,16 @@ function CreateTemplateBox(listId, text, isFocused) {
                         });
                         $text.after($textarea);
                         $textarea.autoResize().wrap('<div class="input-wrap" />');
-                        $textarea.after($actions);
-                        $text.data('textarea', $textarea);
-                        $text.data('actions', $actions);
-                    } else {
-                        $textarea = $text.data('textarea');
-                        $actions = $text.data('actions');
                     }
 
                     editModeOn();
 
                     function editModeOn() {
-                        $text.hide();
-                        $textarea.show();
-                        $actions.show();
+                        $message.addClass('edit-mode');
                         $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
                     }
                     function editModeOff() {
-                        $text.show();
-                        $textarea.hide();
-                        $actions.hide();
+                        $message.removeClass('edit-mode');
                     }
                     function saveTemplate() {
                         if (!$textarea.val()) {

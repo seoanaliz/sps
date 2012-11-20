@@ -330,6 +330,13 @@ var TEMPLATE_LIST_ITEM =
                 '<? each(TEMPLATE_LIST_ITEM_LISTS, lists); ?>' +
             '</div>' +
             '<div class="text"><?=text?></div>' +
+            '<div class="input-wrap">' +
+                '<textarea></textarea>' +
+            '</div>' +
+            '<div class="actions">' +
+                '<button class="button save-template">Сохранить</button>' +
+                '<button class="button cancel">Отменить</button>' +
+            '</div>' +
         '</div>' +
     '</div>' +
     '<div class="right-column">' +

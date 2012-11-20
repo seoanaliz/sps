@@ -521,7 +521,67 @@ body {
                                 height: 1em;
                                 cursor: pointer;
                                 background: url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;
+                                width: 0;
+
+                                .transition(0.2s);
                             }
+                        }
+                    }
+                    &>.input-wrap {
+                        display: none;
+                    }
+                    &>.actions {
+                        display: none;
+                        margin-top: 10px;
+
+                        .button + .button {
+                            margin-left: 10px;
+                        }
+                    }
+                }
+            }
+            &>.right-column {
+                &>.actions {
+                    float: right;
+
+                    &>.icon {
+                        padding: 5px;
+                        cursor: pointer;
+                        .opacity(0);
+
+                        &:hover {
+                            .opacity(1) !important;
+                        }
+                    }
+                }
+            }
+            &:hover {
+                &>.right-column {
+                    &>.actions {
+                        &>.icon {
+                            .opacity(0.5);
+                        }
+                    }
+                }
+            }
+            &.edit-mode {
+                &>.center-column {
+                    &>.content {
+                        &>.title {
+                            &>.tag {
+                                &>.delete {
+                                    width: 1em;
+                                }
+                            }
+                        }
+                        &>.text {
+                            display: none;
+                        }
+                        &>.input-wrap {
+                            display: block;
+                        }
+                        &>.actions {
+                            display: block;
                         }
                     }
                 }
@@ -628,13 +688,6 @@ body {
                 &>.text {
                     overflow: hidden;
                 }
-                .actions {
-                    margin-top: 10px;
-
-                    .button + .button {
-                        margin-left: 10px;
-                    }
-                }
 
                 &>.attachments {
                     margin: .5em 0;
@@ -672,29 +725,6 @@ body {
                 float: left;
                 color: @color_gray;
                 font-size: .9em;
-            }
-
-            &>.actions {
-                float: right;
-
-                &>.icon {
-                    padding: 5px;
-                    cursor: pointer;
-                    .opacity(0);
-
-                    &:hover {
-                        .opacity(1) !important;
-                    }
-                }
-            }
-        }
-    }
-    &>.message:hover {
-        &>.right-column {
-            &>.actions {
-                &>.icon {
-                    .opacity(0.5);
-                }
             }
         }
     }
