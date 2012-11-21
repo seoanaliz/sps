@@ -554,6 +554,9 @@
                 <page uri="daemons://CheckPosts/">
                      <actions>SPS.Stat.CheckPosts</actions>
                  </page>
+                <page uri="daemons://PublicsGrowFixer/">
+                     <actions>SPS.Stat.PublicsGrowFixer</actions>
+                 </page>
 
             </pageGroup>
             <pageGroup name="vtControls" boot="">

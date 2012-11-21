@@ -24,14 +24,14 @@ class AddReport
 
         $info = $this->get_page_name( array( $target_public_id, $barter_public_id ));
         $barter_event = new BarterEvent();
-        $barter_event->barter_public = $info['barter']['id'];;
+        $barter_event->barter_public = $info['barter']['id'];
         $barter_event->target_public =  $info['target']['id'];
         $barter_event->status        = $start_looking_time ? 1 : 2;
         $barter_event->search_string =  $info['target']['shortname'];
         $barter_event->barter_type   = 1;
         $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $start_looking_time );
         $stop_looking_time = $stop_looking_time ?
-            date( 'Y-m-d H:i:s', $stop_looking_time ) : date( 'Y-m-d 00:00:00', $now + 84600 );;
+            date( 'Y-m-d H:i:s', $stop_looking_time ) : date( 'Y-m-d 23:59:59', $now );
         $barter_event->stop_search_at  =  $stop_looking_time;
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
 
