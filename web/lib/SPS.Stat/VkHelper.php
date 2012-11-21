@@ -162,10 +162,12 @@
 
             public static function deactivate_at( $access_token )
             {
+                if ( $access_token )
+                    $access_token = 0;
                 $sql = 'UPDATE serv_access_tokens
                         SET active=false
                         WHERE access_token =@access_token';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
                 $cmd->SetString('@access_token ', $access_token );
                 $cmd->Execute();
             }
