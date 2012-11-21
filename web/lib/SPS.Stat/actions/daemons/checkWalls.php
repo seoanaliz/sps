@@ -11,7 +11,8 @@ class CheckWalls
     const time_shift = 0;
     public function Execute()
     {
-//        error_reporting(0);
+        error_reporting(0);
+        set_time_limit( 0 );
         $this->kill_overtimed();
         $this->turn_on_search();
 
@@ -56,14 +57,13 @@ class CheckWalls
     {
         $barters = array();
         $publics_chunks = array_chunk( $publics, 25 );
-
+        $wall_array = array();
         foreach( $publics_chunks as $public_chunk ) {
             $res = StatPublics::get_publics_walls( $public_chunk );
             $public = reset( $public_chunk );
             //обработка стенок, поиск нужного поста
             foreach( $res as $public_wall ) {
                 unset( $public_wall[0] );
-
                 foreach( $public_wall as $post ) {
 
                     if( $post->date < $public->start_search_at->format('U')){
