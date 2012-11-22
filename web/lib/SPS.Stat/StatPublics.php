@@ -607,7 +607,7 @@
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name', $public->name );
                     $cmd->SetString(  '@photo', $public->photo);
-                    $cmd->SetBoolean( '@page', ( $public->type =='page' ? true : false));
+                    $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
                     $cmd->Execute();
                 }
             }
@@ -649,26 +649,60 @@
                 $conn = ConnectionFactory::Get('tst');
 
             $sql = 'SELECT
-                        public_id, a.name as old_name, changed_at, b.name
+                        public_id, a.name as old_name, changed_at, b.name,b.act,b.active,b.in_search, b.closed
                     FROM '
                         . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
                    'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
                    'ON
                         public_id=vk_id
                     WHERE
-                        changed_at > @time_from
+                            changed_at > @time_from
                         AND changed_at > @time_to
                         AND act = \'name\'';
             $cmd = new SqlCommand( $sql, $conn );
             $cmd->SetString( '@time_from', date( 'r', $time_from ));
             $cmd->SetString( '@time_to', date( 'r', $time_to ));
-//            echo $cmd->getQuery();
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
                 $res[$ds->GetInteger( 'public_id')] = array(
-                    'old_name'  => $ds->GetValue( 'old_name' ),
-                    'new_name'  => $ds->GetValue( 'name' )
+                    'act'        =>  $ds->GerValue( 'act' ),
+                    'old_name'   =>  $ds->GetValue( 'old_name' ),
+                    'new_name'   =>  $ds->GetValue( 'name' ),
+                    'in_search'  =>  $ds->GetBOolean( 'in_search' ),
+                    'closed'     =>  $ds->GetBOolean( 'closed' ),
+                    'active'     =>  $ds->GetBOolean( 'active' ),
+                );
+            }
+            return $res;
+        }
+
+        public static function search_public( $search_string )
+        {
+            //поиск id паблика
+            $int_search = (int) $search_string;
+
+            $sql = 'SELECT vk_id,ava, name,quantity,page
+                    FROM ' . TABLE_STAT_PUBLICS .
+                   ' WHERE
+                        ( name ILIKE @search_string
+                        OR vk_id = @int_search )
+                        AND active IS TRUE
+                        AND quantity > 50000
+                    ORDER BY quantity DESC
+                   ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInteger( '@int_search', $int_search );
+            $cmd->SetString( '@search_string', '%' . $search_string . '%' );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[] = array(
+                    'id'        =>  $ds->GetInteger('vk_id'),
+                    'quantity'  =>  $ds->GetInteger('quantity'),
+                    'name'      =>  $ds->GetString('name'),
+                    'ava'       =>  $ds->GetString('ava'),
+                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'groupe',
                 );
             }
             return $res;

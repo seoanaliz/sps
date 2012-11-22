@@ -159,6 +159,9 @@
                 <page uri="controls://deleteReport/">
                     <actions>SPS.Stat.deleteReport</actions>
                 </page>
+                <page uri="controls://searchInPublics/">
+                    <actions>SPS.Stat.searchInPublics</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
