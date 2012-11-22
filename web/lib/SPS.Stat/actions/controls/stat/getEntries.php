@@ -31,12 +31,15 @@ class getEntries {
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
+        $page       =   Request::getInteger( 'page' );
+
         if( $time_to == 0 )
             $time_to = time();
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
 
+        $page           =   $page ? ' AND publ.page=true ' : ' ';
         $quant_max      =   $quant_max ? $quant_max : 100000000;
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
@@ -78,9 +81,9 @@ class getEntries {
                             ' . TABLE_STAT_PUBLICS . ' as publ,
                             ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
                     WHERE
-                          publ.vk_id=gprel.public_id
-                          AND publ.page=true
-                          AND gprel.group_id=@group_id
+                          publ.vk_id=gprel.public_id '
+                          . $page .
+                         ' AND gprel.group_id=@group_id
                           AND publ.quantity >= @min_quantity
                           AND publ.quantity <= @max_quantity
                           AND publ.quantity >= 50000
@@ -104,9 +107,9 @@ class getEntries {
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
-                            quantity > @min_quantity
-                            AND publ.page=true
-                            AND quantity < @max_quantity
+                            quantity > @min_quantity '
+                            . $page .
+                          ' AND quantity < @max_quantity
                             AND quantity > 50000'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
