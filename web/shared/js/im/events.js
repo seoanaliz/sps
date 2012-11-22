@@ -144,6 +144,14 @@ var Eventlist = {
             callback(true);
         });
     },
+    update_list: function(list_id, list_name, callback) {
+        simpleAjax('setGroup', {
+            groupId: list_id,
+            groupName: list_name
+        }, function() {
+            callback(true);
+        });
+    },
     remove_list: function(listId, callback) {
         simpleAjax('deleteGroup', {groupId: listId}, function() {
             callback(true);
@@ -160,17 +168,12 @@ var Eventlist = {
         });
     },
     get_templates: function(listId, callback) {
-        simpleAjax('findTemplate', {groupId: listId, search: ''}, function(data) {
+        simpleAjax('getTemplates', {groupId: listId}, function(data) {
             var clearTemplates = [];
             $.each(data, function(i, rawTemplate) {
                 clearTemplates.push(Cleaner.template(rawTemplate));
             });
             callback(clearTemplates);
-        });
-    },
-    edit_template: function(tmplId, text, listId, callback) {
-        simpleAjax('addTemplate', {tmplId: tmplId, text: text, groupIds: listId}, function() {
-            callback(true);
         });
     },
     add_template: function(text, listId, callback) {
@@ -180,6 +183,11 @@ var Eventlist = {
     },
     delete_template: function(tmplId, callback) {
         simpleAjax('deleteTemplate', {tmplId: tmplId}, function() {
+            callback(true);
+        });
+    },
+    edit_template: function(tmplId, text, listId, callback) {
+        simpleAjax('addTemplate', {tmplId: tmplId, text: text, groupIds: listId}, function() {
             callback(true);
         });
     },
@@ -213,7 +221,7 @@ var Cleaner = {
             id: rawContent.mid,
             isNew: (rawContent.read_state != 1),
             isViewer: isOut,
-            text: makeMsg(rawContent.body),
+            text: makeMsg(rawContent.body.split('<br>').join('\n'), true),
             attachments: [],
             timestamp: rawContent.date,
             user: userModel.data(),
@@ -332,14 +340,16 @@ var Cleaner = {
             counter: rawList.unread,
             isRead: rawList.isRead,
             isSelected: false,
-            isDraggable: true
+            isDraggable: true,
+            isEditable: true
         };
     },
 
     template: function(rawTemplate) {
         return {
             id: rawTemplate.tmpl_id,
-            title: rawTemplate.text
+            title: rawTemplate.text.split('\n').join('<br>'),
+            lists: rawTemplate.groups
         };
     }
 };

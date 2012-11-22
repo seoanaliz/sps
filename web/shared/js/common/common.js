@@ -103,8 +103,8 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+// Выделение текста в инпутах
 (function($) {
-    // Выделение текста в инпутах
     $.fn.selectRange = function(start, end) {
         return this.each(function() {
             if (this.setSelectionRange) {
@@ -217,22 +217,26 @@ function getURLParameter(name, search) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $autoResize
-                    .css({
-                        position: 'absolute',
-                        width: $input.width(),
-                        minHeight: $input.height(),
-                        font: $input.css('font'),
-                        padding: $input.css('padding'),
-                        fontSize: $input.css('font-size'),
-                        wordWrap: 'break-word',
-                        overflow: $input.css('overflow'),
-                        lineHeight: $input.css('line-height'),
-                        top: -100000
-                    })
-                ;
+                $autoResize.css({
+                    position: 'absolute',
+                    width: $input.width(),
+                    minHeight: $input.height(),
+                    font: $input.css('font'),
+                    padding: $input.css('padding'),
+                    fontSize: $input.css('font-size'),
+                    wordWrap: 'break-word',
+                    overflow: $input.css('overflow'),
+                    lineHeight: $input.css('line-height'),
+                    top: -100000
+                });
 
                 $input.on('keyup keydown focus blur', function(e) {
+                    $autoResize.css({
+                        width: $input.width(),
+                        font: $input.css('font'),
+                        padding: $input.css('padding'),
+                        fontSize: $input.css('font-size')
+                    });
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
@@ -505,6 +509,7 @@ var Box = (function() {
     var $layout;
     var boxesCollection = {};
     var boxesHistory = [];
+    var bodyOverflow;
 
     return function(options) {
         if (typeof options != 'object') {
@@ -522,6 +527,7 @@ var Box = (function() {
             html: '',
             closeBtn: true,
             buttons: [],
+            width: 400,
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
@@ -529,18 +535,15 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $layout = $('<div/>')
-                .addClass('box-layout')
-                .appendTo($body)
-                .click(function(e) {
-                    if (e.target == e.currentTarget) {
-                        boxesHistory[boxesHistory.length-1].hide();
-                        if (!boxesHistory.length) {
-                            $(this).hide();
-                        }
+            $layout = $('<div/>').click(function(e) {
+                if (e.target == e.currentTarget) {
+                    boxesHistory[boxesHistory.length-1].hide();
+                    if (!boxesHistory.length) {
+                        $(this).hide();
                     }
-                })
-            ;
+                }
+            }).addClass('box-layout').appendTo($body);
+
             $(document).keydown(function(e) {
                 if (e.keyCode == 27) {
                     $layout.click();
@@ -558,20 +561,11 @@ var Box = (function() {
             }
         }
 
-        var $box = $(tmpl(BOX_WRAP, {
-            title: params.title,
-            body: '',
-            closeBtn: params.closeBtn
-        })).appendTo($layout).hide();
+        var $box = $(tmpl(BOX_WRAP, {})).appendTo($layout).width(params.width).hide();
 
-        if (params.closeBtn) {
-            $box.find('> .title > .close').click(function() {
-                box.hide();
-            });
-        }
-
-        setHTML(params.html);
-        setButtons(params.buttons);
+        $box.delegate('.title > .close', 'click', function() {
+            box.hide();
+        });
 
         box.$el = box.$box = $box;
         box.show = show;
@@ -583,52 +577,71 @@ var Box = (function() {
         box.refreshTop = refreshTop;
         box.visible = false;
 
+        box.setTitle(params.title);
+        box.setHTML(params.html);
+        box.setButtons(params.buttons);
+
         function show() {
-            box.visible = true;
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.hide();
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.hide();
+                }
+            } else {
+                bodyOverflow = $body.css('overflow-y');
+                $body.width($body.width());
+                $body.css('overflow-y', 'hidden');
+                $layout.show();
             }
 
-            $box.show();
-            $layout.show();
-            refreshTop();
-
-            try {
-                params.onshow.call(box, $box);
-            } catch(e) {}
-
             boxesHistory.push(box);
+            box.visible = true;
+            $box.show();
+            box.refreshTop();
+            params.onshow.call(box, $box);
             return box;
         }
         function hide() {
             box.visible = false;
             $box.hide();
-
-            try {
-                params.onhide.call(box, $box);
-            } catch(e) {}
-
             boxesHistory.pop();
+
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.show();
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.show();
+                }
             } else {
+                $body.css('overflow-y', bodyOverflow);
+                $body.width('auto');
                 $layout.hide();
             }
 
+            params.onhide.call(box, $box);
             return box;
         }
         function remove() {
-            if (box.visible) hide();
+            if (box.visible) {
+                box.hide();
+            }
             delete boxesCollection[params.id];
             $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
-            refreshTop();
+            box.refreshTop();
             return box;
         }
         function setTitle(title) {
-            $box.find('> .title .text').text(title);
+            if (!title) {
+                $box.find('> .title').remove();
+            } else {
+                if (!$box.find('> .title').length) {
+                    $box.prepend('<div class="title"><span class="text"></span></div>');
+                    if (params.closeBtn) {
+                        $box.find('> .title').append('<div class="close"></div>');
+                    }
+                }
+                $box.find('> .title .text').text(title);
+            }
             return box;
         }
         function setButtons(buttons) {
@@ -640,11 +653,9 @@ var Box = (function() {
                 }
                 $box.find('> .actions-wrap .actions').empty();
                 $.each(buttons, function(i, button) {
-                    var $button = $(tmpl(BOX_ACTION, button))
-                        .appendTo($box.find('> .actions-wrap .actions'))
-                        .click(function() {
-                            button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
-                        });
+                    var $button = $(tmpl(BOX_ACTION, button)).click(function() {
+                        button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
+                    }).appendTo($box.find('> .actions-wrap .actions'));
                 });
             }
             return box;
@@ -658,7 +669,6 @@ var Box = (function() {
         }
 
         params.oncreate.call(box, $box);
-
         return box;
     };
 })();
@@ -1422,7 +1432,11 @@ var BOX_WRAP =
             '<? } ?>' +
         '</div>' +
     '<? } ?>' +
-    '<div class="body clear-fix"><?=body?></div>' +
+    '<div class="body clear-fix">' +
+        '<? if (isset("body")) { ?>' +
+            '<?=body?>' +
+        '<? } ?>' +
+    '</div>' +
     '<? if (isset("buttons") && buttons.length) { ?>' +
         '<div class="actions-wrap">' +
             '<div class="actions"></div>' +

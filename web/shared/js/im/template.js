@@ -10,7 +10,10 @@ var TABS =
     '<? if (isset("dialogTab")) { ?>' +
         '<? each(TABS_ITEM_DIALOG, [dialogTab]); ?>' +
     '<? } ?>' +
-    '<div class="filter"><a data-filtered="Показать все диалоги" data-not-filtered="Показать только непрочитанные">Показать только непрочитанные</a></div>' +
+    '<div class="links">' +
+        '<a class="filter" data-filtered="Показать все диалоги" data-not-filtered="Показать только непрочитанные">Показать только непрочитанные</a>' +
+        '<a class="show-templates">Готовые ответы</a>' +
+    '</div>' +
 '</div>';
 
 var TABS_ITEM_LIST =
@@ -126,7 +129,6 @@ var MESSAGES =
             '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
-                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -163,7 +165,6 @@ var MESSAGES_LOADING =
             '</div>' +
             '<div class="actions">' +
                 '<button class="button send">Отправить</button>' +
-                '<a class="link save-template">Создать шаблон</button>' +
             '</div>' +
         '</div>' +
     '</div>' +
@@ -277,9 +278,78 @@ var LIST_ITEM =
     '<? if (isset("title")) { ?>' +
         '<div class="item" data-id="<?=id?>" data-title="<?=title?>">' +
             '<div class="title<?=isset("isRead") && isRead ? "" : " new"?><?=isset("isSelected") && isSelected ? " active" : ""?>">' +
-                '<?=title?>' +
+                '<span class="text"><?=title?></span>' +
+                '<? if (isset("isEditable") && isEditable) { ?>' +
+                    '<span class="icon edit"></span>' +
+                    '<span class="icon delete"></span>' +
+                '<? } ?>' +
                 '<span class="counter"><?=isset("counter") && counter ? "+" + counter : ""?></span>' +
             '</div>' +
         '</div>' +
     '<? } ?>' +
 '</div>';
+
+var SAVE_TEMPLATE_BOX =
+'<div class="box-templates">' +
+    '<div class="add-template-closed">' +
+        '<div class="input-wrap">' +
+            '<input type="text" placeholder="Написать новый ответ..." />' +
+        '</div>' +
+    '</div>' +
+    '<div class="add-template-opened">' +
+        '<div class="input-wrap">' +
+            '<textarea class="template-text" placeholder="Введите текст шаблона..."><?=text ? text : ""?></textarea>' +
+        '</div>' +
+        '<div class="input-wrap">' +
+            '<input class="lists" type="text" placeholder="Выберите списки диалогов..." />' +
+        '</div>' +
+        '<div class="actions">' +
+            '<button class="button save-template">Сохранить</button>' +
+            '<button class="button cancel">Отменить</button>' +
+        '</div>' +
+    '</div>' +
+    '<div class="template-list loading"></div>' +
+'</div>';
+
+var TEMPLATE_LIST =
+'<? each(TEMPLATE_LIST_ITEM, list); ?>';
+
+var TEMPLATE_LIST_ITEM =
+'<div class="message clear-fix" data-id="<?=id?>">' +
+    '<div class="left-column">' +
+        '<div class="photo">' +
+            '<a target="_blank" href="http://vk.com/id<?=user.id?>">' +
+                '<img src="<?=user.photo?>" alt="">' +
+            '</a>' +
+        '</div>' +
+    '</div>' +
+    '<div class="center-column">' +
+        '<div class="content">' +
+            '<div class="title">' +
+                '<a target="_blank" href="http://vk.com/id<?=user.id?>"><?=user.name?></a>' +
+                '<? each(TEMPLATE_LIST_ITEM_LISTS, lists); ?>' +
+                '<span class="tag-plus"></span>' +
+            '</div>' +
+            '<div class="text"><?=text?></div>' +
+            '<div class="input-wrap">' +
+                '<textarea></textarea>' +
+            '</div>' +
+            '<div class="actions">' +
+                '<button class="button save-template">Сохранить</button>' +
+                '<button class="button cancel">Отменить</button>' +
+            '</div>' +
+        '</div>' +
+    '</div>' +
+    '<div class="right-column">' +
+        '<div class="actions">' +
+            '<div class="icon edit"></div>' +
+            '<div class="icon delete"></div>' +
+        '</div>' +
+    '</div>' +
+'</div>';
+
+var TEMPLATE_LIST_ITEM_LISTS =
+'<span data-id="<?=id?>" class="tag">' +
+    '<span class="text"><?=title?></span>' +
+    '<span class="delete"></span>' +
+'</span>';

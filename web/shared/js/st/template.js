@@ -103,7 +103,8 @@ var OUR_TABLE_HEADER =
     '<div class="item authors-posts" title="авторские посты">авт. посты<span class="icon arrow"></div>' +
     '<div class="item authors-likes" title="авторские лайки">авт. лайки<span class="icon arrow"></div>' +
     '<div class="item authors-reposts" title="авторские репосты">авт. репосты<span class="icon arrow"></div>' +
-    '<div class="item sb-posts" title="SB посты">Прирост посетителей<span class="icon arrow"></div>' +
+    '<div class="item growth-visitors" title="прирост посетителей">рост посетит.<span class="icon arrow"></div>' +
+//    '<div class="item sb-posts" title="SB посты">SB посты<span class="icon arrow"></div>' +
     '<div class="item sb-likes" title="SB лайки">SB лайки<span class="icon arrow"></div>' +
 '</div>';
 
@@ -123,7 +124,8 @@ var OUR_TABLE_ROW =
     '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
     '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?></div>' +
     '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
-    '<div class="column public-sb-posts"><?=publicGrowthVisitors ? publicGrowthVisitors : "-"?></div>' +
+    '<div class="column public-growth-visitors"><?=publicGrowthVisitors ? publicGrowthVisitors : "-"?></div>' +
+//    '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
     '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
 '</div>';
 

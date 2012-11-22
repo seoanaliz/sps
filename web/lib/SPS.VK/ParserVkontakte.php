@@ -469,27 +469,31 @@
             if (is_numeric($offset))    $params['offset'] = $offset;
 
             $res = VkHelper::api_request( 'photos.get', $params );
-            if ( $res)
-            $query_line = array();
+            if ($res) {
+                $query_line = array();
 
-            foreach( $res as $photo )
-            {
-                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+                foreach ($res as $photo) {
+                    $query_line[] = $photo->owner_id . '_' . $photo->pid;
+                }
+                $query_line = implode(',', $query_line);
+                if (!$query_line){
+                    throw new AlbumEndException('End of album');
+                }
+
+                sleep(0.3);
+
+                $params = array(
+                    'photos' => $query_line,
+                    'extended' => 1,
+                );
+                $res = VkHelper::api_request('photos.getById', $params);
+
+                $posts = VkAlbums::post_conv($res);
+                $posts = $this->kill_attritions($posts);
+                return $posts;
+            } else {
+                throw new AlbumEndException('End of album. Empty resoponse');
             }
-            $query_line = implode( ',', $query_line );
-            if( !$query_line )
-                      throw new AlbumEndException('End of album');
-            sleep( 0.3 );
-
-            $params = array(
-                'photos'    =>  $query_line,
-                'extended'  =>  1,
-            );
-            $res = VkHelper::api_request( 'photos.getById', $params );
-
-            $posts = VkAlbums::post_conv( $res );
-            $posts = $this->kill_attritions( $posts );
-            return $posts;
         }
 
         /**

@@ -221,16 +221,22 @@ var LeftColumn = Widget.extend({
 
     showList: function(listId, isTrigger) {
         var t = this;
-        t._messages.hide();
-        t._dialogs.show().changePage(listId);
+        if (!t._dialogs.isVisible()) {
+            t._messages.hide();
+            t._dialogs.show();
+        }
+        t._dialogs.changePage(listId);
         t._tabs.setList(listId);
         if (isTrigger) t.trigger('changeList', listId);
     },
 
     showDialog: function(dialogId, isTrigger) {
         var t = this;
-        t._dialogs.hide();
-        t._messages.show().changePage(dialogId);
+        if (!t._messages.isVisible()) {
+            t._dialogs.hide();
+            t._messages.show();
+        }
+        t._messages.changePage(dialogId);
         t._tabs.setDialog(dialogId);
         if (isTrigger) t.trigger('changeDialog', dialogId);
     },
@@ -261,12 +267,6 @@ var LeftColumn = Widget.extend({
     }
 });
 
-var PageNew = Widget.extend({
-    run: function() {
-
-    }
-});
-
 var Page = Widget.extend({
     _isVisible: false,
     _templateLoading: '',
@@ -289,6 +289,7 @@ var Page = Widget.extend({
         if (force || (t._isCache && t.pageId() != pageId)) {
             t.pageId(pageId);
             t.renderTemplateLoading();
+            t.scrollTop();
             t.getData();
         }
     },
@@ -308,12 +309,18 @@ var Page = Widget.extend({
             });
         }
     },
+    scrollTop: function() {
+        $(window).scrollTop(0);
+    },
+    scrollBottom: function() {
+        $(window).scrollTop($(document).height() - $(window).height());
+    },
     show: function() {
         var t = this;
         t.visible(true);
         t.el().show();
         if (t._isBottom) {
-            $(window).scrollTop($(document).height() - $(window).height());
+            t.scrollBottom();
         } else {
             $(window).scrollTop(t._scroll);
         }
@@ -518,19 +525,21 @@ var Dialogs = EndlessPage.extend({
     },
     clickDialog: function(e) {
         var t = this;
-        t.trigger('clickDialog', e);
+        if (!$(e.target).closest('a').length) {
+            t.trigger('clickDialog', e);
+        }
     },
     clickPlus: function(e) {
         var t = this;
         var $target = $(e.currentTarget);
         var $dialog = $target.closest('.dialog');
         var dialogId = $dialog.data('id');
+        var dialogModel = dialogCollection.get(dialogId);
         if (!$target.data('dropdown')) {
             (function updateDropdown() {
 
                 function onCreate() {
-                    var dialog = dialogCollection.get(dialogId).data();
-                    $.each(dialog.lists, function(i, listId) {
+                    $.each(dialogModel.lists(), function(i, listId) {
                         $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
@@ -586,13 +595,19 @@ var Dialogs = EndlessPage.extend({
                                 }
                             } else {
                                 Events.fire('add_to_list', dialogId, item.id, function() {
-                                    t.trigger('addToList');
+                                    var index = $.inArray(item.id, dialogModel.lists());
+                                    if (index == -1) {
+                                        dialogModel.lists().push(item.id);
+                                    }
                                 });
                             }
                         },
                         onunselect: function(item) {
                             Events.fire('remove_from_list', dialogId, item.id, function() {
-                                t.trigger('removeFromList');
+                                var index = $.inArray(item.id, dialogModel.lists());
+                                if (index != -1) {
+                                    dialogModel.lists().splice(index, 1);
+                                }
                             });
                         },
                         data: $.merge(list, [
@@ -697,7 +712,6 @@ var Messages = EndlessPage.extend({
 
     _events: {
         'click: .button.send': 'clickSend',
-        'click: .save-template': 'clickSaveTmpl',
         'hover: .message.new': 'hoverMessage',
         'keydown: textarea': 'keyDownTextarea'
     },
@@ -717,7 +731,7 @@ var Messages = EndlessPage.extend({
         var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
         var listId = dialogModel.lists()[0];
-        var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), function() {
+        var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), true, function() {
             t.updateAutocomplite();
         });
         box.show();
@@ -898,7 +912,10 @@ var RightColumn = Widget.extend({
 
     _events: {
         'mousedown: .drag-wrap': 'mouseDownList',
-        'click: .item': 'clickList'
+        'click: .item': 'clickList',
+        'click: .icon.delete': 'clickIconDelete',
+        'click: .icon.edit': 'clickIconEdit',
+        'click: input': 'clickInput'
     },
 
     run: function() {
@@ -968,7 +985,7 @@ var RightColumn = Widget.extend({
 
         $(window).on('mousemove.list', (function update(e) {
             if (t._isDragging) {
-                var top = e.pageY - startY;
+                var top;
                 var height = $placeholder.height();
                 var position = intval((e.pageY - $placeholder.offset().top) / height);
                 var $next = $placeholder.next('.drag-wrap');
@@ -1007,6 +1024,56 @@ var RightColumn = Widget.extend({
         var $list = $(e.currentTarget);
         var listId = $list.data('id');
         t.setList(listId, true);
+    },
+    clickIconDelete: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var $list = $target.closest('.item');
+        var listId = $list.data('id');
+        var box = new Box({
+            id: 'deleteList' + listId,
+            title: 'Удаление',
+            html: 'Вы уверены, что хотите удалить список?',
+            buttons: [
+                {label: 'Удалить', onclick: deleteList},
+                {label: 'Отмена', isWhite: true}
+            ]
+        }).show();
+
+        function deleteList() {
+            this.hide();
+            $list.closest('.drag-wrap').slideUp(200);
+            Events.fire('remove_list', listId, function() {
+                t.update();
+            });
+        }
+        return false;
+    },
+    clickIconEdit: function(e) {
+        var t = this;
+        var $target = $(e.currentTarget);
+        var $list = $target.closest('.item');
+        var listId = $list.data('id');
+        var $text = $list.find('.text');
+        var input = $('<input type="text" />').width($text.width() + 20).val($text.text());
+
+        $text.replaceWith(input);
+        input.focus().on('keyup.editList', saveList);
+
+        function saveList(e) {
+            var listName = $.trim(input.val());
+            if (e.keyCode == KEY.ENTER && listName) {
+                input.replaceWith($text).off('keyup.editList');
+                $text.text(input.val());
+                Events.fire('update_list', listId, listName, function() {
+                    t.update();
+                });
+            }
+        }
+        return false;
+    },
+    clickInput: function() {
+        return false;
     },
 
     saveOrder: function() {
@@ -1076,7 +1143,8 @@ var Tabs = Widget.extend({
         'click: .tab.dialog': 'clickDialog',
         'click: .tab.list': 'clickList',
         'click: .icon': 'clickPlus',
-        'click: .filter > a': 'clickFilter'
+        'click: .filter': 'clickFilter',
+        'click: .show-templates': 'clickShowTemplates'
     },
 
     clickDialog: function(e) {
@@ -1104,9 +1172,7 @@ var Tabs = Widget.extend({
             (function updateDropdown() {
 
                 function onCreate() {
-                    var lists = dialogModel.lists();
-
-                    $.each(lists, function(i, listId) {
+                    $.each(dialogModel.lists(), function(i, listId) {
                         $target.dropdown('getItem', listId).addClass('active');
                     });
                 }
@@ -1170,13 +1236,19 @@ var Tabs = Widget.extend({
                                 }
                             } else {
                                 Events.fire('add_to_list', dialogId, item.id, function() {
-                                    t.trigger('addToList');
+                                    var index = $.inArray(item.id, dialogModel.lists());
+                                    if (index == -1) {
+                                        dialogModel.lists().push(item.id);
+                                    }
                                 });
                             }
                         },
                         onunselect: function(item) {
                             Events.fire('remove_from_list', dialogId, item.id, function() {
-                                t.trigger('removeFromList');
+                                var index = $.inArray(item.id, dialogModel.lists());
+                                if (index != -1) {
+                                    dialogModel.lists().splice(index, 1);
+                                }
                             });
                         },
                         data: $.merge(list, [
@@ -1203,6 +1275,16 @@ var Tabs = Widget.extend({
         t.trigger('clickFilter');
     },
 
+    clickShowTemplates: function() {
+        var t = this;
+        var listTab = t.model().listTab();
+        var listId = listTab.id();
+        var box = new CreateTemplateBox(listId, false, false, function() {
+            //t.updateAutocomplite();
+        });
+        box.show();
+    },
+
     setList: function(listId) {
         var t = this;
         var listModel = listCollection.get(listId) || new ListModel({
@@ -1219,6 +1301,7 @@ var Tabs = Widget.extend({
         t.renderTemplate();
         //@todo привести к нормальному виду
         t.el().find('.filter').show();
+        t.el().find('.show-templates').hide();
     },
 
     setDialog: function(dialogId) {
@@ -1243,6 +1326,7 @@ var Tabs = Widget.extend({
         t.renderTemplate();
         //@todo привести к нормальному виду
         t.el().find('.filter').hide();
+        t.el().find('.show-templates').show();
     },
 
     setOnline: function(userId) {
@@ -1265,10 +1349,14 @@ var Tabs = Widget.extend({
  * Initialization
  */
 $(document).ready(function() {
-    if (!$('#main').length) {
+    var $window = $(window);
+    var $body = $('body');
+    var $main = $('#main');
+    var $scrollFix = $('#scroll-fix');
+
+    if (!$main.length) {
         return;
     }
-
     if (!Configs.vkId) {
         location.href = '/login/?' + encodeURIComponent('im/');
         return;
@@ -1279,40 +1367,24 @@ $(document).ready(function() {
     var main = new Main({
         selector: '#main'
     });
-    $(window).on('scroll resize', function() {
+    $window.on('scroll resize', function() {
         main.trigger('scroll');
     });
 });
 
-function CreateTemplateBox(listId, text, onSuccess) {
-    var SAVE_TEMPLATE_BOX =
-    '<div class="box-templates">' +
-        '<div class="title">' +
-            'Выберите списки' +
-        '</div>' +
-        '<div class="input-wrap">' +
-            '<input class="lists" type="text"/>' +
-        '</div>' +
-        '<div class="title">' +
-            'Введите текст шаблона' +
-        '</div>' +
-        '<div class="input-wrap">' +
-            '<textarea class="template-text"><?=text?></textarea>' +
-        '</div>' +
-    '</div>';
-
+function CreateTemplateBox(listId, text, isFocused) {
     var box = new Box({
-        title: 'Добавление нового шаблона',
+        title: 'Готовые ответы',
         html: tmpl(BOX_LOADING, {height: 100}),
-        buttons: [
-            {label: 'Закрыть'}
-        ],
+        width: 600,
         onshow: function() {
             Events.fire('get_lists', function(data) {
                 var list = data.list;
                 var listsIds = [];
                 var clearLists = [];
                 var currentList = {};
+                var additionFormInited = false;
+
                 $.each(list, function(i, listItem) {
                     if (listItem.id) {
                         clearLists.push(listItem);
@@ -1323,56 +1395,239 @@ function CreateTemplateBox(listId, text, onSuccess) {
                 });
 
                 box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
-                box.setButtons([
-                    {label: 'Сохранить', onclick: saveTemplate},
-                    {label: 'Отменить', isWhite: true}
-                ]);
 
                 var $input = box.$el.find('.lists');
                 var $textarea = box.$el.find('.template-text');
                 var templateText = $textarea.val();
-                $textarea.focus();
-                $textarea.selectRange(templateText.length, templateText.length);
+                var $templateList = box.$el.find('.template-list');
+                var $addTemplateBtn = box.$el.find('.save-template');
+                var $openedAdditionForm = box.$el.find('.add-template-opened');
+                var $closedAdditionForm = box.$el.find('.add-template-closed');
+                var $openAdditionFormTrigger = $closedAdditionForm.find('input');
+                var $closeAdditionFormTrigger = $openedAdditionForm.find('.button.cancel');
 
-                $input.tags({
-                    onadd: function(tag) {
-                        listsIds.push(parseInt(tag.id));
-                    },
-                    onremove: function(tagId) {
-                        listsIds = jQuery.grep(listsIds, function(listsIds) {
-                            return listsIds != tagId;
-                        });
-                    }
-                }).autocomplete({
-                    data: clearLists,
-                    target: $input.closest('.ui-tags'),
-                    onchange: function(item) {
-                        $(this).tags('addTag', item).val('').focus();
-                    }
-                }).keydown(function(e) {
-                    if (e.keyCode == KEY.DEL && !$(this).val()) {
-                        $(this).tags('removeLastTag');
+                $openAdditionFormTrigger.focus(openAdditionForm);
+                $closeAdditionFormTrigger.click(closeAdditionForm);
+                $addTemplateBtn.click(addTemplate);
+
+                $textarea.keydown(function(e) {
+                    if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
+                        addTemplate();
                     }
                 });
 
-                if (currentList.id) {
-                    $input.tags('addTag', currentList);
+                $templateList.delegate('.icon.delete', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var messageId = $message.data('id');
+                    var deleteBox = new Box({
+                        id: 'templateDeleteBox' + messageId,
+                        title: 'Удаление',
+                        html: 'Вы уверены, что хотите удалить шаблон?',
+                        buttons: [
+                            {label: 'Удалить', onclick: function() {
+                                deleteTemplate.call(this, messageId);
+                            }},
+                            {label: 'Отмена', isWhite: true}
+                        ]
+                    }).show();
+                });
+
+                $templateList.delegate('.icon.edit', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    var $textarea = $message.find('.content textarea');
+                    var $actions = $message.find('.content > .actions');
+
+                    if (!$text.data('textarea')) {
+                        $text.data('textarea', true);
+                        $textarea.on('keydown', function(e) {
+                            if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
+                                saveTemplate();
+                            }
+                        });
+                        $actions.find('.button.save-template').click(function(e) {
+                            saveTemplate();
+                        });
+                        $actions.find('.button.cancel').click(function(e) {
+                            editModeOff();
+                        });
+                        $text.after($textarea);
+                        $textarea.autoResize().wrap('<div class="input-wrap" />');
+                    }
+
+                    $templateList.delegate('.tag-plus', 'click', function() {
+                        var tags = getTags($message);
+                        $target = $(this);
+                        $target.dropdown({
+                            isShow: true,
+                            addClass: 'ui-dropdown-add-to-list-tabs',
+                            data: $.grep(clearLists, function(u) {
+                                var isFound = false;
+                                $.each(tags, function(i, tag) {
+                                    if (tag == u.id) {
+                                        isFound = true;
+                                        return false;
+                                    }
+                                });
+                                return !isFound;
+                            }),
+                            width: 200,
+                            onchange: function(item) {
+                                $target.before($(tmpl(TEMPLATE_LIST_ITEM_LISTS, item)));
+                            }
+                        });
+                    });
+
+                    editModeOn();
+
+                    function editModeOn() {
+                        $message.addClass('edit-mode');
+                        $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
+                    }
+                    function editModeOff() {
+                        $message.removeClass('edit-mode');
+                    }
+                    function saveTemplate() {
+                        if (!$textarea.val()) {
+                            $textarea.focus();
+                            return;
+                        }
+                        editModeOff();
+                        $text.html(makeMsg($textarea.val())).show();
+                        Events.fire('edit_template', messageId, $textarea.val(), getTags($message).join(','), function() {});
+                    }
+                });
+
+                $templateList.delegate('.tag > .delete', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var $tag = $target.closest('.tag');
+                    $tag.remove();
+                    var tags = getTags($message);
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    Events.fire('edit_template', messageId, $text[0].innerText, tags.join(','), function() {});
+                });
+
+
+                function getTags($message) {
+                    var $tags = $message.find('.title > .tag');
+                    var tags = [];
+                    $.each($tags, function() {
+                        var $tag = $(this);
+                        if ($tag.data('id')) {
+                            tags.push($tag.data('id'));
+                        }
+                    });
+                    return tags;
                 }
 
-                function saveTemplate() {
-                    var $textarea = box.$el.find('textarea');
-                    var text = $textarea.val();
-                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-                    box.setButtons([{label: 'Закрыть'}]);
+                function addTemplate() {
+                    var text = $.trim($textarea.val());
+                    if (!text) {
+                        $textarea.focus();
+                        return;
+                    }
+                    $textarea.val('').focus();
+                    $templateList.prepend(tmpl(TEMPLATE_LIST_ITEM, {
+                        id: 'loading',
+                        text: text,
+                        timestamp: '12:21',
+                        user: userCollection.get(Configs.vkId).data(),
+                        lists: []
+                    }));
+                    box.refreshTop();
+
                     Events.fire('add_template', text, listsIds.join(','), function() {
-                        box.hide();
-                        if ($.isFunction(onSuccess)) onSuccess();
+                        updateTemplateList();
                     });
                 }
+
+                function deleteTemplate(templateId) {
+                    var box = this;
+                    box.hide();
+                    Events.fire('delete_template', templateId, function() {
+                        $templateList.find('.message[data-id=' + templateId + ']').slideUp(200);
+                    });
+                }
+
+                function openAdditionForm(e) {
+                    $openedAdditionForm.show();
+                    $closedAdditionForm.hide();
+                    $textarea.focus();
+                    $textarea.selectRange(templateText.length, templateText.length);
+                    box.refreshTop();
+
+                    if (!additionFormInited) {
+                        additionFormInited = true;
+                        $input.tags({
+                            onadd: function(tag) {
+                                listsIds.push(parseInt(tag.id));
+                            },
+                            onremove: function(tagId) {
+                                listsIds = $.grep(listsIds, function(listsIds) {
+                                    return listsIds != tagId;
+                                });
+                            }
+                        }).autocomplete({
+                            data: clearLists,
+                            target: $input.closest('.ui-tags'),
+                            onchange: function(item) {
+                                $(this).tags('addTag', item).val('').focus();
+                            }
+                        }).keydown(function(e) {
+                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                $(this).tags('removeLastTag');
+                            }
+                        });
+
+                        if (currentList.id) {
+                            $input.tags('addTag', currentList);
+                        }
+                    }
+                }
+
+                function closeAdditionForm(e) {
+                    $openedAdditionForm.hide();
+                    $closedAdditionForm.show();
+                    box.refreshTop();
+                }
+
+                function updateTemplateList() {
+                    Events.fire('get_templates', null, function(data) {
+                        var clearData = [];
+                        $.each(data, function(i, template) {
+                            var clearLists = [];
+
+                            $.each(template.lists, function(i, listId) {
+                                var listModel = listCollection.get(listId);
+                                if (listModel) {
+                                    clearLists.push(listModel.data());
+                                }
+                            });
+
+                            clearData.push({
+                                id: template.id,
+                                text: template.title,
+                                user: userCollection.get(Configs.vkId).data(),
+                                lists: clearLists
+                            });
+                        });
+                        $templateList.removeClass('loading');
+                        $templateList.html(tmpl(TEMPLATE_LIST, {list: clearData}));
+                        box.refreshTop();
+                    });
+                }
+
+                if (isFocused) {
+                    $openAdditionFormTrigger.focus();
+                }
+
+                updateTemplateList();
             });
-        },
-        onhide: function() {
-            box.remove();
         }
     });
     return box;
