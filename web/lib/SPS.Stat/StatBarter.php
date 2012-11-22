@@ -29,6 +29,7 @@
           foreach( $query_result as $barter_event ) {
               $overlaps = isset( $barter_event->overlaps ) ? explode( ',', $barter_event->overlaps ) : array();
               $barter_events_res[] = array(
+                  'report_id'     =>  $barter_event->barter_event_id,
                   'published_at'  =>  $publics_data[ $barter_event->barter_public ],
                   'ad_public'     =>  $publics_data[ $barter_event->target_public ],
                   'posted_at'     =>  isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0,
