@@ -553,7 +553,7 @@
 
         }
 
-        public function get_publics_info_from_base( $public_ids )
+        public static function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
             $sql = 'SELECT vk_id, name, ava, quantity, page
@@ -649,33 +649,40 @@
                 $conn = ConnectionFactory::Get('tst');
 
             $sql = 'SELECT
-                        public_id, a.name as old_name, changed_at, b.name,b.act,b.active,b.in_search, b.closed
+                        public_id, a.name as old_name, changed_at, b.name,a.act,a.active,b.active as check,a.in_search, a.closed
                     FROM '
-                        . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
-                   'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
-                   'ON
+                . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
+                'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
+                'ON
                         public_id=vk_id
                     WHERE
                             changed_at > @time_from
-                        AND changed_at > @time_to
-                        AND act = \'name\'';
+                        AND changed_at < @time_to
+                    ORDER BY a.act
+                    ';
             $cmd = new SqlCommand( $sql, $conn );
-            $cmd->SetString( '@time_from', date( 'r', $time_from ));
-            $cmd->SetString( '@time_to', date( 'r', $time_to ));
+            $cmd->SetString( '@time_from', date( 'Y-m-d H:i:s', $time_from ));
+            $cmd->SetString( '@time_to', date( 'Y-m-d H:i:s', $time_to ));
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
-                $res[$ds->GetInteger( 'public_id')] = array(
-                    'act'        =>  $ds->GerValue( 'act' ),
+                $public_id = $ds->GetInteger( 'public_id' );
+                if ( isset( $res[ $public_id ] ) && $res[ $public_id  ]['act'] == 'active' ) {
+                    continue;
+                }
+                $res[ $public_id ] = array(
+                    'act'        =>  $ds->GetValue( 'act' ),
                     'old_name'   =>  $ds->GetValue( 'old_name' ),
                     'new_name'   =>  $ds->GetValue( 'name' ),
-                    'in_search'  =>  $ds->GetBOolean( 'in_search' ),
-                    'closed'     =>  $ds->GetBOolean( 'closed' ),
-                    'active'     =>  $ds->GetBOolean( 'active' ),
+                    'in_search'  =>  $ds->GetValue( 'in_search' ),
+                    'closed'     =>  $ds->GetValue( 'closed' ),
+                    'active'     =>  $ds->GetValue( 'active' ),
                 );
+                $public_id = '';
             }
             return $res;
         }
+
 
         public static function search_public( $search_string )
         {
