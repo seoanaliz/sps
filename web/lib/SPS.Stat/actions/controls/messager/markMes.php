@@ -19,9 +19,11 @@ class markMes
         if ( !$mess_id || !$user_id || !$dialogs_id ) {
             die(ERR_MISSING_PARAMS);
         }
-
-        MesDialogs::set_state( $dialogs_id, 0, 0 );
-        MesDialogs::set_text_read( $dialogs_id );
+        $dialogs_id = explode( ',', $dialogs_id );
+        foreach( $dialogs_id as $dialog_id ) {
+            MesDialogs::set_state( $dialog_id, 0, 0 );
+            MesDialogs::set_text_read( $dialog_id );
+        }
 
         if ( MesDialogs::toggle_read_unread( $user_id, $mess_id, $unread ) )
             die( ObjectHelper::ToJSON( array( 'response' => true ) ) );
