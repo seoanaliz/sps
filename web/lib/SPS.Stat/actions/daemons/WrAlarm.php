@@ -109,7 +109,7 @@ class WrAlarm
                 'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
             sleep(0.5);
             foreach( $res as $apublic_id => $search_result ) {
-                if ($apublic_id == 'error') {
+                if ( $apublic_id == 'error' ) {
                     break;
                 }
                 $public_id = trim( $apublic_id, 'a');
@@ -120,6 +120,8 @@ class WrAlarm
                         continue(2);
                     }
                 }
+
+
                 $this->wasted_array[$public_id] = 'search';
                 StatPublics::set_state( $public_id, 'in_search', false, $this->connect );
             }

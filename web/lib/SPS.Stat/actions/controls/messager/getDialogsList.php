@@ -46,12 +46,6 @@ class getDialogsList
         $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
         //проверка на новые сообщения в группе
         $row_dialog_array   = MesDialogs::get_dialogs_from_db( $user_id, $res_ids );
-//        print_r($row_dialog_array);
-//        print_r( MesDialogs::get_group_dilogs_list( $user_id, $res_ids ));
-
-//        print_r($row_dialog_array);
-//        print_r( );
-//        die();
         if( $row_dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
         $user_ids = array();

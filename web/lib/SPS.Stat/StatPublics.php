@@ -625,14 +625,14 @@
                 old_value boolean    := 0;
                 curr_state boolean := false;
                 BEGIN
-                execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
-                IF $3=old_value THEN
-                    return false;
-                ELSE
-                    execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
-                    execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
-                    return true;
-                END IF;
+                    execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
+                    IF $3=old_value THEN
+                        return false;
+                    ELSE
+                        execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
+                        execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
+                        return true;
+                    END IF;
                 END
                 $$ LANGUAGE plpgsql;
                 SELECT set_state( @public_id, @name, @state) AS cnanged;";

@@ -18,7 +18,7 @@ class OurAdminsStat
 
     private $admins_list  = array();
     private $authors_list = array();
-    private $a_t = 'b52f1331bc6a4323bc6a43232cbc45657bbbc6abc7f7bbdec127517221b577e1e51fb5b';
+    private $a_t;
 
     private $white_list = array(
         2701428,
@@ -43,7 +43,6 @@ class OurAdminsStat
         58540552,
         61514101,
         83475534,
-        106175502,
         110337004,
         114080351,
         121069867,
@@ -51,11 +50,15 @@ class OurAdminsStat
         150220483,
         161113216,
         178503163,
-
+        14412297,
+        13819249,
+        174517560
     );
 
     public function execute() {
         set_time_limit(0);
+
+        $this->a_t = VkHelper::get_service_access_token();
         $this->admins_list = $this->get_admins_list();
         $this->authors_list = $this->get_authors_list();
         $publics = TargetFeedFactory::Get();
@@ -67,21 +70,56 @@ class OurAdminsStat
                 $public->externalId ==  '27421965'  ||
                 $public->externalId ==  '34010064'  ||
                 $public->externalId ==  '35807078'  ||
-                $public->externalId ==  '38000341'   )
-                {
-                    var_dump( $public );
-                    continue;
-                }
+                $public->externalId ==  '38000341'  ||
+                $public->externalId ==  '43503681'  ||
+                $public->externalId ==  '43503753'  ||
+                $public->externalId ==  '43503725'  ||
+                $public->externalId ==  '36959733'  ||
+                $public->externalId ==  '43503694'  ||
+                $public->externalId ==  '38000393'  ||
+                $public->externalId ==  '43157718'  ||
+                $public->externalId ==  '43503630'
+                )
+            {
 
-            $this->get_sign_posts( $public->externalId );
-            $this->get_sb_posts( $public->externalId, $public->targetFeedId );
+                continue;
+            }
+            $this->update_posts_info( $public->externalId );
+
+//            $this->get_sign_posts( $public->externalId );
+//            $this->get_sb_posts( $public->externalId, $public->targetFeedId );
         }
     }
+
+    private function update_posts_info( $public_id )
+    {
+           $sql = 'select * from oadmins_posts where post_time > 1349049600 and post_time <1352980567 and public_id=@public_id';
+
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetString( '@public_id', $public_id);
+        $ds = $cmd->execute();
+        $posts = array();
+        $likes_average = $this->get_average_likes_cast( $public_id );
+
+        while( $ds->Next()) {
+            $posts[] = '-' . $ds->GetValue('public_id') . '_' . $ds->GetValue('vk_post_id');
+
+        }
+        $posts_armfuls = array_chunk( $posts, 100 );
+        foreach ( $posts_armfuls as $posts_line ) {
+            $posts_line = implode( ',', $posts_line );
+            $res = VkHelper::api_request( 'wall.getById', array( 'posts'  =>  $posts_line, 'access_token'=>$this->a_t));
+            sleep(0.3);
+            foreach( $res as $post ) {
+                $this->post_analize( $post, $likes_average, 'a', 0);
+            }
+        }
+     }
 
     private function get_authors_list()
     {
         $sql = 'SELECT * FROM authors';
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
         $ds = $cmd->Execute();
         $res = array();
         while( $ds->next() ) {
@@ -100,7 +138,7 @@ class OurAdminsStat
 
     public function get_sign_posts( $public_id )
     {
-        var_dump($public_id);
+        var_dump( $public_id );
         if ( $public_id == '35806378' )
             return false;
         $stop_post = $this->get_last_post( $public_id );
@@ -119,7 +157,7 @@ class OurAdminsStat
             if ($posts[0] < $offset)
                 break;
             unset ( $posts[0] );
-            $average = $this->get_average_likes_cast( $public_id );
+//            $average = $this->get_average_likes_cast( $public_id );
 
             foreach ( $posts as $post ) {
                 if ( $post->id == $stop_post ) {
@@ -157,16 +195,41 @@ class OurAdminsStat
 
         $posts = array();
         $kmds  = array();
-        while( $ds->Next()) {
-            $a = $ds->GetString('externalId', TYPE_STRING);
-            $article    = $ds->GetValue('articleId');
-//            $author     = $ds->GetString('author', TYPE_STRING);//редактор
-            $author  = $this->get_real_author( $article );//пытаемся найти настоящего автора
-            if ( !in_array( $author, $this->white_list ))
-                continue;
+//        $likes_average = $this->get_average_likes_cast( $public_id );
 
-            $posts[]    = $a;
-            $kmds[$a]   = $author;
+        while( $ds->Next()) {
+            $new_post = array();
+            $post_id =  $ds->GetValue('externalId');
+            $post_id = ltrim( $post_id, '-');
+            $post_id = explode( '_', $post_id );
+            $data = $ds->GetValue('sentAt');
+            $data = explode(' ' ,$data);
+            $data_a = explode( '-',$data[0]);
+            $data_b = explode( ':',$data[1]);
+            $data = mktime($data_b[0],$data_b[1],$data_b[2],$data_a[1], $data_a[2], $data_a[0]);
+            $new_post['vk_post_id'] =   $post_id[1];
+            $new_post['public_id']  =   $public_id;
+            $new_post['author_id']  =   $ds->GetValue('author');
+            $new_post['post_time']  =   $data;
+            $new_post['complicate'] =   "'t'";
+            $new_post['likes']      =   $ds->GetValue('externalLikes');
+            $new_post['reposts']    =   $ds->GetValue('externalRetweets');
+            $new_post['rel_likes']  =   round( $new_post['likes'] / 2 * 100, 2 );
+            $new_post['source']     =   "'a'";
+            $a = $ds->GetString( 'externalId', TYPE_STRING );
+
+            $article = $ds->GetValue('articleId');
+            $editor  = $this->get_editor( $article );
+            if ( $editor ) {
+                $new_post['author_id']  = $editor;
+            } else {
+                $author_k  = $this->get_real_author( $article );//пытаемся найти настоящего автора
+                if ( !$author_k )
+                    continue;
+                $new_post['author_id']  = $author_k;
+            }
+            $this->save_post( $new_post );
+
 
         }
         echo '<br>-------------------------------------------------<br>';
@@ -183,16 +246,31 @@ class OurAdminsStat
         }
     }
 
+    public function get_editor( $article_id) {
+        $sql = 'select * from articles where "articleId"= ' . $article_id;
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
+        $ds= $cmd->execute();
+        $ds->next();
+
+        return $ds->GetValue('editor');
+    }
+
     public function get_real_author( $article_id )
     {
-        $sql = 'SELECT "authorId" FROM articles where "articleId"=@article_id';
+        $sql = 'SELECT "authorId" FROM "authorEvents" where "articleId"=@article_id';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
         $cmd->SetInteger('@article_id',  $article_id);
         $ds = $cmd->Execute();
-
+        echo $cmd->GetQuery() . '<br>';
         $ds->Next();
-        $real_author = $ds->GetValue( 'authorId', TYPE_INTEGER );
-        return $real_author ? $this->authors_list[ $real_author ] : false;
+        $real_author = $ds->GetInteger( 'authorId' );
+        print_r($real_author);
+        if ( $real_author ) {
+            $author = AuthorFactory::GetById( $real_author );
+            print_r($author);
+            return $author->vkId;
+        }
+            return false;
     }
 
     public function get_average_likes_cast( $public_id )
@@ -205,14 +283,13 @@ class OurAdminsStat
 
     public function post_analize( $post, $average, $source, $author_id=0 )
     {
-        echo 'author_id = ' . $author_id . '<br>';
         unset( $post->attachment );
 
-        if ( isset( $post->signer_id ) || $author_id )
+        if ( 1 )
         {
             $post->signer_id = $author_id ? $author_id : $post->signer_id;
-            if ( !in_array( $post->signer_id, $this->white_list ))
-                return true;
+//            if ( !in_array( $post->signer_id, $this->white_list ))
+//                return true;
             $new_post = array();
             $author = $this->add_admin( $post->signer_id );
             echo '<a href="vk.com/wall' . $post->to_id . '_' . $post->id . '"> ' .$post->to_id . '_' . $post->id. '</a><br>';
@@ -225,9 +302,9 @@ class OurAdminsStat
             else
                 $new_post['is_topic'] = "'false'";
             $complicate = "'false'";
-            if( count( $post->attachments  ) > 1 || strlen( $post->text ) > 200 )
+            if( count( $post->attachments  ) > 2 || strlen( $post->text ) > 200 )
                 $complicate = "'true'";
-
+            $data = $post->date;
             $new_post['vk_post_id'] =   $post->id;
             $new_post['public_id']  =   trim( $post->to_id, '-' );
             $new_post['author_id']  =   $author;
@@ -237,9 +314,25 @@ class OurAdminsStat
             $new_post['reposts']    =   $post->reposts->count;
             $new_post['rel_likes']  =   round( $new_post['likes'] / $average * 100, 2 );
             $new_post['source']     =   "'" . $source . "'";
-            $this->save_post( $new_post );
+            $this->update_post( $new_post );
         }
         return true;
+    }
+
+    public function update_post( $post ) {
+        print_r($post);
+        $sql = 'UPDATE oadmins_posts  set likes=@likes, reposts = @reposts, complicate=@complicate, rel_likes=@rel_likes
+              where public_id = @public_id and vk_post_id= @vk_post_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetString('@vk_post_id', $post['vk_post_id'] );
+        $cmd->SetString('@public_id', $post['public_id'] );
+        $cmd->SetInteger('@likes', $post['likes'] );
+        $cmd->SetInteger('@reposts', $post['reposts'] );
+        $cmd->SetBoolean('@complicate', $post['complicate']);
+        $cmd->SetFloat('@rel_likes', $post['rel_likes']);
+        echo $cmd->getQuery();
+        $cmd->execute();
+
     }
 
     public function get_admins_list()
