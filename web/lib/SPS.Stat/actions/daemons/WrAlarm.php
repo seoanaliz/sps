@@ -25,12 +25,9 @@ class WrAlarm
 //        print_R($report);
 //        die();
 
-//        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
-
+        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
         $publics = $this->get_monitoring_publs();
         $this->check_in_search( $publics );
-
-
         $this->check_block( $publics );
 
         print_R($this->wasted_array);
@@ -68,7 +65,6 @@ class WrAlarm
                         die();
                     }
                     StatPublics::set_state( $public_id, 'active', true, $this->connect );
-
                 }
             }
 
@@ -139,10 +135,8 @@ class WrAlarm
         $cmd->Execute();
     }
 
-    public function get_monitoring_publs( $in_search = '' )
+    public function get_monitoring_publs( )
     {
-        if ( $in_search )
-            $in_search = ' AND in_search is TRUE';
         $sql = 'SELECT vk_id,name
                 FROM stat_publics_50k
                 WHERE   quantity>100000';

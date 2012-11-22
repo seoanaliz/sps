@@ -16,7 +16,7 @@ class WrTopics extends wrapper
             die('Не сейчас');
 
         $this->get_id_arr();
-        echo "start_time = " . date( 'H:i') . '<br>';
+        echo "start_time = " . date( 'H:i' ) . '<br>';
         $this->update_quantity();
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
@@ -36,6 +36,11 @@ class WrTopics extends wrapper
         while ( $ds->Next() ) {
             $res[] = $ds->getInteger( 'vk_id' );
         }
+        $res[] = '43503725';
+        $res[] = '43157718';
+        $res[] = '43503753';
+        $res[] = '43503681';
+        $res[] = '43503694';
         $this->ids = $res;
     }
 
@@ -183,9 +188,9 @@ class WrTopics extends wrapper
     //поиск админов пабликов
     public function find_admins(  )
     {
-         foreach ( $this->ids as $id ) {
-            sleep(0.3);
-            echo $id . '<br>';
+        foreach ( $this->ids as $id ) {
+        sleep(0.3);
+        echo $id . '<br>';
 
             $params = array(
                 'act'   =>  'a_get_contacts',
@@ -208,7 +213,7 @@ class WrTopics extends wrapper
                 }
                 $admin = array();
             }
-           }
+        }
         return true;
     }
 

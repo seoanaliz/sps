@@ -162,13 +162,13 @@
 
             public static function deactivate_at( $access_token )
             {
-                if ( $access_token )
+                if ( !$access_token )
                     $access_token = 0;
                 $sql = 'UPDATE serv_access_tokens
                         SET active=false
-                        WHERE access_token =@access_token';
+                        WHERE access_token=@access_token';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-                $cmd->SetString('@access_token ', $access_token );
+                $cmd->SetString('@access_token', $access_token );
                 $cmd->Execute();
             }
 
@@ -186,12 +186,11 @@
             {
                 $sql = 'INSERT INTO serv_access_tokens(user_id, access_token, app_id )
                         VALUES( @user_id, @access_token, @app_id )';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
                 $cmd->SetString ( '@access_token ', $access_token );
                 $cmd->SetInteger( '@user_id ',      $user_id );
                 $cmd->SetInteger( '@app_id',        $app_id );
                 $cmd->Execute();
             }
-
         }
     ?>
