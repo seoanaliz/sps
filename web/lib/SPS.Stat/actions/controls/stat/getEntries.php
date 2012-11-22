@@ -145,8 +145,8 @@ class getEntries {
                                 'diff_rel'  =>  $row[$diff_rel],
                                 'visitors'  =>  $row['visitors'],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
-                                'active'    =>  $row['active'] ? true : false
-                            );
+                                'active'    =>  $row['active']== 't' ? true : false
+                );
             }
         }
         else {
@@ -226,7 +226,7 @@ class getEntries {
             $authors_posts      =   StatPublics::get_public_posts( $public['sb_id'], 'authors', $time_start, $time_stop );
             $non_authors_posts  =   StatPublics::get_public_posts( $public['sb_id'], 'sb', $time_start, $time_stop );
             $ad_posts           =   StatPublics::get_public_posts( $public['sb_id'], 'ads', $time_start, $time_stop );
-            $posts_quantity = $authors_posts['count'] + $non_authors_posts['count'];
+            $posts_quantity     =   $authors_posts['count'] + $non_authors_posts['count'];
             //всего постов
             $res['overall_posts'] = $posts_quantity;
             $days = round(( $time_stop - $time_start ) / 84600 );
@@ -273,8 +273,8 @@ class getEntries {
     {
         $rev = $rev ? 1 : -1 ;
         $code = "
-        if ( $rev > 0 && \$a['$field'] == null ) return  1;
-        if ( $rev > 0 && \$b['$field'] == null ) return -1;
+        if ( $rev = 0 && \$a['$field'] == null ) return  1;
+        if ( $rev = 0 && \$b['$field'] == null ) return -1;
         return  $rev * strnatcmp(\$a['$field'], \$b['$field']);";
         return create_function('$a,$b', $code );
     }
@@ -342,7 +342,7 @@ class getEntries {
     private function get_min_max()
     {
         $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 50000' ;
-        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst') );
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
         $ds = $cmd->Execute();
         $ds->Next();
         return array(
