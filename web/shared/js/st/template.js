@@ -124,7 +124,11 @@ var OUR_TABLE_ROW =
     '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
     '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?></div>' +
     '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
-    '<div class="column public-growth-visitors"><?=publicGrowthVisitors ? publicGrowthVisitors : "-"?></div>' +
+    '<div class="column public-growth-visitors">' +
+        '<span class="<?=publicGrowthVisitors > 0 ? "plus" : "minus"?>">' +
+            '<?=publicGrowthVisitors?> <small><?=publicGrowthVisitorsRelative?>%</small>' +
+        '</span>' +
+    '</div>' +
 //    '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
     '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
 '</div>';

@@ -118,7 +118,7 @@ var Eventlist = {
             authorsLikes: 'auth_likes_eff',
             authorsReposts: 'auth_reposts_eff',
             growthViews: 'avg_vie_grouth',
-            growthVisitors: 'avg_vis_grouth'
+            growthVisitors: 'abs_vis_grouth'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
@@ -207,7 +207,8 @@ var Eventlist = {
                             publicAuthorsLikes: publicItem.auth_likes_eff,
                             publicAuthorsReposts: publicItem.auth_reposts_eff,
                             publicGrowthViews: publicItem.avg_vie_grouth,
-                            publicGrowthVisitors: publicItem.avg_vis_grouth
+                            publicGrowthVisitors: intval(publicItem.abs_vis_grouth),
+                            publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grouth)
                         });
                     });
                 }
