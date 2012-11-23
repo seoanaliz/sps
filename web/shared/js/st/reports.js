@@ -128,8 +128,8 @@ function bindEvents() {
 //                    "visitors":0
 //                }
 //            ]};
-        var ourPublicId = intval($('#our-public-id').val());
-        var publicId = intval($('#public-id').val());
+        var ourPublicId = $.trim($('#our-public-id').val());
+        var publicId = $.trim($('#public-id').val());
         var dirtyTime = ($('#time').val() || '__:__').split('_').join('0').split(':');
         var hours = dirtyTime[0];
         var minutes = dirtyTime[1];
