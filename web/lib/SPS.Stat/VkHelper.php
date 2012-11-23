@@ -141,7 +141,10 @@
             public static function get_service_access_token()
             {
                 $connect =  ConnectionFactory::Get( 'tst' );
+                $count = 0;
                 while( 1 ) {
+                    if( $count++ > 1000 )
+                        throw new Exception ('закончились сервисные токены!');
                     $sql = 'SELECT access_token
                             FROM serv_access_tokens
                             WHERE active IS TRUE
@@ -175,8 +178,9 @@
             public static function check_at( $access_token )
             {
                 $res = self::get_vk_time( $access_token );
+                sleep(0.2);
                 if ( isset( $res->error )) {
-                    self::deactivate_at( $access_token );
+                    //self::deactivate_at( $access_token );
                     return false;
                 }
                 return true;
