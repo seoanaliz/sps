@@ -353,6 +353,7 @@
                 $ds->Next();
                 return $ds->GetInteger( 'avg' );
             }
+            return 0;
 
         }
 
@@ -450,11 +451,14 @@
             $cmd->SetString ( '@time_to',   date( 'Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
             $rate = 0;
+
             while( $ds->next()) {
                 $tmp_rate = $ds->GetValue( 'rate' );
                 $rate += $tmp_rate < 100 ? $tmp_rate : 100;
             }
-            return round( $rate / $ds->GetSize());
+            if ( $rate )
+                return round( $rate / $ds->GetSize());
+            return 0;
         }
 
         public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
