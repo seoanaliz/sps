@@ -276,8 +276,8 @@ class getEntries {
     {
         $rev = $rev ? 1 : -1 ;
         $code = "
-        if ( $rev = 0 && \$a['$field'] == null ) return  1;
-        if ( $rev = 0 && \$b['$field'] == null ) return -1;
+        if ( $rev == 0 && \$a['$field'] == null ) return  1;
+        if ( $rev == 0 && \$b['$field'] == null ) return -1;
         return  $rev * strnatcmp(\$a['$field'], \$b['$field']);";
         return create_function('$a,$b', $code );
     }
