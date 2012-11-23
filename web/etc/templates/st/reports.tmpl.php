@@ -6,8 +6,8 @@
 <div id="main" class="main">
     <div class="header">
         <div class="form">
-            <input id="public-id" type="text" placeholder="Кого рекламируем" />
-            <input id="our-public-id" type="text" placeholder="Где размещаем" />
+            <input id="our-public-id" type="text" placeholder="Кого рекламируем" />
+            <input id="public-id" type="text" placeholder="Где размещаем" />
             <input id="time" type="text" placeholder="Время начала наблюдения" style="width: 200px" />
             <button id="addReport" class="button">+</button>
         </div>
