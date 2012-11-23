@@ -70,7 +70,6 @@ class OurAdminsStat
                 $public->externalId ==  '27421965'  ||
                 $public->externalId ==  '34010064'  ||
                 $public->externalId ==  '35807078'  ||
-                $public->externalId ==  '38000341'  ||
                 $public->externalId ==  '43503681'  ||
                 $public->externalId ==  '43503753'  ||
                 $public->externalId ==  '43503725'  ||
@@ -139,8 +138,6 @@ class OurAdminsStat
     public function get_sign_posts( $public_id )
     {
         var_dump( $public_id );
-        if ( $public_id == '35806378' )
-            return false;
         $stop_post = $this->get_last_post( $public_id );
         $offset = 0;
         while (1) {
@@ -157,7 +154,7 @@ class OurAdminsStat
             if ($posts[0] < $offset)
                 break;
             unset ( $posts[0] );
-//            $average = $this->get_average_likes_cast( $public_id );
+            $average = $this->get_average_likes_cast( $public_id );
 
             foreach ( $posts as $post ) {
                 if ( $post->id == $stop_post ) {
@@ -275,8 +272,7 @@ class OurAdminsStat
 
     public function get_average_likes_cast( $public_id )
     {
-        if ($public_id == '35806378')
-            return false;
+
         $posts = VkHelper::api_request( 'wall.get', array( 'owner_id' => '-' . $public_id, 'count' =>  30, 'offset' => 250, 'access_token'=>$this->a_t ) );
         return $this->get_average_like_value( $posts );
     }

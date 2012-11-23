@@ -26,8 +26,6 @@
                     $public->externalId ==  43503789  ||
                     $public->externalId ==  346191  ||
                     $public->externalId ==  33704958  ||
-                    $public->externalId ==  35806378  ||
-                    $public->externalId ==  38000341  ||
                     $public->externalId ==  38000521  ||
                     $public->externalId ==  1792796  ||
                     $public->externalId ==  27421965  ||
