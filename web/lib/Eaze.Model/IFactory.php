@@ -15,6 +15,7 @@
     define( 'SEARCHTYPE_ILIKE',         'ilike' );
     define( 'SEARCHTYPE_ARRAY',         'inArray' );
     define( 'SEARCHTYPE_NOT_INARRAY',   'notInArray' );
+    define( 'SEARCHTYPE_INTARRAY_CONTAINS', 'arrayContains');
 
     define( 'OPTION_WITH_PARENT',       'withParent' );
     define( 'OPTION_WITH_CHILDREN',     'withChildren' );
