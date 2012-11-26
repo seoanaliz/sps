@@ -32,13 +32,15 @@
         public function GetSearchOperatorString( $operator, $field, $value ) {
             switch( $operator ) {
                 case SEARCHTYPE_EQUALS:
-                    $result = sprintf( '%s = %s', $this->converter->Quote( $operator ), $this->ToDatabase( $value ) );
-                    break;  
+                    $result = sprintf( '%s = %s', $field,  $value );
+                    break;
+                case SEARCHTYPE_INTARRAY_CONTAINS:
+                    $result = sprintf( '%s && %s', $value, $field );
+                    break;
                 default:
                     Logger::Error( 'Invalid search type %s', $operator );
                     $result = 'false';
             }
-
             return $result;
         }
 

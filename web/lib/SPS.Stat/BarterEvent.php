@@ -59,5 +59,8 @@ class BarterEvent
     /** @var string */
     public $post_id;
 
+    /** @var boolean */
+    public $standard_mark;
+
 }
 ?>
