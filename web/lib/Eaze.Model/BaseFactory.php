@@ -213,9 +213,6 @@
                     }
                 }
 
-                if ( $operator === SEARCHTYPE_INTARRAY_CONTAINS )
-                    return $value . ' ' . self::$searchTypes[$operator]['operator'] . $field . ' ) ';
-
                 return $field . ' ' . self::$searchTypes[$operator]['operator'] . ' ' . ( $needValue ? $value : '' );
             }
 
