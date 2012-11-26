@@ -159,6 +159,9 @@
                 <page uri="controls://deleteReport/">
                     <actions>SPS.Stat.deleteReport</actions>
                 </page>
+                <page uri="controls://searchInPublics/">
+                    <actions>SPS.Stat.searchInPublics</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -553,6 +556,9 @@
                  </page>
                 <page uri="daemons://CheckPosts/">
                      <actions>SPS.Stat.CheckPosts</actions>
+                 </page>
+                <page uri="daemons://PublicsGrowFixer/">
+                     <actions>SPS.Stat.PublicsGrowFixer</actions>
                  </page>
 
             </pageGroup>

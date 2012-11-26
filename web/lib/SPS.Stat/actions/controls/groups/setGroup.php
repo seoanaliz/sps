@@ -28,13 +28,10 @@
             if ( !$type || !in_array( $type, $type_array, 1 ) )
                 $type = 'Stat';
             $m_class    = $type . 'Groups';
-
             $general    = $general ? $general : 0;
             $groupId    = $groupId ? $groupId : 0;
-
             $ava        = $ava      ? $ava     : NULL;
             $comments   = $comments ? comments : NULL;
-
 
             if ( !$groupName || !$userId ) {
                 die(ERR_MISSING_PARAMS);

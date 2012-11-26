@@ -96,6 +96,10 @@ class BarterEventFactory
                 'name'      => 'start_search_at'
             , 'type'        => TYPE_STRING
         )
+        ,'standard_mark' => array(
+              'name'      => 'standard_mark'
+            , 'type'      => TYPE_BOOLEAN
+        )
     )
     , 'search'    => array(
             '_barter_event_id' => array(
@@ -155,10 +159,16 @@ class BarterEventFactory
         )
         ,
         '_statusNE' => array(
-              'name'          => 'status'
+              'name'        => 'status'
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_NOT_EQUALS
-            )
+        )
+        ,
+        '_standard_markE' => array(
+              'name'        => 'standard_mark'
+            , 'type'        => TYPE_BOOLEAN
+            , 'searchType'  => SEARCHTYPE_EQUALS
+        )
     ));
 
     /** @return array */

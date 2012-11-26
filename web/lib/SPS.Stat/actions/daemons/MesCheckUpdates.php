@@ -13,7 +13,7 @@ class MesCheckUpdates
 //        error_reporting(0);
 
         $im_users = StatUsers::get_im_users();
-        MesDialogs::check_new_messages( $im_users );
+        MesDialogs::check_new_messages( $im_users, 50 );
         foreach( $im_users as $user ) {
 //                $this->ungroup_transfer( $user );
           // MesDialogs::check_friend_requests( $user );
@@ -23,9 +23,9 @@ class MesCheckUpdates
     public function ungroup_transfer( $im_user )
     {
         $ungr_dialogs =  MesGroups::get_ungroup_dialogs( $im_user, 10000 );
-        $group_id     = MesGroups::get_unlist_dialogs_group( $im_user );
+        $group_id     =  MesGroups::get_unlist_dialogs_group( $im_user );
         foreach( $ungr_dialogs as $dialog_id => $rec_id ) {
-            MesGroups::implement_entry( $group_id, $dialog_id, $user_id );
+            MesGroups::implement_entry( $group_id, $dialog_id, $im_user );
         }
     }
 

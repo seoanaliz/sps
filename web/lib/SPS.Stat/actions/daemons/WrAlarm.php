@@ -17,6 +17,8 @@ class WrAlarm
     {
         set_time_limit(0);
         $this->connect = ConnectionFactory::Get( 'tst' );
+
+
 //         $publics = $this->get_monitoring_publs();
 //         print_r($publics);
 //         $this->check_block( $publics );
@@ -25,19 +27,14 @@ class WrAlarm
 //        print_R($report);
 //        die();
 
-//        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
-
+        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
         $publics = $this->get_monitoring_publs();
         $this->check_in_search( $publics );
-
-
         $this->check_block( $publics );
 
-        print_R($this->wasted_array);
-        $report = $this->form_report();
-//        print_R($report);
-//        if ( $report )
-//            $this->send_report( $report );
+        $report = $this->form_report_2();
+        if ( $report )
+            $this->send_report( $report );
     }
 
     public function check_block( $publics_array )
@@ -68,7 +65,6 @@ class WrAlarm
                         die();
                     }
                     StatPublics::set_state( $public_id, 'active', true, $this->connect );
-
                 }
             }
 
@@ -84,6 +80,7 @@ class WrAlarm
                     $this->wasted_array[$id] = 'closed';
                 } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
                     StatPublics::set_state( $id, 'active', false, $this->connect );
+                    StatPublics::set_state( $id, 'in_search', false, $this->connect );
                     $this->wasted_array[$id] = 'blocked';
                 }
             }
@@ -113,7 +110,7 @@ class WrAlarm
                 'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
             sleep(0.5);
             foreach( $res as $apublic_id => $search_result ) {
-                if ($apublic_id == 'error') {
+                if ( $apublic_id == 'error' ) {
                     break;
                 }
                 $public_id = trim( $apublic_id, 'a');
@@ -124,6 +121,8 @@ class WrAlarm
                         continue(2);
                     }
                 }
+
+
                 $this->wasted_array[$public_id] = 'search';
                 StatPublics::set_state( $public_id, 'in_search', false, $this->connect );
             }
@@ -139,10 +138,8 @@ class WrAlarm
         $cmd->Execute();
     }
 
-    public function get_monitoring_publs( $in_search = '' )
+    public function get_monitoring_publs( )
     {
-        if ( $in_search )
-            $in_search = ' AND in_search is TRUE';
         $sql = 'SELECT vk_id,name
                 FROM stat_publics_50k
                 WHERE   quantity>100000';
@@ -220,6 +217,63 @@ class WrAlarm
         }
 
         return $message;
+    }
+
+    public function form_report_2()
+    {
+        $now = time();
+        $changes = StatPublics::get_public_changes( $now - 3600, $now , $this->connect );
+        foreach( $changes as $k => $v ) {
+            $search_line[] = $k;
+        }
+        if ( empty( $search_line )) {
+            die( 'Никаких изменений замечено не было!' );
+        }
+        $publics_info = StatPublics::get_publics_info_from_base( $search_line );
+
+        $block_line    = '';
+        $unblock_line  = '';
+        $search_line   = '';
+        $unsearch_line = '';
+        $closed_line   = '';
+        $unclosed_line = '';
+        $rename_line   = '';
+        $line          = '';
+        foreach( $changes as $public_id => $change ){
+
+            $type =  $publics_info[$public_id]['page'] ? ' страниц' : ' групп';
+            switch ( $change['act'] ) {
+                case 'active':
+                    $line   = $change['active'] == 't' ? 'unblock_line' : 'block_line';
+                    break;
+                case 'in_search':
+                    $line   = $change['in_search'] == 't' ? 'search_line' : 'unsearch_line';
+                    break;
+                case 'name':
+                    break;
+                case 'closed':
+                    $line   = $change['closed'] == 't' ? 'closed_line' : 'unclosed_line';
+                    break;
+                default:
+                    continue(2);
+            }
+            if( $line )
+                $$line .= '- ' . $type . "у [public$public_id|" . $publics_info[$public_id]['name'] . "] " . "\n";
+            else {
+                $rename_line .= "- [public". $public_id ."|" . $change['new_name'] . "] ( бывший \"" . $change['old_name'] . "\")\n";
+                $line = 'rename_line';
+            }
+            $$line .= "-- Количество подписчиков: " . $publics_info[$public_id]['quantity'] .  " .\n";
+            $$line .= "-- Место в рейтинге " . $type . " : " . $this->get_public_place( $public_id, $publics_info[$public_id]['page'] ). " .\n\n";
+        }
+        return       ( $block_line ? "Заблокировали: \n" . $block_line . "\n": '' ) .
+            ( $unblock_line ? "Разблокировали: \n" . $unblock_line . "\n": '' ) .
+            ( $search_line ? "Убрали из поиска: \n" . $search_line . "\n": '' ) .
+            ( $unsearch_line ? "Вернули в поиск: \n" . $unsearch_line . "\n": '' ) .
+            ( $closed_line ? "Закрыли стену: \n" . $closed_line . "\n": '' ) .
+            ( $unclosed_line ? "Открыли стену: \n" . $unclosed_line . "\n": '' ) .
+            ( $rename_line ? "Переименовали(сь): \n" . $rename_line . "\n": '' );
+
     }
 
     public function send_report( $message )

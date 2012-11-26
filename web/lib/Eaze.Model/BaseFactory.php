@@ -151,6 +151,9 @@
                 'operator'       => 'ILIKE'
                 , 'appendRight'  => '%'
             )
+            , SEARCHTYPE_INTARRAY_CONTAINS => array(
+                'operator'       => '= ANY('
+            )
         );
 
 
@@ -260,7 +263,7 @@
                 // check for nullable
                 if ( isset( $data['nullable'] ) ) {
                     switch ( $data['nullable']) {
-                    	case 'CheckEmpty':
+                        case 'CheckEmpty':
                     		if ( empty( $object->$field ) )  {
                     		    $errors['fields'][$field]['null'] = 'null';
                     		    continue 2;

@@ -8,7 +8,7 @@
  */
 class CheckPosts
 {
-    const time_shift = 10800;
+    const time_shift = 0;
     private $now;
 
     public function Execute()

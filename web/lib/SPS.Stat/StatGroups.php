@@ -13,7 +13,7 @@
             return false;
         }
 
-        public static  function get_group( $groupId )
+        public static function get_group( $groupId )
         {
             $sql = 'SELECT group_id, name, general, name, comments,type, group_admin FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
@@ -67,8 +67,8 @@
         {
             $sql = 'SELECT a.group_id
                     FROM
-                    '  . TABLE_MES_GROUP_USER_REL . ' as a
-                    , ' . TABLE_MES_GROUPS . ' as b
+                    '  . TABLE_STAT_GROUP_USER_REL . ' as a
+                    , ' . TABLE_STAT_GROUPS . ' as b
                     WHERE
                         a.group_id = b.group_id
                         AND a.user_id = @user_id
@@ -76,6 +76,7 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
             $cmd->SetInteger( '@user_id',      $user_id);
             $cmd->SetString ( '@group_name',   $group_name);
+
             $ds = $cmd->Execute();
 
             $ds->Next();
@@ -158,7 +159,7 @@
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
             //update
-            if ($groupId) {
+            if ( $groupId ) {
                 $sql = 'UPDATE
                             ' . TABLE_STAT_GROUPS .
                     ' SET
@@ -171,9 +172,9 @@
                 $cmd->SetString('@comments',    $comments);
                 $cmd->SetString('@ava',         $ava);
                 $cmd->Execute();
-
+                return $groupId;
             //create new
-            } elseif($groupName) {
+            } elseif( $groupName ) {
                 $sql = 'INSERT INTO
                         ' . TABLE_STAT_GROUPS . '
                             ("name", comments, ava)
@@ -189,7 +190,7 @@
                 $ds = $cmd->Execute();
                 $ds->next();
                 $groupId = $ds->getValue('group_id', TYPE_INTEGER);
-                if (!$groupId || $groupId== NULL) {
+                if ( !$groupId || $groupId== NULL) {
                     return false;
                 }
 

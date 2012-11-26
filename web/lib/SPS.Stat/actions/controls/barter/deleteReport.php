@@ -8,7 +8,6 @@
  */
 class deleteReport
 {
-
     public function execute()
     {
         error_reporting(0);
@@ -21,9 +20,6 @@ class deleteReport
         $barter_event = BarterEventFactory::GetById( $barter_event_id );
         $barter_event->status = 6;
         BarterEventFactory::Update( $barter_event );
-        die( ObjectHelper::ToJSON( array('response' => true)));
-
+        die( ObjectHelper::ToJSON( array( 'response' => true )));
     }
-
-
 }

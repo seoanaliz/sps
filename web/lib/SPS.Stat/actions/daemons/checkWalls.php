@@ -11,7 +11,14 @@ class CheckWalls
     const time_shift = 0;
     public function Execute()
     {
-//        error_reporting(0);
+        error_reporting(0);
+        set_time_limit( 0 );
+
+        if ( date('H') == 1 && date('i') < 15 )
+            $this->temp_barter_creater();
+        else
+            echo 'not now!';
+        die();
         $this->kill_overtimed();
         $this->turn_on_search();
 
@@ -56,14 +63,13 @@ class CheckWalls
     {
         $barters = array();
         $publics_chunks = array_chunk( $publics, 25 );
-
+        $wall_array = array();
         foreach( $publics_chunks as $public_chunk ) {
             $res = StatPublics::get_publics_walls( $public_chunk );
             $public = reset( $public_chunk );
             //обработка стенок, поиск нужного поста
             foreach( $res as $public_wall ) {
                 unset( $public_wall[0] );
-
                 foreach( $public_wall as $post ) {
 
                     if( $post->date < $public->start_search_at->format('U')){
@@ -122,4 +128,73 @@ class CheckWalls
         $our_publics = StatPublics::get_our_publics_list();
     }
 
+    //омг
+    public function temp_barter_creater()
+    {
+        $our_array = array(
+             35806721
+            ,35807199
+            ,36959959
+            ,35807148
+            ,36621513
+        );
+
+        $not_our_array = array(
+             42092461
+            ,33769500
+            ,24313746
+            ,28981879
+            ,39441344
+            ,35238813
+            ,23616160
+            ,35683607
+            ,30953300
+        );
+
+        foreach( $our_array as $oid )
+            foreach( $not_our_array as $noid ) {
+                $now = time();
+                $check = BarterEventFactory::Get(
+                    array(
+                     '_barter_public'       =>  $noid
+                    ,'_target_public'       =>  $oid
+                    ,'_start_search_atGE'   =>  date( 'Y-m-d 00:00:01', $now )
+                    )
+                );
+
+                if( !empty( $check )) {
+                    print_r( $check );
+                    return true;
+                }
+                $info = $this->get_page_name( array( $oid, $noid ));
+                $barter_event = new BarterEvent();
+                $barter_event->barter_public =  $info['barter']['id'];
+                $barter_event->target_public =  $info['target']['id'];
+                $barter_event->status        =  1;
+                $barter_event->search_string =  $info['target']['shortname'];
+                $barter_event->barter_type   =  1;
+                $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
+                $stop_looking_time = date( 'Y-m-d 23:59:59', $now );
+                $barter_event->stop_search_at  =  $stop_looking_time;
+//                $barter_event->standard_mark = true;
+                $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
+                BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
+            }
+    }
+
+    public function get_page_name( $urls )
+    {
+        $search = array( '/^(club)/', '/^(public)/');
+
+        $query_line = array();
+        foreach( $urls as $url ) {
+            $url = parse_url( $url );
+            $url = ltrim( $url['path'], '/' );
+            $query_line[] = preg_replace( $search, '', $url );
+        }
+
+        $info = StatPublics::get_publics_info( $query_line );
+        return  array( 'target' =>  reset( $info ),
+            'barter' =>  end( $info ));
+    }
 }
