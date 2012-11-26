@@ -37,9 +37,6 @@
                 case SEARCHTYPE_INTARRAY_CONTAINS:
                     $result = sprintf( '%s && %s', $value, $field );
                     break;
-                case SEARCHTYPE_INTARRAY_CONTAINS:
-                    $result = sprintf( '%s && %s', $value, $field );
-                    break;
                 default:
                     Logger::Error( 'Invalid search type %s', $operator );
                     $result = 'false';
