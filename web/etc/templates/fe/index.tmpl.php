@@ -1,3 +1,8 @@
+<?
+/**
+ * @var $RoleUtility RoleUtility
+ */
+?>
 {increal:tmpl://fe/elements/header.tmpl.php}
 <script src="{web:js://fe/main.js}" type="text/javascript"></script>
 <div id="go-to-top">Наверх</div>
@@ -9,9 +14,12 @@
                 <div id="wall-load"></div>
 
                 <div class="type-selector">
-                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                        <a class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
-                    <? } ?>
+                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle):
+                    ?>
+                        <a class="sourceType <?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                    <?
+                    endforeach;
+                    ?>
                     <a data-type="authors-list">+</a>
                 </div>
 
@@ -107,8 +115,8 @@
 
                     <div class="type-selector">
                         <a class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <a class="active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
-                        <a class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                        <a class="grid_type active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
+                        <a class="grid_type" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
                     </div>
 
                 </div>

@@ -13,7 +13,7 @@
          * Entry Point
          */
         public function Execute() {
-            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            $targetFeedId = Request::getInteger('targetFeedId');
 
             $type = Request::getString( 'type' );
             if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
@@ -52,7 +52,19 @@
                 }
             }
 
-            echo ObjectHelper::ToJSON($result);
+            $RoleUtility = new RoleUtility();
+
+
+
+
+
+
+            echo ObjectHelper::ToJSON(array(
+                'sourceFeeds' => $result,
+                'accessibleSourceTypes' => $RoleUtility->getAccessibleSourceTypes($targetFeedId),
+                'accessibleGridTypes' => $RoleUtility->getAccessibleGridTypes($targetFeedId),
+                'canAddPlanCell' => $RoleUtility->canAddPlanCell($targetFeedId)
+            ));
         }
     }
 

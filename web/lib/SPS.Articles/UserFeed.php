@@ -23,6 +23,16 @@ class UserFeed
      */
     const ROLE_OWNER = 1;
 
+    /**
+     * Роль автор
+     */
+    const ROLE_AUTHOR = 2;
+
+    /**
+     * Роль администратор
+     */
+    const ROLE_ADMINISTRATOR = 3;
+
     /** @var int */
     public $vkId;
 

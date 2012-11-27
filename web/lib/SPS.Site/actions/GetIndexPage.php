@@ -13,12 +13,11 @@
          * Entry Point
          */
         public function Execute() {
-
             /**
              * current values from settings
              */
             $currentTargetFeedId = SettingsUtility::GetTarget();
-
+            $RoleUtility = new RoleUtility();
             /**
              * target feeds
              */
@@ -46,6 +45,7 @@
             Response::setArray( "targetFeeds", $targetFeeds );
             Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
             Response::setParameter('currentDate', SettingsUtility::GetDate());
+            Response::setParameter('RoleUtility', $RoleUtility);
         }
     }
 ?>
