@@ -1,6 +1,9 @@
 <?
 /**
  * @var $RoleUtility RoleUtility
+ * @var $sourceTypes array
+ * @var $gridTypes array
+ *
  */
 ?>
 {increal:tmpl://fe/elements/header.tmpl.php}
@@ -14,10 +17,12 @@
                 <div id="wall-load"></div>
 
                 <div class="type-selector">
-                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle):
+                    <? $i=0;
+                    foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                     ?>
-                        <a class="sourceType <?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                       <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
                     <?
+                    $i++;
                     endforeach;
                     ?>
                     <a data-type="authors-list">+</a>
@@ -114,9 +119,12 @@
                    </div -->
 
                     <div class="type-selector">
-                        <a class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <a class="grid_type active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
-                        <a class="grid_type" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                        <a class="grid_type all" <?=count($gridTypes) < 2 ? 'style="display:none"' : ''?> data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <?
+                        $i=0;
+                        foreach ($gridTypes as $type => $name): ?>
+                        <a class="grid_type <?=!$i++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
+                        <? endforeach; ?>
                     </div>
 
                 </div>

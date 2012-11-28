@@ -65,6 +65,7 @@
         }
 
 
+        static $loaded = array();
         /**
          * Load Package
          *
@@ -73,7 +74,7 @@
          */
         public static function Load( $name ) {
             if ( ( empty( $name ) )
-                 || ( isset( Package::$Packages[$name] ) )
+                 || ( isset( Package::$Packages[$name] ))
             ) {
                 return false;
             }
@@ -124,6 +125,7 @@
                 }
 
                 self::defferedRequire( $deferredInclude );
+                Package::$Packages[$name] = $name;
                 return true;
             }
 

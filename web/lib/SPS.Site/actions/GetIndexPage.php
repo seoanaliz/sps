@@ -13,11 +13,12 @@
          * Entry Point
          */
         public function Execute() {
+
             /**
              * current values from settings
              */
             $currentTargetFeedId = SettingsUtility::GetTarget();
-            $RoleUtility = new RoleUtility();
+
             /**
              * target feeds
              */
@@ -35,17 +36,26 @@
                 }
             }
 
+            $RoleUtility = new RoleUtility();
+            $sourceTypes = $gridTypes = array();
+            if ($currentTargetFeedId) {
+                $sourceTypes = $RoleUtility->getAccessibleSourceTypes($currentTargetFeedId);
+                $gridTypes = $RoleUtility->getAccessibleGridTypes($currentTargetFeedId);
+            }
+
             $sourceFeeds = SourceFeedFactory::Get(
                 array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($currentTargetFeedId))
                 , array( BaseFactory::WithoutPages => true )
             );
 
-            Response::setArray( "sourceFeeds", $sourceFeeds );
-            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
-            Response::setArray( "targetFeeds", $targetFeeds );
+            Response::setArray('sourceFeeds', $sourceFeeds );
+            Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
+            Response::setArray('targetFeeds', $targetFeeds );
             Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
             Response::setParameter('currentDate', SettingsUtility::GetDate());
             Response::setParameter('RoleUtility', $RoleUtility);
+            Response::setParameter('sourceTypes', $sourceTypes);
+            Response::setParameter('gridTypes', $gridTypes);
         }
     }
 ?>

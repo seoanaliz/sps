@@ -1,6 +1,6 @@
 /** @var editors */
 $(function(){
-    $( "input.editors" )
+    $( "input.userList" )
         // don't navigate away from the field on tab when selecting an item
         .bind( "keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB &&
@@ -32,12 +32,16 @@ $(function(){
                 return false;
             },
             select: function( event, ui ) {
+                var b = $('#u' + ui.item.value);
+                if (b.length) {
+                   b.parent().remove();
+                }
                 $(this).val('');
                 var list = $('#' + this.id + '_values');
                 list.append('<li>' +
                         '<input type="hidden" name="' + list.data('input_name') + '" value="' +  ui.item.value + '">' +
                         ui.item.name  +
-                        '<span class="button remove" onclick="removeUser(this)"></span>' +
+                        '<span class="button remove" id="u' + ui.item.value + '" onclick="removeUser(this)"></span>' +
                     '</li>');
                 return false;
             }
@@ -46,5 +50,6 @@ $(function(){
 });
 
 function removeUser(button){
-    $(button).parent().remove()
+    console.log(button)
+    $(button)
 }

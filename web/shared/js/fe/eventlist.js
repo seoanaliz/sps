@@ -342,14 +342,21 @@ var Eventlist = {
                 });
 
                 var gridTypes = data['accessibleGridTypes'];
+                showCount = 0
                 $('.right-panel div.type-selector').children('.grid_type').each(function(i, item){
                     item = $(item);
                     if ($.inArray(item.data('type'), gridTypes) == -1){
                         item.hide();
                     } else {
+                        showCount ++
                         item.show();
                     }
                 });
+                if (showCount > 2) {
+                    $('a.grid_type.all').show();
+                } else {
+                    $('a.grid_type.all').hide();
+                }
 
                 var addCellButton = $('div.queue-footer > a.add-button');
                 if (data['canAddPlanCell']) {

@@ -61,8 +61,8 @@
 
             echo ObjectHelper::ToJSON(array(
                 'sourceFeeds' => $result,
-                'accessibleSourceTypes' => $RoleUtility->getAccessibleSourceTypes($targetFeedId),
-                'accessibleGridTypes' => $RoleUtility->getAccessibleGridTypes($targetFeedId),
+                'accessibleSourceTypes' => array_keys($RoleUtility->getAccessibleSourceTypes($targetFeedId)),
+                'accessibleGridTypes' => array_keys($RoleUtility->getAccessibleGridTypes($targetFeedId)),
                 'canAddPlanCell' => $RoleUtility->canAddPlanCell($targetFeedId)
             ));
         }
