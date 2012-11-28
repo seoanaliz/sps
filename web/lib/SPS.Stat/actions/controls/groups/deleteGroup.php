@@ -20,17 +20,36 @@
             $user_id  = Request::getInteger ( 'userId'  );
             $group_id = Request::getInteger ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
-            $type     =   Request::getString ( 'type' );
+            $type     = ucfirst( Request::getString( 'type' ));
 
-            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
-            if ( !$type || !in_array( $type, $type_array, 1 ) )
-                $type = 'Stat';
+            $type_array = array( 'Stat', 'Mes', 'Barter' );
+            if ( !$type || !in_array( $type, $type_array ))
+                $type    = 'Stat';
+
             $m_class    = $type . 'Groups';
 
             $general = $general ? $general : 0;
 
             if ( !$group_id || !$user_id ) {
                 die(ERR_MISSING_PARAMS);
+            }
+
+            if( $type == 'Barter' ) {
+                $source = 1;
+                $default_group = GroupsUtility::get_default_group( $user_id, $source  );
+                $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by' => $user_id ));
+                if ( $group && $group->group_id === $default_group->group_id )
+                    //дефолтные группы удалять нельзя
+                    die(  ObjectHelper::ToJSON(array('response' => false )));
+                elseif( !$group ) {
+                    //отписываем человека от группы
+                    $group = GroupFactory::GetOne( array( 'group_id' => $group_id ));
+                    GroupsUtility::dismiss_from_group( $group, $user_id );
+                } else {
+                    //жесткое удаление группы, только создавший
+                    GroupsUtility::delete_group( $group, $default_group );
+                }
+                die( ObjectHelper::ToJSON(array('response' => true )));
             }
 
             if ( $general AND statUsers::is_Sadmin( $user_id ) ) {
@@ -40,16 +59,15 @@
                 $res = $m_class::extricate_group( $group_id, $user_id );
 
             } else {
-                echo  ObjectHelper::ToJSON(array('response' => false));
-                die();
+                die( ObjectHelper::ToJSON(array('response' => false)));
+
             }
 
             if ( $res ) {
-                echo  ObjectHelper::ToJSON(array('response' => true));
-                die();
+                die(  ObjectHelper::ToJSON(array('response' => true)));
             }
 
-            echo  ObjectHelper::ToJSON(array('response' => false));
+            die( ObjectHelper::ToJSON(array('response' => false)));
         }
     }
 ?>
