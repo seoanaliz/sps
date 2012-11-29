@@ -62,5 +62,8 @@ class BarterEvent
     /** @var boolean */
     public $standard_mark;
 
+    /** @var int array*/
+    public $groups_ids;
+
 }
 ?>

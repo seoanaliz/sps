@@ -58,6 +58,9 @@
             <action name="setUserRank">
                 <path>controls/setUserRank</path>
             </action>
+            <action name="GetPublicGrowth">
+                <path>controls/stat/GetPublicGrowthAction</path>
+            </action>
         </group>
 
         <group name="Barter">

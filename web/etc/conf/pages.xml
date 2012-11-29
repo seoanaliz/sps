@@ -243,7 +243,7 @@
                         <template>tmpl://vt/statistic/statistic.tmpl.php</template>
                     </page>
                     <page uri="vt://stat/">
-                        <actions>Sps.Stat.GraphGrow</actions>
+                        <actions>SPS.Stat.GetPublicGrowth</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
                     </page>
 
