@@ -13,49 +13,77 @@ class AddReport
     {
         error_reporting(0);
         $now = time();
-
         $target_public_id   =   Request::getString ( 'targetPublicId' );
         $barter_public_id   =   Request::getString ( 'barterPublicId' );
         $start_looking_time =   Request::getInteger( 'startTime' ) ? Request::getInteger( 'startTime' ) : $now ;
         $stop_looking_time  =   Request::getInteger( 'stopTime' );
+        $user_id            =   Request::getInteger( 'userId' );
+        $group_id           =   Request::GetInteger( 'groupId' );
+        $approve            =   Request::getBoolean( 'approve' );
+        $barter_id          =   Request::getInteger( 'reportId' );
+
+//        if ( !$target_public_id || !$barter_public_id || !$start_looking_time || !$user_id || !$group_id ) {
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
         }
 
-        $info = $this->get_page_name( array( $target_public_id, $barter_public_id ));
-        $barter_event = new BarterEvent();
-        $barter_event->barter_public = $info['barter']['id'];
+//        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+//            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
+
+
+        $info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
+
+        //проверяем, нет ли схожих активных событий( есть - вернет их );
+        // $approve - подтверждение на создание, пока всегда 0
+//        if (  $barter_id && !$approve ) {
+//            //todo проверка по времени?
+//
+//            $repeat_check = StatBarter::get_concrete_events( $info['target']['id'], $info['barter']['id'], 1 );
+//            if ( !empty( $repeat_check ))
+//                die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
+//        }
+
+        if( $barter_id )
+            $barter_event = BarterEventFactory::GetById( $barter_id, null, 'tst');
+        else
+            $barter_event = new BarterEvent();
+        $barter_event->barter_public =  $info['barter']['id'];
         $barter_event->target_public =  $info['target']['id'];
-        $barter_event->status        = $start_looking_time ? 1 : 2;
+        $barter_event->status        =  $start_looking_time ? 1 : 2;
         $barter_event->search_string =  $info['target']['shortname'];
-        $barter_event->barter_type   = 1;
+        $barter_event->barter_type   =  1;
         $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $start_looking_time );
         $stop_looking_time = $stop_looking_time ?
             date( 'Y-m-d H:i:s', $stop_looking_time ) : date( 'Y-m-d 23:59:59', $now );
         $barter_event->stop_search_at  =  $stop_looking_time;
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
+        $barter_event->standard_mark = true;
+        $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
+        $barter_event->groups_ids = array( 0 );
 
-        BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
+        //разэталониваем предыдущие события такого рода
+        if ( !$barter_id ) {
+                $standard_check = StatBarter::get_concrete_events( $info['target']['id'], $info['barter']['id'], 0, 1 );
+            if ( !empty( $standard_check )) {
+                foreach( $standard_check as $entry ) {
+                    if ( $entry->standard_mark ) {
+                        $entry->standard_mark = false;
+                        BarterEventFactory::Update( $entry, array(),'tst');
+                    }
+                }
+            }
+        }
+
+        if( $barter_id ) {
+            BarterEventFactory::Update( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
+        } else {
+            BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
+        }
+
         if ( $barter_event->barter_event_id ) {
             die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( array( $barter_event )))));
         } else
             die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something goes wrong' )));
-    }
-
-    public function get_page_name( $urls )
-    {
-        $search = array( '/^(club)/', '/^(public)/');
-
-        $query_line = array();
-        foreach( $urls as $url ) {
-            $url = parse_url( $url );
-            $url = ltrim( $url['path'], '/' );
-            $query_line[] = preg_replace( $search, '', $url );
-        }
-
-        $info = StatPublics::get_publics_info( $query_line );
-        return  array( 'target' =>  reset( $info ),
-                       'barter' =>  end( $info ));
     }
 
 }

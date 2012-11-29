@@ -12,14 +12,21 @@ class deleteReport
     {
         error_reporting(0);
 
-        $barter_event_id   =   Request::getInteger( 'barterId' );
-        if ( !$barter_event_id ) {
+        $barter_event_id   =    Request::getInteger( 'barterId' );
+        $user_id           =    Request::getInteger( 'userId' );
+        $group_id          =    Request::getInteger( 'groupId' );
+
+        if ( !$barter_event_id || !$user_id || !$group_id ) {
             die(ERR_MISSING_PARAMS);
         }
+
+        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
 
         $barter_event = BarterEventFactory::GetById( $barter_event_id );
         $barter_event->status = 6;
         BarterEventFactory::Update( $barter_event );
         die( ObjectHelper::ToJSON( array( 'response' => true )));
+
     }
 }
