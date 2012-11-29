@@ -14,6 +14,8 @@
          */
         public function Execute() {
 
+            $userId = AuthVkontakte::IsAuth();
+
             /**
              * current values from settings
              */
@@ -22,10 +24,7 @@
             /**
              * target feeds
              */
-            $targetFeeds = TargetFeedFactory::Get(
-                array('_targetFeedId' => AccessUtility::GetTargetFeedIds())
-                , array( BaseFactory::WithoutPages => true )
-            );
+            $targetFeeds = TargetFeedFactory::getUserTargetFeeds($userId);
 
             if (empty($currentTargetFeedId)) {
                 //пытаемся получить источники для первого паблика

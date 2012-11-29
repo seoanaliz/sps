@@ -13,11 +13,19 @@
          * Entry Point
          */
         public function Execute() {
+            $RoleUtility = new RoleUtility();
+
             $targetFeedId = Request::getInteger('targetFeedId');
 
             $type = Request::getString( 'type' );
             if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
                 $type = SourceFeedUtility::Source;
+            } else {
+                throw new Exception('Неизвестный тип источника');
+            }
+
+            if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
+                throw new Exception('Доступ запрещен');
             }
 
             $result = array();
@@ -50,13 +58,9 @@
                         );
                     }
                 }
+            } else {
+                throw new Exception('Отсутствует иднетификатор ленты отправки');
             }
-
-            $RoleUtility = new RoleUtility();
-
-
-
-
 
 
             echo ObjectHelper::ToJSON(array(
