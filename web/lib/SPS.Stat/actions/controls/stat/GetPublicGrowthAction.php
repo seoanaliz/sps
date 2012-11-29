@@ -12,13 +12,12 @@ class GetPublicGrowthAction
      * Constructor
      */
     public function execute() {
-
         $this->get_publics_groth();
     }
 
     protected function get_publics_groth()
     {
-        $sql = 'SELECT * FROM ' . TABLE_STAT_OUR_GROWTH . ' ORDER BY point_date';
+        $sql = 'SELECT * FROM stat_our_auditory ORDER BY point_date';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $ds  = $cmd->Execute();
         $res = array();
@@ -31,10 +30,9 @@ class GetPublicGrowthAction
         }
         if ( count( $res ) <= 1 )
             return $res;
-        $i = 0;
         $prev_unq   = 0;
         $prev_ununq = 0;
-        foreach( $res as $date=>&$data ) {
+        foreach( $res as $date => &$data ) {
             $data['change_unq']     = $prev_unq   ? $data['unique_users'] - $prev_unq   : 0;
             $data['change_unuqunq'] = $prev_ununq ? $data['all_users']    - $prev_ununq : 0;
             $prev_unq   = $data['unique_users'];
