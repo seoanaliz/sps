@@ -21,11 +21,11 @@
             if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
                 $type = SourceFeedUtility::Source;
             } else {
-                throw new Exception('Неизвестный тип источника');
+                throw new Exception('Unknown source feed type');
             }
 
             if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
-                throw new Exception('Доступ запрещен');
+                throw new Exception('Access denied');
             }
 
             $result = array();
@@ -59,7 +59,7 @@
                     }
                 }
             } else {
-                throw new Exception('Отсутствует иднетификатор ленты отправки');
+                throw new Exception('Unknown source feed identifier');
             }
 
 
