@@ -8,17 +8,19 @@
  */
 class CheckWalls
 {
+
+    private $walls;
     const time_shift = 0;
+
     public function Execute()
     {
-        error_reporting(0);
+//        error_reporting(0);
         set_time_limit( 0 );
 
         if ( date('H') == 1 && date('i') < 15 )
             $this->temp_barter_creater();
         else
             echo 'not now!';
-        die();
         $this->kill_overtimed();
         $this->turn_on_search();
 
@@ -37,7 +39,6 @@ class CheckWalls
                 $barter_event->start_subscribers     =   $search_results[ $barter_event->barter_event_id ]['start_subscribers'];
             }
         }
-        print_r($barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -61,37 +62,35 @@ class CheckWalls
 
     public function wall_search( $publics )
     {
-        $barters = array();
-        $publics_chunks = array_chunk( $publics, 25 );
-        $wall_array = array();
-        foreach( $publics_chunks as $public_chunk ) {
-            $res = StatPublics::get_publics_walls( $public_chunk );
-            $public = reset( $public_chunk );
-            //обработка стенок, поиск нужного поста
-            foreach( $res as $public_wall ) {
-                unset( $public_wall[0] );
-                foreach( $public_wall as $post ) {
+        $barters   = array();
+        $ids_array = array();
+        foreach( $publics as $barter_event )
+            $ids_array[] = $barter_event->barter_public;
 
-                    if( $post->date < $public->start_search_at->format('U')){
-                        echo 'слишком старые посты<br>';
-                        break;
-                    }
-
-                    $barter_post = $this->find_barter( $post->text, $public->search_string, $public->target_public );
-                    //если в тексте есть вики ссылка, или это репост с нашего паблика
-                    if ( $barter_post
-                        || ( isset( $post->copy_owner_id ) && ltrim( $post->copy_owner_id, '-' ) == $public->target_public )) {
-                        $barters[ $public->barter_event_id ] = array(
-                            'time'      =>  $post->date,
-                            'post_id'   =>  $post->id ,
-                            'target_id' =>  trim( $public->target_public )
-                        );
-                    }
+        $walls = StatPublics::get_public_walls_mk2( $ids_array );
+        foreach( $publics as $barter_event ) {
+            if( !isset( $walls[$barter_event->barter_public ])) {
+                //todo логирование
+                continue;
+            }
+            foreach( $walls[ $barter_event->barter_public ] as $post ) {
+                if( $post->date < $barter_event->start_search_at->format('U')) {
+                    echo 'слишком старые посты<br>';
+                    break;
                 }
-                $public = next( $public_chunk );
+
+                $barter_post = $this->find_barter( $post->text, $barter_event->search_string, $barter_event->target_public );
+                //если в тексте есть вики ссылка, или это репост с нашего паблика
+                if ( $barter_post
+                    || ( isset( $post->copy_owner_id ) && ltrim( $post->copy_owner_id, '-' ) == $barter_event->target_public )) {
+                    $barters[ $barter_event->barter_event_id ] = array(
+                        'time'      =>  $post->date,
+                        'post_id'   =>  $post->id ,
+                        'target_id' =>  trim( $barter_event->target_public )
+                    );
+                }
             }
         }
-        print_r( $barters );
         return $barters;
     }
 
@@ -140,7 +139,7 @@ class CheckWalls
         );
 
         $not_our_array = array(
-             42092461
+            42092461
             ,33769500
             ,24313746
             ,28981879
@@ -149,9 +148,17 @@ class CheckWalls
             ,23616160
             ,35683607
             ,30953300
+            ,30360552
+            ,34522398
+            ,36806640
+            ,25714310
+            ,34188307
+            ,40182105
+            ,30057637
+            ,33106344
         );
 
-        foreach( $our_array as $oid )
+        foreach( $our_array as $oid ) {
             foreach( $not_our_array as $noid ) {
                 $now = time();
                 $check = BarterEventFactory::Get(
@@ -159,6 +166,7 @@ class CheckWalls
                      '_barter_public'       =>  $noid
                     ,'_target_public'       =>  $oid
                     ,'_start_search_atGE'   =>  date( 'Y-m-d 00:00:01', $now )
+                    ,'_status' => array(1,2,3,4)
                     )
                 );
 
@@ -176,10 +184,11 @@ class CheckWalls
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
                 $stop_looking_time = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
-//                $barter_event->standard_mark = true;
+                $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
                 BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
             }
+        }
     }
 
     public function get_page_name( $urls )
