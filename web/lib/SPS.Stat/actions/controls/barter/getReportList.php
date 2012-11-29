@@ -42,7 +42,7 @@ class getReportList
         } elseif( strtolower( $state ) == 'complete' )
             $status_array = array( 4,5 );
         else
-            $status_array = array( 1,2,3 );
+            $status_array = array( 1,2,3,4,5 );
 
         $search = array(
             '_statusNE'     =>   6,
@@ -55,7 +55,9 @@ class getReportList
             '_target_public'=>   $target_public
         );
 
-        $options = array( 'orderBy' => $sort_by );
+//        $options = array( 'orderBy' => $sort_by );
+        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST ');
+
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
         die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res ))));
     }
