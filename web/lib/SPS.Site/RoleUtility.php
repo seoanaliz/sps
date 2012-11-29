@@ -110,4 +110,16 @@ class RoleUtility
         #return false;
         return true;
     }
+
+    public function getDefaultType($targetFeedId){
+        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
+            switch ($this->FeedRulesByFeed[$targetFeedId]) {
+               case UserFeed::ROLE_AUTHOR:
+                    return SourceFeedUtility::Authors;
+               break;
+               default:
+                return SourceFeedUtility::Source;
+            }
+        }
+    }
 }

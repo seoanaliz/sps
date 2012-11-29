@@ -19,13 +19,11 @@
 
             $type = Request::getString( 'type' );
             if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
-                $type = SourceFeedUtility::Source;
-            } else {
-                echo('Unknown source feed type');
+                $type = $RoleUtility->getDefaultType($targetFeedId);
             }
 
             if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
-                echo('Access denied');
+                echo('Access denied to type ' . $type);
             }
 
             $result = array();
@@ -47,7 +45,9 @@
                     }
                 } else {
                     $sourceFeeds = SourceFeedFactory::Get(
-                        array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId), 'type' => $type)
+                        array(
+                            '_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId),
+                            'type' => $type)
                         , array( BaseFactory::WithoutPages => true )
                     );
 
