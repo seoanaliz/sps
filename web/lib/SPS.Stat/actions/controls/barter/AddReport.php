@@ -21,7 +21,7 @@ class AddReport
         $group_id           =   Request::GetInteger( 'groupId' );
         $approve            =   Request::getBoolean( 'approve' );
         $barter_id          =   Request::getInteger( 'reportId' );
-
+        $start_looking_time -=  900;
 //        if ( !$target_public_id || !$barter_public_id || !$start_looking_time || !$user_id || !$group_id ) {
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
