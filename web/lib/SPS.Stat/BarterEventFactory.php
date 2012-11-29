@@ -152,6 +152,17 @@ class BarterEventFactory
             , 'type'         => TYPE_DATETIME
             ,'searchType'    => SEARCHTYPE_LE
         )
+        ,'_posted_atLE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_LE
+        )
+        ,'_posted_atGE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_GE
+        )
+
         ,'_start_search_atGE' => array(
              'name'         => 'start_search_at'
             ,'type'         => TYPE_DATETIME
