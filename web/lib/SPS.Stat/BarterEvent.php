@@ -65,5 +65,11 @@ class BarterEvent
     /** @var int array*/
     public $groups_ids;
 
+    public function __clone()
+    {
+        $this->barter_event_id = null;
+        $this->created_at = date ( 'Y-m-d H:i:s', time());
+    }
+
 }
 ?>
