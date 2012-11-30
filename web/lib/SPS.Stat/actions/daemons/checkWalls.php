@@ -186,7 +186,7 @@ class CheckWalls
                 $barter_event->search_string =  $info['target']['shortname'];
                 $barter_event->barter_type   =  1;
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
-                $stop_looking_time = date( 'Y-m-d 23:59:59', $now );
+                $stop_looking_time           = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
@@ -211,8 +211,29 @@ class CheckWalls
             'barter' =>  end( $info ));
     }
 
-    public function refresh_monitrs()
+    public static function refresh_monitors()
     {
-//        $active_monitors =;
+        $now = date( 'Y-m-d H:i:s', time());
+        $check = BarterEventFactory::Get(
+            array(
+                 '_created_atGE'    => date( 'Y-m-d 00:00:01', time())
+                ,'standard_mark'    => true
+            )
+        );
+
+        if( !empty( $check ))
+            return;
+
+        $active_monitors = BarterEventFactory::Get( array( 'status' => 2 ));
+        $new_monitors = array();
+        foreach( $active_monitors as $monitor ) {
+            $new_monitors[]          = clone $monitor;
+            $monitor->standard_mark  = false;
+            $monitor->status         = 5;
+            $monitor->stop_search_at = $now;
+        }
+
+        BarterEventFactory::AddRange( $new_monitors );
+        BarterEventFactory::UpdateRange( $active_monitors );
     }
 }
