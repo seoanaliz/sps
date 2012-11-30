@@ -43,6 +43,10 @@ class AddReport
 //                die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
 //        }
 
+        $repeat_check = StatBarter::get_concrete_events( $info['target']['id'], $info['barter']['id'], 1 );
+        if ( !empty( $repeat_check ))
+            die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
+
         if( $barter_id )
             $barter_event = BarterEventFactory::GetById( $barter_id, null, 'tst');
         else
