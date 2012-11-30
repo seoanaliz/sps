@@ -528,6 +528,34 @@
             return $res;
         }
 
+        public static function get_public_walls_mk2( $walls_array )
+        {
+            $walls = array();
+            $walls_array = array_unique( $walls_array );
+            $sliced_walls_array = array_chunk( $walls_array, 25 );
+            foreach( $sliced_walls_array as $chunk ) {
+                $code = '';
+                $return = "return{";
+                //запрашиваем стены пабликов по 25 пабликов, 10 постов
+                $i = 0;
+                foreach( $chunk as $public ) {
+                    $id = trim( $public );
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count":10 });';
+                    $return .=  "\"id$id\":id$id,";
+                    $i++;
+                }
+                $code .= trim( $return, ',' ) . "};";
+                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+                if( isset( $res->error ))
+                    continue;
+                foreach( $res as $id => $content ) {
+                    unset( $content[0] );
+                    $walls[ str_replace( 'id', '', $id )] = $content;
+                }
+            }
+            return $walls;
+        }
+
         public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
         {
             $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));

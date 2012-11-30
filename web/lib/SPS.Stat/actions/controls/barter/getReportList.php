@@ -56,7 +56,7 @@ class getReportList
         );
 
 //        $options = array( 'orderBy' => $sort_by );
-        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST ');
+        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
 
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
         die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res ))));

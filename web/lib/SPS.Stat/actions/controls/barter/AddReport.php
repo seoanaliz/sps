@@ -21,7 +21,7 @@ class AddReport
         $group_id           =   Request::GetInteger( 'groupId' );
         $approve            =   Request::getBoolean( 'approve' );
         $barter_id          =   Request::getInteger( 'reportId' );
-
+        $start_looking_time -=  900;
 //        if ( !$target_public_id || !$barter_public_id || !$start_looking_time || !$user_id || !$group_id ) {
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
@@ -42,6 +42,10 @@ class AddReport
 //            if ( !empty( $repeat_check ))
 //                die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
 //        }
+
+        $repeat_check = StatBarter::get_concrete_events( $info['target']['id'], $info['barter']['id'], 1 );
+        if ( !empty( $repeat_check ))
+            die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
 
         if( $barter_id )
             $barter_event = BarterEventFactory::GetById( $barter_id, null, 'tst');

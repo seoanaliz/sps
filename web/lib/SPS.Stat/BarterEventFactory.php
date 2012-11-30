@@ -178,6 +178,11 @@ class BarterEventFactory
             , 'type'         => TYPE_DATETIME
             , 'searchType'   => SEARCHTYPE_LE
         )
+        ,'_created_atGE' => array(
+              'name'         => 'created_at'
+            , 'type'         => TYPE_DATETIME
+            , 'searchType'   => SEARCHTYPE_GE
+        )
         ,
         '_statusNE' => array(
               'name'        => 'status'

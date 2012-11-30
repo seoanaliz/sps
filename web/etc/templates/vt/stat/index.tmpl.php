@@ -10,8 +10,7 @@
             ,   'аудитория'
             ,   'обмены'
             ,   'обмены, подп.'
-            ,   'обмены, посит.'
-
+            ,   'обмены, посет.'
         )
         , "colspans"	=> array()
         , "sorts"		=> array()
@@ -19,11 +18,9 @@
         , "allowAdd"	=> false
         , "canPages"	=> false
         , "basepath"	=> Site::GetWebPath( "vt://stat/" )
-        , "addpath"		=> false
         , "title"		=> 'стата'
 		, "description"	=> ''
         , "pageSize"	=> 0
-        , "deleteStr"	=> LocaleLoader::Translate( "vt.publisher.deleteString")
     );
 	
 	$__breadcrumbs = array( array( 'link' => $grid['basepath'], 'title' => $__pageTitle ) );
@@ -31,9 +28,8 @@
 {increal:tmpl://vt/header.tmpl.php}
 <div class="main">
 
-		
-		<!-- GRID -->
-		{increal:tmpl://vt/elements/datagrid/header.tmpl.php}
+<!-- GRID -->
+{increal:tmpl://vt/elements/datagrid/header.tmpl.php}
 <?php
     foreach ( $stat_summary as $k => $v )  {
 //        $editpath   = $grid['basepath'] . "edit/" . $id;
@@ -43,8 +39,8 @@
                 <td><?=$v['unique_users']?>(<?=$v['change_unq']?>)</td>
                 <td><?=$v['all_users']?>(<?=$v['change_unuqunq']?>)</td>
                 <td><?=$v['barters']?></td>
-                <td><?=$v['barters_vis']?></td>
                 <td><?=$v['barters_subs']?></td>
+                <td><?=$v['barters_vis']?></td>
 
 	        </tr>
 <?php
