@@ -17,8 +17,13 @@ class CheckWalls
 //        error_reporting(0);
         set_time_limit( 0 );
 
-        if ( date('H') == 1 && date('i') < 15 )
+        if ( date('H') == 1 && date('i') < 15 ) {
+            //установка новых заданных бартеров
             $this->temp_barter_creater();
+            //создание новых событий активных мониторов
+            //допустим, ставим монитор на неделю. нам нужно мониторить все эти события, а не только первое.
+//            $this->refresh_monitrs();
+        }
         else
             echo 'not now!';
         $this->kill_overtimed();
@@ -165,11 +170,10 @@ class CheckWalls
                     array(
                      '_barter_public'       =>  $noid
                     ,'_target_public'       =>  $oid
-                    ,'_start_search_atGE'   =>  date( 'Y-m-d 00:00:01', $now )
+                    ,'_created_atGE'        =>  date( 'Y-m-d 00:00:01', $now )
                     ,'_status' => array(1,2,3,4)
                     )
                 );
-
                 if( !empty( $check )) {
                     print_r( $check );
                     return true;
@@ -205,5 +209,10 @@ class CheckWalls
         $info = StatPublics::get_publics_info( $query_line );
         return  array( 'target' =>  reset( $info ),
             'barter' =>  end( $info ));
+    }
+
+    public function refresh_monitrs()
+    {
+//        $active_monitors =;
     }
 }
