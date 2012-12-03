@@ -86,7 +86,14 @@ class CheckPosts
         foreach( $barter_events_array as $barter_event ) {
             if ( $barter_event->status != 3 ) {
                 $time = time() + self::time_shift;
-                $res =  StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
+                for( $i = 0; $i < 5; $i++ ) {
+                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
+                    if( !$res ) {
+                        sleep(1);
+                        continue;
+                    }
+                    break;
+                }
                 $barter_event->end_visitors = $res['visitors'];
                 $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
                 $barter_event->end_subscribers = $res->count;
