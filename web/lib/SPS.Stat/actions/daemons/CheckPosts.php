@@ -14,16 +14,13 @@ class CheckPosts
     public function Execute()
     {
         $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time()));
-        //получить список активных эвентов (статус = 3 )
-        //прогнать нужные стены(10 записей), поиск search_string
-        //не найдено - статус 5, собрать визиторов и население
 //        error_reporting(0);
         $barters_for_search = BarterEventFactory::Get( array( 'status' => 3 ), null, 'tst' );
 
         $this->search_for_posts( $barters_for_search );
 
         $this->update_population( $barters_for_search );
-        print_r($barters_for_search);
+        print_r( $barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -31,7 +28,6 @@ class CheckPosts
     {
         $chunks = array_chunk( $barter_events_array, 25 );
         foreach( $chunks as $chunk ) {
-
             $res = StatPublics::get_publics_walls( $chunk );
             $barter = reset( $chunk );
             $overposts = '';
@@ -41,26 +37,28 @@ class CheckPosts
 
                 foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
-                        if( time() >= StatBarter::TIME_INTERVAL + $post->date ) {
+                        print_r( $barter);
+                        print_r(StatBarter::TIME_INTERVAL + $barter->detected_at->format('U'));
+                        if( time() >= StatBarter::TIME_INTERVAL + $barter->detected_at->format('U')) {
                             $barter->status = 4;
-                            $barter->deletedAt = StatBarter::TIME_INTERVAL + $post->date;
+                            $barter->deletedAt = $this->now;
                         }
                         $trig = true;
                         break;
-                    } elseif( $post->id < $barter->post_id  ) {
-                        $barter->status = 5;
+                    } elseif( $post->id < $barter->post_id ) {
+                        $barter->status = 6;
                         $barter->deleted_at = $this->now;
                         break;
                     } else {
                         if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + self::time_shift )))> 0  )
-                            $overposts .= date( 'Y-m-d H:i:s', $post->date + self::time_shift ) . ',';
+                            $overposts .= $post->date . ',';
                     }
                 }
 
                 $barter->barter_overlaps = rtrim( $overposts, ',' );
 
-                if ( !$trig && !$this->check_post_existence( $barter ) ) {
-                    $barter->status = 5;
+                if ( !$trig && !$this->check_post_existence( $barter )) {
+                    $barter->status = 6;
                     $barter->deleted_at = $this->now;
                 }
 
@@ -86,14 +84,14 @@ class CheckPosts
         foreach( $barter_events_array as $barter_event ) {
             if ( $barter_event->status != 3 ) {
                 $time = time() + self::time_shift;
-                for( $i = 0; $i < 5; $i++ ) {
+
+                $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
+                if( !$res ) {
+                    sleep(1);
+                    $time -= 44600;
                     $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
-                    if( !$res ) {
-                        sleep(1);
-                        continue;
-                    }
-                    break;
                 }
+
                 $barter_event->end_visitors = $res['visitors'];
                 $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
                 $barter_event->end_subscribers = $res->count;
