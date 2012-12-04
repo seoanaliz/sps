@@ -27,6 +27,7 @@ class AddReport
             die(ERR_MISSING_PARAMS);
         }
 
+        $user_id = AuthVkontakte::IsAuth();
 //        if ( !GroupsUtility::is_author( $group_id, $user_id ))
 //            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
 
@@ -63,7 +64,9 @@ class AddReport
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
         $barter_event->standard_mark = true;
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
-        $barter_event->groups_ids = array( 0 );
+        $barter_event->groups_ids  = array( 0 );
+        $barter_event->creator_id  = $user_id;
+
 
         //разэталониваем предыдущие события такого рода
         if ( !$barter_id ) {

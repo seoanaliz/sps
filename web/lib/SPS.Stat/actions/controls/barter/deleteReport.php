@@ -24,7 +24,7 @@ class deleteReport
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
 
         $barter_event = BarterEventFactory::GetById( $barter_event_id );
-        $barter_event->status = 6;
+        $barter_event->status = 7;
         BarterEventFactory::Update( $barter_event );
         die( ObjectHelper::ToJSON( array( 'response' => true )));
 

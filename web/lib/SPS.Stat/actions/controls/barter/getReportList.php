@@ -21,7 +21,7 @@ class getReportList
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   0;#Request::getString ( 'targetPublicId' );
         $barter_public  =   0;#Request::getString ( 'barterPublicId' );
-
+        $group_id       =   0;
 //        if ( $target_public || $barter_public ) {
 //            $info = StatBarter::get_page_name( array( $target_public, $barter_public ));
 //            print_r( $info);
@@ -39,21 +39,27 @@ class getReportList
 
         if( $status ) {
             $status_array = array( $status );
-        } elseif( strtolower( $state ) == 'complete' )
-            $status_array = array( 4,5 );
+        } elseif( strtolower( $state ) == 'results' )
+            $status_array = array( 4,5,6 );
         else
-            $status_array = array( 1,2,3,4,5 );
+            $status_array = array( 1,2,3,4,5,6 );
 
         $search = array(
-            '_statusNE'     =>   6,
+            '_statusNE'     =>   7,
             'page'          =>   round( $offset / $limit ),
             'pageSize'      =>   $limit,
             '_status'       =>   $status_array,
             '_posted_atGE'  =>   $time_from ,
             '_posted_atLE'  =>   $time_to,
             '_barter_public'=>   $barter_public,
-            '_target_public'=>   $target_public
+            '_target_public'=>   $target_public,
         );
+        if( strtolower( $state ) == 'monitors' )
+            $search['standard_mark'] = true;
+        if( $group_id ) {
+            $group_id = explode( ',', $group_id );
+            $search['_groups_ids'] = $group_id;
+        }
 
 //        $options = array( 'orderBy' => $sort_by );
         $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
