@@ -12,8 +12,6 @@ Package::Load( 'SPS.Stat' );
 
 class PublicsGrowFixer
 {
-    //по этим дням проходит разделение месяца на недели
-
     private $conn;
     public function Execute()
     {
@@ -108,7 +106,7 @@ class PublicsGrowFixer
                 VALUES
                     (@point_date, @unique_users, @all_users)';
         $cmd = new SqlCommand( $sql, $this->conn );
-        $cmd->SetString(  '@point_date', date( 'Y-m-d' ));
+        $cmd->SetString(  '@point_date', date( 'Y-m-d', time() - 84600 ));
         $cmd->SetInteger( '@unique_users', $dist_users );
         $cmd->SetInteger( '@all_users', $all_users );
         $cmd->Execute();

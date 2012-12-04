@@ -22,6 +22,7 @@ class GetPublicGrowthAction
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $ds  = $cmd->Execute();
         $res = array();
+//        echo '>>>>>>>>>>>>>>>>>' . microtime(1) . '<br>';
         while( $ds->Next()) {
             $date         =  $ds->GetString( 'point_date' );
             $res[ $date ] =  array(
@@ -29,6 +30,11 @@ class GetPublicGrowthAction
                 'all_users'     =>  $ds->GetString( 'all_users' ),
             );
         }
+        $res[date('Y-m-d')] = array(
+            'unique_users'  =>  '-',
+            'all_users'     =>  '-',
+        );
+//        echo '<<<<<<<<<<<<<<<<<' . microtime(1) . '<br>';
 
         if ( count( $res ) <= 1 )
             return $res;
@@ -36,11 +42,15 @@ class GetPublicGrowthAction
         $prev_ununq = 0;
 //        print_r($res);
         foreach( $res as $date => &$data ) {
-            $data['change_unq']     = $prev_unq   ? $data['unique_users'] - $prev_unq   : 0;
-            $data['change_unuqunq'] = $prev_ununq ? $data['all_users']    - $prev_ununq : 0;
-            $prev_unq   = $data['unique_users'];
-            $prev_ununq = $data['all_users'];
-
+            if( $data['all_users'] != '-' ) {
+                $data['change_unq']     = $prev_unq   ? $data['unique_users'] - $prev_unq   : 0;
+                $data['change_unuqunq'] = $prev_ununq ? $data['all_users']    - $prev_ununq : 0;
+                $prev_unq   = $data['unique_users'];
+                $prev_ununq = $data['all_users'];
+            } else {
+                $data['change_unq'] = '-';
+                $data['change_unuqunq'] = '-';
+            }
             $barter = $this->get_average_barters( $date );
             $data['barters_vis']  = $barter['total_vis'];
             $data['barters_subs'] = $barter['total_sub'];
