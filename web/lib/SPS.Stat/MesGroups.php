@@ -324,7 +324,7 @@
         }
 
 
-
+        //упо создает группу. привязывать к юзеру - в другом месте
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
             if ( $groupId ) {
