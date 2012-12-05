@@ -41,7 +41,7 @@ sql;
                 and a."sourceFeedId" IN(2, 97, 108, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 128, 130, 131, 133, 138, 140, 146, 151, 156, 157, 163, 344)
                 and "isCleaned" = false
                 order by a."articleId"
-                limit 100;
+                limit 5000;
 sql;
 
             $cmd = new SqlCommand($sql, ConnectionFactory::Get());
