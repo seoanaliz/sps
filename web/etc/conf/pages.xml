@@ -530,6 +530,9 @@
                 <page uri="daemons://sync-userpics/">
                     <actions>SPS.Site.SyncUserpics</actions>
                 </page>
+                <page uri="daemons://clear-posts/">
+                    <actions>SPS.Site.ClearPosts</actions>
+                </page>
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
