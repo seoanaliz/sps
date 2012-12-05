@@ -79,6 +79,10 @@
                     , 'type'        => TYPE_STRING
                     , 'max'         => 100
                 )
+                ,'isCleaned' => array(
+                    'name'          => 'isCleaned'
+                    , 'type'        => TYPE_BOOLEAN
+                )
                 ,'statusId' => array(
                     'name'          => 'statusId'
                     , 'type'        => TYPE_INTEGER
@@ -87,7 +91,12 @@
                 ))
             , 'lists'     => array()
             , 'search'    => array(
-                '_externalId' => array(
+                '_articleId' => array(
+                    'name'         => 'articleId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                , '_externalId' => array(
                     'name'         => 'externalId'
                     , 'type'       => TYPE_STRING
                     , 'searchType' => SEARCHTYPE_ARRAY

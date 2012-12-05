@@ -65,6 +65,10 @@
             <label>{lang:vt.article.editor}</label>
             <?= FormHelper::FormInput( $prefix . '[editor]', $object->editor, 'editor', null, array( 'size' => 80 ) ); ?>
         </div>
+        <div data-row="isCleaned" class="row">
+            <label>Очищена</label>
+            <?= FormHelper::FormCheckBox( $prefix . '[isCleaned]', "TRUE", "", "", $object->isCleaned); ?>
+        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.article.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
