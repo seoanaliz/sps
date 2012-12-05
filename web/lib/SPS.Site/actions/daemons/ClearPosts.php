@@ -22,7 +22,7 @@
                 where a."statusId" = 3 and aq."articleId" IS NULL
                 and "isCleaned" = false
                 order by a."articleId"
-                limit 200
+                limit 200 FOR UPDATE;
 sql;
 
             $cmd = new SqlCommand($sql, ConnectionFactory::Get());
