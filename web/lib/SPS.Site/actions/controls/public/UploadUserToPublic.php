@@ -21,6 +21,7 @@ class UploadUserToPublic {
         $article->externalId = -1;
         $article->rate = 0;
         $article->sourceFeedId = SourceFeedUtility::FakeSourceTopface;
+        $article->isCleaned = false;
         $article->statusId = 1;
 
         $targetFeed = TargetFeedFactory::GetOne(array('externalId' => $publicId));

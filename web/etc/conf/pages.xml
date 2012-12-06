@@ -243,7 +243,7 @@
                         <template>tmpl://vt/statistic/statistic.tmpl.php</template>
                     </page>
                     <page uri="vt://stat/">
-                        <actions>Sps.Stat.GraphGrow</actions>
+                        <actions>SPS.Stat.GetPublicGrowth</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
                     </page>
 
@@ -529,6 +529,9 @@
                 </page>
                 <page uri="daemons://sync-userpics/">
                     <actions>SPS.Site.SyncUserpics</actions>
+                </page>
+                <page uri="daemons://clear-posts/">
+                    <actions>SPS.Site.ClearPosts</actions>
                 </page>
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>

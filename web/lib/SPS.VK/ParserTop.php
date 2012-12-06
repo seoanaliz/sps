@@ -2,7 +2,7 @@
 
 class tf_parcer
 {
-    const TOKEN = '4c0c4be547064c2747064c2777472ee4aa4470647074c21179ccaa53e1c7019d18410f3';
+    const TOKEN = 'a0ce7013abfc2f1aabfc2f1a4fabd48797aabfcabfd2f1cfb447340d337eaf2814a1adb';
     const API_URL = 'api.topface.ru';
     const TESTING = false;
     public $counter = 0;

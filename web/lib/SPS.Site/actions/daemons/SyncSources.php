@@ -53,7 +53,9 @@
                         SourceFeedFactory::Update($source);
                         AuditUtility::CreateEvent('importErrors', 'feed', $source->externalId, 'auto disabled');
                     }
-                    break;
+
+                    //переходим к след источнику
+                    continue;
                 }
 
                 $pagesCountTotal = ceil($count / ParserVkontakte::PAGE_SIZE);
