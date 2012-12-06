@@ -136,17 +136,17 @@ sql;
 
             $articleIds = $this->getRemoved();
 
-//            if (empty($articleIds)) {
-//                $articleIds = $this->getPackUnused1();
-//            }
-//
-//            if (empty($articleIds)) {
-//                $articleIds = $this->getPackUnused2();
-//            }
-//
-//            if (empty($articleIds)) {
-//                $articleIds = $this->getTopUnused();
-//            }
+            if (empty($articleIds)) {
+                $articleIds = $this->getPackUnused1();
+            }
+
+            if (empty($articleIds)) {
+                $articleIds = $this->getPackUnused2();
+            }
+
+            if (empty($articleIds)) {
+                $articleIds = $this->getTopUnused();
+            }
 
             if (empty($articleIds)) {
                 $articleIds = $this->getPackUnused3();
