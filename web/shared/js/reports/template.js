@@ -29,7 +29,7 @@ var REPORTS = {
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
-    RESULT: {
+    MONITOR: {
         LIST_HEADER:
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
@@ -38,9 +38,17 @@ var REPORTS = {
         '<div class="item time">На сколько<span class="icon arrow"></div>' +
         '<div class="item time">Активность<span class="icon arrow"></div>',
 
+        LIST_ADD_MONITOR:
+        '<div class="form">' +
+            '<input id="our-public-id" type="text" placeholder="Кого рекламируем" />' +
+            '<input id="public-id" type="text" placeholder="Где размещаем" />' +
+            '<input id="time" type="text" placeholder="Время начала наблюдения" style="width: 200px" />' +
+            '<button id="addReport" class="button">Добавить монитор</button>' +
+        '</div>',
+
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
-            '<? each(REPORTS.RESULT.ITEM, items); ?>' +
+            '<? each(REPORTS.MONITOR.ITEM, items); ?>' +
         '<? } else { ?>' +
             'Empty' +
         '<? } ?>',
@@ -67,17 +75,15 @@ var REPORTS = {
                     '</div>' +
                 '</div>' +
             '<? } ?>' +
+            '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
+            '<div class="column time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
+            '<div class="column time" title="Перекрыт через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
+            '<div class="column visitors" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
+            '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
         '</div>'
     },
-    MONITOR: {
-        LIST_ADD_MONITOR:
-        '<div class="form">' +
-            '<input id="our-public-id" type="text" placeholder="Кого рекламируем" />' +
-            '<input id="public-id" type="text" placeholder="Где размещаем" />' +
-            '<input id="time" type="text" placeholder="Время начала наблюдения" style="width: 200px" />' +
-            '<button id="addReport" class="button">Добавить монитор</button>' +
-        '</div>',
 
+    RESULT: {
         LIST_HEADER:
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
@@ -89,7 +95,7 @@ var REPORTS = {
 
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
-            '<? each(REPORTS.MONITOR.ITEM, items); ?>' +
+            '<? each(REPORTS.RESULT.ITEM, items); ?>' +
         '<? } else { ?>' +
             'Empty' +
         '<? } ?>',
