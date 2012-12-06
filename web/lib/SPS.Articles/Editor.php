@@ -39,5 +39,9 @@
         public function FullName() {
             return trim(FormHelper::RenderToForm($this->firstName . ' ' . $this->lastName));
         }
+
+        public function getName() {
+            return $this->firstName . ' ' . $this->lastName;
+        }
     }
 ?>

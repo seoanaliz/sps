@@ -13,11 +13,17 @@
          * Entry Point
          */
         public function Execute() {
-            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            $RoleUtility = new RoleUtility();
+
+            $targetFeedId = Request::getInteger('targetFeedId');
 
             $type = Request::getString( 'type' );
             if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
-                $type = SourceFeedUtility::Source;
+                $type = $RoleUtility->getDefaultType($targetFeedId);
+            }
+
+            if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
+                echo('Access denied to type ' . $type);
             }
 
             $result = array();
@@ -39,7 +45,9 @@
                     }
                 } else {
                     $sourceFeeds = SourceFeedFactory::Get(
-                        array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId), 'type' => $type)
+                        array(
+                            '_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId),
+                            'type' => $type)
                         , array( BaseFactory::WithoutPages => true )
                     );
 
@@ -50,9 +58,17 @@
                         );
                     }
                 }
+            } else {
+                echo('Unknown source feed identifier');
             }
 
-            echo ObjectHelper::ToJSON($result);
+
+            echo ObjectHelper::ToJSON(array(
+                'sourceFeeds' => $result,
+                'accessibleSourceTypes' => array_keys($RoleUtility->getAccessibleSourceTypes($targetFeedId)),
+                'accessibleGridTypes' => array_keys($RoleUtility->getAccessibleGridTypes($targetFeedId)),
+                'canAddPlanCell' => $RoleUtility->canAddPlanCell($targetFeedId)
+            ));
         }
     }
 

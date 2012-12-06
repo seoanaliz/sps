@@ -35,6 +35,12 @@
         private static $type = self::JS;
 
         /**
+         * Variables
+         * @var array
+         */
+        private static $vars = array();
+
+        /**
          * Add File
          * @param string $file single JS file
          * @param string $mode browser mode
@@ -78,21 +84,73 @@
         }
 
 
+        public static function AddVar($varName, $value) {
+            self::$vars[$varName] = $value;
+        }
+
+
         /**
          * Flush All Modes
          * @return string
          */
         public static function Flush() {
             if ( self::$PostProcess ) {
-                return self::setFlushPoint( self::$type, self::$Minify, self::$Hostname, self::$MaxGroups );
+                $result =  self::setFlushPoint( self::$type, self::$Minify, self::$Hostname, self::$MaxGroups );
+
+                $result .= self::FlushVars();
+
+                return $result;
             }
 
             $result = '';
             foreach ( self::$BrowserModes as $mode ) {
-                $result .= parent::flushMode( self::$type, $mode, self::$Minify, self::$Hostname, self::$MaxGroups );
+                $result .= parent::flushMode( self::$type, $mode, self::$Minify, self::$Hostname, self::$MaxGroups ) . "\n";
+            }
+
+            $result .= self::FlushVars();
+
+            return $result;
+        }
+
+
+        public static function FlushVars(){
+            $result = '';
+            if (self::$vars) {
+                $result = PHP_EOL.'<script type="text/javascript">';
+                foreach (self::$vars as $varName=>$value){
+                    $result .= PHP_EOL.'var ' . $varName . ' = ' . self::FlushVarValue($value) . ';' . PHP_EOL;
+                }
+                $result .= PHP_EOL.'</script>'.PHP_EOL;
             }
 
             return $result;
+        }
+
+        public static function FlushVarValue($value){
+            if (is_int($value) || is_float($value)) {
+                return $value;
+            }
+
+            if (is_string($value)) {
+                return '"' . $value . '"';
+            }
+
+            if (is_array($value)) {
+                $array = '{';
+                foreach ($value as $k => $v) {
+                    $array .= '"' . $k . '": ' . self::FlushVarValue($v) . ',';
+                }
+                return $array . '}';
+            }
+
+            if (is_null($value)) {
+                return 'none';
+            }
+
+            if (is_bool($value)) {
+                return $value ? 'true' : 'false';
+            }
+
         }
 
 
