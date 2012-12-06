@@ -78,6 +78,31 @@ sql;
             return $articleIds;
         }
 
+        private function getPackUnused3() {
+            $sql = <<<sql
+                select a."articleId" from articles a
+                LEFT join "articleQueues" aq USING ("articleId")
+                where a."statusId" = 1 and aq."articleId" IS NULL
+                and "authorId" is null
+                and a.rate < 80
+                and a."createdAt" < (now() - interval '6 months')
+                and "isCleaned" = false
+                order by a."articleId"
+                limit 5000;
+sql;
+
+            $cmd = new SqlCommand($sql, ConnectionFactory::Get());
+            $ds = $cmd->Execute();
+
+            $articleIds = array();
+
+            while ($ds->Next()) {
+                $articleIds[] = $ds->GetInteger('articleId');
+            }
+
+            return $articleIds;
+        }
+
         private function getTopUnused() {
             $sql = <<<sql
                 select a."articleId" from articles a
@@ -111,16 +136,20 @@ sql;
 
             $articleIds = $this->getRemoved();
 
-            if (empty($articleIds)) {
-                $articleIds = $this->getPackUnused1();
-            }
+//            if (empty($articleIds)) {
+//                $articleIds = $this->getPackUnused1();
+//            }
+//
+//            if (empty($articleIds)) {
+//                $articleIds = $this->getPackUnused2();
+//            }
+//
+//            if (empty($articleIds)) {
+//                $articleIds = $this->getTopUnused();
+//            }
 
             if (empty($articleIds)) {
-                $articleIds = $this->getPackUnused2();
-            }
-
-            if (empty($articleIds)) {
-                $articleIds = $this->getTopUnused();
+                $articleIds = $this->getPackUnused3();
             }
 
             if (empty($articleIds)) {
