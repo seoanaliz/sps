@@ -637,7 +637,7 @@
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="stat://reports/" boot="">
-                    <template>tmpl://st/reports.tmpl.php</template>
+                    <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>
 
