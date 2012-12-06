@@ -18,7 +18,7 @@ class GetPublicGrowthAction
 
     protected function get_publics_growth()
     {
-        $sql = 'SELECT * FROM stat_our_auditory ORDER BY point_date';
+        $sql = 'SELECT * FROM stat_our_auditory ORDER BY point_date ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $ds  = $cmd->Execute();
         $res = array();
@@ -40,7 +40,6 @@ class GetPublicGrowthAction
             return $res;
         $prev_unq   = 0;
         $prev_ununq = 0;
-//        print_r($res);
         foreach( $res as $date => &$data ) {
             if( $data['all_users'] != '-' ) {
                 $data['change_unq']     = $prev_unq   ? $data['unique_users'] - $prev_unq   : 0;
@@ -72,7 +71,7 @@ class GetPublicGrowthAction
                         AND post_id IS NOT NULL
                         AND start_visitors IS NOT NULL
                         AND end_visitors IS NOT NULL
-                    ORDER BY posted_at
+                    ORDER BY detected_at
                     ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $cmd->SetString( '@date', $date );
@@ -89,7 +88,11 @@ class GetPublicGrowthAction
             $end_visitors   = $ds->GetInteger( 'end_visitors' );
             $start_subscribers = $ds->GetInteger( 'start_subscribers' );
             $end_subscribers   = $ds->GetInteger( 'end_subscribers' );
-            $a = $ds->GetDateTime( 'posted_at')->getTimestamp();
+            $a = $ds->GetDateTime( 'detected_at');
+            if ( $a )
+                $a = $a->getTimestamp();
+            else
+                $a = $ds->GetDateTime( 'posted_at')->getTimestamp();
             $b = $ds->GetDateTime( 'deleted_at');
             $b = !empty( $b ) ? $b->getTimestamp() : $a + 3600;
             $publics_posts_data[ $ds->GetInteger( 'target_public' )][] = array(
@@ -109,6 +112,7 @@ class GetPublicGrowthAction
     private function find_crosses( $public_time_array )
     {
         foreach( $public_time_array as &$public  ) {
+
             $count = count( $public );
             for( $i = 0; $i <= $count - 2 ; $i++ ) {
                 if( !isset ( $public[$i] ) || empty( $public[$i]))
@@ -127,11 +131,11 @@ class GetPublicGrowthAction
             }
         }
         unset( $public );
-//        print_r( $public_time_array );
         $res = array( 'total_vis' => 0, 'total_sub' => 0 );
         $i = 0;
         foreach( $public_time_array as &$public_f ) {
             foreach( $public_f as $event ) {
+
                 $res['total_vis'] += $event['vis_sto'] - $event['vis_sta'];
                 $res['total_sub'] += $event['sub_sto'] - $event['sub_sta'];
                 ++$i;
