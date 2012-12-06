@@ -28,9 +28,7 @@ sql;
                 $articleIds[] = $ds->GetInteger('articleId');
             }
 
-            return array();
-
-            //return $articleIds;
+            return $articleIds;
         }
 
         private function getPackUnused1() {
@@ -53,9 +51,7 @@ sql;
                 $articleIds[] = $ds->GetInteger('articleId');
             }
 
-            return array();
-
-            //return $articleIds;
+            return $articleIds;
         }
 
         private function getPackUnused2() {
@@ -65,6 +61,30 @@ sql;
                 where a."statusId" = 1 and aq."articleId" IS NULL
                 and a."sourceFeedId" IN (75,200,92,210,15,150,151,155,88,89,92,93,95,1,183,26,36,3)
                 and a."createdAt" < (now() - interval '1 month')
+                and "isCleaned" = false
+                order by a."articleId"
+                limit 5000;
+sql;
+
+            $cmd = new SqlCommand($sql, ConnectionFactory::Get());
+            $ds = $cmd->Execute();
+
+            $articleIds = array();
+
+            while ($ds->Next()) {
+                $articleIds[] = $ds->GetInteger('articleId');
+            }
+
+            return $articleIds;
+        }
+
+        private function getTopUnused() {
+            $sql = <<<sql
+                select a."articleId" from articles a
+                LEFT join "articleQueues" aq USING ("articleId")
+                where a."statusId" = 1 and aq."articleId" IS NULL
+                and a."sourceFeedId" IN (174, 196)
+                and a."createdAt" < (now() - interval '1 week')
                 and "isCleaned" = false
                 order by a."articleId"
                 limit 5000;
@@ -97,6 +117,10 @@ sql;
 
             if (empty($articleIds)) {
                 $articleIds = $this->getPackUnused2();
+            }
+
+            if (empty($articleIds)) {
+                $articleIds = $this->getTopUnused();
             }
 
             if (empty($articleIds)) {
