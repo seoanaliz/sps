@@ -68,7 +68,7 @@ class GetPublicGrowthAction
                         barter_events
                     WHERE
                         posted_at::date = date @date
-                        AND (status = 4 OR status = 5)
+                        AND status in (\'{4,5,6}\')
                         AND post_id IS NOT NULL
                         AND start_visitors IS NOT NULL
                         AND end_visitors IS NOT NULL
@@ -117,7 +117,7 @@ class GetPublicGrowthAction
                     if( !isset ( $public[$j] ))
                         continue;
                     if( $public[$i]['start'] <= $public[$j]['start'] &&
-                        $public[$j]['start'] <= $public[$i]['stop']) {
+                                $public[$j]['start'] <= $public[$i]['stop']) {
                         $public[$i]['stop']    = $public[$j]['stop'];
                         $public[$i]['vis_sto'] = $public[$j]['vis_sto'];
                         $public[$i]['sub_sto'] = $public[$j]['sub_sto'];
