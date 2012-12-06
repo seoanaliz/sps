@@ -535,7 +535,7 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $layout = $('<div/>').click(function(e) {
+            $layout = $(tmpl(BOX_LAYOUT)).click(function(e) {
                 if (e.target == e.currentTarget) {
                     boxesHistory[boxesHistory.length-1].hide();
                     if (!boxesHistory.length) {
@@ -1400,8 +1400,7 @@ var tmpl = (function($) {
             var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
                 ? function() {
                 return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
-            }
-                : (new Function('obj',
+            } : (new Function('obj',
                 'var p=[],' +
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
@@ -1409,9 +1408,10 @@ var tmpl = (function($) {
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
             ));
             return (cache[str] = fn(data || {}));
-        }
-        catch(e) {
-            if (window.console && console.log) console.log(format(str));
+        } catch(e) {
+            if (window.console && console.log) {
+                console.log(format(str));
+            }
             throw e;
         }
     };
@@ -1420,7 +1420,7 @@ var tmpl = (function($) {
 })(jQuery);
 
 var BOX_LAYOUT =
-'<div  class="box-layout"></div>';
+'<div class="box-layout"></div>';
 
 var BOX_WRAP =
 '<div class="box-wrap">' +

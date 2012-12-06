@@ -4,7 +4,7 @@
 var Events = {
     url: Configs.controlsRoot,
     delay: Configs.eventsDelay,
-    isDebug: false,
+    isDebug: Configs.eventsIsDebug,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -43,7 +43,12 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-    get_report_list: function(limit, offset, callback) {
+    get_result_list: function(limit, offset, callback) {
+        simpleAjax('getReportList', {limit: limit, offset: offset, state: 'complete'}, function(data) {
+            callback(data);
+        });
+    },
+    get_monitor_list: function(limit, offset, callback) {
         simpleAjax('getReportList', {limit: limit, offset: offset}, function(data) {
             callback(data);
         });
