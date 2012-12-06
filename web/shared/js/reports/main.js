@@ -92,6 +92,7 @@ var Result = Page.extend({
             $listAddMonitor.slideUp(200);
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
+            t.makeTime($results.find('.time'));
         });
     }
 });
