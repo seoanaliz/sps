@@ -51,6 +51,9 @@
         <action name="DeletePost">
             <path>daemons/DeletePost</path>
         </action>
+        <action name="ClearPosts">
+            <path>daemons/ClearPosts</path>
+        </action>
     </group>
 
     <group name="Controls">

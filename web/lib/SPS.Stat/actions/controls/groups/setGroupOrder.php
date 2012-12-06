@@ -31,6 +31,6 @@
 
             $res = $m_class::set_lists_order( $user_id, $group_ids );
 
-            echo ObjectHelper::ToJSON( array( 'response' => 'true' ));
+            die( ObjectHelper::ToJSON( array( 'response' => 'true' )));
         }
     }

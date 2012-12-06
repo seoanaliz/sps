@@ -74,6 +74,7 @@
             $article->externalId = -1;
             $article->rate = 100;
             $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $article->isCleaned = false;
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();

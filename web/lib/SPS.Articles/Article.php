@@ -54,6 +54,9 @@
         /** @var string */
         public $editor;
 
+        /** @var bool */
+        public $isCleaned;
+
         /** @var int */
         public $statusId;
 

@@ -16,35 +16,42 @@
 
         public function Execute() {
             error_reporting( 0 );
-
-            $user_id   = Request::getInteger ( 'userId'  );
-            $groupId  = Request::getInteger ( 'groupId' );
+            $user_id  = Request::getInteger ( 'userId'  );
+            $group_id  = Request::getInteger ( 'groupId' );
             $entry_id = Request::getInteger ( 'publId'  );
             if ( !$entry_id )
                 $entry_id = Request::getInteger ( 'entryId'  );
             $general  = Request::getInteger ( 'general' );
-            $type     = Request::getString ( 'type' );
+            $type     = ucfirst( Request::getString( 'type' ));
 
-            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
-            if ( !$type || !in_array( $type, $type_array, 1 ) )
-            $type    = 'Stat';
+            $type_array = array( 'Stat', 'Mes', 'Barter' );
+            if ( !$type || !in_array( $type, $type_array ))
+                $type    = 'Stat';
             $m_class = $type . 'Groups';
             $general = $general ? $general : 0;
 
-            if (!$groupId || !$user_id || !$entry_id) {
+            if ( !$group_id || !$user_id || !$entry_id ) {
 
-                die(ERR_MISSING_PARAMS);
+                die( ERR_MISSING_PARAMS );
             }
 
-            //todo не уверен, нужна ли проверка на "главность"
-            if ( !$general
+            if( $type == 'Barter' ) {
+                $source = 1;
+                //внимание, тут сбой в логике. Раньше ( до бартера ) принадлежность записи к группе определялась в спец таблице
+                //поэтому записи приписывались к группе. Теперь эта инфа храниться в самой записи
+                $default_group = GroupsUtility::get_default_group( $user_id, $source );
+                $events = BarterEventFactory::Get( array( 'barter_event_id' => $entry_id ));
+                GroupsUtility::extricate_from_group( $events, $group_id, $default_group->group_id );
+                BarterEventFactory::UpdateRange( $events );
+                die( ObjectHelper::ToJSON(array( 'response' => true )));
+            }
+            elseif ( !$general
                     || ( $general && StatUsers::is_Sadmin( $user_id ))) {
-                $m_class::extricate_entry( $groupId, $entry_id, $user_id );
-                echo  ObjectHelper::ToJSON(array('response' => true));
+                $m_class::extricate_entry( $group_id, $entry_id, $user_id );
+                die( ObjectHelper::ToJSON( array('response' => true )));
 
             } else {
-                echo  ObjectHelper::ToJSON(array('response' => false));
-                die();
+                die( ObjectHelper::ToJSON(array( 'response' => false )));
             }
         }
     }

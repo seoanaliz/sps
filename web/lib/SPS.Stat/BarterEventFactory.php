@@ -100,6 +100,11 @@ class BarterEventFactory
               'name'      => 'standard_mark'
             , 'type'      => TYPE_BOOLEAN
         )
+        ,'groups_ids' => array(
+              'name'        => 'groups_ids'
+            , 'type'        => TYPE_ARRAY
+            , 'complexType' => 'int[]'
+        )
     )
     , 'search'    => array(
             '_barter_event_id' => array(
@@ -147,6 +152,22 @@ class BarterEventFactory
             , 'type'         => TYPE_DATETIME
             ,'searchType'    => SEARCHTYPE_LE
         )
+        ,'_posted_atLE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_LE
+        )
+        ,'_posted_atGE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_GE
+        )
+
+        ,'_start_search_atGE' => array(
+             'name'         => 'start_search_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'    => SEARCHTYPE_GE
+        )
         ,'_stop_search_atGE' => array(
               'name'         => 'stop_search_at'
             , 'type'         => TYPE_DATETIME
@@ -156,6 +177,11 @@ class BarterEventFactory
               'name'         => 'stop_search_at'
             , 'type'         => TYPE_DATETIME
             , 'searchType'   => SEARCHTYPE_LE
+        )
+        ,'_created_atGE' => array(
+              'name'         => 'created_at'
+            , 'type'         => TYPE_DATETIME
+            , 'searchType'   => SEARCHTYPE_GE
         )
         ,
         '_statusNE' => array(
@@ -168,6 +194,12 @@ class BarterEventFactory
               'name'        => 'standard_mark'
             , 'type'        => TYPE_BOOLEAN
             , 'searchType'  => SEARCHTYPE_EQUALS
+        )
+        ,'_groups_ids' => array(
+              'name'        => 'groups_ids'
+            , 'type'        => TYPE_INTEGER
+            , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
+            , 'complexType' => 'int[]'
         )
     ));
 

@@ -1,5 +1,5 @@
 var Configs = {
-    limit: 100
+    limit: 150
 };
 
 //        {"response":[
@@ -40,8 +40,8 @@ var REPORTS_ITEM =
             '</div>' +
         '</div>' +
     '<? } ?>' +
-    '<div class="column time" title="Время постинга"><?=isset("posted_at") ? posted_at : "Неизветсно" ?></div>' +
-    '<div class="column time" title="Время удаления"><?=isset("deleted_at") ? deleted_at : "Неизветсно" ?></div>' +
+    '<div class="column time" title="Время постинга"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
+    '<div class="column time" title="Время удаления"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
     '<div class="column visitors" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
     '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
 '</div>';

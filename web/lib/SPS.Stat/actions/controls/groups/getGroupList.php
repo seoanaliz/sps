@@ -17,19 +17,23 @@
         {
             error_reporting( 0 );
             $user_id    =   Request::getInteger( 'userId' );
-            $type       =   Request::getString ( 'type' );
+                        $type     = ucfirst( Request::getString( 'type' ));
 
-            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
-            if ( !$type || !in_array( $type, $type_array, 1 ) )
-                $type = 'Stat';
+            $type_array = array( 'Stat', 'Mes', 'Barter' );
+            if ( !$type || !in_array( $type, $type_array ))
+                $type    = 'Stat';
 
             $m_class  = $type . 'Groups';
             if ( !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
-
+            if ( $type == 'Barter' ) {
+                $source = 1;
+                $groups = GroupFactory::Get( array( 'status' => 1, 'source' => $source ));
+                die( ObjectHelper::ToJSON( array( 'response' => GroupsUtility::form_response( $groups, $user_id ))));
+            }
             $res = $m_class::get_groups( $user_id );
 
-            echo ObjectHelper::ToJSON( array( 'response' => $res ));
+            die( ObjectHelper::ToJSON( array( 'response' => $res )));
         }
     }

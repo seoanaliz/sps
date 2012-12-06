@@ -47,6 +47,7 @@
             $article->rate = 0;
             $article->targetFeedId = $targetFeedId;
             $article->authorId = $author->authorId;
+            $article->isCleaned = false;
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();
