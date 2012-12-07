@@ -138,7 +138,7 @@ var Monitor = Page.extend({
             var $breakingInput = $(this);
             var isValid = true;
             $inputs.each(function() {
-                if (!$.trim($(this).val())) {
+                if ($(this).data('required') && !$.trim($(this).val())) {
                     isValid = false;
                     $breakingInput = $(this);
                     return false;
@@ -152,15 +152,20 @@ var Monitor = Page.extend({
             var ourPublicId = $.trim($('#our-public-id').val());
             var publicId = $.trim($('#public-id').val());
             var dirtyTimeStart = ($('#time-start').val() || '__:__').split('_').join('0').split(':');
-            var dirtyTimeEnd = ($('#time-end').val() || '__:__').split('_').join('0').split(':');
             var dateStart = $('#datepicker').datepicker('getDate');
-            var dateEnd = new Date();
-            dateEnd.setHours(dirtyTimeEnd[0]);
-            dateEnd.setMinutes(dirtyTimeEnd[1]);
             dateStart.setHours(dirtyTimeStart[0]);
             dateStart.setMinutes(dirtyTimeStart[1]);
             var timestampStart = Math.round(dateStart.getTime() / 1000);
-            var timestampEnd = Math.round(dateEnd.getTime() / 1000);
+            var timestampEnd = null;
+
+            if ($('#time-end').val()) {
+                var dirtyTimeEnd = ($('#time-end').val() || '__:__').split('_').join('0').split(':');
+                var dateEnd = new Date();
+                dateEnd.setHours(dirtyTimeEnd[0]);
+                dateEnd.setMinutes(dirtyTimeEnd[1]);
+                timestampEnd = Math.round(dateEnd.getTime() / 1000);
+            }
+
             Events.fire('add_report', ourPublicId, publicId, timestampStart, timestampEnd, function() {
                 t.update();
             });
