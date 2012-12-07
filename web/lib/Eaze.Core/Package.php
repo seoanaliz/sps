@@ -327,7 +327,11 @@
                 // glue files
                 $buffer = '';
                 foreach ( $packageFiles as $packageFile ) {
-                    $buffer .= file_get_contents( $packageFile );
+                    $content = file_get_contents( $packageFile );
+                    $content = trim($content);
+                    $content = trim($content, PHP_EOL);
+                    $content = trim($content, '?>') . '?>';
+                    $buffer .= $content;
                 }
                 file_put_contents( sprintf( '%s/%s/%s.php', __ROOT__, CONFPATH_CACHE, $packageDir ), $buffer );
 
@@ -336,7 +340,11 @@
                         // Glue files
                         $buffer = '';
                         foreach ( $subFilePaths as $subFilePath ) {
-                            $buffer .= file_get_contents( $subFilePath );
+                            $content = file_get_contents( $subFilePath );
+                            $content = trim($content);
+                            $content = trim($content, PHP_EOL);
+                            $content = trim($content, '?>') . '?>';
+                            $buffer .= $content;
                         }
                         file_put_contents( sprintf( '%s/%s/%s.php', __ROOT__, CONFPATH_CACHE, $subPackage ), $buffer );
                     }

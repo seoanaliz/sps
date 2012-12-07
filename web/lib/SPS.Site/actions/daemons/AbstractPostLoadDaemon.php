@@ -69,6 +69,7 @@ abstract class AbstractPostLoadDaemon {
             $article->externalId = $externalId;
             $article->createdAt = new DateTimeWrapper(date('r', $post['time']));
             $article->importedAt = DateTimeWrapper::Now();
+            $article->isCleaned = false;
             $article->statusId = 1;
 
             $articleRecord = new ArticleRecord();

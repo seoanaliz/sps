@@ -55,55 +55,34 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
             <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 ) ); ?>
         </div>
 
-        <div class="row user_list" data-row="owner">
-            <label for="targetFeedOwner">Владелец</label>
-            <input type="text" name="" value="" id="targetFeedOwner" class="editors">
-            <ul id="targetFeedOwner_values" data-input_name="UserFeed[<?=UserFeed::ROLE_OWNER?>][]">
-                <?
-                if (isset($UserFeeds[UserFeed::ROLE_OWNER])) {
-                    foreach ($UserFeeds[UserFeed::ROLE_OWNER] as $vkId=>$UserFeed) {
-                        /** @var  $UserFeed UserFeed */
-                        ?>
-                        <li>
-                            <input type="hidden" name="UserFeed[<?=UserFeed::ROLE_OWNER?>][]" value="<?=$vkId?>">
-                            <? if (isset($editors[$vkId])) :?>
-                            <?=$editors[$vkId]?>
-                            <? else: ?>
-                            <strong>нет пользователя (<?=$vkId?>)</strong>
-                            <? endif; ?>
-                            <span class="button remove" onclick="removeUser(this)"></span>
-                        </li>
-                        <?
-                    }
-                }
-                ?>
-            </ul>
-        </div>
-        <div class="row user_list" data-row="editors">
-            <label for="targetFeedEditor">Редакторы</label>
-            <input type="text" name="" value="" id="targetFeedEditor" class="editors">
-            <ul id="targetFeedEditor_values" data-input_name="UserFeed[<?=UserFeed::ROLE_EDITOR?>][]">
-                <?
-                if (isset($UserFeeds[UserFeed::ROLE_EDITOR])) {
-                    foreach ($UserFeeds[UserFeed::ROLE_EDITOR] as $vkId=>$UserFeed) {
-                        /** @var  $UserFeed UserFeed */
-                        ?>
-                        <li>
-                            <input type="hidden" name="UserFeed[<?=UserFeed::ROLE_EDITOR?>][]" value="<?=$vkId?>">
-                            <? if (isset($editors[$vkId])) :?>
-                                <?=$editors[$vkId]?>
-                            <? else: ?>
-                                <strong>нет пользователя (<?=$vkId?>)</strong>
-                            <? endif; ?>
-                            <span class="button remove" onclick="removeUser(this)"></span>
-                        </li>
-                        <?
-                    }
-                }
-                ?>
-            </ul>
-        </div>
 
+
+        <? foreach ($roles as $role => $roleName): ?>
+            <div class="row user_list" data-row="editors">
+                <label for="targetFeed<?=$role?>"><?=$roleName?></label>
+                <input type="text" name="" value="" id="targetFeed<?=$role?>" class="userList">
+                <ul id="targetFeed<?=$role?>_values" data-input_name="UserFeed[<?=$role?>][]">
+                    <?
+                    if (isset($UserFeeds[$role])) {
+                        foreach ($UserFeeds[$role] as $vkId=>$UserFeed) {
+                            /** @var  $UserFeed UserFeed */
+                            ?>
+                            <li>
+                                <input type="hidden" name="UserFeed[<?=$role?>][]" value="<?=$vkId?>">
+                                <? if (isset($editors[$vkId])) :?>
+                                <?=$editors[$vkId]?>
+                                <? else: ?>
+                                <strong>нет пользователя (<?=$vkId?>)</strong>
+                                <? endif; ?>
+                                <span class="button remove" id="u<?=$vkId?>" onclick="removeUser(this)"></span>
+                            </li>
+                            <?
+                        }
+                    }
+                    ?>
+                </ul>
+            </div>
+        <? endforeach; ?>
 
         <div data-row="publishers" class="row">
             <label>{lang:vt.targetFeed.publishers}</label>

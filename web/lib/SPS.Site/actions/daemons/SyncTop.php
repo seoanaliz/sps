@@ -96,6 +96,7 @@
                 $article->externalId    = $externalId;
                 $article->createdAt     = DateTimeWrapper::Now();
                 $article->importedAt    = DateTimeWrapper::Now();
+                $article->isCleaned     = false;
                 $article->statusId      = 1;
 
                 $articleRecord = new ArticleRecord();
