@@ -101,7 +101,10 @@ var Result = Page.extend({
         var t = this;
 
         $('.icon.delete').click(function() {
-            console.log(1);
+            var $row = $(this).closest('.row');
+            Events.fire('delete_report', $row.data('our-public-id'), $row.data('public-id'), function() {
+                $row.slideUp(200);
+            });
         });
     }
 });
@@ -143,7 +146,10 @@ var Monitor = Page.extend({
         var t = this;
 
         $('.icon.delete').click(function() {
-            console.log(1);
+            var $row = $(this).closest('.row');
+            Events.fire('delete_report', $row.data('our-public-id'), $row.data('public-id'), function() {
+                $row.slideUp(200);
+            });
         });
         $('#addReport').click(function() {
             var $inputs = $('#list-add-monitor').find('input');
