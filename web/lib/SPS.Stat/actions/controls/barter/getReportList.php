@@ -27,7 +27,7 @@ class getReportList
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
         $order_array = array( 'posted_at', 'visitors', 'subscribers', 'status' );
-        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : 'posted_at';
+        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? 'posted_at': 'created_at' );
         $sort_by  = ' "' . $sort_by . '" ';
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';

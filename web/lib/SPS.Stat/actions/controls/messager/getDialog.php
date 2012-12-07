@@ -7,7 +7,8 @@ class getDialog
     public function execute()
     {
         error_reporting( 0 );
-        $user_id        =   Request::getInteger( 'userId' );
+//        $user_id        =   Request::getInteger( 'userId' );
+        $user_id = AuthVkontakte::IsAuth();
         $dialog_id      =   Request::getInteger( 'dialogId' );
         $offset         =   Request::getInteger( 'offset' );
         $limit          =   Request::getInteger( 'limit' );
@@ -36,9 +37,11 @@ class getDialog
         elseif ( $dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
         $groups = MesGroups::get_dialog_group( $dialog_id );
+        $defaultGroup = MesGroups::get_unlist_dialogs_group( $user_id);
+
         $res = array( 'messages'    =>  $dialog_array,
                       'dialogers'   =>  $users_info,
-                      'groupIds'    =>  $groups
+                      'groupIds'    =>  ($groups[0] == $defaultGroup) ? array() : $groups,
         );
 
         die( ObjectHelper::ToJSON( array( 'response' => $res )));
