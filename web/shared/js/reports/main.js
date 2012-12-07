@@ -93,6 +93,15 @@ var Result = Page.extend({
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.bindEvents();
+        });
+    },
+
+    bindEvents: function() {
+        var t = this;
+
+        $('.icon.delete').click(function() {
+            console.log(1);
         });
     }
 });
@@ -119,7 +128,6 @@ var Monitor = Page.extend({
                 showAnim: '',
                 dateFormat: 'd MM'
             });
-            t.bindEvents();
         }
 
         Events.fire('get_monitor_list', Configs.limit, 0, function(data) {
@@ -127,12 +135,16 @@ var Monitor = Page.extend({
             $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
             $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.bindEvents();
         });
     },
 
     bindEvents: function() {
         var t = this;
 
+        $('.icon.delete').click(function() {
+            console.log(1);
+        });
         $('#addReport').click(function() {
             var $inputs = $('#list-add-monitor').find('input');
             var $breakingInput = $(this);
