@@ -13,9 +13,10 @@ class deleteReport
         error_reporting(0);
 
         $barter_event_id   =    Request::getInteger( 'barterId' );
-        $user_id           =    Request::getInteger( 'userId' );
+//        $user_id           =    Request::getInteger( 'userId' );
         $group_id          =    Request::getInteger( 'groupId' );
 
+        $user_id = AuthVkontakte::IsAuth();
         if ( !$barter_event_id || !$user_id || !$group_id ) {
             die(ERR_MISSING_PARAMS);
         }

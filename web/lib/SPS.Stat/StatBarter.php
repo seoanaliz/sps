@@ -37,7 +37,6 @@ class StatBarter
             if ( $lifetime )
                 $lifetime = $lifetime;
 
-
             $barter_events_res[] = array(
                 'report_id'     =>  $barter_event->barter_event_id,
                 'published_at'  =>  $publics_data[ $barter_event->barter_public ],
@@ -46,14 +45,14 @@ class StatBarter
                 'detected_at'   =>  isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0,
                 'deleted_at'    =>  $lifetime,
                 'start_search_at' => $barter_event->start_search_at->format('U'),
-                'stop_search_at' =>  $barter_event->stop_search_at->format('U') - $barter_event->start_search_at->format('U'),
+                'stop_search_at' =>  $barter_event->stop_search_at->format('U'),
                 'overlaps'      =>  $overlaps,
                 'subscribers'   =>   ( $barter_event->end_subscribers && $barter_event->start_subscribers )?
-                    ( $barter_event->end_subscribers - $barter_event->start_subscribers ) : 0,
+                    $barter_event->end_subscribers - $barter_event->start_subscribers : 0,
                 'visitors'      =>  ( $barter_event->start_visitors && $barter_event->end_visitors ) ?
-                    ( $barter_event->end_visitors    - $barter_event->start_visitors ) : 0,
+                    $barter_event->end_visitors    - $barter_event->start_visitors : 0,
                 'status'        =>   $barter_event->status,
-                'active'        =>   in_array( $barter_event->status, array(1,2,3)) ? true : false
+                'active'         =>   in_array( $barter_event->status, array(1,2,3)) ? true : false
             );
         }
         return $barter_events_res;

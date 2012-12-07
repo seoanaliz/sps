@@ -11,6 +11,7 @@ class getReportList
     public function execute()
     {
         error_reporting(0);
+        $user_id        =   AuthVkontakte::IsAuth();
         $offset         =   Request::getInteger( 'offset' );
         $limit          =   Request::getInteger( 'limit' ) ? Request::getInteger( 'limit' ) : 25;
         $state          =   Request::getString ( 'state' );#мониторы/результаты
@@ -31,6 +32,14 @@ class getReportList
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';
 
+        if ( !$group_id ) {
+            $default_group  = GroupsUtility::get_default_group( $user_id, 1 );
+            $group_id       = $default_group->group_id;
+        }
+        if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
+
+
         if( $status ) {
             $status_array = array( $status );
         } elseif( strtolower( $state ) == 'complete' ) {
@@ -38,6 +47,7 @@ class getReportList
         } else {
             $status_array = array( 1,2,3,4,5,6 );
         }
+
         $search = array(
             '_statusNE'     =>   7,
             'page'          =>   round( $offset / $limit ),
@@ -50,6 +60,7 @@ class getReportList
         );
         if( strtolower( $state ) != 'complete' )
             $search['standard_mark'] = true;
+
         if( $group_id ) {
             $group_id = explode( ',', $group_id );
             $search['_groups_ids'] = $group_id;
