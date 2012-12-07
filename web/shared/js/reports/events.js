@@ -53,8 +53,13 @@ var Eventlist = {
             callback(data);
         });
     },
-    add_report: function(ourPublicId, publicId, time, callback) {
-        simpleAjax('addReport', {targetPublicId: ourPublicId, barterPublicId: publicId, startTime: time}, function() {
+    add_report: function(ourPublicId, publicId, timeStart, timeStop, callback) {
+        simpleAjax('addReport', {
+            targetPublicId: ourPublicId,
+            barterPublicId: publicId,
+            startTime: timeStart,
+            stopTime: timeStop
+        }, function() {
             callback(true);
         })
     }

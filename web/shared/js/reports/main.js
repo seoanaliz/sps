@@ -107,7 +107,8 @@ var Monitor = Page.extend({
         if (!t.inited) {
             t.inited = true;
             $listAddMonitor.html(tmpl(REPORTS.MONITOR.LIST_ADD_MONITOR));
-            $('#time').mask('29:59');
+            $('#time-start').mask('29:59');
+            $('#time-end').mask('29:59');
             $('#datepicker').datepicker({
                 dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
                 dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
@@ -150,14 +151,17 @@ var Monitor = Page.extend({
 
             var ourPublicId = $.trim($('#our-public-id').val());
             var publicId = $.trim($('#public-id').val());
-            var dirtyTime = ($('#time').val() || '__:__').split('_').join('0').split(':');
-            var hours = dirtyTime[0];
-            var minutes = dirtyTime[1];
-            var date = $('#datepicker').datepicker('getDate');
-            date.setHours(hours);
-            date.setMinutes(minutes);
-            var timestamp = Math.round(date.getTime() / 1000);
-            Events.fire('add_report', ourPublicId, publicId, timestamp, function() {
+            var dirtyTimeStart = ($('#time-start').val() || '__:__').split('_').join('0').split(':');
+            var dirtyTimeEnd = ($('#time-end').val() || '__:__').split('_').join('0').split(':');
+            var dateStart = $('#datepicker').datepicker('getDate');
+            var dateEnd = new Date();
+            dateEnd.setHours(dirtyTimeEnd[0]);
+            dateEnd.setMinutes(dirtyTimeEnd[1]);
+            dateStart.setHours(dirtyTimeStart[0]);
+            dateStart.setMinutes(dirtyTimeStart[1]);
+            var timestampStart = Math.round(dateStart.getTime() / 1000);
+            var timestampEnd = Math.round(dateEnd.getTime() / 1000);
+            Events.fire('add_report', ourPublicId, publicId, timestampStart, timestampEnd, function() {
                 t.update();
             });
         });

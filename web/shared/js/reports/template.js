@@ -42,9 +42,10 @@ var REPORTS = {
         '<div class="form">' +
             '<input id="our-public-id" type="text" placeholder="Кого рекламируем" />' +
             '<input id="public-id" type="text" placeholder="Где размещаем" />' +
-            '<input id="time" type="text" placeholder="Время начала наблюдения" style="width: 160px" />' +
-            '<input id="datepicker" type="text" placeholder="Дата" style="width: 100px" />' +
-            '<button id="addReport" class="button">Добавить монитор</button>' +
+            '<input id="time-start" type="text" placeholder="Начало" style="width: 70px" />' +
+            '<input id="time-end" type="text" placeholder="Конец" style="width: 70px" />' +
+            '<input id="datepicker" type="text" placeholder="Дата" style="width: 70px" />' +
+            '<button id="addReport" class="button">Добавить</button>' +
         '</div>',
 
         LIST:
