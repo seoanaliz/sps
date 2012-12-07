@@ -37,3 +37,24 @@ tr.error {
     background: #FFF0F0;
     color: #C00;
 }
+
+form div.row.user_list input[type='text'] {
+    width: 200px;;
+}
+
+form div.row.user_list > ul {
+    margin-left: 222px;
+}
+
+span.button.remove{
+    background: url("/shared/images/vt/common/clear.gif") no-repeat;
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    padding: 0px;
+    margin-left: 10px;
+    visibility: hidden;
+}
+form div.row.user_list > ul > li:hover > span.button.remove {
+    visibility: visible;
+}

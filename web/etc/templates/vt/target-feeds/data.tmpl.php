@@ -9,6 +9,8 @@
     if ( !empty($errors["fatal"] ) ) {
 		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
 	}
+
+JsHelper::PushFile('js://vt/targetFeedEdit.js');
 ?>
 <div class="tabs">
 	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
@@ -52,6 +54,36 @@
             </div>
             <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 ) ); ?>
         </div>
+
+
+
+        <? foreach ($roles as $role => $roleName): ?>
+            <div class="row user_list" data-row="editors">
+                <label for="targetFeed<?=$role?>"><?=$roleName?></label>
+                <input type="text" name="" value="" id="targetFeed<?=$role?>" class="userList">
+                <ul id="targetFeed<?=$role?>_values" data-input_name="UserFeed[<?=$role?>][]">
+                    <?
+                    if (isset($UserFeeds[$role])) {
+                        foreach ($UserFeeds[$role] as $vkId=>$UserFeed) {
+                            /** @var  $UserFeed UserFeed */
+                            ?>
+                            <li>
+                                <input type="hidden" name="UserFeed[<?=$role?>][]" value="<?=$vkId?>">
+                                <? if (isset($editors[$vkId])) :?>
+                                <?=$editors[$vkId]?>
+                                <? else: ?>
+                                <strong>нет пользователя (<?=$vkId?>)</strong>
+                                <? endif; ?>
+                                <span class="button remove" id="u<?=$vkId?>" onclick="removeUser(this)"></span>
+                            </li>
+                            <?
+                        }
+                    }
+                    ?>
+                </ul>
+            </div>
+        <? endforeach; ?>
+
         <div data-row="publishers" class="row">
             <label>{lang:vt.targetFeed.publishers}</label>
             <?= FormHelper::FormSelectMultiple( 'publisherIds[]', $publishers, 'publisherId', 'name', $publisherIds, 'publisherIds', null, null, array('style' => 'height: 200px;') ) ?>

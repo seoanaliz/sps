@@ -1,7 +1,7 @@
 <?php
     /**
      * Save TargetFeed Action
-     * 
+     *
      * @package SPS
      * @subpackage Articles
      * @property TargetFeed originalObject
@@ -17,15 +17,27 @@
                 BaseFactory::WithoutDisabled => false
                 , BaseFactory::WithLists     => true
             );
-
             parent::$factory = new TargetFeedFactory();
         }
 
-               
+        public function Execute() {
+            parent::Execute();
+
+            $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
+
+            Response::setParameter('UserFeeds', $UserFeeds );
+            Response::setParameter('roles', array(
+                UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
+                UserFeed::ROLE_OWNER=> 'Владелец',
+                UserFeed::ROLE_EDITOR => 'Редактор',
+                UserFeed::ROLE_AUTHOR => 'Автор',
+            ) );
+        }
+
         /**
          * Form Object From Request
          *
-         * @param TargetFeed $originalObject 
+         * @param TargetFeed $originalObject
          * @return TargetFeed
          */
         protected function getFromRequest( $originalObject = null ) {
@@ -150,8 +162,8 @@
 
             return $errors;
         }
-        
-        
+
+
         /**
          * Add Object
          *
@@ -185,8 +197,8 @@
             ConnectionFactory::CommitTransaction($result);
             return $result;
         }
-        
-        
+
+
         /**
          * Update Object
          *
@@ -222,20 +234,54 @@
             ConnectionFactory::CommitTransaction($result);
             return $result;
         }
-        
-        
+
+
         /**
          * Set Foreign Lists
          */
         protected function setForeignLists() {
             $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
             Response::setArray( "publishers", $publishers );
+
+            $editors = EditorFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+            $users = array();
+            foreach ($editors as $editor){
+                /** @var $editor Editor */
+                $users[$editor->vkId] = $editor->getName();
+            }
+
+            JsHelper::AddVar('editors', $users);
+            Response::setParameter('editors', $users );
         }
 
         protected function afterAction($result) {
+            parent::afterAction($result);
+
             if ($result && $this->currentObject->type == TargetFeedUtility::VK) {
                 SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
             }
+
+            UserFeedFactory::DeleteForTargetFeed($this->objectId);
+
+            $rawUserFeeds = Request::getArray('UserFeed');
+            $UserFeeds = array();
+            if ($rawUserFeeds) {
+                foreach ($rawUserFeeds as $role => $vkIds) {
+                    $vkIds = array_unique($vkIds);
+                    foreach ($vkIds as $vkId){
+                        $UserFeed = new UserFeed();
+                        $UserFeed->role = $role;
+                        $UserFeed->vkId = $vkId;
+                        $UserFeed->targetFeedId = $this->objectId;
+                        $UserFeeds[] = $UserFeed;
+                    }
+                }
+            }
+
+            if ($UserFeeds) {
+                UserFeedFactory::AddRange($UserFeeds);
+            }
+
         }
     }
 ?>

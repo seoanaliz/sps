@@ -52,7 +52,8 @@
             }
 
             $url = trim($url, '/');
-            $short_name = end(explode('/',$url));
+            $arr = explode('/',$url);
+            $short_name = end($arr);
 
             if (substr_count($a, 'profile_avatar')> 0) {
                 if (!preg_match('/user_id":(.*?),/', $a, $oid))

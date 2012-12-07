@@ -324,10 +324,47 @@ var Eventlist = {
                 type: sourceType
             },
             success: function (data) {
-                for (i in data) {
-                    item = data[i];
-                    $('#source-select').append('<option value="' + item.id + '">' + item.title + '</option>');
+                var sourceSelector = $('#source-select');
+                for (var i in data['sourceFeeds']) {
+                    var item = data['sourceFeeds'][i];
+                     sourceSelector.append('<option value="' + item.id + '">' + item.title + '</option>');
                 }
+
+
+                var sourceTypes = data['accessibleSourceTypes'];
+                $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
+                      item = $(item);
+                      if ($.inArray(item.data('type'), sourceTypes) == -1){
+                        item.hide();
+                      } else {
+                          item.show();
+                      }
+                });
+
+                var gridTypes = data['accessibleGridTypes'];
+                showCount = 0
+                $('.right-panel div.type-selector').children('.grid_type').each(function(i, item){
+                    item = $(item);
+                    if ($.inArray(item.data('type'), gridTypes) == -1){
+                        item.hide();
+                    } else {
+                        showCount ++
+                        item.show();
+                    }
+                });
+                if (showCount > 2) {
+                    $('a.grid_type.all').show();
+                } else {
+                    $('a.grid_type.all').hide();
+                }
+
+                var addCellButton = $('div.queue-footer > a.add-button');
+                if (data['canAddPlanCell']) {
+                    addCellButton.show();
+                } else {
+                    addCellButton.hide();
+                }
+
 
                 //get data from cookie
                 var cookie = $.cookie('sourceFeedIds' + targetFeedId);
@@ -341,11 +378,10 @@ var Eventlist = {
                     }
                 }
 
-                $('#source-select').multiselect("refresh");
+                sourceSelector.multiselect("refresh");
 
                 if (Elements.leftdd().length == 0) {
-                    $('#source-select').multiselect("checkAll");
-                    $('#source-select').multiselect("refresh");
+                     sourceSelector.multiselect("checkAll").multiselect("refresh");
                 }
 
                 articlesLoading = false;
