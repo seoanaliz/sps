@@ -87,6 +87,12 @@ class GroupFactory
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_ARRAY
         )
+        ,'_users_ids' => array(
+                'name'      => 'users_ids'
+            , 'type'        => TYPE_INTEGER
+            , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
+            , 'complexType' => 'int[]'
+        )
     )
     );
 

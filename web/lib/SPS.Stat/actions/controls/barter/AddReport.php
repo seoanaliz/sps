@@ -11,25 +11,30 @@ class AddReport
 
     public function execute()
     {
-        error_reporting(0);
+//        error_reporting(0);
         $now = time();
         $target_public_id   =   Request::getString ( 'targetPublicId' );
         $barter_public_id   =   Request::getString ( 'barterPublicId' );
         $start_looking_time =   Request::getInteger( 'startTime' ) ? Request::getInteger( 'startTime' ) : $now ;
         $stop_looking_time  =   Request::getInteger( 'stopTime' );
-        $user_id            =   Request::getInteger( 'userId' );
+//        $user_id            =   Request::getInteger( 'userId' );
         $group_id           =   Request::GetInteger( 'groupId' );
         $approve            =   Request::getBoolean( 'approve' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $start_looking_time -=  900;
+        $user_id = AuthVkontakte::IsAuth();
+
+        if ( !$group_id ) {
+            $default_group = GroupsUtility::get_default_group( $user_id, 1 );
+            $group_id = $default_group->group_id;
+        }
 //        if ( !$target_public_id || !$barter_public_id || !$start_looking_time || !$user_id || !$group_id ) {
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
         }
 
-//        if ( !GroupsUtility::is_author( $group_id, $user_id ))
-//            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
-
+        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
 
         $info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
 
@@ -63,7 +68,9 @@ class AddReport
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
         $barter_event->standard_mark = true;
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
-        $barter_event->groups_ids = array( 0 );
+        $barter_event->groups_ids  = array( $group_id );
+        $barter_event->creator_id  = $user_id;
+
 
         //разэталониваем предыдущие события такого рода
         if ( !$barter_id ) {
@@ -78,13 +85,16 @@ class AddReport
             }
         }
 
+        //делаем последнее
         if( $barter_id ) {
+
             BarterEventFactory::Update( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {
             BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
         }
 
         if ( $barter_event->barter_event_id ) {
+            $barter_event = BarterEventFactory::GetById( $barter_event->barter_event_id );
             die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( array( $barter_event )))));
         } else
             die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something goes wrong' )));

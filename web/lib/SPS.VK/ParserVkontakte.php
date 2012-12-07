@@ -27,7 +27,7 @@
             if ($public_id != '') $this ->set_page($public_id);
         }
 
-        public function set_page($id, $sh_name = '')
+        public function set_page( $id, $sh_name = '' )
         {
             $this->page_adr         =   self::WALL_URL . $id;
             $this->page_id          =   $id;
@@ -367,9 +367,15 @@
         public function get_posts_count($wall_url = '')
         {
             $params = array( 'owner_id' => '-' . $this->page_id,
-                'count'    =>  1,
-                'filter' => 'owner' );
-            $res = VkHelper::api_request( 'wall.get', $params );
+                             'count'    =>  1,
+                             'filter'   => 'owner' );
+            $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            if ( isset( $res->error )) {
+                if ( $res->error->error_code == 15)
+                    throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
+                else
+                    throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $params ));
+            }
             $this->count = $res[0];
             return (int) $res[0];
         }
@@ -398,7 +404,7 @@
             //проверка на доступность
             if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
                 substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-                throw new Exception('access denied to' . $page);
+                throw new Exception('access denied to http://vk.com/public' . $page);
 
             if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
                 (substr_count($a, '404 Not Found') == 0) &&
@@ -507,7 +513,7 @@
         public function get_photo_count_in_album( $public_id, $album_id )
         {
             $params = array(
-                'gid' => $public_id,
+                'gid'  => $public_id,
                 'aids' => $album_id,
             );
 

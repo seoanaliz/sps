@@ -27,7 +27,7 @@ class getEntries {
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
         $group_type =   Request::getInteger( 'groupType');
-        $search     =   pg_escape_string( Request::getString( 'search' ));
+        $search     =   trim(pg_escape_string( Request::getString( 'search' )));
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
@@ -38,12 +38,12 @@ class getEntries {
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
-
         $page           =   $page ? ' AND publ.page=true ' : ' ';
         $quant_max      =   $quant_max ? $quant_max : 100000000;
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
-        $limit          =   $limit  ?  $limit  :   25;
+        $limit          =   $limit  ?  $limit : 25;
+        $search         =   mb_strlen( $search ) > 5 ? mb_substr( $search, 0, mb_strlen( $search ) - 2 ) : $search;
 
         $group  = StatGroups::get_group($groupId);
         if ( empty( $group) || $group['type'] != 2 ) {
