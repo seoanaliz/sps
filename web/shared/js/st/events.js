@@ -4,6 +4,7 @@
 var Events = {
     url: Configs.controlsRoot,
     delay: Configs.eventsDelay,
+    isDebug: false,
     eventList: {},
     fire: function(name, args){
         var t = this;
@@ -11,7 +12,7 @@ var Events = {
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {
-                    if(window.console && console.log) {
+                    if (window.console && console.log && t.isDebug) {
                         console.log(name + ':');
                         console.log(args.slice(0, -1));
                         console.log('-------');
@@ -19,7 +20,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if(window.console && console.log) {
+                if (window.console && console.log && t.isDebug) {
                     console.log(e);
                 }
             }
@@ -118,7 +119,7 @@ var Eventlist = {
             authorsLikes: 'auth_likes_eff',
             authorsReposts: 'auth_reposts_eff',
             growthViews: 'avg_vie_grouth',
-            growthVisitors: 'avg_vis_grouth'
+            growthVisitors: 'abs_vis_grow'
         };
         simpleAjax('getEntries', {
             groupId: params.listId,
@@ -207,7 +208,8 @@ var Eventlist = {
                             publicAuthorsLikes: publicItem.auth_likes_eff,
                             publicAuthorsReposts: publicItem.auth_reposts_eff,
                             publicGrowthViews: publicItem.avg_vie_grouth,
-                            publicGrowthVisitors: publicItem.avg_vis_grouth
+                            publicGrowthVisitors: intval(publicItem.abs_vis_grow),
+                            publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
                         });
                     });
                 }
@@ -292,16 +294,6 @@ var Eventlist = {
         }, function() {
             callback(true);
         });
-    },
-    get_report_list: function(limit, offset, callback) {
-        simpleAjax('getReportList', {limit: limit, offset: offset}, function(data) {
-            callback(data);
-        });
-    },
-    add_report: function(ourPublicId, publicId, time, callback) {
-        simpleAjax('addReport', {targetPublicId: ourPublicId, barterPublicId: publicId, startTime: time}, function() {
-            callback(true);
-        })
     }
 };
 $.extend(Events.eventList, Eventlist);

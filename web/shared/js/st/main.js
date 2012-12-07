@@ -17,8 +17,6 @@ var cur = {
 };
 
 $(document).ready(function() {
-    if ($('#this-is-reporter').length) return;
-
     (function(w) {
         var $elem = $('#go-to-top');
         $elem.click(function() {

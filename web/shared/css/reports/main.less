@@ -1,10 +1,19 @@
 @import "../common/mixins.less";
 
 #main {
-    &> .header {
-        padding: 10px;
-    }
+    .list-add-monitor {
+        padding: 0 10px 10px;
 
+        .form {
+            input + input {
+                margin-left: 10px;
+            }
+
+            .button {
+                margin-left: 10px;
+            }
+        }
+    }
     .list-head {
         padding: 0 10px;
         background-color: #DEE5EB;
@@ -96,13 +105,11 @@
         }
 
     }
-    .item.our-public,
-    .item.partner,
+    .item.public,
     .column.public {
         width: 250px;
     }
-    .item.post-time,
-    .item.delete-time,
+    .item.time,
     .item.visitors,
     .item.subscribers,
     .column.time,
