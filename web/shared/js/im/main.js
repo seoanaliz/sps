@@ -836,7 +836,7 @@ var Messages = EndlessPage.extend({
         var $textarea = t.el().find('textarea:first');
         var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
-        var listId = dialogModel.lists()[0];
+        var listId = dialogModel.lists()[dialogModel.lists().length-1];
         Events.fire('get_templates', listId, function(data) {
             $textarea.autocomplete({
                 position: 'top',
