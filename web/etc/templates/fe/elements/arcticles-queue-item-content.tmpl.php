@@ -9,7 +9,7 @@
     <? } ?>
 </div>
 <? if (!empty($articleRecord->link)) { ?>
-<div class="link-info-content" style="height: 45px;">
+<div class="link-info-content" style="height: 75px;">
     <div class="link-description-content">
         <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$articleRecord->link}" />
     </div>
