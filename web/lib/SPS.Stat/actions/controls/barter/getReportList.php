@@ -17,17 +17,11 @@ class getReportList
         $time_from      =   Request::getInteger( 'timeFrom' );
         $time_to        =   Request::getInteger( 'timeTo' );
         $status         =   Request::getInteger( 'status' );
-        $sort_by        =   strtolower( pg_escape_string( Request::getString( 'sortBy' )));
+        $sort_by        =   strtolower( Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   0;#Request::getString ( 'targetPublicId' );
         $barter_public  =   0;#Request::getString ( 'barterPublicId' );
-        $group_id       =   0;
-//        if ( $target_public || $barter_public ) {
-//            $info = StatBarter::get_page_name( array( $target_public, $barter_public ));
-//            print_r( $info);
-//            $barter_public = !empty( $info['barter'] ) ? $info['barter']['id'] : 0 ;
-//            $target_public = !empty( $info['target'] ) ? $info['target']['id'] : 0 ;
-//        }
+        $group_id       =   Request::getInteger( 'groupId');
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
@@ -39,11 +33,11 @@ class getReportList
 
         if( $status ) {
             $status_array = array( $status );
-        } elseif( strtolower( $state ) == 'results' )
-            $status_array = array( 4,5,6 );
-        else
+        } elseif( strtolower( $state ) == 'complete' ) {
+            $status_array = array( 4,6 );
+        } else {
             $status_array = array( 1,2,3,4,5,6 );
-
+        }
         $search = array(
             '_statusNE'     =>   7,
             'page'          =>   round( $offset / $limit ),
@@ -54,15 +48,15 @@ class getReportList
             '_barter_public'=>   $barter_public,
             '_target_public'=>   $target_public,
         );
-        if( strtolower( $state ) == 'monitors' )
+        if( strtolower( $state ) != 'complete' )
             $search['standard_mark'] = true;
         if( $group_id ) {
             $group_id = explode( ',', $group_id );
             $search['_groups_ids'] = $group_id;
         }
-
-//        $options = array( 'orderBy' => $sort_by );
-        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
+//        print_r( $search );
+        $options = array( 'orderBy' => $sort_by );
+//        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
 
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
         die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res ))));
