@@ -108,6 +108,16 @@ var Monitor = Page.extend({
             t.inited = true;
             $listAddMonitor.html(tmpl(REPORTS.MONITOR.LIST_ADD_MONITOR));
             $('#time').mask('29:59');
+            $('#datepicker').datepicker({
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                firstDay: 1,
+                showAnim: '',
+                dateFormat: 'd MM'
+            });
             t.bindEvents();
         }
 
@@ -143,7 +153,7 @@ var Monitor = Page.extend({
             var dirtyTime = ($('#time').val() || '__:__').split('_').join('0').split(':');
             var hours = dirtyTime[0];
             var minutes = dirtyTime[1];
-            var date = new Date();
+            var date = $('#datepicker').datepicker('getDate');
             date.setHours(hours);
             date.setMinutes(minutes);
             var timestamp = Math.round(date.getTime() / 1000);

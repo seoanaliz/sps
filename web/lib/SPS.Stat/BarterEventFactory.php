@@ -68,6 +68,10 @@ class BarterEventFactory
           'name'          => 'deleted_at'
         , 'type'        => TYPE_DATETIME
         )
+        ,'detected_at' => array(
+            'name' => 'detected_at'
+           ,'type' => TYPE_DATETIME
+        )
         ,'barter_overlaps' => array(
           'name'        => 'barter_overlaps'
         , 'type'        => TYPE_STRING
@@ -96,7 +100,7 @@ class BarterEventFactory
                 'name'      => 'start_search_at'
             , 'type'        => TYPE_STRING
         )
-        ,'standard_mark' => array(
+        ,'standard_mark'  => array(
               'name'      => 'standard_mark'
             , 'type'      => TYPE_BOOLEAN
         )
@@ -105,6 +109,10 @@ class BarterEventFactory
             , 'type'        => TYPE_ARRAY
             , 'complexType' => 'int[]'
         )
+        ,'creator_id' => array(
+              'name'        => 'creator_id'
+            , 'type'        => TYPE_STRING
+            )
     )
     , 'search'    => array(
             '_barter_event_id' => array(

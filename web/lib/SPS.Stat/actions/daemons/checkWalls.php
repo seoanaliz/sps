@@ -29,7 +29,7 @@ class CheckWalls
         $this->kill_overtimed();
         $this->turn_on_search();
 
-        $barters_for_search = BarterEventFactory::Get( array('_status' => 2 ), null, 'tst' );
+        $barters_for_search = BarterEventFactory::Get( array( '_status' => 2 ), null, 'tst' );
         $search_results = $this->wall_search( $barters_for_search );
 
         $search_results = $this->get_population( $search_results );
@@ -42,6 +42,7 @@ class CheckWalls
                 $barter_event->status     =   3;
                 $barter_event->start_visitors   =   $search_results[ $barter_event->barter_event_id ]['start_visitors'];
                 $barter_event->start_subscribers     =   $search_results[ $barter_event->barter_event_id ]['start_subscribers'];
+                $barter_event->detected_at = date( 'Y-m-d H:i:s', time());
             }
         }
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
@@ -144,7 +145,7 @@ class CheckWalls
         );
 
         $not_our_array = array(
-            42092461
+             42092461
             ,33769500
             ,24313746
             ,28981879

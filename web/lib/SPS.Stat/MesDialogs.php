@@ -105,6 +105,8 @@
 
         public static function addDialog( $user_id, $rec_id, $last_update, $state, $status )
         {
+            if ( self::get_dialog_id( $user_id, $rec_id ))
+                return false;
             $default_group_id = MesGroups::get_groups_by_type( $user_id, 2 );
             $sql = 'INSERT INTO '
                         . TABLE_MES_DIALOGS . '( user_id, rec_id, status, last_update, state )
@@ -696,6 +698,7 @@
         {
             foreach( $im_users as $user ) {
                 $dialogs = MesDialogs::get_all_dialogs( $user, $count );
+                $default_group = MesGroups::get_unlist_dialogs_group( $user);
                 if ( !$dialogs )
                     continue;
                 $i = 0;
@@ -708,6 +711,10 @@
                     //highlighted
                     $dialog_id = MesDialogs::get_dialog_id( $user, $dialog->uid );
                     $group_ids = MesGroups::get_dialog_group( $dialog_id );
+                    if ( empty( $group_ids )) {
+                        MesGroups::implement_entry( $default_group, $dialog_id, $user );
+                        $group_ids = array( $default_group );
+                    }
                     $old_ts    = MesDialogs::get_dialog_ts( $user, $dialog->uid );
                     $last_clear_time = MesGroups::get_last_clear_time( $group_ids[0], $user );
                     $act = '';

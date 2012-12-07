@@ -13,9 +13,10 @@ class deleteReport
         error_reporting(0);
 
         $barter_event_id   =    Request::getInteger( 'barterId' );
-        $user_id           =    Request::getInteger( 'userId' );
+//        $user_id           =    Request::getInteger( 'userId' );
         $group_id          =    Request::getInteger( 'groupId' );
 
+        $user_id = AuthVkontakte::IsAuth();
         if ( !$barter_event_id || !$user_id || !$group_id ) {
             die(ERR_MISSING_PARAMS);
         }
@@ -24,7 +25,7 @@ class deleteReport
             die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
 
         $barter_event = BarterEventFactory::GetById( $barter_event_id );
-        $barter_event->status = 6;
+        $barter_event->status = 7;
         BarterEventFactory::Update( $barter_event );
         die( ObjectHelper::ToJSON( array( 'response' => true )));
 

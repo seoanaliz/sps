@@ -6,6 +6,7 @@
 
     class GroupsUtility
     {
+        //source : 1 - barter
         const default_name       = 'default_group';
         //прикрепить запись к группе
         public static function implement_to_group( $objects, $group_id, $only_one_group = 0 ) {
@@ -68,15 +69,16 @@
 
             $default_group = GroupFactory::Get( array( '_created_by' => $user_id, 'source' => $groupe_sourse, 'type' => 2 ));
             if( empty( $default_group )) {
-                $group = new Group;
-                $group->created_by  =   $user_id;
-                $group->name        =   self::default_name;
-                $group->source      =   $groupe_sourse;
-                $group->status      =   1;
-                $group->type        =   2;
-                $group->users_ids   =   array( $user_id );
-                GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
-                if ( !$group->group_id )
+                $default_group = new Group;
+                $default_group->created_by  =   $user_id;
+                $default_group->name        =   self::default_name;
+                $default_group->source      =   $groupe_sourse;
+                $default_group->status      =   1;
+                $default_group->type        =   2;
+                $default_group->users_ids   =   array( $user_id );
+                GroupFactory::Add( $default_group, array( BaseFactory::WithReturningKeys => true ));
+
+                if ( !$default_group->group_id )
                     return false;
             } else
                 $default_group = reset( $default_group );
@@ -110,7 +112,7 @@
 //            BarterEventFactory::UpdateRange( $entries, null, 'tst');
 //
 //            $group->users_ids   =   array(0);
-            $group->status      =   6;
+            $group->status      =   7;
             GroupFactory::Update( $group );
 
         }
@@ -118,6 +120,7 @@
         //формирует отчет для групп. Если указан user_id, разделяет созданные им группы и нет
         public static function form_response( $groups, $user_id = 0 )
         {
+        //todo place
             if( !is_array( $groups ))
                 $groups = array( $groups );
 
@@ -140,6 +143,14 @@
         public static function is_author( $group_id, $user_id)
         {
             $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by'=> $user_id ));
+            if ( $group )
+                return $group;
+            return false;
+        }
+
+        public static function has_access_to_group( $group_id, $user_id )
+        {
+            $group = GroupFactory::GetOne( array( 'group_id' => $group_id, '_users_ids'=> array( $user_id )));
             if ( $group )
                 return $group;
             return false;

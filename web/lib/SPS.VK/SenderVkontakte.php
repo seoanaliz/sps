@@ -126,7 +126,7 @@
             }
 
             sleep(2);
-            $check_id = $this->delivery_check( count( $attachments ) , $check_id );
+//            $check_id = $this->delivery_check( count( $attachments ) , $check_id );
 
             if ( !$check_id )
                 throw new exception( "can't find post: vk.com/public" . $this->vk_group_id );
@@ -244,27 +244,27 @@
         }
 
         //$post_id  = idпаблика_idпоста
-            public function delete_post( $post_id )
-            {
-                $post_id = trim($post_id, '-');
-                $id = explode('_', $post_id);
-                $params = array(
-                    'owner_id'      =>  '-' . $id[0],
-                    'post_id'       =>  $id[1],
-                    'access_token'  =>  $this->vk_access_token
-                );
+        public function delete_post( $post_id )
+        {
+            $post_id = trim($post_id, '-');
+            $id = explode('_', $post_id);
+            $params = array(
+                'owner_id'      =>  '-' . $id[0],
+                'post_id'       =>  $id[1],
+                'access_token'  =>  $this->vk_access_token
+            );
 
-                $url = self::METH . 'wall.delete';
-                $fwd = $raw_json = $this->qurl_request($url, $params);
-                $fwd = json_decode($fwd);
+            $url = self::METH . 'wall.delete';
+            $fwd = $raw_json = $this->qurl_request($url, $params);
+            $fwd = json_decode($fwd);
 
-                if (!empty ($fwd->error)) {
-                    $fwd3 = $fwd->error;
-                    throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg ::" . $raw_json);
-                }
-
-                return true;
+            if (!empty ($fwd->error)) {
+                $fwd3 = $fwd->error;
+                throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg ::" . $raw_json);
             }
+
+            return true;
+        }
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:
@@ -324,21 +324,20 @@
             );
 
             $res = VkHelper::api_request( 'wall.post', $params, false );
-            if ( isset( $res->post_id ) )
+            if ( isset( $res->post_id ))
                 return $res->post_id;
 
-            elseif( isset( $res->processing ) )
+            elseif( isset( $res->processing ))
                 return true;
 
-            elseif ( isset( $res->error ) )
+            elseif ( isset( $res->error ))
 
-                if ( in_array( $res->error->error_code, $this->change_admin_errors ) )
+                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
                     throw new ChangeSenderException();
 
                 else
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_code
                         . ', public: '. $this->vk_group_id );
-
         }
 
         private function delivery_check( $attacments_count )
@@ -385,6 +384,7 @@
             );
 
             $res = VkHelper::api_request( 'wall.edit', $params, false );
+
         }
 
         //todo описания фоток матьматьмать
