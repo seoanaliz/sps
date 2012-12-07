@@ -1639,7 +1639,7 @@ function CreateTemplateBox(listId, text, isFocused, onHide) {
 
                             clearData.push({
                                 id: template.id,
-                                text: template.title,
+                                text: template.title.split('\n').join('<br>'),
                                 user: userCollection.get(Configs.vkId).data(),
                                 lists: clearLists
                             });
