@@ -74,6 +74,23 @@ var Page = Event.extend({
             }
             $date.html(text);
         });
+    },
+    makeInterval: function($elements, limit) {
+        if (typeof(limit) == "undefined")
+            limit = 1;
+        $elements.each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            if (!intval(timestamp)) return;
+            var interval = timestamp / 60;
+            interval = interval.toFixed(0)
+            if (limit == 1) {
+                var text = interval >= 60 ? '60+' : interval;
+            } else {
+                var text = interval >= 60 ? (interval / 60).toFixed(0) + " час." : interval + " мин.";
+            }
+            $date.html(text);
+        });
     }
 });
 
@@ -93,6 +110,7 @@ var Result = Page.extend({
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.makeInterval($results.find('.interval'));
         });
     }
 });
@@ -126,6 +144,7 @@ var Monitor = Page.extend({
             $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
             $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.makeInterval($results.find('.interval'), 2);
         });
     },
 
