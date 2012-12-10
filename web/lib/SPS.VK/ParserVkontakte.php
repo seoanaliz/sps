@@ -162,7 +162,7 @@
                 'owner_id'  =>  '-' . $this->page_id,
                 'offset'    =>  $offset,
                 'count'     =>  20,
-                'fileter'   =>  'owner'
+                'filter'   =>  'owner'
             );
 
             $res = VkHelper::api_request( 'wall.get', $params );
@@ -206,7 +206,7 @@
                                          'desc' =>  '',
                                          'url'  =>  isset( $attachment->photo->src_big ) ?
                                                                     $attachment->photo->src_big :
-                                                                    $attachment->photo->src
+                                                                    $attachment->photo->src,
                                      );
                                  break;
                             case 'graffiti':
@@ -216,7 +216,7 @@
                                          'desc' =>  '',
                                          'url'  =>  isset( $attachment->graffiti->big_src ) ?
                                                                     $attachment->graffiti->big_src :
-                                                                    $attachment->graffiti->src
+                                                                    $attachment->graffiti->src,
                                      );
                                  break;
                             case 'audio':
@@ -371,7 +371,7 @@
                              'filter'   => 'owner' );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
             if ( isset( $res->error )) {
-                if ( $res->error->error_code == 15)
+                if ( $res->error->error_code == 15 )
                     throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
                 else
                     throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $params ));
