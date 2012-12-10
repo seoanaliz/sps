@@ -537,15 +537,17 @@ var Box = (function() {
             $body = $('body');
             $layout = $(tmpl(BOX_LAYOUT)).click(function(e) {
                 if (e.target == e.currentTarget) {
-                    boxesHistory[boxesHistory.length-1].hide();
-                    if (!boxesHistory.length) {
-                        $(this).hide();
+                    if (boxesHistory[boxesHistory.length-1]) {
+                        boxesHistory[boxesHistory.length-1].hide();
+                        if (!boxesHistory.length) {
+                            $layout.hide();
+                        }
                     }
                 }
             }).addClass('box-layout').appendTo($body);
 
             $(document).keydown(function(e) {
-                if (e.keyCode == 27) {
+                if (e.keyCode == KEY.ESC) {
                     $layout.click();
                 }
             });
@@ -1067,6 +1069,7 @@ var Box = (function() {
 
                 if (!$el.data(DATA_KEY)) {
                     $el.on('keyup', function(e) {
+                        var options = $el.data(DATA_KEY).options;
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -1105,12 +1108,12 @@ var Box = (function() {
                             }
                         }, 0);
                     });
-
-                    $el.data(DATA_KEY, {
-                        $el: $el,
-                        options: options
-                    });
                 }
+
+                $el.data(DATA_KEY, {
+                    $el: $el,
+                    options: options
+                });
             });
         },
 

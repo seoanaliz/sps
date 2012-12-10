@@ -48,13 +48,23 @@ var Eventlist = {
             callback(data);
         });
     },
+    delete_report: function(ourPublicId, publicId, callback) {
+        simpleAjax('deleteReport', {reportId: publicId, groupId: ourPublicId}, function(data) {
+            callback(data);
+        });
+    },
     get_monitor_list: function(limit, offset, callback) {
         simpleAjax('getReportList', {limit: limit, offset: offset}, function(data) {
             callback(data);
         });
     },
-    add_report: function(ourPublicId, publicId, time, callback) {
-        simpleAjax('addReport', {targetPublicId: ourPublicId, barterPublicId: publicId, startTime: time}, function() {
+    add_report: function(ourPublicId, publicId, timeStart, timeStop, callback) {
+        simpleAjax('addReport', {
+            targetPublicId: ourPublicId,
+            barterPublicId: publicId,
+            startTime: timeStart,
+            stopTime: timeStop
+        }, function() {
             callback(true);
         })
     }

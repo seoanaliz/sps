@@ -30,22 +30,23 @@ var REPORTS = {
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
     MONITOR: {
+        LIST_ADD_MONITOR:
+        '<div class="form">' +
+            '<input id="our-public-id" data-required="true" type="text" placeholder="Кого рекламируем" />' +
+            '<input id="public-id" data-required="true" type="text" placeholder="Где размещаем" />' +
+            '<input id="time-start" data-required="true" type="text" placeholder="Начало" style="width: 70px" />' +
+            '<input id="time-end" type="text" placeholder="Конец" style="width: 70px" />' +
+            '<input id="datepicker" data-required="true" type="text" placeholder="Дата" style="width: 70px" />' +
+            '<button id="addReport" class="button">Добавить</button>' +
+        '</div>',
+
         LIST_HEADER:
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
-        '<div class="item time post-time">Во сколько<span class="icon arrow"></div>' +
         '<div class="item time date">Дата<span class="icon arrow"></div>' +
-        '<div class="item time">На сколько<span class="icon arrow"></div>' +
+        '<div class="item time time-start">Начало<span class="icon arrow"></div>' +
+        '<div class="item time time-stop">Конец<span class="icon arrow"></div>' +
         '<div class="item time">Активность<span class="icon arrow"></div>',
-
-        LIST_ADD_MONITOR:
-        '<div class="form">' +
-            '<input id="our-public-id" type="text" placeholder="Кого рекламируем" />' +
-            '<input id="public-id" type="text" placeholder="Где размещаем" />' +
-            '<input id="time" type="text" placeholder="Время начала наблюдения" style="width: 160px" />' +
-            '<input id="datepicker" type="text" placeholder="Дата" style="width: 100px" />' +
-            '<button id="addReport" class="button">Добавить монитор</button>' +
-        '</div>',
 
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
@@ -55,7 +56,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row">' +
+        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -76,11 +77,11 @@ var REPORTS = {
                     '</div>' +
                 '</div>' +
             '<? } ?>' +
-            '<div class="column time" title="Начало поиска в"><?=isset("start_search_at") ? start_search_at : "-" ?></div>' +
-            '<div class="column interval" title="Удалён через"><?= "-" ?></div>' +
-            '<div class="column interval" title="Будет висеть в поиске"><?=( isset("stop_search_at") && isset("start_search_at")) ? (stop_search_at - start_search_at) : "-" ?></div>' +
-            '<div class="column active" title="Без комментариев"><?=isset("active") ? "активен" : "неактивен" ?></div>' +
-            '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
+            '<div class="column date" title="Дата"><?=isset("start_search_at") ? start_search_at : "-" ?></div>' +
+            '<div class="column time" title="Начало"><?=isset("start_search_at") ? start_search_at : "-" ?></div>' +
+            '<div class="column time" title="Конец"><?=isset("stop_search_at") ? stop_search_at : "-" ?></div>' +
+            '<div class="column time" title="Активность"><span class="<?=(isset("active") &&  active) ? "true" : "false"?>">●</span></div>' +
+            '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
         '</div>'
     },
 
@@ -89,8 +90,8 @@ var REPORTS = {
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
         '<div class="item time post-time">Время поста<span class="icon arrow"></div>' +
-        '<div class="item interval delete-time">Удалён через<span class="icon arrow"></div>' +
-        '<div class="item interval overlap-time">Перекрыт через<span class="icon arrow"></div>' +
+        '<div class="item time delete-time">Удалён через<span class="icon arrow"></div>' +
+        '<div class="item time overlap-time">Перекрыт через<span class="icon arrow"></div>' +
         '<div class="item visitors">Посетителей<span class="icon arrow"></div>' +
         '<div class="item subscribers">Подписчиков<span class="icon arrow"></div>',
 
@@ -102,7 +103,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row">' +
+        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -123,11 +124,12 @@ var REPORTS = {
                     '</div>' +
                 '</div>' +
             '<? } ?>' +
-            '<div class="column time" title="Время поста"><?=isset("detected_at") ? detected_at : "-" ?></div>' +
-            '<div class="column interval" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column interval" title="Перекрыт через"><?=isset("overlaps") ? overlaps : "-" ?></div>' +
-            '<div class="column visitors" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
-            '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
+            '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
+            '<div class="column diff-time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
+            '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
+            '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
+            '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
+            '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
         '</div>'
     }
 };

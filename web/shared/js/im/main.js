@@ -181,6 +181,18 @@ var LeftColumn = Widget.extend({
             t.trigger('addList');
         });
 
+        t._dialogs.on('addToList', function(listId, dialogId) {
+            if (dialogId == t._messages.pageId()) {
+                t._messages.updateAutocomplite();
+            }
+        });
+
+        t._dialogs.on('removeFromList', function(listId, dialogId) {
+            if (dialogId == t._messages.pageId()) {
+                t._messages.updateAutocomplite();
+            }
+        });
+
         t._messages.on('hoverMessage', function(e) {
             var $message = $(e.currentTarget);
             var messageId = $message.data('id');
@@ -207,10 +219,27 @@ var LeftColumn = Widget.extend({
 
         t._tabs.on('addList', function() {
             t.trigger('addList');
+            t._messages.updateAutocomplite();
         });
 
         t._tabs.on('clickFilter', function() {
             t._dialogs.toggleFilter();
+        });
+
+        t._tabs.on('addToList', function(listId, dialogId) {
+            if (dialogId == t._messages.pageId()) {
+                t._messages.updateAutocomplite();
+            }
+        });
+
+        t._tabs.on('removeFromList', function(listId, dialogId) {
+            if (dialogId == t._messages.pageId()) {
+                t._messages.updateAutocomplite();
+            }
+        });
+
+        t._tabs.on('templatesUpdate', function() {
+            t._messages.updateAutocomplite();
         });
     },
     onScroll: function(e) {
@@ -598,6 +627,7 @@ var Dialogs = EndlessPage.extend({
                                     var index = $.inArray(item.id, dialogModel.lists());
                                     if (index == -1) {
                                         dialogModel.lists().push(item.id);
+                                        t.trigger('addToList', item.id, dialogId);
                                     }
                                 });
                             }
@@ -607,6 +637,7 @@ var Dialogs = EndlessPage.extend({
                                 var index = $.inArray(item.id, dialogModel.lists());
                                 if (index != -1) {
                                     dialogModel.lists().splice(index, 1);
+                                    t.trigger('removeFromList', item.id, dialogId);
                                 }
                             });
                         },
@@ -726,16 +757,6 @@ var Messages = EndlessPage.extend({
             t.sendMessage();
         }
     },
-    clickSaveTmpl: function() {
-        var t = this;
-        var dialogId = t.pageId();
-        var dialogModel = dialogCollection.get(dialogId);
-        var listId = dialogModel.lists()[0];
-        var box = new CreateTemplateBox(listId, t.el().find('textarea').val(), true, function() {
-            t.updateAutocomplite();
-        });
-        box.show();
-    },
     hoverMessage: function(e) {
         var t = this;
         t.trigger('hoverMessage', e);
@@ -815,7 +836,7 @@ var Messages = EndlessPage.extend({
         var $textarea = t.el().find('textarea:first');
         var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
-        var listId = dialogModel.lists()[0];
+        var listId = dialogModel.lists()[dialogModel.lists().length-1];
         Events.fire('get_templates', listId, function(data) {
             $textarea.autocomplete({
                 position: 'top',
@@ -1239,6 +1260,7 @@ var Tabs = Widget.extend({
                                     var index = $.inArray(item.id, dialogModel.lists());
                                     if (index == -1) {
                                         dialogModel.lists().push(item.id);
+                                        t.trigger('addToList', item.id, dialogId);
                                     }
                                 });
                             }
@@ -1248,6 +1270,7 @@ var Tabs = Widget.extend({
                                 var index = $.inArray(item.id, dialogModel.lists());
                                 if (index != -1) {
                                     dialogModel.lists().splice(index, 1);
+                                    t.trigger('removeFromList', item.id, dialogId);
                                 }
                             });
                         },
@@ -1280,7 +1303,7 @@ var Tabs = Widget.extend({
         var listTab = t.model().listTab();
         var listId = listTab.id();
         var box = new CreateTemplateBox(listId, false, false, function() {
-            //t.updateAutocomplite();
+            t.trigger('templatesUpdate');
         });
         box.show();
     },
@@ -1372,11 +1395,16 @@ $(document).ready(function() {
     });
 });
 
-function CreateTemplateBox(listId, text, isFocused) {
+function CreateTemplateBox(listId, text, isFocused, onHide) {
     var box = new Box({
         title: 'Готовые ответы',
         html: tmpl(BOX_LOADING, {height: 100}),
         width: 600,
+        onhide: function() {
+            if ($.isFunction(onHide)) {
+                onHide();
+            }
+        },
         onshow: function() {
             Events.fire('get_lists', function(data) {
                 var list = data.list;
@@ -1611,7 +1639,7 @@ function CreateTemplateBox(listId, text, isFocused) {
 
                             clearData.push({
                                 id: template.id,
-                                text: template.title,
+                                text: template.title.split('\n').join('<br>'),
                                 user: userCollection.get(Configs.vkId).data(),
                                 lists: clearLists
                             });
