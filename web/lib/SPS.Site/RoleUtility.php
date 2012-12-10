@@ -104,7 +104,7 @@ class RoleUtility
 
     public function canAddPlanCell($targetFeedId) {
         if (isset($this->FeedRulesByFeed[$targetFeedId])) {
-                return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
+                return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
             return true;
         }
         #return false;
