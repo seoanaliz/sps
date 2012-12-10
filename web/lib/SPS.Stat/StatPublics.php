@@ -354,7 +354,6 @@
                 return $ds->GetInteger( 'avg' );
             }
             return 0;
-
         }
 
         public static function get_views_visitors_from_base( $sb_id, $time_from, $time_to )
@@ -366,9 +365,9 @@
                             AND time <= @time_to
                             AND id = @public_id
                     ORDER BY time';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
-            $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
+            $cmd = new SqlCommand( $sql,    ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString( '@time_from',  date('Y-m-d', $time_from ));
+            $cmd->SetString( '@time_to',    date('Y-m-d', $time_to ));
             $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
             $ds = $cmd->Execute();
 
@@ -408,8 +407,8 @@
             $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
             if ( !empty( $public )) {
                 $public = reset( $public );
-                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-                $publisher = reset( $publisher );
+//                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+//                $publisher = reset( $publisher );
             }
 
             $params = array(
@@ -417,8 +416,8 @@
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-            if ( isset( $publisher->publisher->vk_token ))
-                $params['access_token']  =  $publisher->publisher->vk_token;
+//            if ( isset( $publisher->publisher->vk_token ))
+//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error))
@@ -558,20 +557,20 @@
 
         public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
-            if ( !empty( $public )) {
-                $public     = reset( $public );
-                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-                $publisher  = reset( $publisher );
-            }
+//            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
+//            if ( !empty( $public )) {
+//                $public     = reset( $public );
+//                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+//                $publisher  = reset( $publisher );
+//            }
 
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-            if ( isset( $publisher->publisher->vk_token ))
-                $params['access_token']  =  $publisher->publisher->vk_token;
+//            if ( isset( $publisher->publisher->vk_token ))
+//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error ))
@@ -580,7 +579,6 @@
                 'visitors'  =>  $res[0]->visitors,
                 'viewers'   =>  $res[0]->views
             );
-
         }
 
         public static function get_publics_info_from_base( $public_ids )
