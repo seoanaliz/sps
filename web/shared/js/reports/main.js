@@ -157,6 +157,7 @@ var Monitor = Page.extend({
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
             $('#datepicker').datepicker();
+            $('#datepicker').datepicker('setDate', new Date().getTime());
         }
 
         Events.fire('get_monitor_list', Configs.limit, 0, function(data) {
