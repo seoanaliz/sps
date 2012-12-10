@@ -9,15 +9,20 @@ class RoleUtility
     private $FeedRulesByRole = array();
     private $FeedRulesByFeed = array();
 
-    public function __construct() {
-        $this->loadRules();
+    public function __construct($vkId = null) {
+        $this->loadRules($vkId);
     }
 
-
-    public function loadRules() {
-        $userId = AuthVkontakte::IsAuth();
-        if ($userId) {
-            $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$userId));
+    /**
+     * Загружает права пользователя
+     * @param null $vkId
+     */
+    public function loadRules($vkId = null) {
+        if (is_null($vkId)){
+            $vkId = AuthVkontakte::IsAuth();
+        }
+        if ($vkId) {
+            $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$vkId));
             $this->FeedRulesByRole = array();
             foreach ($UserFeeds as $UserFeed) {
                 /** @var $UserFeed UserFeed */
@@ -27,6 +32,17 @@ class RoleUtility
                 $this->FeedRulesByRole[$UserFeed->role][] = $UserFeed->targetFeedId;
                 $this->FeedRulesByFeed[$UserFeed->targetFeedId] = $UserFeed->role;
             }
+        }
+    }
+
+    public function getTargetFeedIds($role = null){
+        if ($role){
+            if (isset($this->FeedRulesByRole[$role]))  {
+                return $this->FeedRulesByRole[$role];
+            }
+            return array();
+        } else {
+            return $this->FeedRulesByRole;
         }
     }
 

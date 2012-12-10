@@ -33,23 +33,30 @@
             return self::$targetFeedIds;
         }
 
+        /**
+         * Возвращает список источников для ленты
+         * @param int $currentTargetFeedId
+         * @return array
+         */
         public static function GetSourceFeedIds($currentTargetFeedId = 0) {
+            // wtf???
             $result = array(-1 => -1, -2 => -2);
 
             if (is_array(self::$sourceFeedIds) && array_key_exists($currentTargetFeedId, self::$sourceFeedIds)) {
                 return self::$sourceFeedIds[$currentTargetFeedId];
             }
 
-            $userId = AuthVkontakte::IsAuth();
+            $vkId = AuthVkontakte::IsAuth();
 
-            if (empty($userId)) {
+
+            if (empty($vkId)) {
                 self::$sourceFeedIds[$currentTargetFeedId] = $result;
                 return $result;
             }
 
-            $checkData = SourceFeedFactory::Get(
-                array()
-                , array(BaseFactory::WithoutPages => true, BaseFactory::WithColumns => '"sourceFeedId", "targetFeedIds"')
+            // получеам все строки!!! почему не использовать массив?
+            $checkData = SourceFeedFactory::Get(array('containsFeedId' => $currentTargetFeedId),
+                array(BaseFactory::WithoutPages => true, BaseFactory::WithColumns => '"sourceFeedId", "targetFeedIds"')
             );
 
             if (!empty($checkData)) {
