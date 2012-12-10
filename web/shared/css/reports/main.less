@@ -105,22 +105,30 @@
         }
 
     }
+    .item,
+    .column {
+        text-align: center;
+        width: 100px;
+    }
     .item.public,
     .column.public {
+        text-align: left;
         width: 250px;
-    }
-    .item.time,
-    .item.visitors,
-    .item.subscribers,
-    .column.time,
-    .column.visitors,
-    .column.subscribers {
-        width: 100px;
-        text-align: center;
     }
     .item.action,
     .column.action {
         width: 30px;
+    }
+    .column.action {
+        .icon {
+            cursor: pointer;
+            .opacity(0.5);
+            .transition(0.2s);
+
+            &:hover {
+                .opacity(1);
+            }
+        }
     }
 
     .item {
