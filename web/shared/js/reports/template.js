@@ -76,10 +76,10 @@ var REPORTS = {
                     '</div>' +
                 '</div>' +
             '<? } ?>' +
-            '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
-            '<div class="column time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column time" title="Перекрыт через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column visitors" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
+            '<div class="column time" title="Начало поиска в"><?=isset("start_search_at") ? start_search_at : "-" ?></div>' +
+            '<div class="column interval" title="Удалён через"><?= "-" ?></div>' +
+            '<div class="column interval" title="Будет висеть в поиске"><?=( isset("stop_search_at") && isset("start_search_at")) ? (stop_search_at - start_search_at) : "-" ?></div>' +
+            '<div class="column active" title="Без комментариев"><?=isset("active") ? "активен" : "неактивен" ?></div>' +
             '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
         '</div>'
     },
@@ -89,8 +89,8 @@ var REPORTS = {
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
         '<div class="item time post-time">Время поста<span class="icon arrow"></div>' +
-        '<div class="item time delete-time">Удалён через<span class="icon arrow"></div>' +
-        '<div class="item time overlap-time">Перекрыт через<span class="icon arrow"></div>' +
+        '<div class="item interval delete-time">Удалён через<span class="icon arrow"></div>' +
+        '<div class="item interval overlap-time">Перекрыт через<span class="icon arrow"></div>' +
         '<div class="item visitors">Посетителей<span class="icon arrow"></div>' +
         '<div class="item subscribers">Подписчиков<span class="icon arrow"></div>',
 
@@ -123,9 +123,9 @@ var REPORTS = {
                     '</div>' +
                 '</div>' +
             '<? } ?>' +
-            '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
-            '<div class="column time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column time" title="Перекрыт через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
+            '<div class="column time" title="Время поста"><?=isset("detected_at") ? detected_at : "-" ?></div>' +
+            '<div class="column interval" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
+            '<div class="column interval" title="Перекрыт через"><?=isset("overlaps") ? overlaps : "-" ?></div>' +
             '<div class="column visitors" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
         '</div>'

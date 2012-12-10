@@ -74,6 +74,18 @@ var Page = Event.extend({
             }
             $date.html(text);
         });
+    },
+    makeInterval: function($elements, ) {
+        if ( !limit )
+        $elements.each(function() {
+            var $date = $(this);
+            var timestamp = $date.text();
+            if (!intval(timestamp)) return;
+            var interval = timestamp / 60;
+            interval = interval.toFixed(0)
+            var text = interval >= 60 && limit ? '60+' : interval;
+            $date.html(text);
+        });
     }
 });
 
@@ -93,6 +105,7 @@ var Result = Page.extend({
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.makeInterval($results.find('.interval'));
         });
     }
 });
@@ -126,6 +139,7 @@ var Monitor = Page.extend({
             $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
             $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
             t.makeTime($results.find('.time'));
+            t.makeInterval($results.find('.interval'), true);
         });
     },
 
