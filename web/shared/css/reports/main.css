@@ -13,5 +13,5 @@
 #main #results .column.public .photo{width:40px;height:40px;margin-right:10px;overflow:hidden;}#main #results .column.public .photo img{max-width:100%;}
 #main #results .column.public .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
 #main .item.public,#main .column.public{width:250px;}
-#main .item.time,#main .item.visitors,#main .item.subscribers,#main .column.time,#main .column.visitors,#main .column.subscribers{width:110px;text-align:center;}
+#main .item.time,#main .item.interval,#main .item.visitors,#main .item.subscribers,#main .column.time,#main .column.interval,#main .column.visitors,#main .column.subscribers, #main .column.active{width:110px;text-align:center;}
 #main .item{cursor:default !important;}#main .item .icon{display:none !important;}
