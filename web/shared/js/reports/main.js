@@ -63,6 +63,10 @@ var Pages = Class.extend({
 
 var Page = Event.extend({
     inited: null,
+    sort: '',
+    sortReverse: false,
+    offset: 0,
+    limit: Configs.limit,
 
     update: function() {},
     bindEvents: function() {},
@@ -140,7 +144,8 @@ var Page = Event.extend({
                 });
             }
         });
-    }
+    },
+    showMore: function() {}
 });
 
 
@@ -156,11 +161,10 @@ var Monitor = Page.extend({
             $listAddMonitor.html(tmpl(REPORTS.MONITOR.LIST_ADD_MONITOR));
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
-            $('#datepicker').datepicker();
-            $('#datepicker').datepicker('setDate', new Date().getTime());
+            $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
-        Events.fire('get_monitor_list', Configs.limit, 0, function(data) {
+        Events.fire('get_monitor_list', t.limit, t.offset, function(data) {
             $listAddMonitor.slideDown(200);
             $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
             $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
@@ -230,7 +234,7 @@ var Result = Page.extend({
             t.inited = true;
         }
 
-        Events.fire('get_result_list', Configs.limit, 0, function(data) {
+        Events.fire('get_result_list', t.limit, t.offset, function(data) {
             $listAddMonitor.slideUp(200);
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
