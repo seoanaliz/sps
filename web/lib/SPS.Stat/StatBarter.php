@@ -28,12 +28,9 @@ class StatBarter
         $barter_events_res = array();
         foreach( $query_result as $barter_event ) {
             $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array();
-            $overlaps = !empty( $overlaps ) ? ( $overlaps[0] - $barter_event->posted_at->format('U'))  : 0;
-            if( abs($overlaps) > 20000) $overlaps = 0;
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
             $deleted_at = isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : $posted_at + 3600;
             $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
-
 
             $barter_events_res[] = array(
                 'report_id'     =>  $barter_event->barter_event_id,
