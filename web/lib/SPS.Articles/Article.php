@@ -79,6 +79,8 @@
         public $status;
 
         /**
+         * Статус:
+         * одобрена, отклонена, на рассмотрении
          * @var int
          */
         public $articleStatus;

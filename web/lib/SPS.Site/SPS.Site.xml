@@ -164,6 +164,12 @@
             <action name="MarkArticleAppControl">
                 <path>app/controls/articles/MarkArticleAppControl</path>
             </action>
+            <action name="ApproveArticleAppControl">
+                <path>app/controls/articles/ApproveArticleAppControl</path>
+            </action>
+            <action name="RejectArticleAppControl">
+                <path>app/controls/articles/RejectArticleAppControl</path>
+            </action>
         </group>
         <group name="Comments">
             <action name="SaveCommentAppControl">

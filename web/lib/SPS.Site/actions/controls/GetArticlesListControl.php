@@ -2,7 +2,7 @@
     Package::Load( 'SPS.Site' );
 
     /**
-     * GetArticlesListControl Action
+     * Конторллер списка постов для Socialboard
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
@@ -12,17 +12,17 @@
         /**
          * @var Article[]
          */
-        private $articles = array();
+        protected $articles = array();
 
         /**
          * @var ArticleRecord[]
          */
-        private $articleRecords = array();
+        protected $articleRecords = array();
 
         /**
          * @var TargetFeed[]
          */
-        private $targetFeeds = array();
+        protected $targetFeeds = array();
 
         /**
          * @var SourceFeed[]
@@ -32,62 +32,66 @@
         /**
          * @var Author[]
          */
-        private $authors = array();
+        protected $authors = array();
 
         /**
          * @var array
          */
-        private $commentsData = array();
+        protected $commentsData = array();
 
         /**
          * @var int
          */
-        private $pageSize = 20;
+        protected $pageSize = 20;
 
         /**
          * @var int
          */
-        private $articlesCount = 0;
+        protected $articlesCount = 0;
 
         /**
          * @var bool
          */
-        private $hasMore = false;
+        protected $hasMore = false;
 
         /**
          * @var array
          */
-        private $search = array();
+        protected $search = array();
 
         /**
          * @var array
          */
-        private $options = array();
+        protected $options = array();
 
         /**
          * @var string
          */
         private $articleLinkPrefix = 'http://vk.com/wall-';
 
-        private function processRequest() {
-            $sourceFeedIds  = Request::getArray('sourceFeedIds');
-            $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
-            $from           = Request::getInteger( 'from' );
-            $to             = Request::getInteger( 'to' );
-            $sortType       = Request::getString( 'sortType' );
-            $type           = Request::getString( 'type' );
-
-            $page = Session::getInteger( 'page' );
+        protected function processPage($sessionKey = 'page'){
+            $page = Session::getInteger( $sessionKey );
             $page = ($page < 0) ? 0 : $page;
             if (Request::getBoolean( 'clean' )) {
                 $page = 0;
             }
 
-            $this->search = array(
-                '_sourceFeedId' => $sourceFeedIds,
-                'pageSize' => $this->pageSize + 1,
-                'page' => $page,
-            );
+            $this->search['pageSize'] = $this->pageSize + 1;
+            $this->search['page'] = $page;
+        }
+
+
+        private function processRequest() {
+            // определяем ленты
+            $sourceFeedIds  = Request::getArray('sourceFeedIds');
+            $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
+            $from = Request::getInteger('from');
+            $to = Request::getInteger('to');
+            $sortType = Request::getString('sortType');
+            $type = Request::getString('type');
+
+
+            $this->processPage();
 
             if ($from !== null) {
                 $this->search['rateGE'] = $from;
@@ -119,12 +123,14 @@
                         // автор видит все записи
                         $articleTypes = array(Article::STATUS_REVIEW, Article::STATUS_REJECT, Article::STATUS_APPROVED);
                     } elseif ($role == UserFeed::ROLE_EDITOR) {
-                        // одобренные и на рассмотрении
+                        // редкатор - одобренные и на рассмотрении
                         $articleTypes = array(Article::STATUS_REVIEW, Article::STATUS_APPROVED);
                     } else {
                         // одобренные записи видят все пользователи
                         $articleTypes = array(Article::STATUS_APPROVED);
                     }
+
+                     $this->search['article-delete'] = $articleTypes;
                 } else {
                     throw new Exception('Access error');
                 }
@@ -159,9 +165,7 @@
             }
         }
 
-        private function getObjects() {
-            $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
-
+        protected function getObjects() {
             $this->articles = ArticleFactory::Get($this->search, $this->options);
             $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
 
@@ -196,17 +200,13 @@
             }
         }
 
-        private function setData() {
-            Response::setArray( 'articles', $this->articles );
-            Response::setArray( 'articleRecords', $this->articleRecords );
-            Response::setInteger( 'articlesCount', $this->articlesCount );
-            Response::setBoolean( 'hasMore', $this->hasMore );
-            Response::setArray( 'authors', $this->authors );
-            Response::setArray( 'targetFeeds', $this->targetFeeds );
-            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
-            Response::setArray( 'sourceFeeds', $this->sourceFeeds );
-            Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
-            Response::setArray( 'commentsData', $this->commentsData );
+        protected function setData() {
+            Response::setArray('articles', $this->articles);
+            Response::setArray('articleRecords', $this->articleRecords);
+            Response::setInteger('articlesCount', $this->articlesCount);
+            Response::setBoolean('hasMore', $this->hasMore);
+            Response::setArray('authors', $this->authors);
+            Response::setArray('commentsData', $this->commentsData);
             Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         }
 
@@ -216,6 +216,11 @@
         public function Execute() {
             $this->processRequest();
             $this->getObjects();
+
+            $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
+            Response::setArray('sourceFeeds', $this->sourceFeeds);
+            Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
+
             $this->setData();
         }
     }

@@ -88,6 +88,11 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
+                )
+                ,'articleStatus' => array(
+                    'name'          => 'articleStatus'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'CheckEmpty'
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -95,6 +100,11 @@
                     'name'         => 'articleId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
+                ),
+                'articleTypesIn' => array(
+                    'name'         => 'articleStatus',
+                    'type'       => TYPE_INTEGER,
+                    'searchType' => SEARCHTYPE_ARRAY,
                 )
                 , '_externalId' => array(
                     'name'         => 'externalId'

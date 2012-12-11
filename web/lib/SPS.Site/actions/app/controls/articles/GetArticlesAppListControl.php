@@ -1,239 +1,163 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site');
+
+/**
+ * Конторллер списка постов для VK приложения
+ * GetArticlesAppListControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+final class GetArticlesAppListControl extends GetArticlesListControl {
+    /**
+     * @var AuthorEvent[]
+     */
+    private $authorEvents = array();
 
     /**
-     * GetArticlesAppListControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * @var array
      */
-    class GetArticlesAppListControl {
+    private $authorCounter = array();
 
-        /**
-         * @var Article[]
-         */
-        private $articles = array();
+    protected function processPage(){
+        parent::processPage('gaal_page');
+    }
 
-        /**
-         * @var ArticleRecord[]
-         */
-        private $articleRecords = array();
 
-        /**
-         * @var TargetFeed[]
-         */
-        private $targetFeeds = array();
 
-        /**
-         * @var Author[]
-         */
-        private $authors = array();
 
-        /**
-         * @var AuthorEvent[]
-         */
-        private $authorEvents = array();
+    private function processRequest()
+    {
+        $this->processPage();
 
-        /**
-         * @var array
-         */
-        private $commentsData = array();
+        $author = Session::getObject('Author');
 
-        /**
-         * @var int
-         */
-        private $pageSize = 20;
+        $type = Request::getString('type');
+        if (empty($type) || $type == 'null') {
+            $type = Session::getString('gaal_type');
+        }
+        Session::setString('gaal_type', $type);
 
-        /**
-         * @var int
-         */
-        private $articlesCount = 0;
+        //все авторские посты
+        $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
 
-        /**
-         * @var bool
-         */
-        private $hasMore = false;
-
-        /**
-         * @var array
-         */
-        private $authorCounter = array();
-
-        /**
-         * @var array
-         */
-        private $search = array();
-
-        /**
-         * @var array
-         */
-        private $options = array();
-
-        private function processRequest() {
-            $author = Session::getObject('Author');
-            $page = Session::getInteger('gaal_page');
-            $page = ($page < 0) ? 0 : $page;
-            if (Request::getBoolean('clear')) {
-                $page = 0;
-            }
-
-            $this->search = array(
-                'pageSize' => $this->pageSize + 1,
-                'page' => $page,
-            );
-
-            $type = Request::getString('type');
-            if (empty($type) || $type == 'null') {
-                $type = Session::getString('gaal_type');
-            }
-            Session::setString('gaal_type', $type);
-
-            //все авторские посты
-            $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
-
-            if (substr($type, 0, 1) == 'p') {
-                $targetFeedId   = substr($type, 1, strlen($type) - 1);
-                $targetFeedIds  = Session::getArray('targetFeedIds');
-                if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
-                    $type = 'my';
-                } else {
-                    $type = 'targetFeed';
-                }
-            } else {
+        if (substr($type, 0, 1) == 'p') {
+            $targetFeedId = substr($type, 1, strlen($type) - 1);
+            $targetFeedIds = Session::getArray('targetFeedIds');
+            if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
                 $type = 'my';
+            } else {
+                $type = 'targetFeed';
             }
-
-            Session::setInteger('gaal_targetFeedId', null);
-
-            switch ($type) {
-                case 'targetFeed':
-                    $this->search['targetFeedId'] = $targetFeedId;
-                    Session::setInteger('gaal_targetFeedId', $targetFeedId);
-                    break;
-                case 'my':
-                default:
-                    $this->search['authorId'] = $author->authorId;
-                    break;
-            }
-
-            $this->options[BaseFactory::WithoutDisabled] = false;
-
-            $filter = Request::getString( 'filter' );
-            switch ($filter) {
-                case 'best':
-                    $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
-                    break;
-                case 'new':
-                    // дефолтная сортировка
-                    break;
-                case 'my':
-                default:
-                    if (empty($this->search['targetFeedId'])) {
-                        $this->search['authorId'] = $author->authorId;
-                    }
-                    break;
-            }
-
-            $tabType = Request::getString( 'tabType' );
-            if (empty($tabType) || $tabType == 'null') {
-                $tabType = Session::getString('gaal_tabType');
-            }
-            Session::setString('gaal_tabType', $tabType);
-            Response::setString('tabType', $tabType);
-
-            if (empty($this->search['authorId'])) {
-                $tabType = 'all';
-            }
-
-            switch ($tabType) {
-                case 'queued':
-                    $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
-                    $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
-                    break;
-                case 'sent':
-                    $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
-                    $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
-                    break;
-                case 'all':
-                default:
-                    // дефолтная сортировка
-                    break;
-            }
+        } else {
+            $type = 'my';
         }
 
-        private function getObjects() {
-            $this->articles = ArticleFactory::Get($this->search, $this->options);
-            $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
+        Session::setInteger('gaal_targetFeedId', null);
 
-            $this->hasMore = (count($this->articles) > $this->pageSize);
-            $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
+        switch ($type) {
+            case 'targetFeed':
+                $this->search['targetFeedId'] = $targetFeedId;
+                Session::setInteger('gaal_targetFeedId', $targetFeedId);
+                break;
+            case 'my':
+            default:
+                $this->search['authorId'] = $author->authorId;
+                break;
+        }
 
-            //load articles data
-            if (!empty($this->articles)) {
-                $this->articleRecords = ArticleRecordFactory::Get(
-                    array('_articleId' => array_keys($this->articles))
-                );
-            }
-            if (!empty($this->articleRecords)) {
-                $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleId', false);
-            }
+        $this->options[BaseFactory::WithoutDisabled] = false;
 
-            if ($this->hasMore) {
-                Session::setInteger('gaal_page', $this->search['page'] + 1);
-            }
-
-            //get articles target feeds with info and authors
-            if (!empty($this->articles)) {
-                $targetFeedIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('targetFeedId'));
-                $authorIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('authorId'));
-
-                if (!empty($targetFeedIds)) {
-                    $this->targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => array_unique($targetFeedIds)));
+        $filter = Request::getString('filter');
+        switch ($filter) {
+            case 'best':
+                $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
+                break;
+            case 'new':
+                // дефолтная сортировка
+                break;
+            case 'my':
+            default:
+                if (empty($this->search['targetFeedId'])) {
+                    $this->search['authorId'] = $author->authorId;
                 }
-                if (!empty($authorIds)) {
-                    $this->authors = AuthorFactory::Get(
-                        array('_authorId' => array_unique($authorIds)),
-                        array(BaseFactory::WithoutPages => true)
-                    );
-                }
+            break;
+        }
 
-                if (!empty($this->search['authorId'])) {
-                    $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
-                }
-                $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
+        $tabType = Request::getString('tabType');
+        if (empty($tabType) || $tabType == 'null') {
+            $tabType = Session::getString('gaal_tabType');
+        }
+        Session::setString('gaal_tabType', $tabType);
+        Response::setString('tabType', $tabType);
+
+        if (empty($this->search['authorId'])) {
+            $tabType = 'all';
+        }
+
+        switch ($tabType) {
+            case 'queued':
+                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
+                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
+                break;
+            case 'sent':
+                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
+                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
+                break;
+            case 'all':
+            default:
+                // дефолтная сортировка
+                break;
+        }
+    }
+
+    protected function getObjects() {
+        parent::getObjects();
+
+        if (!empty($this->articles)) {
+            $targetFeedIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('targetFeedId'));
+
+            if (!empty($targetFeedIds)) {
+                $this->targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => array_unique($targetFeedIds)));
             }
 
             if (!empty($this->search['authorId'])) {
-                $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
+                $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
             }
+            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
         }
 
-        private function setData() {
-            Response::setArray( 'articles', $this->articles );
-            Response::setArray( 'articleRecords', $this->articleRecords );
-            Response::setInteger( 'articlesCount', $this->articlesCount );
-            Response::setBoolean( 'hasMore', $this->hasMore );
-            Response::setArray( 'authors', $this->authors );
-            Response::setArray( 'targetFeeds', $this->targetFeeds );
-            Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
-            Response::setArray( 'commentsData', $this->commentsData );
-            Response::setArray( 'authorEvents', $this->authorEvents );
-            Response::setArray( '__authorCounter', $this->authorCounter );
-        }
-
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $this->processRequest();
-            $this->getObjects();
-            $this->setData();
-
-            //обновляем дату, когда пользователь последний раз смотрел паблик
-            if (!empty($this->search['targetFeedId'])) {
-                $author = Session::getObject('Author');
-                AuthorFeedViewUtility::UpdateLastView($author->authorId, $this->search['targetFeedId']);
-            }
+        if (!empty($this->search['authorId'])) {
+            $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
         }
     }
+
+    protected function setData()
+    {
+        parent::setData();
+        Response::setArray('targetFeeds', $this->targetFeeds);
+        Response::setArray('targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId'));
+        Response::setArray('authorEvents', $this->authorEvents);
+        Response::setArray('__authorCounter', $this->authorCounter);
+    }
+
+    /**
+     * Entry Point
+     */
+    public function Execute()
+    {
+        $this->processRequest();
+        $this->getObjects();
+        $this->setData();
+
+        Response::setArray('targetFeeds', $this->targetFeeds);
+
+        //обновляем дату, когда пользователь последний раз смотрел паблик
+        if (!empty($this->search['targetFeedId'])) {
+            $author = Session::getObject('Author');
+            AuthorFeedViewUtility::UpdateLastView($author->authorId, $this->search['targetFeedId']);
+        }
+    }
+}
+
 ?>

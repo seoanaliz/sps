@@ -1,5 +1,6 @@
 /**
  * Events
+ * @var string appControlsRoot
  */
 var Events = {
     delay: 0,
