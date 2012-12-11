@@ -20,7 +20,8 @@
                     <? $i=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                     ?>
-                       <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
+                       <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}"
+                          id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
                     <?
                     $i++;
                     endforeach;
