@@ -49,6 +49,8 @@
             $article->authorId = $author->authorId;
             $article->isCleaned = false;
             $article->statusId = 1;
+            // при создании статус - на рассмотрении
+            $article->articleStatus = Article::STATUS_REVIEW;
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = mb_substr($text, 0, 4100);

@@ -12,6 +12,21 @@
      */
     class Article {
 
+        /**
+         * На рассмотрение
+         */
+        const STATUS_REVIEW = 1;
+
+        /**
+         * Одобрена
+         */
+        const STATUS_APPROVED = 2;
+
+        /**
+         * Отклонена
+         */
+        const STATUS_REJECT = 3;
+
         /** @var int */
         public $articleId;
 
@@ -62,5 +77,10 @@
 
         /** @var Status */
         public $status;
+
+        /**
+         * @var int
+         */
+        public $articleStatus;
     }
 ?>

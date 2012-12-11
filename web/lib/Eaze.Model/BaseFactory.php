@@ -907,7 +907,7 @@
 
                 $regenerateCache = MemcacheHelper::AddBlock( $cacheKey );
                 if( $regenerateCache == false && $cacheResult == false ) {
-                    sleep( 0.1 );
+                    // sleep( 0.1 );
                     // TODO rewrite
                 }
                 $cacheResult  = MemcacheHelper::Get( $cacheKey );

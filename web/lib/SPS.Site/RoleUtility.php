@@ -47,6 +47,7 @@ class RoleUtility
     }
 
     /**
+     * @param $targetFeedId - ид ленты
      * @param $sourceType - тип ресурса
      */
     public function hasAccessToSourceType($targetFeedId, $sourceType){
@@ -68,12 +69,20 @@ class RoleUtility
                     return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
             }
-
-
             return true;
         }
-        #return false;
         return true;
+    }
+
+    /**
+     * Возвращает роль
+     * @param $targetFeedId
+     */
+    public function getRoleForTargetFeed($targetFeedId){
+        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
+            return $this->FeedRulesByFeed[$targetFeedId];
+        }
+        return null;
     }
 
     public function getAccessibleSourceTypes($targetFeedId){

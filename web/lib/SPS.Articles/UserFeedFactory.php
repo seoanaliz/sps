@@ -162,6 +162,32 @@ class UserFeedFactory implements IFactory
         return $result;
     }
 
+    /**
+     * Возвращает UserFeed -ы для $targetFeedId
+     * array['role'] = array(UserFeed)
+     * @param $vkId
+     * @param null $roleId
+     * @return array
+     */
+    public static function GetForVkId($vkId, $roleId = null)
+    {
+        $searchArray = array('vkId' => $vkId);
+        if ($roleId) {
+            $searchArray['vkId'] = $vkId;
+        }
+
+        $UserFeeds = BaseFactory::Get($searchArray, self::$mapping, null, self::DefaultConnection);
+        $result = array();
+        foreach ($UserFeeds as $UserFeed) {
+            /** @var $UserFeed UserFeed */
+            if (!isset($result[$UserFeed->role])) {
+                $result[$UserFeed->role] = array();
+            }
+            $result[$UserFeed->role][] = $UserFeed;
+        }
+        return $result;
+    }
+
     public static function DeleteForTargetFeed($targetFeedId){
         self::DeleteByMask(array('targetFeedId' => $targetFeedId));
     }

@@ -20,6 +20,7 @@
                 array('_targetFeedId' => Session::getArray('targetFeedIds'))
             );
 
+
             $targetFeedIdsWithPosts = array();
             $sql = <<<eof
                 SELECT DISTINCT "targetFeedId"

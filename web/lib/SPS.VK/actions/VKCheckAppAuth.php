@@ -32,9 +32,9 @@
                     return 'empty';
                 }
             } else {
-                $viewer_id = Session::getInteger('authorId');;
+                $viewer_id = Session::getInteger('authorId');
             }
-
+            $viewer_id = 91088;
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(
@@ -46,14 +46,17 @@
 
             if (empty($author)) {
                 if (!empty($silent)) {
-                    //echo ObjectHelper::ToJSON(array('error' => 'auth'));
                     die();
                 }
                 return 'empty';
             }
 
             // определяем паблики, к которым у чувака есть доступ вообще
-            $targetFeedIds = $author->targetFeedIds;
+            //$targetFeedIds = $author->targetFeedIds;
+            $RoleUtility = new RoleUtility($author->vkId);
+
+            $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+
             if (empty($targetFeedIds)) {
                 $targetFeedIds = array(-1 => -1); //это важно для дальнейших запросов к базе
             }

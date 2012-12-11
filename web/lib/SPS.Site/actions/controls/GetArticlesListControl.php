@@ -107,11 +107,26 @@
                 return;
             }
 
-            //авторские посты
+            // авторские посты
             if ($type == SourceFeedUtility::Authors) {
-                $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                    $this->search['targetFeedId'] = -999;
+                $vkId = AuthVkontakte::IsAuth();
+                $targetFeedId = Request::getInteger('targetFeedId');
+
+                $RoleUtility = new RoleUtility($vkId);
+                if ($RoleUtility->hasAccessToSourceType($targetFeedId, $type)){
+                    $role = $RoleUtility->getRoleForTargetFeed($targetFeedId);
+                    if ($role == UserFeed::ROLE_AUTHOR) {
+                        // автор видит все записи
+                        $articleTypes = array(Article::STATUS_REVIEW, Article::STATUS_REJECT, Article::STATUS_APPROVED);
+                    } elseif ($role == UserFeed::ROLE_EDITOR) {
+                        // одобренные и на рассмотрении
+                        $articleTypes = array(Article::STATUS_REVIEW, Article::STATUS_APPROVED);
+                    } else {
+                        // одобренные записи видят все пользователи
+                        $articleTypes = array(Article::STATUS_APPROVED);
+                    }
+                } else {
+                    throw new Exception('Access error');
                 }
 
                 $this->search['rateGE'] = null;
