@@ -13,7 +13,9 @@
          * Entry Point
          */
         public function Execute() {
-            $RoleUtility = new RoleUtility();
+            $vkId = AuthVkontakte::IsAuth();
+
+            $RoleUtility = new RoleUtility($vkId);
 
             $targetFeedId = Request::getInteger('targetFeedId');
 
@@ -23,7 +25,8 @@
             }
 
             if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
-                echo('Access denied to type ' . $type);
+                // запросили недоступный тип, но мы тогда вернем дефолтный
+                $type = $RoleUtility->getDefaultType($targetFeedId);
             }
 
             $result = array();
@@ -44,9 +47,11 @@
                         );
                     }
                 } else {
+                    $SourceAccessUtility = new SourceAccessUtility($vkId);
+
                     $sourceFeeds = SourceFeedFactory::Get(
                         array(
-                            '_sourceFeedId' => AccessUtility::GetSourceFeedIds($targetFeedId),
+                            '_sourceFeedId' => $SourceAccessUtility->getSourceIdsForFeed($targetFeedId), //AccessUtility::GetSourceFeedIds(),
                             'type' => $type)
                         , array( BaseFactory::WithoutPages => true )
                     );
@@ -64,6 +69,7 @@
 
 
             echo ObjectHelper::ToJSON(array(
+                'type' => $type,
                 'sourceFeeds' => $result,
                 'accessibleSourceTypes' => array_keys($RoleUtility->getAccessibleSourceTypes($targetFeedId)),
                 'accessibleGridTypes' => array_keys($RoleUtility->getAccessibleGridTypes($targetFeedId)),
