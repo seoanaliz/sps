@@ -629,6 +629,18 @@ var Dialogs = EndlessPage.extend({
                                         dialogModel.lists().push(item.id);
                                         t.trigger('addToList', item.id, dialogId);
                                     }
+                                    var pageId = t.pageId() == Configs.commonDialogsList ? null : t.pageId();
+                                    var isAtCurrentList = false;
+                                    if (!dialogModel.lists().length && !pageId) {
+                                        isAtCurrentList = true;
+                                    } else if ($.inArray(pageId, dialogModel.lists()) !== -1) {
+                                        isAtCurrentList = true;
+                                    }
+                                    if (!isAtCurrentList) {
+                                        $dialog.addClass('removed');
+                                    } else {
+                                        $dialog.removeClass('removed');
+                                    }
                                 });
                             }
                         },
@@ -638,6 +650,18 @@ var Dialogs = EndlessPage.extend({
                                 if (index != -1) {
                                     dialogModel.lists().splice(index, 1);
                                     t.trigger('removeFromList', item.id, dialogId);
+                                }
+                                var pageId = t.pageId() == Configs.commonDialogsList ? null : t.pageId();
+                                var isAtCurrentList = false;
+                                if (!dialogModel.lists().length && !pageId) {
+                                    isAtCurrentList = true;
+                                } else if ($.inArray(pageId, dialogModel.lists()) !== -1) {
+                                    isAtCurrentList = true;
+                                }
+                                if (!isAtCurrentList) {
+                                    $dialog.addClass('removed');
+                                } else {
+                                    $dialog.removeClass('removed');
                                 }
                             });
                         },
@@ -727,6 +751,12 @@ var Dialogs = EndlessPage.extend({
                 t.onRender();
             });
         }
+    },
+    show: function() {
+        this._super.apply(this, arguments);
+
+        var t = this;
+        t.el().find('.dialog.removed').remove();
     }
 });
 
