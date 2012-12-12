@@ -101,7 +101,7 @@
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 ),
-                'articleTypesIn' => array(
+                'articleStatusIn' => array(
                     'name'         => 'articleStatus',
                     'type'       => TYPE_INTEGER,
                     'searchType' => SEARCHTYPE_ARRAY,

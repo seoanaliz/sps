@@ -19,55 +19,78 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
      */
     private $authorCounter = array();
 
+    /**
+     * Использовать фильтр по рейтингу
+     * @var bool
+     * @override
+     */
+    protected $userRateFilter = false;
+
+    /**
+     * по умолчанию - режим показа моих записей
+     * @var string
+     */
+    private $mode = 'my';
+
     protected function processPage(){
         parent::processPage('gaal_page');
     }
 
+    protected function getSourceFeedType(){
+        // показываем только авторские
+        return SourceFeedUtility::Authors;
+    }
 
-
-
-    private function processRequest()
-    {
-        $this->processPage();
-
-        $author = Session::getObject('Author');
-
-        $type = Request::getString('type');
-        if (empty($type) || $type == 'null') {
-            $type = Session::getString('gaal_type');
+    /**
+     * Возвращает идентификатор запрошеной ленты
+     */
+    protected function getTargetFeedId(){
+        $mode = Request::getString('type');
+        if (substr($mode, 0, 1) == 'p') {
+            return substr($mode, 1);
         }
-        Session::setString('gaal_type', $type);
+    }
+
+    protected function processRequestCustom(){
+        $author = Session::getObject('Author');
+        $RoleUtility = new RoleUtility($author->vkId);
+        // получаем доступные ленты
+        $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+
+        //$mode = Request::getString('type');
+        //if (empty($mode) || $mode == 'null') {
+        //    $mode = Session::getString('gaal_type');
+        //}
+        //Session::setString('gaal_type', $mode);
 
         //все авторские посты
         $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
 
-        if (substr($type, 0, 1) == 'p') {
-            $targetFeedId = substr($type, 1, strlen($type) - 1);
-            $targetFeedIds = Session::getArray('targetFeedIds');
-            if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
-                $type = 'my';
-            } else {
-                $type = 'targetFeed';
-            }
-        } else {
-            $type = 'my';
+        // если есть лента - показываем для нее
+        // безопасность проверена в parent::processRequest
+        $targetFeedId = $this->getTargetFeedId();
+        if ($targetFeedId) {
+            $this->mode = 'targetFeed';
         }
 
-        Session::setInteger('gaal_targetFeedId', null);
+        //Session::setInteger('gaal_targetFeedId', null);
 
-        switch ($type) {
+        if ($this->mode == 'my') {
+            $this->search['authorId'] = $author->authorId;
+        }
+
+        /*
+        switch ($mode) {
             case 'targetFeed':
                 $this->search['targetFeedId'] = $targetFeedId;
                 Session::setInteger('gaal_targetFeedId', $targetFeedId);
                 break;
-            case 'my':
             default:
                 $this->search['authorId'] = $author->authorId;
                 break;
-        }
+        }  */
 
-        $this->options[BaseFactory::WithoutDisabled] = false;
-
+        // сортировка
         $filter = Request::getString('filter');
         switch ($filter) {
             case 'best':
@@ -78,9 +101,9 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
                 break;
             case 'my':
             default:
-                if (empty($this->search['targetFeedId'])) {
-                    $this->search['authorId'] = $author->authorId;
-                }
+                //if (empty($this->search['targetFeedId'])) {
+                //    $this->search['authorId'] = $author->authorId;
+                //}
             break;
         }
 
@@ -91,7 +114,7 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
         Session::setString('gaal_tabType', $tabType);
         Response::setString('tabType', $tabType);
 
-        if (empty($this->search['authorId'])) {
+        if ($this->mode == 'my') {
             $tabType = 'all';
         }
 
@@ -107,27 +130,36 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
             case 'all':
             default:
                 // дефолтная сортировка
-                break;
+            break;
         }
+
+        $this->options[BaseFactory::WithoutDisabled] = false;
     }
 
+    /**
+     * Получаем объекты
+     */
     protected function getObjects() {
+        // статьи, комменты и т.д.
         parent::getObjects();
 
         if (!empty($this->articles)) {
+            // получаем ленты
             $targetFeedIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('targetFeedId'));
-
             if (!empty($targetFeedIds)) {
                 $this->targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => array_unique($targetFeedIds)));
             }
 
-            if (!empty($this->search['authorId'])) {
+            // получем события
+            if ($this->mode == 'my') {
                 $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
             }
+
+            // перегружаем комменты
             $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
         }
 
-        if (!empty($this->search['authorId'])) {
+        if ($this->mode == 'my') {
             $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
         }
     }
@@ -149,8 +181,6 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
         $this->processRequest();
         $this->getObjects();
         $this->setData();
-
-        Response::setArray('targetFeeds', $this->targetFeeds);
 
         //обновляем дату, когда пользователь последний раз смотрел паблик
         if (!empty($this->search['targetFeedId'])) {
