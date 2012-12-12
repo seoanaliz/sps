@@ -56,7 +56,7 @@ class GetPublicGrowthAction
             $data['barters']      = $barter['total_count'] . '(' . $barter['rel_count']. ')';
         }
 
-        Response::setArray( 'stat_summary' ,$res );
+        Response::setArray( 'stat_summary' , array_reverse( $res ));
     }
 
     private function get_average_barters( $date )

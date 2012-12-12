@@ -191,6 +191,8 @@ class CheckWalls
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
+                $barter_event->creator_id    = '-1';
+                $barter_event->groups_ids    = array(1,2,3,4,5);
                 BarterEventFactory::Add( $barter_event , array( BaseFactory::WithReturningKeys => true ), 'tst' );
             }
         }
