@@ -12,11 +12,12 @@
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
         const PAGE_SIZE = 20;
         const LIMIT_BREAK = 30;//порог отсева постов по лайкам, в процентах
-        const LIKES_LIMIT = 20;//ниже этого порога лайков всем постам выставляется "-"
         const WALL_URL = 'http://vk.com/wall-';
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
+        const ALBUM_MIN_LIKES_LIMIT = 10;
+        const WALL_MIN_LIKES_LIMIT = 30;
         /**
          * Максимальное количество постов, для которых можно запросить лайки
          */
@@ -271,7 +272,7 @@
             ));
         }
 
-        private function kill_attritions( $array )
+        private function kill_attritions( $array, $likes_limit = self::WALL_MIN_LIKES_LIMIT )
         {
             $res = array();
             $sr =  $this->get_average( $array );
@@ -352,7 +353,7 @@
 
                 if ( $array[$i]['likes'] == -1 )
                     ;
-                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT) {
+                elseif ($array[$i]['likes_tr'] < $likes_limit ) {
                     $array[$i]['likes'] = '-';
                 }
             }
@@ -496,7 +497,7 @@
                 $res = VkHelper::api_request('photos.getById', $params);
 
                 $posts = VkAlbums::post_conv($res);
-                $posts = $this->kill_attritions($posts);
+                $posts = $this->kill_attritions($posts, self::ALBUM_MIN_LIKES_LIMIT);
                 return $posts;
             } else {
                 throw new AlbumEndException('End of album. Empty resoponse');
