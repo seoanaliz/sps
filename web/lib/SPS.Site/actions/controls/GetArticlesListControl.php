@@ -115,6 +115,13 @@ class GetArticlesListControl
     }
 
     /**
+     * Возвращает статус записи
+     */
+    protected function getArticleStatus(){
+        return Request::getInteger('articleStatus');
+    }
+
+    /**
      * Возвращает массив источников
      * @return array
      */
@@ -135,26 +142,31 @@ class GetArticlesListControl
         // тип источника
         $sourceFeedType = self::getSourceFeedType();
 
+        // для какой ленты
+        // только для ТопФейса и Авторских, т.к. у них это заранее определено
         $targetFeedId = $this->getTargetFeedId();
-
-        if ($targetFeedId){
+        if ($targetFeedId && ($sourceFeedType == SourceFeedUtility::Authors || $sourceFeedType == SourceFeedUtility::Topface)){
             $this->search['targetFeedId'] = $targetFeedId;
+        }
+
+        // определяем источники
+        $sourceFeedIds = $this->getSourceFeedIds();
+        if ($sourceFeedIds) {
+            $this->search['_sourceFeedId'] = $sourceFeedIds;
         }
 
         // если запрашиваем авторские посты
         if ($sourceFeedType == SourceFeedUtility::Authors) {
-            $RoleUtility = new RoleUtility($this->vkId);
-            if ($RoleUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
-                $role = $RoleUtility->getRoleForTargetFeed($targetFeedId);
-                if ($role == UserFeed::ROLE_AUTHOR) {
-                    // автор видит все записи
-                    $articleStatuses = array(Article::STATUS_REVIEW, Article::STATUS_REJECT, Article::STATUS_APPROVED);
-                } elseif ($role == UserFeed::ROLE_EDITOR) {
-                    // редкатор - одобренные и на рассмотрении
-                    $articleStatuses = array(Article::STATUS_REVIEW, Article::STATUS_APPROVED);
-                } else {
-                    // одобренные записи видят все пользователи
-                    $articleStatuses = array(Article::STATUS_APPROVED);
+            $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
+            if ($ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
+
+                $articleStatuses = $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
+
+                // фильтр по статусам - только для авторских постов
+                // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
+                $reqArticleStatus = $this->getArticleStatus();
+                if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
+                    $articleStatuses = array($reqArticleStatus);
                 }
 
                 $this->search['articleStatusIn'] = $articleStatuses;
@@ -164,8 +176,8 @@ class GetArticlesListControl
 
             $this->userRateFilter = false;
         }
-
-        if ($sourceFeedType == SourceFeedUtility::Topface) {
+        // источник - топфейс
+        elseif ($sourceFeedType == SourceFeedUtility::Topface) {
             if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                 throw new Exception('Access error');
             }
@@ -177,8 +189,8 @@ class GetArticlesListControl
             $this->userRateFilter = false;
         }
 
+        // фильтр по рейтингу
         if ($this->userRateFilter) {
-            // фильтр по рейтингу
             $from = Request::getInteger('from');
             $to = Request::getInteger('to');
 
@@ -234,6 +246,15 @@ class GetArticlesListControl
     }
 
     /**
+     * Загрузка комментариев
+     */
+    protected function loadComments(){
+        if ($this->articles) {
+            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
+        }
+    }
+
+    /**
      * Получаем объекты
      * articles - список статей
      * articlesCount - общее количестово статей
@@ -268,9 +289,9 @@ class GetArticlesListControl
                     array(BaseFactory::WithoutPages => true)
                 );
             }
-
-            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
         }
+
+        $this->loadComments();
 
         if ($this->hasMore) {
             Session::setInteger('page', $this->search['page'] + 1);

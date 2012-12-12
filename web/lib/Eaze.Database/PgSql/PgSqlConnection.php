@@ -125,7 +125,6 @@
 
             /** @var resource $resource  */
             $resource = pg_exec( $this->connection, $query );
-            echo $query, '<br />';
 
             return new PgSqlDataset( $resource, $this );
         }

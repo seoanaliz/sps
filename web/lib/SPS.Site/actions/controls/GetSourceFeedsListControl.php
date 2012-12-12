@@ -15,7 +15,7 @@
         public function Execute() {
             $vkId = AuthVkontakte::IsAuth();
 
-            $RoleUtility = new RoleUtility($vkId);
+            $RoleUtility = new RoleAccessUtility($vkId);
 
             $targetFeedId = Request::getInteger('targetFeedId');
 

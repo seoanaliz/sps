@@ -1,6 +1,5 @@
 <?php
-Package::Load('SPS.Site');
-
+include_once(dirname(__FILE__) . '/../../../controls/GetArticlesListControl.php');
 /**
  * Конторллер списка постов для VK приложения
  * GetArticlesAppListControl Action
@@ -32,8 +31,8 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
      */
     private $mode = 'my';
 
-    protected function processPage(){
-        parent::processPage('gaal_page');
+    protected function processPage($sessionKey = 'gaal_page'){
+        parent::processPage($sessionKey);
     }
 
     protected function getSourceFeedType(){
@@ -53,7 +52,7 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
 
     protected function processRequestCustom(){
         $author = Session::getObject('Author');
-        $RoleUtility = new RoleUtility($author->vkId);
+        $RoleUtility = new RoleAccessUtility($author->vkId);
         // получаем доступные ленты
         $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 
@@ -137,6 +136,15 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
     }
 
     /**
+     * Загрузка комментариев
+     */
+    protected function loadComments(){
+        if ($this->articles)    {
+            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
+        }
+    }
+
+    /**
      * Получаем объекты
      */
     protected function getObjects() {
@@ -154,9 +162,6 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
             if ($this->mode == 'my') {
                 $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
             }
-
-            // перегружаем комменты
-            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles), true, $this->authorEvents);
         }
 
         if ($this->mode == 'my') {

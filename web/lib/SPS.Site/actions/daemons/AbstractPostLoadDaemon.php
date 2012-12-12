@@ -71,6 +71,8 @@ abstract class AbstractPostLoadDaemon {
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 1;
+            // демон загружает уже одобренные посты
+            $article->articleStatus = Article::STATUS_APPROVED;
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $post['text'];

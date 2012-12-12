@@ -1,6 +1,6 @@
 <?
 /**
- * @var $RoleUtility RoleUtility
+ * @var $RoleUtility RoleAccessUtility
  * @var $sourceTypes array
  * @var $gridTypes array
  *

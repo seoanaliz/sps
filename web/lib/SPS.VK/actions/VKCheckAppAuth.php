@@ -53,7 +53,7 @@
 
             // определяем паблики, к которым у чувака есть доступ вообще
             //$targetFeedIds = $author->targetFeedIds;
-            $RoleUtility = new RoleUtility($author->vkId);
+            $RoleUtility = new RoleAccessUtility($author->vkId);
 
             $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 

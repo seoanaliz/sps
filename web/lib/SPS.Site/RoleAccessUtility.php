@@ -4,7 +4,7 @@
  * Date: 26.11.12 23:06
  * In Code We Trust
  */
-class RoleUtility
+class RoleAccessUtility
 {
     private $FeedRulesByRole = array();
     private $FeedRulesByFeed = array();
@@ -49,6 +49,7 @@ class RoleUtility
     /**
      * @param $targetFeedId - ид ленты
      * @param $sourceType - тип ресурса
+     * @return bool
      */
     public function hasAccessToSourceType($targetFeedId, $sourceType){
         if (isset($this->FeedRulesByFeed[$targetFeedId])) {

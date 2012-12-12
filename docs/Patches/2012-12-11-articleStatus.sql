@@ -1,4 +1,4 @@
-alter table "articles" add column "articleStatus" Int NOT NULL Default 1;
+alter table "articles" add column "articleStatus" Int NOT NULL Default 2;
 
 DROP VIEW "getArticles";
 
