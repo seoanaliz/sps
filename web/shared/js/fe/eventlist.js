@@ -313,7 +313,7 @@ var Eventlist = {
         $('#source-select option').remove();
         $('#source-select').multiselect("refresh");
 
-        loadQueue();
+
 
         //грузим источники для этого паблика
         $.ajax({
@@ -330,7 +330,6 @@ var Eventlist = {
                      sourceSelector.append('<option value="' + item.id + '">' + item.title + '</option>');
                 }
 
-
                 var sourceTypes = data['accessibleSourceTypes'];
                 $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
                       item = $(item);
@@ -342,7 +341,7 @@ var Eventlist = {
                 });
 
                 var gridTypes = data['accessibleGridTypes'];
-                showCount = 0
+                var showCount = 0;
                 $('.right-panel div.type-selector').children('.grid_type').each(function(i, item){
                     item = $(item);
                     if ($.inArray(item.data('type'), gridTypes) == -1){
@@ -365,6 +364,14 @@ var Eventlist = {
                     addCellButton.hide();
                 }
 
+                // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+                var sourceTypeLink = $('#sourceType-' + data.type);
+                if (!sourceTypeLink.hasClass('active')) {
+                    $('.sourceType.active').removeClass('active');
+                    sourceTypeLink.addClass('active');
+                }
+
+                loadQueue();
 
                 //get data from cookie
                 var cookie = $.cookie('sourceFeedIds' + targetFeedId);
