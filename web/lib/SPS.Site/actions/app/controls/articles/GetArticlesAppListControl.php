@@ -1,5 +1,5 @@
 <?php
-include_once(dirname(__FILE__) . '/../../../controls/GetArticlesListControl.php');
+Package::Load('SPS.Site/base');
 /**
  * Конторллер списка постов для VK приложения
  * GetArticlesAppListControl Action
@@ -7,7 +7,7 @@ include_once(dirname(__FILE__) . '/../../../controls/GetArticlesListControl.php'
  * @subpackage Site
  * @author     Shuler
  */
-final class GetArticlesAppListControl extends GetArticlesListControl {
+final class GetArticlesAppListControl extends BaseGetArticlesListControl {
     /**
      * @var AuthorEvent[]
      */
@@ -45,7 +45,18 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
         if (substr($mode, 0, 1) == 'p') {
             return substr($mode, 1);
         }
+        return null;
     }
+
+    /**
+     * Возвращает массив источников
+     * @return array
+     */
+    protected function getSourceFeedIds() {
+        $sourceFeedIds = Request::getArray('sourceFeedIds');
+        return !empty($sourceFeedIds) ? $sourceFeedIds : array();
+    }
+
 
     protected function processRequestCustom(){
         $author = Session::getObject('Author');
