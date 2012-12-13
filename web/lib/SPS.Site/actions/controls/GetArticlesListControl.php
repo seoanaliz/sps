@@ -89,11 +89,11 @@ class GetArticlesListControl
      */
     protected function processPage($sessionKey = 'page')
     {
-        $page = Session::getInteger($sessionKey);
+        $page = Request::getInteger($sessionKey);
         $page = ($page < 0) ? 0 : $page;
-        if (Request::getBoolean('clean')) {
-            $page = 0;
-        }
+        //if (Request::getBoolean('clean')) {
+        //    $page = 0;
+        //}
 
         $this->search['pageSize'] = $this->pageSize + 1;
         $this->search['page'] = $page;
@@ -140,7 +140,7 @@ class GetArticlesListControl
         $this->processPage();
 
         // тип источника
-        $sourceFeedType = self::getSourceFeedType();
+        $sourceFeedType = $this->getSourceFeedType();
 
         // для какой ленты
         // только для ТопФейса и Авторских, т.к. у них это заранее определено
@@ -293,9 +293,9 @@ class GetArticlesListControl
 
         $this->loadComments();
 
-        if ($this->hasMore) {
-            Session::setInteger('page', $this->search['page'] + 1);
-        }
+        //if ($this->hasMore) {
+        //    Session::setInteger('page', $this->search['page'] + 1);
+        //}
     }
 
     protected function setData()

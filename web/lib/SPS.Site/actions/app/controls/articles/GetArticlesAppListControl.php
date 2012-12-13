@@ -31,9 +31,6 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
      */
     private $mode = 'my';
 
-    protected function processPage($sessionKey = 'gaal_page'){
-        parent::processPage($sessionKey);
-    }
 
     protected function getSourceFeedType(){
         // показываем только авторские
@@ -107,15 +104,11 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
         }
 
         $tabType = Request::getString('tabType');
-        if (empty($tabType) || $tabType == 'null') {
-            $tabType = Session::getString('gaal_tabType');
-        }
-        Session::setString('gaal_tabType', $tabType);
         Response::setString('tabType', $tabType);
 
-        if ($this->mode == 'my') {
-            $tabType = 'all';
-        }
+        //if ($this->mode == 'my') {
+        //    $tabType = 'all';
+        //}
 
         switch ($tabType) {
             case 'queued':
@@ -148,6 +141,7 @@ final class GetArticlesAppListControl extends GetArticlesListControl {
      * Получаем объекты
      */
     protected function getObjects() {
+
         // статьи, комменты и т.д.
         parent::getObjects();
 

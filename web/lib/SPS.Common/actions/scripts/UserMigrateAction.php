@@ -8,9 +8,9 @@ class UserMigrateAction extends BaseGetAction {
 
      public function Execute() {
          echo '<pre>';
-
+         echo 'EDITORS -> AUTHORS <br/>';
          $this->fromEditorsToAuthors();
-
+         echo 'AUTHORS -> EDITORS <br/>';
          $this->fromAuthorsToEditors();
 
          echo '</pre>';
@@ -18,7 +18,7 @@ class UserMigrateAction extends BaseGetAction {
 
     private function fromEditorsToAuthors(){
         // из editors в authors с сохранением всех связанных сообществ (где был редактором, в приложении стал автором)
-        $editors = EditorFactory::Get();
+        $editors = EditorFactory::Get(array('pageSize' => 100000));
         foreach ($editors as $editor) {
             /** @var $editor Editor */
             $feeds = UserFeedFactory::GetForVkId($editor->vkId);
@@ -58,7 +58,7 @@ class UserMigrateAction extends BaseGetAction {
         /** @var $editor Editor */
 
         // из authors в editors с ограниченными правами доступа - Автор
-        $authors = AuthorFactory::Get();
+        $authors = AuthorFactory::Get(array('pageSize' => 100000));
         foreach ($authors as $author) {
             /** @var $author Author */
 

@@ -10,6 +10,7 @@
     class VKCheckAppAuth {
 
         public function Execute() {
+            /*
             if (!empty(Page::$RequestData[1]) && Page::$RequestData[1] == 'editor/') {
                 $editor = Session::getObject('Editor');
                 if (empty($editor)) {
@@ -18,7 +19,7 @@
                     Response::setBoolean('__editorMode', true);
                     return true;
                 }
-            }
+            }*/
 
             $silent     = Request::getBoolean('silent');
             $api_id     = Request::getInteger('api_id');
@@ -53,9 +54,9 @@
 
             // определяем паблики, к которым у чувака есть доступ вообще
             //$targetFeedIds = $author->targetFeedIds;
-            $RoleUtility = new RoleAccessUtility($author->vkId);
+            $RoleAccessUtility = new RoleAccessUtility($author->vkId);
 
-            $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+            $targetFeedIds = $RoleAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 
             if (empty($targetFeedIds)) {
                 $targetFeedIds = array(-1 => -1); //это важно для дальнейших запросов к базе
