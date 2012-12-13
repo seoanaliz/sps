@@ -35,7 +35,7 @@
                 }
             }
 
-            $RoleUtility = new RoleUtility();
+            $RoleUtility = new RoleAccessUtility();
             $sourceTypes = $gridTypes = array();
             if ($currentTargetFeedId) {
                 $sourceTypes = $RoleUtility->getAccessibleSourceTypes($currentTargetFeedId);

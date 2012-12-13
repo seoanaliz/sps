@@ -4,7 +4,7 @@
  * Date: 26.11.12 23:06
  * In Code We Trust
  */
-class RoleUtility
+class RoleAccessUtility
 {
     private $FeedRulesByRole = array();
     private $FeedRulesByFeed = array();
@@ -47,7 +47,9 @@ class RoleUtility
     }
 
     /**
+     * @param $targetFeedId - ид ленты
      * @param $sourceType - тип ресурса
+     * @return bool
      */
     public function hasAccessToSourceType($targetFeedId, $sourceType){
         if (isset($this->FeedRulesByFeed[$targetFeedId])) {
@@ -68,12 +70,20 @@ class RoleUtility
                     return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
             }
-
-
             return true;
         }
-        #return false;
         return true;
+    }
+
+    /**
+     * Возвращает роль
+     * @param $targetFeedId
+     */
+    public function getRoleForTargetFeed($targetFeedId){
+        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
+            return $this->FeedRulesByFeed[$targetFeedId];
+        }
+        return null;
     }
 
     public function getAccessibleSourceTypes($targetFeedId){

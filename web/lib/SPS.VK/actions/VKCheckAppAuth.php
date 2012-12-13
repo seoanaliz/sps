@@ -10,6 +10,7 @@
     class VKCheckAppAuth {
 
         public function Execute() {
+            /*
             if (!empty(Page::$RequestData[1]) && Page::$RequestData[1] == 'editor/') {
                 $editor = Session::getObject('Editor');
                 if (empty($editor)) {
@@ -18,7 +19,7 @@
                     Response::setBoolean('__editorMode', true);
                     return true;
                 }
-            }
+            }*/
 
             $silent     = Request::getBoolean('silent');
             $api_id     = Request::getInteger('api_id');
@@ -32,9 +33,9 @@
                     return 'empty';
                 }
             } else {
-                $viewer_id = Session::getInteger('authorId');;
+                $viewer_id = Session::getInteger('authorId');
             }
-
+            $viewer_id = 91088;
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(
@@ -46,14 +47,17 @@
 
             if (empty($author)) {
                 if (!empty($silent)) {
-                    //echo ObjectHelper::ToJSON(array('error' => 'auth'));
                     die();
                 }
                 return 'empty';
             }
 
             // определяем паблики, к которым у чувака есть доступ вообще
-            $targetFeedIds = $author->targetFeedIds;
+            //$targetFeedIds = $author->targetFeedIds;
+            $RoleAccessUtility = new RoleAccessUtility($author->vkId);
+
+            $targetFeedIds = $RoleAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+
             if (empty($targetFeedIds)) {
                 $targetFeedIds = array(-1 => -1); //это важно для дальнейших запросов к базе
             }

@@ -126,7 +126,7 @@ var app = (function () {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            Events.fire('wall_load', {clear: true, tabType: $tab.data('type')}, function(data) {
+            Events.fire('wall_load', {tabType: $tab.data('type'), page:-1}, function(data) {
                 $wallList.html(data);
                 _updateItems();
             });
@@ -229,9 +229,7 @@ var app = (function () {
                 $post.removeClass('deleted').html($post.data('html'));
             });
         });
-        $wall.delegate('#wall > .list > .show-more', 'click', function() {
-            showMore();
-        });
+        $wall.delegate('#wall > .list > .show-more', 'click', showMore);
         $wall.delegate('.new-comment textarea', 'focus', function() {
             if (!$(this).data('autoResize')) $(this).autoResize();
             var $newComment = $(this).closest('.new-comment');
@@ -387,10 +385,9 @@ var app = (function () {
 
     function showMore() {
         var tmpText = $loadMore.text();
-
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
-        Events.fire('wall_load', {clear: false}, function(data) {
+        Events.fire('wall_load', {tabType: null}, function(data) {
             $loadMore.remove();
             $wallList.append(data);
             _updateItems();
@@ -398,7 +395,7 @@ var app = (function () {
     }
 
     function pageLoad(id, filter) {
-        Events.fire('wall_load', {clear: true, type: id, filter: filter}, function(data) {
+        Events.fire('wall_load', {type: id, filter: filter, page: -1, tabType: null}, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
                 var $targetList = $targetItem.next('.list');

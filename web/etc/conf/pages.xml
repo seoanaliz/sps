@@ -475,7 +475,6 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -488,6 +487,13 @@
                         <actions>SPS.Common.DeleteDaemonLock</actions>
                     </page>
                 </pageGroup>
+
+                <pageGroup name="scripts">
+                    <page uri="vt://scripts/UserMigrate">
+                        <actions>SPS.Common.UserMigrateAction</actions>
+                    </page>
+                </pageGroup>
+
                 <pageGroup name="vfs">
                     <page uri="vt://vfs(/mce|/|/fldr|/sfldr)([0-9]*)">
                         <actions>Base.VFS.InitBrowseScreen</actions>
@@ -591,6 +597,12 @@
                 </page>
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>
+                </page>
+                <page uri="appControls://article-approved/">
+                    <actions>SPS.Site.ApproveArticleAppControl</actions>
+                </page>
+                <page uri="appControls://article-reject/">
+                    <actions>SPS.Site.RejectArticleAppControl</actions>
                 </page>
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>

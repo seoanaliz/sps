@@ -76,6 +76,8 @@
             $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
             $article->isCleaned = false;
             $article->statusId = 1;
+            // создает редактор, наверное нужно брать статус исходя из пользователя
+            $article->articleStatus = Article::STATUS_APPROVED;
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;

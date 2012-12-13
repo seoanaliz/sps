@@ -58,7 +58,13 @@ function changeRange() {
     }
 }
 
+var wallPage = -1;
+
 function loadArticles(clean) {
+    if (clean){
+        wallPage = -1;
+    }
+    wallPage++;
     if (articlesLoading) return;
 
     articlesLoading = true;
@@ -86,7 +92,7 @@ function loadArticles(clean) {
             dataType : "html",
             data: {
                 sourceFeedIds: Elements.leftdd(),
-                clean: clean,
+                page: wallPage,
                 from : from,
                 to : to,
                 sortType : sortType,
