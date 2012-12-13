@@ -48,8 +48,8 @@ var Eventlist = {
             callback(data);
         });
     },
-    delete_report: function(ourPublicId, publicId, callback) {
-        simpleAjax('deleteReport', {reportId: publicId, groupId: ourPublicId}, function(data) {
+    delete_report: function(reportId, ourPublicId, callback) {
+        simpleAjax('deleteReport', {reportId: reportId, groupId: ourPublicId}, function(data) {
             callback(data);
         });
     },

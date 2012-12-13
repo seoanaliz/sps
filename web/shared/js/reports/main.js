@@ -139,7 +139,7 @@ var Page = Event.extend({
 
             function deleteReport() {
                 confirmBox.hide();
-                Events.fire('delete_report', $row.data('our-public-id'), $row.data('public-id'), function() {
+                Events.fire('delete_report', $row.data('id'), $row.data('our-public-id'), function() {
                     $row.slideUp(200);
                 });
             }
