@@ -19,21 +19,23 @@ $(document).ready(function(){
     $.mask.definitions['3']='[0123]';
     $.mask.definitions['5']='[012345]';
     $.datepick.setDefaults($.datepick.regional['ru']);
+    $.datepicker.setDefaults({
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        firstDay: 1,
+        showAnim: '',
+        dateFormat: "d MM"
+    });
+
+    var $leftPanel = $('.left-panel');
+    var $multiSelect = $("#source-select");
 
     // Календарь
     $("#calendar")
-        .datepicker (
-            {
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: "d MM"
-            }
-        )
+        .datepicker()
         .keydown(function(e){
             if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
         })
@@ -70,7 +72,7 @@ $(document).ready(function(){
     })();
 
     // Left menu multiselect
-    $("#source-select").multiselect({
+    $multiSelect.multiselect({
         minWidth: 250,
         height: 250,
         checkAllText: 'Выделить все',
@@ -87,7 +89,7 @@ $(document).ready(function(){
             Events.fire('leftcolumn_dropdown_change', []);
         }
     });
-    $("#source-select").bind("multiselectclick", function(event, ui){
+    $multiSelect.bind("multiselectclick", function(event, ui){
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
@@ -162,7 +164,7 @@ $(document).ready(function(){
     });
 
     // Вкладки "Источники", "Реклама" в левон меню
-    $(".left-panel .type-selector a").click(function(e){
+    $(".left-panel .type-selector a").click(function(){
         if (articlesLoading) {
             return;
         }
@@ -295,7 +297,6 @@ $(document).ready(function(){
 
                     $container.delegate('.description', 'click', function() {
                         var $input = $(this);
-                        var $author = $(this).closest('.author');
                         $input.attr('contenteditable', 'true').focus();
                     });
                     $container.delegate('.description', 'keyup', function(e) {
@@ -316,7 +317,6 @@ $(document).ready(function(){
             $('body').removeClass('editor-mode');
             Events.fire('rightcolumn_dropdown_change', []);
         }
-
     });
 
     // Вкладки в правом меню
@@ -342,9 +342,10 @@ $(document).ready(function(){
             Events.fire('leftcolumn_deletepost', [pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
-                    if ($('#' + deleteMessageId).length) {
+                    var $deleteMessage = $('#' + deleteMessageId);
+                    if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
-                        $('#' + deleteMessageId).show();
+                        $deleteMessage.show();
                     } else {
                         // иначе добавляем
                         elem.before($(
@@ -362,7 +363,7 @@ $(document).ready(function(){
         .delegate('.post .ignore', 'click', function() {
             var elem = $(this).closest(".post"),
                 gid = elem.data("group");
-            var $menu = $("#source-select").multiselect('widget');
+            var $menu = $multiSelect.multiselect('widget');
             $menu.find('[value=' + gid + ']:checkbox').each(function() {
                 this.click();
             });
@@ -389,7 +390,7 @@ $(document).ready(function(){
             }]);
         })
         // Смена даты
-        .delegate('.time', 'click', function(e) {
+        .delegate('.time', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
             var $input = $time.data('time-edit');
@@ -442,7 +443,7 @@ $(document).ready(function(){
                 }
             }
         })
-        .delegate('.time-of-removal', 'click', function(e) {
+        .delegate('.time-of-removal', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
             var $input = $time.data('time-of-removal-edit');
@@ -492,7 +493,6 @@ $(document).ready(function(){
                 var $datepicker = $('<input type="text" />');
                 var $post = $target.closest('.slot');
                 var $time = $post.find('.time');
-                var pid = $post.data('id');
                 var gridLineId = $post.data('grid-id');
                 var startDate = $post.data('start-date');
                 var endDate = $post.data('end-date');
@@ -576,19 +576,37 @@ $(document).ready(function(){
     });
 
     // Очистка текста
-    $(".left-panel").delegate(".clear-text", "click", function(){
-        var id = $(this).closest(".post").data("id");
-        var post = $(this).closest(".post");
+    $leftPanel.delegate(".clear-text", "click", function(){
+        var $post = $(this).closest(".post");
+        var postId = $post.data("id");
 
         if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
-            Events.fire('leftcolumn_clear_post_text', [id, function(state){
+            Events.fire('leftcolumn_clear_post_text', [postId, function(state){
                 if(state) {
-                    post.find('div.shortcut').html('');
-                    post.find('div.cut').html('');
-                    post.find('a.show-cut').remove();
+                    $post.find('div.shortcut').html('');
+                    $post.find('div.cut').html('');
+                    $post.find('a.show-cut').remove();
                 }
             }]);
         }
+    });
+
+    // Отклонение или одобрения авторских постов
+    $leftPanel.delegate('.moderation .button.approve', 'click', function() {
+        var $post = $(this).closest('.post');
+        var postId = $post.data('id');
+        Events.fire('leftcolumn_approve_post', [postId, function() {
+            $post.slideUp(200);
+        }]);
+    });
+    $leftPanel.delegate('.moderation .button.reject', 'click', function() {
+        var $post = $(this).closest('.post');
+        var postId = $post.data('id');
+        var $comments = $post.find('> .comments');
+        var $moderation = $post.find('> .moderation');
+        $moderation.hide();
+        $comments.show();
+        $comments.find('textarea').focus();
     });
 
     // Устарело?
@@ -883,10 +901,6 @@ $(document).ready(function(){
                             '</div>',
                         onComplete: function(id, fileName, responseJSON) {
                             popupNotice('Не реализовано');
-//                            $('.jcrop-holder').remove();
-//                            t.originalImage.attr({src:responseJSON.image}).show();
-//                            t.previewImage.attr({src:responseJSON.image});
-//                            t.crop();
                         }
                     });
                 } catch (e) {}
@@ -958,11 +972,11 @@ $(document).ready(function(){
             foundDomain = false;
         };
 
-        form.delegate(".save", "click" ,function(e){
+        form.delegate(".save", "click", function(){
             var link = $linkStatus.find('a').attr('href');
-            var photos = new Array();
+            var photos = [];
             $('.newpost .qq-upload-success').each(function(){
-                var photo = new Object();
+                var photo = {};
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
                 photos.push(photo);
@@ -999,7 +1013,7 @@ $(document).ready(function(){
         });
 
         // Быстрое редактирование поста в левой колонке
-        $(".left-panel").delegate(".post .content .shortcut", "click", function(){
+        $leftPanel.delegate(".post .content .shortcut", "click", function(){
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 postId = $post.data("id");
@@ -1014,8 +1028,7 @@ $(document).ready(function(){
         });
 
         // Редактирование поста в левом меню
-        $(".left-panel").delegate(".post .edit", "click", function(){
-
+        $leftPanel.delegate(".post .edit", "click", function(){
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 $buttonPanel = $post.find('> .bottom.d-hide'),
@@ -1224,9 +1237,9 @@ $(document).ready(function(){
                         var onSave = function() {
                             var text = $text.val();
                             var link = $links.find('a').attr('href');
-                            var photos = new Array();
+                            var photos = [];
                             $photos.children().each(function() {
-                                var photo = new Object();
+                                var photo = {};
                                 photo.filename = $(this).find('input:hidden').val();
                                 photos.push(photo);
                             });
@@ -1294,24 +1307,24 @@ $(document).ready(function(){
     })();
 
     // Комментирование записи
-    $('.left-panel').delegate('.post > .bottom .comment', 'click', function(e) {
+    $leftPanel.delegate('.post > .bottom .comment', 'click', function(e) {
         var $target = $(this);
         var $post = $target.closest('.post');
         var postId = $post.data('id');
     });
-    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'focus', function() {
+    $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
         $(this).autoResize();
         var $newComment = $(this).closest('.new-comment');
         $newComment.addClass('open');
     });
-    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
+    $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
         if (e.ctrlKey && e.keyCode == KEY.ENTER) {
             var $newComment = $(this).closest('.new-comment');
             var $sendBtn = $newComment.find('.send');
             $sendBtn.click();
         }
     });
-    $('.left-panel').delegate('.post > .comments .comment > .delete', 'click', function(e) {
+    $leftPanel.delegate('.post > .comments .comment > .delete', 'click', function(e) {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
@@ -1320,7 +1333,7 @@ $(document).ready(function(){
             $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
+    $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
@@ -1328,12 +1341,13 @@ $(document).ready(function(){
             $comment.removeClass('deleted').html($comment.data('html'));
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .new-comment .send', 'click', function() {
+    $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
-        var $comment = $target.closest('.new-comment');
-        var $textarea = $comment.find('textarea');
-        var $button = $comment.find('.send:not(.load)');
-        var $post = $comment.closest('.post');
+        var $post = $target.closest('.post');
+        var $comments = $target.closest('.comments');
+        var $newComment = $target.closest('.new-comment');
+        var $textarea = $newComment.find('textarea');
+        var $button = $newComment.find('.send:not(.load)');
         var $commentsList = $('.comments > .list', $post);
         var postId = $post.data('id');
         if (!$textarea.val()) {
@@ -1344,10 +1358,16 @@ $(document).ready(function(){
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $commentsList.append(html).find('.date').easydate(easydateParams);
+
+                var $moderation = $comments.prev('.moderation');
+                if ($moderation.length) {
+                    $moderation.data('checked', true);
+                    Events.fire('leftcolumn_reject_post', [postId, function() {}]);
+                }
             }]);
         }
     });
-    $('.left-panel').delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
+    $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
         var $target = $(this);
         var $post = $target.closest('.post');
         var $commentsList = $('.comments > .list', $post);
@@ -1359,7 +1379,7 @@ $(document).ready(function(){
             $commentsList.html(html).find('.date').easydate(easydateParams);
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
+    $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
         var $target = $(this);
         var $post = $target.closest('.post');
         var $commentsList = $('.comments > .list', $post);
@@ -1371,22 +1391,29 @@ $(document).ready(function(){
             $commentsList.html(html).find('.date').easydate(easydateParams);
         }]);
     });
-    $(document).bind('mousedown', function(e) {
+    $(document).on('mousedown', function(e) {
         var $newComment = $(e.target).closest('.new-comment.open');
         if (!$newComment.length) {
             $('.new-comment.open').each(function() {
-                var $comment = $(this);
-                var $textarea = $comment.find('textarea');
+                var $newComment = $(this);
+                var $comments = $newComment.closest('.comments');
+                var $textarea = $newComment.find('textarea');
                 if (!$textarea.val()) {
-                    $comment.removeClass('open');
+                    $newComment.removeClass('open');
                     $textarea.height('auto');
+
+                    var $moderation = $comments.prev('.moderation');
+                    if ($moderation.length && !$moderation.data('checked')) {
+                        $comments.hide();
+                        $moderation.show();
+                    }
                 }
             });
         }
     });
 
     // Показать полностью в левом меню
-    $(".left-panel").delegate(".show-cut", "click" ,function(e){
+    $leftPanel.delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
             $shortcut = $content.find('.shortcut'),
             shortcut = $shortcut.html(),

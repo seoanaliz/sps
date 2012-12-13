@@ -57,7 +57,7 @@ $jsFiles = array(
 );
 
 CssHelper::Init(false);
-JsHelper::Init(false);
+JsHelper::Init(true);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {

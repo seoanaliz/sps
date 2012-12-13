@@ -33,7 +33,7 @@
         ?>
         <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>
         <? if($contentPart2) { ?>
-        <a href="javascript:;" class="show-cut">Показать полностью...</a>
+        <a class="show-cut">Показать полностью...</a>
         <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
         <? } ?>
 
@@ -74,8 +74,8 @@
     <div class="bottom d-hide">
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
-            <a class="edit" href="javascript:;">Редактировать</a> |
-            <a class="clear-text" href="javascript:;">Очистить текст</a>
+            <a class="edit">Редактировать</a> |
+            <a class="clear-text">Очистить текст</a>
         </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
@@ -101,6 +101,12 @@
     <div class="clear"></div>
 
     <? if (!empty($article->authorId)) { ?>
+    <div class="moderation">
+        <div class="actions">
+            <button class="button approve">Одобрить</button>
+            <button class="button white reject">Отклонить</button>
+        </div>
+    </div>
     <div class="comments">
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
