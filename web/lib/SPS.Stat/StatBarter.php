@@ -27,7 +27,8 @@ class StatBarter
 
         $barter_events_res = array();
         foreach( $query_result as $barter_event ) {
-            $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array();
+            $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array(0);
+            $overlaps = $overlaps[0] && $barter_event->posted_at ? $overlaps[0] - $barter_event->posted_at->format('U'): $overlaps[0];
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
             $deleted_at = isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : $posted_at + 3600;
             $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
@@ -95,9 +96,10 @@ class StatBarter
             $url = ltrim( $url['path'], '/' );
             $query_line[] = preg_replace( $search, '', $url );
         }
-        if ( count( $query_line ) != 2 )
-            return array();
+
         $info = StatPublics::get_publics_info( $query_line );
+        if ( count( $info ) != 2 )
+            return array();
         return  array( 'target' =>  reset( $info ),
             'barter' =>  end( $info ));
     }

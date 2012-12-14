@@ -78,6 +78,15 @@
             </action>
         </group>
 
+        <group name="Authors">
+            <action name="getAuthors">
+                <path>controls/authors/getAuthors</path>
+            </action>
+            <action name="getPublics">
+                <path>controls/authors/getPublics</path>
+            </action>
+        </group>
+
         <group name="Groups">
             <action name="shareGroup">
                 <path>controls/groups/shareGroup</path>
