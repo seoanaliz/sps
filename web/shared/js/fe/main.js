@@ -1344,7 +1344,6 @@ $(document).ready(function(){
     $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
         var $post = $target.closest('.post');
-        var $comments = $target.closest('.comments');
         var $newComment = $target.closest('.new-comment');
         var $textarea = $newComment.find('textarea');
         var $button = $newComment.find('.send:not(.load)');
@@ -1359,7 +1358,7 @@ $(document).ready(function(){
                 $textarea.val('').focus();
                 $commentsList.append(html).find('.date').easydate(easydateParams);
 
-                var $moderation = $comments.prev('.moderation');
+                var $moderation = $newComment.next('.moderation');
                 if ($moderation.length) {
                     $moderation.data('checked', true);
                     Events.fire('leftcolumn_reject_post', [postId, function() {}]);
