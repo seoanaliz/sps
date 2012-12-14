@@ -69,6 +69,10 @@ class RoleAccessUtility
                 case SourceFeedUtility::Topface:
                     return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
+
+                case SourceFeedUtility::AuthorsList:
+                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                break;
             }
             return true;
         }

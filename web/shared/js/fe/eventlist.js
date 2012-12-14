@@ -20,7 +20,7 @@ function initSlider(targetFeedId, sourceType) {
         }
     }
     var sliderRange = $("#slider-range");
-    sliderRange.data('sourceType', sourceType)
+    sliderRange.data('sourceType', sourceType);
 
     if (!sliderRange.data('slider')) {
         sliderRange.slider({
@@ -93,20 +93,19 @@ function loadArticles(clean) {
             data: {
                 sourceFeedIds: Elements.leftdd(),
                 page: wallPage,
-                from : from,
-                to : to,
-                sortType : sortType,
+                from: from,
+                to: to,
+                sortType: sortType,
                 type: Elements.leftType(),
-                targetFeedId: Elements.rightdd()
+                targetFeedId: Elements.rightdd(),
+                articleStatus: 1
             }
-        })
-        .always(function() {
+        }).always(function() {
             $('#wall-load').hide();
             if (clean) {
                 $('div#wall').empty();
             }
-        })
-        .done(function(data) {
+        }).done(function(data) {
             $('div#wall').append(data);
             articlesLoading = false;
             Elements.addEvents();
@@ -323,6 +322,7 @@ var Eventlist = {
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
         var $multiSelect = $("#source-select");
+        var $leftPanel = $('.left-panel');
 
         //грузим источники для этого паблика
         $.ajax({
@@ -345,8 +345,10 @@ var Eventlist = {
 
             if (sourceType == 'authors') {
                 $multiSelect.multiselect('getButton').hide();
+                $leftPanel.find('.authors-tabs').show();
             } else {
                 $multiSelect.multiselect('getButton').show();
+                $leftPanel.find('.authors-tabs').hide();
             }
 
             $.cookie('sourceTypes' + targetFeedId, sourceType);
@@ -667,6 +669,30 @@ var Eventlist = {
                 callback(true);
             }
         });
+    },
+    get_author_articles: function(articleStatus, callback) {
+        var from = $( "#slider-range" ).slider( "values", 0 );
+        var to = $( "#slider-range" ).slider( "values", 1 );
+        var sortType = $('.wall-title a').data('type');
+
+        $('#wall-load').show();
+
+        $.ajax({
+            url: controlsRoot + 'arcticles-list/',
+            dataType : "html",
+            data: {
+                sourceFeedIds: Elements.leftdd(),
+                page: wallPage,
+                from: from,
+                to: to,
+                sortType: sortType,
+                type: Elements.leftType(),
+                targetFeedId: Elements.rightdd(),
+                articleStatus: articleStatus
+            }
+        }).always(function() {
+            $('#wall-load').hide();
+        }).done(callback);
     },
 
     eof: null

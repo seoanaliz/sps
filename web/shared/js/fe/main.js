@@ -164,12 +164,12 @@ $(document).ready(function(){
     });
 
     // Вкладки "Источники", "Реклама" в левон меню
-    $(".left-panel .type-selector a").click(function(){
+    $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
         if (articlesLoading) {
             return;
         }
 
-        $(".left-panel .type-selector a").removeClass('active');
+        $leftPanel.find(".type-selector .sourceType").removeClass('active');
         $(this).addClass('active');
 
         if ($(this).data('type') == 'authors-list') {
@@ -317,6 +317,16 @@ $(document).ready(function(){
             $('body').removeClass('editor-mode');
             Events.fire('rightcolumn_dropdown_change', []);
         }
+    });
+
+    // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
+    $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
+        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+        $(this).addClass('selected');
+
+        Events.fire('get_author_articles', $(this).data('article-status'), function(html) {
+            $('#wall').html(html);
+        });
     });
 
     // Вкладки в правом меню
@@ -608,71 +618,6 @@ $(document).ready(function(){
         $newComment.show();
         $newComment.find('textarea').focus();
     });
-
-    // Устарело?
-    (function(){
-        var addInput = function(elem, defaultvalue, id){
-            var input = $("<input/>");
-            elem.append(input);
-            input.click(function(e){e.stopPropagation();});
-            input.focus();
-            input.blur(function(){
-                $(this).remove();
-            });
-            input.keydown(function(e){
-                if(e.keyCode == 27) {
-                    $(this).remove();
-                }
-                if(e.keyCode == 13) {
-                    var eventname,
-                        column;
-                    args = [$(this).val()];
-                    column = (elem.closest(".right-panel").length) ? "right" : "left";
-                    if(id) {
-                        args.push(id);
-                        eventname = column + "column_source_edited";
-                    } else {
-                        eventname = column + "column_source_added"
-                    }
-                    args.push(function(state){
-                        if(!state) return;
-                        if(id) {
-                            elem.find("li[data-id=" + id + "]").text(state.value);
-                        } else {
-                            elem.find("ul").append('<li data-id="' + state.id + '">' + state.value + '</li>');
-                        }
-                        elem.dd_sel(state.id || id);
-                    });
-                    Events.fire(eventname, args);
-                    $(this).remove();
-                }
-            });
-            if(defaultvalue) input.val(defaultvalue);
-            return input;
-        };
-        var getDD = function(elem){
-            return $(elem).closest(".header").find(".drop-down");
-        };
-        $(".controls .del").click(function(){
-            var dd = getDD(this),
-                val = dd.data("selected");
-            if(!val) {return}
-            var column = (dd.closest(".right-panel").length) ? "right" : "left";
-            Events.fire(column + "column_source_deleted", [val, function(state){
-                if(!state) { return; }
-                dd.find("li[data-id=" + val + "]").remove();
-                dd.dd_sel(0);
-            }]);
-        });
-        $(".controls .gear").click(function(){
-            var dd = getDD(this);
-            if(!dd.data("selected")) {return}
-            addInput(dd,dd.find(".caption").text(),dd.data("selected"));
-        });
-        $(".controls .plus").click(function(){
-            addInput(getDD(this));
-        });
-    })();
 
     // Автоподгрузка записей
     (function(){
@@ -1490,15 +1435,16 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
             </div>';
 
 var Events = {
-    isDebug: false,
     delay: 0,
+    isDebug: false,
     eventList: Eventlist,
-    fire: function(name, args){
+    fire: function(name){
         var t = this;
-        if (typeof args != "undefined") {
-            if (!$.isArray(args)) args = [args];
+        var args;
+        if (typeof arguments[0] === 'array' && !arguments[1]) {
+            args = arguments[0];
         } else {
-            args = [];
+            args = Array.prototype.slice.call(arguments, 1);
         }
         if ($.isFunction(t.eventList[name])) {
             try {
@@ -1511,7 +1457,7 @@ var Events = {
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
-                if (window.console && console.log) {
+                if (window.console && console.log && t.isDebug) {
                     console.log(e);
                 }
             }

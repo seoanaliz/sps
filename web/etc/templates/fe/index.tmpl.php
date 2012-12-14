@@ -26,7 +26,6 @@
                     $i++;
                     endforeach;
                     ?>
-                    <a data-type="authors-list">+</a>
                 </div>
 
                 <select multiple="multiple" id="source-select">
@@ -39,6 +38,12 @@
 
                 <div style="position: absolute; top: 48px; right: 18px; width: 300px;" id="slider-cont">
                     <div id="slider-range"></div>
+                </div>
+
+                <div class="authors-tabs tab-bar no-padding">
+                    <div class="authors-tab-new tab selected" data-article-status="<?=Article::STATUS_REVIEW?>">Новые</div>
+                    <div class="authors-tab-accepted tab" data-article-status="<?=Article::STATUS_APPROVED?>">Одобренные</div>
+                    <div class="authors-tab-rejected tab" data-article-status="<?=Article::STATUS_REJECT?>">Отклоненные</div>
                 </div>
             </div>
 

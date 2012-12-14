@@ -21,6 +21,8 @@
 
         const Albums = 'albums';
 
+        const AuthorsList = 'authors-list';
+
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
@@ -31,6 +33,7 @@
             self::Authors => 'Авторские',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',
+            self::AuthorsList => '+',
         );
 
         public static function IsTopFeed($sourceFeed) {
