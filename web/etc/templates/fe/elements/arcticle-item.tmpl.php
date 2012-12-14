@@ -106,7 +106,7 @@
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
         </div>
-        <div class="new-comment">
+        <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
             <div class="photo">
                 <img src="{$__Editor->avatar}" alt="" />
             </div>
