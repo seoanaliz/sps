@@ -3,6 +3,7 @@
     /** @var $articleRecord ArticleRecord */
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
+    /** @var $showApproveBlock bool */
 
     if (!empty($article)) {
 
@@ -117,12 +118,14 @@
                 <span class="text">Ctrl+Enter</span>
             </div>
         </div>
+        <? if ($showApproveBlock): ?>
         <div class="moderation">
             <div class="actions">
                 <button class="button approve">Одобрить</button>
                 <button class="button white reject">Отклонить</button>
             </div>
         </div>
+        <? endif; ?>
     </div>
     <? } ?>
     <div class="clear"></div>

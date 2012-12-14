@@ -13,11 +13,23 @@
          * Entry Point
          */
         public function Execute() {
+            /** @var $author Author */
             $author = Session::getObject('Author');
+
+            $RoleAccessUtility = new RoleAccessUtility($author->vkId);
+
+            // TODO сделать граммотно
+            $targetFeedIds = array();
+            $rawTargetFeedIds = $RoleAccessUtility->getTargetFeedIds();
+            foreach ($rawTargetFeedIds as $role=>$ids) {
+                foreach ($ids as $id) {
+                    $targetFeedIds[$id] = $id;
+                }
+            }
 
             //паблики, к которым у пользователя есть доступ
             $targetFeeds = TargetFeedFactory::Get(
-                array('_targetFeedId' => Session::getArray('targetFeedIds'))
+                array('_targetFeedId' => $targetFeedIds)
             );
 
 
