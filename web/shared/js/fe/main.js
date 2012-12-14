@@ -582,7 +582,7 @@ $(document).ready(function(){
 
         if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
             Events.fire('leftcolumn_clear_post_text', [postId, function(state){
-                if(state) {
+                if (state) {
                     $post.find('div.shortcut').html('');
                     $post.find('div.cut').html('');
                     $post.find('a.show-cut').remove();
@@ -602,11 +602,11 @@ $(document).ready(function(){
     $leftPanel.delegate('.moderation .button.reject', 'click', function() {
         var $post = $(this).closest('.post');
         var postId = $post.data('id');
-        var $comments = $post.find('> .comments');
-        var $moderation = $post.find('> .moderation');
+        var $newComment = $post.find('.new-comment');
+        var $moderation = $post.find('.moderation');
         $moderation.hide();
-        $comments.show();
-        $comments.find('textarea').focus();
+        $newComment.show();
+        $newComment.find('textarea').focus();
     });
 
     // Устарело?
@@ -1396,15 +1396,14 @@ $(document).ready(function(){
         if (!$newComment.length) {
             $('.new-comment.open').each(function() {
                 var $newComment = $(this);
-                var $comments = $newComment.closest('.comments');
                 var $textarea = $newComment.find('textarea');
                 if (!$textarea.val()) {
                     $newComment.removeClass('open');
                     $textarea.height('auto');
 
-                    var $moderation = $comments.prev('.moderation');
+                    var $moderation = $newComment.next('.moderation');
                     if ($moderation.length && !$moderation.data('checked')) {
-                        $comments.hide();
+                        $newComment.hide();
                         $moderation.show();
                     }
                 }

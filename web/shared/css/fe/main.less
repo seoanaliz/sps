@@ -1175,20 +1175,7 @@ i {font-style: italic;}
         height: 60px;
     }
 
-    &>.moderation {
-        &>.actions {
-            margin-top: 10px;
-            margin-left: 40px;
-            padding: 7px;
-            background-color: #f1f1f1;
-
-            .button + .button {
-                margin-left: 7px;
-            }
-        }
-    }
     &>.comments {
-        display: none;
         margin-top: 10px;
         margin-left: 40px;
 
@@ -1270,6 +1257,7 @@ i {font-style: italic;}
         }
 
         &>.new-comment {
+            display: none;
             padding: 6px;
             background-color: #f1f1f1;
             position: relative;
@@ -1318,6 +1306,17 @@ i {font-style: italic;}
                     textarea {
                         height: 20px;
                     }
+                }
+            }
+        }
+
+        &>.moderation {
+            &>.actions {
+                padding: 7px;
+                background-color: #f1f1f1;
+
+                .button + .button {
+                    margin-left: 7px;
                 }
             }
         }

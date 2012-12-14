@@ -101,12 +101,6 @@
     <div class="clear"></div>
 
     <? if (!empty($article->authorId)) { ?>
-    <div class="moderation">
-        <div class="actions">
-            <button class="button approve">Одобрить</button>
-            <button class="button white reject">Отклонить</button>
-        </div>
-    </div>
     <div class="comments">
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
@@ -121,6 +115,12 @@
             <div class="actions">
                 <button class="button send">Отправить</button>
                 <span class="text">Ctrl+Enter</span>
+            </div>
+        </div>
+        <div class="moderation">
+            <div class="actions">
+                <button class="button approve">Одобрить</button>
+                <button class="button white reject">Отклонить</button>
             </div>
         </div>
     </div>
