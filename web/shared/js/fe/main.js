@@ -1304,9 +1304,10 @@ $(document).ready(function(){
                 $commentsList.append(html).find('.date').easydate(easydateParams);
 
                 var $moderation = $newComment.next('.moderation');
-                if ($moderation.length) {
+                if ($moderation.length && !$moderation.data('checked')) {
+                    //todo: something wrong
                     $moderation.data('checked', true);
-                    Events.fire('leftcolumn_reject_post', [postId, function() {}]);
+                    Events.fire('leftcolumn_reject_post', postId, function() {});
                 }
             }]);
         }

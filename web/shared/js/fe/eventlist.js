@@ -345,6 +345,8 @@ var Eventlist = {
 
             if (sourceType == 'authors') {
                 $multiSelect.multiselect('getButton').hide();
+                $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+                $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
                 $leftPanel.find('.authors-tabs').show();
             } else {
                 $multiSelect.multiselect('getButton').show();
