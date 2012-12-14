@@ -82,12 +82,12 @@ var app = (function () {
         })();
 
         (function() {
-            var $window = $(document);
+            var $window = $('body');
             var lastHeight = 0;
             setInterval(function() {
-                if ($window.outerHeight() != lastHeight) {
+                if ($window.height() != lastHeight) {
                     refreshSize();
-                    lastHeight = $window.outerHeight();
+                    lastHeight = $window.height();
                 }
             }, 100);
         })();
@@ -417,7 +417,7 @@ var app = (function () {
     }
 
     function refreshSize() {
-        VK.callMethod('resizeWindow', false, $('body').outerHeight());
+        VK.callMethod('resizeWindow', false, $('body').height());
     }
 
     return {

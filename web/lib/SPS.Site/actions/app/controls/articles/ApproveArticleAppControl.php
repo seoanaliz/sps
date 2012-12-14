@@ -6,6 +6,7 @@
  * Time: 16:58
  * To change this template use File | Settings | File Templates.
  */
+Package::load('SPS.Site/base');
 class ApproveArticleAppControl extends ArticleStatusAppControl {
 
     public function Execute() {

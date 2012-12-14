@@ -37,12 +37,6 @@
                     ?>
                 </select>
 
-                <!--div class="controls">
-                    <div class="ctl spr gear"></div>
-                    <div class="ctl spr plus"></div>
-                    <div class="ctl spr del"></div>
-                </div -->
-
                 <div style="position: absolute; top: 48px; right: 18px; width: 300px;" id="slider-cont">
                     <div id="slider-range"></div>
                 </div>
@@ -80,8 +74,6 @@
                     <span class="logout">
                         <a href="/login/">Выход</a>
                     </span>
-<!--                    <span class="counter">11000</span>-->
-<!--                    <span class="counter">68%</span>-->
                 </div>
 
                 <div class="filter">
@@ -112,12 +104,6 @@
                                 ?>
                         </script>
                     </div>
-
-                    <!--div class="controls">
-                       <div class="ctl spr gear"></div>
-                       <div class="ctl spr plus"></div>
-                       <div class="ctl spr del"></div>
-                   </div -->
 
                     <div class="type-selector">
                         <a class="grid_type all" <?=count($gridTypes) < 2 ? 'style="display:none"' : ''?> data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>

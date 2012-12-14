@@ -98,6 +98,12 @@
                 <page uri="controls://plan-post-delete/">
                     <actions>SPS.Site.PostDeletePlanControl</actions>
                 </page>
+                <page uri="controls://article-approved/">
+                    <actions>SPS.Site.ApproveArticleAppControl</actions>
+                </page>
+                <page uri="controls://article-reject/">
+                    <actions>SPS.Site.RejectArticleAppControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -597,12 +603,6 @@
                 </page>
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>
-                </page>
-                <page uri="appControls://article-approved/">
-                    <actions>SPS.Site.ApproveArticleAppControl</actions>
-                </page>
-                <page uri="appControls://article-reject/">
-                    <actions>SPS.Site.RejectArticleAppControl</actions>
                 </page>
                 <page uri="appControls://article-restore/">
                     <actions>SPS.Site.RestoreArticleAppControl</actions>
