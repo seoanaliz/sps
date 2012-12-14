@@ -70,9 +70,18 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $this->setData();
 
+        $showApproveBlock = false;
+        $targetFeedId = $this->getTargetFeedId();
+        if ($targetFeedId) {
+            $RoleAccessUtility = new RoleAccessUtility($this->vkId);
+            $showApproveBlock = $RoleAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
+        }
+
+
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         Response::setArray('sourceFeeds', $this->sourceFeeds);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
+        Response::setBoolean('showApproveBlock', $showApproveBlock);
     }
 }
 
