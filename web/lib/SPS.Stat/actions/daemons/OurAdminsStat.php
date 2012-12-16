@@ -59,7 +59,7 @@ class OurAdminsStat
         set_time_limit(0);
 
         $this->a_t = VkHelper::get_service_access_token();
-        $this->admins_list = $this->get_admins_list();
+        $this->admins_list  = $this->get_admins_list();
         $this->authors_list = $this->get_authors_list();
         $publics = TargetFeedFactory::Get();
         foreach ( $publics as $public ) {
@@ -83,17 +83,24 @@ class OurAdminsStat
 
                 continue;
             }
-            $this->update_posts_info( $public->externalId );
-
+            $public->externalId = 35807284;
+            // парсим стены на предмет подписанных постов
 //            $this->get_sign_posts( $public->externalId );
+            // собираем данные с нашей базы по отправленным чз sb постам
 //            $this->get_sb_posts( $public->externalId, $public->targetFeedId );
+            //так как в sb посты с очень неточными лайками etc - обновляем их
+            $this->update_posts_info( $public->externalId );
+            die();
         }
     }
 
     private function update_posts_info( $public_id )
     {
-           $sql = 'select * from oadmins_posts where post_time > 1349049600 and post_time <1352980567 and public_id=@public_id';
-
+        //1 ноября и 1 декабря
+        $sql = 'SELECT * FROM oadmins_posts
+                WHERE post_time > 1351728000
+                      AND post_time < 1354320000
+                      AND public_id=@public_id';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $cmd->SetString( '@public_id', $public_id);
         $ds = $cmd->execute();
@@ -104,11 +111,13 @@ class OurAdminsStat
             $posts[] = '-' . $ds->GetValue('public_id') . '_' . $ds->GetValue('vk_post_id');
 
         }
+
         $posts_armfuls = array_chunk( $posts, 100 );
         foreach ( $posts_armfuls as $posts_line ) {
             $posts_line = implode( ',', $posts_line );
             $res = VkHelper::api_request( 'wall.getById', array( 'posts'  =>  $posts_line, 'access_token'=>$this->a_t));
             sleep(0.3);
+            print_r($res);
             foreach( $res as $post ) {
                 $this->post_analize( $post, $likes_average, 'a', 0);
             }
@@ -142,11 +151,11 @@ class OurAdminsStat
         $offset = 0;
         while (1) {
             $params = array(
-                'owner_id'  =>      '-' . $public_id,
-                'offset'    =>      $offset,
-                'count'     =>      100,
-                'filter'    =>      'owner',
-                'access_token'=>$this->a_t
+                'owner_id'      =>      '-' . $public_id,
+                'offset'        =>      $offset,
+                'count'         =>      100,
+                'filter'        =>      'owner',
+                'access_token'  =>      $this->a_t
             );
             $offset += 100;
             $posts  =  wrapper::vk_api_wrap( 'wall.get', $params );
@@ -311,11 +320,16 @@ class OurAdminsStat
             $new_post['rel_likes']  =   round( $new_post['likes'] / $average * 100, 2 );
             $new_post['source']     =   "'" . $source . "'";
             $this->update_post( $new_post );
+//            $this->save_post( $new_post);
+//            if ( $source == 'a')
+//                $this->update_post( $new_post );
+//            elseif($source == 'w')
         }
         return true;
     }
 
-    public function update_post( $post ) {
+    public function update_post( $post )
+    {
         print_r($post);
         $sql = 'UPDATE oadmins_posts  set likes=@likes, reposts = @reposts, complicate=@complicate, rel_likes=@rel_likes
               where public_id = @public_id and vk_post_id= @vk_post_id';
