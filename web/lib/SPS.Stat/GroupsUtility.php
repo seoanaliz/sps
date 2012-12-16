@@ -123,17 +123,17 @@
             $i = 1;
             foreach( $groups as $group ) {
                 $field = ( $group->created_by == $user_id ) ? 'user_lists' : 'shared_lists';
-                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_group' : $field;
+                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
                 $res[$field][] = array(
                     'group_id'  =>  $group->group_id,
                     'type'      =>  $group->type,
-                    'name'      =>  ( $field == 'default_group' ) ? 'Не в списке' : $group->name,
-                    'place'     =>  ( $field == 'default_group' ) ? 0 : $i++
+                    'name'      =>  ( $field == 'default_list' ) ? 'Не в списке' : $group->name,
+                    'place'     =>  ( $field == 'default_list' ) ? 0 : $i++
                 );
             }
             if( !isset( $res['user_lists'] )) $res['user_lists'] = array();
             if( !isset( $res['shared_lists'] )) $res['shared_lists'] = array();
-            if( !isset( $res['default_group'] )) $res['default_group'] = array( GroupsUtility::get_default_group( $user_id, $group_source ));
+            if( !isset( $res['default_list'] )) $res['default_list'] = array( GroupsUtility::get_default_group( $user_id, $group_source ));
             return $res;
         }
 
