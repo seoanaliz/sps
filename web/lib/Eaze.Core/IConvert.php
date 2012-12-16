@@ -6,14 +6,13 @@
     define( 'TYPE_ARRAY',     'array' );
     define( 'TYPE_OBJECT',    'object' );
     define( 'TYPE_RESOURCE',  'resource' );
-    define( 'TYPE_PARAMETER', 'parameter' );
+
     define( 'TYPE_DATETIME',  'dateTime' );
     define( 'TYPE_TIME',      'time' );
     define( 'TYPE_DATE',      'date' );
     define( 'TYPE_LTREE',     'ltree' );
     
-    define( 'MODE_GET',       'get' );
-    define( 'MODE_SET',       'set' );
+
     
     interface IConvert {
     

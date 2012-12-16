@@ -78,6 +78,11 @@
                 return false;
             }
 
+            if (defined('WITH_AUTOLOAD') && WITH_AUTOLOAD){
+                self::RegisterPackage($name);
+                return true;
+            }
+
             // Check for package compile flag
             if ( defined( self::WithPackageCompile ) && WITH_PACKAGE_COMPILE ) {
                 if ( strpos( $name, '/' ) !== false ) {
@@ -111,23 +116,22 @@
                 $d->close();
             }
 
-            if ( !empty( $deferredInclude ) ) {
-                $includeOrders = self::getIncludeOrderList( $name );
-                if ( !empty( $includeOrders ) ) {
-                    $newOrder  = array();
+                if ( !empty( $deferredInclude )) {
+                    $includeOrders = self::getIncludeOrderList( $name );
+                    if ( !empty( $includeOrders ) ) {
+                        $newOrder  = array();
 
-                    $orderKeys = array_unique( array_merge( $includeOrders, array_keys( $deferredInclude ) ) );
-                    foreach( $orderKeys as $key ) {
-                        $newOrder[$key] = $deferredInclude[$key];
+                        $orderKeys = array_unique( array_merge( $includeOrders, array_keys( $deferredInclude ) ) );
+                        foreach( $orderKeys as $key ) {
+                            $newOrder[$key] = $deferredInclude[$key];
+                        }
+                        $deferredInclude = $newOrder;
                     }
-                    $deferredInclude = $newOrder;
+
+                    self::defferedRequire( $deferredInclude );
+                    return true;
                 }
-
-                self::defferedRequire( $deferredInclude );
-                return true;
-            }
-
-            return false;
+                return false;
         }
 
 
@@ -185,27 +189,36 @@
          *
          * @return void
          */
-        private static function initLibStructure() {
+        public static function initLibStructure() {
             $libDir = __LIB__ . '/';
-
             if ( is_dir( $libDir ) ) {
                 $d = dir( $libDir );
                 while ( false !== ( $packageDir = $d->read() ) ) {
                     if ( $packageDir != '.' && $packageDir != '..' && is_dir( $libDir . $packageDir ) ) {
-                        $packageDir = $libDir . $packageDir . '/';
-
-                        $pd = dir( $packageDir );
-                        while ( false !== ( $file = $pd->read() ) ) {
-                            if ( self::CheckPHPFilename( $file, $packageDir ) ) {
-                                /** @var $file string */
-                                Package::$LibStructure[$file] = $packageDir . $file;
-                            }
-                        }
-                        $pd->close();
+                        //$packageDir = $libDir . $packageDir . '/';
+                        self::RegisterPackage($packageDir);
                     }
                 }
                 $d->close();
             }
+        }
+
+        public static $RegisterdPackages = array();
+
+        public static function RegisterPackage($package = ''){
+            if (in_array($package, self::$RegisterdPackages)){
+                return;
+            }
+            $packageDir =  __LIB__ . '/' . $package . '/';
+            $pd = dir($packageDir);
+            while (false !== ($file = $pd->read())) {
+                if (self::CheckPHPFilename($file, $packageDir)) {
+                    /** @var $file string */
+                    Package::$LibStructure[$file] = $packageDir . $file;
+                }
+            }
+            $pd->close();
+            self::$RegisterdPackages[] =  $package;
         }
 
 
@@ -216,16 +229,15 @@
          * @return bool
          */
         public static function LoadClass( $className ) {
-            if ( true == empty( Package::$LibStructure ) ) {
+            if (true == empty(Package::$LibStructure)) {
                 Package::initLibStructure();
-                Logger::Error( 'AutoLoad Event for Class %s! Please, use Package::Load() instead of AutoLoad.', $className );
+                //Logger::Error('AutoLoad Event for Class %s! Please, use Package::Load() instead of AutoLoad.', $className);
             }
-
             $fileName = $className . '.php';
 
-            if ( isset( Package::$LibStructure[$fileName] ) ) {
+            if (isset(Package::$LibStructure[$fileName])) {
                 /** @noinspection PhpIncludeInspection */
-                require_once( Package::$LibStructure[$fileName] );
+                require_once(Package::$LibStructure[$fileName]);
                 return true;
             }
 
@@ -235,18 +247,21 @@
 
 
     /**
-     * AutoLoad Function
-     *
-     * @param string $className  the class name
-     */
-    function __autoload( $className ) {
-        Package::LoadClass( $className );
-    }
-
-    /**
      * Initialize Constants
      */
     Package::InitConstants();
+
+
+    if (defined('WITH_AUTOLOAD') and WITH_AUTOLOAD) {
+        if (function_exists('spl_autoload_register')) {
+            spl_autoload_register('Package::LoadClass');
+        }
+        Package::initLibStructure();
+    } else {
+        function __autoload($className) {
+            Package::LoadClass($className);
+        }
+    }
 
     /**
      * Eaze Compile Packages Code

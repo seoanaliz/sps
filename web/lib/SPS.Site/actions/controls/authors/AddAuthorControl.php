@@ -20,6 +20,7 @@ class AddAuthorControl extends BaseControl
 
         $targetFeedId = Request::getInteger('targetFeedId');
         if (!$TargetFeedAccessUtility->canAddAuthor($targetFeedId)) {
+            Logger::Debug('Add Author access denied');
             echo ObjectHelper::ToJSON($result);
             return;
         }
@@ -61,6 +62,15 @@ class AddAuthorControl extends BaseControl
 
             $result['success'] = AuthorFactory::UpdateByMask($exists, array('targetFeedIds', 'statusId'), array('vkId' => $exists->vkId));
         }
+
+        //
+        UserFeedFactory::DeleteByMask(array('vkId'=>$vkId, 'targetFeedId'=>$targetFeedId));
+        //
+        $UserFeed = new UserFeed();
+        $UserFeed->vkId = $vkId;
+        $UserFeed->role = UserFeed::ROLE_AUTHOR;
+        $UserFeed->targetFeedId = $targetFeedId;
+        UserFeedFactory::Add($UserFeed);
 
         $manageEvent = new AuthorManage();
         $manageEvent->createdAt = DateTimeWrapper::Now();

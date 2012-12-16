@@ -3,7 +3,6 @@ Package::Load('SPS.Site/base');
 
 /**
  * Возвращает список авторов для ленты
- * TODO наверное нкжно переделать
  * @package    SPS
  * @subpackage Site
  * @author     shuler
@@ -22,17 +21,26 @@ class GetAuthorsListControl extends BaseControl
             return;
         }
 
+        $authors = array();
+
         if (!empty($targetFeedId)) {
-            $authors = AuthorFactory::Get(
-                array()
-                , array(
-                    BaseFactory::WithoutPages => true
-                , BaseFactory::OrderBy => ' "firstName", "lastName" '
-                , BaseFactory::CustomSql => ' AND"targetFeedIds" @> \'{' . PgSqlConvert::ToInt($targetFeedId) . '}\''
-                )
-            );
-        } else {
-            $authors = array();
+            $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
+            if ($UserFeeds) {
+                $vkIds = array();
+                foreach ($UserFeeds as $UserFeed){
+                    $vkIds[] = $UserFeed->vkId;
+                }
+
+                $authors = AuthorFactory::Get(
+                    array(
+                        'vkIdIn' => $vkIds
+                    )
+                    , array(
+                        BaseFactory::WithoutPages => true,
+                        BaseFactory::OrderBy => ' "firstName", "lastName" ',
+                    )
+                );
+            }
         }
 
         Response::setArray('authors', $authors);

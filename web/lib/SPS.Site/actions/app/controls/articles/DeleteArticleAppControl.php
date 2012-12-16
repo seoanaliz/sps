@@ -1,5 +1,5 @@
 <?php
-    Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.Site/base' );
 
     /**
      * DeleteArticleAppControl Action
@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteArticleAppControl {
+    class DeleteArticleAppControl extends BaseControl {
 
         /**
          * Entry Point
@@ -19,7 +19,7 @@
                 return;
             }
 
-            $author = Session::getObject('Author');
+            $author = $this->getAuthor();
 
             $o = new Article();
             $o->statusId = 3;

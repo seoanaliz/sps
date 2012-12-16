@@ -1,5 +1,5 @@
 <?php
-    Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.Site/base' );
 
     /**
      * RestoreArticleAppControl Action
@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class RestoreArticleAppControl {
+    class RestoreArticleAppControl extends BaseControl {
 
         /**
          * Entry Point
@@ -15,7 +15,7 @@
         public function Execute() {
             $id = Request::getInteger( 'id' );
             if ($id) {
-                $author = Session::getObject('Author');
+                $author = $this->getAuthor();
 
                 $existsCount = ArticleQueueFactory::Count(
                     array('articleId' => $id)
