@@ -1,9 +1,11 @@
 <?
 /**
- * @var $RoleUtility RoleAccessUtility
+ * @var $SourceAccessUtility SourceAccessUtility
  * @var $sourceTypes array
  * @var $gridTypes array
- *
+ * @var $availableSourceTypes array
+ * @var $articleStatuses array
+ * @var $availableArticleStatuses array
  */
 ?>
 {increal:tmpl://fe/elements/header.tmpl.php}
@@ -17,13 +19,14 @@
                 <div id="wall-load"></div>
 
                 <div class="type-selector">
-                    <? $i=0;
+                    <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                     ?>
-                       <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}"
+                       <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
+                          <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
                           id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
                     <?
-                    $i++;
+                    $isFirst++;
                     endforeach;
                     ?>
                 </div>
@@ -41,9 +44,18 @@
                 </div>
 
                 <div class="authors-tabs tab-bar no-padding">
-                    <div class="authors-tab-new tab selected" data-article-status="<?=Article::STATUS_REVIEW?>">Новые</div>
-                    <div class="authors-tab-accepted tab" data-article-status="<?=Article::STATUS_APPROVED?>">Одобренные</div>
-                    <div class="authors-tab-rejected tab" data-article-status="<?=Article::STATUS_REJECT?>">Отклоненные</div>
+                    <?
+                    $isFirst = true;
+                    foreach ($articleStatuses as $articleStatus => $statusName) :
+                        $isHidden = !in_array($articleStatus, $availableArticleStatuses);
+                    ?>
+                    <div class="authors-tab-new tab<?=($isFirst && !$isHidden) ? ' selected' : ''?>" <?=$isHidden ? 'style="display:none"' : ''?> data-article-status="<?=$articleStatus?>"><?=$statusName?></div>
+                    <?
+                        if (!$isHidden){
+                            $isFirst = false;
+                        }
+                    endforeach ?>
+
                 </div>
             </div>
 
@@ -113,9 +125,9 @@
                     <div class="type-selector">
                         <a class="grid_type all" <?=count($gridTypes) < 2 ? 'style="display:none"' : ''?> data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
                         <?
-                        $i=0;
+                        $isFirst=0;
                         foreach ($gridTypes as $type => $name): ?>
-                        <a class="grid_type <?=!$i++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
+                        <a class="grid_type <?=!$isFirst++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
                         <? endforeach; ?>
                     </div>
 

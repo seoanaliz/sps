@@ -7,13 +7,8 @@
      */
     class AuthorFeedViewUtility {
 
-        public static function GetCounters($authorId) {
+        public static function GetCounters($authorId, $targetFeedIds) {
             $result = array();
-
-            $targetFeedIds = Session::getArray('targetFeedIds');
-            if ($targetFeedIds == array(-1 => -1)) {
-                return array();
-            }
 
             //фиксим даты
             self::fixViews($authorId, $targetFeedIds);

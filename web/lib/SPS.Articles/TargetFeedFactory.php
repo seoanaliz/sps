@@ -181,25 +181,5 @@
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }
-
-        /**
-         * Возвращает источники, доступные для пользователя
-         * @param $vkId
-         * @return array|TargetFeed[]
-         */
-        public static function getUserTargetFeeds($vkId) {
-            $targetFeedIds = array();
-            $userFeeds = UserFeedFactory::Get(array('vkId' => $vkId));
-            foreach ($userFeeds as $userFeed) {
-                /** @var  $userFeed UserFeed */
-                $targetFeedIds[] = $userFeed->targetFeedId;
-            }
-
-            if ($targetFeedIds)
-                return self::Get(array('_targetFeedId' => $targetFeedIds));
-            else
-                return array();
-        }
-        
     }
 ?>

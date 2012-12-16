@@ -354,7 +354,8 @@ var app = (function () {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('wall_post', {text: text, photos: photos}, function() {
+            var publicId = $menu.find('.item.selected').data('id');
+            Events.fire('wall_post', {text: text, publicId: publicId, photos: photos}, function() {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $photos.html('');

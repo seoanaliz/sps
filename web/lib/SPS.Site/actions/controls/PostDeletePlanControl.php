@@ -5,12 +5,15 @@
  * In Code We Trust
  */
 
-Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
 
-
-class PostDeletePlanControl
+/**
+ * Планирует удаление поста
+ */
+class PostDeletePlanControl extends BaseControl
 {
-    public function Execute() {
+    public function Execute()
+    {
         $result = array();
         $articleQueueId = Request::getInteger('queueId');
         $time = Request::getString('time');
@@ -20,17 +23,18 @@ class PostDeletePlanControl
             $result['error'] = 'Need more data';
         } else {
 
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
 
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($articleQueue->targetFeedId)) {
+            if (!$TargetFeedAccessUtility->canCreatePlanDeletePost($articleQueue->targetFeedId)) {
                 $result['success'] = false;
                 $result['error'] = 'Access Denied';
             } else {
                 list($hour, $minutes) = explode(':', $time);
                 $ts = $articleQueue->startDate->getTimestamp();
                 $articleQueue->deleteAt = new DateTimeWrapper(null);
-                $articleQueue->deleteAt->setTimestamp($ts)->modify('+'.$hour.' hours')->modify('+'.$minutes.' minutes');
+                $articleQueue->deleteAt->setTimestamp($ts)->modify('+' . $hour . ' hours')->modify('+' . $minutes . ' minutes');
                 ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
                 $result['success'] = true;
             }
@@ -39,4 +43,5 @@ class PostDeletePlanControl
         echo ObjectHelper::ToJSON($result);
     }
 }
+
 ?>

@@ -1,66 +1,71 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
 
-    /**
-     * SaveGridLineItemControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
-     */
-    class SaveGridLineItemControl {
+/**
+ * SaveGridLineItemControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class SaveGridLineItemControl extends BaseControl
+{
 
-        public function Execute() {
-            $gridLineId = Request::getInteger( 'gridLineId' );
-            $gridLineItemId = Request::getInteger( 'gridLineItemId' );
-            $time = Request::getString( 'time' );
-            $timestamp = Request::getInteger( 'timestamp' );
-            $itemDate = new DateTimeWrapper(date('d.m.Y', !empty($timestamp) ? $timestamp : null) . ' ' . $time);
-            $queueId = Request::getInteger( 'queueId' );
+    public function Execute()
+    {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
-            $result = array(
-                'success' => false
-            );
+        $gridLineId = Request::getInteger('gridLineId');
+        $gridLineItemId = Request::getInteger('gridLineItemId');
+        $time = Request::getString('time');
+        $timestamp = Request::getInteger('timestamp');
+        $itemDate = new DateTimeWrapper(date('d.m.Y', !empty($timestamp) ? $timestamp : null) . ' ' . $time);
+        $queueId = Request::getInteger('queueId');
 
-            if (empty($time) || empty($gridLineId)) {
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
+        $result = array(
+            'success' => false
+        );
 
-            $gridLine = GridLineFactory::GetById($gridLineId);
-            if (empty($gridLine)) {
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
-            //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($gridLine->targetFeedId)) {
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
-            $object = new GridLineItem();
-            $object->gridLineItemId = $gridLineItemId;
-            $object->gridLineId = $gridLineId;
-            $object->date = $itemDate;
-
-            if (!empty($object->gridLineItemId)) {
-                $queryResult = GridLineItemFactory::Update($object);
-            } else {
-                $queryResult = GridLineItemFactory::Add($object);
-            }
-
-            if (!$queryResult) {
-                $result['message'] = 'saveError';
-            } else {
-                $result['success'] = true;
-            }
-
-            if (!empty($queueId)) {
-                //актуализируем время запланированного контента
-                ArticleUtility::ChangeQueueDates($queueId, $itemDate->format('U'));
-            }
-
+        if (empty($time) || empty($gridLineId)) {
             echo ObjectHelper::ToJSON($result);
+            return false;
         }
+
+        $gridLine = GridLineFactory::GetById($gridLineId);
+        if (empty($gridLine)) {
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        //check access
+        if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        $object = new GridLineItem();
+        $object->gridLineItemId = $gridLineItemId;
+        $object->gridLineId = $gridLineId;
+        $object->date = $itemDate;
+
+        if (!empty($object->gridLineItemId)) {
+            $queryResult = GridLineItemFactory::Update($object);
+        } else {
+            $queryResult = GridLineItemFactory::Add($object);
+        }
+
+        if (!$queryResult) {
+            $result['message'] = 'saveError';
+        } else {
+            $result['success'] = true;
+        }
+
+        if (!empty($queueId)) {
+            //актуализируем время запланированного контента
+            ArticleUtility::ChangeQueueDates($queueId, $itemDate->format('U'));
+        }
+
+        echo ObjectHelper::ToJSON($result);
     }
+}
+
 ?>

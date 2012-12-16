@@ -7,12 +7,8 @@
      */
     class SettingsUtility {
 
-        public static function GetTarget($checkAccess = true) {
+        public static function GetTarget() {
             $targetFeedId = Cookie::getParameter('currentTargetFeedId');
-            if ($checkAccess && !AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                $targetFeedId = null;
-            }
-
             return $targetFeedId;
         }
 

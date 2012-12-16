@@ -1,38 +1,42 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
+
+/**
+ * Возвращает список авторов для ленты
+ * TODO наверное нкжно переделать
+ * @package    SPS
+ * @subpackage Site
+ * @author     shuler
+ */
+class GetAuthorsListControl extends BaseControl
+{
 
     /**
-     * GetAuthorsListControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     shuler
+     * Entry Point
      */
-    class GetAuthorsListControl {
+    public function Execute() {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $targetFeedId = Request::getInteger('targetFeedId');
 
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $targetFeedId = Request::getInteger( 'targetFeedId' );
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                return;
-            }
-
-            if (!empty($targetFeedId)) {
-                $authors = AuthorFactory::Get(
-                    array()
-                    , array(
-                        BaseFactory::WithoutPages => true
-                    , BaseFactory::OrderBy => ' "firstName", "lastName" '
-                    , BaseFactory::CustomSql => ' AND"targetFeedIds" @> \'{' . PgSqlConvert::ToInt($targetFeedId) . '}\''
-                    )
-                );
-            } else {
-                $authors = array();
-            }
-
-            Response::setArray( 'authors', $authors );
+        if (!$TargetFeedAccessUtility->canShowAuthorList($targetFeedId)) {
+            return;
         }
+
+        if (!empty($targetFeedId)) {
+            $authors = AuthorFactory::Get(
+                array()
+                , array(
+                    BaseFactory::WithoutPages => true
+                , BaseFactory::OrderBy => ' "firstName", "lastName" '
+                , BaseFactory::CustomSql => ' AND"targetFeedIds" @> \'{' . PgSqlConvert::ToInt($targetFeedId) . '}\''
+                )
+            );
+        } else {
+            $authors = array();
+        }
+
+        Response::setArray('authors', $authors);
     }
+}
 
 ?>

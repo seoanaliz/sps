@@ -80,22 +80,10 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
             $this->mode = 'targetFeed';
         }
 
-        //Session::setInteger('gaal_targetFeedId', null);
 
         if ($this->mode == 'my') {
             $this->search['authorId'] = $author->authorId;
         }
-
-        /*
-        switch ($mode) {
-            case 'targetFeed':
-                $this->search['targetFeedId'] = $targetFeedId;
-                Session::setInteger('gaal_targetFeedId', $targetFeedId);
-                break;
-            default:
-                $this->search['authorId'] = $author->authorId;
-                break;
-        }  */
 
         // сортировка
         $filter = Request::getString('filter');

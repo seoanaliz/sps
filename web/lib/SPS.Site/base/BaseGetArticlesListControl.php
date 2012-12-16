@@ -6,16 +6,8 @@
  * Time: 13:47
  * To change this template use File | Settings | File Templates.
  */
-abstract class BaseGetArticlesListControl
+abstract class BaseGetArticlesListControl extends BaseControl
 {
-
-    /**
-     *
-     */
-    public function __construct(){
-        $this->vkId = AuthVkontakte::IsAuth();
-    }
-
     /**
      * @var Article[]
      */
@@ -30,8 +22,6 @@ abstract class BaseGetArticlesListControl
      * @var TargetFeed[]
      */
     protected $targetFeeds = array();
-
-
 
     /**
      * @var Author[]
@@ -124,6 +114,8 @@ abstract class BaseGetArticlesListControl
      */
     protected function processRequest()
     {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
         // Определяем страницу
         $this->processPage();
 
@@ -153,6 +145,7 @@ abstract class BaseGetArticlesListControl
                 // фильтр по статусам - только для авторских постов
                 // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
                 $reqArticleStatus = $this->getArticleStatus();
+                Logger::Debug('Get article list with article status ' . $reqArticleStatus);
                 if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
                     $articleStatuses = array($reqArticleStatus);
                 }
@@ -166,7 +159,8 @@ abstract class BaseGetArticlesListControl
         }
         // источник - топфейс
         elseif ($sourceFeedType == SourceFeedUtility::Topface) {
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+            // TODO узнать - только проверить доступ?
+            if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                 throw new Exception('Access error');
             }
             // в топфейсе не сортируем
@@ -261,6 +255,5 @@ abstract class BaseGetArticlesListControl
         Response::setBoolean('hasMore', $this->hasMore);
         Response::setArray('authors', $this->authors);
         Response::setArray('commentsData', $this->commentsData);
-
     }
 }
