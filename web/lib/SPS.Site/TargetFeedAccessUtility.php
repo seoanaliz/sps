@@ -129,4 +129,17 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
     public function canDeleteArticlesFromQueue($targetFeedId){
         return $this->hasAccessToTargetFeed($targetFeedId);
     }
+
+    /**
+     * Может ли добавить группу постов ?
+     * @param $targetFeedId
+     * @return bool
+     */
+    public function canAddArticleGroup($targetFeedId){
+        $role = $this->getRoleForTargetFeed($targetFeedId);
+        if (!is_null($role)) {
+            return $role != UserFeed::ROLE_AUTHOR;
+        }
+        return false;
+    }
 }
