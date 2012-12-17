@@ -15,7 +15,7 @@ class SyncLikes {
      * макс. кол-во постов которое будем обрабатывать за один раз
      * @var int
      */
-    private $maxArticlesSelectFromQueue = 100;
+    private $maxArticlesSelectFromQueue = 2000;
 
     public function Execute() {
         set_time_limit(0);
@@ -87,7 +87,7 @@ class SyncLikes {
             'sentAtTo' => $to,
             'externalIdNot' => '1',
             'externalIdExist' => true,
-            'emptyExternalLikes' => true,
+//            'emptyExternalLikes' => true,
             'pageSize' => $this->maxArticlesSelectFromQueue
         );
 
@@ -123,7 +123,6 @@ class SyncLikes {
                 AND aq."externalLikes" IS NULL
                 ORDER BY random()
                 LIMIT 3000';
-
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
         $ds         = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );

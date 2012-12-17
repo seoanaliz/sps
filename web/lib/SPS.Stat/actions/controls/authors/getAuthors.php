@@ -39,7 +39,7 @@ class getAuthors
             $reposts = ( $state_data[$author->vkId]['avg_reposts'] && $average_public_data['avg_reposts']) ?
                 round( 100 * $state_data[$author->vkId]['avg_reposts'] / $average_public_data['avg_reposts'], 2) : 0;
             $total_posts_tmp = isset( $total_posts[$author->authorId] ) ? $total_posts[$author->authorId] : 0;
-            if ( !$total_posts_tmp)
+            if ( !$total_posts_tmp )
                 continue;
             $res[] = array(
                 'id'        =>  $author->vkId,
@@ -54,6 +54,8 @@ class getAuthors
         $sort = $this->compare( 'b' );
 //        print_r($res);
         usort( $res, $sort);
+        if(!$res )
+            $res = array();
         die( ObjectHelper::ToJSON( array( 'response' => array( 'authors' => $res ))));
     }
 
@@ -67,7 +69,7 @@ class getAuthors
                 USING ("articleId")
                 WHERE
                     a."createdAt" < now()- interval \'1 day\'
-                    AND a."createdAt" > now()- interval \'111 month\'
+                    AND a."createdAt" > now()- interval \'1 month\'
                     and "authorId" = @author_id
                     AND a."targetFeedId"= @target_feed_id
                     and b."sentAt" is not null
@@ -96,7 +98,7 @@ class getAuthors
                 USING ("articleId")
                 WHERE
                     a."createdAt" < now()-interval \'1 day\'
-                    AND a."createdAt" > now()-interval \'111 month\'
+                    AND a."createdAt" > now()-interval \'1 month\'
                     AND a."targetFeedId" = @target_feed_id
                 GROUP BY
                     "authorId"
@@ -122,7 +124,7 @@ class getAuthors
                 USING ("articleId")
                 WHERE
                     a."createdAt" < now()-interval \'1 day\'
-                    AND a."createdAt" > now()-interval \'111 month\'
+                    AND a."createdAt" > now()-interval \'1 month\'
                     AND a."targetFeedId"= @target_feed_id
                     and b."sentAt" is not null
                 ';
