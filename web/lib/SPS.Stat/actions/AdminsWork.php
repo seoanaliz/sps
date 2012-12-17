@@ -27,7 +27,7 @@ class AdminsWork extends wrapper
         58540552,
         61514101,
         83475534,
-        106175502,
+//        106175502,
         110337004,
         114080351,
         121069867,
@@ -269,12 +269,13 @@ class AdminsWork extends wrapper
 
 
         while ( $ds->Next() ) {
-
+            $tmp_rel_likes = $ds->getValue( 'rel_likes', TYPE_FLOAT );
+            $tmp_rel_likes = ( $tmp_rel_likes > 500 ) ? 100 : $tmp_rel_likes;
             $post_id     = $ds->getValue( 'vk_post_id', TYPE_INTEGER );
             $res[]       = $post_id;
             $reposts    += $ds->getValue( 'reposts', TYPE_INTEGER );
             $diff       += $ds->getValue( 'likes', TYPE_INTEGER );
-            $diff_rel   += $ds->getValue( 'rel_likes', TYPE_FLOAT );
+            $diff_rel   += $tmp_rel_likes;
 
             $post_time = $ds->GetValue( 'post_time', TYPE_INTEGER );
             if ( $post_time - $time_prev < 30 * 60 ) {
@@ -289,7 +290,7 @@ class AdminsWork extends wrapper
                 $compls++;
         }
 
-        $q = count($res);
+        $q = count( $res );
         if ($q < 1)
             return false;
         $res['rel_likes']   = round( $diff / $q);
@@ -440,11 +441,11 @@ class AdminsWork extends wrapper
         $cmd->SetInteger( '@feed_id'  , $target_feed_id );
         $ds = $cmd->Execute();
         $ds->Next();
-        return array(
-            'posts_quantity'    =>  $ds->GetInteger(),
-            'avg_likes'         =>  round( $ds->GetFloat( 'avg_likes' )),
-            'avg_retweets'      =>  round( $ds->GetFloat( 'avg_retweets' ))
-        );
+//        return array(
+//            'posts_quantity'    =>  $ds->GetInteger(),
+//            'avg_likes'         =>  round( $ds->GetFloat( 'avg_likes' )),
+//            'avg_retweets'      =>  round( $ds->GetFloat( 'avg_retweets' ))
+//        );
 
     }
 

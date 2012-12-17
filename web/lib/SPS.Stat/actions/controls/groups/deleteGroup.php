@@ -17,7 +17,7 @@
         public function Execute() {
 
             error_reporting( 0 );
-            $user_id  = Request::getInteger ( 'userId'  );
+            $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getInteger ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
             $type     = ucfirst( Request::getString( 'type' ));
@@ -38,17 +38,18 @@
                 $source = 1;
                 $default_group = GroupsUtility::get_default_group( $user_id, $source  );
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by' => $user_id ));
-                if ( $group && $group->group_id === $default_group->group_id )
+                if ( $group && $group->group_id === $default_group->group_id ) {
                     //дефолтные группы удалять нельзя
                     die(  ObjectHelper::ToJSON(array('response' => false )));
-                elseif( !$group ) {
+                } else {
                     //отписываем человека от группы
                     $group = GroupFactory::GetOne( array( 'group_id' => $group_id ));
                     GroupsUtility::dismiss_from_group( $group, $user_id );
-                } else {
-                    //жесткое удаление группы, только создавший
-                    GroupsUtility::delete_group( $group, $default_group );
                 }
+//                  else {
+//                    //жесткое удаление группы, только создавший
+//                    GroupsUtility::delete_group( $group, $default_group );
+//                }
                 die( ObjectHelper::ToJSON(array('response' => true )));
             }
 
