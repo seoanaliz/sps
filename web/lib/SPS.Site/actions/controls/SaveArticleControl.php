@@ -1,132 +1,140 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
+
+/**
+ * SaveArticleControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class SaveArticleControl extends BaseControl
+{
+
+    private function convert_line_breaks($string, $line_break = PHP_EOL)
+    {
+        $patterns = array(
+            "/(<br>|<br \/>|<br\/>|<div>)\s*/i",
+            "/(\r\n|\r|\n)/",
+        );
+        $replacements = array(
+            PHP_EOL,
+            $line_break
+        );
+        $string = preg_replace($patterns, $replacements, $string);
+        return $string;
+    }
+
 
     /**
-     * SaveArticleControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class SaveArticleControl {
+    public function Execute()
+    {
+        $result = array(
+            'success' => false
+        );
 
-        private function convert_line_breaks($string, $line_break=PHP_EOL) {
-            $patterns = array(
-                "/(<br>|<br \/>|<br\/>|<div>)\s*/i",
-                "/(\r\n|\r|\n)/",
-            );
-            $replacements = array(
-                PHP_EOL,
-                $line_break
-            );
-            $string = preg_replace($patterns, $replacements, $string);
-            return $string;
-        }
+        $id = Request::getInteger('articleId');
+        $text = trim(Request::getString('text'));
+        $link = trim(Request::getString('link'));
+        $photos = Request::getArray('photos');
+        $sourceFeedId = Request::getInteger('sourceFeedId');
 
+        $text = $this->convert_line_breaks($text);
+        $text = strip_tags($text);
 
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $result = array(
-                'success' => false
-            );
+        if (empty($id)) {
+            //check access
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
-            $id             = Request::getInteger('articleId');
-            $text           = trim(Request::getString( 'text' ));
-            $link           = trim(Request::getString( 'link' ));
-            $photos         = Request::getArray( 'photos' );
-            $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
-
-            $text = $this->convert_line_breaks($text);
-            $text = strip_tags($text);
-
-            if (empty($id)) {
-                //check access
-                if (!AccessUtility::HasAccessToSourceFeedId($sourceFeedId)) {
-                    $sourceFeedId = null;
-                }
-
-                $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
-                if (empty($sourceFeedId) || empty($sourceFeed)) {
-                    $result['message'] = 'emptySourceFeedId';
-                    echo ObjectHelper::ToJSON($result);
-                    return false;
-                }
+            //check access
+            if (!$SourceAccessUtility->hasAccessToSourceFeed($sourceFeedId)) {
+                $sourceFeedId = null;
             }
 
-            //parsing link
-            $linkInfo = UrlParser::Parse($link);
-            if (empty($linkInfo)) {
-                $link = null;
-            }
-
-            if (empty($text) && empty($photos) && empty($link)) {
-                $result['message'] = 'emptyArticle';
+            $sourceFeed = SourceFeedFactory::GetById($sourceFeedId);
+            if (empty($sourceFeedId) || empty($sourceFeed)) {
+                $result['message'] = 'emptySourceFeedId';
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
+        }
 
-            //building data
-            $article = new Article();
-            $article->createdAt = DateTimeWrapper::Now();
-            $article->importedAt = $article->createdAt;
-            $article->sourceFeedId = $sourceFeedId;
-            $article->externalId = -1;
-            $article->rate = 100;
-            $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
-            $article->isCleaned = false;
-            $article->statusId = 1;
-            // создает редактор, наверное нужно брать статус исходя из пользователя
-            $article->articleStatus = Article::STATUS_APPROVED;
+        //parsing link
+        $linkInfo = UrlParser::Parse($link);
+        if (empty($linkInfo)) {
+            $link = null;
+        }
 
-            $articleRecord = new ArticleRecord();
-            $articleRecord->content = $text;
-            $articleRecord->likes = 0;
-            $articleRecord->photos = !empty($photos) ? $photos : array();
-            $articleRecord->link = $link;
-
-            if (!empty($id)) {
-                $queryResult = $this->update($id, $articleRecord);
-            } else {
-                $queryResult = $this->add($article, $articleRecord);
-            }
-
-            if (!$queryResult) {
-                $result['message'] = 'saveError';
-            } else {
-                $result['success'] = true;
-                if ($id) {
-                    $result['id'] = $id;
-                }
-            }
-
+        if (empty($text) && empty($photos) && empty($link)) {
+            $result['message'] = 'emptyArticle';
             echo ObjectHelper::ToJSON($result);
+            return false;
         }
 
-        private function add($article, $articleRecord) {
-            ConnectionFactory::BeginTransaction();
+        //building data
+        $article = new Article();
+        $article->createdAt = DateTimeWrapper::Now();
+        $article->importedAt = $article->createdAt;
+        $article->sourceFeedId = $sourceFeedId;
+        $article->externalId = -1;
+        $article->rate = 100;
+        $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
+        $article->isCleaned = false;
+        $article->statusId = 1;
+        // создает редактор, наверное нужно брать статус исходя из пользователя
+        $article->articleStatus = Article::STATUS_APPROVED;
 
-            $result = ArticleFactory::Add($article);
+        $articleRecord = new ArticleRecord();
+        $articleRecord->content = $text;
+        $articleRecord->likes = 0;
+        $articleRecord->photos = !empty($photos) ? $photos : array();
+        $articleRecord->link = $link;
 
-            if ($result) {
-                $article->articleId = ArticleFactory::GetCurrentId();
-                $articleRecord->articleId = $article->articleId;
+        if (!empty($id)) {
+            $queryResult = $this->update($id, $articleRecord);
+        } else {
+            $queryResult = $this->add($article, $articleRecord);
+        }
 
-                $result = ArticleRecordFactory::Add($articleRecord);
+        if (!$queryResult) {
+            $result['message'] = 'saveError';
+        } else {
+            $result['success'] = true;
+            if ($id) {
+                $result['id'] = $id;
             }
-
-            ConnectionFactory::CommitTransaction($result);
-            return $result;
         }
 
-        private function update($id, $articleRecord) {
-            ConnectionFactory::BeginTransaction();
-
-            $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link'), array('articleId' => $id));
-
-            ConnectionFactory::CommitTransaction($result);
-            return $result;
-        }
+        echo ObjectHelper::ToJSON($result);
     }
+
+    private function add($article, $articleRecord)
+    {
+        ConnectionFactory::BeginTransaction();
+
+        $result = ArticleFactory::Add($article);
+
+        if ($result) {
+            $article->articleId = ArticleFactory::GetCurrentId();
+            $articleRecord->articleId = $article->articleId;
+
+            $result = ArticleRecordFactory::Add($articleRecord);
+        }
+
+        ConnectionFactory::CommitTransaction($result);
+        return $result;
+    }
+
+    private function update($id, $articleRecord)
+    {
+        ConnectionFactory::BeginTransaction();
+
+        $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link'), array('articleId' => $id));
+
+        ConnectionFactory::CommitTransaction($result);
+        return $result;
+    }
+}
 
 ?>

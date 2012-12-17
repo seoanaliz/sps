@@ -67,6 +67,11 @@
                     'name'         => 'authorId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
+                ),
+                'vkIdIn' => array(
+                    'name'         => 'vkId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
                 )
                 ,'page' => array(
                     'name'         => 'page'

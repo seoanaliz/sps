@@ -249,10 +249,10 @@ $(document).ready(function(){
                             var box = this;
                             box.setHTML(tmpl(BOX_LOADING, {height: 100}));
                             box.setButtons([{label: 'Закрыть', isWhite: true}]);
-                            Events.fire('author_add', [authorId, function(data) {
+                            Events.fire('author_add', authorId, function(data) {
                                 box.remove();
                                 updatePage();
-                            }]);
+                            });
                         }
                     });
 

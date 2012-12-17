@@ -1,6 +1,4 @@
 <?php
-    Package::Load( 'SPS.VK' );
-
     /**
      * VKCheckAppAuth Action
      * @package    SPS
@@ -36,6 +34,7 @@
                 $viewer_id = Session::getInteger('authorId');
             }
 
+
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(
@@ -63,9 +62,7 @@
             }
 
             Response::setObject('__Author', $author);
-            Session::setObject('Author', $author);
             Session::setInteger('authorId', $viewer_id);
-            Session::setArray('targetFeedIds', $targetFeedIds);
         }
     }
 ?>

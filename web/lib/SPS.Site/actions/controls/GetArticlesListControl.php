@@ -73,8 +73,11 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         $showApproveBlock = false;
         $targetFeedId = $this->getTargetFeedId();
         if ($targetFeedId) {
-            $RoleAccessUtility = new RoleAccessUtility($this->vkId);
-            $showApproveBlock = $RoleAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $showApproveBlock = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
+
+            $showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
+
         }
 
 

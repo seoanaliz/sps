@@ -1,47 +1,50 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
+
+/**
+ * RestoreCommentAppControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class RestoreCommentAppControl extends BaseControl
+{
 
     /**
-     * RestoreCommentAppControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class RestoreCommentAppControl {
+    public function Execute()
+    {
+        $id = Request::getInteger('id');
 
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $id = Request::getInteger( 'id' );
+        if (empty($id)) {
+            return;
+        }
 
-            if (empty($id)) {
+        $__editorMode = false;
+        if ($__editorMode) {
+           /* CommentFactory::$mapping['view'] = CommentFactory::$mapping['table'];
+            $comment = CommentFactory::GetById($id, array(), array(BaseFactory::WithoutPages => false));
+            if (empty($comment)) {
+                return;
+            }
+            $article = ArticleFactory::GetById($comment->articleId);
+            if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
                 return;
             }
 
-            $__editorMode = Response::getBoolean('__editorMode');
-            if ($__editorMode) {
-                CommentFactory::$mapping['view'] = CommentFactory::$mapping['table'];
-                $comment = CommentFactory::GetById($id, array(), array(BaseFactory::WithoutPages => false));
-                if (empty($comment)) {
-                    return;
-                }
-                $article = ArticleFactory::GetById($comment->articleId);
-                if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
-                    return;
-                }
+            $comment->statusId = 1;
+            CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
+            AuthorEventUtility::EventComment($article, $comment->commentId);   */
+        } else {
+            /** @var $author Author */
+            $author = $this->getAuthor();
 
-                $comment->statusId = 1;
-                CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
-                AuthorEventUtility::EventComment($article, $comment->commentId);
-            } else {
-                /** @var $author Author */
-                $author = Session::getObject('Author');
-
-                $o = new Comment();
-                $o->statusId = 1;
-                CommentFactory::UpdateByMask($o, array('statusId'), array('commentId' => $id, 'authorId' => $author->authorId, 'statusId' => 3));
-            }
+            $o = new Comment();
+            $o->statusId = 1;
+            CommentFactory::UpdateByMask($o, array('statusId'), array('commentId' => $id, 'authorId' => $author->authorId, 'statusId' => 3));
         }
     }
+}
+
 ?>

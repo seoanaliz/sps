@@ -27,6 +27,14 @@
          */
         const STATUS_REJECT = 3;
 
+        public static function getStatuses(){
+            return array(
+                self::STATUS_REVIEW => 'Новые',
+                self::STATUS_APPROVED => 'Одобренные',
+                self::STATUS_REJECT => 'Отклоненные',
+            );
+        }
+
         /** @var int */
         public $articleId;
 
@@ -84,5 +92,10 @@
          * @var int
          */
         public $articleStatus;
+
+        /**
+         * @var int|null
+         */
+        public $articleGroupId;
     }
 ?>

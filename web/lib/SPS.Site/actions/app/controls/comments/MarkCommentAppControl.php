@@ -1,5 +1,5 @@
 <?php
-    Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.Site/base' );
 
     /**
      * MarkCommentAppControl Action
@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class MarkCommentAppControl {
+    class MarkCommentAppControl extends BaseControl {
 
         /**
          * Entry Point
@@ -20,7 +20,7 @@
                 return;
             }
 
-            $author = Session::getObject('Author');
+            $author = $this->getAuthor();
 
             $article = ArticleFactory::GetById(
                 $articleId

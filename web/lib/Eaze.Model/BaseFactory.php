@@ -531,7 +531,7 @@
          * @param array   $mapping         the object mapping
          * @param array|null   $options
          * @param string  $connectionName  the database connection name
-         * @return array|boolean
+         * @return boolean
          */
         public static function Add( $object, array $mapping, $options, $connectionName = null ) {
             $errors = BaseFactory::Validate( $object, $mapping, $options, $connectionName );

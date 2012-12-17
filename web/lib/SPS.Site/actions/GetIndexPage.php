@@ -1,60 +1,91 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
+
+/**
+ * GetIndexPage Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class GetIndexPage extends BaseControl
+{
 
     /**
-     * GetIndexPage Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class GetIndexPage {
+    public function Execute()
+    {
+        $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+        /**
+         * current values from settings
+         */
+        $currentTargetFeedId = SettingsUtility::GetTarget();
+        if ($currentTargetFeedId) {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($currentTargetFeedId)) {
+                $currentTargetFeedId = null;
+            }
+        }
 
         /**
-         * Entry Point
+         * target feeds
          */
-        public function Execute() {
 
-            $userId = AuthVkontakte::IsAuth();
+        $targetFeeds = array();
 
-            /**
-             * current values from settings
-             */
-            $currentTargetFeedId = SettingsUtility::GetTarget();
-
-            /**
-             * target feeds
-             */
-            $targetFeeds = TargetFeedFactory::getUserTargetFeeds($userId);
-
-            if (empty($currentTargetFeedId)) {
-                //пытаемся получить источники для первого паблика
-                if (!empty($targetFeeds)) {
-                    $currentTargetFeedId = current(array_keys($targetFeeds));
-                } else {
-                    $currentTargetFeedId = -1;
-                }
-            }
-
-            $RoleUtility = new RoleAccessUtility();
-            $sourceTypes = $gridTypes = array();
-            if ($currentTargetFeedId) {
-                $sourceTypes = $RoleUtility->getAccessibleSourceTypes($currentTargetFeedId);
-                $gridTypes = $RoleUtility->getAccessibleGridTypes($currentTargetFeedId);
-            }
-
-            $sourceFeeds = SourceFeedFactory::Get(
-                array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($currentTargetFeedId))
-                , array( BaseFactory::WithoutPages => true )
-            );
-
-            Response::setArray('sourceFeeds', $sourceFeeds );
-            Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );
-            Response::setArray('targetFeeds', $targetFeeds );
-            Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
-            Response::setParameter('currentDate', SettingsUtility::GetDate());
-            Response::setParameter('RoleUtility', $RoleUtility);
-            Response::setParameter('sourceTypes', $sourceTypes);
-            Response::setParameter('gridTypes', $gridTypes);
+        $targetFeedIds = $SourceAccessUtility->getAllTargetFeedIds();
+        if ($targetFeedIds){
+            $targetFeeds = TargetFeedFactory::Get(array('_targetFeedId' => $targetFeedIds));
         }
+
+        if (empty($currentTargetFeedId)) {
+            //пытаемся получить источники для первого паблика
+            if (!empty($targetFeeds)) {
+                $currentTargetFeedId = current(array_keys($targetFeeds));
+            } else {
+                $currentTargetFeedId = -1;
+            }
+        }
+
+
+        $sourceTypes = $gridTypes = array();
+        if ($currentTargetFeedId) {
+            $sourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($currentTargetFeedId);
+            $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
+        }
+
+        $sourceFeedIds = $SourceAccessUtility->getSourceIdsForTargetFeed($currentTargetFeedId);
+
+        Logger::Debug('$sourceFeedIds = '.print_r($sourceFeedIds, true));
+        $sourceFeeds = array();
+        if ($sourceFeedIds) {
+            $sourceFeeds = SourceFeedFactory::Get(
+                array('_sourceFeedId' => $sourceFeedIds)
+                ,array(BaseFactory::WithoutPages => true)
+            );
+        }
+
+        $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
+
+        // фильтры по статусам статей
+        $availableArticleStatuses = array();
+        if ($currentTargetFeedId) {
+            $availableArticleStatuses = $ArticleAccessUtility->getArticleStatusesForTargetFeed($currentTargetFeedId);
+        }
+        $articleStatuses = Article::getStatuses();
+
+        Response::setArray('sourceFeeds', $sourceFeeds);
+        Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
+        Response::setArray('targetFeeds', $targetFeeds);
+        Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
+        Response::setParameter('currentDate', SettingsUtility::GetDate());
+        Response::setParameter('SourceAccessUtility', $SourceAccessUtility);
+        Response::setParameter('sourceTypes', SourceFeedUtility::$Types);
+        Response::setParameter('availableSourceTypes', $sourceTypes);
+        Response::setParameter('gridTypes', $gridTypes);
+        Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
+        Response::setParameter('articleStatuses', $articleStatuses);
     }
+}
+
 ?>

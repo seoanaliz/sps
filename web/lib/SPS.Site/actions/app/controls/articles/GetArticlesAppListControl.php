@@ -59,16 +59,11 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
 
     protected function processRequestCustom(){
-        $author = Session::getObject('Author');
+        $author = $this->getAuthor();
         $RoleUtility = new RoleAccessUtility($author->vkId);
         // получаем доступные ленты
         $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 
-        //$mode = Request::getString('type');
-        //if (empty($mode) || $mode == 'null') {
-        //    $mode = Session::getString('gaal_type');
-        //}
-        //Session::setString('gaal_type', $mode);
 
         //все авторские посты
         $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
@@ -80,22 +75,10 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
             $this->mode = 'targetFeed';
         }
 
-        //Session::setInteger('gaal_targetFeedId', null);
 
         if ($this->mode == 'my') {
             $this->search['authorId'] = $author->authorId;
         }
-
-        /*
-        switch ($mode) {
-            case 'targetFeed':
-                $this->search['targetFeedId'] = $targetFeedId;
-                Session::setInteger('gaal_targetFeedId', $targetFeedId);
-                break;
-            default:
-                $this->search['authorId'] = $author->authorId;
-                break;
-        }  */
 
         // сортировка
         $filter = Request::getString('filter');
@@ -108,18 +91,13 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
                 break;
             case 'my':
             default:
-                //if (empty($this->search['targetFeedId'])) {
-                //    $this->search['authorId'] = $author->authorId;
-                //}
+
             break;
         }
 
         $tabType = Request::getString('tabType');
         Response::setString('tabType', $tabType);
 
-        //if ($this->mode == 'my') {
-        //    $tabType = 'all';
-        //}
 
         switch ($tabType) {
             case 'queued':
@@ -194,7 +172,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
         //обновляем дату, когда пользователь последний раз смотрел паблик
         if (!empty($this->search['targetFeedId'])) {
-            $author = Session::getObject('Author');
+            $author = $this->getAuthor();
             AuthorFeedViewUtility::UpdateLastView($author->authorId, $this->search['targetFeedId']);
         }
     }

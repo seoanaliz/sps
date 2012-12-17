@@ -6,44 +6,73 @@
  */
 class RoleAccessUtility
 {
-    private $FeedRulesByRole = array();
-    private $FeedRulesByFeed = array();
+    protected static $FeedRulesByRole = array();
+    protected static $FeedRulesByFeed = array();
+
+    private static $isLoaded = false;
 
     public function __construct($vkId = null) {
-        $this->loadRules($vkId);
+        if (!self::$isLoaded) {
+            $this->loadRules($vkId);
+        }
     }
 
     /**
      * Загружает права пользователя
      * @param null $vkId
      */
-    public function loadRules($vkId = null) {
+    private function loadRules($vkId = null) {
         if (is_null($vkId)){
             $vkId = AuthVkontakte::IsAuth();
         }
         if ($vkId) {
+            Logger::Debug('load!!!');
             $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$vkId));
-            $this->FeedRulesByRole = array();
+            Logger::Debug('end load!!!');
+            self::$FeedRulesByRole = array();
             foreach ($UserFeeds as $UserFeed) {
                 /** @var $UserFeed UserFeed */
-                if (!isset($this->FeedRulesByRole[$UserFeed->role])) {
-                    $this->FeedRulesByRole[$UserFeed->role] = array();
+                if (!isset(self::$FeedRulesByRole[$UserFeed->role])) {
+                    self::$FeedRulesByRole[$UserFeed->role] = array();
                 }
-                $this->FeedRulesByRole[$UserFeed->role][] = $UserFeed->targetFeedId;
-                $this->FeedRulesByFeed[$UserFeed->targetFeedId] = $UserFeed->role;
+                self::$FeedRulesByRole[$UserFeed->role][] = $UserFeed->targetFeedId;
+                self::$FeedRulesByFeed[$UserFeed->targetFeedId] = $UserFeed->role;
             }
+
+
+            self::$isLoaded = true;
         }
     }
 
+    /**
+     * Возвращает ленты отправки пользователя
+     * Если указана роль - то масси лент
+     * Если нет - то array(role => array(targetFeedId))
+     * @param null $role
+     * @return array
+     */
     public function getTargetFeedIds($role = null){
         if ($role){
-            if (isset($this->FeedRulesByRole[$role]))  {
-                return $this->FeedRulesByRole[$role];
+            if (isset(self::$FeedRulesByRole[$role]))  {
+                return self::$FeedRulesByRole[$role];
             }
             return array();
         } else {
-            return $this->FeedRulesByRole;
+            return self::$FeedRulesByRole;
         }
+    }
+
+    /**
+     * Возвращает все ленты, доступные пользователю
+     * @return array
+     */
+    public function getAllTargetFeedIds(){
+        $targetFeedIds = array();
+        $targetFeedIdsByRole = $this->getTargetFeedIds();
+        foreach ($targetFeedIdsByRole as $roleTargetFeedIds){
+            $targetFeedIds = array_merge($targetFeedIds, $roleTargetFeedIds);
+        }
+        return $targetFeedIds;
     }
 
     /**
@@ -52,26 +81,26 @@ class RoleAccessUtility
      * @return bool
      */
     public function hasAccessToSourceType($targetFeedId, $sourceType){
-        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
+        if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
             switch ($sourceType) {
                 case SourceFeedUtility::Ads:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
                 break;
 
                 case SourceFeedUtility::Albums:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
 
                 case SourceFeedUtility::Source:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
 
                 case SourceFeedUtility::Topface:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
 
                 case SourceFeedUtility::AuthorsList:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
             }
             return true;
@@ -80,16 +109,10 @@ class RoleAccessUtility
     }
 
     /**
-     * Возвращает роль
+     * Созвращает массив источников, доступных для ленты
      * @param $targetFeedId
+     * @return array
      */
-    public function getRoleForTargetFeed($targetFeedId){
-        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
-            return $this->FeedRulesByFeed[$targetFeedId];
-        }
-        return null;
-    }
-
     public function getAccessibleSourceTypes($targetFeedId){
         $accessibleSourceTypes = array();
         foreach (SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) {
@@ -97,7 +120,7 @@ class RoleAccessUtility
                 $accessibleSourceTypes[$sourceType] = $sourceTypeTitle;
             }
         }
-        return $accessibleSourceTypes;
+        return array_keys($accessibleSourceTypes);
     }
 
     public function getAccessibleGridTypes($targetFeedId){
@@ -112,15 +135,15 @@ class RoleAccessUtility
 
     public function hasAccessToGridType($targetFeedId, $gridType){
 
-        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
+        if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
 
             switch ($gridType)    {
                 case GridLineUtility::TYPE_ADS:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
                 break;
 
                 case GridLineUtility::TYPE_CONTENT:
-                    return !in_array($this->FeedRulesByFeed[$targetFeedId], array());
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array());
                 break;
             }
 
@@ -133,8 +156,8 @@ class RoleAccessUtility
 
 
     public function canAddPlanCell($targetFeedId) {
-        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
-                return !in_array($this->FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+        if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
+                return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
             return true;
         }
         #return false;
@@ -142,8 +165,8 @@ class RoleAccessUtility
     }
 
     public function getDefaultType($targetFeedId){
-        if (isset($this->FeedRulesByFeed[$targetFeedId])) {
-            switch ($this->FeedRulesByFeed[$targetFeedId]) {
+        if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
+            switch (self::$FeedRulesByFeed[$targetFeedId]) {
                case UserFeed::ROLE_AUTHOR:
                     return SourceFeedUtility::Authors;
                break;

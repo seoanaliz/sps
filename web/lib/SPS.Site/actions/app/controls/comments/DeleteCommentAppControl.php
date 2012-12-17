@@ -1,47 +1,51 @@
 <?php
-    Package::Load( 'SPS.Site' );
+Package::Load('SPS.Site/base');
+
+/**
+ * DeleteCommentAppControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class DeleteCommentAppControl extends BaseControl
+{
 
     /**
-     * DeleteCommentAppControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class DeleteCommentAppControl {
+    public function Execute()
+    {
+        $id = Request::getInteger('id');
 
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $id = Request::getInteger( 'id' );
-
-            if (empty($id)) {
-                return;
-            }
-
-            $comment = CommentFactory::GetById($id);
-            if (empty($comment)) {
-                return;
-            }
-
-            $__editorMode = Response::getBoolean('__editorMode');
-            $article = ArticleFactory::GetById($comment->articleId, array(), array(BaseFactory::WithoutDisabled => false));
-            if ($__editorMode) {
-                if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
-                    return;
-                }
-            } else {
-                /** @var $author Author */
-                $author = Session::getObject('Author');
-                if ($comment->authorId != $author->authorId) {
-                    return;
-                }
-            }
-
-            $comment->statusId = 3;
-            CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
-
-            AuthorEventUtility::EventCommentRemove($article, $comment->commentId);
+        if (empty($id)) {
+            return;
         }
+
+        $comment = CommentFactory::GetById($id);
+        if (empty($comment)) {
+            return;
+        }
+
+        $article = ArticleFactory::GetById($comment->articleId, array(), array(BaseFactory::WithoutDisabled => false));
+
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $role = $TargetFeedAccessUtility->getRoleForTargetFeed($article->targetFeedId);
+
+        if ($role == UserFeed::ROLE_EDITOR) {
+            // ок, редактор может удалять комменты
+        } elseif ($role == UserFeed::ROLE_AUTHOR && $comment->authorId == $author->authorId) {
+            // ок, автор может удалять свои комменты
+            /** @var $author Author */
+            $author = $this->getAuthor();
+        } else {
+            return;
+        }
+
+        $comment->statusId = 3;
+        CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
+
+        AuthorEventUtility::EventCommentRemove($article, $comment->commentId);
     }
+}
+
 ?>

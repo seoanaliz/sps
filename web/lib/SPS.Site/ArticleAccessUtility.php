@@ -4,7 +4,7 @@
  * Date: 13.12.12 0:08
  * In Code We Trust
  */
-class ArticleAccessUtility extends RoleAccessUtility {
+class ArticleAccessUtility extends TargetFeedAccessUtility {
 
     /**
      * Возвращает возможные статусы постов для ленты
@@ -23,5 +23,4 @@ class ArticleAccessUtility extends RoleAccessUtility {
         // одобренные записи видят все пользователи
         return array(Article::STATUS_APPROVED);
     }
-
 }
