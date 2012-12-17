@@ -11,23 +11,7 @@
 
     include_once 'lib/Eaze.Core/Package.php' ;
 
-    Package::Load( 'Eaze.Core');
-
-    Package::Load( 'Eaze.Site');
-    Package::Load( 'Eaze.Modules');
-    Package::Load( 'Eaze.Model' );
-    Package::Load( 'Eaze.Database/PgSql' );
-
-    Package::Load( 'Base.Tree' );
-    Package::Load( 'Base.VFS' );
-
-    Package::Load( 'SPS.Common' );
-    Package::Load( 'SPS.System' );
-    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.VK' );
-    Package::Load( 'SPS.FB' );
-    Package::Load( 'SPS.Site' );
-    Package::Load( 'SPS.App' );
+    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
 
     // Initialize Logger
     Logger::Init( ELOG_DEBUG  );
