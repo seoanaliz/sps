@@ -1,6 +1,6 @@
 .idea
-/web/cache/
-/web/shared/temp/
+/web/cache/*
+/web/shared/temp/*
 /media/
 SPS.~m2
 /docs/rebuild-database-from-dump.bat
