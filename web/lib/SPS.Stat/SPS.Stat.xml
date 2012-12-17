@@ -58,6 +58,9 @@
             <action name="setUserRank">
                 <path>controls/setUserRank</path>
             </action>
+            <action name="GetPublicGrowth">
+                <path>controls/stat/GetPublicGrowthAction</path>
+            </action>
         </group>
 
         <group name="Barter">
@@ -69,6 +72,18 @@
             </action>
             <action name="deleteReport">
                 <path>controls/barter/deleteReport</path>
+            </action>
+            <action name="searchInPublics">
+                <path>controls/stat/searchInPublics</path>
+            </action>
+        </group>
+
+        <group name="Authors">
+            <action name="getAuthors">
+                <path>controls/authors/getAuthors</path>
+            </action>
+            <action name="getPublics">
+                <path>controls/authors/getPublics</path>
             </action>
         </group>
 

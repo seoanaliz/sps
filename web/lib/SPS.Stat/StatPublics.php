@@ -26,14 +26,12 @@
                     $public->externalId ==  43503789  ||
                     $public->externalId ==  346191  ||
                     $public->externalId ==  33704958  ||
-                    $public->externalId ==  35806378  ||
-                    $public->externalId ==  38000341  ||
                     $public->externalId ==  38000521  ||
                     $public->externalId ==  1792796  ||
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
-//                    $public->externalId ==  38000555  ||
+                    $public->externalId ==  38000555  ||
                     $public->externalId ==  35807078  ||
                     $public->externalId ==  25817269 )
                     continue;
@@ -355,7 +353,7 @@
                 $ds->Next();
                 return $ds->GetInteger( 'avg' );
             }
-
+            return 0;
         }
 
         public static function get_views_visitors_from_base( $sb_id, $time_from, $time_to )
@@ -367,9 +365,9 @@
                             AND time <= @time_to
                             AND id = @public_id
                     ORDER BY time';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-            $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
-            $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
+            $cmd = new SqlCommand( $sql,    ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString( '@time_from',  date('Y-m-d', $time_from ));
+            $cmd->SetString( '@time_to',    date('Y-m-d', $time_to ));
             $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
             $ds = $cmd->Execute();
 
@@ -409,8 +407,8 @@
             $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
             if ( !empty( $public )) {
                 $public = reset( $public );
-                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-                $publisher = reset( $publisher );
+//                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+//                $publisher = reset( $publisher );
             }
 
             $params = array(
@@ -418,8 +416,8 @@
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-            if ( isset( $publisher->publisher->vk_token ))
-                $params['access_token']  =  $publisher->publisher->vk_token;
+//            if ( isset( $publisher->publisher->vk_token ))
+//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error))
@@ -452,11 +450,14 @@
             $cmd->SetString ( '@time_to',   date( 'Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
             $rate = 0;
+
             while( $ds->next()) {
                 $tmp_rate = $ds->GetValue( 'rate' );
                 $rate += $tmp_rate < 100 ? $tmp_rate : 100;
             }
-            return round( $rate / $ds->GetSize());
+            if ( $rate )
+                return round( $rate / $ds->GetSize());
+            return 0;
         }
 
         public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
@@ -526,22 +527,50 @@
             return $res;
         }
 
+        public static function get_public_walls_mk2( $walls_array )
+        {
+            $walls = array();
+            $walls_array = array_unique( $walls_array );
+            $sliced_walls_array = array_chunk( $walls_array, 25 );
+            foreach( $sliced_walls_array as $chunk ) {
+                $code = '';
+                $return = "return{";
+                //запрашиваем стены пабликов по 25 пабликов, 10 постов
+                $i = 0;
+                foreach( $chunk as $public ) {
+                    $id = trim( $public );
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count":10 });';
+                    $return .=  "\"id$id\":id$id,";
+                    $i++;
+                }
+                $code .= trim( $return, ',' ) . "};";
+                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+                if( isset( $res->error ))
+                    continue;
+                foreach( $res as $id => $content ) {
+                    unset( $content[0] );
+                    $walls[ str_replace( 'id', '', $id )] = $content;
+                }
+            }
+            return $walls;
+        }
+
         public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
-            if ( !empty( $public )) {
-                $public     = reset( $public );
-                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-                $publisher  = reset( $publisher );
-            }
+//            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
+//            if ( !empty( $public )) {
+//                $public     = reset( $public );
+//                $publisher  = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
+//                $publisher  = reset( $publisher );
+//            }
 
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-            if ( isset( $publisher->publisher->vk_token ))
-                $params['access_token']  =  $publisher->publisher->vk_token;
+//            if ( isset( $publisher->publisher->vk_token ))
+//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error ))
@@ -550,10 +579,9 @@
                 'visitors'  =>  $res[0]->visitors,
                 'viewers'   =>  $res[0]->views
             );
-
         }
 
-        public function get_publics_info_from_base( $public_ids )
+        public static function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
             $sql = 'SELECT vk_id, name, ava, quantity, page
@@ -607,7 +635,7 @@
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name', $public->name );
                     $cmd->SetString(  '@photo', $public->photo);
-                    $cmd->SetBoolean( '@page', ( $public->type =='page' ? true : false));
+                    $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
                     $cmd->Execute();
                 }
             }
@@ -625,14 +653,14 @@
                 old_value boolean    := 0;
                 curr_state boolean := false;
                 BEGIN
-                execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
-                IF $3=old_value THEN
-                    return false;
-                ELSE
-                    execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
-                    execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
-                    return true;
-                END IF;
+                    execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
+                    IF $3=old_value THEN
+                        return false;
+                    ELSE
+                        execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
+                        execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
+                        return true;
+                    END IF;
                 END
                 $$ LANGUAGE plpgsql;
                 SELECT set_state( @public_id, @name, @state) AS cnanged;";
@@ -649,26 +677,67 @@
                 $conn = ConnectionFactory::Get('tst');
 
             $sql = 'SELECT
-                        public_id, a.name as old_name, changed_at, b.name
+                        public_id, a.name as old_name, changed_at, b.name,a.act,a.active,b.active as check,a.in_search, a.closed
                     FROM '
-                        . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
-                   'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
-                   'ON
+                . TABLE_STAT_PUBLICS_AUDIT . ' as a '.
+                'JOIN ' . TABLE_STAT_PUBLICS . ' as b '.
+                'ON
                         public_id=vk_id
                     WHERE
-                        changed_at > @time_from
-                        AND changed_at > @time_to
-                        AND act = \'name\'';
+                            changed_at > @time_from
+                        AND changed_at < @time_to
+                    ORDER BY a.act
+                    ';
             $cmd = new SqlCommand( $sql, $conn );
-            $cmd->SetString( '@time_from', date( 'r', $time_from ));
-            $cmd->SetString( '@time_to', date( 'r', $time_to ));
-//            echo $cmd->getQuery();
+            $cmd->SetString( '@time_from', date( 'Y-m-d H:i:s', $time_from ));
+            $cmd->SetString( '@time_to', date( 'Y-m-d H:i:s', $time_to ));
             $ds = $cmd->Execute();
             $res = array();
             while( $ds->Next()) {
-                $res[$ds->GetInteger( 'public_id')] = array(
-                    'old_name'  => $ds->GetValue( 'old_name' ),
-                    'new_name'  => $ds->GetValue( 'name' )
+                $public_id = $ds->GetInteger( 'public_id' );
+                if ( isset( $res[ $public_id ] ) && $res[ $public_id  ]['act'] == 'active' ) {
+                    continue;
+                }
+                $res[ $public_id ] = array(
+                    'act'        =>  $ds->GetValue( 'act' ),
+                    'old_name'   =>  $ds->GetValue( 'old_name' ),
+                    'new_name'   =>  $ds->GetValue( 'name' ),
+                    'in_search'  =>  $ds->GetValue( 'in_search' ),
+                    'closed'     =>  $ds->GetValue( 'closed' ),
+                    'active'     =>  $ds->GetValue( 'active' ),
+                );
+                $public_id = '';
+            }
+            return $res;
+        }
+
+
+        public static function search_public( $search_string )
+        {
+            //поиск id паблика
+            $int_search = (int) $search_string;
+
+            $sql = 'SELECT vk_id,ava, name,quantity,page
+                    FROM ' . TABLE_STAT_PUBLICS .
+                   ' WHERE
+                        ( name ILIKE @search_string
+                        OR vk_id = @int_search )
+                        AND active IS TRUE
+                        AND quantity > 50000
+                    ORDER BY quantity DESC
+                   ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInteger( '@int_search', $int_search );
+            $cmd->SetString( '@search_string', '%' . $search_string . '%' );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[] = array(
+                    'id'        =>  $ds->GetInteger('vk_id'),
+                    'quantity'  =>  $ds->GetInteger('quantity'),
+                    'name'      =>  $ds->GetString('name'),
+                    'ava'       =>  $ds->GetString('ava'),
+                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'groupe',
                 );
             }
             return $res;

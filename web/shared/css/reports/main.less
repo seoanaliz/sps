@@ -1,10 +1,19 @@
 @import "../common/mixins.less";
 
 #main {
-    &> .header {
-        padding: 10px;
-    }
+    .list-add-monitor {
+        padding: 0 10px 10px;
 
+        .form {
+            input + input {
+                margin-left: 10px;
+            }
+
+            .button {
+                margin-left: 10px;
+            }
+        }
+    }
     .list-head {
         padding: 0 10px;
         background-color: #DEE5EB;
@@ -96,20 +105,30 @@
         }
 
     }
-    .item.our-public,
-    .item.partner,
+    .item,
+    .column {
+        text-align: center;
+        width: 100px;
+    }
+    .item.public,
     .column.public {
+        text-align: left;
         width: 250px;
     }
-    .item.post-time,
-    .item.delete-time,
-    .item.visitors,
-    .item.subscribers,
-    .column.time,
-    .column.visitors,
-    .column.subscribers {
-        width: 110px;
-        text-align: center;
+    .item.action,
+    .column.action {
+        width: 30px;
+    }
+    .column.action {
+        .icon {
+            cursor: pointer;
+            .opacity(0.5);
+            .transition(0.2s);
+
+            &:hover {
+                .opacity(1);
+            }
+        }
     }
 
     .item {

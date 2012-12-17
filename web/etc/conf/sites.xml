@@ -23,6 +23,7 @@
 				<path name="im" value="/im" />
                 <path name="reports" value="/int/reports" />
 				<path name="stat" value="/stat" />
+				<path name="authors" value="/authors" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>

@@ -159,6 +159,18 @@
                 <page uri="controls://deleteReport/">
                     <actions>SPS.Stat.deleteReport</actions>
                 </page>
+                <page uri="controls://searchInPublics/">
+                    <actions>SPS.Stat.searchInPublics</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://getAuthors/">
+                    <actions>SPS.Stat.getAuthors</actions>
+                </page>
+                <page uri="controls://getPublics/">
+                    <actions>SPS.Stat.getPublics</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -240,7 +252,7 @@
                         <template>tmpl://vt/statistic/statistic.tmpl.php</template>
                     </page>
                     <page uri="vt://stat/">
-                        <actions>Sps.Stat.GraphGrow</actions>
+                        <actions>SPS.Stat.GetPublicGrowth</actions>
                         <template>tmpl://vt/stat/index.tmpl.php</template>
                     </page>
 
@@ -527,6 +539,9 @@
                 <page uri="daemons://sync-userpics/">
                     <actions>SPS.Site.SyncUserpics</actions>
                 </page>
+                <page uri="daemons://clear-posts/">
+                    <actions>SPS.Site.ClearPosts</actions>
+                </page>
                 <page uri="daemons://wr-topics/">
                     <actions>SPS.Stat.WrTopics</actions>
                 </page>
@@ -553,6 +568,9 @@
                  </page>
                 <page uri="daemons://CheckPosts/">
                      <actions>SPS.Stat.CheckPosts</actions>
+                 </page>
+                <page uri="daemons://PublicsGrowFixer/">
+                     <actions>SPS.Stat.PublicsGrowFixer</actions>
                  </page>
 
             </pageGroup>
@@ -628,7 +646,13 @@
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="stat://reports/" boot="">
-                    <template>tmpl://st/reports.tmpl.php</template>
+                    <template>tmpl://reports/index.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="authors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="authors://">
+                    <template>tmpl://authors/index.tmpl.php</template>
                 </page>
             </pageGroup>
 

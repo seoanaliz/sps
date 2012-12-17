@@ -1,3 +1,11 @@
+<?
+/**
+ * @var $RoleUtility RoleUtility
+ * @var $sourceTypes array
+ * @var $gridTypes array
+ *
+ */
+?>
 {increal:tmpl://fe/elements/header.tmpl.php}
 <script src="{web:js://fe/main.js}" type="text/javascript"></script>
 <div id="go-to-top">Наверх</div>
@@ -9,9 +17,15 @@
                 <div id="wall-load"></div>
 
                 <div class="type-selector">
-                    <? foreach(SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) { ?>
-                        <a class="<?= ($sourceType == SourceFeedUtility::Source) ? 'active' : '' ?>" data-type="{$sourceType}">{$sourceTypeTitle}</a>
-                    <? } ?>
+                    <? $i=0;
+                    foreach($sourceTypes as $sourceType => $sourceTypeTitle):
+                    ?>
+                       <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}"
+                          id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
+                    <?
+                    $i++;
+                    endforeach;
+                    ?>
                     <a data-type="authors-list">+</a>
                 </div>
 
@@ -106,9 +120,12 @@
                    </div -->
 
                     <div class="type-selector">
-                        <a class="" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <a class="active" data-type="<?= GridLineUtility::TYPE_CONTENT ?>">Контент</a>
-                        <a class="" data-type="<?= GridLineUtility::TYPE_ADS ?>">Реклама</a>
+                        <a class="grid_type all" <?=count($gridTypes) < 2 ? 'style="display:none"' : ''?> data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <?
+                        $i=0;
+                        foreach ($gridTypes as $type => $name): ?>
+                        <a class="grid_type <?=!$i++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
+                        <? endforeach; ?>
                     </div>
 
                 </div>

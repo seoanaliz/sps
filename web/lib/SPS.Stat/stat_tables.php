@@ -15,11 +15,12 @@ define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 
     define( 'TABLE_STAT_USERS',       'stat_users');   #таблица юзеров
 
 //статистика по крупным пабликам
-    define( 'TABLE_STAT_PUBLICS_POINTS', 'stat_publics_50k_points'); #посуточные чек-ауты
-    define( 'TABLE_STAT_PUBLICS',     'stat_publics_50k');          #таблица пабликов
-    define( 'TABLE_STAT_PUBLICS_AUDIT',     'stat_public_audit');        #таблица изменения состояния пабликов(пока в поиск/из поиска, активен/неактивен, поменялось название) -
-    define( 'TABLE_STAT_GROUPS',      'stat_groups');               #группы(листы) пабликов
-    define( 'TABLE_STAT_ADMINS',      'stat_admins');               #админы этих пабликов
+    define( 'TABLE_STAT_PUBLICS_POINTS', 'stat_publics_50k_points');   #посуточные чек-ауты
+    define( 'TABLE_STAT_PUBLICS',        'stat_publics_50k');          #таблица пабликов
+    define( 'TABLE_STAT_PUBLICS_AUDIT',  'stat_public_audit');         #таблица изменения состояния пабликов(пока в поиск/из поиска, активен/неактивен, поменялось название) -
+    define( 'TABLE_STAT_GROUPS',         'stat_groups');               #группы(листы) пабликов
+    define( 'TABLE_STAT_ADMINS',         'stat_admins');               #админы этих пабликов
+    define( 'TABLE_STAT_OUR_GROWTH',     'stat_our_auditory' );        #админы этих пабликов
 
     define( 'TABLE_STAT_GROUP_PUBLIC_REL', 'stat_group_public_relation');  #принадлежность пабликов группам
     define( 'TABLE_STAT_GROUP_USER_REL',   'stat_group_user_relation');    #принадлежность групп юзерам
@@ -29,7 +30,7 @@ define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 
     define( 'TABLE_OADMINS', 'oadmins' );              #на
     define( 'TABLE_OADMINS_CONF', 'oadmins_conf' );
 
-//messeger
+//messenger
     define ( 'TABLE_MES_DIALOGS', 'mes_dialogs' ); #список диалогов, статус для каждого
     define ( 'TABLE_MES_DIALOG_STATUSES', 'mes_dialog_statuses' );  #таблица статусов диалогов
     define ( 'TABLE_MES_GROUPS', 'mes_dialogs_groups' );  #группы диалогов

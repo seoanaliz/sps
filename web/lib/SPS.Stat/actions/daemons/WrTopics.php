@@ -12,14 +12,15 @@ class WrTopics extends wrapper
     public function Execute()
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
-//        if (! $this->check_time())
-//            die('Не сейчас');
+        if (! $this->check_time())
+            die('Не сейчас');
+
         $this->get_id_arr();
-        echo "start_time = " . date( 'H:i') . '<br>';
+        echo "start_time = " . date( 'H:i' ) . '<br>';
         $this->update_quantity();
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
-        $this->find_admins();
+//        $this->find_admins();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
 
@@ -35,6 +36,11 @@ class WrTopics extends wrapper
         while ( $ds->Next() ) {
             $res[] = $ds->getInteger( 'vk_id' );
         }
+        $res[] = '43503725';
+        $res[] = '43157718';
+        $res[] = '43503753';
+        $res[] = '43503681';
+        $res[] = '43503694';
         $this->ids = $res;
     }
 
@@ -59,8 +65,8 @@ class WrTopics extends wrapper
             ' WHERE
                         id=@publ_id
                         AND (
-                                time=CURRENT_DATE - interval \'3 day\'
-                                or time=CURRENT_DATE - interval \'7 day\'
+                                time=CURRENT_DATE - interval \'7 day\'
+                                or time=CURRENT_DATE - interval \'30 day\'
                             )
                    ORDER BY time DESC';
 
@@ -183,8 +189,8 @@ class WrTopics extends wrapper
     public function find_admins(  )
     {
         foreach ( $this->ids as $id ) {
-            sleep(0.3);
-            echo $id . '<br>';
+        sleep(0.3);
+        echo $id . '<br>';
 
             $params = array(
                 'act'   =>  'a_get_contacts',
@@ -196,17 +202,17 @@ class WrTopics extends wrapper
             $k = $this->qurl_request( $url, $params );
             $k = explode( '<div class="image">' ,$k );
             unset( $k[0] );
-
+            if ( empty( $k ) )
+                continue;
+            $this->delete_admins( $id );
             foreach( $k as $admin_html ) {
                 $admin = $this->get_admin('a href="/' . $admin_html);
-                $this->delete_admins( $id );
+
                 if ( !empty( $admin )) {
                     $this->save_admin( $id, $admin );
                 }
                 $admin = array();
             }
-            if ( !empty( $k ))
-                die();
         }
         return true;
     }

@@ -242,6 +242,7 @@
                     $dbField  = $mapping['search'][$field]['name'];
                     $type     = $mapping['search'][$field]['type'];
                     $operator =  ( !empty( $mapping['search'][$field]['searchType'] ) ) ? $mapping['search'][$field]['searchType'] : SEARCHTYPE_EQUALS;
+                    $complexType = ( !empty( $mapping['search'][$field]['complexType'] ) ) ? $mapping['search'][$field]['complexType'] : null;
                 } elseif ( isset( $mapping['fields'][$field] ) ) {
                     $dbField  = $field;
                     $type     = $mapping['fields'][$field]['type'];
@@ -255,7 +256,6 @@
                             && empty( $value ) ) {
                         continue;
                     }
-
                     $query .=  ' AND ' . BaseFactory::GetOperatorString( $operator, $prefix . $conn->quote( $dbField ),   '@' . $field, $type, $complexType, $conn );
                 }
             }

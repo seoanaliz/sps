@@ -12,11 +12,12 @@
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
         const PAGE_SIZE = 20;
         const LIMIT_BREAK = 30;//порог отсева постов по лайкам, в процентах
-        const LIKES_LIMIT = 20;//ниже этого порога лайков всем постам выставляется "-"
         const WALL_URL = 'http://vk.com/wall-';
         const VK_URL = 'http://vk.com';
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
+        const ALBUM_MIN_LIKES_LIMIT = 10;
+        const WALL_MIN_LIKES_LIMIT = 30;
         /**
          * Максимальное количество постов, для которых можно запросить лайки
          */
@@ -27,7 +28,7 @@
             if ($public_id != '') $this ->set_page($public_id);
         }
 
-        public function set_page($id, $sh_name = '')
+        public function set_page( $id, $sh_name = '' )
         {
             $this->page_adr         =   self::WALL_URL . $id;
             $this->page_id          =   $id;
@@ -52,7 +53,8 @@
             }
 
             $url = trim($url, '/');
-            $short_name = end(explode('/',$url));
+            $arr = explode('/',$url);
+            $short_name = end($arr);
 
             if (substr_count($a, 'profile_avatar')> 0) {
                 if (!preg_match('/user_id":(.*?),/', $a, $oid))
@@ -161,7 +163,7 @@
                 'owner_id'  =>  '-' . $this->page_id,
                 'offset'    =>  $offset,
                 'count'     =>  20,
-                'fileter'   =>  'owner'
+                'filter'   =>  'owner'
             );
 
             $res = VkHelper::api_request( 'wall.get', $params );
@@ -205,7 +207,7 @@
                                          'desc' =>  '',
                                          'url'  =>  isset( $attachment->photo->src_big ) ?
                                                                     $attachment->photo->src_big :
-                                                                    $attachment->photo->src
+                                                                    $attachment->photo->src,
                                      );
                                  break;
                             case 'graffiti':
@@ -215,7 +217,7 @@
                                          'desc' =>  '',
                                          'url'  =>  isset( $attachment->graffiti->big_src ) ?
                                                                     $attachment->graffiti->big_src :
-                                                                    $attachment->graffiti->src
+                                                                    $attachment->graffiti->src,
                                      );
                                  break;
                             case 'audio':
@@ -270,7 +272,7 @@
             ));
         }
 
-        private function kill_attritions( $array )
+        private function kill_attritions( $array, $likes_limit = self::WALL_MIN_LIKES_LIMIT )
         {
             $res = array();
             $sr =  $this->get_average( $array );
@@ -351,7 +353,7 @@
 
                 if ( $array[$i]['likes'] == -1 )
                     ;
-                elseif ($array[$i]['likes_tr'] < self::LIKES_LIMIT) {
+                elseif ($array[$i]['likes_tr'] < $likes_limit ) {
                     $array[$i]['likes'] = '-';
                 }
             }
@@ -366,9 +368,15 @@
         public function get_posts_count($wall_url = '')
         {
             $params = array( 'owner_id' => '-' . $this->page_id,
-                'count'    =>  1,
-                'filter' => 'owner' );
-            $res = VkHelper::api_request( 'wall.get', $params );
+                             'count'    =>  1,
+                             'filter'   => 'owner' );
+            $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            if ( isset( $res->error )) {
+                if ( $res->error->error_code == 15 )
+                    throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
+                else
+                    throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $params ));
+            }
             $this->count = $res[0];
             return (int) $res[0];
         }
@@ -397,7 +405,7 @@
             //проверка на доступность
             if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
                 substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-                throw new Exception('access denied to' . $page);
+                throw new Exception('access denied to http://vk.com/public' . $page);
 
             if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
                 (substr_count($a, '404 Not Found') == 0) &&
@@ -469,27 +477,31 @@
             if (is_numeric($offset))    $params['offset'] = $offset;
 
             $res = VkHelper::api_request( 'photos.get', $params );
-            if ( $res)
-            $query_line = array();
+            if ($res) {
+                $query_line = array();
 
-            foreach( $res as $photo )
-            {
-                $query_line[]= $photo->owner_id . '_' . $photo->pid;
+                foreach ($res as $photo) {
+                    $query_line[] = $photo->owner_id . '_' . $photo->pid;
+                }
+                $query_line = implode(',', $query_line);
+                if (!$query_line){
+                    throw new AlbumEndException('End of album');
+                }
+
+                sleep(0.3);
+
+                $params = array(
+                    'photos' => $query_line,
+                    'extended' => 1,
+                );
+                $res = VkHelper::api_request('photos.getById', $params);
+
+                $posts = VkAlbums::post_conv($res);
+                $posts = $this->kill_attritions($posts, self::ALBUM_MIN_LIKES_LIMIT);
+                return $posts;
+            } else {
+                throw new AlbumEndException('End of album. Empty resoponse');
             }
-            $query_line = implode( ',', $query_line );
-            if( !$query_line )
-                      throw new AlbumEndException('End of album');
-            sleep( 0.3 );
-
-            $params = array(
-                'photos'    =>  $query_line,
-                'extended'  =>  1,
-            );
-            $res = VkHelper::api_request( 'photos.getById', $params );
-
-            $posts = VkAlbums::post_conv( $res );
-            $posts = $this->kill_attritions( $posts );
-            return $posts;
         }
 
         /**
@@ -502,7 +514,7 @@
         public function get_photo_count_in_album( $public_id, $album_id )
         {
             $params = array(
-                'gid' => $public_id,
+                'gid'  => $public_id,
                 'aids' => $album_id,
             );
 

@@ -31,8 +31,9 @@ class getDialogsList
 //        $ungrouped      =   $ungrouped ? 1 : 0;
 
         $dialogs_array = array();
+        $default_group  = MesGroups::get_unlist_dialogs_group( $user_id );
         if ( !$group_id ) {
-            $group_id  = MesGroups::get_unlist_dialogs_group( $user_id );
+            $group_id       = $default_group;
         }
 
         $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
@@ -46,12 +47,6 @@ class getDialogsList
         $res_ids  = MesGroups::get_group_dialogs( $user_id, $group_id, $limit, $offset, $only_new );
         //проверка на новые сообщения в группе
         $row_dialog_array   = MesDialogs::get_dialogs_from_db( $user_id, $res_ids );
-//        print_r($row_dialog_array);
-//        print_r( MesDialogs::get_group_dilogs_list( $user_id, $res_ids ));
-
-//        print_r($row_dialog_array);
-//        print_r( );
-//        die();
         if( $row_dialog_array == 'no access_token' )
             die( ERR_NO_ACC_TOK );
         $user_ids = array();
@@ -59,7 +54,7 @@ class getDialogsList
 
         foreach ( $row_dialog_array as $dialog ) {
             $dialog->id = MesDialogs::get_dialog_id( $user_id, $dialog->uid );
-            $dialog->groups = MesDialogs::get_rec_groups( $user_id, $dialog->uid );
+            $dialog->groups = ( $default_group == $group_id ) ? array() : array( $group_id );
             $dialog->status = $statuses[$dialog->uid];
             if( !$dialog->id ) {
                 $state = MesDialogs::calculate_state( $dialog->read_state, !$dialog->out );
@@ -87,8 +82,8 @@ class getDialogsList
         if ( count( $user_ids ) < 1 )
             die( ObjectHelper::ToJSON( array( 'response' => array())));
 
+        //навешиваем юзеров на диалоги
         $users_array = StatUsers::get_vk_user_info( $user_ids, $user_id );
-
         foreach( $dialogs_array as &$dialog ) {
             $dialog->uid = $users_array[ $dialog->uid ];
         }

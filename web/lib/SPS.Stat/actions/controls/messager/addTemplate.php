@@ -15,7 +15,7 @@ class addTemplate
         $tmpl_id    =   isset( $tmpl_id ) ? $tmpl_id   : 0;
         $group_ids  =   $group_ids        ? $group_ids : 0;
 
-        if ( !$user_id || !$text ) {
+        if ( !$user_id || !$text || !$group_ids ) {
             die(ERR_MISSING_PARAMS);
         }
 

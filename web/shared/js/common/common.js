@@ -103,8 +103,8 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+// Выделение текста в инпутах
 (function($) {
-    // Выделение текста в инпутах
     $.fn.selectRange = function(start, end) {
         return this.each(function() {
             if (this.setSelectionRange) {
@@ -217,22 +217,26 @@ function getURLParameter(name, search) {
             var $autoResize = $('<div/>').appendTo('body');
             if (!$input.data('autoResize')) {
                 $input.data('autoResize', $autoResize);
-                $autoResize
-                    .css({
-                        position: 'absolute',
-                        width: $input.width(),
-                        minHeight: $input.height(),
-                        font: $input.css('font'),
-                        padding: $input.css('padding'),
-                        fontSize: $input.css('font-size'),
-                        wordWrap: 'break-word',
-                        overflow: $input.css('overflow'),
-                        lineHeight: $input.css('line-height'),
-                        top: -100000
-                    })
-                ;
+                $autoResize.css({
+                    position: 'absolute',
+                    width: $input.width(),
+                    minHeight: $input.height(),
+                    font: $input.css('font'),
+                    padding: $input.css('padding'),
+                    fontSize: $input.css('font-size'),
+                    wordWrap: 'break-word',
+                    overflow: $input.css('overflow'),
+                    lineHeight: $input.css('line-height'),
+                    top: -100000
+                });
 
                 $input.on('keyup keydown focus blur', function(e) {
+                    $autoResize.css({
+                        width: $input.width(),
+                        font: $input.css('font'),
+                        padding: $input.css('padding'),
+                        fontSize: $input.css('font-size')
+                    });
                     var minHeight = intval($input.css('min-height'));
                     var maxHeight = intval($input.css('max-height'));
                     var val = $input.val().split('\n').join('<br/>.');
@@ -505,6 +509,7 @@ var Box = (function() {
     var $layout;
     var boxesCollection = {};
     var boxesHistory = [];
+    var bodyOverflow;
 
     return function(options) {
         if (typeof options != 'object') {
@@ -522,6 +527,7 @@ var Box = (function() {
             html: '',
             closeBtn: true,
             buttons: [],
+            width: 400,
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
@@ -529,20 +535,19 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
-            $layout = $('<div/>')
-                .addClass('box-layout')
-                .appendTo($body)
-                .click(function(e) {
-                    if (e.target == e.currentTarget) {
+            $layout = $(tmpl(BOX_LAYOUT)).click(function(e) {
+                if (e.target == e.currentTarget) {
+                    if (boxesHistory[boxesHistory.length-1]) {
                         boxesHistory[boxesHistory.length-1].hide();
                         if (!boxesHistory.length) {
-                            $(this).hide();
+                            $layout.hide();
                         }
                     }
-                })
-            ;
+                }
+            }).addClass('box-layout').appendTo($body);
+
             $(document).keydown(function(e) {
-                if (e.keyCode == 27) {
+                if (e.keyCode == KEY.ESC) {
                     $layout.click();
                 }
             });
@@ -558,20 +563,11 @@ var Box = (function() {
             }
         }
 
-        var $box = $(tmpl(BOX_WRAP, {
-            title: params.title,
-            body: '',
-            closeBtn: params.closeBtn
-        })).appendTo($layout).hide();
+        var $box = $(tmpl(BOX_WRAP, {})).appendTo($layout).width(params.width).hide();
 
-        if (params.closeBtn) {
-            $box.find('> .title > .close').click(function() {
-                box.hide();
-            });
-        }
-
-        setHTML(params.html);
-        setButtons(params.buttons);
+        $box.delegate('.title > .close', 'click', function() {
+            box.hide();
+        });
 
         box.$el = box.$box = $box;
         box.show = show;
@@ -583,52 +579,71 @@ var Box = (function() {
         box.refreshTop = refreshTop;
         box.visible = false;
 
+        box.setTitle(params.title);
+        box.setHTML(params.html);
+        box.setButtons(params.buttons);
+
         function show() {
-            box.visible = true;
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.hide();
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.hide();
+                }
+            } else {
+                bodyOverflow = $body.css('overflow-y');
+                $body.width($body.width());
+                $body.css('overflow-y', 'hidden');
+                $layout.show();
             }
 
-            $box.show();
-            $layout.show();
-            refreshTop();
-
-            try {
-                params.onshow.call(box, $box);
-            } catch(e) {}
-
             boxesHistory.push(box);
+            box.visible = true;
+            $box.show();
+            box.refreshTop();
+            params.onshow.call(box, $box);
             return box;
         }
         function hide() {
             box.visible = false;
             $box.hide();
-
-            try {
-                params.onhide.call(box, $box);
-            } catch(e) {}
-
             boxesHistory.pop();
+
             if (boxesHistory.length) {
-                boxesHistory[boxesHistory.length-1].$box.show();
+                if (boxesHistory[boxesHistory.length-1] != box) {
+                    boxesHistory[boxesHistory.length-1].$box.show();
+                }
             } else {
+                $body.css('overflow-y', bodyOverflow);
+                $body.width('auto');
                 $layout.hide();
             }
 
+            params.onhide.call(box, $box);
             return box;
         }
         function remove() {
-            if (box.visible) hide();
+            if (box.visible) {
+                box.hide();
+            }
             delete boxesCollection[params.id];
             $box.remove();
         }
         function setHTML(html) {
             $box.find('> .body').html(html);
-            refreshTop();
+            box.refreshTop();
             return box;
         }
         function setTitle(title) {
-            $box.find('> .title .text').text(title);
+            if (!title) {
+                $box.find('> .title').remove();
+            } else {
+                if (!$box.find('> .title').length) {
+                    $box.prepend('<div class="title"><span class="text"></span></div>');
+                    if (params.closeBtn) {
+                        $box.find('> .title').append('<div class="close"></div>');
+                    }
+                }
+                $box.find('> .title .text').text(title);
+            }
             return box;
         }
         function setButtons(buttons) {
@@ -640,11 +655,9 @@ var Box = (function() {
                 }
                 $box.find('> .actions-wrap .actions').empty();
                 $.each(buttons, function(i, button) {
-                    var $button = $(tmpl(BOX_ACTION, button))
-                        .appendTo($box.find('> .actions-wrap .actions'))
-                        .click(function() {
-                            button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
-                        });
+                    var $button = $(tmpl(BOX_ACTION, button)).click(function() {
+                        button.onclick ? button.onclick.call(box, $button, $box) : box.hide();
+                    }).appendTo($box.find('> .actions-wrap .actions'));
                 });
             }
             return box;
@@ -658,7 +671,6 @@ var Box = (function() {
         }
 
         params.oncreate.call(box, $box);
-
         return box;
     };
 })();
@@ -724,7 +736,6 @@ var Box = (function() {
                     $el.dropdown('getMenu').remove();
                     isUpdate = true;
                 } else {
-                    dropdownId++;
                     $el.on(options.openEvent, function(e) {
                         if (e.originalEvent && e.type == 'mousedown' && e.button != 0) return;
                         e.stopPropagation();
@@ -753,18 +764,17 @@ var Box = (function() {
                 $menu.hide();
 
                 $el.data(DATA_KEY, {
-                    id: dropdownId,
+                    id: dropdownId++,
                     $el: $el,
                     $menu: $menu,
                     $target: $target,
-                    options: options,
-                    isVisible: false
+                    options: options
                 });
 
                 $el.dropdown('setItems', options.data);
 
                 if (options.isShow && $el.is(':visible')) {
-                    $el.dropdown('open', isUpdate);
+                    $el.dropdown('open');
                 }
                 if (isUpdate) {
                     run(options.onupdate, $el);
@@ -810,10 +820,6 @@ var Box = (function() {
                 if (!options.data.length && !options.emptyMenuText) {
                     return;
                 }
-                if ($menu.data('isVisible')) {
-                    return;
-                }
-                $menu.data('isVisible', true);
 
                 $menu.css({
                     width: options.width || $target.outerWidth() - (intval($target.css('border-left-width')) + intval($target.css('border-right-width')))
@@ -906,7 +912,6 @@ var Box = (function() {
 
             $target.removeClass(CLASS_ACTIVE);
             $menu.hide();
-            $menu.data('isVisible', false);
 
             $(window).off('resize.' + nameSpace);
             $(window).off('scroll.' + nameSpace);
@@ -1056,37 +1061,15 @@ var Box = (function() {
                     }
                 };
                 var options = $.extend(defaults, params);
-                options.defData = options.data.slice(0);
-                options.notFoundText = options.emptyMenuText;
                 var searchTimeout;
-                var data = options.defData.slice(0);
+                options.notFoundText = options.emptyMenuText;
+                options.defData = options.data.slice(0);
 
                 $el.dropdown(options);
-                $el.on('open', function() {
-                    var tags = [];
-                    if (!$el.tags) {
-                        return;
-                    }
-                    tags = $el.tags('getTags');
-                    data = $.grep(options.defData, function(item) {
-                        var isNotFound = true;
-                        $.each(tags, function(i, tag) {
-                            if (tag.id == item.id) {
-                                isNotFound = false;
-                                return false;
-                            }
-                        });
-                        return isNotFound;
-                    });
-                    $el.dropdown($.extend(options, {
-                        isShow: true,
-                        data: data,
-                        emptyMenuText: options.notFoundText
-                    }));
-                });
 
                 if (!$el.data(DATA_KEY)) {
-                    $el.on('keydown', function(e) {
+                    $el.on('keyup', function(e) {
+                        var options = $el.data(DATA_KEY).options;
                         switch(e.keyCode) {
                             case KEY.UP:
                             case KEY.DOWN:
@@ -1103,10 +1086,11 @@ var Box = (function() {
                         }
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function() {
-                            var searchStr = $.trim(options.getValue.apply(t) || '').split('ё').join('е');
-                            data = !searchStr ? data : [];
-                            data = $.grep(options.defData, function(item) {
-                                var str = $.trim(item.title).split('ё').join('е');
+                            var elVal = options.getValue.apply(t) || '';
+                            var defData = options.defData;
+                            var data = !elVal ? defData : $.grep(defData, function(n, i) {
+                                var str = $.trim(n.title).split('ё').join('е');
+                                var searchStr = $.trim(elVal).split('ё').join('е');
                                 if (!options.caseSensitive) {
                                     str = str.toLowerCase();
                                     searchStr = searchStr.toLowerCase();
@@ -1122,14 +1106,14 @@ var Box = (function() {
                             } else {
                                 $el.dropdown('close');
                             }
-                        }, 100);
-                    });
-
-                    $el.data(DATA_KEY, {
-                        $el: $el,
-                        options: options
+                        }, 0);
                     });
                 }
+
+                $el.data(DATA_KEY, {
+                    $el: $el,
+                    options: options
+                });
             });
         },
 
@@ -1192,30 +1176,13 @@ var Box = (function() {
                 $el.data(DATA_KEY, {
                     $el: $el,
                     $wrap: $el.closest('.' + CLASS_WRAP),
-                    options: options
+                    options: options,
+                    tags: {}
                 });
 
                 refreshPadding($el);
                 run(options.oncreate, $el);
             });
-        },
-        getTags: function() {
-            var $el = this;
-            var data = $el.data(DATA_KEY);
-            if (!data) {
-                return;
-            }
-            var options = data.options;
-            var $wrap = data.$wrap;
-            var $tags = $wrap.find('.' + CLASS_TAG);
-            var tags = [];
-            $.each($tags, function() {
-                tags.push({
-                    id: $(this).data('id'),
-                    title: $(this).find('.' + CLASS_TAG_TEXT).text()
-                });
-            });
-            return tags;
         },
         addTag: function(params) {
             return this.each(function() {
@@ -1436,8 +1403,7 @@ var tmpl = (function($) {
             var fn = (/^#[A-Za-z0-9_-]*$/.test(str))
                 ? function() {
                 return cache[str] || ($(str).length ? tmpl($(str).html()) : str)
-            }
-                : (new Function('obj',
+            } : (new Function('obj',
                 'var p=[],' +
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
@@ -1445,9 +1411,10 @@ var tmpl = (function($) {
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
             ));
             return (cache[str] = fn(data || {}));
-        }
-        catch(e) {
-            if (window.console && console.log) console.log(format(str));
+        } catch(e) {
+            if (window.console && console.log) {
+                console.log(format(str));
+            }
             throw e;
         }
     };
@@ -1456,7 +1423,7 @@ var tmpl = (function($) {
 })(jQuery);
 
 var BOX_LAYOUT =
-'<div  class="box-layout"></div>';
+'<div class="box-layout"></div>';
 
 var BOX_WRAP =
 '<div class="box-wrap">' +
@@ -1468,7 +1435,11 @@ var BOX_WRAP =
             '<? } ?>' +
         '</div>' +
     '<? } ?>' +
-    '<div class="body clear-fix"><?=body?></div>' +
+    '<div class="body clear-fix">' +
+        '<? if (isset("body")) { ?>' +
+            '<?=body?>' +
+        '<? } ?>' +
+    '</div>' +
     '<? if (isset("buttons") && buttons.length) { ?>' +
         '<div class="actions-wrap">' +
             '<div class="actions"></div>' +

@@ -141,7 +141,10 @@
             public static function get_service_access_token()
             {
                 $connect =  ConnectionFactory::Get( 'tst' );
+                $count = 0;
                 while( 1 ) {
+                    if( $count++ > 1000 )
+                        throw new Exception ('закончились сервисные токены!');
                     $sql = 'SELECT access_token
                             FROM serv_access_tokens
                             WHERE active IS TRUE
@@ -162,19 +165,22 @@
 
             public static function deactivate_at( $access_token )
             {
+                if ( !$access_token )
+                    $access_token = 0;
                 $sql = 'UPDATE serv_access_tokens
                         SET active=false
-                        WHERE access_token =@access_token';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetString('@access_token ', $access_token );
+                        WHERE access_token=@access_token';
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+                $cmd->SetString('@access_token', $access_token );
                 $cmd->Execute();
             }
 
             public static function check_at( $access_token )
             {
                 $res = self::get_vk_time( $access_token );
+                sleep(0.2);
                 if ( isset( $res->error )) {
-                    self::deactivate_at( $access_token );
+                    //self::deactivate_at( $access_token );
                     return false;
                 }
                 return true;
@@ -184,12 +190,11 @@
             {
                 $sql = 'INSERT INTO serv_access_tokens(user_id, access_token, app_id )
                         VALUES( @user_id, @access_token, @app_id )';
-                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
                 $cmd->SetString ( '@access_token ', $access_token );
                 $cmd->SetInteger( '@user_id ',      $user_id );
                 $cmd->SetInteger( '@app_id',        $app_id );
                 $cmd->Execute();
             }
-
         }
     ?>

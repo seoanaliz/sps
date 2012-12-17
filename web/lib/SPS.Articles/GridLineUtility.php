@@ -15,6 +15,11 @@
             self::TYPE_ADS => self::TYPE_ADS,
         );
 
+        public static $TitleTypes = array(
+            self::TYPE_CONTENT => 'Контент',
+            self::TYPE_ADS => 'Реклама',
+        );
+
         public static function GetGrid($targetFeedId, $date = null, $type = self::TYPE_CONTENT) {
             $result = array();
             $now = DateTimeWrapper::Now();

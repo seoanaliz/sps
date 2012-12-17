@@ -41,6 +41,9 @@ class BarterEvent
     /** @var DateTimeWrapper */
     public $deleted_at;
 
+    /** @var DateTimeWrapper */
+    public $detected_at;
+
     /** @var int */
     public $barter_overlaps;
 
@@ -58,6 +61,21 @@ class BarterEvent
 
     /** @var string */
     public $post_id;
+
+    /** @var boolean */
+    public $standard_mark;
+
+    /** @var int array*/
+    public $groups_ids;
+
+    /** @var int array*/
+    public $creator_id;
+
+    public function __clone()
+    {
+        $this->barter_event_id = null;
+        $this->created_at = date ( 'Y-m-d H:i:s', time());
+    }
 
 }
 ?>

@@ -68,6 +68,10 @@ class BarterEventFactory
           'name'          => 'deleted_at'
         , 'type'        => TYPE_DATETIME
         )
+        ,'detected_at' => array(
+            'name' => 'detected_at'
+           ,'type' => TYPE_DATETIME
+        )
         ,'barter_overlaps' => array(
           'name'        => 'barter_overlaps'
         , 'type'        => TYPE_STRING
@@ -96,6 +100,19 @@ class BarterEventFactory
                 'name'      => 'start_search_at'
             , 'type'        => TYPE_STRING
         )
+        ,'standard_mark'  => array(
+              'name'      => 'standard_mark'
+            , 'type'      => TYPE_BOOLEAN
+        )
+        ,'groups_ids' => array(
+              'name'        => 'groups_ids'
+            , 'type'        => TYPE_ARRAY
+            , 'complexType' => 'int[]'
+        )
+        ,'creator_id' => array(
+              'name'        => 'creator_id'
+            , 'type'        => TYPE_STRING
+            )
     )
     , 'search'    => array(
             '_barter_event_id' => array(
@@ -143,6 +160,22 @@ class BarterEventFactory
             , 'type'         => TYPE_DATETIME
             ,'searchType'    => SEARCHTYPE_LE
         )
+        ,'_posted_atLE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_LE
+        )
+        ,'_posted_atGE' => array(
+             'name'         => 'posted_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'   => SEARCHTYPE_GE
+        )
+
+        ,'_start_search_atGE' => array(
+             'name'         => 'start_search_at'
+            ,'type'         => TYPE_DATETIME
+            ,'searchType'    => SEARCHTYPE_GE
+        )
         ,'_stop_search_atGE' => array(
               'name'         => 'stop_search_at'
             , 'type'         => TYPE_DATETIME
@@ -153,12 +186,29 @@ class BarterEventFactory
             , 'type'         => TYPE_DATETIME
             , 'searchType'   => SEARCHTYPE_LE
         )
+        ,'_created_atGE' => array(
+              'name'         => 'created_at'
+            , 'type'         => TYPE_DATETIME
+            , 'searchType'   => SEARCHTYPE_GE
+        )
         ,
         '_statusNE' => array(
-              'name'          => 'status'
+              'name'        => 'status'
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_NOT_EQUALS
-            )
+        )
+        ,
+        '_standard_markE' => array(
+              'name'        => 'standard_mark'
+            , 'type'        => TYPE_BOOLEAN
+            , 'searchType'  => SEARCHTYPE_EQUALS
+        )
+        ,'_groups_ids' => array(
+              'name'        => 'groups_ids'
+            , 'type'        => TYPE_INTEGER
+            , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
+            , 'complexType' => 'int[]'
+        )
     ));
 
     /** @return array */

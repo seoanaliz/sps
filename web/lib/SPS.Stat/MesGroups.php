@@ -324,7 +324,7 @@
         }
 
 
-
+        //упо создает группу. привязывать к юзеру - в другом месте
         public static function setGroup( $ava, $groupName, $comments, $groupId = false )
         {
             if ( $groupId ) {
@@ -452,7 +452,6 @@
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
             $cmd->SetInteger('@user_id', $user_id);
-//            echo $cmd->GetQuery();
             $ds = $cmd->Execute();
             $res = array();
             while ( $ds->Next() ) {
