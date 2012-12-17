@@ -1,0 +1,17 @@
+server {
+    listen       8001;
+    server_name  127.0.0.1;
+    client_max_body_size 32M;
+
+    location / {
+        root                   /home/sps/photos/;
+        client_body_temp_path  /home/sps/photos/temp/;
+        dav_methods  PUT DELETE MKCOL COPY MOVE;
+        create_full_put_path   on;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
