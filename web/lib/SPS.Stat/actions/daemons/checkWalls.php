@@ -31,7 +31,6 @@ class CheckWalls
 
         $barters_for_search = BarterEventFactory::Get( array( '_status' => 2 ), null, 'tst' );
         $search_results = $this->wall_search( $barters_for_search );
-
         $search_results = $this->get_population( $search_results );
 
         foreach( $barters_for_search as $barter_event )
