@@ -21,10 +21,10 @@
             <label>{lang:vt.editor.vkId}</label>
             <?= FormHelper::FormInput( 'vkId', $object->vkId, 'vkId', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="targetFeedIds" class="row">
+        <!--div data-row="targetFeedIds" class="row">
             <label>{lang:vt.sourceFeed.targetFeedIds}</label>
             <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', !empty($object->targetFeedIds) ? $object->targetFeedIds : array(), 'targetFeedIds', null, null, array('style' => 'height: 200px;') ) ?>
-        </div>
+        </div -->
         <div data-row="statusId" class="row required">
             <label>{lang:vt.editor.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
