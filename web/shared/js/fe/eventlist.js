@@ -333,6 +333,14 @@ var Eventlist = {
                 type: sourceType
             }
         }).success(function(data) {
+            // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+            var $sourceTypeLink = $('#sourceType-' + data.type);
+            if (!$sourceTypeLink.hasClass('active')) {
+                $('.sourceType.active').removeClass('active');
+                $sourceTypeLink.addClass('active');
+            }
+            sourceType = $sourceTypeLink.data('type');
+
             if (sourceType != 'source' && sourceType != 'albums') {
                 $('#slider-text').hide();
                 $('#slider-cont').hide();
@@ -397,13 +405,6 @@ var Eventlist = {
                 addCellButton.show();
             } else {
                 addCellButton.hide();
-            }
-
-            // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
-            var sourceTypeLink = $('#sourceType-' + data.type);
-            if (!sourceTypeLink.hasClass('active')) {
-                $('.sourceType.active').removeClass('active');
-                sourceTypeLink.addClass('active');
             }
 
             loadQueue();
