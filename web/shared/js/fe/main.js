@@ -3,11 +3,7 @@ var easydateParams = {
     date_parse: function(date) {
         if (!date) return;
         var d = date.split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
-        return Date.parse(date);
+        return Date.parse([d[1], d[0], d[2]].join('/'));
     },
     uneasy_format: function(date) {
         return date.toLocaleDateString();
@@ -34,9 +30,10 @@ $(document).ready(function(){
 
     var $leftPanel = $('.left-panel');
     var $multiSelect = $("#source-select");
+    var $calendar = $('#calendar');
 
     // Календарь
-    $("#calendar")
+    $calendar
         .datepicker()
         .keydown(function(e){
             if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
@@ -49,30 +46,25 @@ $(document).ready(function(){
         });
 
     $(".calendar .tip, #calendar-fix").click(function(){
-        $("#calendar").focus();
+        $calendar.focus();
     });
 
     // Приведение вида календаря из 22.12.2012 в 22 декабря
     (function() {
-        var d = $("#calendar").val().split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
-        $("#calendar").datepicker('setDate', new Date(date).getTime()).trigger('change');
+        var d = $calendar.val().split('.');
+        var date = Date.parse([d[1], d[0], d[2]].join('/'));
+        $calendar.datepicker('setDate', date).trigger('change');
     })();
 
     // Кнопки вперед-назад в календаре
     (function() {
-        var day = (86000 * 1000);
-
         $(".calendar .prev").click(function(){
-            var date = $('#calendar').datepicker('getDate').getTime();
-            $("#calendar").datepicker('setDate', new Date(date - day)).trigger('change');
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
         });
         $(".calendar .next").click(function(){
-            var date = $('#calendar').datepicker('getDate').getTime();
-            $("#calendar").datepicker('setDate', new Date(date + day * 2)).trigger('change');
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
         });
     })();
 
@@ -365,7 +357,7 @@ $(document).ready(function(){
                         // иначе добавляем
                         elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
-                                'Пост удален. <a href="javascript:;" class="recover">Восстановить</a><br/>' +
+                                'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 '<span class="button ignore">Не показывать новости сообщества</span>' +
                             '</div>'
                         ));
@@ -718,11 +710,11 @@ $(document).ready(function(){
                             var $span = $('<span />', { text: 'Ссылка: ' });
                             $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
 
-                            var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
+                            var $deleteLink = $('<a />', { 'class': 'delete-link', text: 'удалить' }).click(function() {
                                 // убираем аттач ссылки
                                 deleteLink();
                             });
-                            var $reloadLink = $('<a />', { href: 'javascript:;', 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
+                            var $reloadLink = $('<a />', { 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
                                 link = foundLink;
                                 deleteLink();
                                 parseUrl(link);
@@ -1257,11 +1249,6 @@ $(document).ready(function(){
     })();
 
     // Комментирование записи
-    $leftPanel.delegate('.post > .bottom .comment', 'click', function(e) {
-        var $target = $(this);
-        var $post = $target.closest('.post');
-        var postId = $post.data('id');
-    });
     $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
         $(this).autoResize();
         var $newComment = $(this).closest('.new-comment');
@@ -1280,7 +1267,7 @@ $(document).ready(function(){
         var commentId = $comment.data('id');
         Events.fire('comment_delete', [commentId, function() {
             $comment.data('html', $comment.html());
-            $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+            $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
         }]);
     });
     $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
