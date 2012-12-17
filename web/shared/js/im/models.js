@@ -1,4 +1,3 @@
-
 var UserModel = Model.extend({
     init: function() {
         this._defData = {
