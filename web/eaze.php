@@ -3,19 +3,12 @@
 
     define( 'WITH_PACKAGE_COMPILE', false  );
 
-    if ( !WITH_PACKAGE_COMPILE ) {
-        include_once 'lib/Eaze.Core/Logger.php';
-        include_once 'lib/Base.Tree/ITreeFactory.php';
-        include_once 'lib/Base.Tree/TreeFactory.php';
-    }
-
+    include_once 'lib/Eaze.Core/Logger.php';
+    // Initialize Logger
+    Logger::Init( ELOG_DEBUG  );
     include_once 'lib/Eaze.Core/Package.php' ;
 
     Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
-
-    // Initialize Logger
-    Logger::Init( ELOG_DEBUG  );
-    Logger::Init( ELOG_WARNING );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
