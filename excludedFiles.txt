@@ -1,3 +1,4 @@
 web/cache
 web/shared/files
+web/shared/temp
 /devel
