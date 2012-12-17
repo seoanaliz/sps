@@ -8,7 +8,7 @@
     Logger::Debug(PHP_EOL . PHP_EOL. ' START ' . PHP_EOL . PHP_EOL)   ;
 
     define( 'WITH_PACKAGE_COMPILE', false  );
-    define( 'WITH_AUTOLOAD', true  );
+    define( 'WITH_AUTOLOAD', false  );
 
     include_once 'lib/Eaze.Core/Package.php' ;
 
