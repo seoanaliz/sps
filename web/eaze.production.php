@@ -1,6 +1,4 @@
 <?php
-       include_once 'eaze.php';
-return;
     /* Don't Forget to turn on mod_rewrite!  */
 
     define( 'WITH_PACKAGE_COMPILE', true  );
