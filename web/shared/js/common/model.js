@@ -25,7 +25,7 @@ var Model = Event.extend({
             key += '';
             return this.set(key, value);
         } else if (key) {
-            key = key.toString();
+            key += '';
             return this.get(key);
         } else {
             return this._data;
