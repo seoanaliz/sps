@@ -18,7 +18,7 @@ class ArticleAccessUtility extends TargetFeedAccessUtility {
             return array(Article::STATUS_REVIEW, Article::STATUS_REJECT, Article::STATUS_APPROVED);
         } elseif ($role == UserFeed::ROLE_EDITOR) {
             // редактор - одобренные и на рассмотрении
-            return array(Article::STATUS_REVIEW, Article::STATUS_APPROVED);
+            return array(Article::STATUS_REVIEW, Article::STATUS_REJECT, Article::STATUS_APPROVED);
         }
         // одобренные записи видят все пользователи
         return array(Article::STATUS_APPROVED);

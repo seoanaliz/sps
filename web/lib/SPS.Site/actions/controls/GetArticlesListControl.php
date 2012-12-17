@@ -32,21 +32,40 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $type = self::getSourceFeedType();
 
-        // не авторские посты
-        // if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
-        //    $this->search['_sourceFeedId'] = array(-999 => -999);
-        //    return;
-        // }
 
         if ($type == SourceFeedUtility::Authors) {
-            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
-
+            //$this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
+            unset($this->search['_sourceFeedId']);
             // определяем источники
-            $sourceFeedIds = $this->getSourceFeedIds();
+            //$sourceFeedIds = $this->getSourceFeedIds();
+
+            // выираем авторов для этой ленты
+            $authorsIds = array();
+            $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $this->search['targetFeedId']));
+            if ($UserFeeds) {
+                $vkIds = array();
+                foreach ($UserFeeds as $UserFeed){
+                    $vkIds[] = $UserFeed->vkId;
+                }
+
+                $authors = AuthorFactory::Get(
+                    array(
+                        'vkIdIn' => $vkIds
+                    )
+                    , array(
+                        BaseFactory::WithoutPages => true,
+                        BaseFactory::OrderBy => ' "firstName", "lastName" ',
+                    )
+                );
+
+                foreach ($authors as $author){
+                    $authorsIds[] = $author->authorId;
+                }
+            }
 
             // фильтр источников выступает как фильтр авторов
-            if (!empty($sourceFeedIds)) {
-                $this->search['_authorId'] = $sourceFeedIds;
+            if (!empty($authorsIds)) {
+                $this->search['_authorId'] = $authorsIds;
             } else {
                 $this->search['_authorId'] = array(-1 => -1);
             }

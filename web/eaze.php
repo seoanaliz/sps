@@ -3,8 +3,8 @@
 
     // Initialize Logger
     include_once 'lib/Eaze.Core/Logger.php';
-    //Logger::Init( ELOG_WARNING, Logger::FileMode  );
-    Logger::Init( ELOG_DEBUG, Logger::FileMode  );
+    Logger::Init(ELOG_WARNING);
+    // Logger::Init( ELOG_DEBUG, Logger::FileMode  );
     Logger::Debug(PHP_EOL . PHP_EOL. ' START ' . PHP_EOL . PHP_EOL)   ;
 
     define( 'WITH_PACKAGE_COMPILE', false  );

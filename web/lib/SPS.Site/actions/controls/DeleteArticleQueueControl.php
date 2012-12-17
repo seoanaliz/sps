@@ -40,12 +40,13 @@ class DeleteArticleQueueControl extends BaseControl {
         //пытаемся восстановить статью, которую заблокировали
         if (!empty($object)) {
 
-            $o = new Article();
-            $o->statusId = 1;
-            $o->queuedAt = null;
-            ArticleFactory::UpdateByMask($o, array('statusId', 'queuedAt'), array('articleId' => $object->articleId, 'statusId' => 2));
+                $o = new Article();
+                $o->statusId = 1;
+                $o->queuedAt = null;
+                ArticleFactory::UpdateByMask($o, array('statusId', 'queuedAt'), array('articleId' => $object->articleId, 'statusId' => 2));
 
-            AuthorEventUtility::EventQueueRemove($object->articleId);
+                AuthorEventUtility::EventQueueRemove($object->articleId);
+            }
         }
     }
 }
