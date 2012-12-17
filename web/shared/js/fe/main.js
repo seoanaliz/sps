@@ -39,7 +39,9 @@ $(document).ready(function(){
     $("#calendar")
         .datepicker()
         .keydown(function(e){
-            if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
+            if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
+                e.preventDefault();
+            }
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
