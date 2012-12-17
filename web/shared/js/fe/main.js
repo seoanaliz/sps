@@ -605,9 +605,9 @@ $(document).ready(function(){
     $leftPanel.delegate('.moderation .button.approve', 'click', function() {
         var $post = $(this).closest('.post');
         var postId = $post.data('id');
-        Events.fire('leftcolumn_approve_post', [postId, function() {
+        Events.fire('leftcolumn_approve_post', postId, function() {
             $post.slideUp(200);
-        }]);
+        });
     });
     $leftPanel.delegate('.moderation .button.reject', 'click', function() {
         var $post = $(this).closest('.post');
