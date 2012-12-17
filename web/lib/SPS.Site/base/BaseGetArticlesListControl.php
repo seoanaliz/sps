@@ -133,6 +133,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
         $sourceFeedIds = $this->getSourceFeedIds();
         if ($sourceFeedIds) {
             $this->search['_sourceFeedId'] = $sourceFeedIds;
+        } else {
+            $this->search['_sourceFeedId'] = array(-999 => -999);
         }
 
         // если запрашиваем авторские посты

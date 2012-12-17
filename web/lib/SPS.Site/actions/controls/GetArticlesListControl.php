@@ -32,11 +32,6 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $type = self::getSourceFeedType();
 
-        // не авторские посты
-        // if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
-        //    $this->search['_sourceFeedId'] = array(-999 => -999);
-        //    return;
-        // }
 
         if ($type == SourceFeedUtility::Authors) {
             $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
