@@ -27,7 +27,7 @@ $(document).ready(function(){
         monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         firstDay: 1,
         showAnim: '',
-        dateFormat: "d MM"
+        dateFormat: "d MM               yy"
     });
 
     var $leftPanel = $('.left-panel');
