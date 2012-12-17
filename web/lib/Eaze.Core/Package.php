@@ -275,9 +275,17 @@
         public static function DoCompiledCacheOperations() {
             if ( Package::WithPackageCompile() ) {
                 $packageCompiledFlag = sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
-                if ( !file_exists( $packageCompiledFlag ) ) {
-                    Package::FlushCompiledCache();
-                    touch( $packageCompiledFlag );
+                $handle = fopen($packageCompiledFlag, 'c+');
+                if (flock($handle, LOCK_EX | LOCK_NB)) {
+                    $pid = fgets($handle, 4096);
+                    if (empty($pid)) {
+                        fputs($handle, getmypid());
+                        Logger::Info('LOCK');
+                        Package::FlushCompiledCache();
+                        touch( $packageCompiledFlag );
+                    }
+                } else {
+                    //TODO force disable package compile
                 }
             }
         }

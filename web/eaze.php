@@ -1,11 +1,11 @@
 <?php
     /* Don't Forget to turn on mod_rewrite!  */
 
-    define( 'WITH_PACKAGE_COMPILE', false  );
+    define( 'WITH_PACKAGE_COMPILE', true  );
 
     include_once 'lib/Eaze.Core/Logger.php';
     // Initialize Logger
-    Logger::Init( ELOG_DEBUG  );
+    Logger::Init( ELOG_WARNING );
     include_once 'lib/Eaze.Core/Package.php' ;
 
     Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
