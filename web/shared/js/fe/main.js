@@ -42,7 +42,7 @@ $(document).ready(function(){
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change', []);
+            Events.fire('calendar_change');
         });
 
     $(".calendar .tip, #calendar-fix").click(function(){
@@ -80,14 +80,14 @@ $(document).ready(function(){
                 + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
         },
         checkAll: function(){
-            Events.fire('leftcolumn_dropdown_change', []);
+            Events.fire('leftcolumn_dropdown_change');
         },
         uncheckAll: function(){
-            Events.fire('leftcolumn_dropdown_change', []);
+            Events.fire('leftcolumn_dropdown_change');
         }
     });
     $multiSelect.bind("multiselectclick", function(event, ui){
-        Events.fire('leftcolumn_dropdown_change', []);
+        Events.fire('leftcolumn_dropdown_change');
     });
 
     // right dropdown
@@ -130,7 +130,7 @@ $(document).ready(function(){
             $(".right-panel .type-selector a").removeClass('active');
             targetType.addClass('active');
 
-            Events.fire('rightcolumn_dropdown_change', []);
+            Events.fire('rightcolumn_dropdown_change');
         },
         oncreate: function() {
             $(this).find('.default').removeClass('default');
@@ -139,7 +139,7 @@ $(document).ready(function(){
     });
 
     $(".left-panel .drop-down").change(function(){
-        Events.fire('leftcolumn_dropdown_change', []);
+        Events.fire('leftcolumn_dropdown_change');
     });
 
     $('.wall-title a').dropdown({
@@ -156,7 +156,7 @@ $(document).ready(function(){
         onclose: function() {},
         onchange: function(item) {
             $('.wall-title a').text(item.title).data('type', item.type);
-            Events.fire('leftcolumn_sort_type_change', []);
+            Events.fire('leftcolumn_sort_type_change');
         }
     });
 
@@ -264,10 +264,10 @@ $(document).ready(function(){
                             html: tmpl(BOX_LOADING, {height: 100}),
                             buttons: [
                                 {label: 'Удалить', onclick: function() {
-                                    Events.fire('author_remove', [authorId, function(data) {
+                                    Events.fire('author_remove', authorId, function(data) {
                                         $author.remove();
                                         confirmDeleteBox.hide();
-                                    }]);
+                                    });
                                 }},
                                 {label: 'Отменить', isWhite: true}
                             ],
@@ -305,14 +305,14 @@ $(document).ready(function(){
                             var clearText = $input.text();
 
                             $input.blur().removeAttr('contenteditable').html(clearText);
-                            Events.fire('author_edit_desc', [$author.data('id'), clearText, function() {}]);
+                            Events.fire('author_edit_desc', $author.data('id'), clearText, function() {});
                         }
                     });
                 });
             })();
         } else {
             $('body').removeClass('editor-mode');
-            Events.fire('rightcolumn_dropdown_change', []);
+            Events.fire('rightcolumn_dropdown_change');
         }
     });
 
@@ -337,7 +337,7 @@ $(document).ready(function(){
         $(".right-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        Events.fire('rightcolumn_type_change', []);
+        Events.fire('rightcolumn_type_change');
     });
 
     // Wall init
@@ -346,7 +346,7 @@ $(document).ready(function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
                 gid = elem.data('group');
-            Events.fire('leftcolumn_deletepost', [pid, function(state){
+            Events.fire('leftcolumn_deletepost', pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
                     var $deleteMessage = $('#' + deleteMessageId);
@@ -365,7 +365,7 @@ $(document).ready(function(){
 
                     elem.hide();
                 }
-            }]);
+            });
         })
         .delegate('.post .ignore', 'click', function() {
             var elem = $(this).closest(".post"),
@@ -378,11 +378,11 @@ $(document).ready(function(){
         .delegate('.post .recover', 'click', function() {
             var elem = $(this).closest(".post"),
                 pid = elem.data("id");
-            Events.fire('leftcolumn_recoverpost', [pid, function(state){
+            Events.fire('leftcolumn_recoverpost', pid, function(state){
                 if(state) {
                     elem.hide().next().show();
                 }
-            }]);
+            });
         });
 
     $("#queue")
@@ -390,11 +390,11 @@ $(document).ready(function(){
         .delegate(".delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id");
-            Events.fire('rightcolumn_deletepost', [pid, function(state){
+            Events.fire('rightcolumn_deletepost', pid, function(state){
                 if(state) {
                     elem.remove();
                 }
-            }]);
+            });
         })
         // Смена даты
         .delegate('.time', 'click', function() {
@@ -440,9 +440,9 @@ $(document).ready(function(){
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
                     // console.log([gridLineId, gridLineItemId, time]);
-                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
-                    }]);
+                    });
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
@@ -487,9 +487,9 @@ $(document).ready(function(){
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_removal_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                     if (state) {}
-                }]);
+                });
             }
         })
         .delegate('.datepicker', 'click', function() {
@@ -537,16 +537,16 @@ $(document).ready(function(){
                         if ($post.hasClass('new')) {
                             // Добавление ячейки
                             // console.log([gridLineId, time, startDate, endDate]);
-                            Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state){
+                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
                                 if (state) {}
-                            }]);
+                            });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
                                 console.log([gridLineId, time, startDate, endDate]);
-                                Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state) {
+                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
                                     if (state) {}
-                                }]);
+                                });
                             }
                         }
                     }
@@ -588,13 +588,13 @@ $(document).ready(function(){
         var postId = $post.data("id");
 
         if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
-            Events.fire('leftcolumn_clear_post_text', [postId, function(state){
+            Events.fire('leftcolumn_clear_post_text', postId, function(state){
                 if (state) {
                     $post.find('div.shortcut').html('');
                     $post.find('div.cut').html('');
                     $post.find('a.show-cut').remove();
                 }
-            }]);
+            });
         }
     });
 
@@ -602,9 +602,9 @@ $(document).ready(function(){
     $leftPanel.delegate('.moderation .button.approve', 'click', function() {
         var $post = $(this).closest('.post');
         var postId = $post.data('id');
-        Events.fire('leftcolumn_approve_post', [postId, function() {
+        Events.fire('leftcolumn_approve_post', postId, function() {
             $post.slideUp(200);
-        }]);
+        });
     });
     $leftPanel.delegate('.moderation .button.reject', 'click', function() {
         var $post = $(this).closest('.post');
@@ -666,68 +666,65 @@ $(document).ready(function(){
                 foundLink   = matches[0];
                 foundDomain = matches[2];
 
-                Events.fire("post_describe_link", [
-                    foundLink,
-                    function(result) {
-                        if (result) {
-                            $linkDescription.empty();
-                            $linkStatus.empty();
+                Events.fire("post_describe_link", foundLink, function(result) {
+                    if (result) {
+                        $linkDescription.empty();
+                        $linkStatus.empty();
 
-                            var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
-                            $linkDescription.append($descriptionLayout);
+                        var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
+                        $linkDescription.append($descriptionLayout);
 
-                            // отрисовываем ссылку
-                            if (result.img) {
-                                var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css(
-                                    {
-                                        'background-image' : 'url('+result.img+')'
-                                    }
-                                );
+                        // отрисовываем ссылку
+                        if (result.img) {
+                            var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css(
+                                {
+                                    'background-image' : 'url('+result.img+')'
+                                }
+                            );
 
-                                $linkDescription.prepend($imgBlock);
-                            }
-                            if (result.title) {
-                                var $a = $('<a />', {
-                                    href: foundLink,
-                                    target: '_blank',
-                                    html: '<span>'+result.title+'</span>',
-                                    title:'Редактировать заголовок'
-                                });
-                                var $h = $('<div></div>',{'class':'post_describe_header'});
-                                $h.append($a);
-                                $descriptionLayout.append($h);
-                            }
-                            if (result.description) {
-                                var $p = $('<p />', {
-                                    html: '<span>'+result.description+'</span>',
-                                    title:'Редактировать описание'
-                                });
-                                $descriptionLayout.append($p);
-                            }
-
-                            editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
-
-                            var $span = $('<span />', { text: 'Ссылка: ' });
-                            $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
-
-                            var $deleteLink = $('<a />', { 'class': 'delete-link', text: 'удалить' }).click(function() {
-                                // убираем аттач ссылки
-                                deleteLink();
-                            });
-                            var $reloadLink = $('<a />', { 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
-                                link = foundLink;
-                                deleteLink();
-                                parseUrl(link);
-                            });
-                            $span.append($deleteLink);
-                            $span.append($reloadLink);
-
-                            $linkStatus.html($span);
-
-                            $linkInfo.show();
+                            $linkDescription.prepend($imgBlock);
                         }
+                        if (result.title) {
+                            var $a = $('<a />', {
+                                href: foundLink,
+                                target: '_blank',
+                                html: '<span>'+result.title+'</span>',
+                                title:'Редактировать заголовок'
+                            });
+                            var $h = $('<div></div>',{'class':'post_describe_header'});
+                            $h.append($a);
+                            $descriptionLayout.append($h);
+                        }
+                        if (result.description) {
+                            var $p = $('<p />', {
+                                html: '<span>'+result.description+'</span>',
+                                title:'Редактировать описание'
+                            });
+                            $descriptionLayout.append($p);
+                        }
+
+                        editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
+
+                        var $span = $('<span />', { text: 'Ссылка: ' });
+                        $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
+
+                        var $deleteLink = $('<a />', { 'class': 'delete-link', text: 'удалить' }).click(function() {
+                            // убираем аттач ссылки
+                            deleteLink();
+                        });
+                        var $reloadLink = $('<a />', { 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
+                            link = foundLink;
+                            deleteLink();
+                            parseUrl(link);
+                        });
+                        $span.append($deleteLink);
+                        $span.append($reloadLink);
+
+                        $linkStatus.html($span);
+
+                        $linkInfo.show();
                     }
-                ]);
+                });
             }
         };
 
@@ -884,9 +881,9 @@ $(document).ready(function(){
 
                 $('.editImagePopup .close').click();
 
-                Events.fire('post_link_data', [data, function(state){
+                Events.fire('post_link_data', data, function(state){
 
-                }]);
+                });
             }
         };
 
@@ -927,7 +924,7 @@ $(document).ready(function(){
                 return input.focus();
             } else {
                 form.addClass("spinner");
-                Events.fire("post", [
+                Events.fire("post",
                     input.val(),
                     photos,
                     link,
@@ -940,7 +937,7 @@ $(document).ready(function(){
                         form.removeClass("spinner");
                         input.blur();
                     }
-                ]);
+                );
             }
         });
         form.delegate(".cancel", "click" ,function(e){
@@ -962,11 +959,11 @@ $(document).ready(function(){
 
             if ($post.editing) return;
 
-            Events.fire('load_post_edit', [postId, function(state, data){
+            Events.fire('load_post_edit', postId, function(state, data){
                 if (state && data) {
                     new SimpleEditPost(postId, $post, $content, data);
                 }
-            }]);
+            });
         });
 
         // Редактирование поста в левом меню
@@ -978,7 +975,7 @@ $(document).ready(function(){
 
             if ($post.editing) return;
 
-            Events.fire('load_post_edit', [postId, function(state, data){
+            Events.fire('load_post_edit', postId, function(state, data){
                 if (state && data) {
 
                     (function($post, $el, data) {
@@ -1009,127 +1006,124 @@ $(document).ready(function(){
                             }
                         }
                         function addLink(link, domain, el) {
-                            Events.fire("post_describe_link", [
-                                link,
-                                function(data) {
-                                    var savePost = function(d) {
-                                        d = d || {};
-                                        Events.fire('post_link_data', [
-                                            {
-                                                link: d.link || link,
-                                                header: d.title || data.title,
-                                                coords: d.coords || data.coords,
-                                                description: d.description || data.description
-                                            }, function(data) {
-                                                if (data) {
-                                                    if (data.img) {
-                                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
-                                                    }
-                                                    popupSuccess('Изменения сохранены');
+                            Events.fire("post_describe_link", link, function(data) {
+                                var savePost = function(d) {
+                                    d = d || {};
+                                    Events.fire('post_link_data', [
+                                        {
+                                            link: d.link || link,
+                                            header: d.title || data.title,
+                                            coords: d.coords || data.coords,
+                                            description: d.description || data.description
+                                        }, function(data) {
+                                            if (data) {
+                                                if (data.img) {
+                                                    el.find('.link-img').css('background-image', 'url(' + data.img + ')');
                                                 }
+                                                popupSuccess('Изменения сохранены');
                                             }
-                                        ]);
-                                    };
-                                    var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
-                                        $links.html('');
-                                    });
-                                    el.html(linkTplFull);
-                                    el.find('a').attr('href', link).html(domain);
-                                    el.find('.link-status-content').append($del);
+                                        }
+                                    ]);
+                                };
+                                var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                                    $links.html('');
+                                });
+                                el.html(linkTplFull);
+                                el.find('a').attr('href', link).html(domain);
+                                el.find('.link-status-content').append($del);
 
-                                    if (data.img) {
-                                        el.find('.link-img')
-                                            .css('background-image', 'url(' + data.img + ')')
-                                            .click(function() {
-                                                var originalImage = new Image();
-                                                originalImage.src = data.imgOriginal;
-                                                originalImage.onload = function () {
-                                                    var linkImageCoords = {};
-                                                    var closePopup = function() {
-                                                        $popup.remove();
-                                                        $bg.remove();
-                                                    };
-                                                    var showPreview = function(coords)
-                                                    {
-                                                        linkImageCoords = coords;
-                                                        var $preview = $popup.find('.preview');
-                                                        var rx = $preview.width() / coords.w;
-                                                        var ry = $preview.height() / coords.h;
+                                if (data.img) {
+                                    el.find('.link-img')
+                                        .css('background-image', 'url(' + data.img + ')')
+                                        .click(function() {
+                                            var originalImage = new Image();
+                                            originalImage.src = data.imgOriginal;
+                                            originalImage.onload = function () {
+                                                var linkImageCoords = {};
+                                                var closePopup = function() {
+                                                    $popup.remove();
+                                                    $bg.remove();
+                                                };
+                                                var showPreview = function(coords)
+                                                {
+                                                    linkImageCoords = coords;
+                                                    var $preview = $popup.find('.preview');
+                                                    var rx = $preview.width() / coords.w;
+                                                    var ry = $preview.height() / coords.h;
 
-                                                        $preview.find('> img').css({
-                                                            width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
-                                                            height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
-                                                            marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-                                                            marginTop: '-' + Math.round(ry * coords.y) + 'px'
-                                                        });
-                                                    };
-                                                    var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
-                                                    var $popup = $('<div/>', {
-                                                            'class': 'popup-image-edit',
-                                                            'html': '<div class="title">Редактировать изображение</div>'+
-                                                                '<div class="close"></div>' +
-                                                                '<div class="left-column">' +
-                                                                    '<div class="original"><img src="'+originalImage.src+'" /></div>' +
-                                                                '</div>' +
-                                                                '<div class="right-column">' +
-                                                                    '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                                                    '<div class="button save">Сохранить</div>'+
-                                                                '</div>'
-                                                        })
-                                                        .appendTo('body');
-
-                                                    $bg.click(closePopup);
-                                                    $popup.css({'margin-left': -$popup.width()/2});
-                                                    $popup.find('.close').click(closePopup);
-                                                    $popup.find('.save').click(function() {
-                                                        data.coords = linkImageCoords;
-                                                        savePost({coords: linkImageCoords});
-                                                        closePopup();
-                                                    });
-                                                    $popup.find('.original > img').Jcrop({
-                                                        onChange: showPreview,
-                                                        onSelect: showPreview,
-                                                        aspectRatio: 2.06,
-                                                        minSize: [130,63],
-                                                        setSelect: [0,0,130,63]
+                                                    $preview.find('> img').css({
+                                                        width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+                                                        height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+                                                        marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                                                        marginTop: '-' + Math.round(ry * coords.y) + 'px'
                                                     });
                                                 };
-                                            });
-                                    } else {
-                                        el.find('.link-img').remove();
-                                    }
-                                    if (data.title) {
-                                        el.find('div.link-description-text a')
-                                            .text(data.title)
-                                            .click(function() {
-                                                var $title = $(this);
-                                                $title.attr('contenteditable', true).focus();
-                                                return false;
-                                            })
-                                            .blur(function() {
-                                                var $title = $(this);
-                                                $title.attr('contenteditable', false);
-                                                data.title = $title.text();
-                                                savePost({title: $title.text()});
-                                            });
-                                    }
-                                    if (data.description) {
-                                        el.find('div.link-description-text p')
-                                            .text(data.description)
-                                            .click(function() {
-                                                var $description = $(this);
-                                                $description.attr('contenteditable', true).focus();
-                                                return false;
-                                            })
-                                            .blur(function() {
-                                                var $description = $(this);
-                                                $description.attr('contenteditable', false);
-                                                data.description = $description.text();
-                                                savePost({description: $description.text()});
-                                            });
-                                    }
+                                                var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
+                                                var $popup = $('<div/>', {
+                                                        'class': 'popup-image-edit',
+                                                        'html': '<div class="title">Редактировать изображение</div>'+
+                                                            '<div class="close"></div>' +
+                                                            '<div class="left-column">' +
+                                                                '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                                            '</div>' +
+                                                            '<div class="right-column">' +
+                                                                '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                                                '<div class="button save">Сохранить</div>'+
+                                                            '</div>'
+                                                    })
+                                                    .appendTo('body');
+
+                                                $bg.click(closePopup);
+                                                $popup.css({'margin-left': -$popup.width()/2});
+                                                $popup.find('.close').click(closePopup);
+                                                $popup.find('.save').click(function() {
+                                                    data.coords = linkImageCoords;
+                                                    savePost({coords: linkImageCoords});
+                                                    closePopup();
+                                                });
+                                                $popup.find('.original > img').Jcrop({
+                                                    onChange: showPreview,
+                                                    onSelect: showPreview,
+                                                    aspectRatio: 2.06,
+                                                    minSize: [130,63],
+                                                    setSelect: [0,0,130,63]
+                                                });
+                                            };
+                                        });
+                                } else {
+                                    el.find('.link-img').remove();
                                 }
-                            ]);
+                                if (data.title) {
+                                    el.find('div.link-description-text a')
+                                        .text(data.title)
+                                        .click(function() {
+                                            var $title = $(this);
+                                            $title.attr('contenteditable', true).focus();
+                                            return false;
+                                        })
+                                        .blur(function() {
+                                            var $title = $(this);
+                                            $title.attr('contenteditable', false);
+                                            data.title = $title.text();
+                                            savePost({title: $title.text()});
+                                        });
+                                }
+                                if (data.description) {
+                                    el.find('div.link-description-text p')
+                                        .text(data.description)
+                                        .click(function() {
+                                            var $description = $(this);
+                                            $description.attr('contenteditable', true).focus();
+                                            return false;
+                                        })
+                                        .blur(function() {
+                                            var $description = $(this);
+                                            $description.attr('contenteditable', false);
+                                            data.description = $description.text();
+                                            savePost({description: $description.text()});
+                                        });
+                                }
+                            });
                         }
                         function addPhoto(path, filename, el) {
                             var $photo = $('<span/>', {class: 'attachment'})
@@ -1188,13 +1182,13 @@ $(document).ready(function(){
                             if (!($.trim(text) || link || photos.length)) {
                                 return $text.focus();
                             } else {
-                                Events.fire("post", [
+                                Events.fire("post",
                                     text,
                                     photos,
                                     link,
                                     postId,
                                     function(data) {}
-                                ]);
+                                );
                             }
                         };
                         var onCancel = function() {
@@ -1244,7 +1238,7 @@ $(document).ready(function(){
                         }
                     })($post, $content, data);
                 }
-            }]);
+            });
         });
     })();
 
@@ -1265,18 +1259,18 @@ $(document).ready(function(){
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
-        Events.fire('comment_delete', [commentId, function() {
+        Events.fire('comment_delete', commentId, function() {
             $comment.data('html', $comment.html());
             $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
-        }]);
+        });
     });
     $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
-        Events.fire('comment_restore', [commentId, function() {
+        Events.fire('comment_restore', commentId, function() {
             $comment.removeClass('deleted').html($comment.data('html'));
-        }]);
+        });
     });
     $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
@@ -1290,7 +1284,7 @@ $(document).ready(function(){
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('comment_post', [postId, $textarea.val(), function(html) {
+            Events.fire('comment_post', postId, $textarea.val(), function(html) {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $commentsList.append(html).find('.date').easydate(easydateParams);
@@ -1301,7 +1295,7 @@ $(document).ready(function(){
                     $moderation.data('checked', true);
                     Events.fire('leftcolumn_reject_post', postId, function() {});
                 }
-            }]);
+            });
         }
     });
     $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
@@ -1311,10 +1305,10 @@ $(document).ready(function(){
         var postId = $post.data('id');
         var tmpText = $target.text();
         $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', [{postId: postId, all: true}, function(html) {
+        Events.fire('comment_load', {postId: postId, all: true}, function(html) {
             $target.removeClass('load').html(tmpText);
             $commentsList.html(html).find('.date').easydate(easydateParams);
-        }]);
+        });
     });
     $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
         var $target = $(this);
@@ -1323,10 +1317,10 @@ $(document).ready(function(){
         var postId = $post.data('id');
         var tmpText = $target.text();
         $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', [{postId: postId, all: false}, function(html) {
+        Events.fire('comment_load', {postId: postId, all: false}, function(html) {
             $target.removeClass('load').html(tmpText);
             $commentsList.html(html).find('.date').easydate(easydateParams);
-        }]);
+        });
     });
     $(document).on('mousedown', function(e) {
         var $newComment = $(e.target).closest('.new-comment.open');
@@ -1434,8 +1428,8 @@ var Events = {
     fire: function(name){
         var t = this;
         var args;
-        if (typeof arguments[0] === 'array' && !arguments[1]) {
-            args = arguments[0];
+        if (arguments.length == 2 && arguments[1] && arguments[1].length) {
+            args = arguments[1];
         } else {
             args = Array.prototype.slice.call(arguments, 1);
         }
@@ -1501,13 +1495,13 @@ var Elements = {
             $(".slot .post .content").addClass("dragged");
             var target = false;
             var dragdrop = function(post, slot, queueId, callback, failback){
-                Events.fire('post_moved', [post, slot, queueId, function(state, newId){
+                Events.fire('post_moved', post, slot, queueId, function(state, newId){
                     if (state) {
                         callback(newId);
                     } else {
                         failback();
                     }
-                }]);
+                });
             };
 
             var draggableParams = {
