@@ -59,6 +59,9 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
 
     protected function processRequestCustom(){
+
+        unset($this->options['_sourceFeedId']);
+
         $author = $this->getAuthor();
         $RoleUtility = new RoleAccessUtility($author->vkId);
         // получаем доступные ленты

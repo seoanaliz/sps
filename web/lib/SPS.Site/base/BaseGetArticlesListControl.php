@@ -139,6 +139,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
 
         // если запрашиваем авторские посты
         if ($sourceFeedType == SourceFeedUtility::Authors) {
+            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
+
             $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
             if ($ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
 
@@ -218,6 +220,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
     protected function getObjects()
     {
         $this->articles = ArticleFactory::Get($this->search, $this->options);
+
         $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
 
         $this->hasMore = (count($this->articles) > $this->pageSize);
