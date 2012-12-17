@@ -807,7 +807,7 @@ var RightColumn = Widget.extend({
     },
     clickList: function(e) {
         var t = this;
-        if (t._isDragging) return;
+//        if (t._isDragging) return;
         var $list = $(e.currentTarget);
         var listId = $list.data('id');
         t.setList(listId, true);
@@ -893,8 +893,9 @@ var RightColumn = Widget.extend({
                 item.isSelected(false);
             }
         }
+        var scroll_lock = $('#right-column .scroll-like-mac').scrollTop();
         t.renderTemplate();
-
+        $('#right-column .scroll-like-mac').scrollTop(scroll_lock);
         if (isTrigger) t.trigger('setList', listId);
     },
     setDialog: function(dialogId, isTrigger) {

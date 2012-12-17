@@ -15,7 +15,7 @@
          */
         public function Execute() {
             error_reporting( 0 );
-            $user_id        =   Request::getInteger( 'userId' );
+            $user_id        =   AuthVkontakte::IsAuth();
             $group_ids      =   Request::getString(  'groupId' );
             $recipients_ids =   Request::getString(  'recId' );
             $general        =   Request::getInteger( 'general' );
