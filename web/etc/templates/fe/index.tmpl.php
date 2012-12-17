@@ -97,6 +97,7 @@
                     <div class="calendar">
                         <div class="prev"></div>
                         <input type="text" id="calendar" value="<?= $currentDate->DefaultDateFormat() ?>"/>
+                        <input type="text" id="calendar-fix"/>
                         <div class="next"></div>
                         <div class="caption default">Дата</div>
                         <div class="tip"></div>

@@ -15,6 +15,7 @@ b {font-weight: bold;}
 i {font-style: italic;}
 
 #calendar,
+#calendar-fix,
 .calendar,
 .drop-down {
     background: #fff;
@@ -155,7 +156,8 @@ i {font-style: italic;}
     border-color: #97A4C4;
 }
 
-#calendar {
+#calendar,
+#calendar-fix {
     position: absolute;
     border: none;
     background: none;
@@ -169,9 +171,12 @@ i {font-style: italic;}
     font-size: 12px;
     text-align: center;
     text-transform: lowercase;
-    width: 65px;
+    width: 85px;
     height: 25px;
-    padding: 0 15px;
+    padding: 0 5px;
+}
+#calendar {
+    visibility: hidden;
 }
 .calendar {
     position: relative;

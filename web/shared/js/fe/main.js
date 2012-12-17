@@ -27,7 +27,9 @@ $(document).ready(function(){
         monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         firstDay: 1,
         showAnim: '',
-        dateFormat: "d MM               yy"
+        dateFormat: 'd MM yy',
+        altField: '#calendar-fix',
+        altFormat: 'd MM'
     });
 
     var $leftPanel = $('.left-panel');
@@ -43,8 +45,9 @@ $(document).ready(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
             Events.fire('calendar_change', []);
         });
-    $(".calendar .tip").click(function(){
-        $(this).closest(".calendar").find("input").focus();
+
+    $(".calendar .tip, #calendar-fix").click(function(){
+        $("#calendar").focus();
     });
 
     // Приведение вида календаря из 22.12.2012 в 22 декабря
