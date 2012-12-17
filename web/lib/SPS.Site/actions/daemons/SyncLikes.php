@@ -87,7 +87,7 @@ class SyncLikes {
             'sentAtTo' => $to,
             'externalIdNot' => '1',
             'externalIdExist' => true,
-            'emptyExternalLikes' => true,
+//            'emptyExternalLikes' => true,
             'pageSize' => $this->maxArticlesSelectFromQueue
         );
 
@@ -120,10 +120,9 @@ class SyncLikes {
                 WHERE 1=1
                 AND aq."externalId" IS NOT NULL
                 AND aq."externalId" != \'1\'
-                AND aq."externalLikes" IS NULL
+                AND aq."exte  rnalLikes" IS NULL
                 ORDER BY random()
                 LIMIT 3000';
-
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get() );
         $ds         = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
