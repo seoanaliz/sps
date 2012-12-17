@@ -15,7 +15,7 @@ class SyncLikes {
      * макс. кол-во постов которое будем обрабатывать за один раз
      * @var int
      */
-    private $maxArticlesSelectFromQueue = 100;
+    private $maxArticlesSelectFromQueue = 2000;
 
     public function Execute() {
         set_time_limit(0);
