@@ -72,6 +72,7 @@ $(document).ready(function(){
     $multiSelect.multiselect({
         minWidth: 250,
         height: 250,
+        classes: $multiSelect.data('classes'),
         checkAllText: 'Выделить все',
         uncheckAllText: 'Сбросить',
         noneSelectedText: '<span class="gray">Источник не выбран</span>',

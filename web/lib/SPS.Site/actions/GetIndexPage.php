@@ -74,6 +74,14 @@ class GetIndexPage extends BaseControl
         }
         $articleStatuses = Article::getStatuses();
 
+        $isShowSourceList = true;
+        if ($currentTargetFeedId) {
+            $role = $ArticleAccessUtility->getRoleForTargetFeed($currentTargetFeedId);
+            if ($role == UserFeed::ROLE_AUTHOR){
+                $isShowSourceList = false;
+            }
+        }
+
         Response::setArray('sourceFeeds', $sourceFeeds);
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));
         Response::setArray('targetFeeds', $targetFeeds);
@@ -85,6 +93,8 @@ class GetIndexPage extends BaseControl
         Response::setParameter('gridTypes', $gridTypes);
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
+
+        Response::setParameter('isShowSourceList', $isShowSourceList);
     }
 }
 

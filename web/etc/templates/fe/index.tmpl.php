@@ -31,7 +31,7 @@
                     ?>
                 </div>
 
-                <select multiple="multiple" id="source-select">
+                <select multiple="multiple" id="source-select" <?=!$isShowSourceList ? 'data-classes="hide"' : ''?>>
                     <?
                     foreach ($sourceFeeds as $sourceFeed) {
                         ?><option value="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</option><?
