@@ -323,6 +323,7 @@ $(document).ready(function(){
 
         Events.fire('get_author_articles', $(this).data('article-status'), function(html) {
             $('#wall').html(html);
+            Elements.initImages();
         });
     });
 
@@ -1453,7 +1454,7 @@ var Events = {
 };
 
 var Elements = {
-    initImages: function(selector){
+    initImages: function(){
         $(".fancybox-thumb").fancybox({
             prevEffect		: 'none',
             nextEffect		: 'none',
@@ -1484,7 +1485,6 @@ var Elements = {
             img.src = src;
         });
 
-
         $(".left-panel .timestamp").easydate(easydateParams);
         $(".left-panel .date").easydate(easydateParams);
         $('.left-panel .images-ready').imageComposition();
@@ -1493,7 +1493,6 @@ var Elements = {
     addEvents: function(){
         (function(){
             $(".slot .post .content").addClass("dragged");
-            var target = false;
             var dragdrop = function(post, slot, queueId, callback, failback){
                 Events.fire('post_moved', post, slot, queueId, function(state, newId){
                     if (state) {
@@ -1532,9 +1531,7 @@ var Elements = {
 
                 drop: function(e, ui) {
                     var $target = $(this),
-                        $post = $(ui.draggable).closest('.post'),
-                        $slot = $post.closest('.slot'),
-                        $helper = $(ui.helper);
+                        $post = $(ui.draggable).closest('.post');
 
                     if ($target.hasClass('empty')) {
                         dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
@@ -1621,30 +1618,4 @@ var Elements = {
             Elements.initLinkLoader($(this), true);
         });
     }
-};
-
-$.fn.dd_sel = function(id){
-    var elem = $(this);
-    if(!elem.hasClass("drop-down")) return;
-    if(id) {
-        elem = elem.find("li[data-id=" + id + "]");
-    } else {
-        elem = elem.find("li:first");
-    }
-
-    $(this).find('li.active').removeClass('active');
-    elem.addClass('active');
-
-    if(elem.length) {
-        $(this)
-            .data("selected",elem.data("id"))
-            .find(".caption")
-            .text(elem.text())
-            .removeClass("default");
-    } else {
-        $(this)
-            .data("selected",0)
-            .find(".caption").text('Источник').addClass("default");
-    }
-    $(this).trigger("change");
 };
