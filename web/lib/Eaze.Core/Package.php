@@ -56,6 +56,11 @@
          */
         public static $CurrentUri;
 
+        /**
+         * Force disable package compiling
+         * @var bool
+         */
+        private static $ForceDisableCompile = false;
 
         /**
          * Begin URI
@@ -276,16 +281,18 @@
             if ( Package::WithPackageCompile() ) {
                 $packageCompiledFlag = sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
                 $handle = fopen($packageCompiledFlag, 'c+');
-                if (flock($handle, LOCK_EX | LOCK_NB)) {
-                    $pid = fgets($handle, 4096);
-                    if (empty($pid)) {
-                        fputs($handle, getmypid());
-                        Logger::Info('LOCK');
+                if ( flock ( $handle, LOCK_EX | LOCK_NB ) ) {
+                    $pid = fgets( $handle, 4096 );
+                    if ( empty( $pid ) ) {
+                        $pid = getmypid();
+                        Logger::Info( "Lock of " . Package::CompiledEaze . " acquired with pid $pid. Flushing compiled cache" );
+                        fputs($handle, $pid);
                         Package::FlushCompiledCache();
                         touch( $packageCompiledFlag );
                     }
                 } else {
-                    //TODO force disable package compile
+                    Logger::Info( "Lock of " . Package::CompiledEaze . " already exists. Turning WITH_PACKAGE_COMPILE off" );
+                    self::$ForceDisableCompile = true;
                 }
             }
         }
@@ -296,7 +303,7 @@
          * @return bool
          */
         public static function WithPackageCompile() {
-            if ( defined( Package::WithPackageCompile ) ) {
+            if ( defined( Package::WithPackageCompile ) && !self::$ForceDisableCompile ) {
                 if ( WITH_PACKAGE_COMPILE ) {
                     return true;
                 }
