@@ -1607,7 +1607,7 @@ var Elements = {
 
                 var matches = link.match(pattern);
 
-                shortLink = link;
+                var shortLink = link;
                 if (matches[2]) {
                     shortLink = matches[2];
                 }
