@@ -29,7 +29,8 @@ if (!window.localStorage) {
 if (!window.console) {
     window.console = {
         log: function(params) {},
-        dir: function(params) {}
+        dir: function(params) {},
+        error: function(params) {}
     };
 }
 
