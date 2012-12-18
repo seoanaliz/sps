@@ -63,9 +63,8 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         unset($this->options['_sourceFeedId']);
 
         $author = $this->getAuthor();
-        $RoleUtility = new RoleAccessUtility($author->vkId);
         // получаем доступные ленты
-        $targetFeedIds = $RoleUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+        $targetFeedIds = $this->ArticleAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 
 
         //все авторские посты

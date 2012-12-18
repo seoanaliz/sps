@@ -72,6 +72,7 @@ $(document).ready(function(){
     $multiSelect.multiselect({
         minWidth: 250,
         height: 250,
+        classes: $multiSelect.data('classes'),
         checkAllText: 'Выделить все',
         uncheckAllText: 'Сбросить',
         noneSelectedText: '<span class="gray">Источник не выбран</span>',
@@ -319,9 +320,10 @@ $(document).ready(function(){
     // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
     $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
         $leftPanel.find('.authors-tabs .tab').removeClass('selected');
-        $(this).addClass('selected');
+        var tab = $(this);
+        tab.addClass('selected');
 
-        Events.fire('get_author_articles', $(this).data('article-status'), function(html) {
+        Events.fire('get_author_articles', tab.data('article-status'), tab.data('mode'), function(html) {
             $('#wall').html(html);
             Elements.initImages();
         });

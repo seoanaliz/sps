@@ -31,7 +31,7 @@
                     ?>
                 </div>
 
-                <select multiple="multiple" id="source-select">
+                <select multiple="multiple" id="source-select" <?=!$isShowSourceList ? 'data-classes="hide"' : ''?>>
                     <?
                     foreach ($sourceFeeds as $sourceFeed) {
                         ?><option value="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</option><?
@@ -44,12 +44,13 @@
                 </div>
 
                 <div class="authors-tabs tab-bar no-padding">
+                    <div class="authors-tab-new tab" data-mode="all">Все</div>
                     <?
                     $isFirst = true;
                     foreach ($articleStatuses as $articleStatus => $statusName) :
                         $isHidden = !in_array($articleStatus, $availableArticleStatuses);
                     ?>
-                    <div class="authors-tab-new tab<?=($isFirst && !$isHidden) ? ' selected' : ''?>" <?=$isHidden ? 'style="display:none"' : ''?> data-article-status="<?=$articleStatus?>"><?=$statusName?></div>
+                    <div class="authors-tab-new tab<?=($isFirst && !$isHidden) ? ' selected' : ''?>" <?=$isHidden ? 'style="display:none"' : ''?>  data-mode="my" data-article-status="<?=$articleStatus?>"><?=$statusName?></div>
                     <?
                         if (!$isHidden){
                             $isFirst = false;
