@@ -23,6 +23,8 @@
 
         const AuthorsList = 'authors-list';
 
+        const My = 'my';
+
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
@@ -30,6 +32,7 @@
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
+            self::My => 'Мои публикации',
             self::Authors => 'Авторские',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',

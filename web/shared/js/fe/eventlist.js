@@ -101,10 +101,6 @@ function loadArticles(clean) {
         if (typeof articleStatus != 'undefinded'){
             requestData['articleStatus'] = articleStatus;
         }
-        var mode = selectedTab.data('mode');
-        if (typeof mode != 'undefinded'){
-            requestData['mode'] = mode;
-        }
     }
 
     //clean and load left column
@@ -352,7 +348,6 @@ var Eventlist = {
                 $sourceTypeLink.addClass('active');
             }
             sourceType = $sourceTypeLink.data('type');
-
             if (sourceType != 'source' && sourceType != 'albums') {
                 $('#slider-text').hide();
                 $('#slider-cont').hide();
@@ -363,15 +358,34 @@ var Eventlist = {
                 $('#filter-list a').show();
             }
 
-            if (sourceType == 'authors') {
-                $multiSelect.multiselect('getButton').addClass('hide');
+            if (data['showSourceList']) {
+                $multiSelect.multiselect('getButton').removeClass('hidden');
+            } else {
+                $multiSelect.multiselect('getButton').addClass('hidden');
+            }
+
+            // фильтры по типу постов
+            if (data['showArticleStatusFilter']) {
                 $leftPanel.find('.authors-tabs .tab').removeClass('selected');
                 $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
                 $leftPanel.find('.authors-tabs').show();
             } else {
-                $multiSelect.multiselect('getButton').removeClass('hide');
                 $leftPanel.find('.authors-tabs').hide();
             }
+
+            // группы юзеров
+            var userGroupTabs = $('.user-groups-tabs');
+            if (data['showUserGroups']){
+                userGroupTabs.find('.tab').remove();
+                userGroupTabs.removeClass('hidden');
+                var userGroups = data['showUserGroups'];
+                for (var i in userGroups){
+                    userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                }
+            } else {
+                userGroupTabs.addClass('hidden');
+            }
+
 
             $.cookie('sourceTypes' + targetFeedId, sourceType);
 
@@ -632,6 +646,26 @@ var Eventlist = {
         callback();
     },
 
+    add_article_group: function(targetFeedId, name, callback) {
+        $.ajax({
+            url: controlsRoot + 'add-user-group/',
+            type: 'POST',
+            dataType : "json",
+            data: {
+                name: name,
+                targetFeedId: targetFeedId
+            },
+            success: function (data) {
+                if(data.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
+    },
+
+
     leftcolumn_sort_type_change: function() {
         loadArticles(true);
     },
@@ -686,7 +720,7 @@ var Eventlist = {
         });
     },
 
-    get_author_articles: function(articleStatus, mode, callback) {
+    get_author_articles: function(articleStatus, callback) {
         var slider = $( "#slider-range" );
         var from = slider.slider( "values", 0 );
         var to = slider.slider( "values", 1 );
@@ -705,9 +739,7 @@ var Eventlist = {
         if (typeof articleStatus != 'undefined'){
             requestData['articleStatus'] = articleStatus;
         }
-        if (typeof mode != 'undefined'){
-            requestData['mode'] = mode;
-        }
+
 
         $.ajax({
             url: controlsRoot + 'arcticles-list/',

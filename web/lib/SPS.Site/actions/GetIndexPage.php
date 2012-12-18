@@ -16,6 +16,7 @@ class GetIndexPage extends BaseControl
     public function Execute()
     {
         $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+
         /**
          * current values from settings
          */
@@ -30,7 +31,6 @@ class GetIndexPage extends BaseControl
         /**
          * target feeds
          */
-
         $targetFeeds = array();
 
         $targetFeedIds = $SourceAccessUtility->getAllTargetFeedIds();

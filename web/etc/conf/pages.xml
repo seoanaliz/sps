@@ -104,6 +104,11 @@
                 <page uri="controls://article-reject/">
                     <actions>SPS.Site.RejectArticleAppControl</actions>
                 </page>
+
+
+                <page uri="controls://add-user-group/">
+                    <actions>SPS.Site.AddUserGroup</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">

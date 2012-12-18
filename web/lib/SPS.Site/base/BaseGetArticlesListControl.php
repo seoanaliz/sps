@@ -156,7 +156,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
                 // фильтр по статусам - только для авторских постов
                 // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
                 $reqArticleStatus = $this->getArticleStatus();
-                Logger::Debug('Get article list with article status ' . $reqArticleStatus);
                 if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
                     $articleStatuses = array($reqArticleStatus);
                 }

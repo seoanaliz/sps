@@ -26,9 +26,7 @@ class RoleAccessUtility
             $vkId = AuthVkontakte::IsAuth();
         }
         if ($vkId) {
-            Logger::Debug('load!!!');
             $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$vkId));
-            Logger::Debug('end load!!!');
             self::$FeedRulesByRole = array();
             foreach ($UserFeeds as $UserFeed) {
                 /** @var $UserFeed UserFeed */
@@ -38,7 +36,6 @@ class RoleAccessUtility
                 self::$FeedRulesByRole[$UserFeed->role][] = $UserFeed->targetFeedId;
                 self::$FeedRulesByFeed[$UserFeed->targetFeedId] = $UserFeed->role;
             }
-
 
             self::$isLoaded = true;
         }

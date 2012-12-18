@@ -4,13 +4,13 @@
  * Date: 16.12.12 13:50
  * In Code We Trust
  */
-class ArticleGroup {
+class UserGroup {
 
     /**
      * Идентификатор группы
      * @var int
      */
-    public $articleGroupId;
+    public $userGroupId;
 
     /**
      * Лента отправки
@@ -23,4 +23,11 @@ class ArticleGroup {
      * @var string
      */
     public $name;
+
+    public function toArray(){
+        return array(
+            'id' => $this->userGroupId,
+            'name' => $this->name
+        );
+    }
 }

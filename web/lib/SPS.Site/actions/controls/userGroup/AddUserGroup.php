@@ -5,7 +5,7 @@ Package::Load('SPS.Site/base');
  * Date: 16.12.12 17:12
  * In Code We Trust
  */
-class AddArticleGroup extends BaseControl {
+class AddUserGroup extends BaseControl {
     public function Execute(){
         $result = array('success' => false);
 
@@ -26,22 +26,22 @@ class AddArticleGroup extends BaseControl {
 
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
-        if (!$TargetFeedAccessUtility->canAddArticleGroup($targetFeedId)) {
+        if (!$TargetFeedAccessUtility->canAddUserGroup($targetFeedId)) {
             $result['message'] = 'Access denied';
             echo ObjectHelper::ToJSON($result);
             return;
         }
 
-        $ArticleGroup = new ArticleGroup();
-        $ArticleGroup->name = $name;
-        $ArticleGroup->targetFeedId = $targetFeedId;
-        $addResult = ArticleGroupFactory::Add($ArticleGroup);
+        $UserGroup = new UserGroup();
+        $UserGroup->name = $name;
+        $UserGroup->targetFeedId = $targetFeedId;
+        $addResult = UserGroupFactory::Add($UserGroup);
 
         if ($addResult) {
+            $UserGroup->userGroupId = UserGroupFactory::GetCurrentId();
             $result = array(
                 'success' => true,
-                'name' => $name,
-                'articleGroupId' => $ArticleGroup->articleGroupId
+                'userGroup' => $UserGroup->toArray(),
             );
             echo ObjectHelper::ToJSON($result);
         } else {
