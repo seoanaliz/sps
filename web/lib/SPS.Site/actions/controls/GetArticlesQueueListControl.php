@@ -32,9 +32,12 @@
             $articlesQueue  = array();
 
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-                $targetFeedId = null;
-            }
+            //if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+            //    $targetFeedId = null;
+            //}
+
+
+
 
             if(!empty($targetFeedId) && !empty($targetFeed)) {
                 //вытаскиваем всю очередь на этот день на этот паблик
