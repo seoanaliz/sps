@@ -58,6 +58,8 @@ $jsFiles = array(
     'js://im/endless-page.js',
     'js://im/dialogs.js',
     'js://im/messages.js',
+    'js://im/left-column.js',
+    'js://im/right-column.js',
     'js://im/tabs.js',
     'js://im/login.js',
     'js://im/events.js',

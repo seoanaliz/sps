@@ -229,3 +229,269 @@ var Tabs = Widget.extend({
         }
     }
 });
+
+function CreateTemplateBox(listId, text, isFocused, onHide) {
+    var box = new Box({
+        title: 'Готовые ответы',
+        html: tmpl(BOX_LOADING, {height: 100}),
+        width: 600,
+        onhide: function() {
+            if ($.isFunction(onHide)) {
+                onHide();
+            }
+        },
+        onshow: function() {
+            Events.fire('get_lists', function(data) {
+                var list = data.list;
+                var listsIds = [];
+                var clearLists = [];
+                var currentList = {};
+                var additionFormInited = false;
+
+                $.each(list, function(i, listItem) {
+                    if (listItem.id) {
+                        clearLists.push(listItem);
+                    }
+                    if (listId == listItem.id) {
+                        currentList = listItem;
+                    }
+                });
+
+                box.setHTML(tmpl(SAVE_TEMPLATE_BOX, {text: text}));
+
+                var $input = box.$el.find('.lists');
+                var $textarea = box.$el.find('.template-text');
+                var templateText = $textarea.val();
+                var $templateList = box.$el.find('.template-list');
+                var $addTemplateBtn = box.$el.find('.save-template');
+                var $openedAdditionForm = box.$el.find('.add-template-opened');
+                var $closedAdditionForm = box.$el.find('.add-template-closed');
+                var $openAdditionFormTrigger = $closedAdditionForm.find('input');
+                var $closeAdditionFormTrigger = $openedAdditionForm.find('.button.cancel');
+
+                $openAdditionFormTrigger.focus(openAdditionForm);
+                $closeAdditionFormTrigger.click(closeAdditionForm);
+                $addTemplateBtn.click(addTemplate);
+
+                $textarea.keydown(function(e) {
+                    if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
+                        addTemplate();
+                    }
+                });
+
+                $templateList.delegate('.icon.delete', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var messageId = $message.data('id');
+                    var deleteBox = new Box({
+                        id: 'templateDeleteBox' + messageId,
+                        title: 'Удаление',
+                        html: 'Вы уверены, что хотите удалить шаблон?',
+                        buttons: [
+                            {label: 'Удалить', onclick: function() {
+                                deleteTemplate.call(this, messageId);
+                            }},
+                            {label: 'Отмена', isWhite: true}
+                        ]
+                    }).show();
+                });
+
+                $templateList.delegate('.icon.edit', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    var $textarea = $message.find('.content textarea');
+                    var $actions = $message.find('.content > .actions');
+
+                    if (!$text.data('textarea')) {
+                        $text.data('textarea', true);
+                        $textarea.on('keydown', function(e) {
+                            if (e.keyCode == KEY.ENTER && (e.ctrlKey || e.metaKey)) {
+                                saveTemplate();
+                            }
+                        });
+                        $actions.find('.button.save-template').click(function(e) {
+                            saveTemplate();
+                        });
+                        $actions.find('.button.cancel').click(function(e) {
+                            editModeOff();
+                        });
+                        $text.after($textarea);
+                        $textarea.autoResize().wrap('<div class="input-wrap" />');
+                    }
+
+                    $templateList.delegate('.tag-plus', 'click', function() {
+                        var tags = getTags($message);
+                        $target = $(this);
+                        $target.dropdown({
+                            isShow: true,
+                            addClass: 'ui-dropdown-add-to-list-tabs',
+                            data: $.grep(clearLists, function(u) {
+                                var isFound = false;
+                                $.each(tags, function(i, tag) {
+                                    if (tag == u.id) {
+                                        isFound = true;
+                                        return false;
+                                    }
+                                });
+                                return !isFound;
+                            }),
+                            width: 200,
+                            onchange: function(item) {
+                                $target.before($(tmpl(TEMPLATE_LIST_ITEM_LISTS, item)));
+                            }
+                        });
+                    });
+
+                    editModeOn();
+
+                    function editModeOn() {
+                        $message.addClass('edit-mode');
+                        $textarea.val($text[0].innerText).focus().selectRange($text[0].innerText.length, $text[0].innerText.length);
+                    }
+                    function editModeOff() {
+                        $message.removeClass('edit-mode');
+                    }
+                    function saveTemplate() {
+                        if (!$textarea.val()) {
+                            $textarea.focus();
+                            return;
+                        }
+                        editModeOff();
+                        $text.html(makeMsg($textarea.val())).show();
+                        Events.fire('edit_template', messageId, $textarea.val(), getTags($message).join(','), function() {});
+                    }
+                });
+
+                $templateList.delegate('.tag > .delete', 'click', function() {
+                    var $target = $(this);
+                    var $message = $target.closest('.message');
+                    var $tag = $target.closest('.tag');
+                    $tag.remove();
+                    var tags = getTags($message);
+                    var messageId = $message.data('id');
+                    var $text = $message.find('.content > .text');
+                    Events.fire('edit_template', messageId, $text[0].innerText, tags.join(','), function() {});
+                });
+
+
+                function getTags($message) {
+                    var $tags = $message.find('.title > .tag');
+                    var tags = [];
+                    $.each($tags, function() {
+                        var $tag = $(this);
+                        if ($tag.data('id')) {
+                            tags.push($tag.data('id'));
+                        }
+                    });
+                    return tags;
+                }
+
+                function addTemplate() {
+                    var text = $.trim($textarea.val());
+                    if (!text) {
+                        $textarea.focus();
+                        return;
+                    }
+                    $textarea.val('').focus();
+                    $templateList.prepend(tmpl(TEMPLATE_LIST_ITEM, {
+                        id: 'loading',
+                        text: text,
+                        timestamp: '12:21',
+                        user: userCollection.get(Configs.vkId).data(),
+                        lists: []
+                    }));
+                    box.refreshTop();
+
+                    Events.fire('add_template', text, listsIds.join(','), function() {
+                        updateTemplateList();
+                    });
+                }
+
+                function deleteTemplate(templateId) {
+                    var box = this;
+                    box.hide();
+                    Events.fire('delete_template', templateId, function() {
+                        $templateList.find('.message[data-id=' + templateId + ']').slideUp(200);
+                    });
+                }
+
+                function openAdditionForm(e) {
+                    $openedAdditionForm.show();
+                    $closedAdditionForm.hide();
+                    $textarea.focus();
+                    $textarea.selectRange(templateText.length, templateText.length);
+                    box.refreshTop();
+
+                    if (!additionFormInited) {
+                        additionFormInited = true;
+                        $input.tags({
+                            onadd: function(tag) {
+                                listsIds.push(parseInt(tag.id));
+                            },
+                            onremove: function(tagId) {
+                                listsIds = $.grep(listsIds, function(listsIds) {
+                                    return listsIds != tagId;
+                                });
+                            }
+                        }).autocomplete({
+                                data: clearLists,
+                                target: $input.closest('.ui-tags'),
+                                onchange: function(item) {
+                                    $(this).tags('addTag', item).val('').focus();
+                                }
+                            }).keydown(function(e) {
+                                if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                    $(this).tags('removeLastTag');
+                                }
+                            });
+
+                        if (currentList.id) {
+                            $input.tags('addTag', currentList);
+                        }
+                    }
+                }
+
+                function closeAdditionForm(e) {
+                    $openedAdditionForm.hide();
+                    $closedAdditionForm.show();
+                    box.refreshTop();
+                }
+
+                function updateTemplateList() {
+                    Events.fire('get_templates', null, function(data) {
+                        var clearData = [];
+                        $.each(data, function(i, template) {
+                            var clearLists = [];
+
+                            $.each(template.lists, function(i, listId) {
+                                var listModel = listCollection.get(listId);
+                                if (listModel) {
+                                    clearLists.push(listModel.data());
+                                }
+                            });
+
+                            clearData.push({
+                                id: template.id,
+                                text: template.title.split('\n').join('<br>'),
+                                user: userCollection.get(Configs.vkId).data(),
+                                lists: clearLists
+                            });
+                        });
+                        $templateList.removeClass('loading');
+                        $templateList.html(tmpl(TEMPLATE_LIST, {list: clearData}));
+                        box.refreshTop();
+                    });
+                }
+
+                if (isFocused) {
+                    $openAdditionFormTrigger.focus();
+                }
+
+                updateTemplateList();
+            });
+        }
+    });
+    return box;
+}
