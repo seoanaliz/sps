@@ -13,12 +13,12 @@ class getAuthors
     public function execute()
     {
 
-//        error_reporting(0);
+        error_reporting(0);
         $this->conn = ConnectionFactory::Get();
         $user_id    =   AuthVkontakte::IsAuth();
         $public_sb_id  =   Request::getInteger('groupId');
         $res = array();
-        $authors = AuthorFactory::Get( array( '_targetFeedIds' => array( $public_sb_id )));
+        $authors = AuthorFactory::Get( array( '_targetFeedIds' => array( $public_sb_id ), 'pageSize'=>200));
 
         if ( !$authors )
             die( ObjectHelper::ToJSON( array( 'response' => array( 'authors' => array()))));
@@ -30,8 +30,6 @@ class getAuthors
             $state_data[$author->vkId] = $this->get_sent_authors_posts( $public_sb_id, $author->authorId, $author->vkId );
             $users_line .= $author->vkId . ',';
         }
-
-
 
         $total_posts          =     $this->get_all_authors_app_posts( $public_sb_id );
         $total_posts          =     $this->get_all_authors_sb_posts( $public_sb_id, $total_posts );
