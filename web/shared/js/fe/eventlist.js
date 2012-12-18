@@ -86,20 +86,32 @@ function loadArticles(clean) {
         to = 100;
     }
 
+    var requestData = {
+        sourceFeedIds: Elements.leftdd(),
+        page: wallPage,
+        from: from,
+        to: to,
+        sortType: sortType,
+        type: Elements.leftType(),
+        targetFeedId: Elements.rightdd()
+    }
+    var selectedTab = $('.authors-tab-new.selected');
+    if (selectedTab.length) {
+        var articleStatus = selectedTab.data('article-status');
+        if (typeof articleStatus != 'undefinded'){
+            requestData['articleStatus'] = articleStatus;
+        }
+        var mode = selectedTab.data('mode');
+        if (typeof mode != 'undefinded'){
+            requestData['mode'] = mode;
+        }
+    }
+
     //clean and load left column
     $.ajax({
             url: controlsRoot + 'arcticles-list/',
             dataType : "html",
-            data: {
-                sourceFeedIds: Elements.leftdd(),
-                page: wallPage,
-                from: from,
-                to: to,
-                sortType: sortType,
-                type: Elements.leftType(),
-                targetFeedId: Elements.rightdd(),
-                articleStatus: 1
-            }
+            data: requestData,
         }).always(function() {
             $('#wall-load').hide();
             if (clean) {
@@ -673,26 +685,34 @@ var Eventlist = {
             }
         });
     },
-    get_author_articles: function(articleStatus, callback) {
-        var from = $( "#slider-range" ).slider( "values", 0 );
-        var to = $( "#slider-range" ).slider( "values", 1 );
+
+    get_author_articles: function(articleStatus, mode, callback) {
+        var slider = $( "#slider-range" );
+        var from = slider.slider( "values", 0 );
+        var to = slider.slider( "values", 1 );
         var sortType = $('.wall-title a').data('type');
 
         $('#wall-load').show();
+        var requestData =  {
+            sourceFeedIds: Elements.leftdd(),
+            page: wallPage,
+            from: from,
+            to: to,
+            sortType: sortType,
+            type: Elements.leftType(),
+            targetFeedId: Elements.rightdd()
+        }
+        if (typeof articleStatus != 'undefined'){
+            requestData['articleStatus'] = articleStatus;
+        }
+        if (typeof mode != 'undefined'){
+            requestData['mode'] = mode;
+        }
 
         $.ajax({
             url: controlsRoot + 'arcticles-list/',
             dataType : "html",
-            data: {
-                sourceFeedIds: Elements.leftdd(),
-                page: wallPage,
-                from: from,
-                to: to,
-                sortType: sortType,
-                type: Elements.leftType(),
-                targetFeedId: Elements.rightdd(),
-                articleStatus: articleStatus
-            }
+            data: requestData
         }).always(function() {
             $('#wall-load').hide();
         }).done(callback);

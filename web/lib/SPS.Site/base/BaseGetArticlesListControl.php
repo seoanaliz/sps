@@ -65,6 +65,16 @@ abstract class BaseGetArticlesListControl extends BaseControl
     protected $userRateFilter = true;
 
     /**
+     * @var ArticleAccessUtility
+     */
+    protected $ArticleAccessUtility;
+
+    public function __construct(){
+        parent::__construct();
+        $this->ArticleAccessUtility= new ArticleAccessUtility($this->vkId);
+    }
+
+    /**
      * Определяем страницу
      * @param string $sessionKey
      */
@@ -114,8 +124,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
      */
     protected function processRequest()
     {
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
         // Определяем страницу
         $this->processPage();
 
@@ -141,10 +149,9 @@ abstract class BaseGetArticlesListControl extends BaseControl
         if ($sourceFeedType == SourceFeedUtility::Authors) {
             $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
 
-            $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
-            if ($ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
+            if ($this->ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
 
-                $articleStatuses = $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
+                $articleStatuses = $this->ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
 
                 // фильтр по статусам - только для авторских постов
                 // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
@@ -164,7 +171,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         // источник - топфейс
         elseif ($sourceFeedType == SourceFeedUtility::Topface) {
             // TODO узнать - только проверить доступ?
-            if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
+            if (!$this->ArticleAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                 throw new Exception('Access error');
             }
             // в топфейсе не сортируем

@@ -8,6 +8,11 @@ Package::Load('SPS.Site/base');
  * @author     Shuler
  */
 class GetArticlesListControl extends BaseGetArticlesListControl {
+
+    const MODE_MY = 'my';
+
+    const MODE_ALL = 'all';
+
     /**
      * @var string
      */
@@ -17,6 +22,41 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
      * @var SourceFeed[]
      */
     private $sourceFeeds = array();
+
+    protected function getMode(){
+        $mode = Request::getString('mode');
+        if ($mode == self::MODE_MY) {
+            return self::MODE_MY;
+        }
+        return self::MODE_ALL;
+    }
+
+    protected function getAuthorsForTargetFeed() {
+        // выираем авторов для этой ленты
+        $authorsIds = array();
+        $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $this->search['targetFeedId']));
+        if ($UserFeeds) {
+            $vkIds = array();
+            foreach ($UserFeeds as $UserFeed){
+                $vkIds[] = $UserFeed->vkId;
+            }
+
+            $authors = AuthorFactory::Get(
+                array(
+                    'vkIdIn' => $vkIds
+                )
+                , array(
+                    BaseFactory::WithoutPages => true,
+                    BaseFactory::OrderBy => ' "firstName", "lastName" ',
+                )
+            );
+
+            foreach ($authors as $author){
+                $authorsIds[] = $author->authorId;
+            }
+        }
+        return $authorsIds;
+    }
 
     /**
      * Расширение стандартной выборки
@@ -32,37 +72,31 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $type = self::getSourceFeedType();
 
+        $mode = $this->getMode();
+        $targetFeedId = $this->getTargetFeedId();
+        if (!$targetFeedId) {
+            return array('success' => false);
+        }
+
+        $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
+        if (is_null($role)) {
+            return array('success' => false);
+        }
+
 
         if ($type == SourceFeedUtility::Authors) {
-            //$this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
             unset($this->search['_sourceFeedId']);
-            // определяем источники
-            //$sourceFeedIds = $this->getSourceFeedIds();
-
-            // выираем авторов для этой ленты
-            $authorsIds = array();
-            $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $this->search['targetFeedId']));
-            if ($UserFeeds) {
-                $vkIds = array();
-                foreach ($UserFeeds as $UserFeed){
-                    $vkIds[] = $UserFeed->vkId;
+            // #11115
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                if ($mode == self::MODE_MY) {
+                    $authorsIds = array($this->getAuthor()->authorId);
+                } else {
+                    $authorsIds = $this->getAuthorsForTargetFeed();
+                    $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
                 }
-
-                $authors = AuthorFactory::Get(
-                    array(
-                        'vkIdIn' => $vkIds
-                    )
-                    , array(
-                        BaseFactory::WithoutPages => true,
-                        BaseFactory::OrderBy => ' "firstName", "lastName" ',
-                    )
-                );
-
-                foreach ($authors as $author){
-                    $authorsIds[] = $author->authorId;
-                }
+            } else {
+                $authorsIds = $this->getAuthorsForTargetFeed();
             }
-
             // фильтр источников выступает как фильтр авторов
             if (!empty($authorsIds)) {
                 $this->search['_authorId'] = $authorsIds;
