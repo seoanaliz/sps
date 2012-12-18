@@ -1,13 +1,9 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
-
 
     class GroupsUtility
     {
-        //source : 1 - barter
-        const default_name       = 'default_group';
         //прикрепить запись к группе
         public static function implement_to_group( $objects, $group_id, $only_one_group = 0 ) {
             foreach( $objects as $object ) {
@@ -41,7 +37,7 @@
         //подписать человека на группу
         public static function assign_to_group( Group $group, $user_id )
         {
-            if( !in_array( $user_id, $object->users_ids )) {
+            if( !in_array( $user_id, $group->users_ids )) {
                 $group->users_ids[] = $user_id;
                 GroupFactory::Update( $group );
             }
@@ -71,7 +67,7 @@
             if( empty( $default_group )) {
                 $default_group = new Group;
                 $default_group->created_by  =   $user_id;
-                $default_group->name        =   self::default_name;
+                $default_group->name        =   self::DEFAULT_GROUPE_NAME;
                 $default_group->source      =   $groupe_sourse;
                 $default_group->status      =   1;
                 $default_group->type        =   2;
@@ -118,24 +114,26 @@
         }
 
         //формирует отчет для групп. Если указан user_id, разделяет созданные им группы и нет
-        public static function form_response( $groups, $user_id = 0 )
+        public static function form_response( $groups, $user_id, $group_source )
         {
         //todo place
             if( !is_array( $groups ))
                 $groups = array( $groups );
-
             $res = array();
             $i = 1;
             foreach( $groups as $group ) {
-                $field = ( $user_id && $group->created_by == $user_id ) ? 'user_groups' : 'shared_groups';
-                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_group' : $field;
+                $field = ( $group->created_by == $user_id ) ? 'user_lists' : 'shared_lists';
+                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
                 $res[$field][] = array(
                     'group_id'  =>  $group->group_id,
                     'type'      =>  $group->type,
-                    'name'      =>  $group->name,
-                    'place'     =>  ( $field == 'default_group' ) ? 0 : $i++
+                    'name'      =>  ( $field == 'default_list' ) ? 'Не в списке' : $group->name,
+                    'place'     =>  ( $field == 'default_list' ) ? 0 : $i++
                 );
             }
+            if( !isset( $res['user_lists'] )) $res['user_lists'] = array();
+            if( !isset( $res['shared_lists'] )) $res['shared_lists'] = array();
+            if( !isset( $res['default_list'] )) $res['default_list'] = array( GroupsUtility::get_default_group( $user_id, $group_source ));
             return $res;
         }
 
