@@ -81,7 +81,16 @@
          * @return bool
          */
         protected function add( $object ) {
-            $result = parent::$factory->Add( $object );
+            EditorFactory::$mapping['view'] = 'editors';
+            $exists = EditorFactory::GetOne(array('vkId' => $object->vkId), array(BaseFactory::WithoutDisabled => false));
+
+            if (empty($exists)) {
+                $result = parent::$factory->Add( $object );
+            } else {
+                //update
+                $object->editorId = $exists->editorId;
+                $result = parent::$factory->Update( $object );
+            }
             
             return $result;
         }

@@ -5,7 +5,8 @@ Package::Load( 'SPS.VK' );
 
 class SyncLikes {
     const   MODE_LAST_DAY = 'last_day',
-            MODE_ALL = 'all';
+            MODE_ALL = 'all',
+            MODE_TWO_MONTHS = 'two_months';
     /**
      * @var Daemon
      */
@@ -15,7 +16,7 @@ class SyncLikes {
      * макс. кол-во постов которое будем обрабатывать за один раз
      * @var int
      */
-    private $maxArticlesSelectFromQueue = 2000;
+    private $maxArticlesSelectFromQueue = 200;
 
     public function Execute() {
         set_time_limit(0);
@@ -31,12 +32,16 @@ class SyncLikes {
         $mode = self::MODE_LAST_DAY;
         if (array_key_exists(self::MODE_ALL, $_REQUEST)) {
             $mode = self::MODE_ALL;
+        } elseif (array_key_exists(self::MODE_TWO_MONTHS, $_REQUEST)) {
+            $mode = self::MODE_TWO_MONTHS;
         }
 
         if ($mode == self::MODE_ALL) {
             $articleExternalIds = $this->getAllArticles();
-        } else {
+        } elseif( $mode == self::MODE_LAST_DAY) {
             $articleExternalIds = $this->getLastDayArticles();
+        } elseif( $mode == self::MODE_TWO_MONTHS ) {
+            $articleExternalIds = $this->getTwoMonthsArticles();
         }
 
         // если ничего не нашли
@@ -72,7 +77,7 @@ class SyncLikes {
     }
 
     /**
-     * Возвращает статьи за предидущий день
+     * Возвращает статьи за предыдущий день
      * @return array
      */
     private function getLastDayArticles() {
@@ -131,6 +136,41 @@ class SyncLikes {
             $ArticleQueue = BaseFactory::GetObject( $ds, ArticleQueueFactory::$mapping, $structure );
             $articleExternalIds[$ArticleQueue->externalId] = $ArticleQueue->articleQueueId;
         }
+        return $articleExternalIds;
+    }
+
+    private function getTwoMonthsArticles() {
+        // со вчера 00-00-00 до 23-59-59
+        $refresh_from_date  =    new DateInterval('P2M');
+        $refresh_to_date    =    new DateInterval('P1D');
+        $from = DateTimeWrapper::Now()->setTime(0, 0, 0)->sub($refresh_from_date);
+        $to = DateTimeWrapper::Now()->setTime(0, 0, 0)->sub($refresh_to_date);
+
+        // загружаем посты постранично, чтобы сильно не жрало память
+        $search = array(
+            'sentAtFrom' => $from,
+            'sentAtTo' => $to,
+            'externalIdNot' => '1',
+            'externalIdExist' => true,
+            'pageSize' => $this->maxArticlesSelectFromQueue
+        );
+
+        $page = 0;
+        $articleExternalIds = array();
+        while (true) {
+            $search['page'] = $page++;
+            // Список постов
+            $ArticlesQueues = ArticleQueueFactory::Get($search, array(BaseFactory::WithoutDisabled => false));
+
+            if (!$ArticlesQueues) break;
+
+            foreach ($ArticlesQueues as $ArticleQueue) {
+                /** @var $ArticleQueue ArticleQueue */
+                // делаем так, чтобы было легко найти articleQueueId при обновлении
+                $articleExternalIds[$ArticleQueue->externalId] = $ArticleQueue->articleQueueId;
+            }
+        }
+
         return $articleExternalIds;
     }
 }
