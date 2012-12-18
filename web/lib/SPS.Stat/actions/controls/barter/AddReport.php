@@ -22,6 +22,8 @@ class AddReport
         $approve            =   Request::getBoolean( 'approve' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $start_looking_time -=  900;
+        if ( $stop_looking_time && $stop_looking_time < $start_looking_time)
+            $stop_looking_time += 84600;
         $user_id = AuthVkontakte::IsAuth();
 
         if ( !$group_id ) {
@@ -68,7 +70,7 @@ class AddReport
         $barter_event->stop_search_at  =  $stop_looking_time;
         $barter_event->created_at  = date ( 'Y-m-d H:i:s', $now );
         $barter_event->standard_mark = true;
-        $barter_event->groups_ids  = array( $group_id );
+        $barter_event->groups_ids  = array( $group_id,1,2,3 );
         $barter_event->creator_id  = $user_id;
 
 
@@ -87,7 +89,6 @@ class AddReport
 
         //делаем последнее
         if( $barter_id ) {
-
             BarterEventFactory::Update( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {
             BarterEventFactory::Add( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
