@@ -43,7 +43,6 @@
          */
         public static $LibStructure = array();
 
-
         /**
          * Loaded Classes
          * @var array system = before uri, uri = after uri
@@ -57,10 +56,17 @@
         public static $CurrentUri;
 
         /**
-         * Force disable package compiling
+         * Handle for GetLock & ReleaseLock
+         * @var resource
+         */
+        private static $lockHandle;
+
+
+        /**
+         * Using Windows
          * @var bool
          */
-        private static $ForceDisableCompile = false;
+        private static $isWindows = false;
 
         /**
          * Begin URI
@@ -109,23 +115,85 @@
 
 
         /**
+         * Get Lock Depending on System (only in WITH_PACKAGE_COMPILE)
+         * @return bool
+         */
+        public static function GetLock() {
+            if ( !self::WithPackageCompile() ) {
+                return false;
+            }
+
+            if ( self::$isWindows ) {
+                if ( !is_file( self::GetPackageCompiledFlagFile() . '.lock' )
+                    && touch( self::GetPackageCompiledFlagFile() . '.lock' ) )
+                {
+                    return true;
+                }
+
+                return false;
+            } else { // Unix with flock LOCK_NB
+                $handle = fopen( self::GetPackageCompiledFlagFile(), 'r+');
+                if ( flock ( $handle, LOCK_EX | LOCK_NB ) ) {
+                    self::$lockHandle = $handle;
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+
+        /**
+         * Release Lock (only in WITH_PACKAGE_COMPILE)
+         * @return bool
+         */
+        public static function ReleaseLock() {
+            if ( !self::WithPackageCompile() ) {
+                return false;
+            }
+
+            if ( self::$isWindows ) {
+                return unlink( self::GetPackageCompiledFlagFile() . '.lock' );
+            } else {
+                return flock( self::$lockHandle, LOCK_UN );
+            }
+        }
+
+
+        /**
          * Save Loaded classes to cache file
          */
         public static function Shutdown() {
-            foreach ( self::$LoadedClasses as $type => $classes ) {
+            $hasClasses = false;
+            foreach( self::$LoadedClasses as $classes ) {
                 if ( $classes ) {
-                    Logger::Checkpoint();
+                    $hasClasses = true;
+                    break;
+                }
+            }
 
-                    $buffer = '';
-                    foreach ( $classes as $filename ) {
-                        $filePath = self::$LibStructure[$filename];
-                        $content  = file_get_contents( $filePath );
-                        $content  = rtrim( trim( trim( $content ), PHP_EOL ), '?>' );
-                        $buffer  .= $content . '?>';
+            if ( $hasClasses ) {
+                if ( self::GetLock() ) {
+                    foreach ( self::$LoadedClasses as $type => $classes ) {
+                        if ( $classes ) {
+                            Logger::Checkpoint();
+
+                            $buffer = '';
+                            foreach ( $classes as $filename ) {
+                                $filePath = self::$LibStructure[$filename];
+                                $content  = file_get_contents( $filePath );
+                                $content  = rtrim( trim( trim( $content ), PHP_EOL ), '?>' );
+                                $buffer .= $content . '?>';
+                            }
+
+                            file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
+                            Logger::Info( 'Writing %d classes to %s', count( $classes ), $type );
+
+                        }
                     }
-
-                    file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
-                    Logger::Info( 'Writing %d classes to %s', count( $classes ), $type );
+                    self::ReleaseLock();
+                } else {
+                    Logger::Info( 'Failed to get lock on compiled packages' );
                 }
             }
         }
@@ -174,6 +242,10 @@
 
             if ( !defined( '__ROOT__' ) ) {
                 define( '__ROOT__', realpath( dirname( __FILE__ ) . '/../..' ) );
+            }
+
+            if ( strtoupper( substr( PHP_OS, 0, 3 ) ) === 'WIN' ) {
+                self::$isWindows = true;
             }
         }
 
@@ -279,23 +351,23 @@
          */
         public static function DoCompiledCacheOperations() {
             if ( Package::WithPackageCompile() ) {
-                $packageCompiledFlag = sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
-                $handle = fopen($packageCompiledFlag, 'c+');
-                if ( flock ( $handle, LOCK_EX | LOCK_NB ) ) {
-                    $pid = fgets( $handle, 4096 );
-                    if ( empty( $pid ) ) {
-                        $pid = getmypid();
-                        Logger::Info( "Lock of " . Package::CompiledEaze . " acquired with pid $pid. Flushing compiled cache" );
-                        fputs($handle, $pid);
-                        Package::FlushCompiledCache();
-                        touch( $packageCompiledFlag );
-                    }
-                } else {
-                    Logger::Info( "Lock of " . Package::CompiledEaze . " already exists. Turning WITH_PACKAGE_COMPILE off" );
-                    self::$ForceDisableCompile = true;
+                $packageCompiledFlag = self::GetPackageCompiledFlagFile();
+                if ( !file_exists( $packageCompiledFlag ) ) {
+                    Package::FlushCompiledCache();
+                    touch( $packageCompiledFlag );
                 }
             }
         }
+
+
+        /**
+         * Get Compiled Lock Filename
+         * @return string
+         */
+        public static function GetPackageCompiledFlagFile() {
+            return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
+        }
+
 
 
         /**
@@ -303,7 +375,7 @@
          * @return bool
          */
         public static function WithPackageCompile() {
-            if ( defined( Package::WithPackageCompile ) && !self::$ForceDisableCompile ) {
+            if ( defined( Package::WithPackageCompile ) ) {
                 if ( WITH_PACKAGE_COMPILE ) {
                     return true;
                 }
