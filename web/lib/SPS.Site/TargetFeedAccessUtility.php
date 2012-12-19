@@ -135,7 +135,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @param $targetFeedId
      * @return bool
      */
-    public function canAddArticleGroup($targetFeedId){
+    public function canAddUserGroup($targetFeedId){
         $role = $this->getRoleForTargetFeed($targetFeedId);
         if (!is_null($role)) {
             return $role != UserFeed::ROLE_AUTHOR;

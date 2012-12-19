@@ -19,7 +19,7 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function Validate($object, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Validate($object, self::$mapping, $options, $connectionName);
+        return BaseFactory::Validate($object, static::$mapping, $options, $connectionName);
     }
 
     /**
@@ -30,7 +30,7 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function ValidateSearch($search, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::ValidateSearch($search, self::$mapping, $options, $connectionName);
+        return BaseFactory::ValidateSearch($search, static::$mapping, $options, $connectionName);
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function UpdateByMask($object, $changes, $searchArray = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::UpdateByMask($object, $changes, $searchArray, self::$mapping, $connectionName);
+        return BaseFactory::UpdateByMask($object, $changes, $searchArray, static::$mapping, $connectionName);
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function SaveArray($objects, $originalObjects = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::SaveArray($objects, $originalObjects, self::$mapping, $connectionName);
+        return BaseFactory::SaveArray($objects, $originalObjects, static::$mapping, $connectionName);
     }
 
     /**
@@ -61,13 +61,13 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function CanPages()
     {
-        return BaseFactory::CanPages(self::$mapping);
+        return BaseFactory::CanPages(static::$mapping);
     }
 
 
     public static function Add($object, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Add($object, self::$mapping, $options, $connectionName);
+        return BaseFactory::Add($object, static::$mapping, $options, $connectionName);
     }
 
     /**
@@ -78,24 +78,24 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function AddRange($objects, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::AddRange($objects, self::$mapping, $options, $connectionName);
+        return BaseFactory::AddRange($objects, static::$mapping, $options, $connectionName);
     }
 
     /** @return bool|array */
     public static function Update($object, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Update($object, self::$mapping, $options, $connectionName);
+        return BaseFactory::Update($object, static::$mapping, $options, $connectionName);
     }
 
     /** @return bool */
     public static function UpdateRange($objects, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::UpdateRange($objects, self::$mapping, $options, $connectionName);
+        return BaseFactory::UpdateRange($objects, static::$mapping, $options, $connectionName);
     }
 
     public static function Count($searchArray, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Count($searchArray, self::$mapping, $options, $connectionName);
+        return BaseFactory::Count($searchArray, static::$mapping, $options, $connectionName);
     }
 
     /**
@@ -106,48 +106,48 @@ abstract class BaseModelFactory implements IFactory {
      */
     public static function Get($searchArray = null, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Get($searchArray, self::$mapping, $options, $connectionName);
+        return BaseFactory::Get($searchArray, static::$mapping, $options, $connectionName);
     }
 
     /** @return UserFeed */
     public static function GetById($id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::GetById($id, $searchArray, self::$mapping, $options, $connectionName);
+        return BaseFactory::GetById($id, $searchArray, static::$mapping, $options, $connectionName);
     }
 
     /** @return UserFeed */
     public static function GetOne($searchArray = null, $options = null, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::GetOne($searchArray, self::$mapping, $options, $connectionName);
+        return BaseFactory::GetOne($searchArray, static::$mapping, $options, $connectionName);
     }
 
     public static function GetCurrentId($connectionName = self::DefaultConnection)
     {
-        return BaseFactory::GetCurrentId(self::$mapping, $connectionName);
+        return BaseFactory::GetCurrentId(static::$mapping, $connectionName);
     }
 
     public static function Delete($object, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::Delete($object, self::$mapping, $connectionName);
+        return BaseFactory::Delete($object, static::$mapping, $connectionName);
     }
 
     public static function DeleteByMask($searchArray, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::DeleteByMask($searchArray, self::$mapping, $connectionName);
+        return BaseFactory::DeleteByMask($searchArray, static::$mapping, $connectionName);
     }
 
     public static function PhysicalDelete($object, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::PhysicalDelete($object, self::$mapping, $connectionName);
+        return BaseFactory::PhysicalDelete($object, static::$mapping, $connectionName);
     }
 
     public static function LogicalDelete($object, $connectionName = self::DefaultConnection)
     {
-        return BaseFactory::LogicalDelete($object, self::$mapping, $connectionName);
+        return BaseFactory::LogicalDelete($object, static::$mapping, $connectionName);
     }
 
     /** @return UserFeed */
     public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
-        return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
+        return BaseFactory::GetFromRequest( $prefix, static::$mapping, null, $connectionName );
     }
 }

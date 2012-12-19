@@ -92,10 +92,5 @@
          * @var int
          */
         public $articleStatus;
-
-        /**
-         * @var int|null
-         */
-        public $articleGroupId;
     }
 ?>

@@ -128,6 +128,18 @@
                 <path>controls/authors/DeleteAuthorControl</path>
             </action>
         </group>
+
+        <group name="AuthorGroup">
+            <action name="AddUserGroup">
+                <path>controls/userGroup/AddUserGroup</path>
+            </action>
+            <action name="AddUserToUserGroup">
+                <path>controls/userGroup/AddUserToUserGroup</path>
+            </action>
+            <action name="RemoveUserFromUserGroup">
+                <path>controls/userGroup/RemoveUserFromUserGroup</path>
+            </action>
+        </group>
     </group>
 
 

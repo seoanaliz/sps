@@ -31,7 +31,7 @@
                     ?>
                 </div>
 
-                <select multiple="multiple" id="source-select" <?=!$isShowSourceList ? 'data-classes="hide"' : ''?>>
+                <select multiple="multiple" id="source-select" data-classes="hidden" style="display: none;">
                     <?
                     foreach ($sourceFeeds as $sourceFeed) {
                         ?><option value="{$sourceFeed.sourceFeedId}">{$sourceFeed.title}</option><?
@@ -43,8 +43,11 @@
                     <div id="slider-range"></div>
                 </div>
 
+                <div class="user-groups-tabs hidden">
+                    <div class="add-user-group-button">+</div>
+                </div>
+
                 <div class="authors-tabs tab-bar no-padding">
-                    <div class="authors-tab-new tab" data-mode="all">Все</div>
                     <?
                     $isFirst = true;
                     foreach ($articleStatuses as $articleStatus => $statusName) :

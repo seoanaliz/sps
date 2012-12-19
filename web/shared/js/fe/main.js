@@ -161,6 +161,11 @@ $(document).ready(function(){
         }
     });
 
+    $('.user-groups-tabs').delegate('.add-user-group-button', 'click', function(){
+        var targetFeedId = Elements.rightdd();
+        Events.fire('add_article_group', targetFeedId, 'Простая группа', function(state){});
+    });
+
     // Вкладки "Источники", "Реклама" в левон меню
     $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
         if (articlesLoading) {
@@ -315,6 +320,8 @@ $(document).ready(function(){
             $('body').removeClass('editor-mode');
             Events.fire('rightcolumn_dropdown_change');
         }
+
+
     });
 
     // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
