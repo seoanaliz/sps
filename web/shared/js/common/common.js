@@ -32,7 +32,8 @@ if (!window.console) {
         dir: function(params) {},
         group: function(groupName) {},
         groupCollapsed: function(groupName) {},
-        groupEnd: function(groupName) {}
+        groupEnd: function(groupName) {},
+        error: function(params) {}
     };
 }
 
