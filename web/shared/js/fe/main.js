@@ -200,7 +200,7 @@ $(document).ready(function(){
             '</a>' +
             ' из списка авторов?';
 
-           (function updatePage(method) {
+            (function updatePage(method) {
                 Events.fire(method || 'authors_get', function(data) {
                     $('body').addClass('editor-mode');
                     var $container = $('#wall');
@@ -320,8 +320,6 @@ $(document).ready(function(){
             $('body').removeClass('editor-mode');
             Events.fire('rightcolumn_dropdown_change');
         }
-
-
     });
 
     // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
@@ -332,6 +330,7 @@ $(document).ready(function(){
 
         Events.fire('get_author_articles', tab.data('article-status'), tab.data('mode'), function(html) {
             $('#wall').html(html);
+            Elements.initImages();
         });
     });
 
@@ -448,7 +447,6 @@ $(document).ready(function(){
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    // console.log([gridLineId, gridLineItemId, time]);
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
                     });
@@ -545,14 +543,12 @@ $(document).ready(function(){
                         $('#queue').css('overflow', 'auto');
                         if ($post.hasClass('new')) {
                             // Добавление ячейки
-                            // console.log([gridLineId, time, startDate, endDate]);
                             Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
                                 if (state) {}
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
-                                console.log([gridLineId, time, startDate, endDate]);
                                 Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
                                     if (state) {}
                                 });
@@ -1437,7 +1433,7 @@ var Events = {
     fire: function(name){
         var t = this;
         var args;
-        if (arguments.length == 2 && arguments[1] && arguments[1].length) {
+        if (arguments.length == 2 && (typeof arguments[1] == 'object') && arguments[1].length) {
             args = arguments[1];
         } else {
             args = Array.prototype.slice.call(arguments, 1);
@@ -1446,15 +1442,17 @@ var Events = {
             try {
                 setTimeout(function() {
                     if (window.console && console.log && t.isDebug) {
-                        console.log(name + ':');
-                        console.log(args.slice(0, -1));
-                        console.log('-------');
+                        console.groupCollapsed(name);
+                        console.log('args: ' + args.slice(0, -1));
+                        console.groupEnd(name);
                     }
                     t.eventList[name].apply(window, args);
                 }, t.delay);
             } catch(e) {
                 if (window.console && console.log && t.isDebug) {
+                    console.groupCollapsed('Error');
                     console.log(e);
+                    console.groupEnd('Error');
                 }
             }
         }
@@ -1462,7 +1460,7 @@ var Events = {
 };
 
 var Elements = {
-    initImages: function(selector){
+    initImages: function(){
         $(".fancybox-thumb").fancybox({
             prevEffect		: 'none',
             nextEffect		: 'none',
@@ -1493,7 +1491,6 @@ var Elements = {
             img.src = src;
         });
 
-
         $(".left-panel .timestamp").easydate(easydateParams);
         $(".left-panel .date").easydate(easydateParams);
         $('.left-panel .images-ready').imageComposition();
@@ -1502,7 +1499,6 @@ var Elements = {
     addEvents: function(){
         (function(){
             $(".slot .post .content").addClass("dragged");
-            var target = false;
             var dragdrop = function(post, slot, queueId, callback, failback){
                 Events.fire('post_moved', post, slot, queueId, function(state, newId){
                     if (state) {
@@ -1541,9 +1537,7 @@ var Elements = {
 
                 drop: function(e, ui) {
                     var $target = $(this),
-                        $post = $(ui.draggable).closest('.post'),
-                        $slot = $post.closest('.slot'),
-                        $helper = $(ui.helper);
+                        $post = $(ui.draggable).closest('.post');
 
                     if ($target.hasClass('empty')) {
                         dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
@@ -1617,7 +1611,7 @@ var Elements = {
 
                 var matches = link.match(pattern);
 
-                shortLink = link;
+                var shortLink = link;
                 if (matches[2]) {
                     shortLink = matches[2];
                 }
@@ -1630,30 +1624,4 @@ var Elements = {
             Elements.initLinkLoader($(this), true);
         });
     }
-};
-
-$.fn.dd_sel = function(id){
-    var elem = $(this);
-    if(!elem.hasClass("drop-down")) return;
-    if(id) {
-        elem = elem.find("li[data-id=" + id + "]");
-    } else {
-        elem = elem.find("li:first");
-    }
-
-    $(this).find('li.active').removeClass('active');
-    elem.addClass('active');
-
-    if(elem.length) {
-        $(this)
-            .data("selected",elem.data("id"))
-            .find(".caption")
-            .text(elem.text())
-            .removeClass("default");
-    } else {
-        $(this)
-            .data("selected",0)
-            .find(".caption").text('Источник').addClass("default");
-    }
-    $(this).trigger("change");
 };
