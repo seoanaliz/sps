@@ -84,7 +84,6 @@ var Widget = (function() {
                 var throughParams = ['template', 'model', 'modelClass', 'events'];
 
                 function tmplWrapper(template, data) {
-                    var t = this;
                     var tmplData = $.extend(true, {}, data);
                     if (data instanceof Model) {
                         tmplData = tmplData.data();
@@ -105,11 +104,15 @@ var Widget = (function() {
                 }
 
                 for (var i in throughParams) {
-                    if (!throughParams.hasOwnProperty(i)) continue;
+                    if (!throughParams.hasOwnProperty(i)) {
+                        continue;
+                    }
                     var optionKey = throughParams[i];
                     var paramKey = '_' + throughParams[i];
                     var param = t[paramKey] || t.constructor.prototype[paramKey];
-                    if (param) options[optionKey] = param;
+                    if (param) {
+                        options[optionKey] = param;
+                    }
                 }
 
                 if (!options.template) {
