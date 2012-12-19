@@ -82,6 +82,9 @@ class GetSourceFeedsListControl extends BaseControl
                 );
             }
         } else {
+
+            $showSourceList =  ($type == SourceFeedUtility::Topface || $type == SourceFeedUtility::Source || $type == SourceFeedUtility::Albums);
+
             $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
             $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
@@ -102,7 +105,6 @@ class GetSourceFeedsListControl extends BaseControl
                 );
             }
         }
-
 
         echo ObjectHelper::ToJSON(array(
             'type' => $type,
