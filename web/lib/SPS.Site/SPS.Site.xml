@@ -137,7 +137,7 @@
                 <path>controls/userGroup/AddUserToUserGroup</path>
             </action>
             <action name="RemoveUserFromUserGroup">
-                <path>controls/userGroup/AddUserGroup</path>
+                <path>controls/userGroup/RemoveUserFromUserGroup</path>
             </action>
         </group>
     </group>
