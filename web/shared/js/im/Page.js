@@ -122,4 +122,5 @@ var Page = Widget.extend({
             return this._params;
         }
     }
+    //rename
 });
