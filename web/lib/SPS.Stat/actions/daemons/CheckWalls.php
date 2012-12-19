@@ -50,7 +50,7 @@ class CheckWalls
     public function kill_overtimed()
     {
         //ищем просроченные
-        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift + StatBarter::TIME_INTERVAL),'_status' => 2 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ),'_status' => 2 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 5;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
