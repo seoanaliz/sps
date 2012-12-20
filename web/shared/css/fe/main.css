@@ -199,6 +199,7 @@ i{font-style:italic;}
 .header .filter{height:28px;padding:10px;border-top:1px solid #fff;}
 .header .filter .type-selector{margin-top:10px;}
 .ui-draggable{cursor:move;}
+.show-all-postponed{background:#edf1f5;text-align:center;color:#99adc2;padding:8px;cursor:pointer;margin:10px 10px 0;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}.show-all-postponed:hover{background:#e1e7ed;color:#5e82a8;}
 .post{background:#fff;position:relative;padding:10px;-webkit-box-shadow:0px 0px 4px 0px rgba(0, 0, 0, 0.1);-moz-box-shadow:0px 0px 4px 0px rgba(0, 0, 0, 0.1);box-shadow:0px 1px 4px 0px rgba(0, 0, 0, 0.1);line-height:160%;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}.post:hover .post-image,.post:hover .img{outline-color:#fff !important;}
 .post:hover{background-color:#fff;}
 .post:hover .image-compositing:after{background-color:#fff;}

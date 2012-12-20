@@ -1046,6 +1046,20 @@ i {font-style: italic;}
     cursor: move;
 }
 
+.show-all-postponed {
+    background: @bg_light_hover;
+    text-align: center;
+    color: @color_light_blue;
+    padding: 8px;
+    cursor: pointer;
+    margin: 10px 10px 0;
+    .user-select(none);
+
+    &:hover {
+        background: @bg_hover;
+        color: @color_blue;
+    }
+}
 .post {
     background: #fff;
     position: relative;

@@ -71,9 +71,7 @@
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 
-            <div class="wall" id="wall">
-
-            </div>
+            <div class="wall" id="wall"></div>
 
             <div id="wallloadmore" class="hidden">Больше</div>
         </div>

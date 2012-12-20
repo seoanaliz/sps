@@ -387,6 +387,9 @@ $(document).ready(function(){
                     elem.hide().next().show();
                 }
             });
+        })
+        .delegate('.show-all-postponed', 'click', function() {
+            console.log(1);
         });
 
     $("#queue")
