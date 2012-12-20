@@ -788,6 +788,17 @@ var Events = {
     }
 };
 
+Control = $.extend(Control, {
+    root: controlsRoot,
+    dataType: 'html',
+
+    controlMap: {
+        get_author_articles: {
+            name: 'arcticles-list'
+        }
+    }
+});
+
 function popupSuccess( message ) {
     $.blockUI({
         message: message,

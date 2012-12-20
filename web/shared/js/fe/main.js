@@ -304,15 +304,29 @@ $(document).ready(function(){
             return;
         }
 
-        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
         var $tab = $(this);
+        var slider = $("#slider-range");
+        var from = slider.slider("values", 0);
+        var to = slider.slider("values", 1);
+        var sortType = $('.wall-title a').data('type');
+        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
 
-        Events.fire('get_author_articles', $tab.data('article-status'), $tab.data('mode'), function(html) {
-            var $block = $('#wall');
-            $block.html(html);
+        Control.fire('get_author_articles', {
+            sourceFeedIds: Elements.leftdd(),
+            page: wallPage,
+            from: from,
+            to: to,
+            sortType: sortType,
+            type: Elements.leftType(),
+            targetFeedId: Elements.rightdd(),
+            articleStatus: $tab.data('article-status'),
+            mode: $tab.data('mode')
+        }).success(function(html) {
+            var $block = $(html);
             Elements.initImages($block);
             Elements.initLinks($block);
+            $('#wall').html($block);
         });
     });
 
