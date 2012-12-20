@@ -9,6 +9,8 @@
         define ( 'ACC_TOK_WRK', '0b8c8e800086894200868942b100a9af1a000860093b1dc50eb180b9b836874e8ec5f99' );
         define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
+        class AccessTokenIsDead extends Exception{}
+
         class VkHelper {
 
             /**
@@ -24,10 +26,16 @@
                 if ( !isset( $request_params['access_token'] ))
                     $request_params['access_token']  =  self::get_service_access_token();
                 $url = VK_API_URL . $method;
+
                 $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
+                if(!$res)
+                    return array();
                 if ( isset( $res->error ) )
                     if ( $throw_exc_on_errors ) {
-                        throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
+                        if( $res->error->error_code == 5 )
+                            throw new AccessTokenIsDead();
+                        else
+                            throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
                     }
                     else
                         return $res;
@@ -39,13 +47,13 @@
                 if (empty( $url )) {
                     return false;
                 }
-
-                $ch = curl_init($url);
+                $ch = curl_init( $url );
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_TIMEOUT , 5 );
 
-                if (is_array($headers)) { // если заданы какие-то заголовки для браузера
+                if (is_array( $headers )) { // если заданы какие-то заголовки для браузера
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 }
 
