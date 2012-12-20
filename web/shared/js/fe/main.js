@@ -176,33 +176,9 @@ $(document).ready(function(){
         $(this).addClass('active');
 
         if ($(this).data('type') == 'authors-list') {
-             var BOX_AUTHOR =
-            '<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
-                '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                    '<img src="<?=user.photo?>" alt="" />' +
-                '</a>' +
-            '</div>' +
-            '<div class="info">' +
-                '<?=text?>' +
-            '</div>';
-
-             var BOX_ADD_AUTHOR =
-            'Вы действительно хотите назначить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' автором?';
-
-             var BOX_DELETE_AUTHOR =
-            'Вы действительно хотите удалить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' из списка авторов?';
-
+            $('body').addClass('editor-mode');
             (function updatePage(method) {
                 Events.fire(method || 'authors_get', function(data) {
-                    $('body').addClass('editor-mode');
                     var $container = $('#wall');
                     $container.html(data);
 
@@ -324,13 +300,19 @@ $(document).ready(function(){
 
     // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
     $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
-        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
-        var tab = $(this);
-        tab.addClass('selected');
+        if (articlesLoading) {
+            return;
+        }
 
-        Events.fire('get_author_articles', tab.data('article-status'), tab.data('mode'), function(html) {
-            $('#wall').html(html);
-            Elements.initImages();
+        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+        var $tab = $(this);
+        $tab.addClass('selected');
+
+        Events.fire('get_author_articles', $tab.data('article-status'), $tab.data('mode'), function(html) {
+            var $block = $('#wall');
+            $block.html(html);
+            Elements.initImages($block);
+            Elements.initLinks($block);
         });
     });
 
@@ -349,7 +331,7 @@ $(document).ready(function(){
     });
 
     // Wall init
-    $(".wall")
+    $("#wall")
         .delegate(".post > .delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
@@ -1408,9 +1390,6 @@ $(document).ready(function(){
             }
         }
     })();
-
-    // ===
-    Elements.addEvents();
 });
 
 var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
@@ -1426,42 +1405,33 @@ var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href=
 var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
             </div>';
 
-var Events = {
-    delay: 0,
-    isDebug: false,
-    eventList: Eventlist,
-    fire: function(name){
-        var t = this;
-        var args;
-        if (arguments.length == 2 && (typeof arguments[1] == 'object') && arguments[1].length) {
-            args = arguments[1];
-        } else {
-            args = Array.prototype.slice.call(arguments, 1);
-        }
-        if ($.isFunction(t.eventList[name])) {
-            try {
-                setTimeout(function() {
-                    if (window.console && console.log && t.isDebug) {
-                        console.groupCollapsed(name);
-                        console.log('args: ' + args.slice(0, -1));
-                        console.groupEnd(name);
-                    }
-                    t.eventList[name].apply(window, args);
-                }, t.delay);
-            } catch(e) {
-                if (window.console && console.log && t.isDebug) {
-                    console.groupCollapsed('Error');
-                    console.log(e);
-                    console.groupEnd('Error');
-                }
-            }
-        }
-    }
-};
+ var BOX_AUTHOR =
+'<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
+    '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+        '<img src="<?=user.photo?>" alt="" />' +
+    '</a>' +
+'</div>' +
+'<div class="info">' +
+    '<?=text?>' +
+'</div>';
+
+ var BOX_ADD_AUTHOR =
+'Вы действительно хотите назначить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' автором?';
+
+ var BOX_DELETE_AUTHOR =
+'Вы действительно хотите удалить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' из списка авторов?';
 
 var Elements = {
-    initImages: function(){
-        $(".fancybox-thumb").fancybox({
+    initImages: function($block) {
+        $block.find(".fancybox-thumb").fancybox({
             prevEffect		: 'none',
             nextEffect		: 'none',
             closeBtn		: false,
@@ -1473,7 +1443,7 @@ var Elements = {
         });
 
         //логика картинок топа
-        $("div.post-image-top img").bind("load", function () {
+        $block.find(".post-image-top img").bind("load", function () {
             var src = $(this).attr('src');
             var img = new Image();
             var link = $(this).closest(".post").find('.ajax-loader-ext');
@@ -1491,72 +1461,69 @@ var Elements = {
             img.src = src;
         });
 
-        $(".left-panel .timestamp").easydate(easydateParams);
-        $(".left-panel .date").easydate(easydateParams);
-        $('.left-panel .images-ready').imageComposition();
+        $block.find(".timestamp").easydate(easydateParams);
+        $block.find(".date").easydate(easydateParams);
+        $block.find('.images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
-    addEvents: function(){
-        (function(){
-            $(".slot .post .content").addClass("dragged");
-            var dragdrop = function(post, slot, queueId, callback, failback){
-                Events.fire('post_moved', post, slot, queueId, function(state, newId){
-                    if (state) {
-                        callback(newId);
-                    } else {
-                        failback();
-                    }
-                });
-            };
-
-            var draggableParams = {
-                revert: 'invalid',
-                appendTo: 'body',
-                cursor: 'move',
-                cursorAt: {left: 100, top: 20},
-                helper: function() {
-                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
-                },
-                start: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.addClass('moving');
-                },
-                stop: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.removeClass('moving');
-                }
-            };
-
-            $(".post:not(.blocked) > .content").draggable(draggableParams);
-
-            $('.items .slot').droppable({
-                activeClass: "ui-state-active",
-                hoverClass: "ui-state-hover",
-
-                drop: function(e, ui) {
-                    var $target = $(this),
-                        $post = $(ui.draggable).closest('.post');
-
-                    if ($target.hasClass('empty')) {
-                        dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
-                            if ($post.hasClass('movable')) {
-                                $target.html($post);
-                            }
-                            $target.addClass('image-compositing');
-                        });
-                    }
+    initDraggable: function($block) {
+        $block.find(".slot .post .content").addClass("dragged");
+        var dragdrop = function(post, slot, queueId, callback, failback){
+            Events.fire('post_moved', post, slot, queueId, function(state, newId){
+                if (state) {
+                    callback(newId);
+                } else {
+                    failback();
                 }
             });
-        })();
+        };
+
+        var draggableParams = {
+            revert: 'invalid',
+            appendTo: 'body',
+            cursor: 'move',
+            cursorAt: {left: 100, top: 20},
+            helper: function() {
+                return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+            },
+            start: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.addClass('moving');
+            },
+            stop: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.removeClass('moving');
+            }
+        };
+
+        $block.find(".post:not(.blocked) > .content").draggable(draggableParams);
+        $block.find('.items .slot').droppable({
+            activeClass: "ui-state-active",
+            hoverClass: "ui-state-hover",
+
+            drop: function(e, ui) {
+                var $target = $(this),
+                    $post = $(ui.draggable).closest('.post');
+
+                if ($target.hasClass('empty')) {
+                    dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
+                        if ($post.hasClass('movable')) {
+                            $target.html($post);
+                        }
+                        $target.addClass('image-compositing');
+                    });
+                }
+            }
+        });
     },
     leftdd: function(){
         return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
     },
-    rightdd:function(value){
+    rightdd: function(value){
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
@@ -1619,8 +1586,8 @@ var Elements = {
             }
         });
     },
-    initLinks: function(){
-        $('img.ajax-loader').each(function(){
+    initLinks: function($block) {
+        $block.find('img.ajax-loader').each(function(){
             Elements.initLinkLoader($(this), true);
         });
     }
