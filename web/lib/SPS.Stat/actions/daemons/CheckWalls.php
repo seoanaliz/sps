@@ -114,7 +114,13 @@ class CheckWalls
             $now =  time();
             $id = $public[ 'target_id' ];
 
+
             $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+            if ( !$res[ 'visitors']) {
+                $now -= 22000;
+                $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+            }
+
             $public['start_visitors'] =  $res[ 'visitors' ];
             sleep(0.3);
 
