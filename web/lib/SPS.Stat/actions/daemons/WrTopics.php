@@ -12,14 +12,13 @@ class WrTopics extends wrapper
     public function Execute()
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
-//        if (! $this->check_time())
-//            die('Не сейчас');
+        if (! $this->check_time())
+            die('Не сейчас');
 
-//        $this->get_id_arr();
-        $this->ids = array( 43503725 );
+        $this->get_id_arr();
         echo "start_time = " . date( 'H:i' ) . '<br>';
         $this->update_quantity();
-        die();
+
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
 //        $this->find_admins();
