@@ -126,7 +126,7 @@ var REPORTS = {
             '<? } ?>' +
             '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
             '<div class="column diff-time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
+            '<div class="column diff-time" title="Перекрыт через"><?=isset("overlaps")  ? overlaps : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
             '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
