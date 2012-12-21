@@ -51,10 +51,20 @@ class AddReport
 //            if ( !empty( $repeat_check ))
 //                die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
 //        }
-
-        $repeat_check = BarterEventFactory::Get(array('barter_public' => $info['barter']['id'], 'target_public' => $info['target']['id'], '_status'=>array( 1,2,3 )));
-        if ( !empty( $repeat_check ))
+        $repeat_check = $this->repeat_check($info['target']['id'], $info['barter']['id'], $start_looking_time, $stop_looking_time );
+        if ( $repeat_check )
             die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check, $default_group->group_id ))));
+
+//        $search = array(
+//            'barter_public' => $info['barter']['id'],
+//            'target_public' => $info['target']['id'],
+//            '_status'=>array( 1,2,3 ),
+//
+//        );
+
+//        $repeat_check = BarterEventFactory::Get( array('barter_public' => $info['barter']['id'], 'target_public' => $info['target']['id'], '_status'=>array( 1,2,3 )));
+//        if ( $repeat_check )
+//            die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check, $default_group->group_id ))));
 
         if( $barter_id )
             $barter_event = BarterEventFactory::GetById( $barter_id, null, 'tst');
@@ -88,7 +98,6 @@ class AddReport
             }
         }
 
-        //делаем последнее
         if( $barter_id ) {
             BarterEventFactory::Update( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {
@@ -101,5 +110,35 @@ class AddReport
         } else
             die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something goes wrong' )));
     }
+
+    private function repeat_check( $target_public_id, $barter_public_id, $start_time, $stop_time )
+    {
+        $start_time = date( 'Y-m-d H:i:s', $start_time );
+        $stop_time  = date( 'Y-m-d H:i:s', $stop_time );
+        $sql = 'SELECT * FROM
+                    barter_events
+                WHERE
+                        barter_public = @barter_public
+                    AND target_public = @target_public
+                    AND (( start_search_at <= @start_time AND @start_time <= stop_search_at)
+                      OR ( start_search_at <= @stop_time  AND @stop_time <= stop_search_at)
+                      OR ( @start_time <= start_search_at AND stop_search_at <= @stop_time )
+                    )
+                    AND status in (1,2,3)
+                ';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+        $cmd->SetString( '@start_time', $start_time );
+        $cmd->SetString( '@stop_time',  $stop_time );
+        $cmd->SetString( '@barter_public',  $barter_public_id );
+        $cmd->SetString( '@target_public',  $target_public_id );
+        $ds = $cmd->Execute();
+        $structure  = BaseFactory::getObjectTree( $ds->Columns );
+        if( $ds->Next()) {
+            return array( BaseFactory::GetObject( $ds, BarterEventFactory::$mapping, $structure ));
+        }
+        return false;
+
+    }
+
 
 }

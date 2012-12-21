@@ -59,14 +59,14 @@ class getReportList
             '_barter_public'=>   $barter_public,
             '_target_public'=>   $target_public,
         );
-        if( strtolower( $state ) != 'complete' )
-            $search['standard_mark'] = true;
+//        if( strtolower( $state ) != 'complete' )
+//            $search['standard_mark'] = true;
 
         if( $group_id ) {
             $group_id = explode( ',', $group_id );
             $search['_groups_ids'] = $group_id;
         }
-//        print_r( $search );
+
         $options = array( 'orderBy' => $sort_by );
 //        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
 
