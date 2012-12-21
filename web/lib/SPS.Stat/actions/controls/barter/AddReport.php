@@ -24,6 +24,7 @@ class AddReport
         $start_looking_time -=  900;
         if ( $stop_looking_time && $stop_looking_time < $start_looking_time)
             $stop_looking_time += 84600;
+
         $user_id = AuthVkontakte::IsAuth();
         $default_group = GroupsUtility::get_default_group( $user_id, 1 );
         if ( !$group_id ) {
@@ -36,11 +37,11 @@ class AddReport
         }
 
         if ( !GroupsUtility::is_author( $group_id, $user_id ))
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
+            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
 
         $info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $info ))
-            die( ObjectHelper::ToJSON( array('response' => 'false','err_mes' => 'wrong publics data')));
+            die( ObjectHelper::ToJSON( array('response' => 'wrong publics data')));
         //проверяем, нет ли схожих активных событий( есть - вернет их );
         // $approve - подтверждение на создание, пока всегда 0
 //        if (  $barter_id && !$approve ) {
@@ -96,7 +97,7 @@ class AddReport
 
         if ( $barter_event->barter_event_id ) {
             $barter_event = BarterEventFactory::GetById( $barter_event->barter_event_id );
-            die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( array( $barter_event )))));
+            die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( array( $barter_event), $default_group->group_id))));
         } else
             die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something goes wrong' )));
     }

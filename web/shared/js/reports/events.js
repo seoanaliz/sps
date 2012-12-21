@@ -40,6 +40,10 @@ var simpleAjax = function(method, data, callback) {
                     alert('Такой монитор уже есть');
                     return;
                 }
+                if (result.response =='wrong publics data') {
+                    alert('Не получилось распознать паблики. Попробуйте ввести название в виде "http://vk.com/public123456" ');
+                    return;
+                }
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
             }
@@ -54,6 +58,7 @@ var Eventlist = {
         });
     },
     delete_report: function(ourPublicId, publicId, callback) {
+
         simpleAjax('deleteReport', {reportId: publicId, groupId: ourPublicId}, function(data) {
             callback(data);
         });
@@ -69,8 +74,8 @@ var Eventlist = {
             barterPublicId: publicId,
             startTime: timeStart,
             stopTime: timeStop
-        }, function() {
-            callback(true);
+        }, function(data) {
+            callback(data);
         })
     }
 };
