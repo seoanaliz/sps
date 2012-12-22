@@ -912,14 +912,18 @@ var Messages = EndlessPage.extend({
                 dialogId: t.pageId()
             });
             var $newMessage = t.addMessage(newMessageModel);
+
             $newMessage.addClass('loading');
             $textarea.focus();
             Events.fire('send_message', t.pageId(), text, function(messageId) {
-                if (!messageId) {
+                var check = $("[data-id=" + messageId + "]");
+                if (!messageId || check[0] != undefined ) {
                     $textarea.val(text);
                     $newMessage.remove();
                     return;
                 }
+
+                if ( check[0] != undefined ) return false;
                 $newMessage.removeClass('loading').attr('data-id', messageId);
             });
         } else {
@@ -930,6 +934,9 @@ var Messages = EndlessPage.extend({
         var t = this;
         if (!(messageModel instanceof MessageModel)) throw new TypeError('Message is not correct');
         if (messageModel.dialogId() != t.pageId()) return false;
+        var id = messageModel.id();
+        var check = $("[data-id=" + id + "]");
+        if ( check[0] != undefined ) return false;
 
         var $el = t.el();
         var $message = $(t.tmpl()(t._templateItem, messageModel));
