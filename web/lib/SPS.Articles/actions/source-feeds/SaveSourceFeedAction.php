@@ -30,35 +30,35 @@
          */
         protected function getFromRequest( $originalObject = null ) {
             /**
-             * @var SourceFeed $object
+             * @var SourceFeed $SourceFeed
              */
-            $object = parent::$factory->GetFromRequest();
+            $SourceFeed = parent::$factory->GetFromRequest();
 
             if ( $originalObject != null ) {
-                $object->sourceFeedId = $originalObject->sourceFeedId;
-                $object->processed = $originalObject->processed;
+                $SourceFeed->sourceFeedId = $originalObject->sourceFeedId;
+                $SourceFeed->processed = $originalObject->processed;
             } else {
-                $object->processed = null;
+                $SourceFeed->processed = null;
             }
 
             $targetFeedIds = Request::getArray( 'targetFeedIds' );
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
-            $object->targetFeedIds = implode(',', $targetFeedIds);
+            $SourceFeed->targetFeedIds = implode(',', $targetFeedIds);
 
-            if ($object->type == SourceFeedUtility::Source) {
+            if ($SourceFeed->type == SourceFeedUtility::Source) {
                 // do nothing
-            } else if ($object->type == SourceFeedUtility::Albums)   {
-                preg_match('/(\d+)_(\d+)$/', $object->externalId, $matches);
+            } else if ($SourceFeed->type == SourceFeedUtility::Albums)   {
+                preg_match('/(\d+)_(\d+)$/', $SourceFeed->externalId, $matches);
                 if (count($matches) == 3) {
-                    $object->externalId = $matches[0];
+                    $SourceFeed->externalId = $matches[0];
                 } else {
-                    $object->externalId = '-';
+                    $SourceFeed->externalId = '-';
                 }
             } else {
-                $object->externalId = '-';
+                $SourceFeed->externalId = '-';
             }
 
-            return $object;
+            return $SourceFeed;
         }
         
         

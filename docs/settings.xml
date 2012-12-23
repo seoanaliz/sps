@@ -22,7 +22,7 @@
 	
 	<!-- Database -->
     <cmd find="%db_driver%" replace="PgSql" /> <!-- MySql,PgSql -->
-    <cmd find="%db_name%" replace="sps" />
+    <cmd find="%db_name%" replace="sps2" />
     <cmd find="%db_user%" replace="postgres" /> <!-- postgres, root -->
     <cmd find="%db_pass%" replace="" />
     <cmd find="%db_encode%" replace="UTF8" /> <!-- UTF8, cp1251 -->

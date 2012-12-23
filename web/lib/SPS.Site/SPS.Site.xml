@@ -147,6 +147,29 @@
         </action>
     </group>
 
+    <group name="Users">
+        <action name="SaveAuthor">
+            <path>controls/users/SaveAuthorAction</path>
+            <redirects>
+                <redirect name="success" path="vt://authors/" />
+            </redirects>
+        </action>
+        <action name="SaveEditor">
+            <path>editors/SaveEditorAction</path>
+            <redirects>
+                <redirect name="success" path="vt://editors/" />
+            </redirects>
+        </action>
+        <action name="DeleteEditor">
+            <path>editors/SaveEditorAction</path>
+            <parameters>
+                <request>
+                    <param name="action">'delete'</param>
+                </request>
+            </parameters>
+        </action>
+    </group>
+
     <group name="AppControls">
         <group name="Articles">
             <action name="SaveArticleAppControl">

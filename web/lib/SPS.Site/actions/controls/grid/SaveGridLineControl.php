@@ -1,5 +1,5 @@
 <?php
-    Package::Load( 'SPS.Site' );
+    Package::Load('SPS.Site/base');
 
     /**
      * SaveGridLineControl Action
@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveGridLineControl {
+    class SaveGridLineControl extends BaseControl {
 
         public function Execute() {
             $gridLineId = Request::getInteger( 'gridLineId' );
@@ -33,8 +33,10 @@
                 return false;
             }
 
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+            if (!$TargetFeedAccessUtility->canSaveGridLine($targetFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }

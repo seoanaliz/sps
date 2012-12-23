@@ -7,17 +7,13 @@
      * @property Editor originalObject
      * @property Editor currentObject
      */
-    class SaveEditorAction extends BaseSaveAction  {
+    class SaveVkEditorAction extends SaveVkUserAction  {
         
         /**
          * Constructor
          */
         public function __construct() {
-            $this->options = array(
-                BaseFactory::WithoutDisabled => false
-                , BaseFactory::WithLists     => true
-            );
-
+            parent::__construct();
             parent::$factory = new EditorFactory();
         }
 
@@ -45,8 +41,6 @@
                 $object->vkId = current($matches);
             }
 
-            $object->targetFeedIds = Request::getArray( 'targetFeedIds' );
-
             try {
                 if (!empty($object->vkId)) {
                     $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $object->vkId, 'fields' => 'photo'));
@@ -59,24 +53,9 @@
             
             return $object;
         }
-        
-        
-        /**
-         * Validate Object
-         *
-         * @param Editor $object
-         * @return array
-         */
-        protected function validate( $object ) {
-            $errors = parent::$factory->Validate( $object );
-            
-            return $errors;
-        }
-        
-        
+
         /**
          * Add Object
-         *
          * @param Editor $object
          * @return bool
          */
@@ -93,28 +72,6 @@
             }
             
             return $result;
-        }
-        
-        
-        /**
-         * Update Object
-         *
-         * @param Editor $object
-         * @return bool
-         */
-        protected function update( $object ) {
-            $result = parent::$factory->Update( $object );
-            
-            return $result;
-        }
-        
-        
-        /**
-         * Set Foreign Lists
-         */
-        protected function setForeignLists() {
-            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
-            Response::setArray( 'targetFeeds', $targetFeeds );
         }
     }
 ?>
