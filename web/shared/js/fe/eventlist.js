@@ -377,11 +377,15 @@ var Eventlist = {
 
             // группы юзеров
             var userGroupTabs = $('.user-groups-tabs');
-            if (data['showUserGroups']){
+            if (data['showUserGroups']) {
                 userGroupTabs.find('.tab').remove();
                 userGroupTabs.removeClass('hidden');
                 var userGroups = data['showUserGroups'];
-                for (var i in userGroups){
+                for (var i in userGroups) {
+                    var userGroupModel = new UserGroupModel();
+                    userGroupModel.id(userGroups[i]['id']);
+                    userGroupModel.id(userGroups[i]['name']);
+                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
                     userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }
             } else {
@@ -599,55 +603,6 @@ var Eventlist = {
         });
     },
 
-    authors_get: function(callback) {
-        $.ajax({
-            url: controlsRoot + 'authors-list/',
-            data : {
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(data);
-            }
-        });
-    },
-    author_add: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-add/',
-            type: 'GET',
-            dataType : "json",
-            data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                if(data.success) {
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            }
-        });
-    },
-
-    author_remove: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-delete/',
-            type: 'GET',
-            dataType : "json",
-            data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(true);
-            }
-        });
-    },
-
-    author_edit_desc: function(userId, description, callback) {
-        callback();
-    },
-
     add_article_group: function(targetFeedId, name, callback) {
         $.ajax({
             url: controlsRoot + 'add-user-group/',
@@ -795,6 +750,24 @@ Control = $.extend(Control, {
     controlMap: {
         get_author_articles: {
             name: 'arcticles-list'
+        },
+
+        authors_get: {
+            name: 'authors-list'
+        },
+
+        author_remove: {
+            name: 'author-delete',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+
+        author_add: {
+            name: 'author-add',
+            params: {
+                authorId: 'vkId'
+            }
         }
     }
 });

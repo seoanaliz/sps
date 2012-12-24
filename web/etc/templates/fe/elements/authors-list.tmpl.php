@@ -23,9 +23,9 @@
                     <div class="name">
                         <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                     </div>
-                    <!-- div class="description">User description</div -->
                 </div>
-                <div class="delete"></div>
+                <div class="action add-to-list"></div>
+                <div class="action delete"></div>
             </div>
         <? } ?>
     </div>

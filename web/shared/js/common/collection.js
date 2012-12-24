@@ -1,5 +1,5 @@
 var Collection = Class.extend({
-    _modelClass: Model,
+    modelClass: Model,
     _models: null,
 
     init: function() {
@@ -12,7 +12,7 @@ var Collection = Class.extend({
         if (typeof key === 'undefined') {
             console.log([key, model]);
             throw new Error('Key is not correct');
-        } else if (!(model instanceof this._modelClass)) {
+        } else if (!(model instanceof this.modelClass)) {
             throw new TypeError('Model is not correct');
         }
         key += '';
