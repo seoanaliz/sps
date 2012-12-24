@@ -4,6 +4,13 @@
     /** @var $articleRecords ArticleRecord[] */
     /** @var $sourceFeeds SourceFeed[] */
     /** @var $authors Author[] */
+    /** @var $reviewArticleCount int */
+?>
+    <? if ($reviewArticleCount): ?>
+     <div>Показать <?=$reviewArticleCount?> отложенные записи</div>
+    <? endif; ?>
+<?
+
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();

@@ -622,6 +622,9 @@
                     <actions>SPS.Site.GetArticlesAppListControl</actions>
                     <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
                 </page>
+                <page uri="appControls://user-groups/">
+                    <actions>SPS.Site.GetUserGroups</actions>
+                </page>
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>
                 </page>

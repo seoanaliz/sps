@@ -109,13 +109,11 @@ abstract class BaseModelFactory implements IFactory {
         return BaseFactory::Get($searchArray, static::$mapping, $options, $connectionName);
     }
 
-    /** @return UserFeed */
     public static function GetById($id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection)
     {
         return BaseFactory::GetById($id, $searchArray, static::$mapping, $options, $connectionName);
     }
 
-    /** @return UserFeed */
     public static function GetOne($searchArray = null, $options = null, $connectionName = self::DefaultConnection)
     {
         return BaseFactory::GetOne($searchArray, static::$mapping, $options, $connectionName);

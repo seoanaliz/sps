@@ -92,5 +92,8 @@
          * @var int
          */
         public $articleStatus;
+
+        /** @var int */
+        public $userGroupId;
     }
 ?>

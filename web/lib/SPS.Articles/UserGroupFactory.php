@@ -32,11 +32,25 @@ class UserGroupFactory extends BaseModelFactory {
                 'name' => 'name',
                 'type' => TYPE_STRING
             ),
+        ),
+        'search' => array(
+            'vkId' => array(
+                'name'         => 'vkId',
+                'type'       => TYPE_INTEGER,
+            ),
+            'targetFeedId' => array(
+                'name'         => 'targetFeedId',
+                'type'       => TYPE_INTEGER,
+            ),
         )
     );
 
 
     public static function GetForTargetFeed($targetFeedId){
         return self::Get(array('targetFeedId' => $targetFeedId));
+    }
+
+    public static function GetForUserTargetFeed($targetFeedId, $vkId){
+        return self::Get(array('targetFeedId' => $targetFeedId, 'vkId' => $vkId));
     }
 }

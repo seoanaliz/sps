@@ -89,6 +89,11 @@
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
                 )
+                ,'userGroupId' => array(
+                    'name'          => 'userGroupId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'foreignKey'  => 'UserGroup'
+                )
                 ,'articleStatus' => array(
                     'name'          => 'articleStatus'
                     , 'type'        => TYPE_INTEGER

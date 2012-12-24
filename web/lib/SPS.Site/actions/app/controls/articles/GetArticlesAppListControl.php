@@ -1,5 +1,4 @@
 <?php
-Package::Load('SPS.Site/base');
 /**
  * Конторллер списка постов для VK приложения
  * GetArticlesAppListControl Action

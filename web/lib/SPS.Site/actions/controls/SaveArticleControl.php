@@ -79,11 +79,23 @@ class SaveArticleControl extends BaseControl
         $article->sourceFeedId = $sourceFeedId;
         $article->externalId = -1;
         $article->rate = 100;
+        $article->authorId = AuthorFactory::GetOne(array('vkId' => $this->vkId))->authorId;
         $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
         $article->isCleaned = false;
         $article->statusId = 1;
         // создает редактор, наверное нужно брать статус исходя из пользователя
         $article->articleStatus = Article::STATUS_APPROVED;
+
+        $userGroupId =  Request::getArray('userGroupId');
+        if (is_numeric($userGroupId)){
+            // TODO сделать проверку, что пользователь может добавлять статью для это группы
+            $article->userGroupId = $userGroupId;
+        } else {
+            $UserGroup = UserGroupFactory::GetOne(array('vkId' => $this->vkId, 'targetFeedId' => $article->targetFeedId));
+            if ($UserGroup) {
+                $article->userGroupId = $UserGroup->userGroupId;
+            }
+        }
 
         $articleRecord = new ArticleRecord();
         $articleRecord->content = $text;
