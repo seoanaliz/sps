@@ -31,7 +31,15 @@ class UserUserGroupFactory extends BaseModelFactory
             'userGroupId' => array(
                 'name' => 'userGroupId',
                 'type' => TYPE_INTEGER
-            )
+            ),
+            'vkIdIn' => array(
+                'name' => 'vkId',
+                'type' => SEARCHTYPE_ARRAY
+            ),
+            'userGroupIdIn' => array(
+                'name' => 'userGroupId',
+                'type' => SEARCHTYPE_ARRAY
+            ),
         ),
     );
 }
