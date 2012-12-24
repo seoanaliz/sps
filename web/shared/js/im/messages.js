@@ -78,7 +78,7 @@ var Messages = EndlessPage.extend({
         t.onShow();
         t.makeTextarea(t.el().find('textarea:first'));
         if (t.checkAtTop()) {
-            $(window).trigger('scroll');
+            t.onScroll();
         }
     },
     makeList: function($list) {
@@ -105,7 +105,8 @@ var Messages = EndlessPage.extend({
         var dialogId = t.pageId();
         var dialogModel = dialogCollection.get(dialogId);
         var listId = dialogModel.lists()[dialogModel.lists().length-1];
-        Events.fire('get_templates', listId, function(data) {
+        var deferred = Control.fire('get_templates', {listId: listId});
+        deferred.success(function(data) {
             $textarea.autocomplete({
                 position: 'top',
                 notFoundText: '',
@@ -152,7 +153,8 @@ var Messages = EndlessPage.extend({
             var $newMessage = t.addMessage(newMessageModel);
             $newMessage.addClass('loading');
             $textarea.focus();
-            Events.fire('send_message', t.pageId(), text, function(messageId) {
+            var deferred = Control.fire('send_message', {pageId: t.pageId(), text: text});
+            deferred.success(function(messageId) {
                 if (!messageId) {
                     $textarea.val(text);
                     $newMessage.remove();
