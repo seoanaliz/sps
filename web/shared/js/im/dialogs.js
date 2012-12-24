@@ -184,12 +184,11 @@ var Dialogs = EndlessPage.extend({
     onRender: function() {
         var t = this;
         if (t.checkAtBottom()) {
-            $(window).trigger('scroll');
+            t.onScroll();
         }
     },
     addDialog: function(dialogModel) {
         var t = this;
-        console.log(dialogModel);
         var isCommonList = (t.pageId() == Configs.commonDialogsList);
         if (!(dialogModel instanceof DialogModel)) {
             throw new TypeError('Dialog is not correct');
