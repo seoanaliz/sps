@@ -26,7 +26,7 @@ abstract class SaveVkUserAction extends BaseSaveAction
             $exist = false;
         }
         $Editor->avatar = $Author->avatar;
-        $Editor->firstName = $Author->lastName;
+        $Editor->firstName = $Author->firstName;
         $Editor->lastName = $Author->lastName;
         $Editor->statusId = $Author->statusId;
         if ($exist){
@@ -49,7 +49,7 @@ abstract class SaveVkUserAction extends BaseSaveAction
             $exist = false;
         }
         $Author->avatar = $Editor->avatar;
-        $Author->firstName = $Editor->lastName;
+        $Author->firstName = $Editor->firstName;
         $Author->lastName = $Editor->lastName;
         $Author->statusId = $Editor->statusId;
         if ($exist){

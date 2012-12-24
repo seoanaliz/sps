@@ -155,13 +155,13 @@
             </redirects>
         </action>
         <action name="SaveEditor">
-            <path>editors/SaveEditorAction</path>
+            <path>controls/users/SaveEditorAction</path>
             <redirects>
                 <redirect name="success" path="vt://editors/" />
             </redirects>
         </action>
         <action name="DeleteEditor">
-            <path>editors/SaveEditorAction</path>
+            <path>controls/users/SaveEditorAction</path>
             <parameters>
                 <request>
                     <param name="action">'delete'</param>
