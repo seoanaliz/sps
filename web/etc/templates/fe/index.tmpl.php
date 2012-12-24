@@ -43,8 +43,7 @@
                     <div id="slider-range"></div>
                 </div>
 
-                <div class="user-groups-tabs hidden">
-                    <div class="add-user-group-button">+</div>
+                <div class="user-groups-tabs tab-bar no-padding hidden">
                 </div>
 
                 <div class="authors-tabs tab-bar no-padding">
