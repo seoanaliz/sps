@@ -5,28 +5,27 @@ Control = $.extend(Control, {
     dataType: 'html',
 
     controlMap: {
-        get_author_articles: {
-            name: 'arcticles-list'
+        get_articles: {
+            name: 'arcticles-list',
+            params: {
+                articlesOnly: 'articles-only'
+            }
         },
-
         authors_get: {
             name: 'authors-list'
         },
-
         author_remove: {
             name: 'author-delete',
             params: {
                 authorId: 'vkId'
             }
         },
-
         author_add: {
             name: 'author-add',
             params: {
                 authorId: 'vkId'
             }
         },
-
         add_list: {
             name: 'add-user-group',
             dataType: 'json'
@@ -38,7 +37,6 @@ Control = $.extend(Control, {
                 listId: 'userGroupId'
             }
         },
-
         remove_from_list: {
             name: 'remove-user-from-group',
             params: {
@@ -147,22 +145,22 @@ function loadArticles(clean) {
 
     //clean and load left column
     $.ajax({
-            url: controlsRoot + 'arcticles-list/',
-            dataType : "html",
-            data: requestData
-        }).always(function() {
-            $('#wall-load').hide();
-            if (clean) {
-                $('#wall').empty();
-            }
-        }).done(function(data) {
-            articlesLoading = false;
-            var $block = $(data);
-            Elements.initDraggable($block);
-            Elements.initImages($block);
-            Elements.initLinks($block);
-            $('#wall').append($block);
-        });
+        url: controlsRoot + 'arcticles-list/',
+        dataType: "html",
+        data: requestData
+    }).always(function() {
+        $('#wall-load').hide();
+        if (clean) {
+            $('#wall').empty();
+        }
+    }).done(function(data) {
+        articlesLoading = false;
+        var $block = $(data);
+        Elements.initDraggable($block);
+        Elements.initImages($block);
+        Elements.initLinks($block);
+        $('#wall').append($block);
+    });
 }
 
 function loadQueue() {

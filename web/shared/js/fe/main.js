@@ -413,9 +413,10 @@ $(document).ready(function(){
         var sortType = $('.wall-title a').data('type');
         $leftPanel.find('.authors-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
-        $('#wall-load').show();
 
-        Control.fire('get_author_articles', {
+        wallPage = 0;
+        $('#wall-load').show();
+        Control.fire('get_articles', {
             page: wallPage,
             sortType: sortType,
             type: Elements.leftType(),
@@ -441,9 +442,10 @@ $(document).ready(function(){
         var sortType = $('.wall-title a').data('type');
         $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
-        $('#wall-load').show();
 
-        Control.fire('get_author_articles', {
+        wallPage = 0;
+        $('#wall-load').show();
+        Control.fire('get_articles', {
             page: wallPage,
             sortType: sortType,
             type: Elements.leftType(),
@@ -517,7 +519,45 @@ $(document).ready(function(){
             });
         })
         .delegate('.show-all-postponed', 'click', function() {
-            console.log(1);
+            var $target = $(this);
+            if ($target.data('block')) {
+                var $posts = $target.data('block');
+                if ($posts.first().is(':visible')) {
+                    $target.html('Скрыть отложенные записи');
+                    $posts.hide();
+                } else {
+                    $target.html($target.data('def-html'));
+                    $posts.show();
+                }
+            } else {
+                var $tabs = $leftPanel.find('.user-groups-tabs');
+                var sortType = $('.wall-title a').data('type');
+                var userGroupId;
+                if ($tabs.is(':visible')) {
+                    userGroupId = $tabs.find('.tab.selected').data('user-group-id')
+                }
+                $target.data('def-html', $target.html());
+
+                wallPage = 0;
+                $('#wall-load').show();
+                Control.fire('get_articles', {
+                    page: wallPage,
+                    sortType: sortType,
+                    type: Elements.leftType(),
+                    targetFeedId: Elements.rightdd(),
+                    userGroupId: userGroupId,
+                    articlesOnly: true,
+                    mode: 'my',
+                    articleStatus: 3
+                }).success(function(html) {
+                    var $posts = $(html);
+                    Elements.initImages($posts);
+                    Elements.initLinks($posts);
+                    $target.after($posts);
+                    $('#wall-load').hide();
+                    $target.data('block', $posts)
+                });
+            }
         });
 
     $("#queue")
