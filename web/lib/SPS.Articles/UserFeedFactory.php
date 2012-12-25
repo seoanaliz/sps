@@ -150,6 +150,7 @@ class UserFeedFactory implements IFactory
      */
     public static function GetForTargetFeed($targetFeedId)
     {
+        if (!$targetFeedId) return array();
         $UserFeeds = BaseFactory::Get(array('targetFeedId' => $targetFeedId), self::$mapping, null, self::DefaultConnection);
         $result = array();
         foreach ($UserFeeds as $UserFeed) {

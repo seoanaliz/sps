@@ -48,9 +48,9 @@ class GetIndexPage extends BaseControl
         }
 
 
-        $sourceTypes = $gridTypes = array();
+        $availableSourceTypes = $gridTypes = array();
         if ($currentTargetFeedId) {
-            $sourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($currentTargetFeedId);
+            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($currentTargetFeedId);
             $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
         }
 
@@ -89,11 +89,10 @@ class GetIndexPage extends BaseControl
         Response::setParameter('currentDate', SettingsUtility::GetDate());
         Response::setParameter('SourceAccessUtility', $SourceAccessUtility);
         Response::setParameter('sourceTypes', SourceFeedUtility::$Types);
-        Response::setParameter('availableSourceTypes', $sourceTypes);
+        Response::setParameter('availableSourceTypes', $availableSourceTypes);
         Response::setParameter('gridTypes', $gridTypes);
         Response::setParameter('availableArticleStatuses', $availableArticleStatuses);
         Response::setParameter('articleStatuses', $articleStatuses);
-
         Response::setParameter('isShowSourceList', $isShowSourceList);
     }
 }

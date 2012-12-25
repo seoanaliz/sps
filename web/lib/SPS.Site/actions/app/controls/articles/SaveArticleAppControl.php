@@ -36,33 +36,34 @@ class SaveArticleAppControl extends BaseControl {
         $author = $this->getAuthor();
         if (!$author) {
             $result['message'] = 'authentification failed';
+            echo ObjectHelper::ToJSON($result);
             return false;
         }
 
+        $userGroupId = Request::getArray('userGroupId');
+        if (!$userGroupId || !is_numeric($userGroupId)) {
+            $result['message'] = 'emptyUserGroup';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+        // TODO сделать проверку, что пользователь может добавлять статью для это группы
 
-        $RoleAccessUtility = new RoleAccessUtility($this->vkId);
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
-        // получаем список лент отправки и ролей
-        $targetFeedIdsByRoles = $RoleAccessUtility->getTargetFeedIds();
-        $role = null;
         $targetFeedId = $this->getTargetFeedId();
 
         if ($targetFeedId) {
-            // хотим запостить в какую-то ленту
-            $targetFeedIds = null;
-            foreach ($targetFeedIdsByRoles as $role=>$targetFeedIds) {
-                if (in_array($targetFeedId, $targetFeedIds)) {
-                    break;
-                }
-            }
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
 
-            if (!$targetFeedIds) {
+            if (!$role) {
                 $result['message'] = 'emptyTargetFeedId';
+                echo ObjectHelper::ToJSON($result);
                 return false;
             }
         } else {
-            // постим к себе
-            $targetFeedId = -1;
+            $result['message'] = 'emptyTargetFeed';
+            echo ObjectHelper::ToJSON($result);
+            return false;
         }
 
         $text = trim(Request::getString('text'));
@@ -83,18 +84,7 @@ class SaveArticleAppControl extends BaseControl {
         } else {
             $article->articleStatus = Article::STATUS_APPROVED;
         }
-
-        $userGroupId =  Request::getArray('userGroupId');
-        if (is_numeric($userGroupId)){
-            // TODO сделать проверку, что пользователь может добавлять статью для это группы
-            $article->userGroupId = $userGroupId;
-        } else {
-            $UserGroup = UserGroupFactory::GetOne(array('vkId' => $this->vkId, 'targetFeedId' => $article->targetFeedId));
-            if ($UserGroup) {
-                $article->userGroupId = $UserGroup->userGroupId;
-            }
-        }
-
+        $article->userGroupId = $userGroupId;
 
         $articleRecord = new ArticleRecord();
         $articleRecord->content = mb_substr($text, 0, 4100);
@@ -138,9 +128,7 @@ class SaveArticleAppControl extends BaseControl {
     private function add($article, $articleRecord)
     {
         ConnectionFactory::BeginTransaction();
-
         $result = ArticleFactory::Add($article);
-
         if ($result) {
             $article->articleId = ArticleFactory::GetCurrentId();
             $articleRecord->articleId = $article->articleId;

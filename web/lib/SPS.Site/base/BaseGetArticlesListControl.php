@@ -69,9 +69,10 @@ abstract class BaseGetArticlesListControl extends BaseControl
      */
     protected $ArticleAccessUtility;
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
-        $this->ArticleAccessUtility= new ArticleAccessUtility($this->vkId);
+        $this->ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
     }
 
     /**
@@ -91,14 +92,16 @@ abstract class BaseGetArticlesListControl extends BaseControl
      * Какие типы источников используем
      * @return string|null
      */
-    protected function getSourceFeedType(){
+    protected function getSourceFeedType()
+    {
         return Request::getString('type');
     }
 
     /**
      * Возвращает идентификатор запрошеной ленты
      */
-    protected function getTargetFeedId(){
+    protected function getTargetFeedId()
+    {
         return Request::getInteger('targetFeedId');
     }
 
@@ -106,7 +109,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
      * Возвращает массив источников
      * @return array
      */
-    protected function getSourceFeedIds() {
+    protected function getSourceFeedIds()
+    {
         $sourceFeedIds = Request::getArray('sourceFeedIds');
         return !empty($sourceFeedIds) ? $sourceFeedIds : array();
     }
@@ -114,7 +118,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
     /**
      * Возвращает статус записи
      */
-    protected function getArticleStatus(){
+    protected function getArticleStatus()
+    {
         return Request::getInteger('articleStatus');
     }
 
@@ -124,6 +129,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
      */
     protected function processRequest()
     {
+        $useSourceFilter = false;
+
         // Определяем страницу
         $this->processPage();
 
@@ -133,21 +140,12 @@ abstract class BaseGetArticlesListControl extends BaseControl
         // для какой ленты
         // только для ТопФейса и Авторских, т.к. у них это заранее определено
         $targetFeedId = $this->getTargetFeedId();
-        if ($targetFeedId && ($sourceFeedType == SourceFeedUtility::Authors || $sourceFeedType == SourceFeedUtility::Topface)){
+        if ($targetFeedId && ($sourceFeedType == SourceFeedUtility::Authors || $sourceFeedType == SourceFeedUtility::Topface)) {
             $this->search['targetFeedId'] = $targetFeedId;
-        }
-
-        // определяем источники
-        $sourceFeedIds = $this->getSourceFeedIds();
-        if ($sourceFeedIds) {
-            $this->search['_sourceFeedId'] = $sourceFeedIds;
-        } else {
-            $this->search['_sourceFeedId'] = array(-999 => -999);
         }
 
         // если запрашиваем авторские посты
         if ($sourceFeedType == SourceFeedUtility::Authors) {
-            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
 
             if ($this->ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
 
@@ -166,19 +164,21 @@ abstract class BaseGetArticlesListControl extends BaseControl
             }
 
             $this->userRateFilter = false;
-        }
-        // источник - топфейс
+        } // источник - топфейс
         elseif ($sourceFeedType == SourceFeedUtility::Topface) {
             // TODO узнать - только проверить доступ?
             if (!$this->ArticleAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                 throw new Exception('Access error');
             }
-            // в топфейсе не сортируем
-            unset($this->search['rateGE'], $this->search['rateLE']);
-            // выставляем источники вручную
-            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
 
             $this->userRateFilter = false;
+        } elseif ($sourceFeedType == SourceFeedUtility::My) {
+            $this->userRateFilter = false;
+            $this->search['authorId'] = $this->getAuthor()->authorId;
+        } elseif ($sourceFeedType == SourceFeedUtility::Source) {
+            $useSourceFilter = true;
+        } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
+            $useSourceFilter = true;
         }
 
         // фильтр по рейтингу
@@ -194,6 +194,17 @@ abstract class BaseGetArticlesListControl extends BaseControl
             }
         }
 
+        // фильтр по источникам
+        // определяем источники
+        if ($useSourceFilter) {
+            $sourceFeedIds = $this->getSourceFeedIds();
+            if ($sourceFeedIds) {
+                $this->search['_sourceFeedId'] = $sourceFeedIds;
+            } else {
+                $this->search['_sourceFeedId'] = array(-999 => -999);
+            }
+        }
+
         $this->processRequestCustom();
     }
 
@@ -201,14 +212,16 @@ abstract class BaseGetArticlesListControl extends BaseControl
      * Функция, расширяющая условия выборки
      * @return mixed
      */
-    protected function processRequestCustom(){
+    protected function processRequestCustom()
+    {
         //pass
     }
 
     /**
      * Загрузка комментариев
      */
-    protected function loadComments(){
+    protected function loadComments()
+    {
         if ($this->articles) {
             $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
         }

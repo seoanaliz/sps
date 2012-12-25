@@ -23,12 +23,17 @@
         public function Execute() {
             parent::Execute();
 
-            $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
+            if ($this->objectId) {
+                $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
+            } else {
+                $UserFeeds = array();
+            }
+
 
             Response::setParameter('UserFeeds', $UserFeeds );
             Response::setParameter('roles', array(
                 UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
-                UserFeed::ROLE_OWNER=> 'Владелец',
+                UserFeed::ROLE_OWNER => 'Владелец',
                 UserFeed::ROLE_EDITOR => 'Редактор',
                 UserFeed::ROLE_AUTHOR => 'Автор',
             ) );

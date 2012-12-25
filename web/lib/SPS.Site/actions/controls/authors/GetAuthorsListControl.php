@@ -1,6 +1,4 @@
 <?php
-Package::Load('SPS.Site/base');
-
 /**
  * Возвращает список авторов для ленты
  * @package    SPS
@@ -13,7 +11,8 @@ class GetAuthorsListControl extends BaseControl
     /**
      * Entry Point
      */
-    public function Execute() {
+    public function Execute()
+    {
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $targetFeedId = Request::getInteger('targetFeedId');
 
@@ -27,7 +26,7 @@ class GetAuthorsListControl extends BaseControl
             $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
             if ($UserFeeds) {
                 $vkIds = array();
-                foreach ($UserFeeds as $UserFeed){
+                foreach ($UserFeeds as $UserFeed) {
                     $vkIds[] = $UserFeed->vkId;
                 }
 
@@ -41,7 +40,7 @@ class GetAuthorsListControl extends BaseControl
                     )
                 );
 
-                foreach ($authors as $author){
+                foreach ($authors as $author) {
                     $authorGroups[$author->vkId] = array();
                 }
 
@@ -49,13 +48,13 @@ class GetAuthorsListControl extends BaseControl
                     $UserGroups = UserGroupFactory::Get(array('targetFeedId' => $targetFeedId));
                     if ($UserGroups) {
                         $userGroupIds = array();
-                        foreach($UserGroups as $UserGroup){
+                        foreach ($UserGroups as $UserGroup) {
                             $userGroupIds[] = $UserGroup->userGroupId;
                         }
-                        $UserUserGroups = UserUserGroupFactory::Get(array('vkIdIn' => array_keys($authorGroups), 'userGroupIdIn'=>$userGroupIds));
-                        if ($UserUserGroups){
-                            foreach ($UserUserGroups as $UserUserGroup){
-                                $authorGroups[$UserUserGroup->vkId][] =  $UserUserGroup->userGroupId;
+                        $UserUserGroups = UserUserGroupFactory::Get(array('vkIdIn' => array_keys($authorGroups), 'userGroupIdIn' => $userGroupIds));
+                        if ($UserUserGroups) {
+                            foreach ($UserUserGroups as $UserUserGroup) {
+                                $authorGroups[$UserUserGroup->vkId][] = $UserUserGroup->userGroupId;
                             }
                         }
                     }

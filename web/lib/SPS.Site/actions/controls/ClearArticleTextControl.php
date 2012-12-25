@@ -1,44 +1,40 @@
 <?php
-Package::Load('SPS.Site\base');
-
-/**
- * ClearArticleTextControl Action
- * @package    SPS
- * @subpackage Site
- * @author     Shuler
- */
-class ClearArticleTextControl extends BaseControl
-{
-
     /**
-     * Entry Point
+     * ClearArticleTextControl Action
+     * @package    SPS
+     * @subpackage Site
+     * @author     Shuler
      */
-    public function Execute()
-    {
-        $id = Request::getInteger('id');
+    class ClearArticleTextControl extends BaseControl {
 
-        if (empty($id)) {
-            return;
-        }
+        /**
+         * Entry Point
+         */
+        public function Execute() {
+            $id = Request::getInteger( 'id' );
 
-        $object = ArticleFactory::GetById($id);
-        if (empty($object)) {
-            return;
-        }
+            if (empty($id)) {
+                return;
+            }
 
-        $SourceAccessUtility =new SourceAccessUtility($this->vkId);
+            $object = ArticleFactory::GetById($id);
+            if (empty($object)) {
+                return;
+            }
 
-        //check access
-        if (!$SourceAccessUtility->hasAccessToSourceFeed($object->sourceFeedId)) {
-            return;
-        }
+            $SourceAccessUtility =new SourceAccessUtility($this->vkId);
 
-        if ($id) {
-            $o = new ArticleRecord();
-            $o->content = '';
-            ArticleRecordFactory::UpdateByMask($o, array('content'), array('articleId' => $id));
+            //check access
+            if (!$SourceAccessUtility->hasAccessToSourceFeed($object->sourceFeedId)) {
+                return;
+            }
+
+            if ($id) {
+                $o = new ArticleRecord();
+                $o->content = '';
+                ArticleRecordFactory::UpdateByMask($o, array('content'), array('articleId' => $id));
+            }
         }
     }
-}
 
 ?>

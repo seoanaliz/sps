@@ -7,8 +7,15 @@
      */
     class AuthorFeedViewUtility {
 
-        public static function GetCounters($authorId, $targetFeedIds) {
+        public static function GetCounters($authorId) {
             $result = array();
+
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility();
+            $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
+
+            if (!$targetFeedIds) {
+                return array();
+            }
 
             //фиксим даты
             self::fixViews($authorId, $targetFeedIds);

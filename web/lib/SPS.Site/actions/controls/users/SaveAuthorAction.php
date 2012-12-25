@@ -7,17 +7,13 @@
      * @property Author originalObject
      * @property Author currentObject
      */
-    class SaveAuthorAction extends BaseSaveAction  {
+    class SaveAuthorAction extends SaveVkUserAction  {
         
         /**
          * Constructor
          */
         public function __construct() {
-            $this->options = array(
-                BaseFactory::WithoutDisabled => false
-                , BaseFactory::WithLists     => true
-            );
-
+            parent::__construct();
             parent::$factory = new AuthorFactory();
         }
 
@@ -45,8 +41,6 @@
                 $object->vkId = current($matches);
             }
 
-            $object->targetFeedIds = Request::getArray( 'targetFeedIds' );
-
             try {
                 if (!empty($object->vkId)) {
                     $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $object->vkId, 'fields' => 'photo'));
@@ -60,20 +54,6 @@
             return $object;
         }
         
-        
-        /**
-         * Validate Object
-         *
-         * @param Author $object
-         * @return array
-         */
-        protected function validate( $object ) {
-            $errors = parent::$factory->Validate( $object );
-            
-            return $errors;
-        }
-        
-        
         /**
          * Add Object
          *
@@ -85,36 +65,18 @@
             $exists = AuthorFactory::GetOne(array('vkId' => $object->vkId), array(BaseFactory::WithoutDisabled => false));
 
             if (empty($exists)) {
-                $result = parent::$factory->Add( $object );
+                $result = parent::$factory->Add($object);
             } else {
                 //update
                 $object->authorId = $exists->authorId;
-                $result = parent::$factory->Update( $object );
+                $result = parent::$factory->Update($object);
+            }
+
+            if ($result){
+                $this->afterSaveAuthor($object);
             }
             
             return $result;
-        }
-        
-        
-        /**
-         * Update Object
-         *
-         * @param Author $object
-         * @return bool
-         */
-        protected function update( $object ) {
-            $result = parent::$factory->Update( $object );
-            
-            return $result;
-        }
-        
-        
-        /**
-         * Set Foreign Lists
-         */
-        protected function setForeignLists() {
-            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
-            Response::setArray( 'targetFeeds', $targetFeeds );
         }
     }
 ?>

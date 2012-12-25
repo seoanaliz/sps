@@ -7,6 +7,10 @@
  * @author     Shuler
  */
 final class GetArticlesAppListControl extends BaseGetArticlesListControl {
+    const MODE_MY = 'my';
+
+    const MODE_ALL = 'all';
+
     /**
      * @var AuthorEvent[]
      */
@@ -24,16 +28,21 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
      */
     protected $userRateFilter = false;
 
-    /**
-     * по умолчанию - режим показа моих записей
-     * @var string
-     */
-    private $mode = 'my';
-
 
     protected function getSourceFeedType(){
         // показываем только авторские
         return SourceFeedUtility::Authors;
+    }
+
+    protected function getMode(){
+        // если есть лента - показываем для нее
+        // безопасность проверена в parent::processRequest
+        $targetFeedId = $this->getTargetFeedId();
+        if ($targetFeedId) {
+            return self::MODE_ALL;
+        }
+
+        return self::MODE_MY;
     }
 
     /**
@@ -47,38 +56,22 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         return null;
     }
 
-    /**
-     * Возвращает массив источников
-     * @return array
-     */
-    protected function getSourceFeedIds() {
-        $sourceFeedIds = Request::getArray('sourceFeedIds');
-        return !empty($sourceFeedIds) ? $sourceFeedIds : array();
-    }
-
 
     protected function processRequestCustom(){
-
-        unset($this->options['_sourceFeedId']);
-
         $author = $this->getAuthor();
-        // получаем доступные ленты
-        $targetFeedIds = $this->ArticleAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
 
+        $mode = $this->getMode();
 
-        //все авторские посты
-        $this->search['sourceFeedId'] = SourceFeedUtility::FakeSourceAuthors;
-
-        // если есть лента - показываем для нее
-        // безопасность проверена в parent::processRequest
-        $targetFeedId = $this->getTargetFeedId();
-        if ($targetFeedId) {
-            $this->mode = 'targetFeed';
-        }
-
-
-        if ($this->mode == 'my') {
+        if ($mode == self::MODE_MY) {
             $this->search['authorId'] = $author->authorId;
+        } else {
+            // получаем доступные ленты
+            $targetFeedIds = $this->ArticleAccessUtility->getAllTargetFeedIds();
+            $targetFeedId = $this->getTargetFeedId();
+            if (!in_array($targetFeedId, $targetFeedIds)) {
+                echo ObjectHelper::ToJSON(array('success' => false));
+                return;
+            }
         }
 
         // сортировка
@@ -86,19 +79,11 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         switch ($filter) {
             case 'best':
                 $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
-                break;
-            case 'new':
-                // дефолтная сортировка
-                break;
-            case 'my':
-            default:
-
             break;
         }
 
         $tabType = Request::getString('tabType');
         Response::setString('tabType', $tabType);
-
 
         switch ($tabType) {
             case 'queued':
@@ -109,10 +94,6 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
                 $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
                 $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
                 break;
-            case 'all':
-            default:
-                // дефолтная сортировка
-            break;
         }
 
         $this->options[BaseFactory::WithoutDisabled] = false;
@@ -135,6 +116,8 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         // статьи, комменты и т.д.
         parent::getObjects();
 
+        $mode = $this->getMode();
+
         if (!empty($this->articles)) {
             // получаем ленты
             $targetFeedIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('targetFeedId'));
@@ -143,12 +126,12 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
             }
 
             // получем события
-            if ($this->mode == 'my') {
+            if ($mode == self::MODE_MY) {
                 $this->authorEvents = AuthorEventFactory::Get(array('_articleId' => array_keys($this->articles)));
             }
         }
 
-        if ($this->mode == 'my') {
+        if ($mode == self::MODE_MY) {
             $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
         }
     }

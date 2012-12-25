@@ -1,6 +1,5 @@
 <?
 /**
- * @var $SourceAccessUtility SourceAccessUtility
  * @var $sourceTypes array
  * @var $gridTypes array
  * @var $availableSourceTypes array
@@ -24,7 +23,7 @@
                     ?>
                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
                           <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
-                          id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
+                          id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                     <?
                     $isFirst++;
                     endforeach;

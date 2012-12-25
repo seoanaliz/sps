@@ -531,7 +531,7 @@
          * @param array   $mapping         the object mapping
          * @param array|null   $options
          * @param string  $connectionName  the database connection name
-         * @return boolean
+         * @return array|boolean
          */
         public static function Add( $object, array $mapping, $options, $connectionName = null ) {
             $errors = BaseFactory::Validate( $object, $mapping, $options, $connectionName );
@@ -907,7 +907,7 @@
 
                 $regenerateCache = MemcacheHelper::AddBlock( $cacheKey );
                 if( $regenerateCache == false && $cacheResult == false ) {
-                    // sleep( 0.1 );
+                    sleep( 0.1 );
                     // TODO rewrite
                 }
                 $cacheResult  = MemcacheHelper::Get( $cacheKey );
@@ -1138,7 +1138,7 @@
          *
          * @param object $object
          * @param array $changes
-         * @param array $searchArray
+         * @param array|null $searchArray
          * @param array $mapping
          * @param string $connectionName
          * @return bool

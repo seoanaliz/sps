@@ -1,5 +1,5 @@
 <?php
-Package::Load('SPS.Site/base');
+Package::Load('SPS.Site');
 
 /**
  * GetAppIndexPage Action
@@ -15,17 +15,18 @@ class GetAppIndexPage extends BaseControl
      */
     public function Execute()
     {
-        /** @var $author Author */
         $author = $this->getAuthor();
 
-        $RoleAccessUtility = new RoleAccessUtility($author->vkId);
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $targetFeeds = array();
 
-        $targetFeedIds = $RoleAccessUtility->getAllTargetFeedIds();
-
-
-        //паблики, к которым у пользователя есть доступ
-        $targetFeeds = TargetFeedFactory::Get( array('_targetFeedId' => $targetFeedIds));
-
+        $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
+        if ($targetFeedIds) {
+            //паблики, к которым у пользователя есть доступ
+            $targetFeeds = TargetFeedFactory::Get(
+                array('_targetFeedId' => $targetFeedIds)
+            );
+        }
 
         $targetFeedIdsWithPosts = array();
         $sql = <<<eof
@@ -45,7 +46,7 @@ eof;
 
         // счетчик событий автора
         $authorCounter = AuthorEventUtility::GetAuthorCounter($author->authorId);
-        $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId, $targetFeedIds);
+        $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId);
 
         Response::setArray('targetFeeds', $targetFeeds);
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId'));

@@ -1,56 +1,51 @@
 <?php
-Package::Load('SPS.Site/base');
-
-/**
- * GetArticleControl Action
- * @package    SPS
- * @subpackage Site
- * @author     Shuler
- */
-class GetArticleControl extends BaseControl
-{
-
     /**
-     * Entry Point
+     * GetArticleControl Action
+     * @package    SPS
+     * @subpackage Site
+     * @author     Shuler
      */
-    public function Execute()
-    {
-        $articleId = Request::getInteger('articleId');
-        if (empty($articleId)) return;
+    class GetArticleControl extends BaseControl {
 
-        $article = ArticleFactory::GetById($articleId);
+        /**
+         * Entry Point
+         */
+        public function Execute() {
+            $articleId = Request::getInteger( 'articleId' );
+            if (empty($articleId)) return;
 
-        if (empty($article)) return;
+            $article = ArticleFactory::GetById($articleId);
 
-        $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+            if (empty($article)) return;
 
-        //check access
-        if (!$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
-            return;
-        }
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
-        $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
-
-        if (empty($articleRecord)) return;
-
-        $photos = array();
-        if (!empty($articleRecord->photos)) {
-            foreach ($articleRecord->photos as $photoItem) {
-                $photo = $photoItem;
-                $photo['path'] = MediaUtility::GetFilePath('Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation);
-                $photos[] = $photo;
+            //check access
+            if (!$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
+                return;
             }
+
+            $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
+
+            if (empty($articleRecord)) return;
+
+            $photos = array();
+            if (!empty($articleRecord->photos)) {
+                foreach($articleRecord->photos as $photoItem) {
+                    $photo = $photoItem;
+                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $photos[] = $photo;
+                }
+            }
+
+            $result = array(
+                'id' => $articleId,
+                'text' => nl2br($articleRecord->content),
+                'photos' => ObjectHelper::ToJSON($photos),
+                'link' => $articleRecord->link
+            );
+
+            echo ObjectHelper::ToJSON($result);
         }
-
-        $result = array(
-            'id' => $articleId,
-            'text' => nl2br($articleRecord->content),
-            'photos' => ObjectHelper::ToJSON($photos),
-            'link' => $articleRecord->link
-        );
-
-        echo ObjectHelper::ToJSON($result);
     }
-}
-
 ?>

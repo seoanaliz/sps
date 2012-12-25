@@ -278,7 +278,8 @@ $(document).ready(function(){
                 var $author = $target.closest('.author');
                 (function updateDropdown() {
                     var authorId = $author.data('id');
-                    var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
+
+                    var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
                     var authorGroups = [];
                     $.each(userGroupCollection.get(), function(id, userGroupModel) {
                         if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
