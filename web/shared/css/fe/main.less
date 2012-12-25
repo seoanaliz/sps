@@ -1452,7 +1452,7 @@ body.editor-mode {
 
             &:hover {
                 .action {
-                    opacity: 0.5;
+                    .opacity(0.5);
                 }
             }
 
@@ -1463,12 +1463,12 @@ body.editor-mode {
                 height: 20px;
                 margin-top: -10px;
                 cursor: pointer;
-                opacity: 0;
 
+                .opacity(0);
                 .transition(0.2s opacity);
 
                 &:hover {
-                    opacity: 1;
+                    .opacity(1);
                 }
             }
 
@@ -1480,6 +1480,11 @@ body.editor-mode {
             .add-to-list {
                 right: 35px;
                 background: url('../../images/common/add.png') center no-repeat;
+
+                &.active {
+                    background: url('../../images/common/add-white.png') center no-repeat @bg_active;
+                    .opacity(1);
+                }
             }
         }
     }

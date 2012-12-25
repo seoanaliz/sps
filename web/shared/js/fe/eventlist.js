@@ -384,7 +384,7 @@ var Eventlist = {
                 for (var i in userGroups) {
                     var userGroupModel = new UserGroupModel();
                     userGroupModel.id(userGroups[i]['id']);
-                    userGroupModel.id(userGroups[i]['name']);
+                    userGroupModel.name(userGroups[i]['name']);
                     userGroupCollection.add(userGroupModel.id(), userGroupModel);
                     userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }

@@ -14,6 +14,7 @@ var UserGroupModel = Model.extend({
     init: function() {
         this.defData('id', null);
         this.defData('name', '...');
+        this.defData('isSelected', false);
         this._super.apply(this, arguments);
     },
 
@@ -24,6 +25,10 @@ var UserGroupModel = Model.extend({
     name: function(name) {
         if (arguments.length) name = name + '';
         return this.data('name', name);
+    },
+    isSelected: function(isSelected) {
+        if (arguments.length) isSelected = !!isSelected;
+        return this.data('isSelected', isSelected);
     }
 });
 var UserGroupCollection = Collection.extend({
@@ -274,9 +279,66 @@ $(document).ready(function(){
             }
             $container.data('initedList', true);
             $container.delegate('.add-to-list', 'click', function() {
-                var $author = $(this).closest('.author');
+                var $target = $(this);
+                var $author = $target.closest('.author');
                 var authorId = $author.data('id');
-                console.log(authorId);
+                var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
+                var authorGroups = [];
+                $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                    if ($.inArray(userGroupModel.id(), authorGroupIds) !== -1) {
+                        userGroupModel.isSelected(true);
+                    }
+                    authorGroups.push({
+                        id: userGroupModel.id(),
+                        title: userGroupModel.name(),
+                        isSelected: userGroupModel.isSelected()
+                    });
+                });
+                (function updateDropdown() {
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        data: $.merge(authorGroups, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ]),
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            //Control.fire('add_list', {});
+                                            //updateDropdown();
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                //Control.fire('add_to_list', {});
+                            }
+                        }
+                    });
+                })();
             });
             $container.delegate('.delete', 'click', function() {
                 var $author = $(this).closest('.author');
