@@ -1,5 +1,6 @@
 <?
     /** @var $authors Author[] */
+    /** @var $authorGroups Author[] */
 ?>
 <div class="authors-list">
     <div class="authors-types tab-bar">
@@ -15,7 +16,7 @@
     <? if (!empty($authors)) { ?>
     <div class="list">
         <? foreach ($authors as $author) { ?>
-            <div class="author" data-id="{$author->vkId}">
+            <div class="author" data-id="{$author->vkId}" data-groups="<?=implode(',', $authorGroups[$author->authorId])?>">
                 <div class="photo">
                     <img src="{$author->avatar}" alt="" />
                 </div>

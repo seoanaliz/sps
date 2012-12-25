@@ -19,7 +19,7 @@ CREATE INDEX "fki_targetFeed_FK"
 
 
 
-CREATE TABLE "UserUserGroup"
+CREATE TABLE "userUserGroup"
 (
   "vkId" integer NOT NULL, -- Идентификатор вконтакте
   "userGroupId" integer NOT NULL, -- Идентификатор группы постов
@@ -33,9 +33,9 @@ WITH (
 );
 
 
-COMMENT ON COLUMN "useruserGroup"."vkId" IS 'Идентификатор вконтакте';
-COMMENT ON COLUMN "useruserGroup"."targetFeedId" IS 'Идентификатор ленты';
-COMMENT ON COLUMN "useruserGroup"."userGroupId" IS 'Идентификатор группы постов';
+COMMENT ON COLUMN "userUserGroup"."vkId" IS 'Идентификатор вконтакте';
+COMMENT ON COLUMN "userUserGroup"."targetFeedId" IS 'Идентификатор ленты';
+COMMENT ON COLUMN "userUserGroup"."userGroupId" IS 'Идентификатор группы постов';
 
 
 CREATE INDEX "fki_userGroup_FK"

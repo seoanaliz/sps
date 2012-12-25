@@ -167,6 +167,9 @@
             <action name="GetArticlesAppListControl">
                 <path>app/controls/articles/GetArticlesAppListControl</path>
             </action>
+            <action name="GetUserGroups">
+                <path>app/controls/GetUserGroups</path>
+            </action>
             <action name="DeleteArticleAppControl">
                 <path>app/controls/articles/DeleteArticleAppControl</path>
             </action>

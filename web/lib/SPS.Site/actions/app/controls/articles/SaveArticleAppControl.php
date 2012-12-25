@@ -84,6 +84,17 @@ class SaveArticleAppControl extends BaseControl {
             $article->articleStatus = Article::STATUS_APPROVED;
         }
 
+        $userGroupId =  Request::getArray('userGroupId');
+        if (is_numeric($userGroupId)){
+            // TODO сделать проверку, что пользователь может добавлять статью для это группы
+            $article->userGroupId = $userGroupId;
+        } else {
+            $UserGroup = UserGroupFactory::GetOne(array('vkId' => $this->vkId, 'targetFeedId' => $article->targetFeedId));
+            if ($UserGroup) {
+                $article->userGroupId = $UserGroup->userGroupId;
+            }
+        }
+
 
         $articleRecord = new ArticleRecord();
         $articleRecord->content = mb_substr($text, 0, 4100);

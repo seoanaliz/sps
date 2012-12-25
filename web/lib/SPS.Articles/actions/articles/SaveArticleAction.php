@@ -50,17 +50,17 @@
          */
         protected function getFromRequest( $originalObject = null ) {
             /**
-             * @var Article $object
+             * @var Article $Article
              */
-            $object = parent::$factory->GetFromRequest();
+            $Article = parent::$factory->GetFromRequest();
             
             if ( $originalObject != null ) {
-                $object->articleId = $originalObject->articleId;
+                $Article->articleId = $originalObject->articleId;
             }
 
             $objectData = Request::getArray('article');
-            if (empty($object->sourceFeedId)) {
-                $object->sourceFeedId = !empty($objectData['sourceFeedId']) ? $objectData['sourceFeedId'] : SourceFeedUtility::FakeSourceAuthors;
+            if (empty($Article->sourceFeedId)) {
+                $Article->sourceFeedId = !empty($objectData['sourceFeedId']) ? $objectData['sourceFeedId'] : SourceFeedUtility::FakeSourceAuthors;
             }
 
             $this->articleRecord = ArticleRecordFactory::GetFromRequest( "articleRecord" );
@@ -98,7 +98,7 @@
                 $this->articleRecord->$arrayName = $value;
             }
 
-            return $object;
+            return $Article;
         }
         
         

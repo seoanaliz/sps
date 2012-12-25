@@ -23,6 +23,8 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
      */
     private $sourceFeeds = array();
 
+    private $reviewArticleCount = 0;
+
     protected function getMode(){
         $mode = Request::getString('mode');
         if ($mode == self::MODE_MY) {
@@ -130,6 +132,10 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             } else {
                 $this->search['_authorId'] = array(-1 => -1);
             }
+
+            // в группе ищем записи на рассмотрении
+            $this->reviewArticleCount = ArticleFactory::Count(array('authorId' => $this->getAuthor()->authorId,
+                'articleStatusIn' => array(Article::STATUS_REVIEW), 'userGroupId' => $userGroupId));
         }
 
         if ($type == SourceFeedUtility::Albums) {
@@ -157,14 +163,13 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             $showApproveBlock = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
 
             $showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
-
         }
-
 
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         Response::setArray('sourceFeeds', $this->sourceFeeds);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
         Response::setBoolean('showApproveBlock', $showApproveBlock);
+        Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
     }
 }
 
