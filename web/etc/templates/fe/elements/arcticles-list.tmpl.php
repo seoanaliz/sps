@@ -7,7 +7,7 @@
     /** @var $reviewArticleCount int */
 ?>
     <? if ($reviewArticleCount): ?>
-     <div>Показать <?=$reviewArticleCount?> отложенные записи</div>
+        <div class="show-all-postponed">Показать <?=$reviewArticleCount?> отложенные записи</div>
     <? endif; ?>
 <?
 
