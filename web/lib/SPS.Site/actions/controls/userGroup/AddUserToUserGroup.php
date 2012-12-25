@@ -15,6 +15,10 @@ class AddUserToUserGroup extends BaseControl
         $UserUserGroup->vkId = $vkId;
         $UserUserGroup->userGroupId = $userGroupId;
 
-        UserUserGroupFactory::Add($UserUserGroup);
+        if (UserUserGroupFactory::Add($UserUserGroup)) {
+            echo ObjectHelper::ToJSON(array('success' => true));
+            return;
+        }
+        echo ObjectHelper::ToJSON(array('success' => false));
     }
 }
