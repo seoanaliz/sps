@@ -34,17 +34,10 @@ WITH (
 
 
 COMMENT ON COLUMN "userUserGroup"."vkId" IS 'Идентификатор вконтакте';
-COMMENT ON COLUMN "userUserGroup"."targetFeedId" IS 'Идентификатор ленты';
 COMMENT ON COLUMN "userUserGroup"."userGroupId" IS 'Идентификатор группы постов';
 
 
 CREATE INDEX "fki_userGroup_FK"
-  ON "useruserGroup"
+  ON "userUserGroup"
   USING btree
   ("userGroupId");
-
-
-CREATE INDEX "fki_uag_targetFeed_FK"
-  ON "useruserGroup"
-  USING btree
-  ("targetFeedId");
