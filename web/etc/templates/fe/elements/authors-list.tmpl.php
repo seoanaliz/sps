@@ -16,7 +16,7 @@
     <? if (!empty($authors)) { ?>
     <div class="list">
         <? foreach ($authors as $author) { ?>
-            <div class="author" data-id="{$author->vkId}" data-group-ids="<?=implode(',', $authorGroups[$author->authorId])?>">
+            <div class="author" data-id="{$author->vkId}" data-group-ids="<?=implode(',', $authorGroups[$author->vkId])?>">
                 <div class="photo">
                     <img src="{$author->avatar}" alt="" />
                 </div>

@@ -63,7 +63,6 @@
 			<host name="local" devel="true">
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
-                <port>2280</port>
 				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
