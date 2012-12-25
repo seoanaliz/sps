@@ -741,19 +741,6 @@ $(document).ready(function(){
         $newPost.find('.time').click();
     });
 
-    // Загрузка стены по клику
-    $("#wallloadmore").click(function(){
-        var b = $(this);
-        if(b.hasClass("disabled")) { return; }
-        b.addClass("disabled");
-        Events.fire('wall_load_more', function(state){
-            b.removeClass("disabled");
-            if(!state) {
-                b.addClass("disabled");
-            }
-        });
-    });
-
     // Очистка текста
     $leftPanel.delegate(".clear-text", "click", function(){
         var $post = $(this).closest(".post");
@@ -790,11 +777,10 @@ $(document).ready(function(){
 
     // Автоподгрузка записей
     (function(){
-        var w = $(window),
-            b = $("#wallloadmore");
-        w.scroll(function() {
-            if (b.is(':visible') && w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
-                b.click();
+        var $window = $(window);
+        $window.scroll(function() {
+            if ($window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                Events.fire('wall_load_more', function(state) {});
             }
         });
     })();
