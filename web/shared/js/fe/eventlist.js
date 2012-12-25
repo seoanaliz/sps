@@ -1,5 +1,46 @@
 var articlesLoading = false;
 
+Control = $.extend(Control, {
+    root: controlsRoot,
+    dataType: 'html',
+
+    controlMap: {
+        get_author_articles: {
+            name: 'arcticles-list'
+        },
+
+        authors_get: {
+            name: 'authors-list'
+        },
+
+        author_remove: {
+            name: 'author-delete',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+
+        author_add: {
+            name: 'author-add',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+
+        add_list: {
+            name: 'add-user-group',
+            dataType: 'json'
+        },
+        add_to_list: {
+            name: 'add-user-to-group'
+        },
+
+        remove_from_list: {
+            name: 'remove-user-from-group'
+        }
+    }
+});
+
 function initSlider(targetFeedId, sourceType) {
     var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
     var from = sourceType == 'albums' ? 0 : 50;
@@ -95,13 +136,6 @@ function loadArticles(clean) {
         type: Elements.leftType(),
         targetFeedId: Elements.rightdd()
     };
-    var selectedTab = $('.authors-tab-new.selected');
-    if (selectedTab.length) {
-        var articleStatus = selectedTab.data('article-status');
-        if (typeof articleStatus != 'undefinded'){
-            requestData['articleStatus'] = articleStatus;
-        }
-    }
 
     //clean and load left column
     $.ajax({
@@ -376,20 +410,21 @@ var Eventlist = {
             }
 
             // группы юзеров
-            var userGroupTabs = $('.user-groups-tabs');
-            if (data['showUserGroups']) {
-                userGroupTabs.find('.tab').remove();
-                userGroupTabs.removeClass('hidden');
-                var userGroups = data['showUserGroups'];
+            var $userGroupTabs = $('.user-groups-tabs');
+            var userGroups = data['showUserGroups'];
+            if (userGroups) {
+                $userGroupTabs.empty();
+                $userGroupTabs.removeClass('hidden');
+                $userGroupTabs.append('<div class="tab selected">Все новости</div>');
                 for (var i in userGroups) {
                     var userGroupModel = new UserGroupModel();
                     userGroupModel.id(userGroups[i]['id']);
                     userGroupModel.name(userGroups[i]['name']);
                     userGroupCollection.add(userGroupModel.id(), userGroupModel);
-                    userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }
             } else {
-                userGroupTabs.addClass('hidden');
+                $userGroupTabs.addClass('hidden');
             }
 
 
@@ -742,35 +777,6 @@ var Events = {
         }
     }
 };
-
-Control = $.extend(Control, {
-    root: controlsRoot,
-    dataType: 'html',
-
-    controlMap: {
-        get_author_articles: {
-            name: 'arcticles-list'
-        },
-
-        authors_get: {
-            name: 'authors-list'
-        },
-
-        author_remove: {
-            name: 'author-delete',
-            params: {
-                authorId: 'vkId'
-            }
-        },
-
-        author_add: {
-            name: 'author-add',
-            params: {
-                authorId: 'vkId'
-            }
-        }
-    }
-});
 
 function popupSuccess( message ) {
     $.blockUI({

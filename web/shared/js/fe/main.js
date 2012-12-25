@@ -187,12 +187,7 @@ $(document).ready(function(){
         }
     });
 
-    $('.user-groups-tabs').delegate('.add-user-group-button', 'click', function(){
-        var targetFeedId = Elements.rightdd();
-        Events.fire('add_article_group', targetFeedId, 'Простая группа', function(state){});
-    });
-
-    // Вкладки "Источники", "Реклама" в левон меню
+    // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
     $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
         if (articlesLoading) {
             return;
@@ -281,20 +276,22 @@ $(document).ready(function(){
             $container.delegate('.add-to-list', 'click', function() {
                 var $target = $(this);
                 var $author = $target.closest('.author');
-                var authorId = $author.data('id');
-                var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
-                var authorGroups = [];
-                $.each(userGroupCollection.get(), function(id, userGroupModel) {
-                    if ($.inArray(userGroupModel.id(), authorGroupIds) !== -1) {
-                        userGroupModel.isSelected(true);
-                    }
-                    authorGroups.push({
-                        id: userGroupModel.id(),
-                        title: userGroupModel.name(),
-                        isSelected: userGroupModel.isSelected()
-                    });
-                });
                 (function updateDropdown() {
+                    var authorId = $author.data('id');
+                    var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
+                    var authorGroups = [];
+                    $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                        if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
+                            userGroupModel.isSelected(true);
+                        } else {
+                            userGroupModel.isSelected(false);
+                        }
+                        authorGroups.push({
+                            id: userGroupModel.id(),
+                            title: userGroupModel.name(),
+                            isActive: userGroupModel.isSelected()
+                        });
+                    });
                     $target.dropdown({
                         isShow: true,
                         position: 'right',
@@ -327,15 +324,33 @@ $(document).ready(function(){
                                     $input.focus();
                                     $input.keydown(function(e) {
                                         if (e.keyCode == KEY.ENTER) {
-                                            //Control.fire('add_list', {});
-                                            //updateDropdown();
+                                            var newUserGroupModel = new UserGroupModel();
+                                            newUserGroupModel.name($input.val());
+                                            Control.fire('add_list', {
+                                                name: newUserGroupModel.name(),
+                                                targetFeedId: Elements.rightdd()
+                                            }).success(function(data) {
+                                                newUserGroupModel.id(data.userGroup.id);
+                                                userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
+                                                updateDropdown();
+                                            });
                                         }
                                     });
                                     $(this).dropdown('refreshPosition');
                                 }
                             } else {
+                                authorGroupIds.push(item.id + '');
+                                $author.data('group-ids', authorGroupIds.join(','));
                                 //Control.fire('add_to_list', {});
                             }
+                        },
+                        onunselect: function(item) {
+                            var index = $.inArray(item.id + '', authorGroupIds);
+                            if (index !== -1) {
+                                authorGroupIds.splice(index, 1);
+                            }
+                            $author.data('group-ids', authorGroupIds.join(','));
+                            //Control.fire('remove_from_list', {});
                         }
                     });
                 })();
@@ -382,7 +397,7 @@ $(document).ready(function(){
         });
     }
 
-    // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
+    // Подвкладки Авторов: Новые Одобренные Отклоненные
     $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
         if (articlesLoading) {
             return;
@@ -406,7 +421,7 @@ $(document).ready(function(){
             Elements.initImages($block);
             Elements.initLinks($block);
             $('#wall').html($block);
-                $('#wall-load').hide();
+            $('#wall-load').hide();
         });
     });
 

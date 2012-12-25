@@ -44,7 +44,6 @@
                 </div>
 
                 <div class="user-groups-tabs tab-bar no-padding hidden">
-                    <div class="tab">Все новости</div>
                 </div>
 
                 <div class="authors-tabs tab-bar no-padding">
