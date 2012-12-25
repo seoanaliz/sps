@@ -7,9 +7,9 @@
     /** @var $reviewArticleCount int */
     /** @var $showArticlesOnly bool */
 ?>
-    <? if ($reviewArticleCount && !$showArticlesOnly): ?>
-     <div>Показать <?=$reviewArticleCount?> отложенные записи</div>
-    <? endif; ?>
+<? if ($reviewArticleCount && !$showArticlesOnly): ?>
+    <div class="show-all-postponed">Показать <?=$reviewArticleCount?> отложенные записи</div>
+<? endif; ?>
 <?
 
     if (!empty($articles)) {
@@ -24,7 +24,6 @@
 
     $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension( $articlesCount ));
 ?>
-
 <? if ($showArticlesOnly): ?>
 <script type="text/javascript">
     $('.wall-title span.count').text('{$articlesCountText}');

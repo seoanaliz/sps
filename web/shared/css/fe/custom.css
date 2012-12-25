@@ -9,10 +9,11 @@
 
 .ui-multiselect {
     font-family: inherit;
+    margin-top: 8px;
 }
 .ui-multiselect .gray {
     color: gray;
-    font-size: .8em;
+    font-size: 0.8em;
 }
 .ui-multiselect .counter {
     background-color: #DEE5EB;
@@ -142,10 +143,6 @@
 .failed {
     background: #FFC0C0 !important;
     opacity: 1;
-}
-
-div.type-selector {
-    margin-bottom: 8px;
 }
 
 div.type-selector .counter {

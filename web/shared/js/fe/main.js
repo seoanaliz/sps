@@ -10,6 +10,32 @@ var easydateParams = {
     }
 };
 
+var UserGroupModel = Model.extend({
+    init: function() {
+        this.defData('id', null);
+        this.defData('name', '...');
+        this.defData('isSelected', false);
+        this._super.apply(this, arguments);
+    },
+
+    id: function(id) {
+        if (arguments.length) id = intval(id);
+        return this.data('id', id);
+    },
+    name: function(name) {
+        if (arguments.length) name = name + '';
+        return this.data('name', name);
+    },
+    isSelected: function(isSelected) {
+        if (arguments.length) isSelected = !!isSelected;
+        return this.data('isSelected', isSelected);
+    }
+});
+var UserGroupCollection = Collection.extend({
+    modelClass: UserGroupModel
+});
+var userGroupCollection = new UserGroupCollection();
+
 $(document).ready(function(){
     $.mask.definitions['2']='[012]';
     $.mask.definitions['3']='[0123]';
@@ -161,12 +187,7 @@ $(document).ready(function(){
         }
     });
 
-    $('.user-groups-tabs').delegate('.add-user-group-button', 'click', function(){
-        var targetFeedId = Elements.rightdd();
-        Events.fire('add_article_group', targetFeedId, 'Простая группа', function(state){});
-    });
-
-    // Вкладки "Источники", "Реклама" в левон меню
+    // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
     $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
         if (articlesLoading) {
             return;
@@ -176,161 +197,266 @@ $(document).ready(function(){
         $(this).addClass('active');
 
         if ($(this).data('type') == 'authors-list') {
-             var BOX_AUTHOR =
-            '<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
-                '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                    '<img src="<?=user.photo?>" alt="" />' +
-                '</a>' +
-            '</div>' +
-            '<div class="info">' +
-                '<?=text?>' +
-            '</div>';
-
-             var BOX_ADD_AUTHOR =
-            'Вы действительно хотите назначить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' автором?';
-
-             var BOX_DELETE_AUTHOR =
-            'Вы действительно хотите удалить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' из списка авторов?';
-
-            (function updatePage(method) {
-                Events.fire(method || 'authors_get', function(data) {
-                    $('body').addClass('editor-mode');
-                    var $container = $('#wall');
-                    $container.html(data);
-
-                    var $navigation = $container.find('.authors-types');
-                    $navigation.delegate('.tab', 'click', function() {
-                        $navigation.find('.tab.selected').removeClass('selected');
-                        $(this).addClass('selected');
-                        updatePage('authors_get');
-                    });
-
-                    var $input = $container.find('.author-link');
-                    $input.placeholder();
-                    $input.keyup(function(e) {
-                        if (e.keyCode == KEY.ENTER) {
-                            $input.blur();
-                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
-                            var confirmBox = new Box({
-                                id: 'addAuthor' + authorId,
-                                title: 'Добавление автора',
-                                html: tmpl(BOX_LOADING, {height: 100}),
-                                buttons: [
-                                    {label: 'Добавить автора', onclick: addAuthor},
-                                    {label: 'Отменить', isWhite: true}
-                                ],
-                                onshow: function($box) {
-                                    var box = this;
-
-                                    VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                        if (!dataVK.response) {
-                                            return box.setHTML('Пользователь не найден');
-                                        }
-                                        var user = dataVK.response[0];
-                                        var clearUser = {
-                                            id: user.uid,
-                                            name: user.first_name + ' ' + user.last_name,
-                                            photo: user.photo_medium_rec
-                                        };
-                                        authorId = clearUser.id;
-                                        var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
-                                        box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                    });
-                                }
-                            });
-                            confirmBox.show();
-                        }
-                        function addAuthor() {
-                            var box = this;
-                            box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-                            box.setButtons([{label: 'Закрыть', isWhite: true}]);
-                            Events.fire('author_add', authorId, function(data) {
-                                box.remove();
-                                updatePage();
-                            });
-                        }
-                    });
-
-                    if ($container.data('initedList')) return;
-                    $container.data('initedList', true);
-                    $container.delegate('.delete', 'click', function() {
-                        var $author = $(this).closest('.author');
-                        var authorId = $author.data('id');
-                        var confirmDeleteBox = new Box({
-                            id: 'confirmDeleteBox' + authorId,
-                            title: 'Удаление автора',
-                            html: tmpl(BOX_LOADING, {height: 100}),
-                            buttons: [
-                                {label: 'Удалить', onclick: function() {
-                                    Events.fire('author_remove', authorId, function(data) {
-                                        $author.remove();
-                                        confirmDeleteBox.hide();
-                                    });
-                                }},
-                                {label: 'Отменить', isWhite: true}
-                            ],
-                            onshow: function($box) {
-                                var box = this;
-
-                                VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                    if (!dataVK.response) {
-                                        return box.setHTML('Пользователь не найден');
-                                    }
-                                    var user = dataVK.response[0];
-                                    var clearUser = {
-                                        id: user.uid,
-                                        name: user.first_name + ' ' + user.last_name,
-                                        photo: user.photo_medium_rec
-                                    };
-                                    authorId = clearUser.id;
-                                    var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
-                                    box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                });
-                            }
-                        }).show();
-                    });
-
-                    $container.delegate('.description', 'click', function() {
-                        var $input = $(this);
-                        $input.attr('contenteditable', 'true').focus();
-                    });
-                    $container.delegate('.description', 'keyup', function(e) {
-                        if (!e.originalEvent) return;
-
-                        if (e.keyCode == KEY.ENTER) {
-                            var $input = $(this);
-                            var $author = $(this).closest('.author');
-                            var clearText = $input.text();
-
-                            $input.blur().removeAttr('contenteditable').html(clearText);
-                            Events.fire('author_edit_desc', $author.data('id'), clearText, function() {});
-                        }
-                    });
-                });
-            })();
+            $('body').addClass('editor-mode');
+            updateAuthorListPage();
         } else {
             $('body').removeClass('editor-mode');
             Events.fire('rightcolumn_dropdown_change');
         }
     });
 
-    // Подвкладки Авторов: "Новые" "Одобренные" "Отклоненные"
-    $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
-        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
-        var tab = $(this);
-        tab.addClass('selected');
+    // Список авторов
+    function updateAuthorListPage(method) {
+        Control.fire(method || 'authors_get', {
+            targetFeedId: Elements.rightdd()
+        }).success(function(data) {
+            var $container = $('#wall');
+            $container.html(data);
 
-        Events.fire('get_author_articles', tab.data('article-status'), tab.data('mode'), function(html) {
-            $('#wall').html(html);
-            Elements.initImages();
+            var $navigation = $container.find('.authors-types');
+            $navigation.delegate('.tab', 'click', function() {
+                $navigation.find('.tab.selected').removeClass('selected');
+                $(this).addClass('selected');
+                updateAuthorListPage('authors_get');
+            });
+
+            var $input = $container.find('.author-link');
+            $input.placeholder();
+            $input.keyup(function(e) {
+                if (e.keyCode == KEY.ENTER) {
+                    $input.blur();
+                    var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                    var confirmBox = new Box({
+                        id: 'addAuthor' + authorId,
+                        title: 'Добавление автора',
+                        html: tmpl(BOX_LOADING, {height: 100}),
+                        buttons: [
+                            {label: 'Добавить автора', onclick: addAuthor},
+                            {label: 'Отменить', isWhite: true}
+                        ],
+                        onshow: function($box) {
+                            var box = this;
+
+                            VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                if (!dataVK.response) {
+                                    return box.setHTML('Пользователь не найден');
+                                }
+                                var user = dataVK.response[0];
+                                var clearUser = {
+                                    id: user.uid,
+                                    name: user.first_name + ' ' + user.last_name,
+                                    photo: user.photo_medium_rec
+                                };
+                                authorId = clearUser.id;
+                                var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
+                                box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                            });
+                        }
+                    });
+                    confirmBox.show();
+                }
+                function addAuthor() {
+                    var box = this;
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Control.fire('author_add', {
+                        authorId: authorId,
+                        targetFeedId: Elements.rightdd()
+                    }).success(function(data) {
+                        box.remove();
+                        updateAuthorListPage();
+                    });
+                }
+            });
+
+            if ($container.data('initedList')) {
+                return;
+            }
+            $container.data('initedList', true);
+            $container.delegate('.add-to-list', 'click', function() {
+                var $target = $(this);
+                var $author = $target.closest('.author');
+                (function updateDropdown() {
+                    var authorId = $author.data('id');
+                    var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
+                    var authorGroups = [];
+                    $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                        if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
+                            userGroupModel.isSelected(true);
+                        } else {
+                            userGroupModel.isSelected(false);
+                        }
+                        authorGroups.push({
+                            id: userGroupModel.id(),
+                            title: userGroupModel.name(),
+                            isActive: userGroupModel.isSelected()
+                        });
+                    });
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        data: $.merge(authorGroups, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ]),
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            var newUserGroupModel = new UserGroupModel();
+                                            newUserGroupModel.name($input.val());
+                                            Control.fire('add_list', {
+                                                name: newUserGroupModel.name(),
+                                                targetFeedId: Elements.rightdd()
+                                            }).success(function(data) {
+                                                newUserGroupModel.id(data.userGroup.id);
+                                                userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
+                                                updateDropdown();
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                authorGroupIds.push(item.id + '');
+                                $author.data('group-ids', authorGroupIds.join(','));
+                                Control.fire('add_to_list', {
+                                    userId: authorId,
+                                    listId: item.id
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            var index = $.inArray(item.id + '', authorGroupIds);
+                            if (index !== -1) {
+                                authorGroupIds.splice(index, 1);
+                            }
+                            $author.data('group-ids', authorGroupIds.join(','));
+                            Control.fire('remove_from_list', {
+                                userId: authorId,
+                                listId: item.id
+                            });
+                        }
+                    });
+                })();
+            });
+            $container.delegate('.delete', 'click', function() {
+                var $author = $(this).closest('.author');
+                var authorId = $author.data('id');
+                var confirmDeleteBox = new Box({
+                    id: 'confirmDeleteBox' + authorId,
+                    title: 'Удаление автора',
+                    html: tmpl(BOX_LOADING, {height: 100}),
+                    buttons: [
+                        {label: 'Удалить', onclick: function() {
+                            Control.fire('author_remove', {
+                                authorId: authorId,
+                                targetFeedId: Elements.rightdd()
+                            }).success(function(data) {
+                                $author.remove();
+                                confirmDeleteBox.hide();
+                            });
+                        }},
+                        {label: 'Отменить', isWhite: true}
+                    ],
+                    onshow: function($box) {
+                        var box = this;
+
+                        VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                            if (!dataVK.response) {
+                                return box.setHTML('Пользователь не найден');
+                            }
+                            var user = dataVK.response[0];
+                            var clearUser = {
+                                id: user.uid,
+                                name: user.first_name + ' ' + user.last_name,
+                                photo: user.photo_medium_rec
+                            };
+                            authorId = clearUser.id;
+                            var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
+                            box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                        });
+                    }
+                }).show();
+            });
+        });
+    }
+
+    // Подвкладки Авторов: Новые Одобренные Отклоненные
+    $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
+        if (articlesLoading) {
+            return;
+        }
+
+        var $tab = $(this);
+        var sortType = $('.wall-title a').data('type');
+        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+        $tab.addClass('selected');
+
+        wallPage = 0;
+        $('#wall-load').show();
+        Control.fire('get_articles', {
+            page: wallPage,
+            sortType: sortType,
+            type: Elements.leftType(),
+            targetFeedId: Elements.rightdd(),
+            articleStatus: $tab.data('article-status'),
+            mode: $tab.data('mode')
+        }).success(function(html) {
+            var $block = $(html);
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $('#wall').html($block);
+            $('#wall-load').hide();
+        });
+    });
+
+    // Кастомные подвкладки
+    $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
+        if (articlesLoading) {
+            return;
+        }
+
+        var $tab = $(this);
+        var sortType = $('.wall-title a').data('type');
+        $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
+        $tab.addClass('selected');
+
+        wallPage = 0;
+        $('#wall-load').show();
+        Control.fire('get_articles', {
+            page: wallPage,
+            sortType: sortType,
+            type: Elements.leftType(),
+            targetFeedId: Elements.rightdd(),
+            userGroupId: $tab.data('user-group-id')
+        }).success(function(html) {
+            var $block = $(html);
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $('#wall').html($block);
+            $('#wall-load').hide();
         });
     });
 
@@ -349,7 +475,7 @@ $(document).ready(function(){
     });
 
     // Wall init
-    $(".wall")
+    $("#wall")
         .delegate(".post > .delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
@@ -391,6 +517,47 @@ $(document).ready(function(){
                     elem.hide().next().show();
                 }
             });
+        })
+        .delegate('.show-all-postponed', 'click', function() {
+            var $target = $(this);
+            if ($target.data('block')) {
+                var $posts = $target.data('block');
+                if ($posts.first().is(':visible')) {
+                    $target.html('Скрыть отложенные записи');
+                    $posts.hide();
+                } else {
+                    $target.html($target.data('def-html'));
+                    $posts.show();
+                }
+            } else {
+                var $tabs = $leftPanel.find('.user-groups-tabs');
+                var sortType = $('.wall-title a').data('type');
+                var userGroupId;
+                if ($tabs.is(':visible')) {
+                    userGroupId = $tabs.find('.tab.selected').data('user-group-id')
+                }
+                $target.data('def-html', $target.html());
+
+                wallPage = 0;
+                $('#wall-load').show();
+                Control.fire('get_articles', {
+                    page: wallPage,
+                    sortType: sortType,
+                    type: Elements.leftType(),
+                    targetFeedId: Elements.rightdd(),
+                    userGroupId: userGroupId,
+                    articlesOnly: true,
+                    mode: 'my',
+                    articleStatus: 3
+                }).success(function(html) {
+                    var $posts = $(html);
+                    Elements.initImages($posts);
+                    Elements.initLinks($posts);
+                    $target.after($posts);
+                    $('#wall-load').hide();
+                    $target.data('block', $posts)
+                });
+            }
         });
 
     $("#queue")
@@ -1408,9 +1575,6 @@ $(document).ready(function(){
             }
         }
     })();
-
-    // ===
-    Elements.addEvents();
 });
 
 var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
@@ -1426,42 +1590,33 @@ var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href=
 var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
             </div>';
 
-var Events = {
-    delay: 0,
-    isDebug: false,
-    eventList: Eventlist,
-    fire: function(name){
-        var t = this;
-        var args;
-        if (arguments.length == 2 && (typeof arguments[1] == 'object') && arguments[1].length) {
-            args = arguments[1];
-        } else {
-            args = Array.prototype.slice.call(arguments, 1);
-        }
-        if ($.isFunction(t.eventList[name])) {
-            try {
-                setTimeout(function() {
-                    if (window.console && console.log && t.isDebug) {
-                        console.groupCollapsed(name);
-                        console.log('args: ' + args.slice(0, -1));
-                        console.groupEnd(name);
-                    }
-                    t.eventList[name].apply(window, args);
-                }, t.delay);
-            } catch(e) {
-                if (window.console && console.log && t.isDebug) {
-                    console.groupCollapsed('Error');
-                    console.log(e);
-                    console.groupEnd('Error');
-                }
-            }
-        }
-    }
-};
+ var BOX_AUTHOR =
+'<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
+    '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+        '<img src="<?=user.photo?>" alt="" />' +
+    '</a>' +
+'</div>' +
+'<div class="info">' +
+    '<?=text?>' +
+'</div>';
+
+ var BOX_ADD_AUTHOR =
+'Вы действительно хотите назначить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' автором?';
+
+ var BOX_DELETE_AUTHOR =
+'Вы действительно хотите удалить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' из списка авторов?';
 
 var Elements = {
-    initImages: function(){
-        $(".fancybox-thumb").fancybox({
+    initImages: function($block) {
+        $block.find(".fancybox-thumb").fancybox({
             prevEffect		: 'none',
             nextEffect		: 'none',
             closeBtn		: false,
@@ -1473,7 +1628,7 @@ var Elements = {
         });
 
         //логика картинок топа
-        $("div.post-image-top img").bind("load", function () {
+        $block.find(".post-image-top img").bind("load", function () {
             var src = $(this).attr('src');
             var img = new Image();
             var link = $(this).closest(".post").find('.ajax-loader-ext');
@@ -1491,72 +1646,69 @@ var Elements = {
             img.src = src;
         });
 
-        $(".left-panel .timestamp").easydate(easydateParams);
-        $(".left-panel .date").easydate(easydateParams);
-        $('.left-panel .images-ready').imageComposition();
+        $block.find(".timestamp").easydate(easydateParams);
+        $block.find(".date").easydate(easydateParams);
+        $block.find('.images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
-    addEvents: function(){
-        (function(){
-            $(".slot .post .content").addClass("dragged");
-            var dragdrop = function(post, slot, queueId, callback, failback){
-                Events.fire('post_moved', post, slot, queueId, function(state, newId){
-                    if (state) {
-                        callback(newId);
-                    } else {
-                        failback();
-                    }
-                });
-            };
-
-            var draggableParams = {
-                revert: 'invalid',
-                appendTo: 'body',
-                cursor: 'move',
-                cursorAt: {left: 100, top: 20},
-                helper: function() {
-                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
-                },
-                start: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.addClass('moving');
-                },
-                stop: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.removeClass('moving');
-                }
-            };
-
-            $(".post:not(.blocked) > .content").draggable(draggableParams);
-
-            $('.items .slot').droppable({
-                activeClass: "ui-state-active",
-                hoverClass: "ui-state-hover",
-
-                drop: function(e, ui) {
-                    var $target = $(this),
-                        $post = $(ui.draggable).closest('.post');
-
-                    if ($target.hasClass('empty')) {
-                        dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
-                            if ($post.hasClass('movable')) {
-                                $target.html($post);
-                            }
-                            $target.addClass('image-compositing');
-                        });
-                    }
+    initDraggable: function($block) {
+        $block.find(".slot .post .content").addClass("dragged");
+        var dragdrop = function(post, slot, queueId, callback, failback){
+            Events.fire('post_moved', post, slot, queueId, function(state, newId){
+                if (state) {
+                    callback(newId);
+                } else {
+                    failback();
                 }
             });
-        })();
+        };
+
+        var draggableParams = {
+            revert: 'invalid',
+            appendTo: 'body',
+            cursor: 'move',
+            cursorAt: {left: 100, top: 20},
+            helper: function() {
+                return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+            },
+            start: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.addClass('moving');
+            },
+            stop: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.removeClass('moving');
+            }
+        };
+
+        $block.find(".post:not(.blocked) > .content").draggable(draggableParams);
+        $block.find('.items .slot').droppable({
+            activeClass: "ui-state-active",
+            hoverClass: "ui-state-hover",
+
+            drop: function(e, ui) {
+                var $target = $(this),
+                    $post = $(ui.draggable).closest('.post');
+
+                if ($target.hasClass('empty')) {
+                    dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
+                        if ($post.hasClass('movable')) {
+                            $target.html($post);
+                        }
+                        $target.addClass('image-compositing');
+                    });
+                }
+            }
+        });
     },
     leftdd: function(){
         return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
     },
-    rightdd:function(value){
+    rightdd: function(value){
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
@@ -1619,8 +1771,8 @@ var Elements = {
             }
         });
     },
-    initLinks: function(){
-        $('img.ajax-loader').each(function(){
+    initLinks: function($block) {
+        $block.find('img.ajax-loader').each(function(){
             Elements.initLinkLoader($(this), true);
         });
     }

@@ -1,5 +1,139 @@
+Control = $.extend(Control, {
+    root: Configs.controlsRoot,
+
+    // Обработка каждого запроса
+    commonParams: {
+        type: 'mes',
+        userId: Configs.vkId
+    },
+
+    // Обработка каждого ответа
+    commonResponse: function(data) {
+        return data.response;
+    },
+
+    // Обработка запросов и ответов отдельных методов
+    controlMap: {
+        get_dialogs: {
+            name: 'getDialogsList',
+            params: {
+                pageId: 'groupId',
+                offset: 'offset',
+                limit: 'limit',
+                filter: 'unreadIn'
+            },
+            response: function(data) {
+                var dialogs = [];
+                $.each(data, function(i, rawDialog) {
+                    var clearDialog = Cleaner.dialog(rawDialog);
+                    dialogs.push(clearDialog);
+                });
+                return {list: dialogs};
+            }
+        },
+        get_messages: {
+            name: 'getDialog',
+            params: {
+                pageId: 'dialogId',
+                offset: 'offset',
+                limit: 'limit'
+            },
+            response: function(data) {
+                var clearData;
+                var rawUsers = data.dialogers;
+                var rawMessages = data.messages;
+                var clearUser = {};
+                var clearMessages = [];
+                $.each(rawUsers, function(i, rawUser) {
+                    clearUser = Cleaner.user(rawUser);
+                    if (clearUser.id != Configs.vkId) {
+                        return false;
+                    }
+                });
+                $.each(rawMessages, function(i, rawMessage) {
+                    clearMessages.push(Cleaner.message(rawMessage));
+                });
+                clearData = {
+                    user: clearUser,
+                    viewer: userCollection.get(Configs.vkId).data(),
+                    list: clearMessages,
+                    lists: data.groupIds
+                };
+                return clearData;
+            }
+        },
+        add_user: {
+            name: 'saveAt'
+        },
+        get_viewer: {
+            name: 'addUser'
+        },
+        get_lists: {
+            name: 'getGroupList'
+        },
+        send_message: {
+            name: 'messages.send',
+            params: {
+                pageId: 'dialogId',
+                text: 'text'
+            }
+        },
+        message_mark_as_read: {
+            name: 'markMes'
+        },
+        add_list: {
+            name: 'setGroup'
+        },
+        update_list: {
+            name: 'setGroup'
+        },
+        remove_list: {
+            name: 'deleteGroup'
+        },
+        add_to_list: {
+            name: 'implEntryToGroup'
+        },
+        remove_from_list: {
+            name: 'exlEntryFromGroup'
+        },
+        get_templates: {
+            name: 'getTemplates',
+            params: {
+                listId: 'groupId'
+            },
+            response: function(data) {
+                var clearTemplates = [];
+                $.each(data, function(i, rawTemplate) {
+                    clearTemplates.push(Cleaner.template(rawTemplate));
+                });
+                return clearTemplates;
+            }
+        },
+        add_template: {
+            name: 'addTemplate'
+        },
+        delete_template: {
+            name: 'deleteTemplate'
+        },
+        edit_template: {
+            name: 'addTemplate'
+        },
+        set_list_as_read: {
+            name: 'toggleReadRead'
+        },
+        set_list_as_new: {
+            name: 'toggleReadRead'
+        },
+        set_list_order: {
+            name: 'setGroupOrder'
+        }
+    }
+});
+
 /**
  * Events
+ * @deprecated
+ * @see Control
  */
 var Events = {
     delay: 0,
@@ -27,27 +161,7 @@ var Events = {
     }
 };
 
-var simpleAjax = function(method, data, callback) {
-    $.ajax({
-        url: Configs.controlsRoot + method + '/',
-        dataType: 'json',
-        data: $.extend({
-            userId: Configs.vkId,
-            type: 'mes'
-        }, data),
-        success: function (result) {
-            if (result && result.response) {
-                if ($.isFunction(data)) callback = data;
-                if ($.isFunction(callback)) callback(result.response);
-            } else {
-                if ($.isFunction(data)) callback = data;
-                if ($.isFunction(callback)) callback(false);
-            }
-        }
-    });
-};
-
-var Eventlist = {
+var EventList = {
     add_user: function(token, callback) {
         simpleAjax('saveAt', {access_token: token}, function() {
             callback(true);
@@ -99,14 +213,14 @@ var Eventlist = {
         });
     },
     get_messages: function(dialogId, offset, limit, callback) {
-        var params = {};
+        var params;
         params = {
             dialogId: dialogId,
             offset: offset,
             limit: limit
         };
         simpleAjax('getDialog', params, function(rawData) {
-            var clearData = {};
+            var clearData;
             var rawUsers = rawData.dialogers;
             var rawMessages = rawData.messages;
             var clearUser = {};
@@ -207,7 +321,27 @@ var Eventlist = {
         });
     }
 };
-$.extend(Events.eventList, Eventlist);
+$.extend(Events.eventList, EventList);
+
+function simpleAjax(method, data, callback) {
+    $.ajax({
+        url: Configs.controlsRoot + method + '/',
+        dataType: 'json',
+        data: $.extend({
+            userId: Configs.vkId,
+            type: 'mes'
+        }, data),
+        success: function (result) {
+            if (result && result.response) {
+                if ($.isFunction(data)) callback = data;
+                if ($.isFunction(callback)) callback(result.response);
+            } else {
+                if ($.isFunction(data)) callback = data;
+                if ($.isFunction(callback)) callback(false);
+            }
+        }
+    });
+}
 
 /**
  * Helpers

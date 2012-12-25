@@ -67,6 +67,9 @@
 				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
+                        <vkapi class="AuthVkontakte">
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
+                        </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps</param>
                             <param name="mainLocation">/</param>

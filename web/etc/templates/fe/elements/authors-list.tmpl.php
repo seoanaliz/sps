@@ -16,7 +16,7 @@
     <? if (!empty($authors)) { ?>
     <div class="list">
         <? foreach ($authors as $author) { ?>
-            <div class="author" data-id="{$author->vkId}" data-groups="<?=implode(',', $authorGroups[$author->authorId])?>">
+            <div class="author" data-id="{$author->vkId}" data-group-ids="<?=implode(',', $authorGroups[$author->authorId])?>">
                 <div class="photo">
                     <img src="{$author->avatar}" alt="" />
                 </div>
@@ -24,9 +24,9 @@
                     <div class="name">
                         <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                     </div>
-                    <!-- div class="description">User description</div -->
                 </div>
-                <div class="delete"></div>
+                <div class="action add-to-list"></div>
+                <div class="action delete"></div>
             </div>
         <? } ?>
     </div>

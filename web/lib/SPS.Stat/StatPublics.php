@@ -31,7 +31,7 @@
                     $public->externalId ==  27421965  ||
                     $public->externalId ==  34010064  ||
                     $public->externalId ==  25749497  ||
-                    $public->externalId ==  38000555  ||
+//                    $public->externalId ==  38000555  ||
                     $public->externalId ==  35807078  ||
                     $public->externalId ==  25817269 )
                     continue;
@@ -293,10 +293,12 @@
                 case 'authors':
                     $type = "";
                     $operator = ' = ';
+                    $add = ' OR "editor" is not null ';
                     break;
                 case 'sb':
-                    $type = " AND c.type<>'ads' ";
+                    $type = " AND c.type<>'ads ' ";
                     $operator = ' <> ';
+                    $add = ' AND "editor" is null ';
                     break;
                 //по умолчанию - рекламные
                 default:
@@ -311,13 +313,14 @@
                 avg("externalLikes") as avg_likes,
                 avg("externalRetweets") as avg_reposts
             FROM
-              "articles" as a LEFT JOIN "articleQueues" as b
+                  "articles" as a LEFT JOIN "articleQueues" as b
                   USING("articleId") LEFT JOIN "sourceFeeds" as c
                   USING("sourceFeedId")
             WHERE
                   b."sentAt" > @time_from
               AND b."sentAt" < @time_to
-              AND "sourceFeedId" ' . $operator . ' -1
+              AND ( "sourceFeedId" ' . $operator . ' -1
+                ' .$add .')
               AND b."targetFeedId" = @targetFeedId
               AND b."externalId" IS NOT NULL'
               . $type ;
@@ -336,7 +339,37 @@
             return $res;
         }
 
-        public static function get_average_visitors( $sb_id, $time_from, $time_to ) {
+        public static function get_average($public_sb_id, $time_from, $time_to )
+        {
+            $sql = 'SELECT
+                        COUNT(*),
+                        avg("externalLikes") as avg_likes,
+                        avg("externalRetweets") as avg_reposts
+                    FROM
+                        "articles" as a LEFT JOIN
+                        "articleQueues" as b USING("articleId") LEFT JOIN
+                        "sourceFeeds" as c USING("sourceFeedId")
+                    WHERE
+                        b."sentAt" > @time_from
+                        AND b."sentAt" < @time_to
+                        AND b."targetFeedId" = 4
+                        AND b."externalId" IS NOT NULL';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( '' ));
+            $cmd->SetInteger( '@targetFeedId', $public_sb_id );
+            $cmd->SetString ( '@time_from', date('Y-m-d H:i:00', $time_from ));
+            $cmd->SetString ( '@time_to',   date('Y-m-d H:i:00', $time_to ));
+            $ds = $cmd->Execute();
+            $ds->next();
+            $res = array(
+                'likes'      =>  round( $ds->GetFloat( 'avg_likes' )),
+                'reposts'    =>  round( $ds->GetFloat( 'avg_reposts' )),
+                'count'      =>  round( $ds->GetFloat( 'count' )),
+            );
+            return $res;
+        }
+
+        public static function get_average_visitors( $sb_id, $time_from, $time_to )
+        {
             $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
 
             $sql = 'SELECT avg(visitors)
@@ -344,6 +377,27 @@
                       WHERE time >= @time_from
                             AND time <= @time_to
                             AND id = @public_id';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
+            $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
+            $cmd->SetInteger( '@public_id', $public[$sb_id]->externalId );
+            $ds = $cmd->Execute();
+            if ( $ds->GetSize() ) {
+                $ds->Next();
+                return $ds->GetInteger( 'avg' );
+            }
+            return 0;
+        }
+
+        public static function get_avg_subs_growth( $sb_id, $time_from, $time_to )
+        {
+            $public = TargetFeedFactory::Get( array( 'targetFeedId' => $sb_id ));
+
+            $sql = 'SELECT avg(visitors)
+                          FROM ' . TABLE_STAT_PUBLICS_POINTS . '
+                          WHERE time >= @time_from
+                                AND time <= @time_to
+                                AND id = @public_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetString( '@time_from', date('Y-m-d', $time_from ));
             $cmd->SetString( '@time_to',   date('Y-m-d', $time_to ));
@@ -449,6 +503,7 @@
             $cmd->SetString ( '@time_from', date( 'Y-m-d H:i:00', $time_from ));
             $cmd->SetString ( '@time_to',   date( 'Y-m-d H:i:00', $time_to ));
             $ds = $cmd->Execute();
+
             $rate = 0;
 
             while( $ds->next()) {
@@ -710,7 +765,6 @@
             }
             return $res;
         }
-
 
         public static function search_public( $search_string )
         {

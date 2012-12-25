@@ -33,16 +33,7 @@ class UserGroupFactory extends BaseModelFactory {
                 'type' => TYPE_STRING
             ),
         ),
-        'search' => array(
-            'vkId' => array(
-                'name'         => 'vkId',
-                'type'       => TYPE_INTEGER,
-            ),
-            'targetFeedId' => array(
-                'name'         => 'targetFeedId',
-                'type'       => TYPE_INTEGER,
-            ),
-        )
+        'search' => array()
     );
 
 

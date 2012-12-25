@@ -1,7 +1,53 @@
 var articlesLoading = false;
 
-function initSlider(targetFeedId, sourceType) {
+Control = $.extend(Control, {
+    root: controlsRoot,
+    dataType: 'html',
 
+    controlMap: {
+        get_articles: {
+            name: 'arcticles-list',
+            params: {
+                articlesOnly: 'articles-only'
+            }
+        },
+        authors_get: {
+            name: 'authors-list'
+        },
+        author_remove: {
+            name: 'author-delete',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+        author_add: {
+            name: 'author-add',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+        add_list: {
+            name: 'add-user-group',
+            dataType: 'json'
+        },
+        add_to_list: {
+            name: 'add-user-to-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
+        },
+        remove_from_list: {
+            name: 'remove-user-from-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
+        }
+    }
+});
+
+function initSlider(targetFeedId, sourceType) {
     var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
     var from = sourceType == 'albums' ? 0 : 50;
     var to = 100;
@@ -77,8 +123,9 @@ function loadArticles(clean) {
         $('.newpost').show();
     }
 
-    var from = $( "#slider-range" ).slider( "values", 0 );
-    var to = $( "#slider-range" ).slider( "values", 1 );
+    var $slider = $("#slider-range");
+    var from = $slider.slider("values", 0);
+    var to = $slider.slider("values", 1);
     var sortType = $('.wall-title a').data('type');
 
     if ($('.type-selector a.active').data('type') == 'ads') {
@@ -94,32 +141,26 @@ function loadArticles(clean) {
         sortType: sortType,
         type: Elements.leftType(),
         targetFeedId: Elements.rightdd()
-    }
-    var selectedTab = $('.authors-tab-new.selected');
-    if (selectedTab.length) {
-        var articleStatus = selectedTab.data('article-status');
-        if (typeof articleStatus != 'undefinded'){
-            requestData['articleStatus'] = articleStatus;
-        }
-    }
+    };
 
     //clean and load left column
     $.ajax({
-            url: controlsRoot + 'arcticles-list/',
-            dataType : "html",
-            data: requestData,
-        }).always(function() {
-            $('#wall-load').hide();
-            if (clean) {
-                $('div#wall').empty();
-            }
-        }).done(function(data) {
-            $('div#wall').append(data);
-            articlesLoading = false;
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
-        });
+        url: controlsRoot + 'arcticles-list/',
+        dataType: "html",
+        data: requestData
+    }).always(function() {
+        $('#wall-load').hide();
+        if (clean) {
+            $('#wall').empty();
+        }
+    }).done(function(data) {
+        articlesLoading = false;
+        var $block = $(data);
+        Elements.initDraggable($block);
+        Elements.initImages($block);
+        Elements.initLinks($block);
+        $('#wall').append($block);
+    });
 }
 
 function loadQueue() {
@@ -128,7 +169,7 @@ function loadQueue() {
         return;
     }
 
-    $.cookie('currentTargetFeedId', targetFeedId, { expires: 7, path: '/', secure: false });
+    $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
 
     var type = Elements.rightType();
 
@@ -141,19 +182,20 @@ function loadQueue() {
     //clean and load right column
     $.ajax({
         url: controlsRoot + 'arcticles-queue-list/',
-        dataType : "html",
+        dataType: "html",
         data: {
             targetFeedId: Elements.rightdd(),
             timestamp: Elements.calendar(),
             type: type
         },
         success: function (data) {
-            $('div#queue').show().html(data);
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
+            var $block = $(data);
+            Elements.initDraggable($block);
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $block.find('.post.blocked').draggable('disable');
 
-            $('.post.blocked').draggable('disable');
+            $('#queue').show().html($block);
             renderQueueSize();
         }
     });
@@ -172,12 +214,12 @@ function reloadArticle(id) {
             id: id
         },
         success: function (data) {
-            elem = $("div.post[data-id=" + id + "]");
-            elem.replaceWith(data);
+            var $elem = $("div.post[data-id=" + id + "]");
+            $elem.replaceWith(data);
 
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
+            Elements.initDraggable($elem);
+            Elements.initImages($elem);
+            Elements.initLinks($elem);
         }
     });
 }
@@ -374,16 +416,21 @@ var Eventlist = {
             }
 
             // группы юзеров
-            var userGroupTabs = $('.user-groups-tabs');
-            if (data['showUserGroups']){
-                userGroupTabs.find('.tab').remove();
-                userGroupTabs.removeClass('hidden');
-                var userGroups = data['showUserGroups'];
-                for (var i in userGroups){
-                    userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+            var $userGroupTabs = $('.user-groups-tabs');
+            var userGroups = data['showUserGroups'];
+            if (userGroups) {
+                $userGroupTabs.empty();
+                $userGroupTabs.removeClass('hidden');
+                $userGroupTabs.append('<div class="tab selected">Все новости</div>');
+                for (var i in userGroups) {
+                    var userGroupModel = new UserGroupModel();
+                    userGroupModel.id(userGroups[i]['id']);
+                    userGroupModel.name(userGroups[i]['name']);
+                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }
             } else {
-                userGroupTabs.addClass('hidden');
+                $userGroupTabs.addClass('hidden');
             }
 
 
@@ -411,7 +458,7 @@ var Eventlist = {
 
             var gridTypes = data['accessibleGridTypes'];
             var showCount = 0;
-            $('.right-panel div.type-selector').children('.grid_type').each(function(i, item){
+            $('.right-panel .type-selector').children('.grid_type').each(function(i, item){
                 item = $(item);
                 if ($.inArray(item.data('type'), gridTypes) == -1){
                     item.hide();
@@ -448,13 +495,12 @@ var Eventlist = {
             }
 
             $multiSelect.multiselect("refresh");
-
             if (Elements.leftdd().length == 0) {
                 $multiSelect.multiselect("checkAll").multiselect("refresh");
             }
 
             articlesLoading = false;
-            Events.fire('leftcolumn_dropdown_change', []);
+            Events.fire('leftcolumn_dropdown_change');
         });
     },
     calendar_change: function(){
@@ -537,7 +583,8 @@ var Eventlist = {
     },
 
     post: function(text, photos, link, id, callback){
-        $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedId;
         if ($sourceFeedIds.length != 1) {
             $sourceFeedId = null;
         } else {
@@ -595,55 +642,6 @@ var Eventlist = {
                 }
             }
         });
-    },
-
-    authors_get: function(callback) {
-        $.ajax({
-            url: controlsRoot + 'authors-list/',
-            data : {
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(data);
-            }
-        });
-    },
-    author_add: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-add/',
-            type: 'GET',
-            dataType : "json",
-            data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                if(data.success) {
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            }
-        });
-    },
-
-    author_remove: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-delete/',
-            type: 'GET',
-            dataType : "json",
-            data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(true);
-            }
-        });
-    },
-
-    author_edit_desc: function(userId, description, callback) {
-        callback();
     },
 
     add_article_group: function(targetFeedId, name, callback) {
@@ -735,7 +733,7 @@ var Eventlist = {
             sortType: sortType,
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd()
-        }
+        };
         if (typeof articleStatus != 'undefined'){
             requestData['articleStatus'] = articleStatus;
         }
@@ -751,6 +749,39 @@ var Eventlist = {
     },
 
     eof: null
+};
+
+var Events = {
+    delay: 0,
+    isDebug: false,
+    eventList: Eventlist,
+    fire: function(name){
+        var t = this;
+        var args;
+        if (arguments.length == 2 && (typeof arguments[1] == 'object') && arguments[1].length) {
+            args = arguments[1];
+        } else {
+            args = Array.prototype.slice.call(arguments, 1);
+        }
+        if ($.isFunction(t.eventList[name])) {
+            try {
+                setTimeout(function() {
+                    if (window.console && console.log && t.isDebug) {
+                        console.groupCollapsed(name);
+                        console.log('args: ' + args.slice(0, -1));
+                        console.groupEnd(name);
+                    }
+                    t.eventList[name].apply(window, args);
+                }, t.delay);
+            } catch(e) {
+                if (window.console && console.log && t.isDebug) {
+                    console.groupCollapsed('Error');
+                    console.log(e);
+                    console.groupEnd('Error');
+                }
+            }
+        }
+    }
 };
 
 function popupSuccess( message ) {
