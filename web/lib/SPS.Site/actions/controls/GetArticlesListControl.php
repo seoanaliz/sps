@@ -170,6 +170,8 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
         Response::setBoolean('showApproveBlock', $showApproveBlock);
         Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
+        Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
+
     }
 }
 
