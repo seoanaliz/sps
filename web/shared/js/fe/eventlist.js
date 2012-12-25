@@ -32,11 +32,19 @@ Control = $.extend(Control, {
             dataType: 'json'
         },
         add_to_list: {
-            name: 'add-user-to-group'
+            name: 'add-user-to-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
         },
 
         remove_from_list: {
-            name: 'remove-user-from-group'
+            name: 'remove-user-from-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
         }
     }
 });

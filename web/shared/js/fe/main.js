@@ -341,7 +341,10 @@ $(document).ready(function(){
                             } else {
                                 authorGroupIds.push(item.id + '');
                                 $author.data('group-ids', authorGroupIds.join(','));
-                                //Control.fire('add_to_list', {});
+                                Control.fire('add_to_list', {
+                                    userId: authorId,
+                                    listId: item.id
+                                });
                             }
                         },
                         onunselect: function(item) {
@@ -350,7 +353,10 @@ $(document).ready(function(){
                                 authorGroupIds.splice(index, 1);
                             }
                             $author.data('group-ids', authorGroupIds.join(','));
-                            //Control.fire('remove_from_list', {});
+                            Control.fire('remove_from_list', {
+                                userId: authorId,
+                                listId: item.id
+                            });
                         }
                     });
                 })();
