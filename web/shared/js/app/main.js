@@ -121,12 +121,64 @@ var app = (function () {
             }
         });
 
-        /*Left column*/
+        /*Right column*/
+        $menu.delegate('.item', 'click', function() {
+            var $item = $(this);
+            var itemId = $item.data('id');
+            var isEmpty = $item.data('empty');
+
+            (function() {
+                var dropdownItems = [
+                    {title: 'мои записи', type: 'my'},
+                    {title: 'лучшие записи', type: 'best'},
+                    {title: 'последние записи', type: 'new'}
+                ];
+
+                if (itemId == 'my') {
+                    dropdownItems = [
+                        {title: 'мои записи', type: 'my'},
+                        {title: 'лучшие записи', type: 'best'}
+                    ];
+                    $wall.addClass('not-textarea');
+                } else {
+                    $item.find('.counter').fadeOut(200);
+                    $wall.removeClass('not-textarea');
+                }
+                if (isEmpty) {
+                    dropdownItems = [
+                        {title: 'лучшие записи', type: 'best'},
+                        {title: 'последние записи', type: 'new'}
+                    ];
+                }
+
+                $wall.find('> .title > .dropdown').dropdown({
+                    position: 'right',
+                    width: 'auto',
+                    addClass: 'wall-dropdown-menu',
+                    data: dropdownItems,
+                    oncreate: filterWall,
+                    onupdate: filterWall,
+                    onchange: function(item) {
+                        $(this).text(item.title);
+                        pageLoad($menu.find('.item.selected').data('id'), item.type);
+                    }
+                });
+                function filterWall() {
+                    var $defItem = $(this).dropdown('getMenu').find('div:first');
+                    var itemData = $defItem.data('item');
+                    $(this).text(itemData.title);
+                    pageLoad(itemId, itemData.type);
+                }
+            })();
+        });
+    }
+
+    function _bindLeftColumnEvents() {
         $wallTabs.delegate('.tab', 'click', function() {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            Events.fire('wall_load', {tabType: $tab.data('type'), page:-1}, function(data) {
+            Events.fire('wall_load', {tabType: $tab.data('type'), page: -1}, function(data) {
                 $wallList.html(data);
                 _updateItems();
             });
@@ -284,57 +336,6 @@ var app = (function () {
                 $commentsList.html(html).find('.date').easydate(easydateParams);
             });
         });
-
-        /*Right column*/
-        $menu.delegate('.item', 'click', function() {
-            var $item = $(this);
-            var itemId = $item.data('id');
-            var isEmpty = $item.data('empty');
-
-            (function() {
-                var dropdownItems = [
-                    {title: 'мои записи', type: 'my'},
-                    {title: 'лучшие записи', type: 'best'},
-                    {title: 'последние записи', type: 'new'}
-                ];
-
-                if (itemId == 'my') {
-                    dropdownItems = [
-                        {title: 'мои записи', type: 'my'},
-                        {title: 'лучшие записи', type: 'best'}
-                    ];
-                    $wall.addClass('not-textarea');
-                } else {
-                    $item.find('.counter').fadeOut(200);
-                    $wall.removeClass('not-textarea');
-                }
-                if (isEmpty) {
-                    dropdownItems = [
-                        {title: 'лучшие записи', type: 'best'},
-                        {title: 'последние записи', type: 'new'}
-                    ];
-                }
-
-                $wall.find('> .title > .dropdown').dropdown({
-                    position: 'right',
-                    width: 'auto',
-                    addClass: 'wall-dropdown-menu',
-                    data: dropdownItems,
-                    oncreate: filterWall,
-                    onupdate: filterWall,
-                    onchange: function(item) {
-                        $(this).text(item.title);
-                        pageLoad($menu.find('.item.selected').data('id'), item.type);
-                    }
-                });
-                function filterWall() {
-                    var $defItem = $(this).dropdown('getMenu').find('div:first');
-                    var itemData = $defItem.data('item');
-                    $(this).text(itemData.title);
-                    pageLoad(itemId, itemData.type);
-                }
-            })();
-        });
     }
 
     function _wallPost(target) {
@@ -413,8 +414,9 @@ var app = (function () {
                 }
             }
 
-            $wallList.html(data);
+            $leftColumn.html(data);
             _updateItems();
+            _bindLeftColumnEvents();
         });
     }
 

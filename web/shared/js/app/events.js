@@ -35,10 +35,9 @@ var WallLoadParams = {
     type: null,
     filter: null,
     page: -1
-}
+};
 
 var Eventlist = {
-
     wall_load: function(options, callback) {
         WallLoadParams = $.extend(WallLoadParams, options);
         WallLoadParams.page++;
