@@ -38,9 +38,10 @@
                     ?>
                 </select>
 
-                <div style="position: absolute; top: 48px; right: 18px; width: 300px;" id="slider-cont">
+                <div id="slider-cont" class="clear-fix">
                     <div id="slider-range"></div>
                 </div>
+                <div class="clear-fix"></div>
 
                 <div class="user-groups-tabs tab-bar no-padding hidden">
                 </div>
@@ -57,7 +58,6 @@
                             $isFirst = false;
                         }
                     endforeach ?>
-
                 </div>
             </div>
 
