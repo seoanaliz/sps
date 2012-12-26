@@ -198,9 +198,11 @@ $(document).ready(function(){
 
         if ($(this).data('type') == 'authors-list') {
             $('body').addClass('editor-mode');
+            $(window).data('disable-load-more', true);
             updateAuthorListPage();
         } else {
             $('body').removeClass('editor-mode');
+            $(window).data('disable-load-more', false);
             Events.fire('rightcolumn_dropdown_change');
         }
     });
@@ -777,10 +779,10 @@ $(document).ready(function(){
     });
 
     // Автоподгрузка записей
-    (function(){
+    (function() {
         var $window = $(window);
         $window.scroll(function() {
-            if ($window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
                 Events.fire('wall_load_more', function(state) {});
             }
         });
