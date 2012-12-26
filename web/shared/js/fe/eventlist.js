@@ -109,9 +109,12 @@ var wallPage = -1;
 function loadArticles(clean) {
     if (clean){
         wallPage = -1;
+        $(window).data('disable-load-more', false);
     }
     wallPage++;
-    if (articlesLoading) return;
+    if (articlesLoading) {
+        return;
+    }
 
     articlesLoading = true;
 
@@ -154,6 +157,9 @@ function loadArticles(clean) {
             $('#wall').empty();
         }
     }).done(function(data) {
+        if (!data) {
+            $(window).data('disable-load-more', true);
+        }
         articlesLoading = false;
         var tmpEl = document.createElement('div');
         var $block = $(tmpEl).html(data);
