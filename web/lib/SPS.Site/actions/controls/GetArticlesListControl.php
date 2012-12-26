@@ -94,14 +94,20 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     $authorsIds = array($this->getAuthor()->authorId);
                 } else {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
+                    $this->options[BaseFactory::CustomSql] = ' AND ' .
+                    ' (("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL ) OR '.
+                    '("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
+                    $authorsIds = true;
+                    unset($this->search['articleStatusIn']);
                 }
             } else {
                 $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
             }
             // фильтр источников выступает как фильтр авторов
-            if (!empty($authorsIds)) {
-                $this->search['_authorId'] = $authorsIds;
+            if ($authorsIds) {
+                if (is_array($authorsIds)){
+                    $this->search['_authorId'] = $authorsIds;
+                }
             } else {
                 $this->search['_authorId'] = array(-1 => -1);
             }
