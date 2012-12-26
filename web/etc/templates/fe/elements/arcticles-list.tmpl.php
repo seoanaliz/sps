@@ -27,12 +27,5 @@
 <? if ($showArticlesOnly): ?>
 <script type="text/javascript">
     $('.wall-title span.count').text('{$articlesCountText}');
-    <?
-        if (!empty($hasMore)) {
-            ?>$("#wallloadmore").removeClass('hidden');<?
-        } else {
-            ?>$("#wallloadmore").addClass('hidden');<?
-        }
-    ?>
 </script>
 <? endif; ?>

@@ -31,6 +31,19 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
         return in_array($targetFeedId, $this->getAllTargetFeedIds());
     }
 
+    /**
+     * Круче чем автор
+     * @param $targetFeedId
+     * @return bool
+     */
+    protected function moreThenAuthor($targetFeedId){
+        $role = $this->getRoleForTargetFeed($targetFeedId);
+        if (!is_null($role)) {
+            return $role != UserFeed::ROLE_AUTHOR;
+        }
+        return false;
+    }
+
 
     /**
      * TODO переделать
@@ -47,11 +60,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canAddAuthor($targetFeedId){
-        $role = $this->getRoleForTargetFeed($targetFeedId);
-        if (!is_null($role)) {
-            return $role != UserFeed::ROLE_AUTHOR;
-        }
-        return false;
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
@@ -77,7 +86,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canShowAuthorList($targetFeedId){
-        return $this->hasAccessToTargetFeed($targetFeedId);
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
@@ -86,11 +95,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canDeleteAuthor($targetFeedId){
-        $role = $this->getRoleForTargetFeed($targetFeedId);
-        if (!is_null($role)) {
-            return $role != UserFeed::ROLE_AUTHOR;
-        }
-        return false;
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
@@ -99,11 +104,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canCreatePlanDeletePost($targetFeedId){
-        $role = $this->getRoleForTargetFeed($targetFeedId);
-        if (!is_null($role)) {
-            return $role != UserFeed::ROLE_AUTHOR;
-        }
-        return false;
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
@@ -136,10 +137,6 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canAddUserGroup($targetFeedId){
-        $role = $this->getRoleForTargetFeed($targetFeedId);
-        if (!is_null($role)) {
-            return $role != UserFeed::ROLE_AUTHOR;
-        }
-        return false;
+        return $this->moreThenAuthor($targetFeedId);
     }
 }

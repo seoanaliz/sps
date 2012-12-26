@@ -5,15 +5,8 @@
  * In Code We Trust
  */
 
-Package::Load('SPS.Site/base');
-
-/**
- * Планирует удаление поста
- */
-class PostDeletePlanControl extends BaseControl
-{
-    public function Execute()
-    {
+class PostDeletePlanControl extends BaseControl {
+    public function Execute() {
         $result = array();
         $articleQueueId = Request::getInteger('queueId');
         $time = Request::getString('time');
@@ -34,7 +27,7 @@ class PostDeletePlanControl extends BaseControl
                 list($hour, $minutes) = explode(':', $time);
                 $ts = $articleQueue->startDate->getTimestamp();
                 $articleQueue->deleteAt = new DateTimeWrapper(null);
-                $articleQueue->deleteAt->setTimestamp($ts)->modify('+' . $hour . ' hours')->modify('+' . $minutes . ' minutes');
+                $articleQueue->deleteAt->setTimestamp($ts)->modify('+'.$hour.' hours')->modify('+'.$minutes.' minutes');
                 ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
                 $result['success'] = true;
             }
@@ -43,5 +36,4 @@ class PostDeletePlanControl extends BaseControl
         echo ObjectHelper::ToJSON($result);
     }
 }
-
 ?>

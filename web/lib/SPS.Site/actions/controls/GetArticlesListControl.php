@@ -1,6 +1,4 @@
 <?php
-Package::Load('SPS.Site/base');
-
 /**
  * Конторллер списка постов для Socialboard
  * @package    SPS

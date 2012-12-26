@@ -511,10 +511,7 @@ var Eventlist = {
         loadQueue();
     },
     wall_load_more: function(callback){
-        if (!$("#wallloadmore").hasClass('hidden')) {
-            $("#wallloadmore").addClass('hidden');
-            loadArticles(false);
-        }
+        loadArticles(false);
         callback(true);
     },
     post_moved: function(post_id, slot_id, queueId, callback){

@@ -1,44 +1,39 @@
 <?php
-Package::Load('SPS.Site/base');
-
-/**
- * LoadCommentsAppControl Action
- * @package    SPS
- * @subpackage Site
- * @author     Shuler
- */
-class LoadCommentsAppControl extends BaseControl
-{
-
     /**
-     * Entry Point
+     * LoadCommentsAppControl Action
+     * @package    SPS
+     * @subpackage Site
+     * @author     Shuler
      */
-    public function Execute()
-    {
-        $article = ArticleFactory::GetById(Request::getInteger('postId'), array(), array(BaseFactory::WithoutDisabled => false));
+    class LoadCommentsAppControl extends BaseControl {
 
-        if (empty($article)) {
-            return false;
-        }
+        /**
+         * Entry Point
+         */
+        public function Execute() {
+            $article = ArticleFactory::GetById(Request::getInteger('postId'), array(), array(BaseFactory::WithoutDisabled => false));
 
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            if (empty($article)) {
+                return false;
+            }
 
-        if (!$TargetFeedAccessUtility->canShowArticleComments($article->targetFeedId)) {
-            return false;
-        }
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
-        $all = Request::getBoolean('all');
-        $authorEvents = AuthorEventFactory::Get(array('articleId' => $article->articleId));
-        $commentsData = CommentUtility::GetLastComments(array($article->articleId), !$all, $authorEvents);
+            if (!$TargetFeedAccessUtility->canShowArticleComments($article->targetFeedId)) {
+                return false;
+            }
 
-        Response::setParameter('article', $article);
-        Response::setArray('commentsData', $commentsData);
-        Response::setArray('authorEvents', $authorEvents);
+            $all = Request::getBoolean( 'all' );
+            $authorEvents = AuthorEventFactory::Get(array('articleId' => $article->articleId));
+            $commentsData = CommentUtility::GetLastComments(array($article->articleId), !$all, $authorEvents);
 
-        if (!empty($all)) {
-            Response::setBoolean('showHideBtn', true);
+            Response::setParameter( 'article', $article );
+            Response::setArray( 'commentsData', $commentsData );
+            Response::setArray( 'authorEvents', $authorEvents );
+
+            if (!empty($all)) {
+                Response::setBoolean( 'showHideBtn', true );
+            }
         }
     }
-}
-
 ?>

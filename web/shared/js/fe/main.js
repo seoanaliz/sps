@@ -278,7 +278,8 @@ $(document).ready(function(){
                 var $author = $target.closest('.author');
                 (function updateDropdown() {
                     var authorId = $author.data('id');
-                    var authorGroupIds = $author.data('group-ids') ? $author.data('group-ids').split(',') : [];
+
+                    var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
                     var authorGroups = [];
                     $.each(userGroupCollection.get(), function(id, userGroupModel) {
                         if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
@@ -741,19 +742,6 @@ $(document).ready(function(){
         $newPost.find('.time').click();
     });
 
-    // Загрузка стены по клику
-    $("#wallloadmore").click(function(){
-        var b = $(this);
-        if(b.hasClass("disabled")) { return; }
-        b.addClass("disabled");
-        Events.fire('wall_load_more', function(state){
-            b.removeClass("disabled");
-            if(!state) {
-                b.addClass("disabled");
-            }
-        });
-    });
-
     // Очистка текста
     $leftPanel.delegate(".clear-text", "click", function(){
         var $post = $(this).closest(".post");
@@ -790,11 +778,10 @@ $(document).ready(function(){
 
     // Автоподгрузка записей
     (function(){
-        var w = $(window),
-            b = $("#wallloadmore");
-        w.scroll(function() {
-            if (b.is(':visible') && w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
-                b.click();
+        var $window = $(window);
+        $window.scroll(function() {
+            if ($window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                Events.fire('wall_load_more', function(state) {});
             }
         });
     })();

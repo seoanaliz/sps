@@ -53,58 +53,58 @@ class GetSourceFeedsListControl extends BaseControl
                 $showArticleStatusFilter = true;
             }
         } else
-        if ($type == SourceFeedUtility::Authors) {
+            if ($type == SourceFeedUtility::Authors) {
 
-            if ($role == UserFeed::ROLE_EDITOR) {
-                //$showArticleStatusFilter = true;
+                if ($role == UserFeed::ROLE_EDITOR) {
+                    //$showArticleStatusFilter = true;
 
-                $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
-                $showUserGroups = array();
+                    $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
+                    $showUserGroups = array();
 
-                foreach ($userGroups as $userGroup) {
-                    /** @var $userGroup UserGroup */
-                    $showUserGroups[] = $userGroup->toArray();
+                    foreach ($userGroups as $userGroup) {
+                        /** @var $userGroup UserGroup */
+                        $showUserGroups[] = $userGroup->toArray();
+                    }
+                }
+
+                $authors = AuthorFactory::Get(
+                    array(),
+                    array(
+                        BaseFactory::WithoutPages => true,
+                        BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
+                    )
+                );
+
+                foreach ($authors as $author) {
+                    $sourceFeedResult[] = array(
+                        'id' => $author->authorId,
+                        'title' => $author->FullName()
+                    );
+                }
+            } else {
+
+                $showSourceList =  ($type == SourceFeedUtility::Topface || $type == SourceFeedUtility::Source || $type == SourceFeedUtility::Albums);
+
+                $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+
+                $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
+                $sourceFeeds = array();
+                if ($sourceIds) {
+                    $sourceFeeds = SourceFeedFactory::Get(
+                        array(
+                            '_sourceFeedId' => $sourceIds,
+                            'type' => $type)
+                        , array(BaseFactory::WithoutPages => true)
+                    );
+                }
+
+                foreach ($sourceFeeds as $sourceFeed) {
+                    $sourceFeedResult[] = array(
+                        'id' => $sourceFeed->sourceFeedId,
+                        'title' => $sourceFeed->title
+                    );
                 }
             }
-
-            $authors = AuthorFactory::Get(
-                array(),
-                array(
-                    BaseFactory::WithoutPages => true,
-                    BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
-                )
-            );
-
-            foreach ($authors as $author) {
-                $sourceFeedResult[] = array(
-                    'id' => $author->authorId,
-                    'title' => $author->FullName()
-                );
-            }
-        } else {
-
-            $showSourceList =  ($type == SourceFeedUtility::Topface || $type == SourceFeedUtility::Source || $type == SourceFeedUtility::Albums);
-
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
-            $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
-            $sourceFeeds = array();
-            if ($sourceIds) {
-                $sourceFeeds = SourceFeedFactory::Get(
-                    array(
-                        '_sourceFeedId' => $sourceIds,
-                        'type' => $type)
-                    , array(BaseFactory::WithoutPages => true)
-                );
-            }
-
-            foreach ($sourceFeeds as $sourceFeed) {
-                $sourceFeedResult[] = array(
-                    'id' => $sourceFeed->sourceFeedId,
-                    'title' => $sourceFeed->title
-                );
-            }
-        }
 
         echo ObjectHelper::ToJSON(array(
             'type' => $type,

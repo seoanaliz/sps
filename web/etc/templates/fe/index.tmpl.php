@@ -1,6 +1,5 @@
 <?
 /**
- * @var $SourceAccessUtility SourceAccessUtility
  * @var $sourceTypes array
  * @var $gridTypes array
  * @var $availableSourceTypes array
@@ -24,7 +23,7 @@
                     ?>
                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
                           <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
-                          id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
+                          id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                     <?
                     $isFirst++;
                     endforeach;
@@ -71,8 +70,6 @@
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 
             <div class="wall" id="wall"></div>
-
-            <div id="wallloadmore" class="hidden">Больше</div>
         </div>
     </div>
 
