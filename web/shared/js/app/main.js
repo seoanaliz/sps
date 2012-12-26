@@ -125,51 +125,17 @@ var app = (function () {
         $menu.delegate('.item', 'click', function() {
             var $item = $(this);
             var itemId = $item.data('id');
+            var itemType = 'my';
             var isEmpty = $item.data('empty');
 
-            (function() {
-                var dropdownItems = [
-                    {title: 'мои записи', type: 'my'},
-                    {title: 'лучшие записи', type: 'best'},
-                    {title: 'последние записи', type: 'new'}
-                ];
+            if (itemId != 'my') {
+                $item.find('.counter').fadeOut(200);
+            }
+            if (isEmpty) {
+                itemType = 'best';
+            }
 
-                if (itemId == 'my') {
-                    dropdownItems = [
-                        {title: 'мои записи', type: 'my'},
-                        {title: 'лучшие записи', type: 'best'}
-                    ];
-                    $wall.addClass('not-textarea');
-                } else {
-                    $item.find('.counter').fadeOut(200);
-                    $wall.removeClass('not-textarea');
-                }
-                if (isEmpty) {
-                    dropdownItems = [
-                        {title: 'лучшие записи', type: 'best'},
-                        {title: 'последние записи', type: 'new'}
-                    ];
-                }
-
-                $wall.find('> .title > .dropdown').dropdown({
-                    position: 'right',
-                    width: 'auto',
-                    addClass: 'wall-dropdown-menu',
-                    data: dropdownItems,
-                    oncreate: filterWall,
-                    onupdate: filterWall,
-                    onchange: function(item) {
-                        $(this).text(item.title);
-                        pageLoad($menu.find('.item.selected').data('id'), item.type);
-                    }
-                });
-                function filterWall() {
-                    var $defItem = $(this).dropdown('getMenu').find('div:first');
-                    var itemData = $defItem.data('item');
-                    $(this).text(itemData.title);
-                    pageLoad(itemId, itemData.type);
-                }
-            })();
+            pageLoad(itemId, itemType);
         });
     }
 
@@ -428,6 +394,12 @@ var app = (function () {
             $leftColumn.html(data);
             _updateItems();
             _bindLeftColumnEvents();
+
+            if (id == 'my') {
+                $wall.addClass('not-textarea');
+            } else {
+                $wall.removeClass('not-textarea');
+            }
         });
     }
 

@@ -1,12 +1,7 @@
 {increal:tmpl://app/elements/header.tmpl.php}
 <div class="main clear-fix">
     <div class="left-column" id="left-column">
-        <div class="wall" id="wall">
-            <div class="title clear-fix">
-                <div class="text"></div>
-                <div class="dropdown" style="visibility: hidden;">мои записи</div>
-            </div>
-        </div>
+
     </div>
     <div class="right-column" id="right-column">
         <div class="header">
