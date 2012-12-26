@@ -355,7 +355,8 @@ var app = (function () {
         } else {
             $button.addClass('load');
             var publicId = $menu.find('.item.selected').data('id');
-            Events.fire('wall_post', {text: text, publicId: publicId, photos: photos}, function() {
+            var groupId = $('#groups').find('.tab.selected').data('id');
+            Events.fire('wall_post', {text: text, publicId: publicId, photos: photos, userGroupId: groupId}, function() {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $photos.html('');

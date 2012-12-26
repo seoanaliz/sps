@@ -17,11 +17,6 @@
                             <a target="_blank" href="http://vk.com/id{$__Author->vkId}">{$__Author->FullName()}</a>
                         </div>
                     <? } ?>
-                    <!--div class="other">
-                        <span class="rating"><span class="icon"></span> 300</span>
-                        <span class="likes"><span class="icon hart"></span> 15000</span>
-                        <span class="diff">+1300</span>
-                    </div-->
                 </div>
             </div>
         </div>
