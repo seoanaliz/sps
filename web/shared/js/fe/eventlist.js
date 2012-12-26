@@ -155,7 +155,8 @@ function loadArticles(clean) {
         }
     }).done(function(data) {
         articlesLoading = false;
-        var $block = $(data);
+        var tmpEl = document.createElement('div');
+        var $block = $(tmpEl).html(data);
         Elements.initDraggable($block);
         Elements.initImages($block);
         Elements.initLinks($block);
@@ -189,13 +190,13 @@ function loadQueue() {
             type: type
         },
         success: function (data) {
-            var $block = $(data);
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            $('#queue').show().html($block);
             Elements.initDraggable($block);
             Elements.initImages($block);
             Elements.initLinks($block);
             $block.find('.post.blocked').draggable('disable');
-
-            $('#queue').show().html($block);
             renderQueueSize();
         }
     });
@@ -209,14 +210,13 @@ function renderQueueSize() {
 function reloadArticle(id) {
     $.ajax({
         url: controlsRoot + 'arcticle-item/',
-        dataType : "html",
+        dataType: "html",
         data: {
             id: id
         },
-        success: function (data) {
+        success: function(data) {
             var $elem = $("div.post[data-id=" + id + "]");
             $elem.replaceWith(data);
-
             Elements.initDraggable($elem);
             Elements.initImages($elem);
             Elements.initLinks($elem);

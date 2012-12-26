@@ -1606,13 +1606,13 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
 var Elements = {
     initImages: function($block) {
         $block.find(".fancybox-thumb").fancybox({
-            prevEffect		: 'none',
-            nextEffect		: 'none',
-            closeBtn		: false,
-            fitToView       : false,
-            helpers		: {
-                title	: { type : 'inside' },
-                buttons	: {}
+            prevEffect: 'none',
+            nextEffect: 'none',
+            closeBtn:false,
+            fitToView: false,
+            helpers: {
+                title: {type : 'inside'},
+                buttons: {}
             }
         });
 
@@ -1692,6 +1692,11 @@ var Elements = {
             }
         });
     },
+    initLinks: function($block) {
+        $block.find('img.ajax-loader').each(function(){
+            Elements.initLinkLoader($(this), true);
+        });
+    },
     leftdd: function(){
         return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
@@ -1758,11 +1763,6 @@ var Elements = {
                 }
                 container.find('div.link-status-content span a').text(shortLink);
             }
-        });
-    },
-    initLinks: function($block) {
-        $block.find('img.ajax-loader').each(function(){
-            Elements.initLinkLoader($(this), true);
         });
     }
 };
