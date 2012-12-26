@@ -107,15 +107,15 @@ function changeRange() {
 var wallPage = -1;
 
 function loadArticles(clean) {
+    if (articlesLoading) {
+        return;
+    }
     if (clean){
         wallPage = -1;
         $(window).data('disable-load-more', false);
     }
-    wallPage++;
-    if (articlesLoading) {
-        return;
-    }
 
+    wallPage++;
     articlesLoading = true;
 
     $('#wall-load').show();
