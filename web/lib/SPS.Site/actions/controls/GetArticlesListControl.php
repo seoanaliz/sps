@@ -118,28 +118,6 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $userGroupId = Request::getInteger('userGroupId');
         if ($userGroupId) {
-            $UserUserGroups = UserUserGroupFactory::Get(array('userGroupId' => $userGroupId));
-            $vkIds = array();
-            foreach ($UserUserGroups as $UserUserGroup) {
-                $vkIds[] = $UserUserGroup->vkId;
-            }
-            $authors = $authorsIds = array();
-            if ($vkIds) {
-                $authors = AuthorFactory::Get(
-                    array('vkIdIn' => $vkIds),
-                    array( BaseFactory::WithoutPages => true)
-                );
-            }
-
-            foreach ($authors as $author){
-                $authorsIds[] = $author->authorId;
-            }
-            if (!empty($authorsIds)) {
-                $this->search['_authorId'] = $authorsIds;
-            } else {
-                $this->search['_authorId'] = array(-1 => -1);
-            }
-
             // в группе ищем записи на рассмотрении
             $this->reviewArticleCount = ArticleFactory::Count(array('authorId' => $this->getAuthor()->authorId,
                 'articleStatusIn' => array(Article::STATUS_REVIEW), 'userGroupId' => $userGroupId));
