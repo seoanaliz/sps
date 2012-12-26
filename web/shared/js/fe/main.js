@@ -1642,17 +1642,8 @@ var Elements = {
     },
     initDraggable: function($block) {
         $block.find(".slot .post .content").addClass("dragged");
-        var dragdrop = function(post, slot, queueId, callback, failback){
-            Events.fire('post_moved', post, slot, queueId, function(state, newId){
-                if (state) {
-                    callback(newId);
-                } else {
-                    failback();
-                }
-            });
-        };
 
-        var draggableParams = {
+        $block.find(".post:not(.blocked) > .content").draggable({
             revert: 'invalid',
             appendTo: 'body',
             cursor: 'move',
@@ -1670,9 +1661,19 @@ var Elements = {
                     $post = self.closest('.post');
                 $post.removeClass('moving');
             }
+        });
+    },
+    initDroppable: function($block) {
+        var dragdrop = function(post, slot, queueId, callback, failback){
+            Events.fire('post_moved', post, slot, queueId, function(state, newId){
+                if (state) {
+                    callback(newId);
+                } else {
+                    failback();
+                }
+            });
         };
 
-        $block.find(".post:not(.blocked) > .content").draggable(draggableParams);
         $block.find('.items .slot').droppable({
             activeClass: "ui-state-active",
             hoverClass: "ui-state-hover",

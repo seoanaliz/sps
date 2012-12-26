@@ -168,6 +168,7 @@ function loadArticles(clean) {
             var tmpEl = document.createElement('div');
             var $block = $(tmpEl).html(data);
             Elements.initDraggable($block);
+            Elements.initDroppable($('.right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
             $('#wall').append($block);
@@ -207,6 +208,7 @@ function loadQueue() {
             var $block = $(tmpEl).html(data);
             $('#queue').show().html($block);
             Elements.initDraggable($block);
+            Elements.initDroppable($('.right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
             $block.find('.post.blocked').draggable('disable');
@@ -233,6 +235,7 @@ function reloadArticle(id) {
             var $elem = $("div.post[data-id=" + id + "]");
             $elem.replaceWith(data);
             Elements.initDraggable($elem);
+            Elements.initDroppable($('.right-panel'));
             Elements.initImages($elem);
             Elements.initLinks($elem);
         }
