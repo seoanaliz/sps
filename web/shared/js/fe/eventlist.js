@@ -163,14 +163,16 @@ function loadArticles(clean) {
     }).done(function(data) {
         if (!data) {
             $(window).data('disable-load-more', true);
+            $('.wall-title span.count').text('нет записей');
+        } else {
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            Elements.initDraggable($block);
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $('#wall').append($block);
         }
         articlesLoading = false;
-        var tmpEl = document.createElement('div');
-        var $block = $(tmpEl).html(data);
-        Elements.initDraggable($block);
-        Elements.initImages($block);
-        Elements.initLinks($block);
-        $('#wall').append($block);
     });
 }
 
@@ -198,8 +200,9 @@ function loadQueue() {
             targetFeedId: Elements.rightdd(),
             timestamp: Elements.calendar(),
             type: type
-        },
-        success: function (data) {
+        }
+    }).success(function (data) {
+        if (data) {
             var tmpEl = document.createElement('div');
             var $block = $(tmpEl).html(data);
             $('#queue').show().html($block);
@@ -208,6 +211,8 @@ function loadQueue() {
             Elements.initLinks($block);
             $block.find('.post.blocked').draggable('disable');
             renderQueueSize();
+        } else {
+            $('#queue').empty();
         }
     });
 }

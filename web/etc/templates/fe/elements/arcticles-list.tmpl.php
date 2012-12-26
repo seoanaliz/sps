@@ -24,7 +24,7 @@
 
     $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension( $articlesCount ));
 ?>
-<? if (!$showArticlesOnly): ?>
+<? if (!$showArticlesOnly && $articlesCount): ?>
 <script type="text/javascript">
     $('.wall-title span.count').text('{$articlesCountText}');
 </script>
