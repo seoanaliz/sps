@@ -146,6 +146,10 @@ function loadArticles(clean) {
         targetFeedId: Elements.rightdd()
     };
 
+    if (!clean) {
+        requestData['articles-only'] = 1;
+    }
+
     //clean and load left column
     $.ajax({
         url: controlsRoot + 'arcticles-list/',
