@@ -143,6 +143,9 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId'));
         Response::setArray('authorEvents', $this->authorEvents);
         Response::setArray('__authorCounter', $this->authorCounter);
+
+        $userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
+        Response::setArray('userGroups', $userGroups);
     }
 
     /**
