@@ -35,6 +35,7 @@
             }
 
 
+
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(

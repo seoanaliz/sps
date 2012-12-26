@@ -107,6 +107,9 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             } else {
                 $this->search['_authorId'] = array(-1 => -1);
             }
+        } else if ($type == SourceFeedUtility::My) {
+            unset($this->search['_sourceFeedId']);
+            $this->search['authorId'] = $this->getAuthor()->authorId;
         }
 
         $userGroupId = Request::getInteger('userGroupId');

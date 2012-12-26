@@ -21,6 +21,7 @@ class AddAuthorControl extends BaseControl
         $targetFeedId = Request::getInteger('targetFeedId');
         if (!$TargetFeedAccessUtility->canAddAuthor($targetFeedId)) {
             Logger::Debug('Add Author access denied');
+            $result['message'] = 'access denied';
             echo ObjectHelper::ToJSON($result);
             return;
         }
