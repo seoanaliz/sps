@@ -4,6 +4,7 @@
     /** @var $articleRecords ArticleRecord[] */
     /** @var $authors Author[] */
     /** @var $targetFeeds TargetFeed[] */
+    /** @var $userGroups array - группы пользователя   */
 
     if (!empty($articles)) {
         foreach($articles as $article) {

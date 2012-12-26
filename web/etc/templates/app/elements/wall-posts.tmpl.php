@@ -4,16 +4,12 @@
  * @var $currentGroup int - выбранная группа
  */
 $currentGroup = 1;
-$userGroups = array(
-    array('id' => 1, 'name' => 'Test'),
-    array('id' => 2, 'name' => 'Test'),
-);
 ?>
 <div class="groups" id="groups">
     <div class="tab-bar no-padding">
         <? foreach($userGroups as $userGroup) { ?>
-            <div class="tab<?=$currentGroup == $userGroup['id'] ? ' selected' : ''?>" data-id="<?=$userGroup['id']?>">
-                <?=$userGroup['name']?>
+            <div class="tab<?=$currentGroup == $userGroup->userGroupId ? ' selected' : ''?>" data-id="<?=$userGroup->userGroupId?>">
+                <?=$userGroup->name?>
             </div>
         <? } ?>
     </div>
