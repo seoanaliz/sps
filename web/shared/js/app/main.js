@@ -394,12 +394,6 @@ var app = (function () {
             $leftColumn.html(data);
             _updateItems();
             _bindLeftColumnEvents();
-
-            if (id == 'my') {
-                $wall.addClass('not-textarea');
-            } else {
-                $wall.removeClass('not-textarea');
-            }
         });
     }
 

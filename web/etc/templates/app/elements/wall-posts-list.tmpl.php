@@ -6,6 +6,7 @@
     /** @var $targetFeeds TargetFeed[] */
     /** @var $userGroups array - группы пользователя   */
 
+    $type = Request::getString('type');
     $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension( $articlesCount ));
 ?>
 <div class="groups" id="groups">
@@ -17,7 +18,7 @@
         <? } ?>
     </div>
 </div>
-<div class="wall" id="wall">
+<div class="wall<?=$type == 'my' ? ' not-textarea' : ''?>" id="wall">
     <div class="title clear-fix">
         <div class="text"></div>
         <div class="dropdown" style="visibility: hidden;">мои записи</div>
