@@ -31,10 +31,10 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         return self::MODE_ALL;
     }
 
-    protected function getAuthorsForTargetFeed() {
+    protected function getAuthorsForTargetFeed($targetFeedId) {
         // выираем авторов для этой ленты
         $authorsIds = array();
-        $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $this->search['targetFeedId']));
+        $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId));
         if ($UserFeeds) {
             $vkIds = array();
             foreach ($UserFeeds as $UserFeed){
@@ -93,11 +93,11 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                 if ($mode == self::MODE_MY) {
                     $authorsIds = array($this->getAuthor()->authorId);
                 } else {
-                    $authorsIds = $this->getAuthorsForTargetFeed();
+                    $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                     $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
                 }
             } else {
-                $authorsIds = $this->getAuthorsForTargetFeed();
+                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
             }
             // фильтр источников выступает как фильтр авторов
             if (!empty($authorsIds)) {
