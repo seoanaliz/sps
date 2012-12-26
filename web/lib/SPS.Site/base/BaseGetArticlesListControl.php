@@ -129,7 +129,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
      */
     protected function processRequest()
     {
-        $useSourceFilter = false;
+        $useSourceFilter = $useArticleStatusFilter = false;
 
         // Определяем страницу
         $this->processPage();
@@ -148,17 +148,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         if ($sourceFeedType == SourceFeedUtility::Authors) {
 
             if ($this->ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
-
-                $articleStatuses = $this->ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
-
-                // фильтр по статусам - только для авторских постов
-                // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
-                $reqArticleStatus = $this->getArticleStatus();
-                if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
-                    $articleStatuses = array($reqArticleStatus);
-                }
-
-                $this->search['articleStatusIn'] = $articleStatuses;
+                $useArticleStatusFilter= true;
             } else {
                 throw new Exception('Access error');
             }
@@ -175,6 +165,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         } elseif ($sourceFeedType == SourceFeedUtility::My) {
             $this->userRateFilter = false;
             $this->search['authorId'] = $this->getAuthor()->authorId;
+            $useArticleStatusFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Source) {
             $useSourceFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
@@ -193,6 +184,21 @@ abstract class BaseGetArticlesListControl extends BaseControl
                 $this->search['rateLE'] = $to;
             }
         }
+
+        // фильтр по статусам статей
+        if ($useArticleStatusFilter) {
+            $articleStatuses = $this->ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
+
+            // фильтр по статусам - только для авторских постов
+            // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
+            $reqArticleStatus = $this->getArticleStatus();
+            if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
+                $articleStatuses = array($reqArticleStatus);
+            }
+
+            $this->search['articleStatusIn'] = $articleStatuses;
+        }
+
 
         // фильтр по источникам
         // определяем источники
