@@ -174,11 +174,21 @@ var app = (function () {
     }
 
     function _bindLeftColumnEvents() {
+        var $wallGroups = $leftColumn.find('#groups');
+        $wallGroups.delegate('.tab', 'click', function() {
+            var $tab = $(this);
+            $wallGroups.find('.tab.selected').removeClass('selected');
+            $tab.addClass('selected');
+            var groupId = $tab.data('id');
+            pageLoad($menu.find('.item.selected').data('id'));
+        });
+
         $wallTabs.delegate('.tab', 'click', function() {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            Events.fire('wall_load', {tabType: $tab.data('type'), page: -1}, function(data) {
+            var groupId = $wallGroups.find('.tab.selected').data('id');
+            Events.fire('wall_load', {tabType: $tab.data('type'), page: -1, userGroupId: groupId}, function(data) {
                 $wallList.html(data);
                 _updateItems();
             });
@@ -361,7 +371,7 @@ var app = (function () {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $photos.html('');
-                pageLoad();
+                pageLoad($menu.find('.item.selected').data('id'));
             });
         }
     }
@@ -387,10 +397,10 @@ var app = (function () {
     }
 
     function showMore() {
-        var tmpText = $loadMore.text();
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
-        Events.fire('wall_load', {tabType: null}, function(data) {
+        var groupId = $('#groups').find('.tab.selected').data('id');
+        Events.fire('wall_load', {tabType: null, userGroupId: groupId}, function(data) {
             $loadMore.remove();
             $wallList.append(data);
             _updateItems();
@@ -398,7 +408,8 @@ var app = (function () {
     }
 
     function pageLoad(id, filter) {
-        Events.fire('wall_load', {type: id, filter: filter, page: -1, tabType: null}, function(data) {
+        var groupId = $('#groups').find('.tab.selected').data('id');
+        Events.fire('wall_load', {type: id, filter: filter, page: -1, tabType: null, userGroupId: groupId}, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
                 var $targetList = $targetItem.next('.list');
