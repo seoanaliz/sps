@@ -25,6 +25,7 @@
 
             $viewer_id = 194550138;
 
+
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(

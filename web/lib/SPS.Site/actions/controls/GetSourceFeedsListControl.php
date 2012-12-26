@@ -1,81 +1,123 @@
 <?php
+Package::Load('SPS.Site/base');
+
+/**
+ * GetSourceFeedsListControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class GetSourceFeedsListControl extends BaseControl
+{
+
     /**
-     * GetSourceFeedsListControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class GetSourceFeedsListControl extends BaseControl {
+    public function Execute()
+    {
+        $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
+
+        $targetFeedId = Request::getInteger('targetFeedId');
+
+        $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
+
+        $type = Request::getString('type');
+        if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
+            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
+        }
+
+        if (!$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
+            // запросили недоступный тип, но мы тогда вернем дефолтный
+            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
+        }
 
         /**
-         * Entry Point
+         * Показывать фильтр по типам постов
          */
-        public function Execute() {
-            $RoleUtility = new RoleAccessUtility($this->vkId);
+        $showArticleStatusFilter = false;
 
-            $targetFeedId = Request::getInteger('targetFeedId');
+        /**
+         * Показывать список источников
+         */
+        $showSourceList = false;
 
-            $type = Request::getString( 'type' );
-            if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
-                $type = $RoleUtility->getDefaultType($targetFeedId);
+        /**
+         *  Показывать группы юзеров
+         */
+        $showUserGroups = false;
+
+        $sourceFeedResult = array();
+
+        if ($type == SourceFeedUtility::My) {
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                $showArticleStatusFilter = true;
             }
+        } else
+            if ($type == SourceFeedUtility::Authors) {
 
-            if (!$RoleUtility->hasAccessToSourceType($targetFeedId, $type)) {
-                // запросили недоступный тип, но мы тогда вернем дефолтный
-                $type = $RoleUtility->getDefaultType($targetFeedId);
-            }
+                if ($role == UserFeed::ROLE_EDITOR) {
+                    //$showArticleStatusFilter = true;
 
-            $result = array();
-            if (!empty($targetFeedId)) {
-                if ($type == SourceFeedUtility::Authors) {
-                    $authors = AuthorFactory::Get(
-                        array(),
-                        array(
-                            BaseFactory::WithoutPages => true,
-                            BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
-                        )
-                    );
+                    $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
+                    $showUserGroups = array();
 
-                    foreach ($authors as $author) {
-                        $result[] =  array(
-                            'id' => $author->authorId,
-                            'title' => $author->FullName()
-                        );
-                    }
-                } else {
-                    $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
-                    $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
-                    $sourceFeeds = array();
-                    if ($sourceIds) {
-                        $sourceFeeds = SourceFeedFactory::Get(
-                            array(
-                                '_sourceFeedId' => $sourceIds,
-                                'type' => $type)
-                            , array(BaseFactory::WithoutPages => true)
-                        );
-                    }
-
-                    foreach ($sourceFeeds as $sourceFeed) {
-                        $result[] =  array(
-                            'id' => $sourceFeed->sourceFeedId,
-                            'title' => $sourceFeed->title
-                        );
+                    foreach ($userGroups as $userGroup) {
+                        /** @var $userGroup UserGroup */
+                        $showUserGroups[] = $userGroup->toArray();
                     }
                 }
+
+                $authors = AuthorFactory::Get(
+                    array(),
+                    array(
+                        BaseFactory::WithoutPages => true,
+                        BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
+                    )
+                );
+
+                foreach ($authors as $author) {
+                    $sourceFeedResult[] = array(
+                        'id' => $author->authorId,
+                        'title' => $author->FullName()
+                    );
+                }
             } else {
-                echo('Unknown source feed identifier');
+
+                $showSourceList =  ($type == SourceFeedUtility::Topface || $type == SourceFeedUtility::Source || $type == SourceFeedUtility::Albums);
+
+                $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+
+                $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
+                $sourceFeeds = array();
+                if ($sourceIds) {
+                    $sourceFeeds = SourceFeedFactory::Get(
+                        array(
+                            '_sourceFeedId' => $sourceIds,
+                            'type' => $type)
+                        , array(BaseFactory::WithoutPages => true)
+                    );
+                }
+
+                foreach ($sourceFeeds as $sourceFeed) {
+                    $sourceFeedResult[] = array(
+                        'id' => $sourceFeed->sourceFeedId,
+                        'title' => $sourceFeed->title
+                    );
+                }
             }
 
-
-            echo ObjectHelper::ToJSON(array(
-                'type' => $type,
-                'sourceFeeds' => $result,
-                'accessibleSourceTypes' => $RoleUtility->getAccessibleSourceTypes($targetFeedId),
-                'accessibleGridTypes' => array_keys($RoleUtility->getAccessibleGridTypes($targetFeedId)),
-                'canAddPlanCell' => $RoleUtility->canAddPlanCell($targetFeedId)
-            ));
-        }
+        echo ObjectHelper::ToJSON(array(
+            'type' => $type,
+            'sourceFeeds' => $sourceFeedResult,
+            'accessibleSourceTypes' => $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId),
+            'accessibleGridTypes' => array_keys($ArticleAccessUtility->getAccessibleGridTypes($targetFeedId)),
+            'canAddPlanCell' => $ArticleAccessUtility->canAddPlanCell($targetFeedId),
+            'accessibleMyArticleStatuses' => $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId),
+            'showArticleStatusFilter' => $showArticleStatusFilter,
+            'showSourceList' => $showSourceList,
+            'showUserGroups' => $showUserGroups
+        ));
     }
+}
 
 ?>
