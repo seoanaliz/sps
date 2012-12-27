@@ -11,7 +11,7 @@
 
         class AccessTokenIsDead extends Exception{}
 
-        class VkHelper {
+        class   VkHelper {
 
             /**
              *wrap for VkAPI
@@ -28,7 +28,7 @@
                 $url = VK_API_URL . $method;
 
                 $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
-                if(!$res)
+                if( !$res )
                     return array();
                 if ( isset( $res->error ) )
                     if ( $throw_exc_on_errors ) {
@@ -51,7 +51,7 @@
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                curl_setopt($ch, CURLOPT_TIMEOUT , 5 );
+                curl_setopt($ch, CURLOPT_TIMEOUT , 180 );
 
                 if (is_array( $headers )) { // если заданы какие-то заголовки для браузера
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -71,7 +71,7 @@
                 } else return false;
 
                 $result = curl_exec($ch);
-                if (curl_errno($ch)){
+                if (curl_errno($ch)) {
                     echo "<br>error in curl: ". curl_error($ch) ."<br>";
                     return 'error in curl: '. curl_error($ch);
                 }

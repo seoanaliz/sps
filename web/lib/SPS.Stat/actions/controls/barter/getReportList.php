@@ -38,13 +38,13 @@ class getReportList
             $group_id       = $default_group->group_id;
         }
         if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
-            die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
+            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
 
 
         if( $status ) {
             $status_array = array( $status );
         } elseif( strtolower( $state ) == 'complete' ) {
-            $status_array = array( 4,6 );
+            $status_array = array( 4,5,6 );
         } else {
             $status_array = array( 1,2,3,4,5,6 );
         }

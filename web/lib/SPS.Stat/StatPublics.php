@@ -17,23 +17,26 @@
         public static function get_our_publics_list()
         {
             $publics = TargetFeedFactory::Get();
+            //массив пабликов, которые не надо включать в сбор/отбражение данных
+            $exception_publics_array = array(
+                 25678227
+                ,26776509
+                ,43503789
+                ,346191
+                ,33704958
+                ,38000521
+                ,1792796
+                ,27421965
+                ,34010064
+                ,25749497
+                ,35807078
+                ,25817269
+            );
+
 
             $res = array();
             foreach ( $publics as $public ) {
-                if( $public->type != 'vk'             ||
-                    $public->externalId ==  25678227  ||
-                    $public->externalId ==  26776509  ||
-                    $public->externalId ==  43503789  ||
-                    $public->externalId ==  346191  ||
-                    $public->externalId ==  33704958  ||
-                    $public->externalId ==  38000521  ||
-                    $public->externalId ==  1792796  ||
-                    $public->externalId ==  27421965  ||
-                    $public->externalId ==  34010064  ||
-                    $public->externalId ==  25749497  ||
-//                    $public->externalId ==  38000555  ||
-                    $public->externalId ==  35807078  ||
-                    $public->externalId ==  25817269 )
+                if( $public->type != 'vk' || in_array( $public->externalId, $exception_publics_array ))
                     continue;
 
                 $a['id']    = $public->externalId;
@@ -563,12 +566,12 @@
 
         }
 
-        //возвращает стены до 25 пабликов
+        //РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚РµРЅС‹ РґРѕ 25 РїР°Р±Р»РёРєРѕРІ
         public static function get_publics_walls( $barter_events_array )
         {
             $code = '';
             $return = "return{";
-            //запрашиваем стены пабликов по 25 пабликов, 15 постов
+            //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 15 РїРѕСЃС‚РѕРІ
             $i = 0;
             foreach( $barter_events_array as $public ) {
                 $id = trim( $public->barter_public );
@@ -577,8 +580,7 @@
                 $i++;
             }
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
-                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
             return $res;
         }
 
@@ -590,7 +592,7 @@
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
-                //запрашиваем стены пабликов по 25 пабликов, 10 постов
+                //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 10 РїРѕСЃС‚РѕРІ
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
@@ -628,7 +630,7 @@
 //                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
-            if ( !empty ( $res->error ))
+            if ( !empty ( $res->error ) || empty( $res ))
                 return false;
             return array(
                 'visitors'  =>  $res[0]->visitors,

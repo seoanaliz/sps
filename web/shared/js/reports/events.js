@@ -35,15 +35,24 @@ var simpleAjax = function(method, data, callback) {
         data: data,
         success: function(result) {
             if (result && result.response) {
+                var error_text = '';
+                if (result.response == 'matches')
+                     error_text = 'На это время уже назначен подобный обмен';
+                else if(result.response =='wrong publics data')
+                    error_text = 'Не получилось распознать паблики. Попробуйте ввести' +
+                        ' название в виде "http://vk.com/public123456"';
+                if (error_text) {
+                    var confirmBox = new Box({
+                        title: 'Ошибка',
+                        html: error_text,
+                        buttons: [
+                            {label: 'Ок'}
+                        ]
+                    }).show();
 
-                if (result.response == 'matches') {
-                    alert('Такой монитор уже есть');
                     return;
                 }
-                if (result.response =='wrong publics data') {
-                    alert('Не получилось распознать паблики. Попробуйте ввести название в виде "http://vk.com/public123456" ');
-                    return;
-                }
+
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
             }
