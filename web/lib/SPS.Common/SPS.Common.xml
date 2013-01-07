@@ -55,6 +55,9 @@
         <action name="UserMigrateAction">
             <path>scripts/UserMigrateAction</path>
         </action>
+        <action name="ArticlesStatusSetAction">
+            <path>scripts/ArticlesStatusSetAction</path>
+        </action>
     </group>
     <group name="staticpage">
         <action name="SaveStaticPage">
