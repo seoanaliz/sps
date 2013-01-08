@@ -519,6 +519,9 @@
                     <page uri="vt://scripts/UserMigrate">
                         <actions>SPS.Common.UserMigrateAction</actions>
                     </page>
+                    <page uri="vt://scripts/articlesStatusSet">
+                        <actions>SPS.Common.ArticlesStatusSetAction</actions>
+                    </page>
                 </pageGroup>
 
                 <pageGroup name="vfs">
