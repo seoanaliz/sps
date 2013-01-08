@@ -78,11 +78,13 @@ var Eventlist = {
         });
     },
     add_report: function(ourPublicId, publicId, timeStart, timeStop, callback) {
+        tmpDate = new Date();
         simpleAjax('addReport', {
             targetPublicId: ourPublicId,
             barterPublicId: publicId,
             startTime: timeStart,
-            stopTime: timeStop
+            stopTime: timeStop,
+            timeShift: tmpDate.getTimezoneOffset()
         }, function(data) {
             callback(data);
         })

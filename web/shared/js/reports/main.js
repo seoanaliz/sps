@@ -90,9 +90,12 @@ var Page = Event.extend({
     },
     makeTime: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
             var $date = $(this);
-            var timestamp = $date.text();
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getTime(timestamp));
         });
@@ -109,7 +112,9 @@ var Page = Event.extend({
     makeFullTime: function($elements) {
         var t = this;
         $elements.each(function() {
+
             var $date = $(this);
+            console.log($date);
             var timestamp = $date.text();
             if (!intval(timestamp)) return;
             $date.html(t.getTime(timestamp) + ', ' + t.getDate(timestamp));
@@ -162,6 +167,7 @@ var Monitor = Page.extend({
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
             $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
+            $('#filter_datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
         Events.fire('get_monitor_list', t.limit, t.offset, function(data) {
@@ -250,3 +256,4 @@ var Result = Page.extend({
         t.bindDeleteEvent();
     }
 });
+	
