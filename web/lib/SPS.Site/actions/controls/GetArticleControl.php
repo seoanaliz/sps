@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * GetArticleControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticleControl {
+    class GetArticleControl extends BaseControl {
 
         /**
          * Entry Point
@@ -20,8 +18,10 @@
 
             if (empty($article)) return;
 
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+
             //check access
-            if (!AccessUtility::HasAccessToSourceFeedId($article->sourceFeedId)) {
+            if (!$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
                 return;
             }
 

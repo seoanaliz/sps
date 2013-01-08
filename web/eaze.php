@@ -27,11 +27,12 @@
     Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.FB' );
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.Site/base' );
     Package::Load( 'SPS.App' );
 
     // Initialize Logger
-    Logger::Init( ELOG_DEBUG  );
-    Logger::Init( ELOG_WARNING );
+    // Logger::Init( ELOG_DEBUG);
+    //Logger::Init( ELOG_WARNING );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
