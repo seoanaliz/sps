@@ -22,7 +22,7 @@ var Page = Widget.extend({
             t.pageId(pageId);
             t.renderTemplateLoading();
             t.scrollTop();
-            t.getData();
+            t.loadData();
         }
     },
     renderTemplateLoading: function() {
@@ -30,19 +30,15 @@ var Page = Widget.extend({
         t.el().html(t.tmpl()(t._templateLoading, t.model()));
         return this;
     },
-    getData: function() {
+    loadData: function() {
         var t = this;
-        var pageId = t.pageId();
         var deferred = Control.fire(t.serviceName(), t.serviceParams());
 
         t.lock();
-        deferred.success(function(data) {
+        deferred.success(function() {
             t.unlock();
-            if (pageId == t.pageId()) {
-                t.model().data(data);
-                t.renderTemplate();
-            }
         });
+
         return deferred;
     },
     scrollTop: function() {
