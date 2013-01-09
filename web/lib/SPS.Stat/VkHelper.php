@@ -26,8 +26,13 @@
                 if ( !isset( $request_params['access_token'] ))
                     $request_params['access_token']  =  self::get_service_access_token();
                 $url = VK_API_URL . $method;
-
-                $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
+                $a = VkHelper::qurl_request( $url, $request_params );
+                if ( $method == 'stats.get')
+                {
+                    $start = strpos( $a, ',"sex"');
+                    $a = substr_replace( $a, '}]}', $start );
+                }
+                $res = json_decode(  $a );
                 if( !$res )
                     return array();
                 if ( isset( $res->error ) )
