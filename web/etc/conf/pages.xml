@@ -630,6 +630,9 @@
                 <page uri="tools://init-editors/">
                     <actions>SPS.Common.InitEditorsTool</actions>
                 </page>
+                <page uri="tools://fix-userfeed/">
+                    <actions>SPS.Common.FixUserFeedTools</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="im" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
