@@ -26,6 +26,7 @@ var REPORTS = {
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
+        '<input id="filter_datepicker" data-required="true" type="text" placeholder="Дата" style="width: 70px" />' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
@@ -103,7 +104,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
+        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>" data-report-id="<?=report_id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
