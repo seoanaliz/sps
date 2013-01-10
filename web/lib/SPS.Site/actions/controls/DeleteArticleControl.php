@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * DeleteArticleControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteArticleControl extends BaseControl {
+    class DeleteArticleControl {
 
         /**
          * Entry Point
@@ -22,10 +24,8 @@
                 return;
             }
 
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
             //check access
-            if (!$SourceAccessUtility->hasAccessToSourceFeed($object->sourceFeedId)) {
+            if (!AccessUtility::HasAccessToSourceFeedId($object->sourceFeedId)) {
                 return;
             }
 

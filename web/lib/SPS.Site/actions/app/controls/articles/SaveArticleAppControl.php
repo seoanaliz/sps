@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * SaveArticleControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveArticleAppControl extends BaseControl {
+    class SaveArticleAppControl {
 
         /**
          * Entry Point
@@ -15,12 +17,11 @@
                 'success' => false
             );
 
-            $author = $this->getAuthor();
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $author = Session::getObject('Author');
 
             $text           = trim(Request::getString( 'text' ));
             $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
-            $targetFeedIds  = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+            $targetFeedIds  = Session::getArray('targetFeedIds');
 
             if (!in_array($targetFeedId, $targetFeedIds)) {
                 $targetFeedId = null;

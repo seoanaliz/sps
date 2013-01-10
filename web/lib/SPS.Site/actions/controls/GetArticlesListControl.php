@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * GetArticlesListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesListControl extends BaseControl {
+    class GetArticlesListControl {
 
         /**
          * @var Article[]
@@ -68,8 +70,6 @@
         private $articleLinkPrefix = 'http://vk.com/wall-';
 
         private function processRequest() {
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
             $sourceFeedIds  = Request::getArray('sourceFeedIds');
             $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
             $from           = Request::getInteger( 'from' );
@@ -110,7 +110,7 @@
             //авторские посты
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
 
@@ -129,7 +129,7 @@
 
             if ($type == SourceFeedUtility::Topface) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
+                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
 

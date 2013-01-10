@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * RestoreCommentAppControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class RestoreCommentAppControl extends BaseControl {
+    class RestoreCommentAppControl {
 
         /**
          * Entry Point
@@ -17,9 +19,9 @@
                 return;
             }
 
-            $__editorMode = false; //Response::getBoolean('__editorMode');
+            $__editorMode = Response::getBoolean('__editorMode');
             if ($__editorMode) {
-                /*CommentFactory::$mapping['view'] = CommentFactory::$mapping['table'];
+                CommentFactory::$mapping['view'] = CommentFactory::$mapping['table'];
                 $comment = CommentFactory::GetById($id, array(), array(BaseFactory::WithoutPages => false));
                 if (empty($comment)) {
                     return;
@@ -31,10 +33,10 @@
 
                 $comment->statusId = 1;
                 CommentFactory::UpdateByMask($comment, array('statusId'), array('commentId' => $comment->commentId));
-                AuthorEventUtility::EventComment($article, $comment->commentId);      */
+                AuthorEventUtility::EventComment($article, $comment->commentId);
             } else {
                 /** @var $author Author */
-                $author = $this->getAuthor();
+                $author = Session::getObject('Author');
 
                 $o = new Comment();
                 $o->statusId = 1;

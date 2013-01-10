@@ -4,7 +4,12 @@
     <action name="GetAuthorList">
       <path>authors/GetAuthorListAction</path>
     </action>
-
+    <action name="SaveAuthor">
+      <path>authors/SaveAuthorAction</path>
+      <redirects>
+        <redirect name="success" path="vt://authors/" />
+      </redirects>
+    </action>
     <action name="DeleteAuthor">
       <path>authors/SaveAuthorAction</path>
       <parameters>
