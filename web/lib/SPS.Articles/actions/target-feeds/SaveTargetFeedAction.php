@@ -23,7 +23,10 @@
         public function Execute() {
             parent::Execute();
 
-            $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
+            $UserFeeds = array();
+            if (is_numeric($this->objectId) && (int)$this->objectId > 0){
+                $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
+            }
 
             Response::setParameter('UserFeeds', $UserFeeds );
             Response::setParameter('roles', array(
