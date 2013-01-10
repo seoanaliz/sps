@@ -103,7 +103,8 @@ var Page = Event.extend({
     makeDate: function($elements) {
         var t = this;
         $elements.each(function() {
-            var $date = $(this);
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
             var timestamp = $date.text();
             if (!intval(timestamp)) return;
             $date.html(t.getDate(timestamp));
@@ -114,8 +115,9 @@ var Page = Event.extend({
         $elements.each(function() {
 
             var $date = $(this);
-            console.log($date);
-            var timestamp = $date.text();
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getTime(timestamp) + ', ' + t.getDate(timestamp));
         });
@@ -144,7 +146,7 @@ var Page = Event.extend({
 
             function deleteReport() {
                 confirmBox.hide();
-                Events.fire('delete_report',0, $row.data('report-id'), function() {
+                Events.fire('delete_report', $row.data('report-id'),12, function() {
                     $row.slideUp(200);
                 });
             }
