@@ -261,7 +261,9 @@
                 SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
             }
 
-            UserFeedFactory::DeleteForTargetFeed($this->objectId);
+            if (is_numeric($this->objectId) && (int)$this->objectId > 0) {
+                UserFeedFactory::DeleteForTargetFeed($this->objectId);
+            }
 
             $rawUserFeeds = Request::getArray('UserFeed');
             $UserFeeds = array();
