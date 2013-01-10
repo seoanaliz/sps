@@ -102,16 +102,19 @@ var Page = Event.extend({
     },
     makeDate: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
+            var $date = $(this);
             var timestamp = $date.text() * 1;
             var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
-            var timestamp = $date.text();
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getDate(timestamp));
         });
     },
     makeFullTime: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
 
             var $date = $(this);
