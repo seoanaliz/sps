@@ -69,6 +69,7 @@ SELECT "public"."articleQueues"."articleQueueId"
 	, "public"."articleQueues"."deleteAt"
 	, "public"."articleQueues"."isDeleted"
 	, "public"."articleQueues"."statusId"
+	, "public"."articleQueues"."collectLikes"
  FROM "public"."articleQueues"
 	WHERE "public"."articleQueues"."statusId" != 3
 ORDER BY "createdAt" DESC, "articleQueueId" DESC;
