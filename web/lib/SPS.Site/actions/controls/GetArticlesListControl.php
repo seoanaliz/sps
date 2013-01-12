@@ -85,31 +85,37 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             return array('success' => false);
         }
 
-
         if ($type == SourceFeedUtility::Authors) {
+
+            $loadAll = !Request::getInteger('userGroupId');
+
             unset($this->search['_sourceFeedId']);
-            // #11115
-            if ($role == UserFeed::ROLE_AUTHOR) {
-                if ($mode == self::MODE_MY) {
-                    $authorsIds = array($this->getAuthor()->authorId);
+            if ($loadAll) {
+                // #11115
+                if ($role == UserFeed::ROLE_AUTHOR) {
+                    if ($mode == self::MODE_MY) {
+                        $authorsIds = array($this->getAuthor()->authorId);
+                    } else {
+                            // если грузим все посты
+                            $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                            $this->options[BaseFactory::CustomSql] = ' AND ' .
+                            ' (("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL ) OR '.
+                            '("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
+                            $authorsIds = true;
+                            unset($this->search['articleStatusIn']);
+                    }
                 } else {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    $this->options[BaseFactory::CustomSql] = ' AND ' .
-                    ' (("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL ) OR '.
-                    '("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
-                    $authorsIds = true;
-                    unset($this->search['articleStatusIn']);
                 }
-            } else {
-                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-            }
-            // фильтр источников выступает как фильтр авторов
-            if ($authorsIds) {
-                if (is_array($authorsIds)){
-                    $this->search['_authorId'] = $authorsIds;
+
+                // фильтр источников выступает как фильтр авторов
+                if ($authorsIds) {
+                    if (is_array($authorsIds)){
+                        $this->search['_authorId'] = $authorsIds;
+                    }
+                } else {
+                    $this->search['_authorId'] = array(-1 => -1);
                 }
-            } else {
-                $this->search['_authorId'] = array(-1 => -1);
             }
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);

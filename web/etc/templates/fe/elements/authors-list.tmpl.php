@@ -1,6 +1,9 @@
 <?
-    /** @var $authors Author[] */
-    /** @var $authorGroups Author[] */
+    /**
+     * @var $authors Author[]
+     * @var $authorGroups Author[]
+     * @var $userGroups UserGroup[]
+     */
 ?>
 <div class="authors-list">
     <div class="authors-types tab-bar">
@@ -32,3 +35,17 @@
     </div>
     <? } ?>
 </div>
+
+ <script style="text/javascript">
+     userGroupCollection.clear();
+     <? foreach ($userGroups as $UserGroup) {
+        /** @var $UserGroup UserGroup */
+         ?>
+        var newUserGroupModel = new UserGroupModel();
+        newUserGroupModel.name('<?=$UserGroup->name?>');
+        newUserGroupModel.id(<?=$UserGroup->userGroupId?>);
+        userGroupCollection.add(<?=$UserGroup->userGroupId?>, newUserGroupModel);
+         <?
+        }
+    ?>
+ </script>
