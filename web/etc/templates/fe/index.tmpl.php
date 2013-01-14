@@ -1,6 +1,5 @@
 <?
 /**
- * @var $RoleUtility RoleUtility
  * @var $sourceTypes array
  * @var $gridTypes array
  *
@@ -21,7 +20,7 @@
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                     ?>
                        <a class="sourceType <?=($i == 0 ? 'active' : '')?>" data-type="{$sourceType}"
-                          id="sourceType-<?=$sourceType?>">{$sourceTypeTitle}</a>
+                          id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                     <?
                     $i++;
                     endforeach;

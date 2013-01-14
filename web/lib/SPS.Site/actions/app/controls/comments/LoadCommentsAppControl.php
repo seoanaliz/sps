@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * LoadCommentsAppControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class LoadCommentsAppControl {
+    class LoadCommentsAppControl extends BaseControl {
 
         /**
          * Entry Point
@@ -19,10 +17,9 @@
                 return false;
             }
 
-            $__editorMode = Response::getBoolean('__editorMode');
-            if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
-                $result['message'] = 'accessError';
-                //echo ObjectHelper::ToJSON($result);
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
+            if (!$TargetFeedAccessUtility->canShowArticleComments($article->targetFeedId)) {
                 return false;
             }
 
