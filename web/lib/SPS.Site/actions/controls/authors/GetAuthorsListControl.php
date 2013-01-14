@@ -20,9 +20,10 @@ class GetAuthorsListControl extends BaseControl
             return;
         }
 
-        $authors = $authorGroups = array();
+        $authors = $authorGroups = $UserGroups = array();
 
         if (!empty($targetFeedId)) {
+            $UserGroups = UserGroupFactory::Get(array('targetFeedId' => $targetFeedId));
             $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
             if ($UserFeeds) {
                 $vkIds = array();
@@ -45,7 +46,7 @@ class GetAuthorsListControl extends BaseControl
                 }
 
                 if ($authorGroups) {
-                    $UserGroups = UserGroupFactory::Get(array('targetFeedId' => $targetFeedId));
+
                     if ($UserGroups) {
                         $userGroupIds = array();
                         foreach ($UserGroups as $UserGroup) {
@@ -64,6 +65,7 @@ class GetAuthorsListControl extends BaseControl
 
         Response::setArray('authors', $authors);
         Response::setArray('authorGroups', $authorGroups);
+        Response::setArray('userGroups', $UserGroups);
     }
 }
 

@@ -3,8 +3,6 @@
 
     // Initialize Logger
     include_once 'lib/Eaze.Core/Logger.php';
-    Logger::Init(ELOG_WARNING);
-    //Logger::Init( ELOG_DEBUG, Logger::FileMode  );
 
     define( 'WITH_PACKAGE_COMPILE', false  );
     define( 'WITH_AUTOLOAD', false  );
@@ -22,9 +20,12 @@
     Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.FB' );
     Package::Load( 'SPS.Site' );
-    Package::Load( 'SPS.Site/base' );
     Package::Load( 'SPS.App' );
+    Package::Load( 'SPS.Site/base' );
 
+    // Initialize Logger
+    // Logger::Init( ELOG_DEBUG  );
+    Logger::Init( ELOG_WARNING );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );

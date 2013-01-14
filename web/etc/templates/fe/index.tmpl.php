@@ -20,12 +20,12 @@
                 <div class="type-selector">
                     <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
-                    ?>
-                       <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
-                          <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
-                          id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
-                    <?
-                    $isFirst++;
+                        ?>
+                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
+                            <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
+                           id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
+                        <?
+                        $isFirst++;
                     endforeach;
                     ?>
                 </div>
@@ -51,9 +51,9 @@
                     $isFirst = true;
                     foreach ($articleStatuses as $articleStatus => $statusName) :
                         $isHidden = !in_array($articleStatus, $availableArticleStatuses);
-                    ?>
-                    <div class="authors-tab-new tab<?=($isFirst && !$isHidden) ? ' selected' : ''?>" <?=$isHidden ? 'style="display:none"' : ''?>  data-mode="my" data-article-status="<?=$articleStatus?>"><?=$statusName?></div>
-                    <?
+                        ?>
+                        <div class="authors-tab-new tab<?=($isFirst && !$isHidden) ? ' selected' : ''?>" <?=$isHidden ? 'style="display:none"' : ''?>  data-mode="my" data-article-status="<?=$articleStatus?>"><?=$statusName?></div>
+                        <?
                         if (!$isHidden){
                             $isFirst = false;
                         }
@@ -106,18 +106,18 @@
                         <div class="tip"><s></s></div>
                         <div class="icon"></div>
                         <script type="text/javascript">
-                                <?
-                                $json = array();
-                                foreach ($targetFeeds as $targetFeed) {
-                                    array_push($json, array(
-                                        'id' => $targetFeed->targetFeedId,
-                                        'title' => $targetFeed->title,
-                                        'icon' => $targetInfo[$targetFeed->targetFeedId]['img'],
-                                        'isActive' => ($targetFeed->targetFeedId == $currentTargetFeedId),
-                                    ));
-                                }
-                                echo 'var rightPanelData = '.json_encode($json);
-                                ?>
+                            <?
+                            $json = array();
+                            foreach ($targetFeeds as $targetFeed) {
+                                array_push($json, array(
+                                    'id' => $targetFeed->targetFeedId,
+                                    'title' => $targetFeed->title,
+                                    'icon' => $targetInfo[$targetFeed->targetFeedId]['img'],
+                                    'isActive' => ($targetFeed->targetFeedId == $currentTargetFeedId),
+                                ));
+                            }
+                            echo 'var rightPanelData = '.json_encode($json);
+                            ?>
                         </script>
                     </div>
 
@@ -126,8 +126,8 @@
                         <?
                         $isFirst=0;
                         foreach ($gridTypes as $type => $name): ?>
-                        <a class="grid_type <?=!$isFirst++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
-                        <? endforeach; ?>
+                            <a class="grid_type <?=!$isFirst++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
+                            <? endforeach; ?>
                     </div>
 
                 </div>

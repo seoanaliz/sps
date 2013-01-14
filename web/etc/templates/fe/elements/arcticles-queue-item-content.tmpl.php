@@ -23,7 +23,7 @@
     $size = 'original';
     ?>
     <div class="img">
-        <img src="<?= MediaUtility::GetFilePath( 'Article', 'photos', $size, $photoItem['filename'], MediaServerManager::$MainLocation) ?>">
+        <img src="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
     </div>
     <? } ?>
 </div>

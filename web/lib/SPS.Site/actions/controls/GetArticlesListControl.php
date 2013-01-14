@@ -1,126 +1,142 @@
 <?php
 /**
- * Конторллер списка постов для Socialboard
+ * GetArticlesListControl Action
  * @package    SPS
  * @subpackage Site
  * @author     Shuler
  */
-class GetArticlesListControl extends BaseGetArticlesListControl {
-
-    const MODE_MY = 'my';
-
-    const MODE_ALL = 'all';
+class GetArticlesListControl extends BaseControl {
 
     /**
-     * @var string
+     * @var Article[]
      */
-    private $articleLinkPrefix = 'http://vk.com/wall-';
+    private $articles = array();
+
+    /**
+     * @var ArticleRecord[]
+     */
+    private $articleRecords = array();
+
+    /**
+     * @var TargetFeed[]
+     */
+    private $targetFeeds = array();
 
     /**
      * @var SourceFeed[]
      */
     private $sourceFeeds = array();
 
-    private $reviewArticleCount = 0;
-
-    protected function getMode(){
-        $mode = Request::getString('mode');
-        if ($mode == self::MODE_MY) {
-            return self::MODE_MY;
-        }
-        return self::MODE_ALL;
-    }
-
-    protected function getAuthorsForTargetFeed($targetFeedId) {
-        // выираем авторов для этой ленты
-        $authorsIds = array();
-        $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId));
-        if ($UserFeeds) {
-            $vkIds = array();
-            foreach ($UserFeeds as $UserFeed){
-                $vkIds[] = $UserFeed->vkId;
-            }
-
-            $authors = AuthorFactory::Get(
-                array(
-                    'vkIdIn' => $vkIds
-                )
-                , array(
-                    BaseFactory::WithoutPages => true,
-                    BaseFactory::OrderBy => ' "firstName", "lastName" ',
-                )
-            );
-
-            foreach ($authors as $author){
-                $authorsIds[] = $author->authorId;
-            }
-
-
-        }
-        return $authorsIds;
-    }
+    /**
+     * @var Author[]
+     */
+    private $authors = array();
 
     /**
-     * Расширение стандартной выборки
+     * @var array
      */
-    protected function processRequestCustom(){
-        // сортировка
-        $sortType = Request::getString('sortType');
+    private $commentsData = array();
+
+    /**
+     * @var int
+     */
+    private $pageSize = 20;
+
+    /**
+     * @var int
+     */
+    private $articlesCount = 0;
+
+    /**
+     * @var bool
+     */
+    private $hasMore = false;
+
+    /**
+     * @var array
+     */
+    private $search = array();
+
+    /**
+     * @var array
+     */
+    private $options = array();
+
+    /**
+     * @var string
+     */
+    private $articleLinkPrefix = 'http://vk.com/wall-';
+
+    private function processRequest() {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
+        $sourceFeedIds  = Request::getArray('sourceFeedIds');
+        $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
+        $from           = Request::getInteger( 'from' );
+        $to             = Request::getInteger( 'to' );
+        $sortType       = Request::getString( 'sortType' );
+        $type           = Request::getString( 'type' );
+
+        $page = Session::getInteger( 'page' );
+        $page = ($page < 0) ? 0 : $page;
+        if (Request::getBoolean( 'clean' )) {
+            $page = 0;
+        }
+
+        $this->search = array(
+            '_sourceFeedId' => $sourceFeedIds,
+            'pageSize' => $this->pageSize + 1,
+            'page' => $page,
+        );
+
+        if ($from !== null) {
+            $this->search['rateGE'] = $from;
+        }
+        if ($to !== null && $to < 100) {
+            $this->search['rateLE'] = $to;
+        }
         if ($sortType == 'old') {
             $this->options[BaseFactory::OrderBy] = ' "createdAt" ASC, "articleId" ASC ';
         } else if ($sortType == 'best') {
             $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
         }
 
-        $type = self::getSourceFeedType();
-
-        $mode = $this->getMode();
-        $targetFeedId = $this->getTargetFeedId();
-        if (!$targetFeedId) {
-            return array('success' => false);
+        //не авторские посты
+        if (empty($this->search['_sourceFeedId']) && ($type != SourceFeedUtility::Authors) && ($type != SourceFeedUtility::Topface)) {
+            $this->search['_sourceFeedId'] = array(-999 => -999);
+            return;
         }
 
-        $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
-        if (is_null($role)) {
-            return array('success' => false);
-        }
-
-
+        //авторские посты
         if ($type == SourceFeedUtility::Authors) {
-            unset($this->search['_sourceFeedId']);
-            // #11115
-            if ($role == UserFeed::ROLE_AUTHOR) {
-                if ($mode == self::MODE_MY) {
-                    $authorsIds = array($this->getAuthor()->authorId);
-                } else {
-                    $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    $this->options[BaseFactory::CustomSql] = ' AND ' .
-                    ' (("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL ) OR '.
-                    '("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
-                    $authorsIds = true;
-                    unset($this->search['articleStatusIn']);
-                }
-            } else {
-                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
+                $this->search['targetFeedId'] = -999;
             }
-            // фильтр источников выступает как фильтр авторов
-            if ($authorsIds) {
-                if (is_array($authorsIds)){
-                    $this->search['_authorId'] = $authorsIds;
-                }
+
+            $this->search['rateGE'] = null;
+            $this->search['rateLE'] = null;
+            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
+            $this->search['targetFeedId'] = $targetFeedId;
+
+            //фильтр источников выступает как фильтр авторов
+            if (!empty($sourceFeedIds)) {
+                $this->search['_authorId'] = $sourceFeedIds;
             } else {
                 $this->search['_authorId'] = array(-1 => -1);
             }
-        } else if ($type == SourceFeedUtility::My) {
-            unset($this->search['_sourceFeedId']);
-            $this->search['authorId'] = $this->getAuthor()->authorId;
         }
 
-        $userGroupId = Request::getInteger('userGroupId');
-        if ($userGroupId) {
-            // в группе ищем записи на рассмотрении
-            $this->reviewArticleCount = ArticleFactory::Count(array('authorId' => $this->getAuthor()->authorId,
-                'articleStatusIn' => array(Article::STATUS_REVIEW), 'userGroupId' => $userGroupId));
+        if ($type == SourceFeedUtility::Topface) {
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
+                $this->search['targetFeedId'] = -999;
+            }
+
+            $this->search['rateGE'] = null;
+            $this->search['rateLE'] = null;
+            $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
+            $this->search['targetFeedId'] = $targetFeedId;
         }
 
         if ($type == SourceFeedUtility::Albums) {
@@ -128,36 +144,64 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         }
     }
 
+    private function getObjects() {
+        $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
+
+        $this->articles = ArticleFactory::Get($this->search, $this->options);
+        $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
+
+        $this->hasMore = (count($this->articles) > $this->pageSize);
+        $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
+
+        //load articles data
+        if (!empty($this->articles)) {
+            $this->articleRecords = ArticleRecordFactory::Get(
+                array('_articleId' => array_keys($this->articles))
+            );
+        }
+        if (!empty($this->articleRecords)) {
+            $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleId', false);
+        }
+
+        if ($this->hasMore) {
+            Session::setInteger('page', $this->search['page'] + 1);
+        }
+
+        //get articles target feeds with info and authors
+        if (!empty($this->articles)) {
+            $authorIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('authorId'));
+            if (!empty($authorIds)) {
+                $this->authors = AuthorFactory::Get(
+                    array('_authorId' => array_unique($authorIds)),
+                    array(BaseFactory::WithoutPages => true)
+                );
+            }
+
+            $this->commentsData = CommentUtility::GetLastComments(array_keys($this->articles));
+        }
+    }
+
+    private function setData() {
+        Response::setArray( 'articles', $this->articles );
+        Response::setArray( 'articleRecords', $this->articleRecords );
+        Response::setInteger( 'articlesCount', $this->articlesCount );
+        Response::setBoolean( 'hasMore', $this->hasMore );
+        Response::setArray( 'authors', $this->authors );
+        Response::setArray( 'targetFeeds', $this->targetFeeds );
+        Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId') );
+        Response::setArray( 'sourceFeeds', $this->sourceFeeds );
+        Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
+        Response::setArray( 'commentsData', $this->commentsData );
+        Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
+    }
+
     /**
      * Entry Point
      */
-    public function Execute()
-    {
+    public function Execute() {
         $this->processRequest();
         $this->getObjects();
-
-        // подгружаем источники
-        $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->getSourceFeedIds()));
-
         $this->setData();
-
-        $showApproveBlock = false;
-        $targetFeedId = $this->getTargetFeedId();
-        if ($targetFeedId) {
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $showApproveBlock = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
-
-            $showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
-        }
-
-        Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
-        Response::setArray('sourceFeeds', $this->sourceFeeds);
-        Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
-        Response::setBoolean('showApproveBlock', $showApproveBlock);
-        Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
-        Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
-
     }
 }
-
 ?>

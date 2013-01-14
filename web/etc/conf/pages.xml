@@ -18,7 +18,7 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
-                <page uri="/stat">
+                <page uri="/stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="/oadmins">
@@ -470,14 +470,14 @@
                             <template>tmpl://vt/editors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/add">
-                            <actions>SPS.Site.SaveEditor</actions>
+                            <actions>SPS.Articles.SaveEditor</actions>
                             <template>tmpl://vt/editors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/delete/([0-9]+)">
-                            <actions>SPS.Site.DeleteEditor</actions>
+                            <actions>SPS.Articles.DeleteEditor</actions>
                         </page>
                         <page uri="vt://editors/edit/([0-9]+)">
-                            <actions>SPS.Site.SaveEditor</actions>
+                            <actions>SPS.Articles.SaveEditor</actions>
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
@@ -490,14 +490,14 @@
                             <template>tmpl://vt/authors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/add">
-                            <actions>SPS.Site.SaveAuthor</actions>
+                            <actions>SPS.App.SaveAuthor</actions>
                             <template>tmpl://vt/authors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/delete/([0-9]+)">
                             <actions>SPS.App.DeleteAuthor</actions>
                         </page>
                         <page uri="vt://authors/edit/([0-9]+)">
-                            <actions>SPS.Site.SaveAuthor</actions>
+                            <actions>SPS.App.SaveAuthor</actions>
                             <template>tmpl://vt/authors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>

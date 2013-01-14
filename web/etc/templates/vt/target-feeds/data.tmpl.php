@@ -32,7 +32,17 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
             <label>{lang:vt.common.externalId}</label>
             <?= FormHelper::FormInput( $prefix . '[externalId]', $object->externalId, 'externalId', null, array( 'size' => 80 ) ); ?>
         </div>
-
+        <div data-row="vkIds" class="row">
+            <label>{lang:vt.targetFeed.vkIds}</label>
+            <div class="hint">
+                <a href="#" class="hint-icon">?</a>
+                <div class="hint-text" style="display:none;">
+                    <span>?</span>
+                    Введите vkId редакторов через запятую
+                </div>
+            </div>
+            <?= FormHelper::FormInput( $prefix . '[vkIds]', $object->vkIds, 'vkIds', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="token" class="row">
             <label>{lang:vt.targetFeed.token}</label>
             <div class="hint">

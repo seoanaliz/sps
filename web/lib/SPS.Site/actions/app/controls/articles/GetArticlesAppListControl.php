@@ -79,7 +79,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         switch ($filter) {
             case 'best':
                 $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
-            break;
+                break;
         }
 
         $tabType = Request::getString('tabType');

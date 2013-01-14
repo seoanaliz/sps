@@ -57,7 +57,7 @@
             ?><div class="images-ready"><?
                 foreach($articleRecord->photos as $photoItem) {
                     $i++;
-                    $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $path = MediaUtility::GetArticlePhoto($photoItem);
                     $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
                     $photoTitle = nl2br($photoTitle);
 

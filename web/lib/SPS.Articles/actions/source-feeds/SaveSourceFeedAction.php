@@ -30,35 +30,35 @@
          */
         protected function getFromRequest( $originalObject = null ) {
             /**
-             * @var SourceFeed $SourceFeed
+             * @var SourceFeed $object
              */
-            $SourceFeed = parent::$factory->GetFromRequest();
+            $object = parent::$factory->GetFromRequest();
 
             if ( $originalObject != null ) {
-                $SourceFeed->sourceFeedId = $originalObject->sourceFeedId;
-                $SourceFeed->processed = $originalObject->processed;
+                $object->sourceFeedId = $originalObject->sourceFeedId;
+                $object->processed = $originalObject->processed;
             } else {
-                $SourceFeed->processed = null;
+                $object->processed = null;
             }
 
             $targetFeedIds = Request::getArray( 'targetFeedIds' );
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
-            $SourceFeed->targetFeedIds = implode(',', $targetFeedIds);
+            $object->targetFeedIds = implode(',', $targetFeedIds);
 
-            if ($SourceFeed->type == SourceFeedUtility::Source) {
+            if ($object->type == SourceFeedUtility::Source) {
                 // do nothing
-            } else if ($SourceFeed->type == SourceFeedUtility::Albums)   {
-                preg_match('/(\d+)_(\d+)$/', $SourceFeed->externalId, $matches);
+            } else if ($object->type == SourceFeedUtility::Albums)   {
+                preg_match('/(\d+)_(\d+)$/', $object->externalId, $matches);
                 if (count($matches) == 3) {
-                    $SourceFeed->externalId = $matches[0];
+                    $object->externalId = $matches[0];
                 } else {
-                    $SourceFeed->externalId = '-';
+                    $object->externalId = '-';
                 }
             } else {
-                $SourceFeed->externalId = '-';
+                $object->externalId = '-';
             }
 
-            return $SourceFeed;
+            return $object;
         }
         
         

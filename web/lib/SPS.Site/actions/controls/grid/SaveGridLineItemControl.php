@@ -1,15 +1,15 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * SaveGridLineItemControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveGridLineItemControl extends BaseControl {
+    class SaveGridLineItemControl {
 
         public function Execute() {
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
             $gridLineId = Request::getInteger( 'gridLineId' );
             $gridLineItemId = Request::getInteger( 'gridLineItemId' );
             $time = Request::getString( 'time' );
@@ -33,7 +33,7 @@
             }
 
             //check access
-            if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
+            if (!AccessUtility::HasAccessToTargetFeedId($gridLine->targetFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }

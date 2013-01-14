@@ -1,23 +1,23 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * DeleteAuthorControl Action
      * @package    SPS
      * @subpackage Site
      * @author     eugeneshulepin
      */
-    class DeleteAuthorControl extends BaseControl {
+    class DeleteAuthorControl {
 
         /**
          * Entry Point
          */
         public function Execute() {
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
             $o = new Author();
             $o->vkId = Request::getInteger('vkId');
 
-            $targetFeedId = Request::getInteger('targetFeedId');
-            if (!$TargetFeedAccessUtility->canDeleteAuthor($targetFeedId)) {
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
                 return;
             }
 

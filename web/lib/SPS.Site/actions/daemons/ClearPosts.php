@@ -163,6 +163,7 @@ sql;
                 foreach ($articleRecords as $articleRecord) {
                     if (!empty($articleRecord->photos)) {
                         foreach ($articleRecord->photos as $photo) {
+                            if (empty($photo['filename'])) continue;
                             $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photo['filename'] );
                             $path = str_replace('http://' . MediaServerManager::$Host, '/home/sps/photos', $path);
 
