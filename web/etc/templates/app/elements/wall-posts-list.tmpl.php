@@ -14,6 +14,7 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 <? if ($showControls): ?>
 <div class="groups" id="groups">
     <div class="tab-bar no-padding">
+        <div class="tab<?=$currentGroup ? '' : ' selected'?>">Все записи</div>
         <? foreach ($userGroups as $userGroup) { ?>
         <div class="tab<?=$currentGroup == $userGroup->userGroupId ? ' selected' : ''?>"
              data-id="<?=$userGroup->userGroupId?>">
