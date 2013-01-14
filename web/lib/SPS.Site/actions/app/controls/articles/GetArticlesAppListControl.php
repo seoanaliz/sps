@@ -61,7 +61,6 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         $author = $this->getAuthor();
 
         $mode = $this->getMode();
-
         if ($mode == self::MODE_MY) {
             $this->search['authorId'] = $author->authorId;
         } else {
