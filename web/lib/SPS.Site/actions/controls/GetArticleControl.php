@@ -33,7 +33,7 @@
             if (!empty($articleRecord->photos)) {
                 foreach($articleRecord->photos as $photoItem) {
                     $photo = $photoItem;
-                    $photo['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $photo['path'] = MediaUtility::GetArticlePhoto($photoItem, 'small');
                     $photos[] = $photo;
                 }
             }
