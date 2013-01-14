@@ -81,7 +81,7 @@ class RoleAccessUtility
         if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
             switch ($sourceType) {
                 case SourceFeedUtility::Ads:
-                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_EDITOR, UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
                 break;
 
                 case SourceFeedUtility::Albums:
