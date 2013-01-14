@@ -277,7 +277,7 @@ var app = (function () {
             var commentId = $comment.data('id');
             Events.fire('comment_delete', commentId, function() {
                 $comment.data('html', $comment.html());
-                $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
+                $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
             });
         });
         $wall.delegate('.comment.deleted > .restore', 'click', function() {
