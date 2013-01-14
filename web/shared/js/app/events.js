@@ -27,25 +27,18 @@ var Events = {
     }
 };
 
-/**
- * Кеш запроса
- * @type {Object}
- */
-var WallLoadParams = {
-    type: null,
-    filter: null,
-    page: -1
-};
-
 var Eventlist = {
     wall_load: function(options, callback) {
-        WallLoadParams = $.extend(WallLoadParams, options);
-        WallLoadParams.page++;
+        options = $.extend({
+            type: null,
+            filter: null,
+            page: -1
+        }, options);
 
         $.ajax({
             url: appControlsRoot + 'articles-list/',
             dataType : "html",
-            data: WallLoadParams,
+            data: options,
             success: function (data) {
                 callback(data);
             }
