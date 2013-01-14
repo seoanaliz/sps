@@ -6,6 +6,8 @@
     /**
      * Package Loader
      *
+     * Filename = Class name
+     *
      * @package    Eaze
      * @subpackage Core
      * @author     sergeyfast
@@ -179,11 +181,12 @@
                             Logger::Checkpoint();
 
                             $buffer = '';
-                            foreach ( $classes as $filename ) {
-                                $filePath = self::$LibStructure[$filename];
-                                $content  = file_get_contents( $filePath );
-                                $content  = rtrim( trim( trim( $content ), PHP_EOL ), '?>' );
-                                $buffer .= $content . '?>';
+                            foreach ( $classes as $filenames ) {
+                                foreach( $filenames as $filename => $filepath ) {
+                                    $content  = file_get_contents( $filepath );
+                                    $content  = self::FormatPhpFileForCompile( $content );
+                                    $buffer .= $content;
+                                }
                             }
 
                             file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
@@ -196,6 +199,17 @@
                     Logger::Info( 'Failed to get lock on compiled packages' );
                 }
             }
+        }
+
+
+        /**
+         * Format PHP File Content For Compilation
+         * @param string $content
+         * @return string
+         */
+        public static function FormatPhpFileForCompile( $content ) {
+            $content = rtrim( trim( trim( $content ), PHP_EOL ), '?>' ) . '?>';
+            return $content;
         }
 
 
@@ -274,17 +288,18 @@
                             $subpackageIterator = new FilesystemIterator( $packageInfo->getPathname(), FilesystemIterator::SKIP_DOTS );
                             foreach ( $subpackageIterator as $subPackageInfo ) {
                                 if ( self::CheckPHPFilename( $subPackageInfo->getFilename(), $subPackageInfo->getPath() . '/' ) ) {
-                                    Package::$LibStructure[$subPackageInfo->getFilename()] = $subPackageInfo->getPathname();
+                                    Package::$LibStructure[$subPackageInfo->getFilename()][] = $subPackageInfo->getPathname();
                                 }
                             }
                         } else {
                             if ( self::CheckPHPFilename( $packageInfo->getFilename(), $packageInfo->getPath() . '/' ) ) {
-                                Package::$LibStructure[$packageInfo->getFilename()] = $packageInfo->getPathname();
+                                Package::$LibStructure[$packageInfo->getFilename()][] = $packageInfo->getPathname();
                             }
                         }
                     }
                 }
             }
+
             Logger::Info( 'Lib Structure was initialized: %d classes', count( Package::$LibStructure ) );
         }
 
@@ -313,6 +328,12 @@
                 return true;
             }
 
+            // Get Last Class of Namespace
+            if ( strpos( $className, '\\' ) !== false ) {
+                $classNames = explode( '\\', $className );
+                $className  = end( $classNames );
+            }
+
             if ( !Package::$LibStructure ) {
                 Package::initLibStructure();
             }
@@ -320,9 +341,11 @@
             $fileName = $className . '.php';
             if ( isset( Package::$LibStructure[$fileName] ) ) {
                 /** @noinspection PhpIncludeInspection */
-                require_once( Package::$LibStructure[$fileName] );
+                foreach( Package::$LibStructure[$fileName] as $includeFile ) {
+                    require_once( $includeFile );
+                    Package::$LoadedClasses[Package::$CurrentUri ? 'uri' : 'system'][$className][] = $includeFile;
+                }
 
-                Package::$LoadedClasses[Package::$CurrentUri ? 'uri' : 'system'][$className] = $fileName;
                 return true;
             }
 
@@ -350,12 +373,16 @@
          * Remove packages from cache if not in WITH_PACKAGE_COMPILE or Flush Cache if WITH_PACKAGE_COMPILE && compiled.eaze do not exist
          */
         public static function DoCompiledCacheOperations() {
+            $packageCompiledFlag = self::GetPackageCompiledFlagFile();
             if ( Package::WithPackageCompile() ) {
-                $packageCompiledFlag = self::GetPackageCompiledFlagFile();
                 if ( !file_exists( $packageCompiledFlag ) ) {
                     Package::FlushCompiledCache();
                     touch( $packageCompiledFlag );
                 }
+            } else if ( defined( Package::WithPackageCompile ) && file_exists( $packageCompiledFlag ) ) {
+                unlink( $packageCompiledFlag );
+                Package::FlushCompiledCache();
+                Logger::Info( 'Removing old package cache' );
             }
         }
 
