@@ -60,7 +60,7 @@
             <? if (!empty($articleRecord->photos)) { ?>
                 <div class="attachments">
                 <? foreach($articleRecord->photos as $photoItem) {
-                    $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $path = MediaUtility::GetArticlePhoto($photoItem);
                     ?><img src="{$path}" alt="" /><?
                 } ?>
                 </div>

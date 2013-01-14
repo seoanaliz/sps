@@ -33,8 +33,8 @@ class WrAlarm
         $this->check_block( $publics );
 
         $report = $this->form_report_2();
-        if ( $report )
-            $this->send_report( $report );
+//        if ( $report )
+//            $this->send_report( $report );
     }
 
     public function check_block( $publics_array )
