@@ -7,7 +7,7 @@
      * @property Editor originalObject
      * @property Editor currentObject
      */
-    class SaveVkEditorAction extends SaveVkUserAction  {
+    class SaveEditorAction extends SaveVkUserAction  {
         
         /**
          * Constructor
