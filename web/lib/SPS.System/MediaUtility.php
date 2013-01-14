@@ -315,5 +315,13 @@
             imagedestroy($source);
             imagedestroy($jpg);
         }
+
+        public static function GetArticlePhoto($photoItem) {
+            if (!empty($photoItem['url'])) {
+                return $photoItem['url'];
+            } else {
+                return self::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+            }
+        }
     }
 ?>
