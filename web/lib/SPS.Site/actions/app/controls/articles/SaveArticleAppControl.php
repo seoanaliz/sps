@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * SaveArticleControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveArticleAppControl extends BaseControl {
+    class SaveArticleAppControl {
 
         /**
          * Entry Point
@@ -15,12 +17,11 @@
                 'success' => false
             );
 
-            $author = $this->getAuthor();
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $author = Session::getObject('Author');
 
             $text           = trim(Request::getString( 'text' ));
             $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
-            $targetFeedIds  = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+            $targetFeedIds  = Session::getArray('targetFeedIds');
 
             if (!in_array($targetFeedId, $targetFeedIds)) {
                 $targetFeedId = null;
@@ -78,7 +79,7 @@
             if (!empty($photos)) {
                 foreach($photos as $photoItem) {
                     if (!is_array($photoItem) || empty($photoItem['filename'])) continue;
-                    $path = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
+                    $path = MediaUtility::GetArticlePhoto($photoItem);
                     if (URLUtility::CheckUrl($path)) {
                         $result[] = array('filename' => $photoItem['filename']);
                     }

@@ -1138,7 +1138,7 @@
          *
          * @param object $object
          * @param array $changes
-         * @param array|null $searchArray
+         * @param array $searchArray
          * @param array $mapping
          * @param string $connectionName
          * @return bool

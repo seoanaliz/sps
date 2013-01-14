@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * SaveCommentAppControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveCommentAppControl extends BaseControl {
+    class SaveCommentAppControl {
 
         /**
          * Entry Point
@@ -15,8 +17,9 @@
                 'success' => false
             );
 
+            /** @var $author Author */
             /** @var $editor Editor */
-            $author = $this->getAuthor();
+            $author = Session::getObject('Author');
             $editor = Session::getObject('Editor');
 
             $article = ArticleFactory::GetById(Request::getInteger('id'), array(), array(BaseFactory::WithoutDisabled => false));
@@ -27,11 +30,10 @@
                 return false;
             }
 
-            $__editorMode = false;
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
-            if (!$TargetFeedAccessUtility->canSaveArticleComment($article->targetFeedId)) {
+            $__editorMode = Response::getBoolean('__editorMode');
+            if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId, $__editorMode)) {
                 $result['message'] = 'accessError';
+                //echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
