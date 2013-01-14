@@ -40,7 +40,7 @@ class SaveArticleAppControl extends BaseControl {
             return false;
         }
 
-        $userGroupId = Request::getArray('userGroupId');
+        $userGroupId = Request::getInteger('userGroupId');
         if (!$userGroupId || !is_numeric($userGroupId)) {
             $result['message'] = 'emptyUserGroup';
             echo ObjectHelper::ToJSON($result);
@@ -55,7 +55,7 @@ class SaveArticleAppControl extends BaseControl {
         if ($targetFeedId) {
             $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
 
-            if (!$role) {
+            if (is_null($role)) {
                 $result['message'] = 'emptyTargetFeedId';
                 echo ObjectHelper::ToJSON($result);
                 return false;

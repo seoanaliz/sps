@@ -8,6 +8,8 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $showControls bool */
 
 $type = Request::getString('type');
+$tabType = Request::getString('tabType');
+$currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
 ?>
 

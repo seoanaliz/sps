@@ -146,8 +146,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
         $userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
         Response::setArray('userGroups', $userGroups);
-
-        Response::setBoolean('showControls', $this->search['page'] == 0);
+        Response::setBoolean('showControls', $this->search['page'] == 0 && (Request::getString('tabType') == 'null'));
     }
 
     /**
