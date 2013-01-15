@@ -1,5 +1,6 @@
 <?php
     /** @var SourceFeed $SourceFeed */
+    $SourceFeed = $object;
 
     $prefix = "sourceFeed";
 

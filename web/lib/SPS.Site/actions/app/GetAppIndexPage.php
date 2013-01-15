@@ -18,7 +18,7 @@
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $targetFeeds = array();
 
-            $targetFeedIds = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+            $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
             if ($targetFeedIds) {
                 //паблики, к которым у пользователя есть доступ
                 $targetFeeds = TargetFeedFactory::Get(

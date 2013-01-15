@@ -20,7 +20,7 @@
 
             $text           = trim(Request::getString( 'text' ));
             $targetFeedId   = Session::getInteger( 'gaal_targetFeedId' );
-            $targetFeedIds  = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+            $targetFeedIds  = $TargetFeedAccessUtility->getAllTargetFeedIds();
 
             if (!in_array($targetFeedId, $targetFeedIds)) {
                 $targetFeedId = null;
