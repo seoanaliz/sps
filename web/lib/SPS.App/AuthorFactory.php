@@ -72,6 +72,11 @@
                     'name'         => 'page'
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 0
+                ),
+                'vkIdIn' => array(
+                    'name'         => 'vkId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
                 )
                 ,'pageSize' => array(
                     'name'         => 'pageSize'
