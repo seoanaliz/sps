@@ -50,5 +50,6 @@ $(function(){
 });
 
 function removeUser(button){
-    $(button).parent().remove();
+    console.log(button)
+    $(button)
 }

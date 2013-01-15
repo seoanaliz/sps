@@ -7,24 +7,18 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAppIndexPage extends BaseControl {
+    class GetAppIndexPage {
 
         /**
          * Entry Point
          */
         public function Execute() {
-            $author = $this->getAuthor();
+            $author = Session::getObject('Author');
 
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $targetFeeds = array();
-
-            $targetFeedIds = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
-            if ($targetFeedIds) {
-                //паблики, к которым у пользователя есть доступ
-                $targetFeeds = TargetFeedFactory::Get(
-                    array('_targetFeedId' => $targetFeedIds)
-                );
-            }
+            //паблики, к которым у пользователя есть доступ
+            $targetFeeds = TargetFeedFactory::Get(
+                array('_targetFeedId' => Session::getArray('targetFeedIds'))
+            );
 
             $targetFeedIdsWithPosts = array();
             $sql = <<<eof

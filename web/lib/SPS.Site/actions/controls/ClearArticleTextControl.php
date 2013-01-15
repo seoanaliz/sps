@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * ClearArticleTextControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class ClearArticleTextControl extends BaseControl {
+    class ClearArticleTextControl {
 
         /**
          * Entry Point
@@ -22,10 +24,8 @@
                 return;
             }
 
-            $SourceAccessUtility =new SourceAccessUtility($this->vkId);
-
             //check access
-            if (!$SourceAccessUtility->hasAccessToSourceFeed($object->sourceFeedId)) {
+            if (!AccessUtility::HasAccessToSourceFeedId($object->sourceFeedId)) {
                 return;
             }
 

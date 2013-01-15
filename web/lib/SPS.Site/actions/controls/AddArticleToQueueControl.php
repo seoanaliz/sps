@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * AddArticleToQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class AddArticleToQueueControl extends BaseControl {
+    class AddArticleToQueueControl {
 
         private function buildDates($object, $timestamp) {
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));
@@ -56,11 +58,7 @@
             }
 
             //check access
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-            //check access
-            if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)
-                || !$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
+            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId) || !AccessUtility::HasAccessToSourceFeedId($article->sourceFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }

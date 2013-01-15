@@ -1,4 +1,5 @@
 <?php
+    Package::Load( 'SPS.Site' );
 
     /**
      * GetArticlesAppListControl Action
@@ -6,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesAppListControl extends BaseControl {
+    class GetArticlesAppListControl {
 
         /**
          * @var Article[]
@@ -69,8 +70,7 @@
         private $options = array();
 
         private function processRequest() {
-            $author = $this->getAuthor();
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $author = Session::getObject('Author');
             $page = Session::getInteger('gaal_page');
             $page = ($page < 0) ? 0 : $page;
             if (Request::getBoolean('clear')) {
@@ -93,7 +93,7 @@
 
             if (substr($type, 0, 1) == 'p') {
                 $targetFeedId   = substr($type, 1, strlen($type) - 1);
-                $targetFeedIds  = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+                $targetFeedIds  = Session::getArray('targetFeedIds');
                 if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
                     $type = 'my';
                 } else {

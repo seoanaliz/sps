@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * GetIndexPage Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetIndexPage extends BaseControl {
+    class GetIndexPage {
 
         /**
          * Entry Point
@@ -18,12 +20,6 @@
              * current values from settings
              */
             $currentTargetFeedId = SettingsUtility::GetTarget();
-            if ($currentTargetFeedId) {
-                $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($currentTargetFeedId)) {
-                    $currentTargetFeedId = null;
-                }
-            }
 
             /**
              * target feeds
@@ -39,18 +35,15 @@
                 }
             }
 
-            $RoleUtility = new RoleAccessUtility($this->vkId);
+            $RoleUtility = new RoleUtility();
             $sourceTypes = $gridTypes = array();
             if ($currentTargetFeedId) {
                 $sourceTypes = $RoleUtility->getAccessibleSourceTypes($currentTargetFeedId);
                 $gridTypes = $RoleUtility->getAccessibleGridTypes($currentTargetFeedId);
             }
 
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-            $sourceFeedIds = $SourceAccessUtility->getSourceIdsForTargetFeed($currentTargetFeedId);
-
             $sourceFeeds = SourceFeedFactory::Get(
-                array('_sourceFeedId' => $sourceFeedIds)
+                array('_sourceFeedId' => AccessUtility::GetSourceFeedIds($currentTargetFeedId))
                 , array( BaseFactory::WithoutPages => true )
             );
 
@@ -60,8 +53,7 @@
             Response::setInteger('currentTargetFeedId', $currentTargetFeedId);
             Response::setParameter('currentDate', SettingsUtility::GetDate());
             Response::setParameter('RoleUtility', $RoleUtility);
-            Response::setParameter('sourceTypes', SourceFeedUtility::$Types);
-            Response::setParameter('availableSourceTypes', $sourceTypes);
+            Response::setParameter('sourceTypes', $sourceTypes);
             Response::setParameter('gridTypes', $gridTypes);
         }
     }

@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * SaveArticleControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveArticleControl extends BaseControl {
+    class SaveArticleControl {
 
         private function convert_line_breaks($string, $line_break=PHP_EOL) {
             $patterns = array(
@@ -39,10 +41,8 @@
             $text = strip_tags($text);
 
             if (empty($id)) {
-                $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
                 //check access
-                if (!$SourceAccessUtility->hasAccessToSourceFeed($sourceFeedId)) {
+                if (!AccessUtility::HasAccessToSourceFeedId($sourceFeedId)) {
                     $sourceFeedId = null;
                 }
 

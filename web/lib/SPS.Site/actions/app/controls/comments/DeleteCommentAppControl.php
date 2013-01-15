@@ -1,11 +1,13 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * DeleteCommentAppControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteCommentAppControl extends BaseControl {
+    class DeleteCommentAppControl {
 
         /**
          * Entry Point
@@ -22,22 +24,18 @@
                 return;
             }
 
+            $__editorMode = Response::getBoolean('__editorMode');
             $article = ArticleFactory::GetById($comment->articleId, array(), array(BaseFactory::WithoutDisabled => false));
-
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($article->targetFeedId);
-
-            if ($role == UserFeed::ROLE_EDITOR) {
-                // ок, редактор может удалять комменты
-            } elseif ($role == UserFeed::ROLE_AUTHOR) {
-                // ок, автор может удалять свои комменты
-                /** @var $author Author */
-                $author = $this->getAuthor();
-                if ($author->authorId != $comment->authorId) {
+            if ($__editorMode) {
+                if (!AccessUtility::HasAccessToTargetFeedId($article->targetFeedId)) {
                     return;
                 }
             } else {
-                return;
+                /** @var $author Author */
+                $author = Session::getObject('Author');
+                if ($comment->authorId != $author->authorId) {
+                    return;
+                }
             }
 
             $comment->statusId = 3;

@@ -1,50 +1,38 @@
 <?php
-Package::Load('SPS.Site/base');
-
-/**
- * Возвращает список авторов для ленты
- * @package    SPS
- * @subpackage Site
- * @author     shuler
- */
-class GetAuthorsListControl extends BaseControl
-{
+    Package::Load( 'SPS.Site' );
 
     /**
-     * Entry Point
+     * GetAuthorsListControl Action
+     * @package    SPS
+     * @subpackage Site
+     * @author     shuler
      */
-    public function Execute() {
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-        $targetFeedId = Request::getInteger('targetFeedId');
+    class GetAuthorsListControl {
 
-        if (!$TargetFeedAccessUtility->canShowAuthorList($targetFeedId)) {
-            return;
-        }
+        /**
+         * Entry Point
+         */
+        public function Execute() {
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                return;
+            }
 
-        $authors = array();
-
-        if (!empty($targetFeedId)) {
-            $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
-            if ($UserFeeds) {
-                $vkIds = array();
-                foreach ($UserFeeds as $UserFeed){
-                    $vkIds[] = $UserFeed->vkId;
-                }
-
-                    $authors = AuthorFactory::Get(
-                    array(
-                        'vkIdIn' => $vkIds
-                    )
+            if (!empty($targetFeedId)) {
+                $authors = AuthorFactory::Get(
+                    array()
                     , array(
-                        BaseFactory::WithoutPages => true,
-                        BaseFactory::OrderBy => ' "firstName", "lastName" ',
+                        BaseFactory::WithoutPages => true
+                    , BaseFactory::OrderBy => ' "firstName", "lastName" '
+                    , BaseFactory::CustomSql => ' AND"targetFeedIds" @> \'{' . PgSqlConvert::ToInt($targetFeedId) . '}\''
                     )
                 );
+            } else {
+                $authors = array();
             }
-        }
 
-        Response::setArray('authors', $authors);
+            Response::setArray( 'authors', $authors );
+        }
     }
-}
 
 ?>

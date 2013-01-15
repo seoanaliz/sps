@@ -452,14 +452,14 @@
                             <template>tmpl://vt/editors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/add">
-                            <actions>SPS.Site.SaveEditor</actions>
+                            <actions>SPS.Articles.SaveEditor</actions>
                             <template>tmpl://vt/editors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/delete/([0-9]+)">
-                            <actions>SPS.Site.DeleteEditor</actions>
+                            <actions>SPS.Articles.DeleteEditor</actions>
                         </page>
                         <page uri="vt://editors/edit/([0-9]+)">
-                            <actions>SPS.Site.SaveEditor</actions>
+                            <actions>SPS.Articles.SaveEditor</actions>
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
@@ -472,14 +472,14 @@
                             <template>tmpl://vt/authors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/add">
-                            <actions>SPS.Site.SaveAuthor</actions>
+                            <actions>SPS.App.SaveAuthor</actions>
                             <template>tmpl://vt/authors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/delete/([0-9]+)">
                             <actions>SPS.App.DeleteAuthor</actions>
                         </page>
                         <page uri="vt://authors/edit/([0-9]+)">
-                            <actions>SPS.Site.SaveAuthor</actions>
+                            <actions>SPS.App.SaveAuthor</actions>
                             <template>tmpl://vt/authors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
@@ -629,9 +629,6 @@
             <pageGroup name="tools">
                 <page uri="tools://init-editors/">
                     <actions>SPS.Common.InitEditorsTool</actions>
-                </page>
-                <page uri="tools://fix-userfeed/">
-                    <actions>SPS.Common.FixUserFeedTools</actions>
                 </page>
             </pageGroup>
 

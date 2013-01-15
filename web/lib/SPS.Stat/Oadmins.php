@@ -122,11 +122,7 @@ class Oadmins
                 continue;
 
             echo '<font size="3" color="red">' . $editor->firstName . ' ' . $editor->lastName . '</font><br>';
-
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($editor->vkId);
-            $targetFeedIds = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_EDITOR);
-
-            foreach( $targetFeedIds as $targetFeedId ) {
+            foreach( $editor->targetFeedIds as $targetFeedId ) {
                 $public = TargetFeedFactory::GetById( $targetFeedId );
                 echo '<br>';
                 $now = '';

@@ -9,6 +9,10 @@
 
         public static function GetTarget($checkAccess = true) {
             $targetFeedId = Cookie::getParameter('currentTargetFeedId');
+            if ($checkAccess && !AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                $targetFeedId = null;
+            }
+
             return $targetFeedId;
         }
 

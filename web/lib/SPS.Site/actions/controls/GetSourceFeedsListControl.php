@@ -1,17 +1,21 @@
 <?php
+    Package::Load( 'SPS.Site' );
+
     /**
      * GetSourceFeedsListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetSourceFeedsListControl extends BaseControl {
+    class GetSourceFeedsListControl {
 
         /**
          * Entry Point
          */
         public function Execute() {
-            $RoleUtility = new RoleAccessUtility($this->vkId);
+            $vkId = AuthVkontakte::IsAuth();
+
+            $RoleUtility = new RoleUtility($vkId);
 
             $targetFeedId = Request::getInteger('targetFeedId');
 
@@ -43,18 +47,14 @@
                         );
                     }
                 } else {
-                    $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+                    $SourceAccessUtility = new SourceAccessUtility($vkId);
 
-                    $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
-                    $sourceFeeds = array();
-                    if ($sourceIds) {
-                        $sourceFeeds = SourceFeedFactory::Get(
-                            array(
-                                '_sourceFeedId' => $sourceIds,
-                                'type' => $type)
-                            , array(BaseFactory::WithoutPages => true)
-                        );
-                    }
+                    $sourceFeeds = SourceFeedFactory::Get(
+                        array(
+                            '_sourceFeedId' => $SourceAccessUtility->getSourceIdsForFeed($targetFeedId), //AccessUtility::GetSourceFeedIds(),
+                            'type' => $type)
+                        , array( BaseFactory::WithoutPages => true )
+                    );
 
                     foreach ($sourceFeeds as $sourceFeed) {
                         $result[] =  array(
@@ -71,7 +71,7 @@
             echo ObjectHelper::ToJSON(array(
                 'type' => $type,
                 'sourceFeeds' => $result,
-                'accessibleSourceTypes' => $RoleUtility->getAccessibleSourceTypes($targetFeedId),
+                'accessibleSourceTypes' => array_keys($RoleUtility->getAccessibleSourceTypes($targetFeedId)),
                 'accessibleGridTypes' => array_keys($RoleUtility->getAccessibleGridTypes($targetFeedId)),
                 'canAddPlanCell' => $RoleUtility->canAddPlanCell($targetFeedId)
             ));
