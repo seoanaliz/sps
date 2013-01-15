@@ -93,7 +93,7 @@
 
             if (substr($type, 0, 1) == 'p') {
                 $targetFeedId   = substr($type, 1, strlen($type) - 1);
-                $targetFeedIds  = $TargetFeedAccessUtility->getTargetFeedIds(UserFeed::ROLE_AUTHOR);
+                $targetFeedIds  = $TargetFeedAccessUtility->getAllTargetFeedIds();
                 if (empty($targetFeedIds) || !in_array($targetFeedId, $targetFeedIds)) {
                     $type = 'my';
                 } else {
