@@ -56,7 +56,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-id="report_id" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
+        '<div class="row" data-id="<?=report_id?>" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -103,7 +103,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-id="report_id" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
+        '<div class="row" data-id="<?=report_id?>" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
