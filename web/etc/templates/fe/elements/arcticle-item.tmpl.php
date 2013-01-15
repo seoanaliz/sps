@@ -100,7 +100,9 @@
             <span class="likes spr"></span><span class="likes-count"><?= ($article->rate > 100) ? 'TOP' : $article->rate ?></span>
         </div>
     </div>
+        <? if ($canEditPosts): ?>
     <div class="delete spr"></div>
+    <? endif; ?>
     <div class="clear"></div>
 
     <? if (!empty($article->authorId)) { ?>
