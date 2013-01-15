@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * GetArticlesListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesListControl {
+    class GetArticlesListControl extends BaseControl {
 
         /**
          * @var Article[]
@@ -65,11 +63,18 @@
         private $options = array();
 
         /**
+         * @var bool
+         */
+        private $canEditPosts = false;
+
+        /**
          * @var string
          */
         private $articleLinkPrefix = 'http://vk.com/wall-';
 
         private function processRequest() {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
             $sourceFeedIds  = Request::getArray('sourceFeedIds');
             $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
             $from           = Request::getInteger( 'from' );
@@ -110,9 +115,12 @@
             //авторские посты
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
+
+                $RoleAccessUtility = new TargetFeedAccessUtility($this->vkId);
+                $this->canEditPosts = $RoleAccessUtility->canEditPosts($targetFeedId);
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
@@ -129,7 +137,7 @@
 
             if ($type == SourceFeedUtility::Topface) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
 
@@ -193,6 +201,7 @@
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
             Response::setArray( 'commentsData', $this->commentsData );
             Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
+            Response::setBoolean('canEditPosts', $this->canEditPosts);
         }
 
         /**

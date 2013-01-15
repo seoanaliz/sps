@@ -35,6 +35,11 @@ var simpleAjax = function(method, data, callback) {
         data: data,
         success: function(result) {
             if (result && result.response) {
+
+                if (result.response == 'matches') {
+                    alert('Такой монитор уже есть');
+                    return;
+                }
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
             }

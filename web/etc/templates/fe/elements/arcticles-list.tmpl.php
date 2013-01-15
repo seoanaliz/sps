@@ -4,12 +4,13 @@
     /** @var $articleRecords ArticleRecord[] */
     /** @var $sourceFeeds SourceFeed[] */
     /** @var $authors Author[] */
+    /** @var $canEditPosts boolean */
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : new SourceFeed();
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
-
+            $canEditPosts = $canEditPosts;
             ?>{increal:tmpl://fe/elements/arcticle-item.tmpl.php}<?
         }
     }

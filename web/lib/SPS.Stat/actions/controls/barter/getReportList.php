@@ -27,13 +27,14 @@ class getReportList
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
         $order_array = array( 'posted_at', 'visitors', 'subscribers', 'status' );
-        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? 'posted_at': 'created_at' );
-        $sort_by  = ' "' . $sort_by . '" ';
+        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? 'posted_at': '   created_at DESC NULLS LAST, posted_at  ' );
+//        $sort_by  = ' "' . $sort_by . '" ';
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';
 
+        $default_group  = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if ( !$group_id ) {
-            $default_group  = GroupsUtility::get_default_group( $user_id, 1 );
+
             $group_id       = $default_group->group_id;
         }
         if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
@@ -70,6 +71,6 @@ class getReportList
 //        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
 
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
-        die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res ))));
+        die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res, $default_group->group_id ))));
     }
 }

@@ -10,8 +10,10 @@
         public static function GetCounters($authorId) {
             $result = array();
 
-            $targetFeedIds = Session::getArray('targetFeedIds');
-            if ($targetFeedIds == array(-1 => -1)) {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility();
+            $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
+
+            if (!$targetFeedIds) {
                 return array();
             }
 

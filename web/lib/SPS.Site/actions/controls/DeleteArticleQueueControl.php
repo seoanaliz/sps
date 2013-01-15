@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * DeleteArticleQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteArticleQueueControl {
+    class DeleteArticleQueueControl extends BaseControl {
 
         /**
          * Entry Point
@@ -24,8 +22,9 @@
                 return;
             }
 
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($object->targetFeedId)) {
+            if (!$TargetFeedAccessUtility->canDeleteArticlesFromQueue($object->targetFeedId)) {
                 return;
             }
 
@@ -44,6 +43,13 @@
                 ArticleFactory::UpdateByMask($o, array('statusId', 'queuedAt'), array('articleId' => $object->articleId, 'statusId' => 2));
 
                 AuthorEventUtility::EventQueueRemove($object->articleId);
+
+                AuditUtility::CreateEvent(
+                    'articleQueueDelete',
+                    'article',
+                    $object->articleId,
+                    "QueueId $id deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->editorId
+                );
             }
         }
     }

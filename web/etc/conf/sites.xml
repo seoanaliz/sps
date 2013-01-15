@@ -23,6 +23,7 @@
 				<path name="im" value="/im" />
                 <path name="reports" value="/int/reports" />
 				<path name="stat" value="/stat" />
+				<path name="authors" value="/authors" />
 			</paths>
 			<!-- System modules Settings -->
 			<modules>
@@ -65,6 +66,9 @@
 				<hostname>im.openapi.lc</hostname>
                 <settings>
                     <modules>
+                        <vkapi class="AuthVkontakte">
+                            <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
+                        </vkapi>
                         <mediaServer class="MediaServerManager">
                             <param name="host">media.sps</param>
                             <param name="mainLocation">/</param>

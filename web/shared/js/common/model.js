@@ -7,8 +7,7 @@ var Model = Event.extend({
         this.setData(data);
     },
     setData: function(data) {
-        this._defData = this._defData || {};
-        this._data = $.extend(this._defData, data);
+        this._data = $.extend(this.defData(), data);
     },
     get: function(key) {
         return this._data[key];
@@ -18,17 +17,34 @@ var Model = Event.extend({
         return this;
     },
     data: function(key, value) {
-        if (typeof key === 'object') {
+        if (typeof key === 'object' && typeof value === 'undefined') {
             this.setData(key);
             return this._data;
         } else if (typeof key !== 'undefined' && typeof value !== 'undefined') {
             key += '';
             return this.set(key, value);
         } else if (key) {
-            key = key.toString();
+            key += '';
             return this.get(key);
         } else {
             return this._data;
+        }
+    },
+    defData: function(key, value) {
+        if (!this._defData) {
+            this._defData = {};
+        }
+        if (typeof key === 'object' && typeof value === 'undefined') {
+            this._defData = key;
+            return this._defData;
+        } else if (typeof key !== 'undefined' && typeof value !== 'undefined') {
+            key += '';
+            return this._defData[key] = value;
+        } else if (key) {
+            key += '';
+            return this._defData[key];
+        } else {
+            return this._defData;
         }
     }
 });

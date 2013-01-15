@@ -18,7 +18,7 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
-                <page uri="/stat">
+                <page uri="/stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="/oadmins">
@@ -161,6 +161,15 @@
                 </page>
                 <page uri="controls://searchInPublics/">
                     <actions>SPS.Stat.searchInPublics</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://getAuthors/">
+                    <actions>SPS.Stat.getAuthors</actions>
+                </page>
+                <page uri="controls://getPublics/">
+                    <actions>SPS.Stat.getPublics</actions>
                 </page>
             </pageGroup>
 
@@ -443,14 +452,14 @@
                             <template>tmpl://vt/editors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/add">
-                            <actions>SPS.Articles.SaveEditor</actions>
+                            <actions>SPS.Site.SaveEditor</actions>
                             <template>tmpl://vt/editors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://editors/delete/([0-9]+)">
-                            <actions>SPS.Articles.DeleteEditor</actions>
+                            <actions>SPS.Site.DeleteEditor</actions>
                         </page>
                         <page uri="vt://editors/edit/([0-9]+)">
-                            <actions>SPS.Articles.SaveEditor</actions>
+                            <actions>SPS.Site.SaveEditor</actions>
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
@@ -463,14 +472,14 @@
                             <template>tmpl://vt/authors/index.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/add">
-                            <actions>SPS.App.SaveAuthor</actions>
+                            <actions>SPS.Site.SaveAuthor</actions>
                             <template>tmpl://vt/authors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/delete/([0-9]+)">
                             <actions>SPS.App.DeleteAuthor</actions>
                         </page>
                         <page uri="vt://authors/edit/([0-9]+)">
-                            <actions>SPS.App.SaveAuthor</actions>
+                            <actions>SPS.Site.SaveAuthor</actions>
                             <template>tmpl://vt/authors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
@@ -621,6 +630,9 @@
                 <page uri="tools://init-editors/">
                     <actions>SPS.Common.InitEditorsTool</actions>
                 </page>
+                <page uri="tools://fix-userfeed/">
+                    <actions>SPS.Common.FixUserFeedTools</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="im" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -638,6 +650,12 @@
                 </page>
                 <page uri="stat://reports/" boot="">
                     <template>tmpl://reports/index.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="authors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="authors://">
+                    <template>tmpl://authors/index.tmpl.php</template>
                 </page>
             </pageGroup>
 

@@ -16,17 +16,17 @@
 
         public function Execute() {
             error_reporting( 0 );
-            $user_id  = Request::getInteger ( 'userId'  );
+            $user_id   = AuthVkontakte::IsAuth();
             $group_id  = Request::getInteger ( 'groupId' );
-            $entry_id = Request::getInteger ( 'publId'  );
+            $entry_id  = Request::getInteger ( 'publId'  );
             if ( !$entry_id )
                 $entry_id = Request::getInteger ( 'entryId'  );
-            $general  = Request::getInteger ( 'general' );
-            $type     = ucfirst( Request::getString( 'type' ));
+            $general   = Request::getInteger ( 'general' );
+            $type      = ucfirst( Request::getString( 'type' ));
 
             $type_array = array( 'Stat', 'Mes', 'Barter' );
             if ( !$type || !in_array( $type, $type_array ))
-                $type    = 'Stat';
+                $type  = 'Stat';
             $m_class = $type . 'Groups';
             $general = $general ? $general : 0;
 

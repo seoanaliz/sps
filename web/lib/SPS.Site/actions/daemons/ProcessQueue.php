@@ -129,8 +129,8 @@ sql;
                  */
                 $articlePhotos = array_slice($articleRecord->photos, 0, 10);
                 foreach ($articlePhotos as $photoItem) {
-                    $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
-                    $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
+                    $remotePath = MediaUtility::GetArticlePhoto($photoItem);
+                    $localPath  = Site::GetRealPath('temp://upl_' . md5($remotePath) . '.jpg');
 
                     file_put_contents($localPath, file_get_contents($remotePath));
 
@@ -188,8 +188,8 @@ sql;
             if (!empty($articleRecord->photos)) {
                 $photoItem = current($articleRecord->photos);
 
-                $remotePath = MediaUtility::GetFilePath( 'Article', 'photos', 'original', $photoItem['filename'], MediaServerManager::$MainLocation);
-                $localPath  = Site::GetRealPath('temp://upl_' . $photoItem['filename']);
+                $remotePath = MediaUtility::GetArticlePhoto($photoItem);
+                $localPath  = Site::GetRealPath('temp://upl_' . md5($remotePath) . '.jpg');
 
                 file_put_contents($localPath, file_get_contents($remotePath));
 

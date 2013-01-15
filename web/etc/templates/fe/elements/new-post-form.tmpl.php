@@ -32,6 +32,7 @@
 <script id="fileTemplate" type="text/x-jquery-tmpl">
     <li class="qq-upload-success" id="file-${ $item.counter.nextIndex() }">
         <input type="hidden" name="files[${ $item.counter.index }][filename]" value="${filename}">
+        <input type="hidden" name="files[${ $item.counter.index }][url]" value="${url}">
         <a href="javascript:;" class="delete-attach">удалить</a><img src="${path}" alt="" />
     </li>
 </script><script>''</script>

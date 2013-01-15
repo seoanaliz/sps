@@ -73,23 +73,23 @@
     $langEdit   = LocaleLoader::Translate( "vt.common.edit" );
     $langDelete = LocaleLoader::Translate( "vt.common.delete" );
 
-    foreach ( $list as $object )  {
-        $id         = $object->sourceFeedId;
+    foreach ( $list as $SourceFeed )  {
+        $id         = $SourceFeed->sourceFeedId;
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
-                <td class="header">{$object.title}</td>
+                <td class="header">{$SourceFeed.title}</td>
                 <td>
-                    <? if ($object->type == SourceFeedUtility::Source) : ?>
-                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$object.externalId}</a>
-                    <? elseif ($object->type == SourceFeedUtility::Albums): ?>
-                        <a href="http://vk.com/album-{form:$object.externalId}" target="_blank">http://vk.com/album-{form:$object.externalId}</a>
+                    <? if ($SourceFeed->type == SourceFeedUtility::Source) : ?>
+                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$SourceFeed.externalId}</a>
+                    <? elseif ($SourceFeed->type == SourceFeedUtility::Albums): ?>
+                        <a href="http://vk.com/album-{form:$object.externalId}" target="_blank">http://vk.com/album-{form:$SourceFeed.externalId}</a>
                     <? endif; ?>
                 </td>
-                <td><?= StatusUtility::GetBoolTemplate($object->useFullExport) ?></td>
+                <td><?= StatusUtility::GetBoolTemplate($SourceFeed->useFullExport) ?></td>
                 <td class="left">
                     <?
-                        $targetFeedIds = explode(',', $object->targetFeedIds);
+                        $targetFeedIds = explode(',', $SourceFeed->targetFeedIds);
                         $objectFeeds = array();
                         foreach ($targetFeedIds as $targetFeedId) {
                             if (!empty($targetFeeds[$targetFeedId])) {
@@ -109,8 +109,8 @@
                         }
                     ?>
                 </td>
-                <td><?= SourceFeedUtility::$Types[$object->type] ?></td>
-                <td><?= StatusUtility::GetStatusTemplate($object->statusId) ?></td>
+                <td><?= SourceFeedUtility::$Types[$SourceFeed->type] ?></td>
+                <td><?= StatusUtility::GetStatusTemplate($SourceFeed->statusId) ?></td>
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>

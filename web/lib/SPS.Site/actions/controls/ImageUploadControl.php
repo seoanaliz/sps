@@ -113,7 +113,7 @@
                 $result = MediaUtility::SaveTempFile( $file, 'Article', 'photos' );
                 if( !empty( $result['filename'] ) ) {
                     MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($result['filename']) );
-                    $result['image'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $result['filename'], MediaServerManager::$MainLocation );
+                    $result['image'] = MediaUtility::GetArticlePhoto($result, 'small');
                     $result['success'] = true;
                 } else if( !empty( $result['error'] ) ) {
                     $result['error'] = LocaleLoader::Translate('errors.files.' . $result['error']);
@@ -132,7 +132,7 @@
             $result = MediaUtility::SaveTempFile( !empty($_FILES['Filedata']) ? $_FILES['Filedata'] : null, 'Article', 'photos' );
             if( !empty( $result['filename'] ) ) {
                 MediaUtility::MoveObjectFilesFromTemp( 'Article', 'photos', array($result['filename']) );
-                $result['path'] = MediaUtility::GetFilePath( 'Article', 'photos', 'small', $result['filename'], MediaServerManager::$MainLocation );
+                $result['path'] = MediaUtility::GetArticlePhoto($result, 'small');
             } else if( !empty( $result['error'] ) ) {
                 $result['error'] = LocaleLoader::Translate('errors.files.' . $result['error']);
             }

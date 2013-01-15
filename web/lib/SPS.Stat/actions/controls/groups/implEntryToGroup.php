@@ -15,7 +15,7 @@
          */
         public function Execute() {
             error_reporting( 0 );
-            $user_id   = Request::getInteger( 'userId'  );
+            $user_id  = AuthVkontakte::IsAuth();
             $groupId  = Request::getInteger ( 'groupId' );
             $entry_id = Request::getInteger ( 'publId'  );
             if ( !$entry_id )
@@ -38,7 +38,7 @@
             if ( $type == 'Barter' ) {
                 $source = 1;
                 if ( !GroupsUtility::is_author( $groupId, $user_id ))
-                    die(' Низзя!');
+                    die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
                 $barter_events = BarterEventFactory::Get( array( 'barter_event_id' => $entry_id ));
                 GroupsUtility::implement_to_group( $barter_events, $groupId, 1 );
                 BarterEventFactory::UpdateRange( $barter_events, null, 'tst' );

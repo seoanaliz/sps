@@ -31,7 +31,7 @@ $(document).ready(function(){
                 monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 firstDay: 1,
                 showAnim: '',
-                dateFormat: "d MM"
+                dateFormat: 'd MM yy'
             }
         )
         .keydown(function(e){
@@ -1176,7 +1176,7 @@ $(document).ready(function(){
                                 }
                             ]);
                         }
-                        function addPhoto(path, filename, el) {
+                        function addPhoto(path, filename, url, el) {
                             var $photo = $('<span/>', {class: 'attachment'})
                                 .append('<img src="' + path + '" alt="" />')
                                 .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
@@ -1184,7 +1184,8 @@ $(document).ready(function(){
                                         $photo.remove();
                                     })
                                 )
-                                .append($('<input />', {type: 'hidden', name: '', value: filename}))
+                                .append($('<input />', {type: 'hidden', name: 'filename', value: filename, "class" : 'filename'}))
+                                .append($('<input />', {type: 'hidden', name: 'url', value: url, "class" : 'url'}))
                                 .appendTo(el);
                         }
 
@@ -1218,7 +1219,7 @@ $(document).ready(function(){
                                 '<ul class="qq-upload-list"></ul>' +
                                 '</div>',
                             onComplete: function(id, fileName, res) {
-                                addPhoto(res.image, res.filename, $photos);
+                                addPhoto(res.image, res.filename, res.url, $photos);
                             }
                         });
                         var onSave = function() {
@@ -1227,7 +1228,8 @@ $(document).ready(function(){
                             var photos = new Array();
                             $photos.children().each(function() {
                                 var photo = new Object();
-                                photo.filename = $(this).find('input:hidden').val();
+                                photo.filename = $(this).find('.filename').val();
+                                photo.url = $(this).find('.url').val();
                                 photos.push(photo);
                             });
                             if (!($.trim(text) || link || photos.length)) {
@@ -1284,7 +1286,7 @@ $(document).ready(function(){
                         if (data.photos) {
                             var photos = eval(data.photos);
                             $(photos).each(function() {
-                                addPhoto(this.path, this.filename, $photos);
+                                addPhoto(this.path, this.filename, this.url, $photos);
                             });
                         }
                     })($post, $content, data);

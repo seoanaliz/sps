@@ -47,7 +47,7 @@ form div.row.user_list > ul {
 }
 
 span.button.remove{
-    background: url("/shared/images/vt/common/clear.gif") no-repeat;
+    background: url("../../images/vt/common/clear.gif") no-repeat;
     width: 13px;
     height: 13px;
     display: inline-block;
