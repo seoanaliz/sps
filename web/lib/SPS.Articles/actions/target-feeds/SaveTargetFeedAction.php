@@ -21,7 +21,7 @@
         }
 
         public function Execute() {
-            parent::Execute();
+            $result = parent::Execute();
 
             $UserFeeds = array();
             if (is_numeric($this->objectId) && (int)$this->objectId > 0){
@@ -35,6 +35,7 @@
                 UserFeed::ROLE_EDITOR => 'Редактор',
                 UserFeed::ROLE_AUTHOR => 'Автор',
             ) );
+            return $result;
         }
 
         /**
