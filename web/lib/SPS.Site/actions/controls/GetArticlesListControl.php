@@ -63,6 +63,11 @@
         private $options = array();
 
         /**
+         * @var bool
+         */
+        private $canEditPosts = false;
+
+        /**
          * @var string
          */
         private $articleLinkPrefix = 'http://vk.com/wall-';
@@ -113,6 +118,9 @@
                 if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
+
+                $RoleAccessUtility = new TargetFeedAccessUtility($this->vkId);
+                $this->canEditPosts = $RoleAccessUtility->canEditPosts($targetFeedId);
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
@@ -193,6 +201,7 @@
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
             Response::setArray( 'commentsData', $this->commentsData );
             Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
+            Response::setBoolean('canEditPosts', $this->canEditPosts);
         }
 
         /**

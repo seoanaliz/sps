@@ -131,6 +131,18 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
     }
 
     /**
+     * @param $targetFeedId
+     * @return bool
+     */
+    public function canEditPosts($targetFeedId){
+        $role = $this->getRoleForTargetFeed($targetFeedId);
+        if (!is_null($role)) {
+            return $role != UserFeed::ROLE_AUTHOR;
+        }
+        return false;
+    }
+
+    /**
      * Может ли добавить группу постов ?
      * @param $targetFeedId
      * @return bool

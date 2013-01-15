@@ -3,6 +3,7 @@
     /** @var $articleRecord ArticleRecord */
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
+    /** @var $canEditPosts boolean */
 
     if (!empty($article)) {
 
@@ -73,9 +74,11 @@
     </div>
     <div class="bottom d-hide">
         <div class="l">
-            <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
+            <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
+            <? if ($canEditPosts): ?>|
             <a class="edit" href="javascript:;">Редактировать</a> |
             <a class="clear-text" href="javascript:;">Очистить текст</a>
+            <? endif; ?>
         </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
