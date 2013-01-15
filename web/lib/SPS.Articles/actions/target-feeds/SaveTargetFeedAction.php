@@ -31,7 +31,7 @@
             Response::setParameter('UserFeeds', $UserFeeds );
             Response::setParameter('roles', array(
                 UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
-                UserFeed::ROLE_OWNER=> 'Владелец',
+                UserFeed::ROLE_OWNER => 'Владелец',
                 UserFeed::ROLE_EDITOR => 'Редактор',
                 UserFeed::ROLE_AUTHOR => 'Автор',
             ) );
