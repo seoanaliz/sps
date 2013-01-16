@@ -90,6 +90,7 @@
             $object->author = AuthVkontakte::IsAuth();
             ArticleUtility::BuildDates($object, $timestamp);
             $object->isDeleted = false;
+            $object->collectLikes = true;
             $object->deleteAt = null;
 
             $object->statusId = 1;
