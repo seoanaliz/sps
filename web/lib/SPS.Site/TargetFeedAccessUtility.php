@@ -77,7 +77,11 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canShowAuthorList($targetFeedId){
-        return $this->hasAccessToTargetFeed($targetFeedId);
+        $role = $this->getRoleForTargetFeed($targetFeedId);
+        if (!is_null($role)) {
+            return $role != UserFeed::ROLE_AUTHOR;
+        }
+        return false;
     }
 
     /**
