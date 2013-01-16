@@ -371,6 +371,7 @@
       <externalRetweets><![CDATA[Получено ретвитов]]></externalRetweets>
       <deleteAt><![CDATA[Когда удалить]]></deleteAt>
       <isDeleted><![CDATA[Удалено]]></isDeleted>
+      <collectLikes><![CDATA[Собирается статистика]]></collectLikes>
       <type><![CDATA[Тип]]></type>
       <externalId><![CDATA[externalId]]></externalId>
     </articleQueue>

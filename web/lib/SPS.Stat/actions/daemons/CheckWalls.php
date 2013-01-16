@@ -51,8 +51,10 @@ class CheckWalls
     {
         //ищем просроченные
         $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ),'_status' => 2 ), null, 'tst' );
-        foreach( $events as $event)
+        foreach( $events as $event) {
             $event->status = 5;
+            $event->posted_at = $event->stop_search_at;
+        }
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
     }
 
@@ -78,6 +80,8 @@ class CheckWalls
                 //todo логирование
                 continue;
             }
+            if (empty($walls[ $barter_event->barter_public ]))
+                continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
                 if( $post->date < $barter_event->start_search_at->format('U')) {
                     echo 'слишком старые посты<br>';
@@ -113,7 +117,6 @@ class CheckWalls
         foreach( $publics as &$public ) {
             $now =  time();
             $id = $public[ 'target_id' ];
-
 
             $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
             if ( !$res[ 'visitors']) {

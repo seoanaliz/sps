@@ -13,7 +13,7 @@ class saveAt
         error_reporting( 0 );
         $user_id        =   Request::getInteger( 'userId' );
         $access_token   =   Request::getString(  'access_token' );
-
+        print_r(VkHelper::get_service_access_token());
         if ( !$access_token || !$user_id ) {
             die(ERR_MISSING_PARAMS);
         }
@@ -23,8 +23,8 @@ class saveAt
             $user = StatUsers::add_user( $user_id );
 
         StatUsers::set_access_token( $user_id, $access_token );
-        MesDialogs::get_all_dialogs( $user_id );
-        MesDialogs::check_friend_requests( $user_id );
+        MesDialogs::check_new_messages( $user_id );
+//        MesDialogs::check_friend_requests( $user_id );
 
         die( ObjectHelper::ToJSON( array( 'response' => $user )));
     }

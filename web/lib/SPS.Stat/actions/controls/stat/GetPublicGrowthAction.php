@@ -67,7 +67,7 @@ class GetPublicGrowthAction
                         barter_events
                     WHERE
                         posted_at::date = date @date
-                        AND status in (4,5,6)
+                        AND status in (4,6)
                         AND post_id IS NOT NULL
                         AND start_visitors IS NOT NULL
                         AND end_visitors IS NOT NULL

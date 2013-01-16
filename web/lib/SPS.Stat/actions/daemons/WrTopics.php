@@ -18,6 +18,7 @@ class WrTopics extends wrapper
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i' ) . '<br>';
         $this->update_quantity();
+
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_visitors();
 //        $this->find_admins();
@@ -27,7 +28,7 @@ class WrTopics extends wrapper
     public function get_id_arr()
     {
         $sql = "select vk_id
-                FROM ". TABLE_STAT_PUBLICS ."
+                FROM " . TABLE_STAT_PUBLICS . "
                 WHERE quantity > 50000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
@@ -65,45 +66,57 @@ class WrTopics extends wrapper
             ' WHERE
                         id=@publ_id
                         AND (
-                                time=CURRENT_DATE - interval \'7 day\'
+
+                                time=CURRENT_DATE
+                                or time=CURRENT_DATE - interval \'7 day\'
                                 or time=CURRENT_DATE - interval \'30 day\'
                             )
                    ORDER BY time DESC';
 
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',  $publ_id );
+
         $ds = $cmd->Execute();
-        $time = array();
+        $quan_arr = array();
         while( $ds->Next() ) {
             $quan_arr[] = $ds->getValue('quantity', TYPE_INTEGER);
         }
-
-        if ( isset ( $quan_arr[1] ) ) {
-            $diff_rel_mon = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
-            $diff_abs_mon = $quantity - $quan_arr[1];
+        if ( isset ( $quan_arr[2] )) {
+            $diff_rel_mon = round(( $quantity / $quan_arr[2] - 1) * 100, 2 );
+            $diff_abs_mon = $quantity - $quan_arr[2];
         } else {
             $diff_rel_mon = 0;
             $diff_abs_mon = 0;
         }
 
-        if ( isset ( $quan_arr[0] ) ) {
-            $diff_rel_week = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
-            $diff_abs_week = $quantity - $quan_arr[0];
+        if ( isset ( $quan_arr[1] ) ) {
+            $diff_rel_week = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
+            $diff_abs_week = $quantity - $quan_arr[1];
         } else {
             $diff_rel_week = 0;
             $diff_abs_week = 0;
         }
+        if ( isset ( $quan_arr[0] ) ) {
+            $diff_rel = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
+            $diff_abs = $quantity - $quan_arr[0];
+        } else {
+            $diff_rel = 0;
+            $diff_abs = 0;
+        }
+
+
 
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
             SET
-                quantity=@new_quantity,
-                diff_abs=(@new_quantity - quantity),
-                diff_rel=round( ( @new_quantity/quantity - 1 ) * 100, 2 ),
+                quantity        =   @new_quantity,
+                diff_abs        =   @diff_rel,
+                diff_rel        =   @diff_abs,
                 diff_abs_week   =   @diff_abs_week,
                 diff_rel_week   =   @diff_rel_week,
                 diff_abs_month  =   @diff_abs_month,
                 diff_rel_month  =   @diff_rel_month
-            WHERE vk_id=@publ_id';
+            WHERE
+                vk_id = @publ_id';
 
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',          $publ_id );
@@ -112,6 +125,9 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@diff_rel_week',      $diff_rel_week );
         $cmd->SetFloat( '@diff_rel_month',     $diff_rel_mon );
         $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
+        $cmd->SetFloat( '@diff_rel',           $diff_rel );
+        $cmd->SetFloat( '@diff_abs',           $diff_abs );
+        echo $cmd->GetQuery();
         $cmd->Execute();
     }
 

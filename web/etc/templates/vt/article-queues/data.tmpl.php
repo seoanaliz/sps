@@ -77,6 +77,10 @@
             <label>{lang:vt.articleQueue.isDeleted}</label>
             <?= FormHelper::FormCheckBox( $prefix . '[isDeleted]', "TRUE", "", "", $object->isDeleted); ?>
         </div>
+        <div data-row="collectLikes" class="row">
+            <label>{lang:vt.articleQueue.collectLikes}</label>
+            <?= FormHelper::FormCheckBox( $prefix . '[collectLikes]', "TRUE", "", "", $object->collectLikes); ?>
+        </div>
 	</div>
     <div id="page-1" class="tab-page rows">
         {increal:tmpl://vt/articles/record.tmpl.php}
