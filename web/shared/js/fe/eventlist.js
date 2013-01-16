@@ -498,7 +498,8 @@ var Eventlist = {
                 text: text,
                 photos: photos,
                 link: link,
-                sourceFeedId: $sourceFeedId
+                sourceFeedId: $sourceFeedId,
+                targetFeedId: Elements.rightdd()
             },
             success: function (data) {
                 if(data.success) {
