@@ -476,7 +476,7 @@
                             <template>tmpl://vt/authors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/delete/([0-9]+)">
-                            <actions>SPS.App.DeleteAuthor</actions>
+                            <actions>SPS.Site.DeleteAuthor</actions>
                         </page>
                         <page uri="vt://authors/edit/([0-9]+)">
                             <actions>SPS.Site.SaveAuthor</actions>
