@@ -34,6 +34,18 @@
             $link           = trim(Request::getString( 'link' ));
             $photos         = Request::getArray( 'photos' );
             $sourceFeedId   = Request::getInteger( 'sourceFeedId' );
+            $targetFeedId   = Request::getInteger('targetFeedId');
+
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if (is_null($role)){
+                return ObjectHelper::ToJSON(array('success'=> false));
+            }
+            $authorId = null;
+            if ($role == UserFeed::ROLE_AUTHOR){
+                $authorId = $this->getAuthor()->authorId;
+                $sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
+            }
 
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
@@ -41,16 +53,18 @@
             if (empty($id)) {
                 $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
-                //check access
-                if (!$SourceAccessUtility->hasAccessToSourceFeed($sourceFeedId)) {
-                    $sourceFeedId = null;
-                }
+                if ($sourceFeedId != SourceFeedUtility::FakeSourceAuthors) {
+                    //check access
+                    if (!$SourceAccessUtility->hasAccessToSourceFeed($sourceFeedId)) {
+                        $sourceFeedId = null;
+                    }
 
-                $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
-                if (empty($sourceFeedId) || empty($sourceFeed)) {
-                    $result['message'] = 'emptySourceFeedId';
-                    echo ObjectHelper::ToJSON($result);
-                    return false;
+                    $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
+                    if (empty($sourceFeedId) || empty($sourceFeed)) {
+                        $result['message'] = 'emptySourceFeedId';
+                        echo ObjectHelper::ToJSON($result);
+                        return false;
+                    }
                 }
             }
 
@@ -71,9 +85,11 @@
             $article->createdAt = DateTimeWrapper::Now();
             $article->importedAt = $article->createdAt;
             $article->sourceFeedId = $sourceFeedId;
+            $article->targetFeedId = $targetFeedId;
             $article->externalId = -1;
             $article->rate = 100;
             $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $article->authorId = $authorId;
             $article->isCleaned = false;
             $article->statusId = 1;
 
