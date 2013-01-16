@@ -25,7 +25,7 @@
                     $i++;
                     endforeach;
                     ?>
-                    <a data-type="authors-list">+</a>
+                    <a data-type="authors-list" class="tab-authors-list" style="display: none;">+</a>
                 </div>
 
                 <select multiple="multiple" id="source-select">
