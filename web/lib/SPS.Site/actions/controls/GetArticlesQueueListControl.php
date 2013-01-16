@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesQueueListControl {
+    class GetArticlesQueueListControl extends BaseControl {
 
         /**
          * Entry Point
@@ -31,7 +31,7 @@
             $articleRecords = array();
             $articlesQueue  = array();
 
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility();
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
             if (is_null($role)){
                 return;

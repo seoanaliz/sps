@@ -11,7 +11,7 @@ class RoleAccessUtility
 
     private static $isLoaded = false;
 
-    public function __construct($vkId = null) {
+    public function __construct($vkId) {
         if (!self::$isLoaded) {
             $this->loadRules($vkId);
         }
@@ -21,10 +21,7 @@ class RoleAccessUtility
      * Загружает права пользователя
      * @param null $vkId
      */
-    private function loadRules($vkId = null) {
-        if (is_null($vkId)){
-            $vkId = AuthVkontakte::IsAuth();
-        }
+    private function loadRules($vkId) {
         if ($vkId) {
             $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$vkId));
             self::$FeedRulesByRole = array();

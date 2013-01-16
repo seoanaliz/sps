@@ -7,10 +7,10 @@
      */
     class AuthorFeedViewUtility {
 
-        public static function GetCounters($authorId) {
+        public static function GetCounters($authorId, $vkId) {
             $result = array();
 
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility();
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($vkId);
             $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
 
             if (!$targetFeedIds) {

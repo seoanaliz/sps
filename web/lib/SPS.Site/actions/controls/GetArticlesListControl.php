@@ -153,8 +153,6 @@
         }
 
         private function getObjects() {
-            unset($this->search['_sourceFeedId']);
-            
             $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
 
             $this->articles = ArticleFactory::Get($this->search, $this->options);
