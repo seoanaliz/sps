@@ -127,7 +127,9 @@
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
-                $this->search['targetFeedId'] = $targetFeedId;
+                unset($this->search['_sourceFeedId'], $this->search['targetFeedId']);
+
+                //$this->search['targetFeedId'] = $targetFeedId;
 
                 //фильтр источников выступает как фильтр авторов
                 if (!empty($sourceFeedIds)) {
