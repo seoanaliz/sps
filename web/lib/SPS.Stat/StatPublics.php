@@ -6,6 +6,20 @@
     class StatPublics
     {
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
+        public static $exception_publics_array = array(
+         25678227
+        ,26776509
+        ,43503789
+        ,346191
+        ,33704958
+        ,38000521
+        ,1792796
+        ,27421965
+        ,34010064
+        ,25749497
+        ,35807078
+        ,25817269
+        );
 
         public static function get_id_by_shortname( $shortname )
         {
@@ -18,25 +32,9 @@
         {
             $publics = TargetFeedFactory::Get();
             //массив пабликов, которые не надо включать в сбор/отбражение данных
-            $exception_publics_array = array(
-                 25678227
-                ,26776509
-                ,43503789
-                ,346191
-                ,33704958
-                ,38000521
-                ,1792796
-                ,27421965
-                ,34010064
-                ,25749497
-                ,35807078
-                ,25817269
-            );
-
-
             $res = array();
             foreach ( $publics as $public ) {
-                if( $public->type != 'vk' || in_array( $public->externalId, $exception_publics_array ))
+                if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
 
                 $a['id']    = $public->externalId;
@@ -626,12 +624,15 @@
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-//            if ( isset( $publisher->publisher->vk_token ))
-//                $params['access_token']  =  $publisher->publisher->vk_token;
-
-            $res = VkHelper::api_request( 'stats.get', $params, 0 );
+            for( $i = 0; $i < 3; $i++ ) {
+                sleep(0.6);
+                $res = VkHelper::api_request( 'stats.get', $params, 0 );
+                if ( empty ( $res->error ) && !empty( $res ))
+                    break;
+            }
             if ( !empty ( $res->error ) || empty( $res ))
                 return false;
+
             return array(
                 'visitors'  =>  $res[0]->visitors,
                 'viewers'   =>  $res[0]->views

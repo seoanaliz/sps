@@ -11,21 +11,21 @@ class AddReport
     const DEFAULT_TIMESHIFT = -240;
     public function execute()
     {
-//        error_reporting(0);
+        error_reporting(0);
         $now = time();
         $target_public_id   =   Request::getString ( 'targetPublicId' );
         $barter_public_id   =   Request::getString ( 'barterPublicId' );
         $start_looking_time =   Request::getInteger( 'startTime' ) ? Request::getInteger( 'startTime' ) : $now ;
         $stop_looking_time  =   Request::getInteger( 'stopTime' );
-//        $user_id            =   Request::getInteger( 'userId' );
         $group_id           =   Request::GetInteger( 'groupId' );
-        $approve            =   Request::getBoolean( 'approve' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $time_shift         =   Request::getInteger( 'timeShift');
         $start_looking_time -=  900;
         if ( $stop_looking_time && $stop_looking_time < $start_looking_time)
             $stop_looking_time += 84600;
-
+//        $start_looking_time = explode( ',', $start_looking_time );
+//        $stop_looking_time = $stop_looking_time? explode( ',', $start_looking_time ) : false;
+//
         $user_id = AuthVkontakte::IsAuth();
         //Р±РµСЂРµРј РєРѕРЅС‚Р°РєС‚РѕРІСЃРєРёР№ timezone, РѕРЅ РѕС‚Р»РёС‡Р°РµС‚СЃСЏ РѕС‚ С„Р°РєС‚РёС‡РµСЃРєРѕРіРѕ РЅР° 1
         //todo Р±СЂР°С‚СЊ С‚РµРєСѓС‰РёР№ timezone С‡РµСЂРµР· js
@@ -58,7 +58,7 @@ class AddReport
 //            if ( !empty( $repeat_check ))
 //                die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check ))));
 //        }
-        $repeat_check = $this->repeat_check($info['target']['id'], $info['barter']['id'], $start_looking_time, $stop_looking_time );
+        $repeat_check = $this->repeat_check($info['target']['id'], $info['barter']['id'], $start_looking_time, $stop_looking_time, $user_id );
         if ( $repeat_check )
             die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check, $default_group->group_id ))));
 
@@ -107,7 +107,7 @@ class AddReport
             die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something goes wrong' )));
     }
 
-    private function repeat_check( $target_public_id, $barter_public_id, $start_time, $stop_time )
+    private function repeat_check( $target_public_id, $barter_public_id, $start_time, $stop_time, $creator_id )
     {
         $start_time = date( 'Y-m-d H:i:s', $start_time );
         $stop_time  = date( 'Y-m-d H:i:s', $stop_time );
@@ -121,12 +121,14 @@ class AddReport
                       OR ( @start_time <= start_search_at AND stop_search_at <= @stop_time )
                     )
                     AND status in (1,2,3)
+                    AND creator_id = @creator_id
                 ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
-        $cmd->SetString( '@start_time', $start_time );
-        $cmd->SetString( '@stop_time',  $stop_time );
+        $cmd->SetString( '@start_time',     $start_time );
+        $cmd->SetString( '@stop_time',      $stop_time );
         $cmd->SetString( '@barter_public',  $barter_public_id );
         $cmd->SetString( '@target_public',  $target_public_id );
+        $cmd->SetString( '@creator_id',     $creator_id );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
         if( $ds->Next()) {
