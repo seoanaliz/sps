@@ -112,15 +112,17 @@
                 return;
             }
 
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if ($targetFeedId) {
+                $this->canEditPosts = $TargetFeedAccessUtility->canEditPosts($targetFeedId);
+            }
+
             //авторские посты
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
                 if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
-
-                $RoleAccessUtility = new TargetFeedAccessUtility($this->vkId);
-                $this->canEditPosts = $RoleAccessUtility->canEditPosts($targetFeedId);
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
@@ -136,11 +138,9 @@
             }
 
             if ($type == SourceFeedUtility::Topface) {
-                $targetFeedId = Request::getInteger( 'targetFeedId' );
                 if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
-
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
@@ -153,6 +153,8 @@
         }
 
         private function getObjects() {
+            unset($this->search['_sourceFeedId']);
+            
             $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
 
             $this->articles = ArticleFactory::Get($this->search, $this->options);
