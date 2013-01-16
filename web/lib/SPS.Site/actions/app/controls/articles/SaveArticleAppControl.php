@@ -5,7 +5,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class SaveArticleAppControl extends BaseControl {
+    class SaveArticleAppControl extends XAppBaseControl {
 
         /**
          * Entry Point

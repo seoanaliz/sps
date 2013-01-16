@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAppIndexPage extends BaseControl {
+    class GetAppIndexPage extends XAppBaseControl {
 
         /**
          * Entry Point
@@ -44,7 +44,7 @@ eof;
 
             // счетчик событий автора
             $authorCounter = AuthorEventUtility::GetAuthorCounter($author->authorId);
-            $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId);
+            $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId, $this->vkId);
 
             Response::setArray( 'targetFeeds', $targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );

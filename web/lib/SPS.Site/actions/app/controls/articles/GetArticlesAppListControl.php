@@ -6,7 +6,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesAppListControl extends BaseControl {
+    class GetArticlesAppListControl extends XAppBaseControl {
 
         /**
          * @var Article[]

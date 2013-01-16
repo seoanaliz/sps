@@ -4,14 +4,5 @@
     <action name="GetAuthorList">
       <path>authors/GetAuthorListAction</path>
     </action>
-
-    <action name="DeleteAuthor">
-      <path>authors/SaveAuthorAction</path>
-      <parameters>
-        <request>
-          <param name="action">'delete'</param>
-        </request>
-      </parameters>
-    </action>
   </group>
 </actions>
