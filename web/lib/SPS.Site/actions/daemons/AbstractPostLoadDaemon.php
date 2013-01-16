@@ -171,34 +171,11 @@ abstract class AbstractPostLoadDaemon {
         $result = array();
 
         foreach ($data as $photo) {
-            //чтобы не блочили за частый слив фоточек
-            sleep(1);
-
-            //moving photo to local temp
-            $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-            $content = file_get_contents($photo['url']);
-
-            if (!$content) {
-                throw new Exception('failed to get content of photo ' . $photo['url']);
-            }
-
-            file_put_contents($tmpName, $content);
-            $file = array(
-                'tmp_name' => $tmpName,
-                'name' => $tmpName,
+            $result[] = array(
+                'filename' => '',
+                'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                'url' => $photo['url'],
             );
-            $fileUploadResult = MediaUtility::SaveTempFile($file, 'Article', 'photos');
-
-            if (!empty($fileUploadResult['filename'])) {
-                MediaUtility::MoveObjectFilesFromTemp('Article', 'photos', array($fileUploadResult['filename']));
-                unlink($tmpName);
-
-                $result[] = array(
-                    'filename' => $fileUploadResult['filename'],
-                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
-                    'url' => $photo['url'],
-                );
-            }
         }
 
         return $result;
