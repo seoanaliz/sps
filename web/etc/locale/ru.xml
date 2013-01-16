@@ -197,7 +197,7 @@
       <articleQueue>
         <list><![CDATA[Очередь отправки статей]]></list>
         <addTitle><![CDATA[Добавление в очередь]]></addTitle>
-        <editTitle><![CDATA[Редактирование эелемента очереди]]></editTitle>
+        <editTitle><![CDATA[Редактирование элемента очереди]]></editTitle>
       </articleQueue>
       <publisher>
         <list><![CDATA[Список издателей]]></list>

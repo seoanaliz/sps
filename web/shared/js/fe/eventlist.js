@@ -331,7 +331,8 @@ var Eventlist = {
                 }
 
                 var sourceTypes = data['accessibleSourceTypes'];
-                $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
+                var $typeSelector = $('.left-panel div.type-selector');
+                $typeSelector.children('.sourceType').each(function(i, item){
                       item = $(item);
                       if ($.inArray(item.data('type'), sourceTypes) == -1){
                         item.hide();
@@ -339,6 +340,11 @@ var Eventlist = {
                           item.show();
                       }
                 });
+                if (data['canShowAuthorsList']){
+                    $typeSelector.children('.tab-authors-list').show();
+                } else {
+                    $typeSelector.children('.tab-authors-list').hide();
+                }
 
                 var gridTypes = data['accessibleGridTypes'];
                 var showCount = 0;
@@ -492,7 +498,8 @@ var Eventlist = {
                 text: text,
                 photos: photos,
                 link: link,
-                sourceFeedId: $sourceFeedId
+                sourceFeedId: $sourceFeedId,
+                targetFeedId: Elements.rightdd()
             },
             success: function (data) {
                 if(data.success) {

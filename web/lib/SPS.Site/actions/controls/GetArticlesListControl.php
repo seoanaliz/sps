@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * GetArticlesListControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesListControl {
+    class GetArticlesListControl extends BaseControl {
 
         /**
          * @var Article[]
@@ -65,11 +63,18 @@
         private $options = array();
 
         /**
+         * @var bool
+         */
+        private $canEditPosts = false;
+
+        /**
          * @var string
          */
         private $articleLinkPrefix = 'http://vk.com/wall-';
 
         private function processRequest() {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
             $sourceFeedIds  = Request::getArray('sourceFeedIds');
             $sourceFeedIds  = !empty($sourceFeedIds) ? $sourceFeedIds : array();
             $from           = Request::getInteger( 'from' );
@@ -107,17 +112,24 @@
                 return;
             }
 
+            $targetFeedId = Request::getInteger( 'targetFeedId' );
+            if ($targetFeedId) {
+                $this->canEditPosts = $TargetFeedAccessUtility->canEditPosts($targetFeedId);
+            }
+
             //авторские посты
             if ($type == SourceFeedUtility::Authors) {
                 $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
 
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
-                $this->search['targetFeedId'] = $targetFeedId;
+                unset($this->search['_sourceFeedId'], $this->search['targetFeedId']);
+
+                //$this->search['targetFeedId'] = $targetFeedId;
 
                 //фильтр источников выступает как фильтр авторов
                 if (!empty($sourceFeedIds)) {
@@ -128,11 +140,9 @@
             }
 
             if ($type == SourceFeedUtility::Topface) {
-                $targetFeedId = Request::getInteger( 'targetFeedId' );
-                if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
+                if (!$TargetFeedAccessUtility->hasAccessToTargetFeed($targetFeedId)) {
                     $this->search['targetFeedId'] = -999;
                 }
-
                 $this->search['rateGE'] = null;
                 $this->search['rateLE'] = null;
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceTopface => SourceFeedUtility::FakeSourceTopface);
@@ -193,6 +203,7 @@
             Response::setArray( 'sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds) );
             Response::setArray( 'commentsData', $this->commentsData );
             Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
+            Response::setBoolean('canEditPosts', $this->canEditPosts);
         }
 
         /**

@@ -5,11 +5,7 @@
  * In Code We Trust
  */
 
-Package::Load( 'SPS.Site' );
-
-
-class PostDeletePlanControl
-{
+class PostDeletePlanControl extends BaseControl {
     public function Execute() {
         $result = array();
         $articleQueueId = Request::getInteger('queueId');
@@ -20,10 +16,11 @@ class PostDeletePlanControl
             $result['error'] = 'Need more data';
         } else {
 
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
 
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($articleQueue->targetFeedId)) {
+            if (!$TargetFeedAccessUtility->canCreatePlanDeletePost($articleQueue->targetFeedId)) {
                 $result['success'] = false;
                 $result['error'] = 'Access Denied';
             } else {

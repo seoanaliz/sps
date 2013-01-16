@@ -17,8 +17,7 @@ abstract class AbstractPostLoadDaemon {
      * @param array         $posts массив постов
      * @return bool нужно ли обновить processed у $source
      */
-    protected function saveFeedPosts($source, $posts)
-    {
+    protected function saveFeedPosts($source, $posts) {
         /**
          * Ищем в базе уже возможно сохраненные
          * Попутно собираем id тех, которые надо пропустить
@@ -44,8 +43,8 @@ abstract class AbstractPostLoadDaemon {
             array('_externalId' => $externalIds)
             , array(
                 BaseFactory::WithColumns => '"articleId", "externalId"'
-            , BaseFactory::WithoutPages => true
-            , BaseFactory::WithoutDisabled => false
+                , BaseFactory::WithoutPages => true
+                , BaseFactory::WithoutDisabled => false
             )
         );
         ArticleFactory::$mapping = $__mapping;
@@ -76,7 +75,6 @@ abstract class AbstractPostLoadDaemon {
             $articleRecord->content = $post['text'];
             $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
             $articleRecord->link = Convert::ToString($post['link']);
-            ;
             $articleRecord->photos = array();
 
             $articleRecord->retweet = Convert::ToArray($post['retweet']);
@@ -84,15 +82,10 @@ abstract class AbstractPostLoadDaemon {
             $articleRecord->video = Convert::ToArray($post['video']);
             $articleRecord->music = Convert::ToArray($post['music']);
             $articleRecord->poll = Convert::ToString($post['poll']);
-            ;
             $articleRecord->map = Convert::ToString($post['map']);
-            ;
             $articleRecord->doc = Convert::ToString($post['doc']);
-            ;
-
 
             //rate
-
             $articleRecord->rate = 0;
 
             if (strpos($post['likes'], '%') !== false) {
@@ -148,8 +141,7 @@ abstract class AbstractPostLoadDaemon {
         $this->daemon->Unlock();
     }
 
-    private function addArticle(Article $article, $articleRecord)
-    {
+    private function addArticle(Article $article, $articleRecord) {
         //сохраняем в транзакции
         $conn = ConnectionFactory::Get();
         $conn->begin();
@@ -175,38 +167,15 @@ abstract class AbstractPostLoadDaemon {
      * @param $data
      * @return array
      */
-    private function savePostPhotos($data)
-    {
+    private function savePostPhotos($data) {
         $result = array();
 
         foreach ($data as $photo) {
-            //чтобы не блочили за частый слив фоточек
-            sleep(1);
-
-            //moving photo to local temp
-            $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-            $content = file_get_contents($photo['url']);
-
-            if (!$content) {
-                throw new Exception('failed to get content of photo ' . $photo['url']);
-            }
-
-            file_put_contents($tmpName, $content);
-            $file = array(
-                'tmp_name' => $tmpName,
-                'name' => $tmpName,
+            $result[] = array(
+                'filename' => '',
+                'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                'url' => $photo['url'],
             );
-            $fileUploadResult = MediaUtility::SaveTempFile($file, 'Article', 'photos');
-
-            if (!empty($fileUploadResult['filename'])) {
-                MediaUtility::MoveObjectFilesFromTemp('Article', 'photos', array($fileUploadResult['filename']));
-                unlink($tmpName);
-
-                $result[] = array(
-                    'filename' => $fileUploadResult['filename'],
-                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : ''
-                );
-            }
         }
 
         return $result;

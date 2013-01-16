@@ -72,7 +72,11 @@ Control = $.extend(Control, {
             name: 'getGroupList'
         },
         send_message: {
-            name: 'messages.send'
+            name: 'messages.send',
+            params: {
+                pageId: 'dialogId',
+                text: 'text'
+            }
         },
         message_mark_as_read: {
             name: 'markMes'
@@ -93,7 +97,17 @@ Control = $.extend(Control, {
             name: 'exlEntryFromGroup'
         },
         get_templates: {
-            name: 'getTemplates'
+            name: 'getTemplates',
+            params: {
+                listId: 'groupId'
+            },
+            response: function(data) {
+                var clearTemplates = [];
+                $.each(data, function(i, rawTemplate) {
+                    clearTemplates.push(Cleaner.template(rawTemplate));
+                });
+                return clearTemplates;
+            }
         },
         add_template: {
             name: 'addTemplate'
