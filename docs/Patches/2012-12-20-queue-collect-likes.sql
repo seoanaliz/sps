@@ -3,7 +3,7 @@ alter table "articleQueues" add column "collectLikes" Boolean NOT NULL Default T
 DROP VIEW "getArticleQueues";
 
 CREATE OR REPLACE VIEW "getArticleQueues" AS
-SELECT  "public"."articleQueues"."articleQueueId".
+SELECT  "public"."articleQueues"."articleQueueId"
       , "public"."articleQueues"."startDate"
       , "public"."articleQueues"."endDate"
       , "public"."articleQueues"."createdAt"
