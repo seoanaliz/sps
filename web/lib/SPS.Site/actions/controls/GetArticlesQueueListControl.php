@@ -31,10 +31,12 @@
             $articleRecords = array();
             $articlesQueue  = array();
 
-            //check access
-            //if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-            //    $targetFeedId = null;
-            //}
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility();
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if (is_null($role)){
+                return;
+            }
+            Response::setBoolean('canEditQueue', $role != UserFeed::ROLE_AUTHOR);
 
 
 
