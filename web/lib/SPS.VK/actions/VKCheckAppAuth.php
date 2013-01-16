@@ -35,6 +35,8 @@
                 $viewer_id = Session::getInteger('authorId');;
             }
 
+            $viewer_id = 49158237;
+
             // ищем чувака в базе
             if (!empty($viewer_id)) {
                 $author = AuthorFactory::GetOne(
