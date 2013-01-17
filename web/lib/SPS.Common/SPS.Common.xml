@@ -194,6 +194,9 @@
         <action name="InitEditorsTool">
             <path>tools/InitEditorsTool</path>
         </action>
+        <action name="FixUserFeedTools">
+            <path>tools/FixUserFeedTools</path>
+        </action>
     </group>
 
     <group name="VFS">

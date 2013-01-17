@@ -20,6 +20,7 @@
     Package::Load( 'SPS.VK' );
     Package::Load( 'SPS.FB' );
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.Site/base' );
     Package::Load( 'SPS.App' );
     Package::Load( 'SPS.Site/base' );
 

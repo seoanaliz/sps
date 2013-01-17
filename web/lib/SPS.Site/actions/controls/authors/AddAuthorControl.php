@@ -11,19 +11,24 @@ class AddAuthorControl extends BaseControl {
      * Entry Point
      */
     public function Execute() {
+
         $result = array('success' => false);
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $targetFeedId = Request::getInteger('targetFeedId');
+
         if (!$TargetFeedAccessUtility->canAddAuthor($targetFeedId)) {
             Logger::Debug('Add Author access denied');
             echo ObjectHelper::ToJSON($result);
             return;
         }
 
-        $vkId = Request::getInteger( 'vkId' );
+        $vkId = Request::getInteger('vkId');
         $Author = new Author();
         $Author->statusId = 1;
         $Author->vkId = $vkId;
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $targetFeedId = Request::getInteger('targetFeedId');
+
 
         try {
             if (!empty($vkId)) {
@@ -40,13 +45,11 @@ class AddAuthorControl extends BaseControl {
 
         AuthorFactory::$mapping['view'] = 'authors';
         $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
+        $vkId = Request::getInteger('vkId');
+        $Author = new Author();
+        $Author->statusId = 1;
+        $Author->vkId = $vkId;
 
-        if (empty($exists)) {
-            $result['success'] = AuthorFactory::Add($Author);
-        } else {
-            $exists->statusId = 1;
-            $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId'), array('vkId' => $exists->vkId));
-        }
 
         // copy to editor
         $Editor = EditorFactory::GetOne(array('vkId' => $vkId));
@@ -59,6 +62,41 @@ class AddAuthorControl extends BaseControl {
         $Editor->avatar = $Author->avatar;
         $Editor->statusId = $Author->statusId;
         if ($Editor->editorId){
+            EditorFactory::Update($Editor);
+        } else {
+            EditorFactory::Add($Editor);
+        }
+
+        if (empty($exists)) {
+            $result['success'] = AuthorFactory::Add($Author);
+        } else {
+            $UserFeed = new UserFeed();
+            $UserFeed->vkId = $vkId;
+            $UserFeed->role = UserFeed::ROLE_AUTHOR;
+            $UserFeed->targetFeedId = $targetFeedId;
+            UserFeedFactory::Add($UserFeed);
+            $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId'), array('vkId' => $exists->vkId));
+        }
+
+        $manageEvent = new AuthorManage();
+        $manageEvent->createdAt = DateTimeWrapper::Now();
+        $manageEvent->authorVkId = $vkId;
+        $manageEvent->editorVkId = AuthUtility::GetCurrentUser('Editor')->vkId;
+        $manageEvent->action = 'add';
+        $manageEvent->targetFeedId = $targetFeedId;
+        AuthorManageFactory::Add($manageEvent);
+
+        // copy to editor
+        $Editor = EditorFactory::GetOne(array('vkId' => $vkId));
+        if (!$Editor) {
+            $Editor = new Editor();
+        }
+        $Editor->vkId = $vkId;
+        $Editor->lastName = $Author->lastName;
+        $Editor->firstName = $Author->firstName;
+        $Editor->avatar = $Author->avatar;
+        $Editor->statusId = $Author->statusId;
+        if ($Editor->editorId) {
             EditorFactory::Update($Editor);
         } else {
             EditorFactory::Add($Editor);
@@ -80,6 +118,7 @@ class AddAuthorControl extends BaseControl {
         AuthorManageFactory::Add($manageEvent);
 
         echo ObjectHelper::ToJSON($result);
+        }
     }
 }
 

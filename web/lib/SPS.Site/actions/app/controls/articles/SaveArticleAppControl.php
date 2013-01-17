@@ -1,6 +1,4 @@
 <?php
-Package::Load('SPS.Site/base');
-
 /**
  * SaveArticleControl Action
  * @package    SPS

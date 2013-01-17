@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetArticlesQueueListControl {
+    class GetArticlesQueueListControl extends BaseControl {
 
         /**
          * Entry Point
@@ -31,10 +31,12 @@
             $articleRecords = array();
             $articlesQueue  = array();
 
-            //check access
-            //if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId)) {
-            //    $targetFeedId = null;
-            //}
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if (is_null($role)){
+                return;
+            }
+            Response::setBoolean('canEditQueue', $role != UserFeed::ROLE_AUTHOR);
 
 
 

@@ -28,6 +28,7 @@
                         $isFirst++;
                     endforeach;
                     ?>
+                    <a data-type="authors-list" class="tab-authors-list" style="display: none;">+</a>
                 </div>
 
                 <select multiple="multiple" id="source-select" data-classes="hidden" style="display: none;">

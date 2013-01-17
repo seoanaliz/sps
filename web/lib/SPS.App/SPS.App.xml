@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <actions>
-    <group name="author">
-        <action name="GetAuthorList">
-            <path>authors/GetAuthorListAction</path>
-        </action>
-    </group>
+  <group name="author">
+    <action name="GetAuthorList">
+      <path>authors/GetAuthorListAction</path>
+    </action>
+  </group>
 </actions>

@@ -14,8 +14,77 @@ Package::Load( 'SPS.App' );
  */
 class AuthorFactory implements IFactory {
 
-    /** Default Connection Name */
-    const DefaultConnection = null;
+        /** Author instance mapping  */
+        public static $mapping = array (
+            'class'       => 'Author'
+            , 'table'     => 'authors'
+            , 'view'      => 'getAuthors'
+            , 'flags'     => array( 'CanPages' => 'CanPages', 'CanCache' => false, 'IsLocked' => 'IsLocked' )
+            , 'cacheDeps' => array()
+            , 'fields'    => array(
+                'authorId' => array(
+                    'name'          => 'authorId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'key'         => true
+                )
+                ,'vkId' => array(
+                    'name'          => 'vkId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'No'
+                )
+                ,'firstName' => array(
+                    'name'          => 'firstName'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 1000
+                )
+                ,'lastName' => array(
+                    'name'          => 'lastName'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 1000
+                )
+                ,'avatar' => array(
+                    'name'          => 'avatar'
+                    , 'type'        => TYPE_STRING
+                    , 'max'         => 1000
+                )
+                ,'targetFeedIds' => array(
+                    'name'          => 'targetFeedIds'
+                    , 'type'        => TYPE_ARRAY
+                    , 'complexType' => 'int[]'
+                )
+                ,'statusId' => array(
+                    'name'          => 'statusId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'CheckEmpty'
+                    , 'foreignKey'  => 'Status'
+                ))
+            , 'lists'     => array()
+            , 'search'    => array(
+                '_authorId' => array(
+                    'name'         => 'authorId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'page' => array(
+                    'name'         => 'page'
+                    , 'type'       => TYPE_INTEGER
+                    , 'default'    => 0
+                ),
+                'vkIdIn' => array(
+                    'name'         => 'vkId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'pageSize' => array(
+                    'name'         => 'pageSize'
+                    , 'type'       => TYPE_INTEGER
+                    , 'default'    => 25
+                )
+                ,'_targetFeedIds' => array(
+                    'name'        => 'targetFeedIds'
+                    , 'type'        => TYPE_INTEGER
+                    , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
+                    , 'complexType' => 'int[]'
 
     /** Author instance mapping  */
     public static $mapping = array (

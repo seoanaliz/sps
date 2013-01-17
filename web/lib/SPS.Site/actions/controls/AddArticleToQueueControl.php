@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * AddArticleToQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class AddArticleToQueueControl {
+    class AddArticleToQueueControl extends BaseControl {
 
         private function buildDates($object, $timestamp) {
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));
@@ -58,7 +56,11 @@
             }
 
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($targetFeedId) || !AccessUtility::HasAccessToSourceFeedId($article->sourceFeedId)) {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+            //check access
+            if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)
+                || !$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -88,6 +90,7 @@
             $object->author = AuthVkontakte::IsAuth();
             ArticleUtility::BuildDates($object, $timestamp);
             $object->isDeleted = false;
+            $object->collectLikes = true;
             $object->deleteAt = null;
 
             $object->statusId = 1;

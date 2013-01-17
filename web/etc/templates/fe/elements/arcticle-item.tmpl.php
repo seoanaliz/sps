@@ -4,6 +4,7 @@
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
     /** @var $showApproveBlock bool */
+    /** @var $canEditPosts boolean */
 
     if (!empty($article)) {
 
@@ -74,9 +75,11 @@
     </div>
     <div class="bottom d-hide">
         <div class="l">
-            <span class="timestamp">{$article->createdAt->defaultFormat()}</span> |
+            <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
+            <? if ($canEditPosts): ?>|
             <a class="edit">Редактировать</a> |
             <a class="clear-text">Очистить текст</a>
+            <? endif; ?>
         </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
@@ -98,7 +101,9 @@
             <span class="likes spr"></span><span class="likes-count"><?= ($article->rate > 100) ? 'TOP' : $article->rate ?></span>
         </div>
     </div>
+        <? if ($canEditPosts): ?>
     <div class="delete spr"></div>
+    <? endif; ?>
     <div class="clear"></div>
 
     <? if (!empty($article->authorId)) { ?>
