@@ -21,7 +21,7 @@ class ArticlesStatusSetAction
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $cmd->SetInt('@status', Article::STATUS_REVIEW);
 
-        $ds = $cmd->Execute();
+        $cmd->Execute();
 
         // авторские  запланированеы в Одобренные
         $sql = 'UPDATE "articles" SET "articleStatus" = @status
@@ -31,7 +31,7 @@ class ArticlesStatusSetAction
         $cmd = new SqlCommand($sql, ConnectionFactory::Get());
         $cmd->SetInt('@status', Article::STATUS_APPROVED);
 
-        $ds = $cmd->Execute();
+        $cmd->Execute();
 
         echo 'success';
     }
