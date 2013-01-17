@@ -275,6 +275,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
+                    loadQueue();
                 } else {
                     callback(false);
                 }
