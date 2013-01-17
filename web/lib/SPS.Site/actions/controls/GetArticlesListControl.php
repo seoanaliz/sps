@@ -129,7 +129,7 @@
                 $this->search['_sourceFeedId'] = array(SourceFeedUtility::FakeSourceAuthors => SourceFeedUtility::FakeSourceAuthors);
                 unset($this->search['_sourceFeedId'], $this->search['targetFeedId']);
 
-                //$this->search['targetFeedId'] = $targetFeedId;
+                $this->search['targetFeedId'] = $targetFeedId;
 
                 //фильтр источников выступает как фильтр авторов
                 if (!empty($sourceFeedIds)) {
