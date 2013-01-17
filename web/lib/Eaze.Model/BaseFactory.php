@@ -476,7 +476,7 @@
          *
          * @param array  $objects
          * @param array  $mapping
-         * @param array  $options
+         * @param array|null  $options
          * @param string $connectionName
          * @return result
          */

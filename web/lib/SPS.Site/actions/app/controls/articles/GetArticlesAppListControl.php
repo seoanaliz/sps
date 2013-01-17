@@ -7,6 +7,12 @@
  * @author     Shuler
  */
 final class GetArticlesAppListControl extends BaseGetArticlesListControl {
+
+    public function __construct(){
+        parent::__construct();
+        $this->vkId = Session::getInteger('authorId');
+    }
+
     const MODE_MY = 'my';
 
     const MODE_ALL = 'all';
