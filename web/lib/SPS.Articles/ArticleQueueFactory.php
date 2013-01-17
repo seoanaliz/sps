@@ -98,6 +98,10 @@
                 ,'deleteAt' => array(
                     'name'          => 'deleteAt'
                     , 'type'        => TYPE_DATETIME
+                )
+                ,'collectLikes' => array(
+                    'name'          => 'collectLikes'
+                , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array()
             , 'search'    => array(

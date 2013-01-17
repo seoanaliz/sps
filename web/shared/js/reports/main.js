@@ -90,27 +90,37 @@ var Page = Event.extend({
     },
     makeTime: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
             var $date = $(this);
-            var timestamp = $date.text();
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getTime(timestamp));
         });
     },
     makeDate: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
             var $date = $(this);
-            var timestamp = $date.text();
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getDate(timestamp));
         });
     },
     makeFullTime: function($elements) {
         var t = this;
+        var tmpDate = new Date();
         $elements.each(function() {
+
             var $date = $(this);
-            var timestamp = $date.text();
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
             if (!intval(timestamp)) return;
             $date.html(t.getTime(timestamp) + ', ' + t.getDate(timestamp));
         });
@@ -139,7 +149,7 @@ var Page = Event.extend({
 
             function deleteReport() {
                 confirmBox.hide();
-                Events.fire('delete_report', $row.data('id'), $row.data('our-public-id'), function() {
+                Events.fire('delete_report', $row.data('report-id'),12, function() {
                     $row.slideUp(200);
                 });
             }
@@ -162,6 +172,7 @@ var Monitor = Page.extend({
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
             $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
+            $('#filter_datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
         Events.fire('get_monitor_list', t.limit, t.offset, function(data) {
@@ -250,3 +261,4 @@ var Result = Page.extend({
         t.bindDeleteEvent();
     }
 });
+	
