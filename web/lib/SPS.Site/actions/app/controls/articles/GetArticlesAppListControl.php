@@ -14,6 +14,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
     /**
      * @var AuthorEvent[]
      */
+    class GetArticlesAppListControl extends AppBaseControl {
     private $authorEvents = array();
 
     /**

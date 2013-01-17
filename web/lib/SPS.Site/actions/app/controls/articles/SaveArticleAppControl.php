@@ -9,7 +9,7 @@
 /**
  * Добавление нового поста
  */
-class SaveArticleAppControl extends BaseControl {
+class SaveArticleAppControl extends AppBaseControl {
 
     /**
      * Возвращает идентификатор запрошеной ленты
