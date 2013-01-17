@@ -14,7 +14,7 @@
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
                         <span class="time-of-removal"></span>
-                        <span class="time-of-remove"><?= $delete_at ? $delete_at->defaultTimeFormat() : '' ?></span>
+                        <span class="time-of-remove"><?= $delete_at ? $delete_at : '' ?></span>
                     </div>
                 </div>
             <?
@@ -33,7 +33,7 @@
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
                         <span class="time-of-removal"></span>
-                        <span class="time-of-remove"><?= $delete_at ? $delete_at->defaultTimeFormat() : '' ?></span>
+                        <span class="time-of-remove"><?= $delete_at ? $delete_at : '' ?></span>
                         {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                     </div>
                     <? endif; ?>
