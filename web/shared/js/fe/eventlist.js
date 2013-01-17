@@ -462,11 +462,6 @@ var Eventlist = {
                           item.show();
                       }
                 });
-                if (data['canShowAuthorsList']){
-                    $typeSelector.children('.tab-authors-list').show();
-                } else {
-                    $typeSelector.children('.tab-authors-list').hide();
-                }
 
             $.cookie('sourceTypes' + targetFeedId, sourceType);
 

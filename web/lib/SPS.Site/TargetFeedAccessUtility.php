@@ -139,4 +139,15 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
     public function canAddUserGroup($targetFeedId){
         return $this->moreThenAuthor($targetFeedId);
     }
+
+    /**
+     * Может ли редактировать пост
+     * @param $targetFeedId
+     * @return bool
+     */
+    public function canEditPosts($targetFeedId){
+        return $this->moreThenAuthor($targetFeedId);
+    }
+
+
 }

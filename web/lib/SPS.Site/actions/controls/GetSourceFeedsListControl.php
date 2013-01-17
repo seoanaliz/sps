@@ -78,7 +78,6 @@
                 'type' => $type,
                 'sourceFeeds' => $result,
                 'accessibleSourceTypes' => $TargetFeedAccessUtility->getAccessibleSourceTypes($targetFeedId),
-                'canShowAuthorsList' => $TargetFeedAccessUtility->canShowAuthorList($targetFeedId),
                 'accessibleGridTypes' => array_keys($TargetFeedAccessUtility->getAccessibleGridTypes($targetFeedId)),
                 'canAddPlanCell' => $TargetFeedAccessUtility->canAddPlanCell($targetFeedId)
             ));

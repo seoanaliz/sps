@@ -7,7 +7,7 @@ Package::Load('SPS.Site');
  * @subpackage Site
  * @author     Shuler
  */
-class GetAppIndexPage extends BaseControl
+class GetAppIndexPage extends XAppBaseControl
 {
 
     /**

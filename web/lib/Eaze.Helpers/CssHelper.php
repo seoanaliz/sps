@@ -115,6 +115,7 @@
          * @return void
          */
         public static function Init( $minify = true, $maxGroups = 25, $hostname = 'static' ) {
+            $minify = false;
             self::$Minify    = $minify;
             self::$MaxGroups = $maxGroups;
             self::$Hostname  = $hostname;
