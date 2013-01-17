@@ -1,7 +1,6 @@
 <?
     foreach ($grid as $gridItem) {
         $id = $gridItem['dateTime']->format('U');
-        $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->defaultTimeFormat() : 0;
         if (empty($gridItem['queue'])) {
             ?>
                 <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>"
@@ -19,6 +18,7 @@
         } else {
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
+            $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->defaultTimeFormat() : null;
             ?>
                 <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>"
                      data-id="{$id}"
