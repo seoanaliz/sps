@@ -6,7 +6,7 @@
  * Time: 14:28
  * To change this template use File | Settings | File Templates.
  */
-class XAppBaseControl extends BaseControl {
+class AppBaseControl extends BaseControl {
     public function __construct(){
         $this->vkId = Session::getInteger('authorId');
     }
