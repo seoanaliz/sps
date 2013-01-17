@@ -14,7 +14,6 @@
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
                         <span class="time-of-removal"></span>
-                        <span class="time-of-remove"><?= $delete_at ? $delete_at : '' ?></span>
                     </div>
                 </div>
             <?
