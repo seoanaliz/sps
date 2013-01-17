@@ -1,6 +1,7 @@
 <?
     foreach ($grid as $gridItem) {
         $id = $gridItem['dateTime']->format('U');
+        $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->defaultTimeFormat() : 0;
         if (empty($gridItem['queue'])) {
             ?>
                 <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>"
@@ -13,12 +14,12 @@
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
                         <span class="time-of-removal"></span>
+                        <span class="time-of-remove"><?= $delete_at ? $delete_at->defaultTimeFormat() : '' ?></span>
                     </div>
                 </div>
             <?
         } else {
             $articleQueueId = $gridItem['queue']->articleQueueId;
-            $delete_at     = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->format('U') : 0;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             ?>
                 <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>"
@@ -32,11 +33,13 @@
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
                         <span class="time-of-removal"></span>
-
+                        <span class="time-of-remove"><?= $delete_at ? $delete_at->defaultTimeFormat() : '' ?></span>
                         {increal:tmpl://fe/elements/arcticles-queue-item-header.tmpl.php}
                     </div>
                     <? endif; ?>
-                    <div class="post movable <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>" data-id="{$articleQueueId}" data-queue-id="{$articleQueueId}" data-time-of-remove="{$delete_at}">
+                    <div class="post movable <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>"
+                         data-id="{$articleQueueId}"
+                         data-queue-id="{$articleQueueId}">
                         <div class="content">
                             {increal:tmpl://fe/elements/arcticles-queue-item-content.tmpl.php}
                         </div>
