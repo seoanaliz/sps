@@ -106,9 +106,7 @@
          * @return string Connection string for the connection.
          */
         public function GetConnectionString() {
-            $this->dbname = 'sps2';
             $connectionString = sprintf( 'host=%s port=%s dbname=%s user=%s password=%s', $this->host, $this->port, $this->dbname, $this->user, $this->password );
-
             return $connectionString;
         }
 
