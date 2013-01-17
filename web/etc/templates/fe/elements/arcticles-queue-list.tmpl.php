@@ -13,7 +13,6 @@
                     <div class="slot-header">
                         <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                         <span class="datepicker"></span>
-                        <span class="time-of-removal"></span>
                     </div>
                 </div>
             <?
