@@ -48,6 +48,7 @@
          * @param message $message
          */
         public static function HttpStatusCode( $code, $message = '') {
+            Package::$DisablePackageCompile = true;
             if (substr(php_sapi_name(), 0, 3) == 'cgi')  {
                 header('Status: ' . $code . $message, true );
             } else {
