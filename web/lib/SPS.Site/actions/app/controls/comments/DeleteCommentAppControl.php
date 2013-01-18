@@ -5,7 +5,7 @@
  * @subpackage Site
  * @author     Shuler
  */
-class DeleteCommentAppControl extends AppBaseControl
+class DeleteCommentAppControl extends BaseControl
 {
 
     /**

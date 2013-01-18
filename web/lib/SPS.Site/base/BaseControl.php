@@ -14,7 +14,12 @@ abstract class BaseControl {
      *
      */
     public function __construct(){
-        $this->vkId = AuthVkontakte::IsAuth();
+        // force app
+        if (Request::getParameter('isVkApp')) {
+            $this->vkId = Session::getInteger('authorId');
+        } else {
+            $this->vkId = AuthVkontakte::IsAuth();
+        }
     }
 
     /**
