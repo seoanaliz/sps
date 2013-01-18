@@ -44,7 +44,7 @@ class GetSourceFeedsListControl extends BaseControl
                 } else {
                     $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
                     if ($UserFeeds){
-                        $vkIds = [];
+                        $vkIds = array();
                         foreach ($UserFeeds as $UserFeed) {
                             $vkIds[] = $UserFeed->vkId;
                         }
