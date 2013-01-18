@@ -42,7 +42,7 @@ class GetSourceFeedsListControl extends BaseControl
                         array(BaseFactory::WithoutPages => true)
                     );
                 } else {
-                    $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
+                    $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId));
                     if ($UserFeeds){
                         $vkIds = array();
                         foreach ($UserFeeds as $UserFeed) {
