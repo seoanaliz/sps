@@ -5,8 +5,7 @@
  * @subpackage Site
  * @author     Shuler
  */
-class SaveCommentAppControl extends AppBaseControl
-{
+class SaveCommentAppControl extends BaseControl {
 
     /**
      * Entry Point
