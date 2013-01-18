@@ -7,18 +7,24 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAppIndexPage {
+    class GetAppIndexPage extends AppBaseControl {
 
         /**
          * Entry Point
          */
         public function Execute() {
-            $author = Session::getObject('Author');
+            $author = $this->getAuthor();
 
-            //паблики, к которым у пользователя есть доступ
-            $targetFeeds = TargetFeedFactory::Get(
-                array('_targetFeedId' => Session::getArray('targetFeedIds'))
-            );
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $targetFeeds = array();
+
+            $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
+            if ($targetFeedIds) {
+                //паблики, к которым у пользователя есть доступ
+                $targetFeeds = TargetFeedFactory::Get(
+                    array('_targetFeedId' => $targetFeedIds)
+                );
+            }
 
             $targetFeedIdsWithPosts = array();
             $sql = <<<eof
@@ -38,7 +44,7 @@ eof;
 
             // счетчик событий автора
             $authorCounter = AuthorEventUtility::GetAuthorCounter($author->authorId);
-            $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId);
+            $targetCounters = AuthorFeedViewUtility::GetCounters($author->authorId, $this->vkId);
 
             Response::setArray( 'targetFeeds', $targetFeeds );
             Response::setArray( 'targetInfo', SourceFeedUtility::GetInfo($targetFeeds, 'targetFeedId') );

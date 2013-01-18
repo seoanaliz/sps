@@ -65,5 +65,8 @@
 
         /** @var boolean */
         public $isDeleted;
+
+        /** @var boolean */
+        public $collectLikes;
     }
 ?>

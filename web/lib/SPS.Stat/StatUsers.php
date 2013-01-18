@@ -27,12 +27,14 @@
         {
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
-            if ( !trim( $ids ))
+            $ids = trim( $ids );
+            if ( !$ids )
                 return array();
+
             if( $user_id )
                 $acc_tok = StatUsers::get_access_token( $user_id );
             $users  =   array();
-            $params = array(
+            $params =   array(
                 'uids'   =>  $ids,
                 'fields' =>  'photo,online',
             );
@@ -41,7 +43,9 @@
 
             $result = VkHelper::api_request( 'users.get', $params, 0 );
             if ( isset( $result->error ))
-                die( ERR_NO_ACC_TOK );
+                ;
+//                die( ERR_NO_ACC_TOK );
+
             foreach( $result as $user )
             {
                 $users[ $user->uid ] = array(
@@ -51,7 +55,6 @@
                                     'online'    =>  $user->online,
                                 );
             }
-
             return $users;
         }
 
@@ -72,7 +75,6 @@
             $cmd->SetString ( '@name',        $users['name'] );
             $cmd->SetString ( '@ava',         $users['ava'] );
             $cmd->SetString ( '@comments',    $users['comments'] );
-            echo
             $res = $cmd->ExecuteNonQuery();
 
             if ( !$res )

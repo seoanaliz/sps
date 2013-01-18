@@ -21,7 +21,7 @@
         }
 
         public function Execute() {
-            parent::Execute();
+            $result = parent::Execute();
 
             $UserFeeds = array();
             if (is_numeric($this->objectId) && (int)$this->objectId > 0){
@@ -31,10 +31,11 @@
             Response::setParameter('UserFeeds', $UserFeeds );
             Response::setParameter('roles', array(
                 UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
-                UserFeed::ROLE_OWNER=> 'Владелец',
+                UserFeed::ROLE_OWNER => 'Владелец',
                 UserFeed::ROLE_EDITOR => 'Редактор',
                 UserFeed::ROLE_AUTHOR => 'Автор',
             ) );
+            return $result;
         }
 
         /**

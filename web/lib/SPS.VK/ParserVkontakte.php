@@ -267,8 +267,9 @@
             }
             //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
             return ( array(
-                'avg_likes' => $sum_likes / $q,
-                'avg_retweet' => $sum_reposts / $q
+                'avg_likes' =>  $q ? $sum_likes / $q : 0,
+                'avg_retweet' => $q ? $sum_reposts / $q : 0
+
             ));
         }
 
@@ -387,43 +388,43 @@
         }
 
         private function get_page($page = '')
-        {
+    {
 
-            if ($page == '')
-                $page = $this->page_adr;
-            if (self::TESTING) echo '<br>get page url = ' . $page;
-            $hnd = curl_init($page);
-            //            curl_setopt($hnd , CURLOPT_HEADER, 1);
-            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
-            $a = curl_exec($hnd);
-            if (curl_errno($hnd))
-                throw new Exception('curl error : ' . curl_error($hnd) . ' trying
+    if ($page == '')
+    $page = $this->page_adr;
+    if (self::TESTING) echo '<br>get page url = ' . $page;
+    $hnd = curl_init($page);
+        //            curl_setopt($hnd , CURLOPT_HEADER, 1);
+    curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+    $a = curl_exec($hnd);
+    if (curl_errno($hnd))
+    throw new Exception('curl error : ' . curl_error($hnd) . ' trying
                     to get ' . $page);
-            if (!$a)  throw new Exception("can't download page " . $page);
-            file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
-            //проверка на доступность
-            if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
-                substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-                throw new Exception('access denied to http://vk.com/public' . $page);
+    if (!$a)  throw new Exception("can't download page " . $page);
+    file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
+        //проверка на доступность
+    if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
+    substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
+    throw new Exception('access denied to http://vk.com/public' . $page);
 
-            if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
-                (substr_count($a, '404 Not Found') == 0) &&
-                (substr_count($a, 'общество не найден') == 0))  ;
-            else
-            {
-                throw new Exception('page not found : ' . $page);
-            }
-            if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
-                (substr_count($a, 'Страница заблокирована') == 0))  ;
-            else
-            {
-                throw new Exception('page is blocked: ' . $page);
-            }
-            return $a;
-        }
+    if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
+    (substr_count($a, '404 Not Found') == 0) &&
+    (substr_count($a, 'общество не найден') == 0))  ;
+    else
+    {
+    throw new Exception('page not found : ' . $page);
+    }
+if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
+    (substr_count($a, 'Страница заблокирована') == 0))  ;
+else
+{
+    throw new Exception('page is blocked: ' . $page);
+}
+return $a;
+}
 
-        private function remove_tags($text)
+private function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
             $text = str_replace( '&#189;',  "½",    $text );
@@ -442,29 +443,24 @@
 
         //$post_ids  = массив idпаблика_idпоста
         //ограничение - 90 постов
-        public static function get_post_likes( $post_ids )
-        {
-            $post_ids = implode( ',', $post_ids );
-            $params = array(
-                'posts'   =>   $post_ids
-            );
-
-            $res = VkHelper::api_request( 'wall.getById', $params, 0 );
-
-            if ( !empty( $res->error )) {
-
-                throw new Exception('wall.getById::'.$res->error->error_msg);
-            }
-
-            $result = array();
-            foreach( $res as $post ) {
-                $result[ $post->to_id . '_' . $post->id ] = array(
-                      'likes'   =>     $post->likes->count,
-                      'reposts' =>     $post->reposts->count,
-                );
-            }
-            return $result;
-        }
+public static function get_post_likes( $post_ids, $access_token )
+{
+    $post_ids = implode( ',', $post_ids );
+    $params = array(
+        'posts'   =>   $post_ids
+    );
+    if ( $access_token )
+        $params['access_token'] = $access_token;
+    $res = VkHelper::api_request( 'wall.getById', $params );
+    $result = array();
+    foreach( $res as $post ) {
+        $result[ $post->to_id . '_' . $post->id ] = array(
+              'likes'   =>     $post->likes->count,
+              'reposts' =>     $post->reposts->count,
+        );
+    }
+    return $result;
+}
 
         public function get_album_as_posts( $public_id, $album_id, $limit = false, $offset = false)
         {

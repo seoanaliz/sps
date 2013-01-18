@@ -35,11 +35,24 @@ var simpleAjax = function(method, data, callback) {
         data: data,
         success: function(result) {
             if (result && result.response) {
+                var error_text = '';
+                if (result.response == 'matches')
+                     error_text = 'На это время уже назначен подобный обмен';
+                else if(result.response =='wrong publics data')
+                    error_text = 'Не получилось распознать паблики. Попробуйте ввести' +
+                        ' название в виде "http://vk.com/public123456"';
+                if (error_text) {
+                    var confirmBox = new Box({
+                        title: 'Ошибка',
+                        html: error_text,
+                        buttons: [
+                            {label: 'Ок'}
+                        ]
+                    }).show();
 
-                if (result.response == 'matches') {
-                    alert('Такой монитор уже есть');
                     return;
                 }
+
                 if ($.isFunction(data)) callback = data;
                 callback(result.response);
             }
@@ -53,8 +66,8 @@ var Eventlist = {
             callback(data);
         });
     },
-    delete_report: function(ourPublicId, publicId, callback) {
-        simpleAjax('deleteReport', {reportId: publicId, groupId: ourPublicId}, function(data) {
+    delete_report: function(reportId, publicId, callback) {
+        simpleAjax('deleteReport', {reportId: reportId, groupId: 0}, function(data) {
             callback(data);
         });
     },
@@ -64,13 +77,15 @@ var Eventlist = {
         });
     },
     add_report: function(ourPublicId, publicId, timeStart, timeStop, callback) {
+        tmpDate = new Date();
         simpleAjax('addReport', {
             targetPublicId: ourPublicId,
             barterPublicId: publicId,
             startTime: timeStart,
-            stopTime: timeStop
-        }, function() {
-            callback(true);
+            stopTime: timeStop,
+            timeShift: tmpDate.getTimezoneOffset()
+        }, function(data) {
+            callback(data);
         })
     }
 };

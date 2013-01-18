@@ -1,13 +1,11 @@
 <?php
-    Package::Load( 'SPS.Site' );
-
     /**
      * DeleteArticleQueueControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
      */
-    class DeleteArticleQueueControl {
+    class DeleteArticleQueueControl extends BaseControl {
 
         /**
          * Entry Point
@@ -24,8 +22,9 @@
                 return;
             }
 
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             //check access
-            if (!AccessUtility::HasAccessToTargetFeedId($object->targetFeedId)) {
+            if (!$TargetFeedAccessUtility->canDeleteArticlesFromQueue($object->targetFeedId)) {
                 return;
             }
 

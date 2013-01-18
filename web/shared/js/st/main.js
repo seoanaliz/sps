@@ -394,7 +394,7 @@ var Filter = (function() {
                 monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 firstDay: 1,
                 showAnim: '',
-                dateFormat: 'd MM'
+                dateFormat: 'd MM yy'
             }).change(function(e) {
                 var $timeFrom = $interval.find('.timeFrom');
                 var $timeTo = $interval.find('.timeTo');

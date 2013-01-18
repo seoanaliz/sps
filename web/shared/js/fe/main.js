@@ -52,7 +52,7 @@ $(document).ready(function(){
         d[1] = d[0];
         d[0] = i;
         var date = d.join('/');
-        $("#calendar").datepicker('setDate', new Date(date).getTime()).trigger('change');
+        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
     })();
 
     // Кнопки вперед-назад в календаре
@@ -669,31 +669,31 @@ $(document).ready(function(){
 
     // Добавление записи в борд
     (function(){
-        var form = $(".newpost"),
-            input = $("textarea", form),
-            tip = $(".tip", form);
+        var $form = $(".newpost"),
+            $input = $("textarea", $form),
+            $tip = $(".tip", $form);
 
-        var $linkInfo = $('.link-info', form),
+        var $linkInfo = $('.link-info', $form),
             $linkDescription = $('.link-description', $linkInfo),
             $linkStatus = $('.link-status', $linkInfo),
             foundLink, foundDomain;
 
-        tip.click(function(){input.focus();});
-        form.click(function(e){ e.stopPropagation(); });
-        input
+        $tip.click(function(){$input.focus();});
+        $form.click(function(e){ e.stopPropagation(); });
+        $input
             .focus(function(){
-                form.removeClass("collapsed");
+                $form.removeClass("collapsed");
                 $(window).bind("click", stop);
             })
             .bind('paste', function() {
                 setTimeout(function() {
-                    parseUrl(input.val());
+                    parseUrl($input.val());
                 }, 10);
             })
             .autoResize()
             .keyup(function (e) {
                 if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                    form.find('.save').click();
+                    $form.find('.save').click();
                 }
             }).keyup()
         ;
@@ -935,7 +935,7 @@ $(document).ready(function(){
         };
 
         var clearForm = function(){
-            input.data("id", 0).val('');
+            $input.data("id", 0).val('');
             $('.qq-upload-list').html('');
             deleteLink();
         };
@@ -943,9 +943,9 @@ $(document).ready(function(){
         var stop = function(){
             $(window).unbind("click", stop);
 
-            if(!input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
-                input.data("id", 0);
-                form.addClass("collapsed");
+            if(!$input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
+                $input.data("id", 0);
+                $form.addClass("collapsed");
                 deleteLink();
             }
         };
@@ -958,43 +958,43 @@ $(document).ready(function(){
             foundDomain = false;
         };
 
-        form.delegate(".save", "click" ,function(e){
+        $form.delegate(".save", "click", function(e){
             var link = $linkStatus.find('a').attr('href');
-            var photos = new Array();
+            var photos = [];
             $('.newpost .qq-upload-success').each(function(){
-                var photo = new Object();
+                var photo = {};
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
                 photos.push(photo);
             });
-            if (!($.trim(input.val() || photos.length || link))) {
-                return input.focus();
+            if (!($.trim($input.val() || photos.length || link))) {
+                return $input.focus();
             } else {
-                form.addClass("spinner");
+                $form.addClass("spinner");
                 Events.fire("post", [
-                    input.val(),
+                    $input.val(),
                     photos,
                     link,
-                    input.data("id"),
+                    $input.data("id"),
                     function(state){
                         if(state) {
                             clearForm();
                             stop();
                         }
-                        form.removeClass("spinner");
-                        input.blur();
+                        $form.removeClass("spinner");
+                        $input.blur();
                     }
                 ]);
             }
         });
-        form.delegate(".cancel", "click" ,function(e){
+        $form.delegate(".cancel", "click" ,function(e){
             clearForm();
-            input.val('').blur();
-            form.addClass('collapsed');
+            $input.val('').blur();
+            $form.addClass('collapsed');
             e.preventDefault();
         });
-        form.delegate(".image-attach", "click" ,function(e){
-            input.focus();
+        $form.delegate(".image-attach", "click" ,function(e){
+            $input.focus();
             $('.newpost .qq-upload-button').trigger('focus');
         });
 

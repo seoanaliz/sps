@@ -67,7 +67,7 @@
             if( empty( $default_group )) {
                 $default_group = new Group;
                 $default_group->created_by  =   $user_id;
-                $default_group->name        =   self::DEFAULT_GROUPE_NAME;
+                $default_group->name        =   Group::DEFAULT_GROUPE_NAME;
                 $default_group->source      =   $groupe_sourse;
                 $default_group->status      =   1;
                 $default_group->type        =   2;

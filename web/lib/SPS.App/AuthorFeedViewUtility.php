@@ -7,11 +7,13 @@
      */
     class AuthorFeedViewUtility {
 
-        public static function GetCounters($authorId) {
+        public static function GetCounters($authorId, $vkId) {
             $result = array();
 
-            $targetFeedIds = Session::getArray('targetFeedIds');
-            if ($targetFeedIds == array(-1 => -1)) {
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($vkId);
+            $targetFeedIds = $TargetFeedAccessUtility->getAllTargetFeedIds();
+
+            if (!$targetFeedIds) {
                 return array();
             }
 

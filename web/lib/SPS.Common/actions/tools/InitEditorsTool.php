@@ -34,7 +34,6 @@
                 if (empty($object)) {
                     $object = new Editor();
                     $object->vkId = $vkId;
-                    $object->targetFeedIds = $targetFeedIds;
                     $object->statusId = 1;
                     try {
                         if (!empty($object->vkId)) {
@@ -48,9 +47,8 @@
                         Logger::Error($Ex);
                     }
 
-                    EditorFactory::Add($object);
+                    $saveResult = EditorFactory::Add($object);
                 } else {
-                    $object->targetFeedIds = $targetFeedIds;
                     try {
                         if (!empty($object->vkId)) {
                             $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $object->vkId, 'fields' => 'photo'));
@@ -62,8 +60,21 @@
                     } catch (Exception $Ex) {
                         Logger::Error($Ex);
                     }
-                    EditorFactory::UpdateByMask($object, array('targetFeedIds', 'firstName', 'lastName', 'avatar'), array('editorId' => $object->editorId));
+                    $saveResult = EditorFactory::UpdateByMask($object, array('targetFeedIds', 'firstName', 'lastName', 'avatar'), array('editorId' => $object->editorId));
                 }
+
+                if ($saveResult) {
+                    $userFeeds = array();
+                    foreach ($targetFeedIds as $targetFeedId) {
+                        $UserFeed = new UserFeed();
+                        $UserFeed->vkId = $object->vkId;
+                        $UserFeed->targetFeedId = $targetFeedId;
+                        $UserFeed->role = UserFeed::ROLE_EDITOR;
+                        $userFeeds[] = $UserFeed;
+                    }
+                    UserFeedFactory::AddRange($userFeeds);
+                }
+
                 sleep(1);
             }
         }
