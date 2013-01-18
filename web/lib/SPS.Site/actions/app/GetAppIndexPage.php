@@ -7,7 +7,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class GetAppIndexPage extends XAppBaseControl {
+    class GetAppIndexPage extends AppBaseControl {
 
         /**
          * Entry Point
