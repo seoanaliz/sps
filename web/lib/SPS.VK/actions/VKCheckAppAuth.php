@@ -27,6 +27,8 @@
             $auth_key   = Request::getString('auth_key');
             $auth_key_trust = md5($api_id . '_' . $viewer_id . '_' . $secret);
 
+            $viewer_id = 88927251;
+
             if (empty($silent)) {
                 if ($auth_key != $auth_key_trust) {
                     return 'empty';
