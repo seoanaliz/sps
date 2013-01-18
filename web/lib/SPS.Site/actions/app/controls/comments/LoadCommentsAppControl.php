@@ -5,7 +5,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class LoadCommentsAppControl extends BaseControl {
+    class LoadCommentsAppControl extends AppBaseControl {
 
         /**
          * Entry Point
