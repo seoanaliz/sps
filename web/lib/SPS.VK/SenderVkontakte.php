@@ -138,7 +138,7 @@
         {
             $text = strip_tags( $text );
     //            $text = htmlspecialchars( $text );
-            $text = str_replace( '@', ' @;', $text );
+            $text = str_replace( '@', ' @', $text );
             return $text;
         }
 
