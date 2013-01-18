@@ -5,7 +5,7 @@
      * @subpackage Site
      * @author     Shuler
      */
-    class RestoreCommentAppControl extends BaseControl {
+    class RestoreCommentAppControl extends AppBaseControl {
 
         /**
          * Entry Point
