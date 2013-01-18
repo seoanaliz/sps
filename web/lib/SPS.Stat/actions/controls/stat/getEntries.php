@@ -46,6 +46,7 @@ class getEntries {
         $search         =   mb_strlen( $search ) > 5 ? mb_substr( $search, 0, mb_strlen( $search ) - 2 ) : $search;
 
         $group  = StatGroups::get_group($groupId);
+        //1 тип статистики
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
@@ -57,16 +58,19 @@ class getEntries {
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
                 $diff_vis = 'diff_vis_week';
+                $visitors = 'visitors_week';
             } else if( $period == 30 ) {
                 if ( $sortBy == 'diff_abs' )
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
-                $diff_vis = 'diff_vis_week';
+                $diff_vis = 'diff_vis_month';
+                $visitors = 'visitors_month';
             } else {
                 $diff_rel = 'diff_rel';
                 $diff_abs = 'diff_abs';
                 $diff_vis = 'diff_vis';
+                $visitors = 'visitors';
             }
             $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
 
@@ -75,7 +79,7 @@ class getEntries {
 
              $sql = 'SELECT
                         publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
-                        publ.' . $diff_rel . ', publ.visitors,  publ.quantity, gprel.main_admin,
+                        publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.quantity, gprel.main_admin,
                         publ.in_search,publ.active
                     FROM
                             ' . TABLE_STAT_PUBLICS . ' as publ,
@@ -98,12 +102,12 @@ class getEntries {
                     $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $groupId);
                     $cmd->SetInteger('@user_id',  $userId);
-
+//                    echo $cmd->GetQuery() . '<br>';
             } else {
                 $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
                 $sql = 'SELECT
-                            vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ',visitors, quantity,in_search,active
+                            vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ', quantity,in_search,active
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
@@ -121,6 +125,8 @@ class getEntries {
                 $cmd = new SqlCommand( $sql, $this->conn );
 
                 $cmd->SetString('@sortBy', $sortBy);
+//                echo $cmd->GetQuery() . '<br>';
+
             }
             $cmd->SetInteger('@min_quantity', $quant_min);
             $cmd->SetInteger('@max_quantity', $quant_max);
@@ -146,12 +152,13 @@ class getEntries {
                                 'admins'    =>  $admins,
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
-                                'visitors'  =>  $row['visitors'],
+                                'visitors'  =>  $row[$visitors],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
                                 'active'    =>  $row['active']== 't' ? true : false
                 );
             }
         }
+        //2 тип, наши паблики. Сортировка силами php
         else {
             $allowed_sort_values = array(   'views',
                                             'overall_posts',
@@ -222,6 +229,7 @@ class getEntries {
         $publics = StatPublics::get_our_publics_list();
         $res = array();
         $ret = array();
+
         foreach( $publics as $public ) {
             $res['ava'] = $this->get_ava($public['id']);
             $res['id']  = $public['id'];
@@ -248,6 +256,11 @@ class getEntries {
             $res['auth_reposts_eff']= $non_authors_posts['reposts'] ?
                 (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) : 0;
 
+            //прирост подписчиков относительно предыдущего периода
+            $sub_now = StatPublics::get_avg_subs_growth( $public['sb_id'], $time_start, $time_stop );
+            $sub_pre = StatPublics::get_avg_subs_growth( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
+
+            //прирост посетителей относительно предыдущего периода
             $vis_now = StatPublics::get_average_visitors( $public['sb_id'], $time_start, $time_stop );
             $vis_prev_period = StatPublics::get_average_visitors( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
             if ( $vis_now && $vis_prev_period ) {
@@ -303,7 +316,7 @@ class getEntries {
         $cmd->SetInteger( '@publ_id',  $publ );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
-        while ( $ds->next() ) {
+        while ( $ds->next()) {
             $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
             if ( $vk_id == $sadmin ) {
                 if ( isset( $resul[0] ) )
