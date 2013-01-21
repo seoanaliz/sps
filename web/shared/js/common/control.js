@@ -3,10 +3,15 @@
  */
 var Control = {
     root: '',
-    fire: function(controlName, data) {
+    dataType: 'json',
+    controlMap: {},
+    fire: function(key, data) {
         var t = this;
         var params = $.extend({}, t.commonParams);
-        var control = t.controlMap[controlName];
+        var control = t.controlMap[key] || {};
+        var dataType = control.dataType || t.dataType;
+        var controlName = control.name || key;
+        var root = control.root || t.root;
         for (var paramKey in data) {
             if (!data.hasOwnProperty(paramKey)) {
                 continue;
@@ -22,8 +27,8 @@ var Control = {
             }
         }
         var jQueryObj = $.ajax({
-            url: t.root + control.name + '/',
-            dataType: 'json',
+            url: root + controlName + '/',
+            dataType: dataType,
             data: params
         });
         return {

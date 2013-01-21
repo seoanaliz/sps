@@ -103,8 +103,7 @@ var EndlessPageModel = PageModel.extend({
     }
 });
 
-var DialogsModel = EndlessPageModel.extend({
-});
+var DialogsModel = EndlessPageModel.extend({});
 
 var DialogModel = Model.extend({
     init: function() {
