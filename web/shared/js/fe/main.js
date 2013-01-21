@@ -3,11 +3,7 @@ var easydateParams = {
     date_parse: function(date) {
         if (!date) return;
         var d = date.split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
-        return Date.parse(date);
+        return new Date([d[1], d[0], d[2]].join('/'));
     },
     uneasy_format: function(date) {
         return date.toLocaleDateString();
@@ -19,21 +15,24 @@ $(document).ready(function(){
     $.mask.definitions['3']='[0123]';
     $.mask.definitions['5']='[012345]';
     $.datepick.setDefaults($.datepick.regional['ru']);
+    $.datepicker.setDefaults({
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        firstDay: 1,
+        showAnim: '',
+        dateFormat: 'd MM yy'
+    });
+
+    var $leftPanel = $('.left-panel');
+    var $multiSelect = $("#source-select");
+    var $calendar = $('#calendar');
 
     // Календарь
-    $("#calendar")
-        .datepicker (
-            {
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: 'd MM yy'
-            }
-        )
+    $calendar
+        .datepicker()
         .keydown(function(e){
             if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
         })
@@ -47,12 +46,8 @@ $(document).ready(function(){
 
     // Приведение вида календаря из 22.12.2012 в 22 декабря
     (function() {
-        var d = $("#calendar").val().split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
-        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
+        var d = $calendar.val().split('.');
+        $calendar.datepicker('setDate', new Date([d[1], d[0], d[2]].join('/'))).trigger('change');
     })();
 
     // Кнопки вперед-назад в календаре
@@ -70,7 +65,7 @@ $(document).ready(function(){
     })();
 
     // Left menu multiselect
-    $("#source-select").multiselect({
+    $multiSelect.multiselect({
         minWidth: 250,
         height: 250,
         checkAllText: 'Выделить все',
@@ -87,7 +82,7 @@ $(document).ready(function(){
             Events.fire('leftcolumn_dropdown_change', []);
         }
     });
-    $("#source-select").bind("multiselectclick", function(event, ui){
+    $multiSelect.bind("multiselectclick", function(event, ui) {
         Events.fire('leftcolumn_dropdown_change', []);
     });
 
@@ -342,14 +337,15 @@ $(document).ready(function(){
             Events.fire('leftcolumn_deletepost', [pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
-                    if ($('#' + deleteMessageId).length) {
+                    var $deleteMessage = $('#' + deleteMessageId);
+                    if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
-                        $('#' + deleteMessageId).show();
+                        $deleteMessage.show();
                     } else {
                         // иначе добавляем
                         elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
-                                'Пост удален. <a href="javascript:;" class="recover">Восстановить</a><br/>' +
+                                'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 '<span class="button ignore">Не показывать новости сообщества</span>' +
                             '</div>'
                         ));
@@ -362,7 +358,7 @@ $(document).ready(function(){
         .delegate('.post .ignore', 'click', function() {
             var elem = $(this).closest(".post"),
                 gid = elem.data("group");
-            var $menu = $("#source-select").multiselect('widget');
+            var $menu = $multiSelect.multiselect('widget');
             $menu.find('[value=' + gid + ']:checkbox').each(function() {
                 this.click();
             });
@@ -389,7 +385,7 @@ $(document).ready(function(){
             }]);
         })
         // Смена даты
-        .delegate('.time', 'click', function(e) {
+        .delegate('.time', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
             var $input = $time.data('time-edit');
@@ -431,7 +427,6 @@ $(document).ready(function(){
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    // console.log([gridLineId, gridLineItemId, time]);
                     Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
                     }]);
@@ -576,7 +571,7 @@ $(document).ready(function(){
     });
 
     // Очистка текста
-    $(".left-panel").delegate(".clear-text", "click", function(){
+    $leftPanel.delegate(".clear-text", "click", function(){
         var id = $(this).closest(".post").data("id");
         var post = $(this).closest(".post");
 
@@ -590,71 +585,6 @@ $(document).ready(function(){
             }]);
         }
     });
-
-    // Устарело?
-    (function(){
-        var addInput = function(elem, defaultvalue, id){
-            var input = $("<input/>");
-            elem.append(input);
-            input.click(function(e){e.stopPropagation();});
-            input.focus();
-            input.blur(function(){
-                $(this).remove();
-            });
-            input.keydown(function(e){
-                if(e.keyCode == 27) {
-                    $(this).remove();
-                }
-                if(e.keyCode == 13) {
-                    var eventname,
-                        column;
-                    args = [$(this).val()];
-                    column = (elem.closest(".right-panel").length) ? "right" : "left";
-                    if(id) {
-                        args.push(id);
-                        eventname = column + "column_source_edited";
-                    } else {
-                        eventname = column + "column_source_added"
-                    }
-                    args.push(function(state){
-                        if(!state) return;
-                        if(id) {
-                            elem.find("li[data-id=" + id + "]").text(state.value);
-                        } else {
-                            elem.find("ul").append('<li data-id="' + state.id + '">' + state.value + '</li>');
-                        }
-                        elem.dd_sel(state.id || id);
-                    });
-                    Events.fire(eventname, args);
-                    $(this).remove();
-                }
-            });
-            if(defaultvalue) input.val(defaultvalue);
-            return input;
-        };
-        var getDD = function(elem){
-            return $(elem).closest(".header").find(".drop-down");
-        };
-        $(".controls .del").click(function(){
-            var dd = getDD(this),
-                val = dd.data("selected");
-            if(!val) {return}
-            var column = (dd.closest(".right-panel").length) ? "right" : "left";
-            Events.fire(column + "column_source_deleted", [val, function(state){
-                if(!state) { return; }
-                dd.find("li[data-id=" + val + "]").remove();
-                dd.dd_sel(0);
-            }]);
-        });
-        $(".controls .gear").click(function(){
-            var dd = getDD(this);
-            if(!dd.data("selected")) {return}
-            addInput(dd,dd.find(".caption").text(),dd.data("selected"));
-        });
-        $(".controls .plus").click(function(){
-            addInput(getDD(this));
-        });
-    })();
 
     // Автоподгрузка записей
     (function(){
@@ -999,7 +929,7 @@ $(document).ready(function(){
         });
 
         // Быстрое редактирование поста в левой колонке
-        $(".left-panel").delegate(".post .content .shortcut", "click", function(){
+        $leftPanel.delegate(".post .content .shortcut", "click", function(){
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 postId = $post.data("id");
@@ -1014,7 +944,7 @@ $(document).ready(function(){
         });
 
         // Редактирование поста в левом меню
-        $(".left-panel").delegate(".post .edit", "click", function(){
+        $leftPanel.delegate(".post .edit", "click", function(){
 
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
@@ -1296,24 +1226,24 @@ $(document).ready(function(){
     })();
 
     // Комментирование записи
-    $('.left-panel').delegate('.post > .bottom .comment', 'click', function(e) {
+    $leftPanel.delegate('.post > .bottom .comment', 'click', function(e) {
         var $target = $(this);
         var $post = $target.closest('.post');
         var postId = $post.data('id');
     });
-    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'focus', function() {
+    $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
         $(this).autoResize();
         var $newComment = $(this).closest('.new-comment');
         $newComment.addClass('open');
     });
-    $('.left-panel').delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
+    $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
         if (e.ctrlKey && e.keyCode == KEY.ENTER) {
             var $newComment = $(this).closest('.new-comment');
             var $sendBtn = $newComment.find('.send');
             $sendBtn.click();
         }
     });
-    $('.left-panel').delegate('.post > .comments .comment > .delete', 'click', function(e) {
+    $leftPanel.delegate('.post > .comments .comment > .delete', 'click', function(e) {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
@@ -1322,7 +1252,7 @@ $(document).ready(function(){
             $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
+    $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
@@ -1330,7 +1260,7 @@ $(document).ready(function(){
             $comment.removeClass('deleted').html($comment.data('html'));
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .new-comment .send', 'click', function() {
+    $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.new-comment');
         var $textarea = $comment.find('textarea');
@@ -1349,7 +1279,7 @@ $(document).ready(function(){
             }]);
         }
     });
-    $('.left-panel').delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
+    $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
         var $target = $(this);
         var $post = $target.closest('.post');
         var $commentsList = $('.comments > .list', $post);
@@ -1361,7 +1291,7 @@ $(document).ready(function(){
             $commentsList.html(html).find('.date').easydate(easydateParams);
         }]);
     });
-    $('.left-panel').delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
+    $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
         var $target = $(this);
         var $post = $target.closest('.post');
         var $commentsList = $('.comments > .list', $post);
@@ -1388,7 +1318,7 @@ $(document).ready(function(){
     });
 
     // Показать полностью в левом меню
-    $(".left-panel").delegate(".show-cut", "click" ,function(e){
+    $leftPanel.delegate(".show-cut", "click" ,function(e){
         var $content = $(this).closest('.content'),
             $shortcut = $content.find('.shortcut'),
             shortcut = $shortcut.html(),
@@ -1611,11 +1541,13 @@ var Elements = {
         return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        if(typeof value == 'undefined') {
-            var timestamp = $("#calendar").datepicker("getDate");
-            return timestamp ? timestamp.getTime() / 1000 : null;
+        var $calendar = $('#calendar');
+        if (typeof value == 'undefined') {
+            var date = $calendar.datepicker('getDate');
+            var timestamp = Math.floor(date.getTime() / 1000) - (new Date().getTimezoneOffset() * 60);
+            return timestamp ? timestamp : null;
         } else {
-            $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
+            $calendar.datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
     initLinkLoader: function(obj, full){
