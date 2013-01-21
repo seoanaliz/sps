@@ -24,10 +24,14 @@ class PostDeletePlanControl extends BaseControl {
                 $result['success'] = false;
                 $result['error'] = 'Access Denied';
             } else {
-                list($hour, $minutes) = explode(':', $time);
-                $ts = $articleQueue->startDate->getTimestamp();
-                $articleQueue->deleteAt = new DateTimeWrapper(null);
-                $articleQueue->deleteAt->setTimestamp($ts)->modify('+'.$hour.' hours')->modify('+'.$minutes.' minutes');
+                if ( $time = '00:00' ) {
+                    $articleQueue->deleteAt = null;
+                } else {
+                    list($hour, $minutes) = explode(':', $time);
+                    $ts = $articleQueue->startDate->getTimestamp();
+                    $articleQueue->deleteAt = new DateTimeWrapper(null);
+                    $articleQueue->deleteAt->setTimestamp($ts)->modify('+'.$hour.' hours')->modify('+'.$minutes.' minutes');
+                }
                 ArticleQueueFactory::UpdateByMask($articleQueue, array('deleteAt'), array('articleQueueId' => $articleQueueId));
                 $result['success'] = true;
             }

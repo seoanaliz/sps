@@ -29,7 +29,7 @@ class WrTopics extends wrapper
     {
         $sql = "select vk_id
                 FROM " . TABLE_STAT_PUBLICS . "
-                WHERE quantity > 50000
+                WHERE quantity > 10000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
@@ -43,6 +43,7 @@ class WrTopics extends wrapper
         $res[] = '43503681';
         $res[] = '43503694';
         $this->ids = $res;
+
     }
 
     public function check_time()
@@ -64,25 +65,26 @@ class WrTopics extends wrapper
     {
         $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS .
             ' WHERE
-                        id=@publ_id
-                        AND (
-
-                                time=CURRENT_DATE
-                                or time=CURRENT_DATE - interval \'7 day\'
-                                or time=CURRENT_DATE - interval \'30 day\'
-                            )
-                   ORDER BY time DESC';
+                    id=@publ_id
+                    AND (
+                            time=CURRENT_DATE - interval \'2 day\'
+                            or time=CURRENT_DATE - interval \'8 day\'
+                            or time=CURRENT_DATE - interval \'31 day\'
+                        )
+               ORDER BY time DESC';
 
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',  $publ_id );
 
         $ds = $cmd->Execute();
         $quan_arr = array();
+
         while( $ds->Next() ) {
             $quan_arr[] = $ds->getValue('quantity', TYPE_INTEGER);
         }
+
         if ( isset ( $quan_arr[2] )) {
-            $diff_rel_mon = round(( $quantity / $quan_arr[2] - 1) * 100, 2 );
+            $diff_rel_mon = $quan_arr[2] ? round(( $quantity / $quan_arr[2] - 1) * 100, 2 ) : 0;
             $diff_abs_mon = $quantity - $quan_arr[2];
         } else {
             $diff_rel_mon = 0;
@@ -90,14 +92,15 @@ class WrTopics extends wrapper
         }
 
         if ( isset ( $quan_arr[1] ) ) {
-            $diff_rel_week = round( ( $quantity / $quan_arr[1] - 1) * 100, 2 );
+            $diff_rel_week = $quan_arr[1] ? round( ( $quantity / $quan_arr[1] - 1) * 100, 2 ) : 0;
             $diff_abs_week = $quantity - $quan_arr[1];
         } else {
             $diff_rel_week = 0;
             $diff_abs_week = 0;
         }
-        if ( isset ( $quan_arr[0] ) ) {
-            $diff_rel = round( ( $quantity / $quan_arr[0] - 1) * 100, 2 );
+
+        if ( isset ( $quan_arr[0] )) {
+            $diff_rel = $quan_arr[0] ? round( ( $quantity / $quan_arr[0] - 1) * 100, 2 ) : 0;
             $diff_abs = $quantity - $quan_arr[0];
         } else {
             $diff_rel = 0;
@@ -105,12 +108,11 @@ class WrTopics extends wrapper
         }
 
 
-
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
             SET
                 quantity        =   @new_quantity,
-                diff_abs        =   @diff_rel,
-                diff_rel        =   @diff_abs,
+                diff_abs        =   @diff_abs,
+                diff_rel        =   @diff_rel,
                 diff_abs_week   =   @diff_abs_week,
                 diff_rel_week   =   @diff_rel_week,
                 diff_abs_month  =   @diff_abs_month,
@@ -127,7 +129,6 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@new_quantity',       $quantity + 0.1 );
         $cmd->SetFloat( '@diff_rel',           $diff_rel );
         $cmd->SetFloat( '@diff_abs',           $diff_abs );
-        echo $cmd->GetQuery();
         $cmd->Execute();
     }
 
@@ -192,22 +193,41 @@ class WrTopics extends wrapper
 
         $sql = 'UPDATE stat_publics_50k as a
                 SET visitors=(
-                    SELECT b.visitors
-                    FROM stat_publics_50k_points as b
-                    WHERE a.vk_id=b.id
-                    ORDER BY time DESC
-                    LIMIT 1)';
+                        SELECT b.visitors
+                        FROM stat_publics_50k_points as b
+                        WHERE a.vk_id=b.id
+                        ORDER BY time DESC
+                        LIMIT 1
+                )';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
+        $sql = 'UPDATE stat_publics_50k as a
+                SET visitors_month=(
+                        SELECT sum(b.visitors)
+                        FROM stat_publics_50k_points as b
+                        WHERE a.vk_id=b.id AND b.time> now()-interval \'1 month\' AND b.time < now()
+                )';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->Execute();
+        $sql = 'UPDATE stat_publics_50k as a
+                SET visitors_week=(
+                        SELECT sum(b.visitors)
+                        FROM stat_publics_50k_points as b
+                        WHERE a.vk_id=b.id AND b.time> now()-interval \'1 week\' AND b.time < now()
+                )';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->Execute();
+
     }
 
     //поиск админов пабликов
-    public function find_admins(  )
+    public function find_admins( )
     {
         foreach ( $this->ids as $id ) {
-        sleep(0.3);
-        echo $id . '<br>';
-
+            if ( $id < 38852667 )
+                continue;
+            sleep(0.3);
+            echo $id . '<br>';
             $params = array(
                 'act'   =>  'a_get_contacts',
                 'al'    =>  1,
@@ -222,6 +242,7 @@ class WrTopics extends wrapper
                 continue;
             $this->delete_admins( $id );
             foreach( $k as $admin_html ) {
+
                 $admin = $this->get_admin('a href="/' . $admin_html);
 
                 if ( !empty( $admin )) {
@@ -235,16 +256,24 @@ class WrTopics extends wrapper
 
     private function get_admin( $contact_html )
     {
-        $desk = '';
+        $search_array = array( '<span class="info_email">', '<span class="info_phone">', '</span>', '</a>' );
+        $desc = '';
         $cont = '';
-        if (preg_match('/href="\/(.+?)"/', $contact_html, $matches))
+        $link = '';
+        if ( preg_match('/href="\/(.+?)"/', $contact_html, $matches))
             $link = $matches[1];
-        if (preg_match('/<div class="extra_info.+?>(.+?)<\/div>/', $contact_html, $matches))
+        if ( preg_match('/<div class="extra_info.+?>(.+?)<\/div>/', $contact_html, $matches)) {
             $cont = $matches[1];
-        if (preg_match('/<div class="desc.+?>(.+?)<\/div>/', $contact_html, $matches))
+//            $cont = str_replace( '', '', $cont );
+            $cont = strip_tags( $cont );
+        }
+        if ( preg_match( '/<div class="desc.+?>(.+?)<\/div>/', $contact_html, $matches )) {
             $desc = $matches[1];
-        if (preg_match('/<img src="(.+?)"/', $contact_html, $matches))
-            $ava = $this->$matches[1];
+//            $desc = str_replace( '', '', $desc );
+            $desc = strip_tags( $desc );
+        }
+        if ( preg_match('/<img src="(.+?)"/', $contact_html, $matches))
+            $ava  = $matches[1];
 
         if ( isset( $ava ) && substr_count( $ava, 'deactivated' ))
             return false;
@@ -256,11 +285,15 @@ class WrTopics extends wrapper
         if ( $link ) {
             $link = trim( $link, '/' );
             $k = StatUsers::get_vk_user_info( $link );
+
             $k = reset( $k );
+
+        } else {
+            return array();
         }
         $res = array(
             'role'  =>  TextHelper::ToUTF8( $desc . ' ' . $cont ),
-            'name'  =>   $k[ 'name' ],
+            'name'  =>  $k[ 'name' ],
             'vk_id' =>  $k['userId'],
             'ava'   =>  isset( $ava )? $ava : $k['ava']
         );
@@ -284,7 +317,6 @@ class WrTopics extends wrapper
                                     @ava,
                                     @public_id
                                   )";
-        //                $this->db_wrap('query', $query);
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger('@vk_id', $admin_data['vk_id']);
         $cmd->SetInteger('@public_id', $public_id );

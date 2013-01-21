@@ -1,37 +1,37 @@
 <?php
-    Package::Load( 'SPS.Site/base' );
+Package::Load( 'SPS.Site' );
+
+/**
+ * MarkCommentAppControl Action
+ * @package    SPS
+ * @subpackage Site
+ * @author     Shuler
+ */
+class MarkCommentAppControl extends AppBaseControl {
 
     /**
-     * MarkCommentAppControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+     * Entry Point
      */
-    class MarkCommentAppControl extends BaseControl {
+    public function Execute() {
+        $articleId = Request::getInteger( 'articleId' );
+        $commentId = Request::getInteger( 'commentId' );
 
-        /**
-         * Entry Point
-         */
-        public function Execute() {
-            $articleId = Request::getInteger( 'articleId' );
-            $commentId = Request::getInteger( 'commentId' );
+        if (empty($articleId) || empty($commentId)) {
+            return;
+        }
 
-            if (empty($articleId) || empty($commentId)) {
-                return;
-            }
+        $author = $this->getAuthor();
 
-            $author = $this->getAuthor();
+        $article = ArticleFactory::GetById(
+            $articleId
+            , array('authorId' => $author->authorId)
+            , array(BaseFactory::WithoutDisabled => false)
+        );
 
-            $article = ArticleFactory::GetById(
-                $articleId
-                , array('authorId' => $author->authorId)
-                , array(BaseFactory::WithoutDisabled => false)
-            );
-
-            if (!empty($article)) {
-                AuthorEventUtility::EventCommentRemove($article, $commentId);
-            }
+        if (!empty($article)) {
+            AuthorEventUtility::EventCommentRemove($article, $commentId);
         }
     }
+}
 
 ?>

@@ -9,20 +9,28 @@
 class getAuthors
 {
     private $conn;
-
+    private $date_from;
+    private $date_to;
     public function execute()
     {
 
         error_reporting(0);
-        $this->conn = ConnectionFactory::Get();
-        $user_id    =   AuthVkontakte::IsAuth();
-        $public_sb_id  =   Request::getInteger('groupId');
+        $this->conn         =   ConnectionFactory::Get();
+        $this->conn         =   ConnectionFactory::Get();
+        $user_id            =   AuthVkontakte::IsAuth();
+        $public_sb_id       =   Request::getInteger('groupId');
+        //если диапазон не задан, выбирает данные за прошлый месяц
+        $this->date_from    =   Request::getInteger('dateFrom') ? date( 'Y-m-d 00:00:01', Request::getInteger('dateFrom'))
+                : date( 'Y-m-01 00:00:01', strtotime('-1 month'));
+        $this->date_to      =   Request::getInteger('dateTo')   ? date( 'Y-m-d 00:00:01', Request::getInteger('dateFrom'))
+                : date( 'Y-m-01 00:00:01');
+
+
         $res = array();
         $authors = AuthorFactory::Get( array( '_targetFeedIds' => array( $public_sb_id ), 'pageSize'=>200));
 
         if ( !$authors )
             die( ObjectHelper::ToJSON( array( 'response' => array( 'authors' => array()))));
-
 
         $users_line = '';
         $state_data = array();
@@ -58,7 +66,6 @@ class getAuthors
             );
         }
         $sort = $this->compare( 'b' );
-//        print_r($res);
         usort( $res, $sort);
         if(!$res )
             $res = array();
@@ -74,8 +81,8 @@ class getAuthors
                     "articleQueues" b
                 USING ("articleId")
                 WHERE
-                    a."createdAt" < now()- interval \'1 day\'
-                    AND a."createdAt" > now()- interval \'1 month\'
+                    a."createdAt" < @time_to
+                    AND a."createdAt" > @time_from
                     and (   "authorId" = @author_id
                           OR "editor"  = @editor )
                     AND b."targetFeedId"= @target_feed_id
@@ -85,6 +92,8 @@ class getAuthors
         $cmd->SetInt( '@author_id', $author_id );
         $cmd->SetInt( '@target_feed_id', $target_feed_id );
         $cmd->SetString( '@editor', $author_vk_id );
+        $cmd->SetString( '@time_from', $this->date_from );
+        $cmd->SetString( '@time_to',   $this->date_to );
 //        echo $cmd->GetQuery() . '<br>';
         $ds = $cmd->Execute();
         $ds->Next();
@@ -105,16 +114,19 @@ class getAuthors
                     "articleQueues" b
                 USING ("articleId")
                 WHERE
-                    a."createdAt" < now()-interval \'1 day\'
-                    AND a."createdAt" > now()-interval \'1 month\'
+                    a."createdAt" < @time_to
+                    AND a."createdAt" > @time_from
                     AND b."targetFeedId" = @target_feed_id
                 GROUP BY
                     "authorId"
                 ';
         $cmd = new SqlCommand( $sql, $this->conn);
         $cmd->SetInt( '@target_feed_id', $target_feed_id );
-        $ds = $cmd->Execute();
+        $cmd->SetString( '@time_from', $this->date_from );
+        $cmd->SetString( '@time_to',   $this->date_to );
 //        echo $cmd->GetQuery() . '<br>';
+
+        $ds = $cmd->Execute();
         $res = array();
         while( $ds->Next()){
             $res[$ds->GetInteger( 'authorId' )]  =  $ds->GetInteger( 'count' );
@@ -125,6 +137,7 @@ class getAuthors
 
     public function get_all_authors_sb_posts( $target_feed_id, $prev_res )
     {
+
         //выбрать созданные в sb посты
         $sql = 'SELECT count(*), "editor" FROM
                     "articles" a
@@ -132,17 +145,20 @@ class getAuthors
                     "articleQueues" b
                 USING ("articleId")
                 WHERE
-                    a."createdAt" < now()-interval \'1 day\'
-                    AND a."createdAt" > now()-interval \'1 month\'
+                    a."createdAt" < @time_to
+                    AND a."createdAt" > @time_from
                     AND b."targetFeedId" = @target_feed_id
                 GROUP BY
                     "editor"
                 ';
         $cmd = new SqlCommand( $sql, $this->conn);
         $cmd->SetInt( '@target_feed_id', $target_feed_id );
+        $cmd->SetString( '@time_from', $this->date_from );
+        $cmd->SetString( '@time_to',   $this->date_to );
+//        echo $cmd->GetQuery() . '<br>';
+
         $ds = $cmd->Execute();
         $res = array();
-//        echo $cmd->GetQuery();
 
         while( $ds->Next()){
             $vkId = $ds->GetInteger( 'editor' );
@@ -168,15 +184,18 @@ class getAuthors
                     "articleQueues" b
                 USING ("articleId")
                 WHERE
-                    a."createdAt" < now()-interval \'1 day\'
-                    AND a."createdAt" > now()-interval \'1 month\'
+                    a."createdAt" < @time_to
+                    AND a."createdAt" > @time_from
                     AND b."targetFeedId"= @target_feed_id
                     and b."sentAt" is not null
                 ';
         $cmd = new SqlCommand( $sql, $this->conn);
         $cmd->SetInt( '@target_feed_id', $target_feed_id );
+        $cmd->SetString( '@time_from', $this->date_from );
+        $cmd->SetString( '@time_to',   $this->date_to );
         $ds = $cmd->Execute();
-//        echo $cmd->GetQuery();
+//        echo $cmd->GetQuery() . '<br>';
+
         $ds->Next();
         return array(
             'avg_likes'     =>  $ds->GetInteger('likes'),
