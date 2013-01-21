@@ -1,26 +1,36 @@
-/*
-{"response":[
-    {
-        "published_at":null,
-        "ad_public":{
-            "id":123,
-            "ava":"https://vk.com/images/community_50.gif",
-            "name":"ЭРОТИКА НА ГРАНИ ПОРНО. СЕКС ЗНАКОМСТВА.",
-            "link":"http://vk.com/public123"
-        },
-        "posted_at":null,
-        "deleted_at":null,
-        "overlaps":null,
-        "subscribers":0,
-        "visitors":0
-    }
-]}
-*/
 var REPORTS = {
     MAIN:
     '<div id="header" class="header"></div>' +
-    '<div id="list-header" class="list-head clear-fix"></div>' +
-    '<div id="results"></div>',
+    '<table><tbody>' +
+        '<tr>' +
+            '<td class="left-column">' +
+                '<div class="content">' +
+                    '<div id="list-header" class="list-head clear-fix"></div>' +
+                    '<div id="results"></div>' +
+                '</div>' +
+            '</td>' +
+            '<td class="right-column">' +
+                '<div class="filter">' +
+                    '<div class="list">' +
+                        '<div class="item selected">Все списки</div>' +
+                    '</div>' +
+                    '<div class="title">Мои списки</div>' +
+                    '<div class="list">' +
+                        '<div class="item">Топфейс</div>' +
+                        '<div class="item">Другие</div>' +
+                        '<div class="item">Музыка</div>' +
+                        '<div class="item">Избранное</div>' +
+                    '</div>' +
+                    '<div class="title">Общие списки</div>' +
+                    '<div class="list">' +
+                        '<div class="item">Другие</div>' +
+                        '<div class="item">Музыка</div>' +
+                        '<div class="item">Избранное</div>' +
+                    '</div>' +
+                '</div>' +
+            '</td>' +
+        '</tr>' +
+    '</tbody></table>',
 
     HEADER:
     '<div class="tab-bar">' +
@@ -90,8 +100,8 @@ var REPORTS = {
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
         '<div class="item time post-time">Время поста<span class="icon arrow"></div>' +
-        '<div class="item time delete-time">Удалён через<span class="icon arrow"></div>' +
-        '<div class="item time overlap-time">Перекрыт через<span class="icon arrow"></div>' +
+        '<div class="item time delete-time">Удалён<span class="icon arrow"></div>' +
+        '<div class="item time overlap-time">Перекрыт<span class="icon arrow"></div>' +
         '<div class="item visitors">Посетителей<span class="icon arrow"></div>' +
         '<div class="item subscribers">Подписчиков<span class="icon arrow"></div>',
 
@@ -129,7 +139,6 @@ var REPORTS = {
             '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
-            '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
         '</div>'
     }
 };
