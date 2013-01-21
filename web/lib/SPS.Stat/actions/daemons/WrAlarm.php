@@ -6,6 +6,7 @@
  * Time: 18:27
  * To change this template use File | Settings | File Templates.
  */
+new StatTables();
 class WrAlarm
 {
     private $ids = '';

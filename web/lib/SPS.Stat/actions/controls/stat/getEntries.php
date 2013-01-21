@@ -1,6 +1,6 @@
 <?php
-//Package::Load( 'SPS.Stat' );
-//Package::Load( 'SPS.Site' );
+Package::Load( 'SPS.Stat' );
+Package::Load( 'SPS.Site' );
 /**
  * addPrice Action
  * @package    SPS
@@ -45,7 +45,7 @@ class getEntries {
         $limit          =   $limit  ?  $limit : 25;
         $search         =   mb_strlen( $search ) > 5 ? mb_substr( $search, 0, mb_strlen( $search ) - 2 ) : $search;
 
-        $group  = StatGroups::get_group($groupId);
+        $group  = StatGroups::get_group( $groupId );
         //1 тип статистики
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
@@ -90,10 +90,10 @@ class getEntries {
                          ' AND gprel.group_id=@group_id
                           AND publ.quantity >= @min_quantity
                           AND publ.quantity <= @max_quantity
-                          AND publ.quantity >= 50000
+                          AND publ.quantity >= 10000
                           ' . $search . '
                     ORDER BY '
-                        . $sortBy . #$sortReverse .
+                        . $sortBy .
                   ' OFFSET '
                         . $offset .
                   ' LIMIT '
@@ -114,10 +114,10 @@ class getEntries {
                             quantity > @min_quantity '
                             . $page .
                           ' AND quantity < @max_quantity
-                            AND quantity > 50000'.
+                            AND quantity > 10000'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
-                            . $sortBy . #$sortReverse .
+                            . $sortBy .
                       ' OFFSET '
                             . $offset .
                       ' LIMIT '
@@ -136,7 +136,6 @@ class getEntries {
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
                 $admins = array();
-//                if ( isset( $row[ 'main_admins' ]))
                 $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
