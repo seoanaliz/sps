@@ -6,7 +6,10 @@
  * Time: 19:45
  * To change this template use File | Settings | File Templates.
  */
-class StatBarter
+    new stat_tables();
+
+
+    class StatBarter
 {
     /** начинаем и заканчиваем поиск поста с этим добавочным интервалом */
     const TIME_INTERVAL = 3600;
@@ -24,7 +27,6 @@ class StatBarter
         $a = new BarterEvent();
         $request_line = rtrim( $request_line, ',' );
         $publics_data = StatPublics::get_publics_info( $request_line );
-
         $barter_events_res = array();
         foreach( $query_result as $barter_event ) {
             $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array(0);
@@ -32,7 +34,6 @@ class StatBarter
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
             $deleted_at = isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : $posted_at + 3600;
             $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
-
             $groups = $barter_event->groups_ids;
             $key = array_search( $default_group_id, $groups );
             if(( $key !== false ))

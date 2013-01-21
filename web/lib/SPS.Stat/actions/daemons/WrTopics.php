@@ -4,6 +4,7 @@ Package::Load( 'SPS.Stat' );
 
 set_time_limit(13600);
 //error_reporting( 0 );
+new StatTables();
 class WrTopics extends wrapper
 {
     private $ids;
