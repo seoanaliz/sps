@@ -172,7 +172,7 @@ var Monitor = Page.extend({
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
             $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
-            $('#filter_datepicker').datepicker().datepicker('setDate', new Date().getTime());
+//            $('#filter_datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
         Events.fire('get_monitor_list', t.limit, t.offset, function(data) {
