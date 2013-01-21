@@ -26,7 +26,6 @@ var REPORTS = {
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
-        '<input id="filter_datepicker" data-required="true" type="text" placeholder="Дата" style="width: 70px" />' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
@@ -104,7 +103,7 @@ var REPORTS = {
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>" data-report-id="<?=report_id?>">' +
+        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -127,7 +126,7 @@ var REPORTS = {
             '<? } ?>' +
             '<div class="column time" title="Время поста"><?=isset("posted_at") ? posted_at : "-" ?></div>' +
             '<div class="column diff-time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
-            '<div class="column diff-time" title="Перекрыт через"><?=isset("overlaps")  ? overlaps : "-" ?></div>' +
+            '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
             '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +

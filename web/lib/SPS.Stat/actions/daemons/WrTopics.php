@@ -17,9 +17,9 @@ class WrTopics extends wrapper
 
         $this->get_id_arr();
         echo "start_time = " . date( 'H:i' ) . '<br>';
-        $this->update_quantity();
-
         StatPublics::update_public_info( $this->ids, $this->conn );
+
+        $this->update_quantity();
         $this->update_visitors();
 //        $this->find_admins();
         echo "end_time = " . date( 'H:i') . '<br>';
@@ -42,6 +42,12 @@ class WrTopics extends wrapper
         $res[] = '43503753';
         $res[] = '43503681';
         $res[] = '43503694';
+        $res[] = '43503575';
+        $res[] = '43503460';
+        $res[] = '43503503';
+        $res[] = '43503550';
+
+
         $this->ids = $res;
 
     }
