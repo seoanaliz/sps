@@ -1,6 +1,4 @@
 <?php
-    Package::Load( 'Eaze.Core' );
-
     /**
      * Response
      *
@@ -45,7 +43,7 @@
          * Send Http Status Code
          *
          * @param string $code
-         * @param message $message
+         * @param string $message
          */
         public static function HttpStatusCode( $code, $message = '') {
             Package::$DisablePackageCompile = true;
