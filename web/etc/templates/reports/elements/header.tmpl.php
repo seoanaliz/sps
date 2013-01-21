@@ -48,6 +48,7 @@ $jsFiles = array(
     'js://common/event.js',
     'js://common/model.js',
     'js://common/widget.js',
+    'js://common/control.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.datepicker.js',
     'js://fe/jquery.maskedinput-1.3.js',

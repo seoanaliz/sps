@@ -68,8 +68,6 @@ var Page = Event.extend({
     offset: 0,
     limit: Configs.limit,
 
-    update: function() {},
-    bindEvents: function() {},
     getTime: function(timestamp) {
         var date = timestamp ? new Date(timestamp * 1000) : new Date();
         var h = date.getHours() + '';
@@ -149,11 +147,17 @@ var Page = Event.extend({
 
             function deleteReport() {
                 confirmBox.hide();
-                Events.fire('delete_report', $row.data('report-id'),12, function() {
+                Control.fire('delete_report', {
+                    reportId: $row.data('report-id'),
+                    groupId: 12
+                }, function() {
                     $row.slideUp(200);
                 });
             }
         });
+    },
+    bindRightColumnEvent: function() {
+        var t = this;
     },
     showMore: function() {}
 });
@@ -175,7 +179,7 @@ var Monitor = Page.extend({
 //            $('#filter_datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
-        Events.fire('get_monitor_list', t.limit, t.offset, function(data) {
+        Control.fire('get_monitor_list', {limit: t.limit, offset: t.offset}, function(data) {
             $listAddMonitor.slideDown(200);
             $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
             $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
@@ -190,6 +194,7 @@ var Monitor = Page.extend({
         var $addReport = $('#addReport');
 
         t.bindDeleteEvent();
+        t.bindRightColumnEvent();
 
         if (!$addReport.data('inited')) {
             $addReport.data('inited', true);
@@ -226,7 +231,12 @@ var Monitor = Page.extend({
                     timestampEnd = Math.round(dateEnd.getTime() / 1000);
                 }
 
-                Events.fire('add_report', ourPublicId, publicId, timestampStart, timestampEnd, function() {
+                Control.fire('add_report', {
+                    ourPublicId: ourPublicId,
+                    publicId: publicId,
+                    timestampStart: timestampStart,
+                    timestampEnd: timestampEnd
+                }, function() {
                     t.update();
                 });
             });
@@ -245,7 +255,10 @@ var Result = Page.extend({
             t.inited = true;
         }
 
-        Events.fire('get_result_list', t.limit, t.offset, function(data) {
+        Control.fire('get_result_list', {
+            limit: t.limit,
+            offset: t.offset
+        }, function(data) {
             $listAddMonitor.slideUp(200);
             $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
             $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
@@ -259,6 +272,6 @@ var Result = Page.extend({
     bindEvents: function() {
         var t = this;
         t.bindDeleteEvent();
+        t.bindRightColumnEvent();
     }
 });
-	

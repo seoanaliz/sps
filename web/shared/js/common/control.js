@@ -5,12 +5,13 @@ var Control = {
     root: '',
     dataType: 'json',
     controlMap: {},
-    fire: function(key, data) {
+    fire: function(key, data, callback) {
         var t = this;
-        var params = $.extend({}, t.commonParams);
+        var params = $.extend({}, t.commonParams, t.defaultParams);
         var control = t.controlMap[key] || {};
         var dataType = control.dataType || t.dataType;
         var controlName = control.name || key;
+        var controlDefaultParams = control.defaultParams || {};
         var root = control.root || t.root;
         for (var paramKey in data) {
             if (!data.hasOwnProperty(paramKey)) {
@@ -29,7 +30,21 @@ var Control = {
         var jQueryObj = $.ajax({
             url: root + controlName + '/',
             dataType: dataType,
-            data: params
+            data: $.extend(controlDefaultParams, params),
+            success: function(data) {
+                if (typeof callback != 'function') {
+                    return;
+                }
+                if (typeof t.commonResponse == 'function') {
+                    data = t.commonResponse(data);
+                }
+                if (typeof control.response == 'function') {
+                    data = control.response(data);
+                }
+                if (typeof callback == 'function') {
+                    callback(data);
+                }
+            }
         });
         return {
             success: function(callback) {
@@ -43,7 +58,9 @@ var Control = {
                     if (typeof control.response == 'function') {
                         data = control.response(data);
                     }
-                    callback(data);
+                    if (typeof callback == 'function') {
+                        callback(data);
+                    }
                 });
                 return this.success;
             },
