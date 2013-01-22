@@ -107,6 +107,7 @@ GroupListWidget = Widget.extend({
             groupListModel.sharedLists(sharedGroupCollection);
             groupListModel.userLists(userGroupCollection);
         });
+        t.render();
 
         if (!t._groupId) {
             t.el().find('.item[data-id]:first').addClass('selected');
