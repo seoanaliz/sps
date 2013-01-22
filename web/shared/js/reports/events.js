@@ -1,6 +1,10 @@
 Control = $.extend(Control, {
     root: Configs.controlsRoot,
 
+    defaultParams: {
+        type: 'barter'
+    },
+
     commonResponse: function(data) {
         return data.response;
     },
@@ -40,10 +44,7 @@ Control = $.extend(Control, {
             }
         },
         get_group_list: {
-            name: 'getGroupList',
-            defaultParams: {
-                type: 'barter'
-            }
+            name: 'getGroupList'
         }
     }
 });

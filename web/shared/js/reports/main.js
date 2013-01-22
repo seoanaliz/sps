@@ -109,7 +109,7 @@ GroupListWidget = Widget.extend({
             t.render();
         });
 
-        if (!t._groupId || !t.el().find('.item[data-id=' + t.groupId + ']').length) {
+        if (!t._groupId || !t.el().find('.item[data-id=' + t._groupId + ']').length) {
             t.el().find('.item[data-id]:first').addClass('selected');
         }
         t._groupId = t.el().find('.item.selected').data('id');
@@ -128,6 +128,7 @@ GroupListWidget = Widget.extend({
             t.trigger('change', groupId);
         } else {
             $input.toggle();
+            $input.focus();
         }
     },
 
