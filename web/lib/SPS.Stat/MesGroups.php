@@ -1,7 +1,8 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
+    new stat_tables();
+
 
     class MesGroups
     {
@@ -488,7 +489,6 @@
             $res = array();
             while ( $ds->Next() ) {
                 $res[$ds->GetInteger( 'id')] =  $ds->GetInteger( 'rec_id' );
-
             }
             return $res;
         }
@@ -504,6 +504,7 @@
                         user_id=@user_id AND a.id=b.dialog_id AND state=4
                     GROUP BY group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
             $res = array();
@@ -528,6 +529,7 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
+            echo $cmd->GetQuery();
             $ds->Next();
 
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
