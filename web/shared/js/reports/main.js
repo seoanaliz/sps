@@ -125,11 +125,13 @@ GroupListWidget = Widget.extend({
 
         var groupId = $target.data('id');
         if (groupId) {
+            $input.hide();
             t.el().find('.item').removeClass('selected');
             $target.addClass('selected');
             t.trigger('change', groupId);
+            t._groupId = groupId;
         } else {
-            $input.toggle();
+            $input.show();
             $input.focus();
         }
     },
