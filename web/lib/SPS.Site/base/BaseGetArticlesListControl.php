@@ -170,6 +170,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $useSourceFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
             $useSourceFilter = true;
+        } elseif ($sourceFeedType == SourceFeedUtility::Ads) {
+            $useSourceFilter = true;
         }
 
         // фильтр по рейтингу

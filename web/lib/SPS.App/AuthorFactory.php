@@ -5,7 +5,7 @@
  * @package SPS
  * @subpackage App
  */
-class AuthorFactory implements IFactory
+class AuthorFactory extends BaseModelFactory
 {
 
     /** Author instance mapping  */
