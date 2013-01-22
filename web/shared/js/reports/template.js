@@ -21,16 +21,19 @@ var REPORTS = {
     GROUP_LIST:
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
+        '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item">Создать список</div>' +
     '</div>' +
     '<div class="title">Мои списки</div>' +
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
+        '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item">Создать список</div>' +
     '</div>' +
     '<div class="title">Общие списки</div>' +
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
+        '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item">Создать список</div>' +
     '</div>',
 

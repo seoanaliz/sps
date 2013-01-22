@@ -79,13 +79,15 @@ GroupListWidget = Widget.extend({
     clickItem: function(e) {
         var t = this;
         var $target = $(e.target);
+        var $list = $target.closest('.list');
+
         var groupId = $target.data('id');
         if (groupId) {
             t.el().find('.item').removeClass('selected');
             $target.addClass('selected');
             t.trigger('change', groupId);
         } else {
-
+            $list.find('input').toggle();
         }
     }
 });
