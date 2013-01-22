@@ -19,23 +19,23 @@ var REPORTS = {
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
 
     GROUP_LIST:
-    '<div class="list">' +
-        '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
-        '<input type="text" placeholder="Введите название списка..." /> ' +
-        '<div class="item">Создать список</div>' +
-    '</div>' +
-    '<div class="title">Мои списки</div>' +
+    '<? if (!userLists.length || userLists.length > 1) { ?>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
+        '</div>' +
+        '<div class="title">Мои списки</div>' +
+    '<? } ?>' +
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
         '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item">Создать список</div>' +
     '</div>' +
-    '<div class="title">Общие списки</div>' +
-    '<div class="list">' +
-        '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
-        '<input type="text" placeholder="Введите название списка..." /> ' +
-        '<div class="item">Создать список</div>' +
-    '</div>',
+    '<? if (sharedLists.length) { ?>' +
+        '<div class="title">Общие списки</div>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
+        '</div>' +
+    '<? } ?>',
 
     HEADER:
     '<div class="tab-bar">' +
