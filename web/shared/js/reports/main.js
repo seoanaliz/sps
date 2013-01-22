@@ -67,19 +67,58 @@ GroupListWidget = Widget.extend({
     _template: REPORTS.GROUP_LIST,
     _modelClass: GroupListModel,
     _events: {
-        'click: .item': 'clickItem'
+        'click: .item': 'clickItem',
+        'keydown: input': 'keydownInput'
     },
 
+    _groupId: null,
+
     run: function() {
-        this._super.apply(this, arguments);
         var t = this;
-        t.el().find('.item:first').addClass('selected');
+        Control.fire('get_group_list', {}, function(data) {
+            $.each(data.default_list, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                defaultGroupCollection.add(groupModel.id(), groupModel);
+            });
+            $.each(data.shared_lists, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                sharedGroupCollection.add(groupModel.id(), groupModel);
+            });
+            $.each(data.user_lists, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                userGroupCollection.add(groupModel.id(), groupModel);
+            });
+            groupListModel.defaultLists(defaultGroupCollection);
+            groupListModel.sharedLists(sharedGroupCollection);
+            groupListModel.userLists(userGroupCollection);
+        });
+
+        if (!t._groupId) {
+            t.el().find('.item[data-id]:first').addClass('selected');
+        }
+        t._groupId = t.el().find('.item.selected').data('id');
     },
 
     clickItem: function(e) {
         var t = this;
         var $target = $(e.target);
         var $list = $target.closest('.list');
+        var $input = $list.find('input');
 
         var groupId = $target.data('id');
         if (groupId) {
@@ -87,7 +126,17 @@ GroupListWidget = Widget.extend({
             $target.addClass('selected');
             t.trigger('change', groupId);
         } else {
-            $list.find('input').toggle();
+            $input.toggle();
+        }
+    },
+
+    keydownInput: function(e) {
+        var t = this;
+        var $input = e.currentTarget;
+        if (e.keyCode == KEY.ENTER) {
+            Control.fire('add_group', {name: $input.val()}, function() {
+                t.run();
+            });
         }
     }
 });
@@ -140,51 +189,19 @@ Pages = Class.extend({
 
     showRightColumn: function() {
         var t = this;
-        Control.fire('get_group_list', {}, function(data) {
-            $.each(data.default_list, function(i, group) {
-                var groupModel = new GroupModel({
-                    id: group.group_id,
-                    name: group.name,
-                    place: group.place,
-                    type: group.type
-                });
-                defaultGroupCollection.add(groupModel.id(), groupModel);
-            });
-            $.each(data.shared_lists, function(i, group) {
-                var groupModel = new GroupModel({
-                    id: group.group_id,
-                    name: group.name,
-                    place: group.place,
-                    type: group.type
-                });
-                sharedGroupCollection.add(groupModel.id(), groupModel);
-            });
-            $.each(data.user_lists, function(i, group) {
-                var groupModel = new GroupModel({
-                    id: group.group_id,
-                    name: group.name,
-                    place: group.place,
-                    type: group.type
-                });
-                userGroupCollection.add(groupModel.id(), groupModel);
-            });
-            groupListModel.defaultLists(defaultGroupCollection);
-            groupListModel.sharedLists(sharedGroupCollection);
-            groupListModel.userLists(userGroupCollection);
 
-            if (!t.groupListWidget) {
-                t.groupListWidget = new GroupListWidget({
-                    model: groupListModel,
-                    selector: '#group-list'
-                });
-                t.groupListWidget.on('change', function(groupId) {
-                    t.currentPage.groupId = groupId;
-                    t.currentPage.update();
-                });
-            } else {
-                t.groupListWidget.render();
-            }
-        });
+        if (!t.groupListWidget) {
+            t.groupListWidget = new GroupListWidget({
+                model: groupListModel,
+                selector: '#group-list'
+            });
+            t.groupListWidget.on('change', function(groupId) {
+                t.currentPage.groupId = groupId;
+                t.currentPage.update();
+            });
+        } else {
+            t.groupListWidget.render();
+        }
     }
 });
 

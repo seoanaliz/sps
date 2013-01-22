@@ -21,6 +21,12 @@ Control = $.extend(Control, {
         get_monitor_list: {
             name: 'getReportList'
         },
+        add_group: {
+            name: 'setGroup',
+            params: {
+                name: 'groupName'
+            }
+        },
         add_report: {
             name: 'addReport',
             params: {
