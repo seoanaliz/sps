@@ -109,7 +109,7 @@ GroupListWidget = Widget.extend({
             t.render();
         });
 
-        if (!t._groupId) {
+        if (!t._groupId || !t.el().find('.item[data-id=' + t.groupId + ']').length) {
             t.el().find('.item[data-id]:first').addClass('selected');
         }
         t._groupId = t.el().find('.item.selected').data('id');
@@ -133,7 +133,7 @@ GroupListWidget = Widget.extend({
 
     keydownInput: function(e) {
         var t = this;
-        var $input = e.currentTarget;
+        var $input = $(e.currentTarget);
         if (e.keyCode == KEY.ENTER) {
             Control.fire('add_group', {name: $input.val()}, function() {
                 t.run();
@@ -159,7 +159,6 @@ Pages = Class.extend({
         $header.html(tmpl(REPORTS.HEADER));
         t.monitor = new MonitorPage();
         t.result = new ResultPage();
-        t.monitor.update();
 
         $('#tab-results').click(function() {
             t.showResults();
@@ -173,6 +172,7 @@ Pages = Class.extend({
             $(this).addClass('selected');
         });
 
+        t.showMonitors();
         t.showRightColumn();
     },
 
