@@ -37,7 +37,8 @@ Control = $.extend(Control, {
                 ourPublicId: 'targetPublicId',
                 publicId: 'barterPublicId',
                 timestampStart: 'startTime',
-                timestampStop: 'stopTime'
+                timestampStop: 'stopTime',
+                groupId: 'groupId'
             },
             defaultParams: {
                 timeShift: new Date().getTimezoneOffset()

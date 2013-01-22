@@ -400,7 +400,8 @@ MonitorPage = Page.extend({
                     ourPublicId: ourPublicId,
                     publicId: publicId,
                     timestampStart: timestampStart,
-                    timestampEnd: timestampEnd
+                    timestampEnd: timestampEnd,
+                    groupId: t.groupId
                 }, function() {
                     t.update();
                 });
