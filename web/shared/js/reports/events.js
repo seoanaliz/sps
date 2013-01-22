@@ -32,6 +32,12 @@ Control = $.extend(Control, {
             defaultParams: {
                 timeShift: new Date().getTimezoneOffset()
             }
+        },
+        get_group_list: {
+            name: 'getGroupList',
+            defaultParams: {
+                type: 'barter'
+            }
         }
     }
 });

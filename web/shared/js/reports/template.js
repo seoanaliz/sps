@@ -3,34 +3,36 @@ var REPORTS = {
     '<div id="header" class="header"></div>' +
     '<table><tbody>' +
         '<tr>' +
-            '<td class="left-column">' +
+            '<td id="left-column" class="left-column">' +
                 '<div class="content">' +
                     '<div id="list-header" class="list-head clear-fix"></div>' +
                     '<div id="results"></div>' +
                 '</div>' +
             '</td>' +
-            '<td class="right-column">' +
-                '<div class="filter">' +
-                    '<div class="list">' +
-                        '<div class="item selected">Все списки</div>' +
-                    '</div>' +
-                    '<div class="title">Мои списки</div>' +
-                    '<div class="list">' +
-                        '<div class="item">Топфейс</div>' +
-                        '<div class="item">Другие</div>' +
-                        '<div class="item">Музыка</div>' +
-                        '<div class="item">Избранное</div>' +
-                    '</div>' +
-                    '<div class="title">Общие списки</div>' +
-                    '<div class="list">' +
-                        '<div class="item">Другие</div>' +
-                        '<div class="item">Музыка</div>' +
-                        '<div class="item">Избранное</div>' +
-                    '</div>' +
-                '</div>' +
+            '<td id="right-column" class="right-column">' +
+                '<div id="group-list" class="filter"></div>' +
             '</td>' +
         '</tr>' +
     '</tbody></table>',
+
+    GROUP_LIST_ITEM:
+    '<div data-id="<?=id?>" class="item"><?=name?></div>',
+
+    GROUP_LIST:
+    '<div class="list">' +
+        '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
+        '<div class="item">Создать список</div>' +
+    '</div>' +
+    '<div class="title">Мои списки</div>' +
+    '<div class="list">' +
+        '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
+        '<div class="item">Создать список</div>' +
+    '</div>' +
+    '<div class="title">Общие списки</div>' +
+    '<div class="list">' +
+        '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
+        '<div class="item">Создать список</div>' +
+    '</div>',
 
     HEADER:
     '<div class="tab-bar">' +

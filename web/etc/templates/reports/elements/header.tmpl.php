@@ -49,12 +49,13 @@ $jsFiles = array(
     'js://common/model.js',
     'js://common/widget.js',
     'js://common/control.js',
+    'js://common/collection.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.datepicker.js',
     'js://fe/jquery.maskedinput-1.3.js',
+    'js://reports/template.js',
     'js://reports/main.js',
     'js://reports/events.js',
-    'js://reports/template.js',
 );
 
 CssHelper::Init(false);
