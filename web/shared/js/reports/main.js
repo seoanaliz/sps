@@ -109,8 +109,10 @@ GroupListWidget = Widget.extend({
             t.render();
         });
 
-        if (!t._groupId || !t.el().find('.item[data-id=' + t._groupId + ']').length) {
+        if (!t._groupId) {
             t.el().find('.item[data-id]:first').addClass('selected');
+        } else {
+            t.el().find('.item[data-id=' + t._groupId + ']').addClass('selected');
         }
         t._groupId = t.el().find('.item.selected').data('id');
     },
