@@ -139,9 +139,9 @@ var Events = {
     delay: 0,
     isDebug: false,
     eventList: {},
-    fire: function(name, args){
+    fire: function(name){
         var t = this;
-        args = Array.prototype.slice.call(arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
         if ($.isFunction(t.eventList[name])) {
             try {
                 setTimeout(function() {

@@ -1,19 +1,19 @@
 var UserCollection = Collection.extend({
-    _modelClass: UserModel
+    modelClass: UserModel
 });
 
 var MessageCollection = Collection.extend({
-    _modelClass: MessageModel
+    modelClass: MessageModel
 });
 
 var DialogCollection = Collection.extend({
-    _modelClass: DialogModel
+    modelClass: DialogModel
 });
 
 var ListCollection = Collection.extend({
-    _modelClass: ListModel
+    modelClass: ListModel
 });
 
 var TabCollection = Collection.extend({
-    _modelClass: TabModel
+    modelClass: TabModel
 });
