@@ -23,6 +23,12 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
     private $reviewArticleCount = 0;
 
+    /**
+     * @var bool
+     */
+    private $canEditPosts = false;
+
+
     protected function getMode(){
         $mode = Request::getString('mode');
         if ($mode == self::MODE_MY) {
@@ -120,6 +126,8 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
             $this->search['authorId'] = $this->getAuthor()->authorId;
+        } else if ($type == SourceFeedUtility::Ads) {
+            // рекламка
         }
 
         $userGroupId = Request::getInteger('userGroupId');
@@ -132,7 +140,12 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
         }
+
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+
+        $this->canEditPosts = $TargetFeedAccessUtility->canEditPosts($targetFeedId);
     }
+
 
     /**
      * Entry Point
@@ -162,7 +175,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         Response::setBoolean('showApproveBlock', $showApproveBlock);
         Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
-
+        Response::setBoolean('canEditPosts', $this->canEditPosts);
     }
 }
 
