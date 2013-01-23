@@ -386,21 +386,21 @@ MonitorPage = Page.extend({
                 dateStart.setHours(dirtyTimeStart[0]);
                 dateStart.setMinutes(dirtyTimeStart[1]);
                 var timestampStart = Math.round(dateStart.getTime() / 1000);
-                var timestampEnd = null;
+                var timestampStop = null;
 
                 if ($('#time-end').val()) {
                     var dirtyTimeEnd = ($('#time-end').val() || '__:__').split('_').join('0').split(':');
                     var dateEnd = dateStart;
                     dateEnd.setHours(dirtyTimeEnd[0]);
                     dateEnd.setMinutes(dirtyTimeEnd[1]);
-                    timestampEnd = Math.round(dateEnd.getTime() / 1000);
+                    timestampStop = Math.round(dateEnd.getTime() / 1000);
                 }
 
                 Control.fire('add_report', {
                     ourPublicId: ourPublicId,
                     publicId: publicId,
                     timestampStart: timestampStart,
-                    timestampEnd: timestampEnd,
+                    timestampStop: timestampStop,
                     groupId: t.groupId
                 }, function() {
                     t.update();
