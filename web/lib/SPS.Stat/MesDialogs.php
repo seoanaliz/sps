@@ -707,6 +707,8 @@
 
             foreach( $im_users as $user ) {
                 $dialogs = MesDialogs::get_all_dialogs( $user, $count );
+                if ( $dialogs == 'no access_token' )
+                    return false;
                 if ( $user == 13049517) {
                     file_put_contents( '1.txt', json_encode($dialogs) );
                     die();
