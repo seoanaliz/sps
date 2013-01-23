@@ -95,9 +95,9 @@ class RoleAccessUtility
                     return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR)) && in_array($targetFeedId, self::$TopFaceFeeds);
                 break;
 
-                //case SourceFeedUtility::AuthorsList:
-                //    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
-                //break;
+                case SourceFeedUtility::AuthorsList:
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                break;
             }
             return true;
         }
