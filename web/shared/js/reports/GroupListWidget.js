@@ -15,6 +15,9 @@ GroupListWidget = Widget.extend({
     run: function() {
         var t = this;
         Control.fire('get_group_list', {}, function(data) {
+            defaultGroupCollection.clear();
+            sharedGroupCollection.clear();
+            userGroupCollection.clear();
             $.each(data.default_list, function(i, group) {
                 var groupModel = new GroupModel({
                     id: group.group_id,

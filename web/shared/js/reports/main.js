@@ -78,8 +78,12 @@ Pages = Event.extend({
         t.monitor = new MonitorPage();
         t.result = new ResultPage();
 
-        $('#share-link').click(function() {
+        $('#share-list').click(function() {
             t.showShareBox();
+        });
+
+        $('#delete-list').click(function() {
+            t.showDeleteBox();
         });
 
         $('#tab-results').click(function() {
@@ -127,6 +131,33 @@ Pages = Event.extend({
         } else {
             t.groupListWidget.render();
         }
+    },
+
+    showDeleteBox: function() {
+        var t = this;
+        var listId = t.groupListWidget._groupId;
+        new Box({
+            id: 'deleteList' + listId,
+            title: 'Удаление',
+            html: 'Вы уверены, что хотите удалить список?',
+            buttons: [
+                {label: 'Удалить', onclick: function() {
+                    this.hide();
+                    t.deleteList(listId);
+                }},
+                {label: 'Отмена', isWhite: true}
+            ]
+        }).show();
+    },
+
+    deleteList: function(listId) {
+        var t = this;
+        Control.fire('remove_list', {
+            groupId: listId
+        }, function() {
+            t.groupListWidget.run();
+            t.groupListWidget.el().find('.item:first').click();
+        });
     },
 
     showShareBox: function() {
@@ -307,5 +338,14 @@ $(document).ready(function() {
         nameTransportPath: '/xd_receiver.htm'
     });
 
-    new Pages();
+    try {
+        new Pages();
+    } catch(e) {
+        $('#global-loader').hide();
+        new Box({
+            title: 'Ошибка',
+            html: 'Произошла ошибка JavaScript :('
+        }).show();
+        throw e;
+    }
 });

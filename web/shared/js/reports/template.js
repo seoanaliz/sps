@@ -50,7 +50,8 @@ var REPORTS = {
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
         '<div class="actions">' +
-            '<a id="share-link" class="share">Поделиться списком</a>' +
+            '<a id="share-list" class="share">Поделиться списком</a> |' +
+            '<a id="delete-list" class="share">Удалить</a>' +
         '</div>' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',

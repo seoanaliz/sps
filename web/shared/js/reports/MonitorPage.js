@@ -22,12 +22,22 @@ MonitorPage = Page.extend({
             limit: t.limit,
             offset: t.offset
         }, function(data) {
-            $listAddMonitor.slideDown(200);
-            $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
-            $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
-            t.makeTime($results.find('.time'));
-            t.makeDate($results.find('.date'));
-            t.bindEvents();
+            try {
+                $listAddMonitor.slideDown(200);
+                $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
+                $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
+                t.makeTime($results.find('.time'));
+                t.makeDate($results.find('.date'));
+                t.bindEvents();
+            } catch(e) {
+                new Box({
+                    title: 'Ошибка',
+                    html: 'Произошла ошибка загрузки мониторов :('
+                }).show();
+                throw e;
+            } finally {
+                $('#global-loader').fadeOut(200);
+            }
         });
     },
 

@@ -18,13 +18,23 @@ ResultPage = Page.extend({
             limit: t.limit,
             offset: t.offset
         }, function(data) {
-            $listAddMonitor.slideUp(200);
-            $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
-            $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
-            t.makeFullTime($results.find('.time'));
-            t.makeDate($results.find('.date'));
-            t.makeDiffTime($results.find('.diff-time'));
-            t.bindEvents();
+            try {
+                $listAddMonitor.slideUp(200);
+                $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
+                $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
+                t.makeFullTime($results.find('.time'));
+                t.makeDate($results.find('.date'));
+                t.makeDiffTime($results.find('.diff-time'));
+                t.bindEvents();
+            } catch(e) {
+                new Box({
+                    title: 'Ошибка',
+                    html: 'Произошла ошибка загрузки результатов :('
+                }).show();
+                throw e;
+            } finally {
+                $('#global-loader').fadeOut(200);
+            }
         });
     },
 

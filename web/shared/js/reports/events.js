@@ -53,6 +53,12 @@ Control = $.extend(Control, {
                 groupIds: 'groupId',
                 userIds: 'recId'
             }
+        },
+        remove_list: {
+            name: 'deleteGroup',
+            params: {
+                groupId: 'groupId'
+            }
         }
     }
 });
