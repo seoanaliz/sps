@@ -8,6 +8,7 @@ class RoleAccessUtility
 {
     protected static $FeedRulesByRole = array();
     protected static $FeedRulesByFeed = array();
+    public static $TopFaceFeeds = array(22);
 
     private static $isLoaded = false;
 
@@ -69,6 +70,7 @@ class RoleAccessUtility
         return $targetFeedIds;
     }
 
+
     /**
      * @param $targetFeedId - ид ленты
      * @param $sourceType - тип ресурса
@@ -90,7 +92,7 @@ class RoleAccessUtility
                 break;
 
                 case SourceFeedUtility::Topface:
-                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR)) && in_array($targetFeedId, self::$TopFaceFeeds);
                 break;
 
                 //case SourceFeedUtility::AuthorsList:

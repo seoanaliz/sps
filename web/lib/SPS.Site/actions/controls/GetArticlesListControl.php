@@ -114,7 +114,6 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                 }
 
-                // фильтр источников выступает как фильтр авторов
                 if ($authorsIds) {
                     if (is_array($authorsIds)){
                         $this->search['_authorId'] = $authorsIds;
@@ -126,6 +125,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
             $this->search['authorId'] = $this->getAuthor()->authorId;
+            $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
         } else if ($type == SourceFeedUtility::Ads) {
             // рекламка
         }
