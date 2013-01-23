@@ -1,4 +1,5 @@
 Configs = {
+    appId: vk_appId,
     limit: 150,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
@@ -63,7 +64,7 @@ GroupListModel = Model.extend({
  * @class Pages
  * @singleton
  */
-Pages = Class.extend({
+Pages = Event.extend({
     monitor: null,
     result: null,
     currentPage: null,
@@ -76,6 +77,10 @@ Pages = Class.extend({
         $header.html(tmpl(REPORTS.HEADER));
         t.monitor = new MonitorPage();
         t.result = new ResultPage();
+
+        $('#share-link').click(function() {
+            t.showShareBox();
+        });
 
         $('#tab-results').click(function() {
             t.showResults();
@@ -109,8 +114,9 @@ Pages = Class.extend({
         var t = this;
 
         if (!t.groupListWidget) {
+            t.groupListModel = new GroupListModel();
             t.groupListWidget = new GroupListWidget({
-                model: groupListModel,
+                model: t.groupListModel,
                 selector: '#group-list'
             });
             t.groupListWidget.on('change', function(groupId) {
@@ -120,28 +126,185 @@ Pages = Class.extend({
         } else {
             t.groupListWidget.render();
         }
+    },
+
+    showShareBox: function() {
+        var t = this;
+
+        if (typeof t.groupListWidget != 'object') {
+            return;
+        }
+
+        var dataLists = $.extend(true, {},
+            t.groupListModel.defaultLists().get(),
+            t.groupListModel.userLists().get(),
+            t.groupListModel.sharedLists().get()
+        );
+        var listId = t.groupListWidget._groupId;
+        var listTitle = $('.filter > .list > .item.selected').text();
+        var shareUsers = [];
+        var shareLists = [];
+        var isFirstShow = true;
+        var shareBox = new Box({
+            id: 'share' + listId,
+            title: 'Поделиться',
+            html: tmpl(BOX_LOADING),
+            buttons: [
+                {label: 'Отправить', onclick: function() {
+                    t.shareList.call(this, shareUsers, shareLists)}
+                },
+                {label: 'Отменить', isWhite: true}
+            ],
+            onshow: function($box) {
+                if (isFirstShow) {
+                    isFirstShow = false;
+                } else {
+                    return;
+                }
+
+                VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
+                    if (dataVK && dataVK.error) {
+                        shareBox
+                            .setTitle('Ошибка')
+                            .setHTML('Вы не предоставили доступ к друзьям.')
+                            .setButtons([
+                                {label: 'Перелогиниться', onclick: function() {
+                                    VK.Auth.logout(function() {
+                                        location.replace('login/');
+                                    });
+                                }},
+                                {label: 'Отмена', isWhite: true}
+                            ]);
+                    } else {
+                        var dataVKfriends = dataVK.response;
+                        var friends = [];
+                        for (var i in dataVKfriends) {
+                            var user = dataVKfriends[i];
+                            friends.push({
+                                id: user.uid,
+                                icon: user.photo,
+                                title: user.first_name + ' ' + user.last_name
+                            });
+                        }
+                        var lists = [];
+                        for (var i in dataLists) {
+                            var list = dataLists[i];
+                            lists.push({
+                                id: list.id,
+                                title: list.name
+                            });
+                        }
+
+                        shareBox.setHTML(tmpl(REPORTS.BOX_SHARE));
+
+                        var $users = $box.find('.users');
+                        var $lists = $box.find('.lists');
+                        $users.tags({
+                            onadd: function(tag) {
+                                shareUsers.push(parseInt(tag.id));
+                            },
+                            onremove: function(tagId) {
+                                shareUsers = jQuery.grep(shareUsers, function(value) {
+                                    return value != tagId;
+                                });
+                            }
+                        }).autocomplete({
+                            data: friends,
+                            target: $users.closest('.ui-tags'),
+                            onchange: function(item) {
+                                $(this).tags('addTag', item).val('').focus();
+                            }
+                        }).keydown(function(e) {
+                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                $(this).tags('removeLastTag');
+                            }
+                        });
+
+                        $lists.tags({
+                            onadd: function(tag) {
+                                shareLists.push(tag.id);
+                            },
+                            onremove: function(tagId) {
+                                shareLists = jQuery.grep(shareLists, function(value) {
+                                    return value != tagId;
+                                });
+                            }
+                        }).autocomplete({
+                            data: lists,
+                            target: $lists.closest('.ui-tags'),
+                            onchange: function(item) {
+                                $(this).tags('addTag', item).val('').focus();
+                            }
+                        }).keydown(function(e) {
+                            if (e.keyCode == KEY.DEL && !$(this).val()) {
+                                $(this).tags('removeLastTag');
+                            }
+                        }).tags('addTag', {
+                            id: listId,
+                            title: listTitle
+                        });
+
+                        $box.find('input[value=""]:first').focus();
+                    }
+                });
+            }
+        }).show();
+    },
+
+    shareList: function(shareUsers, shareLists) {
+        var box = this;
+
+        if (shareLists.length && shareUsers.length) {
+            Control.fire('share_list', {
+                groupIds: shareLists.join(','),
+                userIds: shareUsers.join(',')
+        }, function() {
+                box.hide();
+                new Box({
+                    id: 'shareSuccess',
+                    title: 'Поделиться',
+                    html: 'Выбранные друзья успешно получили доступ к спискам',
+                    buttons: [
+                        {label: 'Закрыть'}
+                    ]
+                }).show();
+            });
+        } else {
+            new Box({
+                id: 'shareError',
+                title: 'Ошибка',
+                html: 'Не выбран пользователь или список',
+                buttons: [
+                    {label: 'Закрыть'}
+                ]
+            }).show();
+        }
     }
 });
 
-$.mask.definitions['2']='[012]';
-$.mask.definitions['3']='[0123]';
-$.mask.definitions['5']='[012345]';
-$.datepicker.setDefaults({
-    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-    dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-    monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-    monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-    firstDay: 1,
-    showAnim: '',
-    dateFormat: 'd MM'
-});
-
-defaultGroupCollection = new GroupCollection();
-sharedGroupCollection = new GroupCollection();
-userGroupCollection = new GroupCollection();
-groupListModel = new GroupListModel();
-
 $(document).ready(function() {
+    $.mask.definitions['2']='[012]';
+    $.mask.definitions['3']='[0123]';
+    $.mask.definitions['5']='[012345]';
+    $.datepicker.setDefaults({
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        firstDay: 1,
+        showAnim: '',
+        dateFormat: 'd MM'
+    });
+
+    defaultGroupCollection = new GroupCollection();
+    sharedGroupCollection = new GroupCollection();
+    userGroupCollection = new GroupCollection();
+
+    VK.init({
+        apiId: Configs.appId,
+        nameTransportPath: '/xd_receiver.htm'
+    });
+
     new Pages();
 });

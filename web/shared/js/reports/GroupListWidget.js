@@ -42,9 +42,9 @@ GroupListWidget = Widget.extend({
                 });
                 userGroupCollection.add(groupModel.id(), groupModel);
             });
-            groupListModel.defaultLists(defaultGroupCollection);
-            groupListModel.sharedLists(sharedGroupCollection);
-            groupListModel.userLists(userGroupCollection);
+            t.model().defaultLists(defaultGroupCollection);
+            t.model().sharedLists(sharedGroupCollection);
+            t.model().userLists(userGroupCollection);
             t.render();
 
             if (!t._groupId) {

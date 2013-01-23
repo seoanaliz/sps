@@ -15,6 +15,14 @@ var REPORTS = {
         '</tr>' +
     '</tbody></table>',
 
+    BOX_SHARE:
+    '<div class="box-share">' +
+        '<div class="title">Выберите списки</div>' +
+        '<input type="text" class="lists"></textarea>' +
+        '<div class="title">Выберите друзей</div>' +
+        '<input type="text" class="users"></textarea>' +
+    '</div>',
+
     GROUP_LIST_ITEM:
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
 
@@ -41,6 +49,9 @@ var REPORTS = {
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
+        '<div class="actions">' +
+            '<a id="share-link" class="share">Поделиться списком</a>' +
+        '</div>' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
