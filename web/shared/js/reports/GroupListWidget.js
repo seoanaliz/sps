@@ -79,7 +79,9 @@ GroupListWidget = Widget.extend({
         var t = this;
         var $input = $(e.currentTarget);
         if (e.keyCode == KEY.ENTER) {
-            Control.fire('add_group', {name: $input.val()}, function() {
+            Control.fire('add_group', {
+                name: $input.val()
+            }, function() {
                 t.run();
             });
         }

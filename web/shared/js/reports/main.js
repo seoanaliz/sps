@@ -120,7 +120,8 @@ Pages = Event.extend({
                 selector: '#group-list'
             });
             t.groupListWidget.on('change', function(groupId) {
-                t.currentPage.groupId = groupId;
+                t.monitor.groupId = groupId;
+                t.result.groupId = groupId;
                 t.currentPage.update();
             });
         } else {
