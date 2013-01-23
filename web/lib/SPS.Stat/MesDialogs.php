@@ -754,6 +754,7 @@
                     MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
                 }
             }
+            return true;
         }
 
         public static function save_last_line( $dialog_id, $text, $out, $mid, $read )
