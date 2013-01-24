@@ -6,7 +6,7 @@ Package::Load( 'SPS.Site' );
  * @package    SPS
  * @subpackage Stat
  */
-
+new stat_tables();
 set_time_limit(10);
 class getEntries {
 

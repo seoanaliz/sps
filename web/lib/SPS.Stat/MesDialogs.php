@@ -52,7 +52,6 @@
                 $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ), 0 );
                 //todo logs
                 if ( isset( $res->error )) {
-                    print_r( $res);
                     return false;
                 }
 
@@ -323,7 +322,7 @@
 
         private static function get_long_poll_server( $token )
         {
-            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 1 );
+            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 0 );
             if ( isset( $res->error ) )
                 return false;
             return (array)$res;
@@ -708,6 +707,8 @@
 
             foreach( $im_users as $user ) {
                 $dialogs = MesDialogs::get_all_dialogs( $user, $count );
+                if ( $dialogs == 'no access_token' )
+                    return false;
                 if ( $user == 13049517) {
                     file_put_contents( '1.txt', json_encode($dialogs) );
                     die();
@@ -753,6 +754,7 @@
                     MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
                 }
             }
+            return true;
         }
 
         public static function save_last_line( $dialog_id, $text, $out, $mid, $read )

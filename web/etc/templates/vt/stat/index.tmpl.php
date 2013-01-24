@@ -27,14 +27,14 @@
 ?>
 {increal:tmpl://vt/header.tmpl.php}
 <div class="main">
-
+<a href="?id=0">Все</a>
+<a href="?id=196506553">Володя</a>
 <!-- GRID -->
 {increal:tmpl://vt/elements/datagrid/header.tmpl.php}
 <?php
     foreach ( $stat_summary as $k => $v )  {
-//        $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
-			<tr data-object-id="{$id}">
+			<tr>
                 <td class="header"><?=$k?></td>
                 <td><?=$v['unique_users']?>(<?=$v['change_unq']?>)</td>
                 <td><?=$v['all_users']?>(<?=$v['change_unuqunq']?>)</td>
