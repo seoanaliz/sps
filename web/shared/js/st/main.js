@@ -51,9 +51,11 @@ function initVK(data) {
         var r = data.response;
         cur.dataUser = r.me;
 
-        Filter.init(function() {
-            List.init(function() {
-                Table.init();
+        Events.fire('get_user', cur.dataUser.uid, function() {
+            Filter.init(function() {
+                List.init(function() {
+                    Table.init();
+                });
             });
         });
     }
