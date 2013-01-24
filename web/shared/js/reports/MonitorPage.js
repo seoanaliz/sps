@@ -19,6 +19,7 @@ MonitorPage = Page.extend({
         }
 
         t.pageLoaded = 0;
+        t.isEnded = false;
 
         Control.fire('get_monitor_list', {
             groupId: t.groupId,
@@ -31,6 +32,7 @@ MonitorPage = Page.extend({
                 $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
                 t.makeTime($results.find('.time'));
                 t.makeDate($results.find('.date'));
+                $(window).scroll();
             } catch(e) {
                 new Box({
                     title: 'Ошибка',
@@ -77,7 +79,9 @@ MonitorPage = Page.extend({
     },
 
     bindAddReportEvent: function() {
+        var t = this;
         var $addReport = $('#addReport');
+
         if (!$addReport.data('inited')) {
             $addReport.data('inited', true);
             $addReport.click(function() {
@@ -136,6 +140,10 @@ MonitorPage = Page.extend({
             t.loaded = true;
         }
 
+        if (t.isEnded) {
+            return;
+        }
+
         t.pageLoaded++;
 
         Control.fire('get_monitor_list', {
@@ -145,12 +153,17 @@ MonitorPage = Page.extend({
         }).success(function(data) {
             t.loaded = false;
             $('#load-more-table').remove();
-            var $tmpElement = $(document.createElement('div'));
-            $tmpElement.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
-            t.makeTime($tmpElement.find('.time'));
-            t.makeDate($tmpElement.find('.date'));
-            $results.append($tmpElement.html());
-            $tmpElement.remove();
+
+            if (!data.length) {
+                t.isEnded = true;
+            } else {
+                var $tmpElement = $(document.createElement('div'));
+                $tmpElement.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
+                t.makeTime($tmpElement.find('.time'));
+                t.makeDate($tmpElement.find('.date'));
+                $results.append($tmpElement.html());
+                $tmpElement.remove();
+            }
         });
     }
 });

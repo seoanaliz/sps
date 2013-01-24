@@ -9,6 +9,7 @@ Page = Event.extend({
     limit: Configs.limit,
     groupId: 0,
     pageLoaded: 0,
+    isEnded: false,
     locked: false,
 
     getTime: function(timestamp) {

@@ -15,6 +15,7 @@ ResultPage = Page.extend({
         }
 
         t.pageLoaded = 0;
+        t.isEnded = false;
 
         Control.fire('get_result_list', {
             groupId: t.groupId,
@@ -28,6 +29,7 @@ ResultPage = Page.extend({
                 t.makeFullTime($results.find('.time'));
                 t.makeDate($results.find('.date'));
                 t.makeDiffTime($results.find('.diff-time'));
+                $(window).scroll();
             } catch(e) {
                 new Box({
                     title: 'Ошибка',
@@ -54,6 +56,10 @@ ResultPage = Page.extend({
             t.loaded = true;
         }
 
+        if (t.isEnded) {
+            return;
+        }
+
         t.pageLoaded++;
 
         Control.fire('get_result_list', {
@@ -63,13 +69,18 @@ ResultPage = Page.extend({
         }).success(function(data) {
             t.loaded = false;
             $('#load-more-table').remove();
-            var $tmpElement = $(document.createElement('div'));
-            $tmpElement.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
-            t.makeFullTime($tmpElement.find('.time'));
-            t.makeDate($tmpElement.find('.date'));
-            t.makeDiffTime($tmpElement.find('.diff-time'));
-            $results.append($tmpElement.html());
-            $tmpElement.remove();
+
+            if (!data.length) {
+                t.isEnded = true;
+            } else {
+                var $tmpElement = $(document.createElement('div'));
+                $tmpElement.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
+                t.makeFullTime($tmpElement.find('.time'));
+                t.makeDate($tmpElement.find('.date'));
+                t.makeDiffTime($tmpElement.find('.diff-time'));
+                $results.append($tmpElement.html());
+                $tmpElement.remove();
+            }
         });
     }
 });
