@@ -46,6 +46,8 @@
             self::$RequestData = $regs;
             self::$Uri         = $page->getAttribute( 'uri' );
 
+            Package::BeginUri( self::$Uri );
+
             self::setTemplate( $page );
             $actions = self::getActionsArray( $page, $virtualActions );
 

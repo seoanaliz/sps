@@ -1,6 +1,4 @@
 <?php
-    Package::Load( 'Eaze.Core' );
-
     /**
      * Response
      *
@@ -45,9 +43,10 @@
          * Send Http Status Code
          *
          * @param string $code
-         * @param message $message
+         * @param string $message
          */
         public static function HttpStatusCode( $code, $message = '') {
+            Package::$DisablePackageCompile = true;
             if (substr(php_sapi_name(), 0, 3) == 'cgi')  {
                 header('Status: ' . $code . $message, true );
             } else {

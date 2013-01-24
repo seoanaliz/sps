@@ -5,11 +5,19 @@
     }
 
     function renderMenuElement( $menuKey, $menuElement, $__activeElement, &$__menuHTML = '' ) {
+        if (empty($menuElement["link"])) {
+            $menuElement["link"] = '#';
+        } else {
+            if ( mb_strpos($menuElement["link"], 'http') !== 0 ) {
+                $menuElement["link"] = Site::GetWebPath( $menuElement["link"] );
+            }
+        }
+
         $__menuHTML .= '<li>';
         $__menuHTML .= sprintf( '<a %s %s href="%s">%s</a>'
             , ( !empty( $menuElement['target'] ) ) ? 'target="' . $menuElement['target'] . '"' : ''
             , ( $__activeElement === $menuKey ) ? 'class="active" ' : ''
-            , ( ( empty($menuElement["link"]) ) ? "#" : Site::GetWebPath( $menuElement["link"] ) )
+            , $menuElement["link"]
             , LocaleLoader::Translate( $menuElement['title'] )
         );
 

@@ -1,26 +1,41 @@
-/*
-{"response":[
-    {
-        "published_at":null,
-        "ad_public":{
-            "id":123,
-            "ava":"https://vk.com/images/community_50.gif",
-            "name":"ЭРОТИКА НА ГРАНИ ПОРНО. СЕКС ЗНАКОМСТВА.",
-            "link":"http://vk.com/public123"
-        },
-        "posted_at":null,
-        "deleted_at":null,
-        "overlaps":null,
-        "subscribers":0,
-        "visitors":0
-    }
-]}
-*/
 var REPORTS = {
     MAIN:
     '<div id="header" class="header"></div>' +
-    '<div id="list-header" class="list-head clear-fix"></div>' +
-    '<div id="results"></div>',
+    '<table><tbody>' +
+        '<tr>' +
+            '<td id="left-column" class="left-column">' +
+                '<div class="content">' +
+                    '<div id="list-header" class="list-head clear-fix"></div>' +
+                    '<div id="results"></div>' +
+                '</div>' +
+            '</td>' +
+            '<td id="right-column" class="right-column">' +
+                '<div id="group-list" class="filter"></div>' +
+            '</td>' +
+        '</tr>' +
+    '</tbody></table>',
+
+    GROUP_LIST_ITEM:
+    '<div data-id="<?=id?>" class="item"><?=name?></div>',
+
+    GROUP_LIST:
+    '<? if (!userLists.length || userLists.length > 1) { ?>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
+        '</div>' +
+        '<div class="title">Мои списки</div>' +
+    '<? } ?>' +
+    '<div class="list">' +
+        '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
+        '<input type="text" placeholder="Введите название списка..." /> ' +
+        '<div class="item">Создать список</div>' +
+    '</div>' +
+    '<? if (sharedLists.length) { ?>' +
+        '<div class="title">Общие списки</div>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
+        '</div>' +
+    '<? } ?>',
 
     HEADER:
     '<div class="tab-bar">' +
@@ -90,8 +105,8 @@ var REPORTS = {
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
         '<div class="item time post-time">Время поста<span class="icon arrow"></div>' +
-        '<div class="item time delete-time">Удалён через<span class="icon arrow"></div>' +
-        '<div class="item time overlap-time">Перекрыт через<span class="icon arrow"></div>' +
+        '<div class="item time delete-time">Удалён<span class="icon arrow"></div>' +
+        '<div class="item time overlap-time">Перекрыт<span class="icon arrow"></div>' +
         '<div class="item visitors">Посетителей<span class="icon arrow"></div>' +
         '<div class="item subscribers">Подписчиков<span class="icon arrow"></div>',
 
@@ -129,7 +144,6 @@ var REPORTS = {
             '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
-            '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
         '</div>'
     }
 };

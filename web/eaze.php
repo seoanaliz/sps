@@ -3,36 +3,12 @@
 
     define( 'WITH_PACKAGE_COMPILE', false  );
 
-    if ( !WITH_PACKAGE_COMPILE ) {
-        include_once 'lib/Eaze.Core/Logger.php';
-        include_once 'lib/Base.Tree/ITreeFactory.php';
-        include_once 'lib/Base.Tree/TreeFactory.php';
-    }
-
+    include_once 'lib/Eaze.Core/Logger.php';
+    // Initialize Logger
+    Logger::Init( ELOG_WARNING );
     include_once 'lib/Eaze.Core/Package.php' ;
 
-    Package::Load( 'Eaze.Core');
-
-    Package::Load( 'Eaze.Site');
-    Package::Load( 'Eaze.Modules');
-    Package::Load( 'Eaze.Model' );
-    Package::Load( 'Eaze.Database/PgSql' );
-
-    Package::Load( 'Base.Tree' );
-    Package::Load( 'Base.VFS' );
-
-    Package::Load( 'SPS.Common' );
-    Package::Load( 'SPS.System' );
-    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.VK' );
-    Package::Load( 'SPS.FB' );
-    Package::Load( 'SPS.Site' );
-    Package::Load( 'SPS.Site/base' );
-    Package::Load( 'SPS.App' );
-
-    // Initialize Logger
-    // Logger::Init( ELOG_DEBUG);
-    //Logger::Init( ELOG_WARNING );
+    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
