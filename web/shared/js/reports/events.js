@@ -46,6 +46,19 @@ Control = $.extend(Control, {
         },
         get_group_list: {
             name: 'getGroupList'
+        },
+        share_list: {
+            name: 'shareGroup',
+            params: {
+                groupIds: 'groupId',
+                userIds: 'recId'
+            }
+        },
+        remove_list: {
+            name: 'deleteGroup',
+            params: {
+                groupId: 'groupId'
+            }
         }
     }
 });
