@@ -1409,6 +1409,7 @@ var tmpl = (function($) {
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
                     'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
+                    'count=function(obj){for(var i in obj) { if (obj.hasOwnProperty(i)) i++; } return +i};' +
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
             ));
             return (cache[str] = fn(data || {}));
