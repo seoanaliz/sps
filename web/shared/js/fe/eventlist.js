@@ -115,15 +115,21 @@ function loadArticles(clean) {
         $(window).data('disable-load-more', false);
     }
 
+    var sourceType = Elements.leftType();
+    var targetFeedId = Elements.rightdd();
     wallPage++;
     articlesLoading = true;
 
     $('#wall-load').show();
 
-    if (Elements.leftdd().length != 1) {
-        $('.newpost').hide();
-    } else {
+    if (sourceType == 'authors') {
         $('.newpost').show();
+    } else {
+        if (Elements.leftdd().length != 1) {
+            $('.newpost').hide();
+        } else {
+            $('.newpost').show();
+        }
     }
 
     var $slider = $("#slider-range");
@@ -131,7 +137,7 @@ function loadArticles(clean) {
     var to = $slider.slider("values", 1);
     var sortType = $('.wall-title a').data('type');
 
-    if ($('.type-selector a.active').data('type') == 'ads') {
+    if (sourceType == 'ads') {
         from = 0;
         to = 100;
     }
@@ -142,8 +148,8 @@ function loadArticles(clean) {
         from: from,
         to: to,
         sortType: sortType,
-        type: Elements.leftType(),
-        targetFeedId: Elements.rightdd()
+        type: sourceType,
+        targetFeedId: targetFeedId
     };
 
     if (!clean) {
@@ -402,6 +408,7 @@ var Eventlist = {
                 type: sourceType
             }
         }).success(function(data) {
+            var sourceTypes = data['accessibleSourceTypes'];
             // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
             var $sourceTypeLink = $('#sourceType-' + data.type);
             if (!$sourceTypeLink.hasClass('active')) {
@@ -454,7 +461,6 @@ var Eventlist = {
                 $userGroupTabs.addClass('hidden');
             }
 
-            var sourceTypes = data['accessibleSourceTypes'];
             var $typeSelector = $('.left-panel div.type-selector');
             $typeSelector.children('.sourceType').each(function(i, item) {
                 item = $(item);
@@ -477,7 +483,6 @@ var Eventlist = {
                 $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
             }
 
-            var sourceTypes = data['accessibleSourceTypes'];
             $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
                 item = $(item);
                 if ($.inArray(item.data('type'), sourceTypes) == -1){
