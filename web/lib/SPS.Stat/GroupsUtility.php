@@ -81,6 +81,18 @@
             return $default_group;
         }
 
+        public static function get_all_user_groups( $user_id, $groupe_sourse )
+        {
+            $search = array( '_users_ids_in_array' => array( $user_id ), 'source'=> $groupe_sourse );
+            $groups = GroupFactory::Get( $search );
+            $result = array();
+
+            foreach( $groups as $group ) {
+                $result[] = $group->group_id;
+            }
+            return $result;
+        }
+
         //проверяет уникальность предлагаемого имени группы для данного типа групп данного пользователя
         public static function check_name( $user_id, $group_source, $group_name )
         {
@@ -91,23 +103,15 @@
         }
 
         //удаляет группу - точнее, все упоминания группы. она сама меняет статус
-        public static function delete_group( Group $group, Group $default_group )
+        public static function delete_group( Group $group )
         {
-            //todo определение типа группы (бартер, мессагер...)
-            //ищем все привязанные к групе записи, удаляем отметку этой группы
-//            $entries = BarterEventFactory::Get( array( '_groups_ids' => array( $group->group_id )), array(), 'tst');
-//            foreach( $entries as $entry ) {
-//                $key = array_search( $group->group_id, $entry->groups_ids );
-//                if ( $key === false || $key === null )
-//                    continue;
-//                unset( $entry->groups_ids[ $key ]);
-//                //если отметок о группах не осталось, ставим дефолтную
-//                if ( count($entry->groups_ids == 0))
-//                    $entry->groups_ids = array( $default_group->group_id );
-//            }
-//            BarterEventFactory::UpdateRange( $entries, null, 'tst');
-//
-//            $group->users_ids   =   array(0);
+            //удаляем эвенты группы
+            $object = new BarterEvent();
+            $object->status = 7;
+            $search = array( '_groups_ids' => array( $group->group_id ));
+            BarterEventFactory::UpdateByMask( $object, array( 'status'), $search );
+
+            $group->users_ids   =   array(0);
             $group->status      =   7;
             GroupFactory::Update( $group );
 
@@ -123,17 +127,17 @@
             $i = 1;
             foreach( $groups as $group ) {
                 $field = ( $group->created_by == $user_id ) ? 'user_lists' : 'shared_lists';
-                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
+//                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
                 $res[$field][] = array(
                     'group_id'  =>  $group->group_id,
                     'type'      =>  $group->type,
-                    'name'      =>  ( $field == 'default_list' ) ? 'Не в списке' : $group->name,
+                    'name'      =>  ( $field == 'default_list' ) ? 'Моя первая група' : $group->name,
                     'place'     =>  ( $field == 'default_list' ) ? 0 : $i++
                 );
             }
-            if( !isset( $res['user_lists'] )) $res['user_lists'] = array();
+            if( !isset( $res['user_lists'] ))   $res['user_lists'] = array();
             if( !isset( $res['shared_lists'] )) $res['shared_lists'] = array();
-            if( !isset( $res['default_list'] )) $res['default_list'] = array( GroupsUtility::get_default_group( $user_id, $group_source ));
+            if( !isset( $res['default_list'] )) $res['default_list'] = array();
             return $res;
         }
 
