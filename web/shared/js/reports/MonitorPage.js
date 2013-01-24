@@ -134,15 +134,14 @@ MonitorPage = Page.extend({
         var t = this;
         var $results = $('#results');
 
+        if (t.isEnded) {
+            return;
+        }
+
         if (t.loaded) {
             return;
         } else {
             t.loaded = true;
-        }
-
-        if (t.isEnded) {
-            $('#load-more-table').remove();
-            return;
         }
 
         t.pageLoaded++;
