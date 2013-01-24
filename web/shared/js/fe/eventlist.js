@@ -436,32 +436,34 @@ var Eventlist = {
 
             // группы юзеров
             var $userGroupTabs = $('.user-groups-tabs');
-            var userGroups = data['showUserGroups'];
-            if (userGroups) {
+            if (sourceType == 'authors') {
+                var userGroups = data['showUserGroups'];
                 $userGroupTabs.empty();
                 $userGroupTabs.removeClass('hidden');
                 $userGroupTabs.append('<div class="tab selected">Все новости</div>');
-                for (var i in userGroups) {
-                    var userGroupModel = new UserGroupModel();
-                    userGroupModel.id(userGroups[i]['id']);
-                    userGroupModel.name(userGroups[i]['name']);
-                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
-                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                if (userGroups) {
+                    for (var i in userGroups) {
+                        var userGroupModel = new UserGroupModel();
+                        userGroupModel.id(userGroups[i]['id']);
+                        userGroupModel.name(userGroups[i]['name']);
+                        userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                        $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                    }
                 }
             } else {
                 $userGroupTabs.addClass('hidden');
             }
 
-                var sourceTypes = data['accessibleSourceTypes'];
-                var $typeSelector = $('.left-panel div.type-selector');
-                $typeSelector.children('.sourceType').each(function(i, item){
-                      item = $(item);
-                      if ($.inArray(item.data('type'), sourceTypes) == -1){
-                        item.hide();
-                      } else {
-                          item.show();
-                      }
-                });
+            var sourceTypes = data['accessibleSourceTypes'];
+            var $typeSelector = $('.left-panel div.type-selector');
+            $typeSelector.children('.sourceType').each(function(i, item) {
+                item = $(item);
+                if ($.inArray(item.data('type'), sourceTypes) == -1) {
+                    item.hide();
+                } else {
+                    item.show();
+                }
+            });
 
             $.cookie('sourceTypes' + targetFeedId, sourceType);
 
