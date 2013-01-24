@@ -55,15 +55,11 @@ $jsFiles = array(
     'js://fe/jquery.maskedinput-1.3.js',
     'js://reports/template.js',
     'js://reports/main.js',
-    'js://reports/Page.js',
-    'js://reports/MonitorPage.js',
-    'js://reports/ResultPage.js',
-    'js://reports/GroupListWidget.js',
     'js://reports/events.js',
 );
 
 CssHelper::Init(false);
-JsHelper::Init(true);
+JsHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {

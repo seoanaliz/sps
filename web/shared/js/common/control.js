@@ -5,11 +5,6 @@ var Control = {
     root: '',
     dataType: 'json',
     controlMap: {},
-
-    call: function() {
-        this.fire.apply(this, arguments);
-    },
-
     fire: function(key, data, callback) {
         var t = this;
         var params = $.extend({}, t.commonParams, t.defaultParams);

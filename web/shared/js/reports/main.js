@@ -1,5 +1,4 @@
 Configs = {
-    appId: vk_appId,
     limit: 150,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
@@ -61,10 +60,98 @@ GroupListModel = Model.extend({
 });
 
 /**
+ * @class GroupListWidget
+ * @extends Widget
+ */
+GroupListWidget = Widget.extend({
+    _template: REPORTS.GROUP_LIST,
+    _modelClass: GroupListModel,
+    _events: {
+        'click: .item': 'clickItem',
+        'keydown: input': 'keydownInput'
+    },
+
+    _groupId: null,
+
+    run: function() {
+        var t = this;
+        Control.fire('get_group_list', {}, function(data) {
+            $.each(data.default_list, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                defaultGroupCollection.add(groupModel.id(), groupModel);
+            });
+            $.each(data.shared_lists, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                sharedGroupCollection.add(groupModel.id(), groupModel);
+            });
+            $.each(data.user_lists, function(i, group) {
+                var groupModel = new GroupModel({
+                    id: group.group_id,
+                    name: group.name,
+                    place: group.place,
+                    type: group.type
+                });
+                userGroupCollection.add(groupModel.id(), groupModel);
+            });
+            groupListModel.defaultLists(defaultGroupCollection);
+            groupListModel.sharedLists(sharedGroupCollection);
+            groupListModel.userLists(userGroupCollection);
+            t.render();
+
+            if (!t._groupId) {
+                t.el().find('.item[data-id]:first').addClass('selected');
+            } else {
+                t.el().find('.item[data-id=' + t._groupId + ']').addClass('selected');
+            }
+            t._groupId = t.el().find('.item.selected').data('id');
+        });
+    },
+
+    clickItem: function(e) {
+        var t = this;
+        var $target = $(e.target);
+        var $list = $target.closest('.list');
+        var $input = $list.find('input');
+
+        var groupId = $target.data('id');
+        if (groupId) {
+            $input.hide();
+            t.el().find('.item').removeClass('selected');
+            $target.addClass('selected');
+            t.trigger('change', groupId);
+            t._groupId = groupId;
+        } else {
+            $input.show();
+            $input.focus();
+        }
+    },
+
+    keydownInput: function(e) {
+        var t = this;
+        var $input = $(e.currentTarget);
+        if (e.keyCode == KEY.ENTER) {
+            Control.fire('add_group', {name: $input.val()}, function() {
+                t.run();
+            });
+        }
+    }
+});
+
+/**
  * @class Pages
  * @singleton
  */
-Pages = Event.extend({
+Pages = Class.extend({
     monitor: null,
     result: null,
     currentPage: null,
@@ -77,14 +164,6 @@ Pages = Event.extend({
         $header.html(tmpl(REPORTS.HEADER));
         t.monitor = new MonitorPage();
         t.result = new ResultPage();
-
-        $('#share-list').click(function() {
-            t.showShareBox();
-        });
-
-        $('#delete-list').click(function() {
-            t.showDeleteBox();
-        });
 
         $('#tab-results').click(function() {
             t.showResults();
@@ -118,234 +197,274 @@ Pages = Event.extend({
         var t = this;
 
         if (!t.groupListWidget) {
-            t.groupListModel = new GroupListModel();
             t.groupListWidget = new GroupListWidget({
-                model: t.groupListModel,
+                model: groupListModel,
                 selector: '#group-list'
             });
             t.groupListWidget.on('change', function(groupId) {
-                t.monitor.groupId = groupId;
-                t.result.groupId = groupId;
+                t.currentPage.groupId = groupId;
                 t.currentPage.update();
             });
         } else {
             t.groupListWidget.render();
         }
+    }
+});
+
+/**
+ * @class Page
+ * @extends Event
+ */
+Page = Event.extend({
+    inited: null,
+    sort: '',
+    sortReverse: false,
+    offset: 0,
+    limit: Configs.limit,
+    groupId: 0,
+
+    getTime: function(timestamp) {
+        var date = timestamp ? new Date(timestamp * 1000) : new Date();
+        var h = date.getHours() + '';
+        var min = date.getMinutes() + '';
+        return (h.length > 1 ? h : '0' + h) + ':' + (min.length > 1 ? min : '0' + min);
     },
 
-    showDeleteBox: function() {
-        var t = this;
-        var listId = t.groupListWidget._groupId;
-        new Box({
-            id: 'deleteList' + listId,
-            title: 'Удаление',
-            html: 'Вы уверены, что хотите удалить список?',
-            buttons: [
-                {label: 'Удалить', onclick: function() {
-                    this.hide();
-                    t.deleteList(listId);
-                }},
-                {label: 'Отмена', isWhite: true}
-            ]
-        }).show();
+    getDate: function(timestamp) {
+        var date = timestamp ? new Date(timestamp * 1000) : new Date();
+        var m = date.getMonth() + 1;
+        var y = date.getFullYear() + '';
+        var d = date.getDate() + '';
+        return d + '.' + m + '.' + (y.substr(-2));
     },
 
-    deleteList: function(listId) {
+    getDiffTime: function(time) {
+        var h = Math.floor(time / 3600);
+        var m = Math.floor(time / 60) - h * 60;
+        return h + ' ч. ' + m + ' м.';
+    },
+
+    makeTime: function($elements) {
         var t = this;
-        Control.fire('remove_list', {
-            groupId: listId
-        }, function() {
-            t.groupListWidget.run();
-            t.groupListWidget.el().find('.item:first').click();
+        var tmpDate = new Date();
+        $elements.each(function() {
+            var $date = $(this);
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
+            if (!intval(timestamp)) return;
+            $date.html(t.getTime(timestamp));
         });
     },
 
-    showShareBox: function() {
+    makeDate: function($elements) {
         var t = this;
+        var tmpDate = new Date();
+        $elements.each(function() {
+            var $date = $(this);
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
+            if (!intval(timestamp)) return;
+            $date.html(t.getDate(timestamp));
+        });
+    },
 
-        if (typeof t.groupListWidget != 'object') {
-            return;
+    makeFullTime: function($elements) {
+        var t = this;
+        var tmpDate = new Date();
+        $elements.each(function() {
+
+            var $date = $(this);
+            var timestamp = $date.text() * 1;
+            var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
+            timestamp += time_shift;
+            if (!intval(timestamp)) return;
+            $date.html(t.getTime(timestamp) + ', ' + t.getDate(timestamp));
+        });
+    },
+
+    makeDiffTime: function($elements) {
+        var t = this;
+        $elements.each(function() {
+            var $date = $(this);
+            var time = $date.text();
+            if (!intval(time)) return;
+            $date.html(t.getDiffTime(time));
+        });
+    },
+
+    bindDeleteEvent: function() {
+        var t = this;
+        $('.icon.delete').click(function() {
+            var $row = $(this).closest('.row');
+            var confirmBox = new Box({
+                title: 'Удаление',
+                html: 'Вы уверены, что хотите удалить отчет?',
+                buttons: [
+                    {label: 'Удалить', onclick: deleteReport},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function deleteReport() {
+                confirmBox.hide();
+                Control.fire('delete_report', {
+                    reportId: $row.data('report-id'),
+                    groupId: t.groupId
+                }, function() {
+                    $row.slideUp(200);
+                });
+            }
+        });
+    },
+
+    showMore: function() {}
+});
+
+/**
+ * @class MonitorPage
+ * @extends Page
+ */
+MonitorPage = Page.extend({
+    update: function() {
+        var t = this;
+        var $listAddMonitor = $('#list-add-monitor');
+        var $listHeader = $('#list-header');
+        var $results = $('#results');
+
+        if (!t.inited) {
+            t.inited = true;
+            $listAddMonitor.html(tmpl(REPORTS.MONITOR.LIST_ADD_MONITOR));
+            $('#time-start').mask('29:59');
+            $('#time-end').mask('29:59');
+            $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
         }
 
-        var dataLists = $.extend(true, {},
-            t.groupListModel.defaultLists().get(),
-            t.groupListModel.userLists().get(),
-            t.groupListModel.sharedLists().get()
-        );
-        var listId = t.groupListWidget._groupId;
-        var listTitle = $('.filter > .list > .item.selected').text();
-        var shareUsers = [];
-        var shareLists = [];
-        var isFirstShow = true;
-        var shareBox = new Box({
-            id: 'share' + listId,
-            title: 'Поделиться',
-            html: tmpl(BOX_LOADING),
-            buttons: [
-                {label: 'Отправить', onclick: function() {
-                    t.shareList.call(this, shareUsers, shareLists)}
-                },
-                {label: 'Отменить', isWhite: true}
-            ],
-            onshow: function($box) {
-                if (isFirstShow) {
-                    isFirstShow = false;
-                } else {
+        Control.fire('get_monitor_list', {
+            groupId: t.groupId,
+            limit: t.limit,
+            offset: t.offset
+        }, function(data) {
+            $listAddMonitor.slideDown(200);
+            $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
+            $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
+            t.makeTime($results.find('.time'));
+            t.makeDate($results.find('.date'));
+            t.bindEvents();
+        });
+    },
+
+    bindEvents: function() {
+        var t = this;
+        var $addReport = $('#addReport');
+
+        t.bindDeleteEvent();
+
+        if (!$addReport.data('inited')) {
+            $addReport.data('inited', true);
+            $addReport.click(function() {
+                var $inputs = $('#list-add-monitor').find('input');
+                var $breakingInput = $(this);
+                var isValid = true;
+                $inputs.each(function() {
+                    if ($(this).data('required') && !$.trim($(this).val())) {
+                        isValid = false;
+                        $breakingInput = $(this);
+                        return false;
+                    }
+                });
+                if (!isValid) {
+                    $breakingInput.focus();
                     return;
                 }
 
-                VK.Api.call('friends.get', {fields: 'first_name, last_name, photo'}, function(dataVK) {
-                    if (dataVK && dataVK.error) {
-                        shareBox
-                            .setTitle('Ошибка')
-                            .setHTML('Вы не предоставили доступ к друзьям.')
-                            .setButtons([
-                                {label: 'Перелогиниться', onclick: function() {
-                                    VK.Auth.logout(function() {
-                                        location.replace('login/');
-                                    });
-                                }},
-                                {label: 'Отмена', isWhite: true}
-                            ]);
-                    } else {
-                        var dataVKfriends = dataVK.response;
-                        var friends = [];
-                        for (var i in dataVKfriends) {
-                            var user = dataVKfriends[i];
-                            friends.push({
-                                id: user.uid,
-                                icon: user.photo,
-                                title: user.first_name + ' ' + user.last_name
-                            });
-                        }
-                        var lists = [];
-                        for (var i in dataLists) {
-                            var list = dataLists[i];
-                            lists.push({
-                                id: list.id,
-                                title: list.name
-                            });
-                        }
+                var ourPublicId = $.trim($('#our-public-id').val());
+                var publicId = $.trim($('#public-id').val());
+                var dirtyTimeStart = ($('#time-start').val() || '__:__').split('_').join('0').split(':');
+                var dateStart = $('#datepicker').datepicker('getDate');
+                dateStart.setHours(dirtyTimeStart[0]);
+                dateStart.setMinutes(dirtyTimeStart[1]);
+                var timestampStart = Math.round(dateStart.getTime() / 1000);
+                var timestampEnd = null;
 
-                        shareBox.setHTML(tmpl(REPORTS.BOX_SHARE));
+                if ($('#time-end').val()) {
+                    var dirtyTimeEnd = ($('#time-end').val() || '__:__').split('_').join('0').split(':');
+                    var dateEnd = dateStart;
+                    dateEnd.setHours(dirtyTimeEnd[0]);
+                    dateEnd.setMinutes(dirtyTimeEnd[1]);
+                    timestampEnd = Math.round(dateEnd.getTime() / 1000);
+                }
 
-                        var $users = $box.find('.users');
-                        var $lists = $box.find('.lists');
-                        $users.tags({
-                            onadd: function(tag) {
-                                shareUsers.push(parseInt(tag.id));
-                            },
-                            onremove: function(tagId) {
-                                shareUsers = jQuery.grep(shareUsers, function(value) {
-                                    return value != tagId;
-                                });
-                            }
-                        }).autocomplete({
-                            data: friends,
-                            target: $users.closest('.ui-tags'),
-                            onchange: function(item) {
-                                $(this).tags('addTag', item).val('').focus();
-                            }
-                        }).keydown(function(e) {
-                            if (e.keyCode == KEY.DEL && !$(this).val()) {
-                                $(this).tags('removeLastTag');
-                            }
-                        });
-
-                        $lists.tags({
-                            onadd: function(tag) {
-                                shareLists.push(tag.id);
-                            },
-                            onremove: function(tagId) {
-                                shareLists = jQuery.grep(shareLists, function(value) {
-                                    return value != tagId;
-                                });
-                            }
-                        }).autocomplete({
-                            data: lists,
-                            target: $lists.closest('.ui-tags'),
-                            onchange: function(item) {
-                                $(this).tags('addTag', item).val('').focus();
-                            }
-                        }).keydown(function(e) {
-                            if (e.keyCode == KEY.DEL && !$(this).val()) {
-                                $(this).tags('removeLastTag');
-                            }
-                        }).tags('addTag', {
-                            id: listId,
-                            title: listTitle
-                        });
-
-                        $box.find('input[value=""]:first').focus();
-                    }
+                Control.fire('add_report', {
+                    ourPublicId: ourPublicId,
+                    publicId: publicId,
+                    timestampStart: timestampStart,
+                    timestampEnd: timestampEnd,
+                    groupId: t.groupId
+                }, function() {
+                    t.update();
                 });
-            }
-        }).show();
-    },
-
-    shareList: function(shareUsers, shareLists) {
-        var box = this;
-
-        if (shareLists.length && shareUsers.length) {
-            Control.fire('share_list', {
-                groupIds: shareLists.join(','),
-                userIds: shareUsers.join(',')
-        }, function() {
-                box.hide();
-                new Box({
-                    id: 'shareSuccess',
-                    title: 'Поделиться',
-                    html: 'Выбранные друзья успешно получили доступ к спискам',
-                    buttons: [
-                        {label: 'Закрыть'}
-                    ]
-                }).show();
             });
-        } else {
-            new Box({
-                id: 'shareError',
-                title: 'Ошибка',
-                html: 'Не выбран пользователь или список',
-                buttons: [
-                    {label: 'Закрыть'}
-                ]
-            }).show();
         }
     }
 });
 
-$(document).ready(function() {
-    $.mask.definitions['2']='[012]';
-    $.mask.definitions['3']='[0123]';
-    $.mask.definitions['5']='[012345]';
-    $.datepicker.setDefaults({
-        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-        monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-        firstDay: 1,
-        showAnim: '',
-        dateFormat: 'd MM'
-    });
+/**
+ * @class ResultPage
+ * @extends Page
+ */
+ResultPage = Page.extend({
+    update: function() {
+        var t = this;
+        var $listAddMonitor = $('#list-add-monitor');
+        var $listHeader = $('#list-header');
+        var $results = $('#results');
 
-    defaultGroupCollection = new GroupCollection();
-    sharedGroupCollection = new GroupCollection();
-    userGroupCollection = new GroupCollection();
+        if (!t.inited) {
+            t.inited = true;
+        }
 
-    VK.init({
-        apiId: Configs.appId,
-        nameTransportPath: '/xd_receiver.htm'
-    });
+        Control.fire('get_result_list', {
+            groupId: t.groupId,
+            limit: t.limit,
+            offset: t.offset
+        }, function(data) {
+            $listAddMonitor.slideUp(200);
+            $listHeader.html(tmpl(REPORTS.RESULT.LIST_HEADER));
+            $results.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
+            t.makeFullTime($results.find('.time'));
+            t.makeDate($results.find('.date'));
+            t.makeDiffTime($results.find('.diff-time'));
+            t.bindEvents();
+        });
+    },
 
-    try {
-        new Pages();
-    } catch(e) {
-        $('#global-loader').hide();
-        new Box({
-            title: 'Ошибка',
-            html: 'Произошла ошибка JavaScript :('
-        }).show();
-        throw e;
+    bindEvents: function() {
+        var t = this;
+        t.bindDeleteEvent();
     }
+});
+
+$.mask.definitions['2']='[012]';
+$.mask.definitions['3']='[0123]';
+$.mask.definitions['5']='[012345]';
+$.datepicker.setDefaults({
+    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+    monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+    firstDay: 1,
+    showAnim: '',
+    dateFormat: 'd MM'
+});
+
+defaultGroupCollection = new GroupCollection();
+sharedGroupCollection = new GroupCollection();
+userGroupCollection = new GroupCollection();
+groupListModel = new GroupListModel();
+
+$(document).ready(function() {
+    new Pages();
 });
