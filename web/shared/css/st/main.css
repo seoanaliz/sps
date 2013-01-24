@@ -2,7 +2,7 @@ body{overflow-y:scroll;}
 label{display:block;cursor:pointer;}
 label>*{vertical-align:middle;}
 table,tr,td{vertical-align:top;}
-#main{width:1070px;margin:10px auto;border:1px solid #C4CDE0;border-radius:3px;background-color:white;position:relative;z-index:1;}#main>.header{background:#f1f1f1;border:1px solid #fff;border-bottom:none;border-radius:2px;border-bottom:1px solid #D8DFEA;}
+#main{width:1070px;margin:10px auto;border:1px solid #C4CDE0;border-radius:3px;background-color:white;position:relative;z-index:1;}#main>.header{background:#f1f1f1;border:1px solid #fff;border-radius:2px;border-bottom:1px solid #D8DFEA;}
 #main .right-column{background-color:#f7f7f7;border-left:1px solid #D8DFEA;}
 #main .right-column>.filter{width:169px;padding-bottom:10px;}#main .right-column>.filter>.interval-wrapper{display:none;}
 #main .right-column>.filter>div>.title,#main .right-column>.filter>.title{color:#555;font-weight:bold;padding:10px 10px 0;}
@@ -63,7 +63,7 @@ table,tr,td{vertical-align:top;}
 #global-loader{position:fixed;top:0;left:0;right:0;bottom:0;background:#ffffff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;z-index:999;text-align:center;line-height:300px;font-size:14px;}
 #go-to-top{display:none;position:fixed;line-height:100px;font-weight:bold;width:100px;height:100%;top:0;left:0;opacity:.3;cursor:pointer;text-align:center;background-color:#DEE5EB;color:#2B587A;-webkit-transition:.2s opacity;}#go-to-top:hover{opacity:1;}
 #load-more-table{padding:10px;text-align:center;cursor:pointer;color:#2B587A;border-top:1px solid #D8DFEA;position:relative;display:none;}#load-more-table:hover{background-color:#E1E7ED;}
-#load-more-table.loading:after{position:absolute;top:0;left:0;width:100%;height:100%;background:#e1e7ed url('../../images/common/upload.gif') no-repeat center;content:'';}
+#load-more-table.loading:after{position:absolute;top:0;left:0;width:100%;height:100%;background:#ffffff url('../../images/common/upload.gif') no-repeat center;content:'';}
 .plus{color:#7EA65A;}
 .minus{color:#D44F30;}
 .true,.false{cursor:default;font-size:20px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}

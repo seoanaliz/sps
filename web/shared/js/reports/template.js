@@ -15,11 +15,19 @@ var REPORTS = {
         '</tr>' +
     '</tbody></table>',
 
+    BOX_SHARE:
+    '<div class="box-share">' +
+        '<div class="title">Выберите списки</div>' +
+        '<input type="text" class="lists"></textarea>' +
+        '<div class="title">Выберите друзей</div>' +
+        '<input type="text" class="users"></textarea>' +
+    '</div>',
+
     GROUP_LIST_ITEM:
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
 
     GROUP_LIST:
-    '<? if (!userLists.length || userLists.length > 1) { ?>' +
+    '<? if (!count(userLists) || count(userLists) > 1) { ?>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
         '</div>' +
@@ -30,7 +38,7 @@ var REPORTS = {
         '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item">Создать список</div>' +
     '</div>' +
-    '<? if (sharedLists.length) { ?>' +
+    '<? if (count(sharedLists)) { ?>' +
         '<div class="title">Общие списки</div>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
@@ -41,6 +49,10 @@ var REPORTS = {
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
+        '<div class="actions">' +
+            '<a id="share-list" class="share">Поделиться списком</a> |' +
+            '<a id="delete-list" class="share">Удалить</a>' +
+        '</div>' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
@@ -66,8 +78,9 @@ var REPORTS = {
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.MONITOR.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
@@ -113,8 +126,9 @@ var REPORTS = {
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.RESULT.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
