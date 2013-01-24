@@ -10,7 +10,7 @@ class getReportList
 {
     public function execute()
     {
-//        error_reporting(0);
+        error_reporting(0);
         $user_id        =   AuthVkontakte::IsAuth();
         $offset         =   Request::getInteger( 'offset' );
         $limit          =   Request::getInteger( 'limit' ) ? Request::getInteger( 'limit' ) : 25;
@@ -22,7 +22,7 @@ class getReportList
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   0;#Request::getString ( 'targetPublicId' );
         $barter_public  =   0;#Request::getString ( 'barterPublicId' );
-        $group_id       =   Request::getInteger( 'groupId');
+        $group_id       =   Request::getString( 'groupId');
         $all            =   Request::getInteger( 'allEntries') ? true : false;
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
@@ -33,13 +33,12 @@ class getReportList
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';
 
-        $default_group  = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
+        GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if (  $all || !$group_id ) {
             $group_id = GroupsUtility::get_all_user_groups( $user_id, Group::BARTER_GROUP );
         } else {
             $group_id = explode( ',', $group_id );
         }
-
 //        if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
 //            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
 

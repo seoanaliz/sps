@@ -125,16 +125,31 @@
                 $groups = array( $groups );
             $res = array();
             $i = 1;
+
             foreach( $groups as $group ) {
-                $field = ( $group->created_by == $user_id ) ? 'user_lists' : 'shared_lists';
-//                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
-                $res[$field][] = array(
-                    'group_id'  =>  $group->group_id,
-                    'type'      =>  $group->type,
-                    'name'      =>  ( $field == 'default_list' ) ? 'Моя первая група' : $group->name,
-                    'place'     =>  ( $field == 'default_list' ) ? 0 : $i++
+                if( $group->created_by != $user_id ) {
+                    $user_shared_groups[$group->created_by][] = $group->group_id;
+                } else {
+                    $res['user_lists'][] = array(
+                        'group_id'  =>  $group->group_id,
+                        'type'      =>  $group->type,
+                        'name'      =>  $group->type == 2 ? 'Моя первый список' : $group->name,
+                        'place'     =>  $group->type == 2 ? 0 : $i++
+                    );
+                }
+            }
+
+            $users_list = array_keys( $user_shared_groups);
+            $users_info = StatUsers::get_vk_user_info( $users_list );
+            foreach( $user_shared_groups as $sharer_id => $sharer_groups ) {
+                $res['shared_lists'][] = array(
+                    'group_id'  =>  implode( ',', $sharer_groups ),
+                    'type'      =>  1,
+                    'name'      =>  $users_info[$sharer_id]['name'],
+                    'place'     =>  $i++
                 );
             }
+
             if( !isset( $res['user_lists'] ))   $res['user_lists'] = array();
             if( !isset( $res['shared_lists'] )) $res['shared_lists'] = array();
             if( !isset( $res['default_list'] )) $res['default_list'] = array();
