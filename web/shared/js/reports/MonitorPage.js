@@ -141,6 +141,7 @@ MonitorPage = Page.extend({
         }
 
         if (t.isEnded) {
+            $('#load-more-table').remove();
             return;
         }
 
