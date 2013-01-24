@@ -8,6 +8,7 @@
         private $page_short_name;
         private $count;
 
+        const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
         const PAGE_SIZE = 20;
@@ -150,6 +151,7 @@
 
         public function get_posts( $page_number )
         {
+            sleep(rand( 1,12 ));
             $offset = $page_number * self::PAGE_SIZE;
 
             if (!isset($this->count))
@@ -167,7 +169,7 @@
             );
 
             $res = VkHelper::api_request( 'wall.get', $params );
-            sleep(0.5);
+            sleep(self::PAUSE);
             unset( $res[0] );
             $posts = $this->post_conv( $res );
             $posts = $this->kill_attritions( $posts );
@@ -372,7 +374,7 @@
                              'count'    =>  1,
                              'filter'   => 'owner' );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
-            sleep(0.5);
+            sleep( self::PAUSE );
             if ( isset( $res->error )) {
                 if ( $res->error->error_code == 15 )
                     throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
@@ -453,7 +455,7 @@ public static function get_post_likes( $post_ids, $access_token = '')
     if ( $access_token )
         $params['access_token'] = $access_token;
     $res = VkHelper::api_request( 'wall.getById', $params );
-    sleep(0.5);
+    sleep( self::PAUSE );
     $result = array();
     foreach( $res as $post ) {
         $result[ $post->to_id . '_' . $post->id ] = array(
@@ -475,7 +477,7 @@ public static function get_post_likes( $post_ids, $access_token = '')
             if (is_numeric($offset))    $params['offset'] = $offset;
 
             $res = VkHelper::api_request( 'photos.get', $params );
-            sleep(0.5);
+            sleep( self::PAUSE );
             if ($res) {
                 $query_line = array();
 
@@ -494,7 +496,7 @@ public static function get_post_likes( $post_ids, $access_token = '')
                     'extended' => 1,
                 );
                 $res = VkHelper::api_request('photos.getById', $params);
-                sleep(0.5);
+                sleep(self::PAUSE);
                 $posts = VkAlbums::post_conv($res);
                 $posts = $this->kill_attritions($posts, self::ALBUM_MIN_LIKES_LIMIT);
                 return $posts;
@@ -518,7 +520,7 @@ public static function get_post_likes( $post_ids, $access_token = '')
             );
 
             $res = VkHelper::api_request('photos.getAlbums', $params);
-            sleep(0.5);
+            sleep(self::PAUSE);
             if (!empty($res->error)) {
                 throw new Exception('wall.getById::' . $res->error->error_msg);
             } else {
