@@ -33,7 +33,8 @@
                 $user['at'] = StatUsers::get_access_token( $user_id ) ? 1 : 0;
                 if ( $user['at']) {
 //                    MesDialogs::check_friend_requests( $user_id );
-                    MesDialogs::check_new_messages( array( $user_id ), 30 );
+                   if ( !MesDialogs::check_new_messages( array( $user_id ), 30 ))
+                       die( ERR_NO_ACC_TOK );
                 }
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }
