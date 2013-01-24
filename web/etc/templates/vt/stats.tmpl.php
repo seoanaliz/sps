@@ -6,9 +6,9 @@
                 <tr>
                     <th class=""><span>Дата</span></th>
                     <th class="">&nbsp;</th>
-                    <th class=""><span>Кол-во постов</span></th>
-                    <th class=""><span>Кол-во авторских постов</span></th>
-                    <th class=""><span>Кол-во слитых постов</span></th>
+                    <th class=""><span>Кол-во загруженных постов</span></th>
+                    <th class=""><span>Кол-во загруженных авторских постов</span></th>
+                    <th class=""><span>Кол-во загруженных постов из источников</span></th>
                     <th class="">&nbsp;</th>
                     <th class=""><span>Кол-во запланированных постов</span></th>
                     <th class=""><span>Кол-во отправленных постов</span></th>
