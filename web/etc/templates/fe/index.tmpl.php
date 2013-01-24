@@ -122,7 +122,7 @@
                     </div>
 
                     <div class="type-selector">
-                        <a class="grid_type all" <?=count($gridTypes) < 2 ? 'style="display:none"' : ''?> data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
+                        <a class="grid_type all" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
                         <?
                         $isFirst=0;
                         foreach ($gridTypes as $type => $name): ?>
