@@ -51,7 +51,7 @@ class GetSystemStats {
 
         $i = new DateTimeWrapper($endDate->format('c'));
 
-        while ($startDate <= $i) {
+        while ($startDate < $i) {
             $key = $i->DefaultDateFormat();
             $result[$key] = array(
                 "totalArticlesCount" => 0,
