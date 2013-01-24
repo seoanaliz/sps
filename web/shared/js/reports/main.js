@@ -1,6 +1,6 @@
 Configs = {
     appId: vk_appId,
-    limit: 150,
+    limit: 50,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
     eventsIsDebug: true
@@ -96,6 +96,12 @@ Pages = Event.extend({
             t.showMonitors();
             $header.find('.tab').removeClass('selected');
             $(this).addClass('selected');
+        });
+
+        $(window).scroll(function() {
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+                t.currentPage.showMore();
+            }
         });
 
         t.showMonitors();

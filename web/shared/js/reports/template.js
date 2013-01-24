@@ -78,8 +78,9 @@ var REPORTS = {
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.MONITOR.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
@@ -125,8 +126,9 @@ var REPORTS = {
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.RESULT.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
