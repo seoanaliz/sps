@@ -15,12 +15,15 @@ MonitorPage = Page.extend({
             $('#time-start').mask('29:59');
             $('#time-end').mask('29:59');
             $('#datepicker').datepicker().datepicker('setDate', new Date().getTime());
+            t.bindEvents();
         }
+
+        t.pageLoaded = 0;
 
         Control.fire('get_monitor_list', {
             groupId: t.groupId,
             limit: t.limit,
-            offset: t.offset
+            offset: t.limit * t.pageLoaded
         }, function(data) {
             try {
                 $listAddMonitor.slideDown(200);
@@ -28,7 +31,6 @@ MonitorPage = Page.extend({
                 $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
                 t.makeTime($results.find('.time'));
                 t.makeDate($results.find('.date'));
-                t.bindEvents();
             } catch(e) {
                 new Box({
                     title: 'Ошибка',
@@ -43,10 +45,39 @@ MonitorPage = Page.extend({
 
     bindEvents: function() {
         var t = this;
+        t.bindDeleteReportEvent();
+        t.bindAddReportEvent();
+    },
+
+    bindDeleteReportEvent: function() {
+        var t = this;
+        var $results = $('#results');
+
+        $results.delegate('.icon.delete', 'click', function() {
+            var $row = $(this).closest('.row');
+            var confirmBox = new Box({
+                title: 'Удаление',
+                html: 'Вы уверены, что хотите удалить отчет?',
+                buttons: [
+                    {label: 'Удалить', onclick: deleteReport},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function deleteReport() {
+                confirmBox.hide();
+                Control.fire('delete_report', {
+                    reportId: $row.data('report-id'),
+                    groupId: t.groupId
+                }, function() {
+                    $row.slideUp(200);
+                });
+            }
+        });
+    },
+
+    bindAddReportEvent: function() {
         var $addReport = $('#addReport');
-
-        t.bindDeleteEvent();
-
         if (!$addReport.data('inited')) {
             $addReport.data('inited', true);
             $addReport.click(function() {
@@ -93,5 +124,33 @@ MonitorPage = Page.extend({
                 });
             });
         }
+    },
+
+    showMore: function() {
+        var t = this;
+        var $results = $('#results');
+
+        if (t.loaded) {
+            return;
+        } else {
+            t.loaded = true;
+        }
+
+        t.pageLoaded++;
+
+        Control.fire('get_monitor_list', {
+            groupId: t.groupId,
+            limit: t.limit,
+            offset: t.limit * t.pageLoaded
+        }).success(function(data) {
+            t.loaded = false;
+            $('#load-more-table').remove();
+            var $tmpElement = $(document.createElement('div'));
+            $tmpElement.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
+            t.makeTime($tmpElement.find('.time'));
+            t.makeDate($tmpElement.find('.date'));
+            $results.append($tmpElement.html());
+            $tmpElement.remove();
+        });
     }
 });

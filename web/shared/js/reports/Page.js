@@ -6,9 +6,10 @@ Page = Event.extend({
     inited: null,
     sort: '',
     sortReverse: false,
-    offset: 0,
     limit: Configs.limit,
     groupId: 0,
+    pageLoaded: 0,
+    locked: false,
 
     getTime: function(timestamp) {
         var date = timestamp ? new Date(timestamp * 1000) : new Date();
@@ -78,31 +79,6 @@ Page = Event.extend({
             var time = $date.text();
             if (!intval(time)) return;
             $date.html(t.getDiffTime(time));
-        });
-    },
-
-    bindDeleteEvent: function() {
-        var t = this;
-        $('.icon.delete').click(function() {
-            var $row = $(this).closest('.row');
-            var confirmBox = new Box({
-                title: 'Удаление',
-                html: 'Вы уверены, что хотите удалить отчет?',
-                buttons: [
-                    {label: 'Удалить', onclick: deleteReport},
-                    {label: 'Отмена', isWhite: true}
-                ]
-            }).show();
-
-            function deleteReport() {
-                confirmBox.hide();
-                Control.fire('delete_report', {
-                    reportId: $row.data('report-id'),
-                    groupId: t.groupId
-                }, function() {
-                    $row.slideUp(200);
-                });
-            }
         });
     },
 

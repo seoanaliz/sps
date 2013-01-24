@@ -12,6 +12,7 @@
 #main .left-column>.content #results .column.public>div{display:inline-block;vertical-align:middle;}
 #main .left-column>.content #results .column.public .photo{width:40px;height:40px;margin-right:10px;overflow:hidden;}#main .left-column>.content #results .column.public .photo img{max-width:100%;}
 #main .left-column>.content #results .column.public .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+#main .left-column>.content #results .empty-result{padding:100px;text-align:center;color:#666;}
 #main .left-column>.content .list-head .item,#main .left-column>.content #results .item,#main .left-column>.content .list-head .column,#main .left-column>.content #results .column{text-align:center;width:90px;}
 #main .left-column>.content .list-head .item.public,#main .left-column>.content #results .item.public,#main .left-column>.content .list-head .column.public,#main .left-column>.content #results .column.public{text-align:left;width:210px;}
 #main .left-column>.content .list-head .item.action,#main .left-column>.content #results .item.action,#main .left-column>.content .list-head .column.action,#main .left-column>.content #results .column.action{width:30px;}
@@ -19,3 +20,4 @@
 #main .left-column>.content .list-head .item,#main .left-column>.content #results .item{cursor:default !important;}#main .left-column>.content .list-head .item .icon,#main .left-column>.content #results .item .icon{display:none !important;}
 #main .right-column>.filter>.list{border-top:none;padding-top:0;}#main .right-column>.filter>.list .item+input{margin-top:10px;}
 #main .right-column>.filter>.list input{display:none;width:138px;}
+#load-more-table{display:block;}
