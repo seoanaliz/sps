@@ -98,6 +98,10 @@ function intval(value) {
     return (value === true) ? 1 : (parseInt(value) || 0);
 }
 
+function strval(value) {
+    return value + '';
+}
+
 // Парсинг URL
 function getURLParameter(name, search) {
     search = search || location.search;
