@@ -36,7 +36,7 @@ var REPORTS = {
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
         '<input type="text" placeholder="Введите название списка..." /> ' +
-        '<div class="item">Создать список</div>' +
+        '<div class="item"><u>Создать список</u></div>' +
     '</div>' +
     '<? if (count(sharedLists)) { ?>' +
         '<div class="title">Общие списки</div>' +
