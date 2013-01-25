@@ -33,19 +33,20 @@
             $text           = trim(Request::getString( 'text' ));
             $link           = trim(Request::getString( 'link' ));
             $photos         = Request::getArray( 'photos' );
-            //$sourceFeedId   = Request::getInteger( 'sourceFeedId' );
             $targetFeedId   = Request::getInteger('targetFeedId');
+            $userGroupId   = Request::getInteger('userGroupId');
+            if (!$userGroupId){
+                $userGroupId = null;
+            }
 
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
             if (is_null($role)){
                 return ObjectHelper::ToJSON(array('success'=> false));
             }
-            $authorId = null;
-            if ($role == UserFeed::ROLE_AUTHOR){
-                $authorId = $this->getAuthor()->authorId;
-                //$sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
-            }
+
+
+            $authorId = $this->getAuthor()->authorId;
 
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
@@ -92,6 +93,7 @@
             $article->authorId = $authorId;
             $article->isCleaned = false;
             $article->statusId = 1;
+            $article->userGroupId = $userGroupId;
             $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
 
             $articleRecord = new ArticleRecord();
