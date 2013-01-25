@@ -155,7 +155,9 @@
         }
 
         private function getObjects() {
-            $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
+            if (isset($this->search['_sourceFeedId'])){
+                $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->search['_sourceFeedId']));
+            }
 
             $this->articles = ArticleFactory::Get($this->search, $this->options);
             $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
