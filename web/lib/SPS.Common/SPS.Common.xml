@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <actions>
+    <action name="GetSystemStats" />
+
     <group name="siteparam">
         <action name="GetSiteParamList">
             <path>site-params/GetSiteParamListAction</path>
