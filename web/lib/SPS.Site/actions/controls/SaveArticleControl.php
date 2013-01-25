@@ -45,7 +45,6 @@
                 return ObjectHelper::ToJSON(array('success'=> false));
             }
 
-
             $authorId = $this->getAuthor()->authorId;
 
             $text = $this->convert_line_breaks($text);
