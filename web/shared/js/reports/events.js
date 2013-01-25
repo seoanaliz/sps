@@ -13,7 +13,7 @@ Control = $.extend(Control, {
         get_result_list: {
             name: 'getReportList',
             params: {
-                filter: 'filter'
+                filter: 'status'
             },
             defaultParams: {
                 state: 'complete'
@@ -22,7 +22,7 @@ Control = $.extend(Control, {
         get_monitor_list: {
             name: 'getReportList',
             params: {
-                filter: 'filter'
+                filter: 'status'
             }
         },
         delete_report: {

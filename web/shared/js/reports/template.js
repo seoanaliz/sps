@@ -18,11 +18,11 @@ var REPORTS = {
                             '<span>Все</span>' +
                         '</label>' +
                         '<label>' +
-                            '<input name="filter" type="radio" value="success">' +
+                            '<input name="filter" type="radio" value="4">' +
                             '<span>Успешно</span>' +
                         '</label>' +
                         '<label>' +
-                            '<input name="filter" type="radio" value="fail">' +
+                            '<input name="filter" type="radio" value="1">' +
                             '<span>Неудачно</span>' +
                         '</label>' +
                     '</div>' +
