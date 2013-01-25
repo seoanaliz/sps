@@ -122,16 +122,6 @@ function loadArticles(clean) {
 
     $('#wall-load').show();
 
-    if (sourceType == 'authors') {
-        $('.newpost').show();
-    } else {
-        if (Elements.leftdd().length != 1) {
-            $('.newpost').hide();
-        } else {
-            $('.newpost').show();
-        }
-    }
-
     var $slider = $("#slider-range");
     var from = $slider.slider("values", 0);
     var to = $slider.slider("values", 1);
@@ -151,6 +141,17 @@ function loadArticles(clean) {
         type: sourceType,
         targetFeedId: targetFeedId
     };
+
+    if (sourceType == 'authors') {
+        $('.newpost').show();
+        requestData['userGroupId'] = Elements.getUserGroupId();
+    } else {
+        if (Elements.leftdd().length != 1) {
+            $('.newpost').hide();
+        } else {
+            $('.newpost').show();
+        }
+    }
 
     if (!clean) {
         requestData['articles-only'] = 1;
@@ -634,7 +635,8 @@ var Eventlist = {
                 photos: photos,
                 link: link,
                 sourceFeedId: $sourceFeedId,
-                targetFeedId: Elements.rightdd()
+                targetFeedId: Elements.rightdd(),
+                userGroupId: Elements.getUserGroupId()
             },
             success: function (data) {
                 if(data.success) {

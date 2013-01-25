@@ -1770,5 +1770,8 @@ var Elements = {
                 container.find('div.link-status-content span a').text(shortLink);
             }
         });
+    },
+    getUserGroupId: function() {
+        return $('.user-groups-tabs').find('.tab.selected').data('user-group-id') || null;
     }
 };
