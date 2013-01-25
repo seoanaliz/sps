@@ -11,7 +11,7 @@ class GroupFactory
     /** Default Connection Name */
     const DefaultConnection = 'tst';
 
-    /** Group instance mapping  */
+    /** VfsFile instance mapping  */
     public static $mapping = array (
     'class'       => 'Group'
     , 'table'     => 'groups'
@@ -87,7 +87,7 @@ class GroupFactory
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_ARRAY
         )
-        ,'_users_ids_in_array' => array(
+        ,'_users_ids' => array(
                 'name'      => 'users_ids'
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
@@ -143,17 +143,17 @@ class GroupFactory
         return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return Group[] */
+    /** @return VfsFile[] */
     public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return Group */
+    /** @return VfsFile */
     public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return Group */
+    /** @return VfsFile */
     public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
     }
@@ -178,7 +178,7 @@ class GroupFactory
         return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
     }
 
-    /** @return Group */
+    /** @return VfsFile */
     public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
     }

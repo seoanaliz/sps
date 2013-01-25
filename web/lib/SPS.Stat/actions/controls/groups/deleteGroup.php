@@ -37,23 +37,19 @@
             if( $type == 'Barter' ) {
                 $source = 1;
                 $default_group = GroupsUtility::get_default_group( $user_id, $source  );
-                $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if ( !$group )
-                    die(  ObjectHelper::ToJSON(array('response' => false )));
-
-                if ( $group->group_id === $default_group->group_id ) {
+                $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by' => $user_id ));
+                if ( $group && $group->group_id === $default_group->group_id ) {
                     //дефолтные группы удалять нельзя
                     die(  ObjectHelper::ToJSON(array('response' => false )));
-                } elseif ( $group && $group->created_by == $user_id ) {
-                    //жесткое удаление группы, только создавший
-                    GroupsUtility::delete_group( $group, $default_group );
-
+                } else {
+                    //отписываем человека от группы
+                    $group = GroupFactory::GetOne( array( 'group_id' => $group_id ));
+                    GroupsUtility::dismiss_from_group( $group, $user_id );
                 }
-                  else {
-                      //отписываем человека от группы
-                      $group = GroupFactory::GetOne( array( 'group_id' => $group_id ));
-                      GroupsUtility::dismiss_from_group( $group, $user_id );
-                }
+//                  else {
+//                    //жесткое удаление группы, только создавший
+//                    GroupsUtility::delete_group( $group, $default_group );
+//                }
                 die( ObjectHelper::ToJSON(array('response' => true )));
             }
 
