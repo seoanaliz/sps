@@ -29,7 +29,7 @@
             }
             if ( $type == 'Barter' ) {
                 $source = 1;
-                $groups = GroupFactory::Get( array( 'status' => 1, 'source' => Group::BARTER_GROUP, '_users_ids' => array( $user_id )));
+                $groups = GroupFactory::Get( array( 'status' => 1, 'source' => Group::BARTER_GROUP, '_users_ids_in_array' => array( $user_id )));
                 die( ObjectHelper::ToJSON( array( 'response' => GroupsUtility::form_response( $groups, $user_id, Group::BARTER_GROUP ))));
             }
             $res = $m_class::get_groups( $user_id );
