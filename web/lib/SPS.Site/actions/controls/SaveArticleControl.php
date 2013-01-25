@@ -87,7 +87,7 @@
             $article->sourceFeedId = -1;
             $article->targetFeedId = $targetFeedId;
             $article->externalId = -1;
-            $article->rate = 100;
+            $article->rate = 0;
             $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
             $article->authorId = $authorId;
             $article->isCleaned = false;

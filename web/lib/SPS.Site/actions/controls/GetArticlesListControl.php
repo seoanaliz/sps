@@ -125,7 +125,12 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
             $this->search['authorId'] = $this->getAuthor()->authorId;
-            $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
+            if ($role == UserFeed::ROLE_AUTHOR){
+                $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+            } else {
+                $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
+            }
+
         } else if ($type == SourceFeedUtility::Ads) {
             // рекламка
         }
