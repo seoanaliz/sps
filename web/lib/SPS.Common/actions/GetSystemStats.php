@@ -24,6 +24,7 @@ class GetSystemStats {
             "startDate"::date as "createdAt"
             , count(*) as "totalQueueCount"
             , sum (case when "statusId" = 5 then 1 else 0 end) as "sent"
+            , sum (case when "statusId" <> 5 and "endDate" < @now then 1 else 0 end) as "notSent"
         from "getArticleQueues"
         where "startDate"::date > @startDate
         and "startDate"::date <= @endDate
@@ -59,6 +60,7 @@ class GetSystemStats {
                 "imported" => 0,
                 "totalQueueCount" => 0,
                 "sent" => 0,
+                "notSent" => 0,
                 "importErrors" => 0,
                 "exportErrors" => 0,
             );
@@ -83,6 +85,7 @@ class GetSystemStats {
         $cmd = new SqlCommand(self::GET_QUEUES, ConnectionFactory::Get());
         $cmd->SetDate('@startDate', $startDate);
         $cmd->SetDate('@endDate', $endDate);
+        $cmd->SetDate('@now', $endDate);
         $Ds = $cmd->Execute();
 
         while ($Ds->Next()) {
@@ -91,6 +94,7 @@ class GetSystemStats {
 
             $result[$key]['totalQueueCount'] = $Ds->GetInteger('totalQueueCount');
             $result[$key]['sent'] = $Ds->GetInteger('sent');
+            $result[$key]['notSent'] = $Ds->GetInteger('notSent');
         }
 
         $cmd = new SqlCommand(self::GET_ERRORS, ConnectionFactory::Get());
@@ -109,4 +113,3 @@ class GetSystemStats {
         Response::setArray('stats', $result);
     }
 }
-?>
