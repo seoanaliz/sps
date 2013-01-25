@@ -17,6 +17,7 @@ class getEntries {
 
     public function Execute()
     {
+
         error_reporting( 0 );
         $this->conn =   ConnectionFactory::Get('tst');
         $userId     =   Request::getInteger( 'userId' );
@@ -44,9 +45,18 @@ class getEntries {
         $offset         =   $offset ? $offset : 0;
         $limit          =   $limit  ?  $limit : 25;
         $search         =   mb_strlen( $search ) > 5 ? mb_substr( $search, 0, mb_strlen( $search ) - 2 ) : $search;
+    
 
+    
+        if ($groupId    == 100) {
+    	    $quan = ' ';
+        } else {
+    	    $quan = ' AND publ.quantity >= @min_quantity
+                     AND publ.quantity <= @max_quantity
+                     AND publ.quantity >= 10000 ';
+        } 
         $group  = StatGroups::get_group( $groupId );
-        //1 тип статистики
+        //1 С‚РёРї СЃС‚Р°С‚РёСЃС‚РёРєРё
         if ( empty( $group) || $group['type'] != 2 ) {
             $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
@@ -88,10 +98,7 @@ class getEntries {
                       publ.vk_id=gprel.public_id '
                       . $page .
                      ' AND gprel.group_id=@group_id
-                      AND publ.quantity >= @min_quantity
-                      AND publ.quantity <= @max_quantity
-                      AND publ.quantity >= 10000
-                      ' . $search . '
+                     ' . $quan . $search . '
                 ORDER BY '
                     . $sortBy .
               ' OFFSET '
@@ -111,10 +118,10 @@ class getEntries {
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
-                            quantity > @min_quantity '
-                            . $page .
-                          ' AND quantity < @max_quantity
-                            AND quantity > 10000'.
+                            quantity > @min_quantity 
+                            AND quantity < @max_quantity
+                            AND quantity > 10000'
+				 . $page .
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy .
@@ -157,7 +164,7 @@ class getEntries {
                 );
             }
         }
-        //2 тип, наши паблики. Сортировка силами php
+        //2 С‚РёРї, РЅР°С€Рё РїР°Р±Р»РёРєРё. РЎРѕСЂС‚РёСЂРѕРІРєР° СЃРёР»Р°РјРё php
         else {
             $allowed_sort_values = array(   'views',
                                             'overall_posts',
@@ -222,7 +229,7 @@ class getEntries {
         return $res;
     }
 
-    //возвращает данные о наших пабликах
+    //РІРѕР·РІСЂР°С‰Р°РµС‚ РґР°РЅРЅС‹Рµ Рѕ РЅР°С€РёС… РїР°Р±Р»РёРєР°С…
     private function get_our_publics_state( $time_start, $time_stop )
     {
         $publics = StatPublics::get_our_publics_list();
@@ -237,16 +244,16 @@ class getEntries {
             $non_authors_posts  =   StatPublics::get_public_posts( $public['sb_id'], 'sb', $time_start, $time_stop );
             $ad_posts           =   StatPublics::get_public_posts( $public['sb_id'], 'ads', $time_start, $time_stop );
             $posts_quantity     =   $authors_posts['count'] + $non_authors_posts['count'];
-            //всего постов
+            //РІСЃРµРіРѕ РїРѕСЃС‚РѕРІ
             $res['overall_posts'] = $posts_quantity;
             $days = round(( $time_stop - $time_start ) / 84600 );
             $res['posts_days_rel'] = round( $posts_quantity / $days );
 
-            //постов из источников
+            //РїРѕСЃС‚РѕРІ РёР· РёСЃС‚РѕС‡РЅРёРєРѕРІ
             $res['sb_posts_count'] = $non_authors_posts['count'];
-            // средний rate спарсенных постов
+            // СЃСЂРµРґРЅРёР№ rate СЃРїР°СЂСЃРµРЅРЅС‹С… РїРѕСЃС‚РѕРІ
             $res['sb_posts_rate']   = StatPublics::get_average_rate( $public['sb_id'], $time_start, $time_stop );
-            //todo главноредакторских постов непосредственно на стену, гемор!!!!! <- в демона
+            //todo РіР»Р°РІРЅРѕСЂРµРґР°РєС‚РѕСЂСЃРєРёС… РїРѕСЃС‚РѕРІ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РЅР° СЃС‚РµРЅСѓ, РіРµРјРѕСЂ!!!!! <- РІ РґРµРјРѕРЅР°
             $res['auth_posts']      = $posts_quantity ?
                 round( 100 * $authors_posts['count'] / $posts_quantity   )  : 0 ;
             $res['ad_posts_count']  =   $ad_posts['count'];
@@ -255,11 +262,11 @@ class getEntries {
             $res['auth_reposts_eff']= $non_authors_posts['reposts'] ?
                 (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) : 0;
 
-            //прирост подписчиков относительно предыдущего периода
+            //РїСЂРёСЂРѕСЃС‚ РїРѕРґРїРёСЃС‡РёРєРѕРІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РїРµСЂРёРѕРґР°
             $sub_now = StatPublics::get_avg_subs_growth( $public['sb_id'], $time_start, $time_stop );
             $sub_pre = StatPublics::get_avg_subs_growth( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
 
-            //прирост посетителей относительно предыдущего периода
+            //РїСЂРёСЂРѕСЃС‚ РїРѕСЃРµС‚РёС‚РµР»РµР№ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РїРµСЂРёРѕРґР°
             $vis_now = StatPublics::get_average_visitors( $public['sb_id'], $time_start, $time_stop );
             $vis_prev_period = StatPublics::get_average_visitors( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
             if ( $vis_now && $vis_prev_period ) {
@@ -306,7 +313,7 @@ class getEntries {
         return $ds->getValue('ava');
     }
 
-    //выбирает админов, в 0 элемент помещает "главного" для этой выборки
+    //РІС‹Р±РёСЂР°РµС‚ Р°РґРјРёРЅРѕРІ, РІ 0 СЌР»РµРјРµРЅС‚ РїРѕРјРµС‰Р°РµС‚ "РіР»Р°РІРЅРѕРіРѕ" РґР»СЏ СЌС‚РѕР№ РІС‹Р±РѕСЂРєРё
     private function get_admins( $publ, $sadmin ='' )
     {
         $resul = array();
