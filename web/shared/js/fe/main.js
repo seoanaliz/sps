@@ -1773,5 +1773,8 @@ var Elements = {
     },
     getUserGroupId: function() {
         return $('.user-groups-tabs').find('.tab.selected').data('user-group-id') || null;
+    },
+    getArticleStatus: function() {
+        return $('.authors-tabs').find('.tab.selected').data('article-status') || 1;
     }
 };
