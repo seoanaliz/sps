@@ -12,8 +12,17 @@ Control = $.extend(Control, {
     controlMap: {
         get_result_list: {
             name: 'getReportList',
+            params: {
+                filter: 'filter'
+            },
             defaultParams: {
                 state: 'complete'
+            }
+        },
+        get_monitor_list: {
+            name: 'getReportList',
+            params: {
+                filter: 'filter'
             }
         },
         delete_report: {
@@ -21,9 +30,6 @@ Control = $.extend(Control, {
             defaultParams: {
                 groupId: 0
             }
-        },
-        get_monitor_list: {
-            name: 'getReportList'
         },
         add_group: {
             name: 'setGroup',

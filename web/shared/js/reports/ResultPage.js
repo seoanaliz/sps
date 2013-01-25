@@ -20,7 +20,8 @@ ResultPage = Page.extend({
         Control.fire('get_result_list', {
             groupId: t.groupId,
             limit: t.limit,
-            offset: t.limit * t.pageLoaded
+            offset: t.limit * t.pageLoaded,
+            filter: t.filter
         }, function(data) {
             try {
                 $listAddMonitor.slideUp(200);
@@ -65,7 +66,8 @@ ResultPage = Page.extend({
         Control.fire('get_result_list', {
             groupId: t.groupId,
             limit: t.limit,
-            offset: t.limit * t.pageLoaded
+            offset: t.limit * t.pageLoaded,
+            filter: t.filter
         }).success(function(data) {
             t.loaded = false;
             $('#load-more-table').remove();
