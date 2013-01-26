@@ -8,7 +8,7 @@
     Logger::Init( ELOG_WARNING  );
     include_once 'lib/Eaze.Core/Package.php' ;
 
-    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset', 'Editor', 'Author', 'User', 'AuthorEventUtility' );
+    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset', 'Editor', 'Author', 'User', 'AuthorEvent', 'AuthorEventUtility' );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
