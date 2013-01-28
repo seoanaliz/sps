@@ -133,7 +133,7 @@
                     $res['user_lists'][] = array(
                         'group_id'  =>  $group->group_id,
                         'type'      =>  $group->type,
-                        'name'      =>  $group->type == 2 ? 'Моя первый список' : $group->name,
+                        'name'      =>  $group->type == 2 ? 'Мой первый список' : $group->name,
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
                 }
