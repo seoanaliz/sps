@@ -88,6 +88,13 @@ Pages = Event.extend({
             $(this).addClass('selected');
         });
 
+        $('#filter').delegate('input', 'change', function() {
+            var filter = $(this).val();
+            t.monitor.filter = filter;
+            t.result.filter = filter;
+            t.currentPage.update();
+        });
+
         $('#tab-monitors').click(function() {
             t.showMonitors();
             $header.find('.tab').removeClass('selected');
