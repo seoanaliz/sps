@@ -6,9 +6,7 @@
  * Time: 17:00
  * To change this template use File | Settings | File Templates.
  */
-abstract class ArticleStatusAppControl {
-
-    protected $vkId;
+abstract class ArticleStatusControl extends BaseControl {
 
     /**
      * Изменяем статус записи

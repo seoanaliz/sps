@@ -99,10 +99,10 @@
                     <actions>SPS.Site.PostDeletePlanControl</actions>
                 </page>
                 <page uri="controls://article-approved/">
-                    <actions>SPS.Site.ApproveArticleAppControl</actions>
+                    <actions>SPS.Site.ApproveArticleControl</actions>
                 </page>
                 <page uri="controls://article-reject/">
-                    <actions>SPS.Site.RejectArticleAppControl</actions>
+                    <actions>SPS.Site.RejectArticleControl</actions>
                 </page>
 
 

@@ -7,12 +7,10 @@
  * To change this template use File | Settings | File Templates.
  */
 Package::load('SPS.Site/base');
-class ApproveArticleAppControl extends ArticleStatusAppControl {
+
+class ApproveArticleControl extends ArticleStatusControl {
 
     public function Execute() {
-
-        $this->vkId = AuthVkontakte::IsAuth();
-
         $id = Request::getInteger('id');
         $this->changeArticleStatusTo($id, Article::STATUS_APPROVED);
     }

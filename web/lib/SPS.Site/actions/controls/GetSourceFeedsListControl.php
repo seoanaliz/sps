@@ -54,7 +54,7 @@ class GetSourceFeedsListControl extends BaseControl
             if ($type == SourceFeedUtility::Authors) {
 
                 if ($role != UserFeed::ROLE_AUTHOR) {
-                    $showArticleStatusFilter = true;
+                    //$showArticleStatusFilter = true;
 
                     $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
                     $showUserGroups = array();
