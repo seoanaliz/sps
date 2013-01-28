@@ -32,8 +32,10 @@ class getReportList
 //        $sort_by  = ' "' . $sort_by . '" ';
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';
+        $default_group = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
+        if ( !$all && !$group_id )
+            $group_id = $default_group->group_id;
 
-        GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if (  $all || !$group_id ) {
             $group_id = GroupsUtility::get_all_user_groups( $user_id, Group::BARTER_GROUP );
         } else {
