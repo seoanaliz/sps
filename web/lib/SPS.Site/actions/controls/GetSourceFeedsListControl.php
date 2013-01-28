@@ -7,7 +7,7 @@
  */
 class GetSourceFeedsListControl extends BaseControl
 {
-
+    private $canApproveArticles = false;
     /**
      * Entry Point
      */
@@ -18,6 +18,8 @@ class GetSourceFeedsListControl extends BaseControl
         $targetFeedId = Request::getInteger('targetFeedId');
 
         $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
+
+        $this->canApproveArticles = ($role != UserFeed::ROLE_AUTHOR);
 
         $type = Request::getString('type');
         if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
@@ -113,7 +115,8 @@ class GetSourceFeedsListControl extends BaseControl
             'accessibleMyArticleStatuses' => $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId),
             'showArticleStatusFilter' => $showArticleStatusFilter,
             'showSourceList' => $showSourceList,
-            'showUserGroups' => $showUserGroups
+            'showUserGroups' => $showUserGroups,
+            'canApproveArticles' => $this->canApproveArticles,
         ));
     }
 }
