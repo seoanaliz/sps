@@ -36,7 +36,7 @@ class getReportList
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
         $order_array = array( 'posted_at', 'visitors', 'subscribers', 'status' );
-        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? ' order by IF(detected_at is null, stop_search_at,detected_at) desc ' : ' start_search_at DESC NULLS LAST ' );
+        $sort_by  =  ( strtolower( $state ) == 'complete' ) ? ' order by IF(detected_at is null, stop_search_at, detected_at) desc ' : ' start_search_at DESC NULLS LAST ' ;
         $default_group = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if ( !$all && !$group_id )
             $group_id = $default_group->group_id;
