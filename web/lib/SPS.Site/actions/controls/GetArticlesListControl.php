@@ -110,6 +110,17 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                         $authorsIds = true;
                         unset($this->search['articleStatusIn']);
                     }
+
+                    // в группе ищем записи на рассмотрении
+                    $this->reviewArticleCount = ArticleFactory::Count(
+                        array(
+                            'authorId' => $this->getAuthor()->authorId,
+                            'articleStatusIn' => array(Article::STATUS_REVIEW, Article::STATUS_APPROVED),
+                            'userGroupId' => Request::getInteger('userGroupId')
+                        ), array(
+                            BaseFactory::CustomSql => ' AND "sentAt" IS NOT NULL'
+                    ));
+
                 } else {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                     //редактору: только одобренные и на рассмотрении записи этой группы
@@ -137,14 +148,6 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             // рекламка
         }
 
-        $userGroupId = Request::getInteger('userGroupId');
-        if ($userGroupId) {
-            // в группе ищем записи на рассмотрении
-            $this->reviewArticleCount = ArticleFactory::Count(array(
-                'authorId' => $this->getAuthor()->authorId,
-                'articleStatusIn' => array(Article::STATUS_REVIEW),
-                'userGroupId' => $userGroupId));
-        }
 
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
