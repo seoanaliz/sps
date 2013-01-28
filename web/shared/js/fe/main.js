@@ -550,7 +550,8 @@ $(document).ready(function(){
                     targetFeedId: Elements.rightdd(),
                     userGroupId: Elements.getUserGroupId(),
                     articlesOnly: true,
-                    articleStatus: 3
+                    articleStatus: 1,
+                    mode: 'my'
                 }).success(function(html) {
                     var $posts = $(html);
                     Elements.initImages($posts);
