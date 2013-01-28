@@ -171,8 +171,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         if ($targetFeedId) {
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $showApproveBlock = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
-
-            $showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
+            //$showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
         }
 
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
