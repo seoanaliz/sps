@@ -93,10 +93,10 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         if ($type == SourceFeedUtility::Authors) {
 
-            $loadAll = !Request::getInteger('userGroupId');
+            //$loadAll = !Request::getInteger('userGroupId');
 
             unset($this->search['_sourceFeedId']);
-            if ($loadAll) {
+            //if ($loadAll) {
                 // #11115
                 if ($role == UserFeed::ROLE_AUTHOR) {
 
@@ -122,7 +122,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                 } else {
                     $this->search['_authorId'] = array(-1 => -1);
                 }
-            }
+            //}
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
             $this->search['authorId'] = $this->getAuthor()->authorId;
