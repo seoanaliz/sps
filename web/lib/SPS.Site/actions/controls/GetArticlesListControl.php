@@ -166,18 +166,17 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
         $this->setData();
 
-        $showApproveBlock = false;
+        $isWebUserEditor = false;
         $targetFeedId = $this->getTargetFeedId();
         if ($targetFeedId) {
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $showApproveBlock = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
-            //$showApproveBlock = ($showApproveBlock && $this->getArticleStatus() == Article::STATUS_REVIEW);
+            $isWebUserEditor = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
         }
 
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         Response::setArray('sourceFeeds', $this->sourceFeeds);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
-        Response::setBoolean('showApproveBlock', $showApproveBlock);
+        Response::setBoolean('isWebUserEditor', $isWebUserEditor);
         Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
         Response::setBoolean('canEditPosts', $this->canEditPosts);

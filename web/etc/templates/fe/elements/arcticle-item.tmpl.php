@@ -3,12 +3,13 @@
     /** @var $articleRecord ArticleRecord */
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
-    /** @var $showApproveBlock bool */
+    /** @var $isWebUserEditor bool */
     /** @var $canEditPosts boolean */
 
     if (!empty($article)) {
 
         $extLinkLoader  = false;
+        $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
 
         if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
             $extLinkLoader = true;
