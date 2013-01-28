@@ -105,8 +105,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     } else {
                         // если грузим все посты
                         $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                        $this->options[BaseFactory::CustomSql] = ' AND ' .
-                            ' (("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL )  ';
+                        $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL )  ';
                             //'("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
                         $authorsIds = true;
                         unset($this->search['articleStatusIn']);
