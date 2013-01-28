@@ -130,12 +130,20 @@
                 if( $group->created_by != $user_id ) {
                     $user_shared_groups[$group->created_by][] = $group->group_id;
                 } else {
-                    $res['user_lists'][] = array(
+
+                    $tmp = array(
                         'group_id'  =>  $group->group_id,
                         'type'      =>  $group->type,
-                        'name'      =>  $group->type == 2 ? 'Моя первый список' : $group->name,
+                        'name'      =>  $group->type == 2 ? 'Мой первый список' : $group->name,
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
+                    if( $group->type == 2 ) {
+                        if( !is_array( $res['user_lists']))
+                            $res['user_lists'] = array();
+                            array_unshift( $res['user_lists'], $tmp);
+                    } else {
+                        $res['user_lists'][]=$tmp;
+                    }
                 }
             }
 
@@ -176,8 +184,8 @@
         public static function share_groups( $groups, $rec_ids )
         {
             foreach( $groups as $group ) {
-                if ( $group->type == 2 )
-                    continue;
+//                if ( $group->type == 2 )
+//                    continue;
                 $group->users_ids = array_unique( array_merge( $group->users_ids, $rec_ids ));
             }
         }
