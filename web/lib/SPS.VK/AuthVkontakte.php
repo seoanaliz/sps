@@ -1,6 +1,8 @@
 <?php
     class AuthVkontakte {
 
+        public static $AuthorAppId;
+
         public static $AppId;
 
         public static $Password;
@@ -12,6 +14,7 @@
                 $name   = $param->getAttribute( 'name' );
                 $value  = $param->nodeValue;
 
+                if ($name == 'authorAppId') self::$AuthorAppId = $value;
                 if ($name == 'appId') self::$AppId = $value;
                 if ($name == 'password') self::$Password = $value;
                 if ($name == 'authSecret') self::$AuthSecret = $value;

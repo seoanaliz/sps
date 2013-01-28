@@ -1,243 +1,154 @@
 <?php
+if ( !defined( 'CONFPATH_CACHE' ) ) {
     define( 'CONFPATH_CACHE', 'cache' );
+}
+
+/**
+ * Package Loader
+ *
+ * Filename = Class name
+ *
+ * @package    Eaze
+ * @subpackage Core
+ * @author     sergeyfast
+ */
+class Package {
+
+    /**
+     * File flag for WITH_PACKAGE_COMPILE check
+     */
+    const CompiledEaze = 'compiled.eaze';
+
+    /**
+     * WITH_PACKAGE_COMPILE constant name
+     */
+    const WithPackageCompile = 'WITH_PACKAGE_COMPILE';
+
+    /**
+     * Loaded Packages
+     *
+     * @var array
+     */
+    public static $Packages = array();
+
+    /**
+     * Loaded Files
+     *
+     * @var array
+     */
+    public static $Files = array();
+
+    /**
+     * Structure of LIB Directory
+     *
+     * @var array
+     */
+    public static $LibStructure = array();
+
+    /**
+     * Loaded Classes
+     * @var array system = before uri, uri = after uri
+     */
+    public static $LoadedClasses = array( 'system' => array(), 'uri' => array() );
+
+    /**
+     * Current Uri
+     * @var array
+     */
+    public static $CurrentUri;
+
+    /**
+     * Force Disable Package Compile
+     * @var bool
+     */
+    public static $DisablePackageCompile = false;
+
+    /**
+     * Handle for GetLock & ReleaseLock
+     * @var resource
+     */
+    private static $lockHandle;
 
 
     /**
-     * Package Loader
-     *
-     * @package Eaze
-     * @subpackage Core
-     * @author sergeyfast
+     * Using Windows
+     * @var bool
      */
-    class Package {
+    private static $isWindows = false;
 
-        /**
-         * File flag for WITH_PACKAGE_COMPILE check
-         */
-        const CompiledEaze = 'compiled.eaze';
+    /**
+     * Last Successful Lock
+     * @var bool
+     */
+    private static $successfulLock = false;
 
-        /**
-         * .include-order
-         */
-        const IncludeOrderFilename = '.include-order';
+    /**
+     * Begin URI
+     * @param $uri
+     */
+    public static function BeginUri( $uri ) {
+        self::$CurrentUri = $uri;
 
-
-        /**
-         * WITH_PACKAGE_COMPILE constant name
-         */
-        const WithPackageCompile = 'WITH_PACKAGE_COMPILE';
-
-        /**
-         * Loaded Packages
-         *
-         * @var array
-         */
-        public static $Packages = array();
-
-        /**
-         * Loaded Files
-         *
-         * @var array
-         */
-        public static $Files = array();
-
-        /**
-         * Structure of LIB Directory
-         *
-         * @var array
-         */
-        public static $LibStructure = array();
-
-        /**
-         * Get include order list for package
-         * @static
-         * @param  string $packageName
-         * @return array string[]
-         */
-        private static function getIncludeOrderList( $packageName ) {
-            $result       = array();
-            $includeOrder = __LIB__ . '/' . $packageName . '/' . Package::IncludeOrderFilename;
-            if ( is_file( $includeOrder ) ) {
-                $result = file( $includeOrder, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
-            }
-
-            return $result;
-        }
-
-
-        /**
-         * Load Package
-         *
-         * @param string $name
-         * @return bool
-         */
-        public static function Load( $name ) {
-            if ( ( empty( $name ) )
-                 || ( isset( Package::$Packages[$name] ) )
-            ) {
-                return false;
-            }
-
-            if (defined('WITH_AUTOLOAD') && WITH_AUTOLOAD){
-                self::RegisterPackage($name);
-                return true;
-            }
-
-            // Check for package compile flag
-            if ( defined( self::WithPackageCompile ) && WITH_PACKAGE_COMPILE ) {
-                if ( strpos( $name, '/' ) !== false ) {
-                    $name = str_replace( '/', '.', $name );
-                }
-
-                $cacheFileName = sprintf( '%s/%s/%s.php', __ROOT__, CONFPATH_CACHE, $name );
-                if ( is_file( $cacheFileName ) ) {
-                    Package::$Packages[$name] = $name;
-                    /** @noinspection PhpIncludeInspection */
-                    require_once $cacheFileName;
-                    return true;
-                }
-            }
-
-            $packageDir      = __LIB__ . '/' . $name . '/';
-            $deferredInclude = array();
-            if ( is_dir( $packageDir ) ) {
-                $d = dir( $packageDir );
-                while ( false !== ( $file = $d->read() ) ) {
-                    /** @var $file string */
-                    if ( !self::CheckPHPFilename( $file, $packageDir ) ) {
-                        continue;
-                    }
-
-                    $loadedFile = $packageDir . $file;
-                    $deferredInclude[$file] = $loadedFile;
-                    Package::$Files[$loadedFile] = $loadedFile;
-                }
-
-                $d->close();
-            }
-
-                if ( !empty( $deferredInclude )) {
-                    $includeOrders = self::getIncludeOrderList( $name );
-                    if ( !empty( $includeOrders ) ) {
-                        $newOrder  = array();
-
-                        $orderKeys = array_unique( array_merge( $includeOrders, array_keys( $deferredInclude ) ) );
-                        foreach( $orderKeys as $key ) {
-                            $newOrder[$key] = $deferredInclude[$key];
-                        }
-                        $deferredInclude = $newOrder;
-                    }
-
-                    self::defferedRequire( $deferredInclude );
-                    return true;
-                }
-                return false;
-        }
-
-
-        /**
-         * Check PHP Filename and existence
-         * @static
-         * @param  string $file filename
-         * @param  string $packageDir directory path with trailing slash
-         * @return bool
-         */
-        public static function CheckPHPFilename( $file, $packageDir ) {
-            if ( $file == '.'
-                 || $file == '..'
-                 || strpos( $file, '.php' ) === false
-                 || !is_file( $packageDir . $file )
-            ) {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        /**
-         * Deferred Include
-         *
-         * @param array $list
-         */
-        private static function defferedRequire( $list ) {
-            foreach ( $list as $file ) {
-                /** @noinspection PhpIncludeInspection */
+        // include uri
+        if ( Package::WithPackageCompile() ) {
+            $file = self::GetCompiledFilename( 'type', true );
+            if ( is_file( $file ) ) {
                 require_once $file;
             }
         }
+    }
 
 
-        /**
-         * Init Constants
-         *
-         * @return void
-         */
-        public static function InitConstants() {
-            if ( !defined( '__LIB__' ) ) {
-                define( '__LIB__', realpath( dirname( __FILE__ ) . '/..' ) );
-            }
+    /**
+     * Get Compiled Filename from Cache
+     * @param string $type system | uri
+     * @param bool   $withRealPath
+     * @return string
+     */
+    public static function GetCompiledFilename( $type, $withRealPath = false ) {
+        $fileType = $type == 'system' ? $type : md5( self::$CurrentUri );
+        $result   = sprintf( 'package_%s.php', $fileType );
 
-            if ( !defined( '__ROOT__' ) ) {
-                define( '__ROOT__', realpath( dirname( __FILE__ ) . '/../..' ) );
-            }
+        if ( $withRealPath ) {
+            $result = __ROOT__ . '/' . CONFPATH_CACHE . '/' . $result;
         }
 
+        return $result;
+    }
 
-        /**
-         * Load Lib Directory Structure
-         *
-         * @return void
-         */
-        public static function initLibStructure() {
-            $libDir = __LIB__ . '/';
-            if ( is_dir( $libDir ) ) {
-                $d = dir( $libDir );
-                while ( false !== ( $packageDir = $d->read() ) ) {
-                    if ( $packageDir != '.' && $packageDir != '..' && is_dir( $libDir . $packageDir ) ) {
-                        //$packageDir = $libDir . $packageDir . '/';
-                        self::RegisterPackage($packageDir);
-                    }
-                }
-                $d->close();
-            }
+
+    /**
+     * Include System Package File
+     */
+    public static function IncludeSystem() {
+        $file = self::GetCompiledFilename( 'system', true );
+        if ( is_file( $file ) ) {
+            require_once $file;
+        }
+    }
+
+
+    /**
+     * Get Lock Depending on System (only in WITH_PACKAGE_COMPILE)
+     * @return bool
+     */
+    public static function GetLock() {
+        if ( !self::WithPackageCompile() ) {
+            return false;
         }
 
-        public static $RegisterdPackages = array();
-
-        public static function RegisterPackage($package = ''){
-            if (in_array($package, self::$RegisterdPackages)){
-                return;
+        if ( self::$isWindows ) {
+            if ( !is_file( self::GetPackageCompiledFlagFile() . '.lock' )
+                && touch( self::GetPackageCompiledFlagFile() . '.lock' ) )
+            {
+                return true;
             }
-            $packageDir =  __LIB__ . '/' . $package . '/';
-            $pd = dir($packageDir);
-            while (false !== ($file = $pd->read())) {
-                if (self::CheckPHPFilename($file, $packageDir)) {
-                    /** @var $file string */
-                    Package::$LibStructure[$file] = $packageDir . $file;
-                }
-            }
-            $pd->close();
-            self::$RegisterdPackages[] =  $package;
-        }
 
-
-        /**
-         * Load Class by Name
-         *
-         * @param string $className
-         * @return bool
-         */
-        public static function LoadClass( $className ) {
-            if (true == empty(Package::$LibStructure)) {
-                Package::initLibStructure();
-                //Logger::Error('AutoLoad Event for Class %s! Please, use Package::Load() instead of AutoLoad.', $className);
-            }
-            $fileName = $className . '.php';
-
-            if (isset(Package::$LibStructure[$fileName])) {
-                /** @noinspection PhpIncludeInspection */
-                require_once(Package::$LibStructure[$fileName]);
+            return false;
+        } else { // Unix with flock LOCK_NB
+            $handle = fopen( self::GetPackageCompiledFlagFile(), 'r+');
+            if ( flock ( $handle, LOCK_EX | LOCK_NB ) ) {
+                self::$lockHandle = $handle;
                 return true;
             }
 
@@ -247,125 +158,288 @@
 
 
     /**
-     * Initialize Constants
+     * Release Lock (only in WITH_PACKAGE_COMPILE)
+     * @return bool
      */
-    Package::InitConstants();
-
-
-    if (defined('WITH_AUTOLOAD') and WITH_AUTOLOAD) {
-        if (function_exists('spl_autoload_register')) {
-            spl_autoload_register('Package::LoadClass');
+    public static function ReleaseLock() {
+        if ( !self::WithPackageCompile() ) {
+            return false;
         }
-        Package::initLibStructure();
-    } else {
-        function __autoload($className) {
-            Package::LoadClass($className);
-        }
-    }
 
-    /**
-     * Eaze Compile Packages Code
-     *
-     */
-    $packageCompiledFlag = sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
-    if ( defined( Package::WithPackageCompile ) ) {
-        if ( WITH_PACKAGE_COMPILE ) {
-            if ( !file_exists( $packageCompiledFlag ) ) {
-                eaze_compile_packages();
-                touch( $packageCompiledFlag );
-            }
+        if ( self::$isWindows ) {
+            return unlink( self::GetPackageCompiledFlagFile() . '.lock' );
         } else {
-            if ( file_exists( $packageCompiledFlag ) ) {
-                unlink( $packageCompiledFlag );
-
-                $cacheDir = __ROOT__ . '/' . CONFPATH_CACHE . '/';
-                $d = dir( $cacheDir );
-                while ( false !== ( $file = $d->read() ) ) {
-                    if ( Package::CheckPHPFilename( $file, $cacheDir ) ) {
-                        unlink( $cacheDir . $file );
-                    }
-                }
-                $d->close();
-            }
+            return flock( self::$lockHandle, LOCK_UN );
         }
     }
 
 
     /**
-     * Eaze Compile Packages Function
+     * Save Loaded classes to cache file
      */
-    function eaze_compile_packages() {
-        $lib = __LIB__ . '/';
-
-        if ( !is_dir( $lib ) ) {
-            return;
+    public static function Shutdown() {
+        $hasClasses = false;
+        foreach( self::$LoadedClasses as $classes ) {
+            if ( $classes ) {
+                $hasClasses = true;
+                break;
+            }
         }
 
-        $d = dir( $lib );
-        while ( false !== ( $libDir = $d->read() ) ) {
-            if ( $libDir != '.' && $libDir != '..' && is_dir( $lib . $libDir ) ) {
-                if ( false === strpos( $libDir, '.' ) ) {
-                    continue;
-                }
+        if ( $hasClasses ) {
+            if ( self::$DisablePackageCompile ) {
+                Logger::Info( 'Package Compilation was disabled. Total Classes: %d', count( self::$LoadedClasses ) );
+            } else if ( self::$successfulLock ) {
+                foreach ( self::$LoadedClasses as $type => $classes ) {
+                    if ( $classes ) {
+                        Logger::Checkpoint();
 
-                $packageDir   = $libDir;
-                $packageFiles = $subDirs = $subPackageFiles = array();
-                $libDir       = $lib . $libDir . '/';
-
-                $pd = dir( $libDir );
-                while ( false !== ( $file = $pd->read() ) ) {
-                    if ( $file != '.' && $file != '..' && $file != 'Package.php' ) {
-                        $dirItem = $libDir . $file;
-                        if ( is_file( $dirItem ) && strpos( $file, '.php' ) !== false ) {
-                            $packageFiles[] = $dirItem;
-                        } else {
-                            if ( is_dir( $dirItem ) && $file != 'actions' && $file != 'tests' ) {
-                                $subDirs[$packageDir . '.' . $file] = $dirItem;
-                            }
-                        }
-                    }
-                }
-
-                if ( !empty( $subDirs ) ) {
-                    foreach ( $subDirs as $subPackageKey => $subDir ) {
-                        $spd = dir( $subDir );
-                        while ( false !== ( $file = $spd->read() ) ) {
-                            if ( Package::CheckPHPFilename( $file, $subDir . '/' ) ) {
-                                $subPackageFiles[$subPackageKey][] = $subDir . '/' . $file;
-                            }
-                        }
-                        $spd->close();
-                    }
-                }
-                $pd->close();
-
-                // glue files
-                $buffer = '';
-                foreach ( $packageFiles as $packageFile ) {
-                    $content = file_get_contents( $packageFile );
-                    $content = trim($content);
-                    $content = trim($content, PHP_EOL);
-                    $content = trim($content, '?>') . '?>';
-                    $buffer .= $content;
-                }
-                file_put_contents( sprintf( '%s/%s/%s.php', __ROOT__, CONFPATH_CACHE, $packageDir ), $buffer );
-
-                if ( !empty( $subPackageFiles ) ) {
-                    foreach ( $subPackageFiles as $subPackage => $subFilePaths ) {
-                        // Glue files
                         $buffer = '';
-                        foreach ( $subFilePaths as $subFilePath ) {
-                            $content = file_get_contents( $subFilePath );
-                            $content = trim($content);
-                            $content = trim($content, PHP_EOL);
-                            $content = trim($content, '?>') . '?>';
-                            $buffer .= $content;
+                        foreach ( $classes as $filenames ) {
+                            foreach( $filenames as $filepath ) {
+                                $content  = file_get_contents( $filepath );
+                                $content  = self::FormatPhpFileForCompile( $content );
+                                $buffer .= $content;
+                            }
                         }
-                        file_put_contents( sprintf( '%s/%s/%s.php', __ROOT__, CONFPATH_CACHE, $subPackage ), $buffer );
+
+                        file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
+                        Logger::Info( 'Writing %d classes to %s', count( $classes ), $type );
+
                     }
                 }
+            } else {
+                Logger::Info( 'Failed to get lock on compiled packages' );
+            }
+        }
+
+        if ( self::$successfulLock ) {
+            self::ReleaseLock();
+        }
+    }
+
+
+    /**
+     * Format PHP File Content For Compilation
+     * @param string $content
+     * @return string
+     */
+    public static function FormatPhpFileForCompile( $content ) {
+        // TODO namespaces support
+        $content = rtrim( trim( trim( $content ), PHP_EOL ), '?>' ) . '?>';
+        return $content;
+    }
+
+
+    /**
+     * Load Package
+     *
+     * @param string $name
+     * @return bool
+     */
+    public static function Load( $name ) {
+        return true;
+    }
+
+
+    /**
+     * Check PHP Filename and existence
+     * @static
+     * @param  string $file       filename
+     * @param  string $packageDir directory path with trailing slash
+     * @return bool
+     */
+    public static function CheckPHPFilename( $file, $packageDir ) {
+        if ( $file == '.'
+            || $file == '..'
+            || strpos( $file, '.php' ) === false
+            || !is_file( $packageDir . $file )
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Init Constants __LIB__ & __ROOT__
+     *
+     * @return void
+     */
+    public static function InitConstants() {
+        if ( !defined( '__LIB__' ) ) {
+            define( '__LIB__', realpath( dirname( __FILE__ ) . '/..' ) );
+        }
+
+        if ( !defined( '__ROOT__' ) ) {
+            define( '__ROOT__', realpath( dirname( __FILE__ ) . '/../..' ) );
+        }
+
+        if ( strtoupper( substr( PHP_OS, 0, 3 ) ) === 'WIN' ) {
+            self::$isWindows = true;
+        }
+    }
+
+
+    /**
+     * Load Lib Directory Structure
+     *
+     * @return void
+     */
+    private static function initLibStructure() {
+        $libDir = __LIB__ . '/';
+
+        /** @var $libInfo DirectoryIterator */
+        /** @var $packageInfo DirectoryIterator */
+        /** @var $subPackageInfo DirectoryIterator */
+
+        Logger::Checkpoint();
+        $libIterator = new FilesystemIterator( $libDir, FilesystemIterator::SKIP_DOTS );
+        foreach ( $libIterator as $libInfo ) {
+            // Project.Package
+            if ( $libInfo->isDir() ) {
+                $packageIterator = new FilesystemIterator( $libInfo->getPathname(), FilesystemIterator::SKIP_DOTS );
+                foreach ( $packageIterator as $packageInfo ) {
+                    // Project.SubPackage
+                    if ( $packageInfo->isDir() && $packageInfo->getFilename() != 'actions' ) {
+                        $subpackageIterator = new FilesystemIterator( $packageInfo->getPathname(), FilesystemIterator::SKIP_DOTS );
+                        foreach ( $subpackageIterator as $subPackageInfo ) {
+                            if ( self::CheckPHPFilename( $subPackageInfo->getFilename(), $subPackageInfo->getPath() . '/' ) ) {
+                                Package::$LibStructure[strtolower($subPackageInfo->getFilename())][] = $subPackageInfo->getPathname();
+                            }
+                        }
+                    } else {
+                        if ( self::CheckPHPFilename( $packageInfo->getFilename(), $packageInfo->getPath() . '/' ) ) {
+                            Package::$LibStructure[strtolower($packageInfo->getFilename())][] = $packageInfo->getPathname();
+                        }
+                    }
+                }
+            }
+        }
+
+        Logger::Info( 'Lib Structure was initialized: %d classes', count( Package::$LibStructure ) );
+    }
+
+
+    /**
+     * Load Classes
+     * @param string   $args [optional]
+     * @param string   $_    [optional]
+     */
+    public static function LoadClasses( $args = null, $_ = null ) {
+        $classes = func_get_args();
+        foreach ( $classes as $class ) {
+            self::LoadClass( $class );
+        }
+    }
+
+
+    /**
+     * Load Class by Name
+     *
+     * @param string $className
+     * @return bool
+     */
+    public static function LoadClass( $className ) {
+        if ( class_exists( $className, false ) || interface_exists( $className, false ) ) {
+            return true;
+        }
+
+        // Get Last Class of Namespace
+        if ( strpos( $className, '\\' ) !== false ) {
+            $classNames = explode( '\\', $className );
+            $className  = end( $classNames );
+        }
+
+        if ( !Package::$LibStructure ) {
+            if ( self::WithPackageCompile() ) {
+                self::$successfulLock = self::GetLock();
+            }
+
+            Package::initLibStructure();
+        }
+
+        $fileName = strtolower($className) . '.php';
+        if ( isset( Package::$LibStructure[$fileName] ) ) {
+            /** @noinspection PhpIncludeInspection */
+            foreach( Package::$LibStructure[$fileName] as $includeFile ) {
+                require_once( $includeFile );
+                Package::$LoadedClasses[Package::$CurrentUri ? 'uri' : 'system'][$className][] = $includeFile;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Flush Compiled Cache (php files from Package)
+     */
+    public static function FlushCompiledCache() {
+        $cacheDir = __ROOT__ . '/' . CONFPATH_CACHE . '/';
+        $d = dir( $cacheDir );
+        while ( false !== ( $file = $d->read() ) ) {
+            if ( self::CheckPHPFilename( $file, $cacheDir ) && strpos( $file, 'package_' ) === 0 ) {
+                unlink( $cacheDir . $file );
             }
         }
         $d->close();
     }
+
+
+    /**
+     * Eaze Compile Packages Code
+     * Remove packages from cache if not in WITH_PACKAGE_COMPILE or Flush Cache if WITH_PACKAGE_COMPILE && compiled.eaze do not exist
+     */
+    public static function DoCompiledCacheOperations() {
+        $packageCompiledFlag = self::GetPackageCompiledFlagFile();
+        if ( Package::WithPackageCompile() ) {
+            if ( !file_exists( $packageCompiledFlag ) ) {
+                Package::FlushCompiledCache();
+                touch( $packageCompiledFlag );
+            }
+        } else if ( defined( Package::WithPackageCompile ) && file_exists( $packageCompiledFlag ) ) {
+            unlink( $packageCompiledFlag );
+            Package::FlushCompiledCache();
+            Logger::Info( 'Removing old package cache' );
+        }
+    }
+
+
+    /**
+     * Get Compiled Lock Filename
+     * @return string
+     */
+    public static function GetPackageCompiledFlagFile() {
+        return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, Package::CompiledEaze );
+    }
+
+
+
+    /**
+     * Get With Package Compiled Constant value
+     * @return bool
+     */
+    public static function WithPackageCompile() {
+        if ( !self::$DisablePackageCompile && defined( Package::WithPackageCompile ) ) {
+            if ( WITH_PACKAGE_COMPILE ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+Package::InitConstants();
+Package::DoCompiledCacheOperations();
+
+spl_autoload_register( 'Package::LoadClass' );
+if ( Package::WithPackageCompile() ) {
+    register_shutdown_function( 'Package::Shutdown' );
+    Package::IncludeSystem();
+}
 ?>

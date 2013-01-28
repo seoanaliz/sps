@@ -24,7 +24,7 @@ class PostDeletePlanControl extends BaseControl {
                 $result['success'] = false;
                 $result['error'] = 'Access Denied';
             } else {
-                if ( $time = '00:00' ) {
+                if ( $time == '00:00' ) {
                     $articleQueue->deleteAt = null;
                 } else {
                     list($hour, $minutes) = explode(':', $time);

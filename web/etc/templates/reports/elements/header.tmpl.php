@@ -48,16 +48,22 @@ $jsFiles = array(
     'js://common/event.js',
     'js://common/model.js',
     'js://common/widget.js',
+    'js://common/control.js',
+    'js://common/collection.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.datepicker.js',
     'js://fe/jquery.maskedinput-1.3.js',
-    'js://reports/main.js',
-    'js://reports/events.js',
     'js://reports/template.js',
+    'js://reports/main.js',
+    'js://reports/Page.js',
+    'js://reports/MonitorPage.js',
+    'js://reports/ResultPage.js',
+    'js://reports/GroupListWidget.js',
+    'js://reports/events.js',
 );
 
 CssHelper::Init(false);
-JsHelper::Init(false);
+JsHelper::Init(true);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {

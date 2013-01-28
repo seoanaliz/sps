@@ -44,9 +44,13 @@ var Widget = (function() {
             return this;
         },
 
+        render: function() {
+            return this.renderTemplate.apply(this, arguments);
+        },
+
         renderTemplate: function() {
             var t = this;
-            t.el().html(t.tmpl()(t.template(), t.model()));
+            t.el().html(t.tmpl()(t.template(), t.getTemplateData(t.model())));
             return this;
         },
 
@@ -83,26 +87,6 @@ var Widget = (function() {
             } else {
                 var throughParams = ['template', 'model', 'modelClass', 'events'];
 
-                function tmplWrapper(template, data) {
-                    var tmplData = $.extend(true, {}, data);
-                    if (data instanceof Model) {
-                        tmplData = tmplData.data();
-                    }
-                    (function getModelData(data) {
-                        if (typeof data == 'object') {
-                            for (var i in data) {
-                                if (!data.hasOwnProperty(i)) continue;
-                                if (data[i] instanceof Model) {
-                                    data[i] = data[i].data();
-                                } else {
-                                    getModelData(data[i])
-                                }
-                            }
-                        }
-                    })(tmplData);
-                    return tmpl(template, tmplData);
-                }
-
                 for (var i in throughParams) {
                     if (!throughParams.hasOwnProperty(i)) {
                         continue;
@@ -116,16 +100,16 @@ var Widget = (function() {
                 }
 
                 if (!options.template) {
-                    throw new TypeError('Template not found');
+                    throw new TypeError('Template is empty');
                 }
                 if (!options.selector) {
-                    throw new TypeError('Selector not found');
+                    throw new TypeError('Selector is empty');
                 }
                 if (!options.model && options.modelClass) {
-                    throw new TypeError('Model not found');
+                    throw new TypeError('Model is empty');
                 }
                 t.id(options.id || (widgetId = widgetId + 1));
-                t.tmpl(options.tmpl || tmplWrapper);
+                t.tmpl(options.tmpl);
                 t.modelClass(options.modelClass);
                 t.events(options.events);
                 t.template(options.template);
@@ -136,6 +120,32 @@ var Widget = (function() {
                 t._options = options;
                 return t;
             }
+        },
+
+        getTemplateData: function(data) {
+            var tmplData = $.extend(true, {}, data);
+            if (data instanceof Model) {
+                tmplData = tmplData.data();
+            }
+            function getData(data) {
+                if (data instanceof Model) {
+                    return getData(data.data());
+                }
+                if (data instanceof Collection) {
+                    return getData(data.get());
+                }
+                if (typeof data == 'object') {
+                    for (var i in data) {
+                        if (!data.hasOwnProperty(i)) {
+                            continue;
+                        }
+                        data[i] = getData(data[i]);
+                    }
+                }
+
+                return data;
+            }
+            return getData(tmplData)
         },
 
         events: function(events) {
@@ -151,7 +161,7 @@ var Widget = (function() {
         tmpl: function(tmpl) {
             var t = this;
             if (!arguments.length) {
-                return t._tmpl;
+                return t._tmpl || window.tmpl;
             } else {
                 t._tmpl = tmpl;
                 return t;

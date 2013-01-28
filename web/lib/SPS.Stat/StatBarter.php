@@ -6,7 +6,10 @@
  * Time: 19:45
  * To change this template use File | Settings | File Templates.
  */
-class StatBarter
+    new stat_tables();
+
+
+    class StatBarter
 {
     /** начинаем и заканчиваем поиск поста с этим добавочным интервалом */
     const TIME_INTERVAL = 3600;
@@ -14,7 +17,7 @@ class StatBarter
     /** какое время ищем бартерный пост*/
     const DEFAULT_SEARCH_DURATION = 86400;
 
-    public static function form_response( $query_result, $default_group_id )
+    public static function form_response( $query_result, $user_id )
     {
         $request_line = '';
         // строкa для запроса данных о пабликах
@@ -24,7 +27,6 @@ class StatBarter
         $a = new BarterEvent();
         $request_line = rtrim( $request_line, ',' );
         $publics_data = StatPublics::get_publics_info( $request_line );
-
         $barter_events_res = array();
         foreach( $query_result as $barter_event ) {
             $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array(0);
@@ -32,12 +34,7 @@ class StatBarter
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
             $deleted_at = isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : $posted_at + 3600;
             $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
-
             $groups = $barter_event->groups_ids;
-            $key = array_search( $default_group_id, $groups );
-            if(( $key !== false ))
-                unset( $groups[$key]);
-
             $barter_events_res[] = array(
                 'report_id'     =>  $barter_event->barter_event_id,
                 'published_at'  =>  $publics_data[ $barter_event->barter_public ],
@@ -45,7 +42,7 @@ class StatBarter
                 'posted_at'     =>  $posted_at,
                 'detected_at'   =>  isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0,
                 'deleted_at'    =>  $lifetime,
-                'start_search_at' => $barter_event->start_search_at->format('U'),
+                'start_search_at' => $barter_event->start_search_at->modify('+ 15 minutes')->format('U'),
                 'stop_search_at' =>  $barter_event->stop_search_at->format('U'),
                 'overlaps'      =>   $overlaps,
                 'subscribers'   =>   ( $barter_event->end_subscribers && $barter_event->start_subscribers )?
@@ -54,7 +51,9 @@ class StatBarter
                     $barter_event->end_visitors    - $barter_event->start_visitors : 0,
                 'status'        =>   $barter_event->status,
                 'active'        =>   in_array( $barter_event->status, array(1,2,3)) ? true : false,
-                'groups'        =>   $groups
+                'groups'        =>   $groups,
+                'event_creator' =>   $user_id == $barter_event->creator_id
+
             );
         };
         return $barter_events_res;

@@ -264,6 +264,10 @@
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
                 </page>
+                <page uri="vt://stats/">
+                    <actions>SPS.Common.GetSystemStats</actions>
+                    <template>tmpl://vt/stats.tmpl.php</template>
+                </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
                         <!--<actions>SPS.Site.GetIndexPage</actions>-->

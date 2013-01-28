@@ -1,7 +1,8 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
+    new stat_tables();
+
 
     class StatGroups
     {
