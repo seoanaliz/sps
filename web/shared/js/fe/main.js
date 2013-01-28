@@ -556,7 +556,7 @@ $(document).ready(function(){
                     var $posts = $(html);
                     $target.after($posts);
                     $('#wall-load').hide();
-                    $target.data('block', $posts)
+                    $target.data('block', $posts);
                     Elements.initImages($posts);
                     Elements.initLinks($posts);
                 });

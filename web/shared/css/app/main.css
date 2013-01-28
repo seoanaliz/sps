@@ -74,3 +74,4 @@ html,body{background-color:#f1f1f1;}
 .image-compositing{position:relative;overflow:hidden;}.image-compositing:after{content:'' !important;position:absolute;top:0;left:0;right:0;bottom:0;background:url('../../images/common/upload.gif') center no-repeat #ffffff;width:100% !important;height:100% !important;z-index:1;visibility:visible !important;}
 .qq-upload-list{display:none;}
 .qq-upload-button{margin-top:3px;color:#2b587a;}.qq-upload-button:hover{text-decoration:underline;}
+.show-all-postponed{background:#edf1f5;text-align:center;color:#99adc2;padding:8px;cursor:pointer;margin-top:10px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}.show-all-postponed:hover{background:#e1e7ed;color:#5e82a8;}
