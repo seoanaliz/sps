@@ -456,7 +456,7 @@ $(document).ready(function(){
             sortType: sortType,
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd(),
-            userGroupId: $tab.data('user-group-id')
+            userGroupId: Elements.getUserGroupId()
         }).success(function(html) {
             var $block = $(html);
             Elements.initImages($block);
@@ -538,10 +538,6 @@ $(document).ready(function(){
             } else {
                 var $tabs = $leftPanel.find('.user-groups-tabs');
                 var sortType = $('.wall-title a').data('type');
-                var userGroupId;
-                if ($tabs.is(':visible')) {
-                    userGroupId = $tabs.find('.tab.selected').data('user-group-id')
-                }
                 $target.data('def-html', $target.html());
 
                 wallPage = 0;
@@ -551,7 +547,7 @@ $(document).ready(function(){
                     sortType: sortType,
                     type: Elements.leftType(),
                     targetFeedId: Elements.rightdd(),
-                    userGroupId: userGroupId,
+                    userGroupId: Elements.getUserGroupId(),
                     articlesOnly: true,
                     mode: 'my',
                     articleStatus: 3
@@ -1457,9 +1453,10 @@ $(document).ready(function(){
 
                 var $moderation = $newComment.next('.moderation');
                 if ($moderation.length && !$moderation.data('checked')) {
-                    //todo: something wrong
                     $moderation.data('checked', true);
-                    Events.fire('leftcolumn_reject_post', postId, function() {});
+                    Events.fire('leftcolumn_reject_post', postId, function() {
+                        $post.slideUp(200);
+                    });
                 }
             });
         }
