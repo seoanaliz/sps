@@ -176,8 +176,8 @@
         public static function share_groups( $groups, $rec_ids )
         {
             foreach( $groups as $group ) {
-                if ( $group->type == 2 )
-                    continue;
+//                if ( $group->type == 2 )
+//                    continue;
                 $group->users_ids = array_unique( array_merge( $group->users_ids, $rec_ids ));
             }
         }
