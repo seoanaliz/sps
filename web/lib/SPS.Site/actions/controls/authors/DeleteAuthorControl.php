@@ -18,10 +18,18 @@
 
             $targetFeedId = Request::getInteger('targetFeedId');
             if (!$TargetFeedAccessUtility->canDeleteAuthor($targetFeedId)) {
+                echo ObjectHelper::FromJSON(array('success' => false, 'accessDenied' => true));
                 return;
             }
 
             if (!empty($o->vkId)) {
+
+                $UserFeed = UserFeedFactory::GetOne(array('vkId' => $o->vkId, 'targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
+                if ($UserFeed) {
+                    UserFeedFactory::DeleteByMask(array('vkId' => $o->vkId, 'targetFeedId' => $targetFeedId, 'role' => UserFeed::ROLE_AUTHOR));
+                }
+
+                // TODO выпилить
                 $sql = <<<sql
                   UPDATE "authors" SET "targetFeedIds" = array_remove_sql(CAST("targetFeedIds" as int8[]), CAST('{@targetFeedId}' as int8[]))
                   WHERE "vkId" = @vkId
@@ -39,6 +47,8 @@ sql;
             $manageEvent->action = 'delete';
             $manageEvent->targetFeedId = $targetFeedId;
             AuthorManageFactory::Add($manageEvent);
+
+            echo ObjectHelper::FromJSON(array('success' => true));
         }
     }
 
