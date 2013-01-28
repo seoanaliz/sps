@@ -16,7 +16,12 @@ abstract class ArticleStatusControl extends BaseControl {
     public function changeArticleStatusTo($articleId, $newArticleStatus){
         // TODO Добавить секьюрити
         $Article = ArticleFactory::GetById($articleId);
-        $Article->articleStatus = $newArticleStatus;
-        ArticleFactory::UpdateByMask($Article, array('articleStatus'), array('articleId' => $Article->articleId));
+        if ($Article){
+            $Article->articleStatus = $newArticleStatus;
+            ArticleFactory::UpdateByMask($Article, array('articleStatus'), array('articleId' => $Article->articleId));
+            echo ObjectHelper::ToJSON(array('success'=> true));
+        } else {
+            echo ObjectHelper::ToJSON(array('success'=> false, 'message' => 'cantFindArticle'));
+        }
     }
 }
