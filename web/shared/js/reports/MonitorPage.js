@@ -134,14 +134,14 @@ MonitorPage = Page.extend({
         var t = this;
         var $results = $('#results');
 
+        if (t.isEnded) {
+            return;
+        }
+
         if (t.loaded) {
             return;
         } else {
             t.loaded = true;
-        }
-
-        if (t.isEnded) {
-            return;
         }
 
         t.pageLoaded++;
