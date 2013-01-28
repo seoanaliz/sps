@@ -52,7 +52,7 @@ class GetSourceFeedsListControl extends BaseControl
         } else
             if ($type == SourceFeedUtility::Authors) {
 
-                if ($role != UserFeed::ROLE_AUTHOR) {
+                //if ($role != UserFeed::ROLE_AUTHOR) {
                     //$showArticleStatusFilter = true;
 
                     $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
@@ -62,7 +62,7 @@ class GetSourceFeedsListControl extends BaseControl
                         /** @var $userGroup UserGroup */
                         $showUserGroups[] = $userGroup->toArray();
                     }
-                }
+                //}
 
                 $authors = AuthorFactory::Get(
                     array(),

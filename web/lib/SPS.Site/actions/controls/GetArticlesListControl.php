@@ -139,8 +139,10 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         $userGroupId = Request::getInteger('userGroupId');
         if ($userGroupId) {
             // в группе ищем записи на рассмотрении
-            $this->reviewArticleCount = ArticleFactory::Count(array('authorId' => $this->getAuthor()->authorId,
-                'articleStatusIn' => array(Article::STATUS_REVIEW), 'userGroupId' => $userGroupId));
+            $this->reviewArticleCount = ArticleFactory::Count(array(
+                'authorId' => $this->getAuthor()->authorId,
+                'articleStatusIn' => array(Article::STATUS_REVIEW),
+                'userGroupId' => $userGroupId));
         }
 
         if ($type == SourceFeedUtility::Albums) {
