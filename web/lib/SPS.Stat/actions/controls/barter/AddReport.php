@@ -34,8 +34,8 @@ class AddReport
             $group_id = $default_group->group_id;
         }
 
-        if ( !GroupsUtility::is_author( $group_id, $user_id ))
-            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
+//        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+//            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
 
         $publics_info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $publics_info ))
@@ -59,7 +59,7 @@ class AddReport
             }
 
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
-                $stop_looking_time[$i] += 84600;
+                $stop_looking_time = $start_looking_time[$i] + 84600;
 
             $barter_event = new BarterEvent();
             $repeat_check = $this->repeat_check( $publics_info['target']['id'], $publics_info['barter']['id'], $start_looking_time[$i], $stop_looking_time[$i], $user_id );
@@ -74,7 +74,7 @@ class AddReport
             $barter_event->stop_search_at  =  date( 'Y-m-d H:i:s', $stop_looking_time[$i]  );
             $barter_event->created_at      =  date( 'Y-m-d H:i:s', $now );
             $barter_event->standard_mark = true;
-            $barter_event->groups_ids  = array( $group_id,1,2,3 );
+            $barter_event->groups_ids  = array( $group_id );
             $barter_event->creator_id  = $user_id;
             $barter_events_array[] = $barter_event;
         }
@@ -91,6 +91,7 @@ class AddReport
 //                }
 //            }
 //        }
+//        print_r( $barter_events_array );
         if( $barter_id ) {
             $check = BarterEventFactory::Update( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {
