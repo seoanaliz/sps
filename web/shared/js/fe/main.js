@@ -529,16 +529,17 @@ $(document).ready(function(){
             if ($target.data('block')) {
                 var $posts = $target.data('block');
                 if ($posts.first().is(':visible')) {
-                    $target.html('Скрыть отложенные записи');
+                    $target.html($target.data('def-html'));
                     $posts.hide();
                 } else {
-                    $target.html($target.data('def-html'));
+                    $target.html('Скрыть отложенные записи');
                     $posts.show();
                 }
             } else {
                 var $tabs = $leftPanel.find('.user-groups-tabs');
                 var sortType = $('.wall-title a').data('type');
                 $target.data('def-html', $target.html());
+                $target.html('Скрыть отложенные записи');
 
                 wallPage = 0;
                 $('#wall-load').show();
@@ -549,7 +550,6 @@ $(document).ready(function(){
                     targetFeedId: Elements.rightdd(),
                     userGroupId: Elements.getUserGroupId(),
                     articlesOnly: true,
-                    mode: 'my',
                     articleStatus: 3
                 }).success(function(html) {
                     var $posts = $(html);
