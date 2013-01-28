@@ -24,7 +24,8 @@ MonitorPage = Page.extend({
         Control.fire('get_monitor_list', {
             groupId: t.groupId,
             limit: t.limit,
-            offset: t.limit * t.pageLoaded
+            offset: t.limit * t.pageLoaded,
+            filter: t.filter
         }, function(data) {
             try {
                 $listAddMonitor.slideDown(200);
@@ -134,14 +135,14 @@ MonitorPage = Page.extend({
         var t = this;
         var $results = $('#results');
 
+        if (t.isEnded) {
+            return;
+        }
+
         if (t.loaded) {
             return;
         } else {
             t.loaded = true;
-        }
-
-        if (t.isEnded) {
-            return;
         }
 
         t.pageLoaded++;
@@ -149,7 +150,8 @@ MonitorPage = Page.extend({
         Control.fire('get_monitor_list', {
             groupId: t.groupId,
             limit: t.limit,
-            offset: t.limit * t.pageLoaded
+            offset: t.limit * t.pageLoaded,
+            filter: t.filter
         }).success(function(data) {
             t.loaded = false;
             $('#load-more-table').remove();
