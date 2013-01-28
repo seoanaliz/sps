@@ -99,6 +99,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             if ($loadAll) {
                 // #11115
                 if ($role == UserFeed::ROLE_AUTHOR) {
+
                     if ($mode == self::MODE_MY) {
                         $authorsIds = array($this->getAuthor()->authorId);
                     } else {
