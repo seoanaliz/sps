@@ -31,15 +31,12 @@ class getReportList
         elseif( $status == 'false')
             $status = array( 5 );
         else
-            $status = array(4,6);
+            $status = array(3,4,6);
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
         $order_array = array( 'posted_at', 'visitors', 'subscribers', 'status' );
-        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? 'posted_at': '   created_at DESC NULLS LAST, posted_at  ' );
-//        $sort_by  = ' "' . $sort_by . '" ';
-        $sort_by .= $sortReverse ? '' : 'DESC';
-        $sort_by .= ' NULLS LAST ';
+        $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? ' order by IF(detected_at is null, stop_search_at,detected_at) desc ' : ' start_search_at DESC NULLS LAST ' );
         $default_group = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if ( !$all && !$group_id )
             $group_id = $default_group->group_id;
@@ -49,16 +46,13 @@ class getReportList
         } else {
             $group_id = explode( ',', $group_id );
         }
-//        if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
-//            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
-
 
         if( $status ) {
             $status_array = $status;
         } elseif( strtolower( $state ) == 'complete' ) {
-            $status_array = array( 4,5,6 );
+            $status_array = array( 3,4,5,6 );
         } else {
-            $status_array = array( 1,2,3,4,5,6 );
+            $status_array = array( 1,2 );
         }
 
         $search = array(
@@ -72,12 +66,9 @@ class getReportList
             '_target_public'=>   $target_public,
             '_groups_ids'   =>   $group_id
         );
-//        if( strtolower( $state ) != 'complete' )
-//            $search['standard_mark'] = true;
+
 
         $options = array( 'orderBy' => $sort_by );
-//        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
-
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
         die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res, $user_id ))));
     }
