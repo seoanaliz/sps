@@ -431,10 +431,10 @@ $(document).ready(function(){
             mode: $tab.data('mode')
         }).success(function(html) {
             var $block = $(html);
-            Elements.initImages($block);
-            Elements.initLinks($block);
             $('#wall').html($block);
             $('#wall-load').hide();
+            Elements.initImages($block);
+            Elements.initLinks($block);
         });
     });
 
@@ -459,10 +459,10 @@ $(document).ready(function(){
             userGroupId: Elements.getUserGroupId()
         }).success(function(html) {
             var $block = $(html);
-            Elements.initImages($block);
-            Elements.initLinks($block);
             $('#wall').html($block);
             $('#wall-load').hide();
+            Elements.initImages($block);
+            Elements.initLinks($block);
         });
     });
 
@@ -554,11 +554,11 @@ $(document).ready(function(){
                     mode: 'my'
                 }).success(function(html) {
                     var $posts = $(html);
-                    Elements.initImages($posts);
-                    Elements.initLinks($posts);
                     $target.after($posts);
                     $('#wall-load').hide();
                     $target.data('block', $posts)
+                    Elements.initImages($posts);
+                    Elements.initLinks($posts);
                 });
             }
         });

@@ -176,11 +176,11 @@ function loadArticles(clean) {
         } else {
             var tmpEl = document.createElement('div');
             var $block = $(tmpEl).html(data);
+            $('#wall').append($block);
             Elements.initDraggable($block);
             Elements.initDroppable($('.right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
-            $('#wall').append($block);
         }
         articlesLoading = false;
     });
