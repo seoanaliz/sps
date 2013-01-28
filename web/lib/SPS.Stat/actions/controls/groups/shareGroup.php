@@ -35,9 +35,9 @@
 
             if ( $type == 'Barter') {
                 $source = 1;
-                $default_group = GroupsUtility::get_default_group( $user_id, $source );
-                if ( in_array( $default_group->group_id, $group_ids ))
-                    die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mess' => 'can\'t share default' )));
+//                $default_group = GroupsUtility::get_default_group( $user_id, $source );
+//                if ( in_array( $default_group->group_id, $group_ids ))
+//                    die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mess' => 'can\'t share default' )));
                 $groups = GroupFactory::Get( array( '_group_id' => $group_ids ));
                 GroupsUtility::share_groups( $groups, $recipients_ids );
                 GroupFactory::UpdateRange( $groups );

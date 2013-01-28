@@ -17,13 +17,21 @@ class getReportList
         $state          =   Request::getString ( 'state' );#мониторы/результаты
         $time_from      =   Request::getInteger( 'timeFrom' );
         $time_to        =   Request::getInteger( 'timeTo' );
-        $status         =   Request::getInteger( 'status' );
+        $status         =   strtolower(Request::getString( 'status' ));
         $sort_by        =   strtolower( Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   0;#Request::getString ( 'targetPublicId' );
         $barter_public  =   0;#Request::getString ( 'barterPublicId' );
         $group_id       =   Request::getString( 'groupId');
         $all            =   Request::getInteger( 'allEntries') ? true : false;
+
+        $condition_array = array('complete', 'false' );
+        if ( !in_array( $status, $condition_array ))
+            $status = false;
+        elseif( $status == 'false')
+            $status = array( 5 );
+        else
+            $status = array(4,6);
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
@@ -32,8 +40,10 @@ class getReportList
 //        $sort_by  = ' "' . $sort_by . '" ';
         $sort_by .= $sortReverse ? '' : 'DESC';
         $sort_by .= ' NULLS LAST ';
+        $default_group = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
+        if ( !$all && !$group_id )
+            $group_id = $default_group->group_id;
 
-        GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if (  $all || !$group_id ) {
             $group_id = GroupsUtility::get_all_user_groups( $user_id, Group::BARTER_GROUP );
         } else {
@@ -44,7 +54,7 @@ class getReportList
 
 
         if( $status ) {
-            $status_array = array( $status );
+            $status_array = $status;
         } elseif( strtolower( $state ) == 'complete' ) {
             $status_array = array( 4,5,6 );
         } else {
