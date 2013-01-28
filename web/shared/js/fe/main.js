@@ -532,14 +532,14 @@ $(document).ready(function(){
                     $target.html($target.data('def-html'));
                     $posts.hide();
                 } else {
-                    $target.html('Скрыть отложенные записи');
+                    $target.html('Скрыть записи на рассмотрении');
                     $posts.show();
                 }
             } else {
                 var $tabs = $leftPanel.find('.user-groups-tabs');
                 var sortType = $('.wall-title a').data('type');
                 $target.data('def-html', $target.html());
-                $target.html('Скрыть отложенные записи');
+                $target.html('Скрыть записи на рассмотрении');
 
                 wallPage = 0;
                 $('#wall-load').show();
