@@ -142,35 +142,35 @@
         }
     }
 
-    .right-column > .filter {
-        &>.list {
-            border-top: none;
-            padding-top: 0;
-
-            .item + input {
-                margin-top: 10px;
-            }
-            input {
-                display: none;
-                width: 138px;
-            }
-        }
-    }
-/*
     .right-column {
-        position: relative;
-        &:after {
-            content: ' ';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            .opacity(0.3);
+        &> #filter {
+            &>.form {
+                padding: 7px 7px 0;
+
+                label {
+                    padding: 3px;
+                }
+
+                input {
+                    margin-right: 5px;
+                }
+            }
+        }
+        &> .filter {
+            &>.list {
+                border-top: none;
+                padding-top: 0;
+
+                .item + input {
+                    margin-top: 10px;
+                }
+                input {
+                    display: none;
+                    width: 138px;
+                }
+            }
         }
     }
-*/
 }
 
 #load-more-table {

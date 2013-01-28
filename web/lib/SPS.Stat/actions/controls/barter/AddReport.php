@@ -60,6 +60,8 @@ class AddReport
 
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
                 $stop_looking_time = $start_looking_time[$i] + 84600;
+            if ( $start_looking_time[$i] <= time()- 900 )
+                die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'too late' )));
 
             $barter_event = new BarterEvent();
             $repeat_check = $this->repeat_check( $publics_info['target']['id'], $publics_info['barter']['id'], $start_looking_time[$i], $stop_looking_time[$i], $user_id );

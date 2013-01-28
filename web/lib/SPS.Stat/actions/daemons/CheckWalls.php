@@ -56,7 +56,7 @@ class CheckWalls
         $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ),'_status' => 2 ), null, 'tst' );
         foreach( $events as $event) {
             $event->status = 5;
-            $event->posted_at = $event->stop_search_at;
+            $event->posted_at = $event->start_search_at;
         }
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
     }
