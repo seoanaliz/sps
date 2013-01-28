@@ -52,17 +52,18 @@ class GetSourceFeedsListControl extends BaseControl
         } else
             if ($type == SourceFeedUtility::Authors) {
 
-                //if ($role != UserFeed::ROLE_AUTHOR) {
+                if ($role != UserFeed::ROLE_AUTHOR) {
                     //$showArticleStatusFilter = true;
-
                     $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
-                    $showUserGroups = array();
+                } else {
+                    $userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $this->vkId);
+                }
 
-                    foreach ($userGroups as $userGroup) {
-                        /** @var $userGroup UserGroup */
-                        $showUserGroups[] = $userGroup->toArray();
-                    }
-                //}
+                $showUserGroups = array();
+                foreach ($userGroups as $userGroup) {
+                    /** @var $userGroup UserGroup */
+                    $showUserGroups[] = $userGroup->toArray();
+                }
 
                 $authors = AuthorFactory::Get(
                     array(),

@@ -34,6 +34,8 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
      */
     protected $userRateFilter = false;
 
+    private $userGroups = array();
+
 
     protected function getSourceFeedType(){
         // показываем только авторские
@@ -102,6 +104,13 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         }
 
         $this->options[BaseFactory::WithoutDisabled] = false;
+
+        $targetFeedId = $this->getTargetFeedId();
+        if ($targetFeedId){
+            //$TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            //$role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
+        }
     }
 
     /**
@@ -148,9 +157,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         Response::setArray('targetInfo', SourceFeedUtility::GetInfo($this->targetFeeds, 'targetFeedId'));
         Response::setArray('authorEvents', $this->authorEvents);
         Response::setArray('__authorCounter', $this->authorCounter);
-
-        $userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
-        Response::setArray('userGroups', $userGroups);
+        Response::setArray('userGroups', $this->userGroups);
         Response::setBoolean('showControls', $this->search['page'] == 0 && (Request::getString('tabType') == 'null'));
     }
 

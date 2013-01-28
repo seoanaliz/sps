@@ -33,7 +33,13 @@ class UserGroupFactory extends BaseModelFactory {
                 'type' => TYPE_STRING
             ),
         ),
-        'search' => array()
+        'search' => array(
+            'userGroupIdIn' => array(
+                'name'         => 'userGroupId',
+                'type'       => TYPE_INTEGER,
+                'searchType' => SEARCHTYPE_ARRAY,
+            )
+        )
     );
 
 
@@ -42,6 +48,15 @@ class UserGroupFactory extends BaseModelFactory {
     }
 
     public static function GetForUserTargetFeed($targetFeedId, $vkId){
-        return self::Get(array('targetFeedId' => $targetFeedId, 'vkId' => $vkId));
+        $userUserGroups = UserUserGroupFactory::Get(array('vkId' => $vkId));
+        if ($userUserGroups){
+            $userGroupIds = array();
+            foreach ($userUserGroups as $UserUserGroup){
+                $userGroupIds[] = $UserUserGroup->userGroupId;
+            }
+
+            return self::Get(array('targetFeedId' => $targetFeedId, 'userGroupIdIn' => $userGroupIds));
+        }
+        return array();
     }
 }
