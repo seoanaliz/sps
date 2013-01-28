@@ -7,7 +7,6 @@
  */
 class GetSourceFeedsListControl extends BaseControl
 {
-
     /**
      * Entry Point
      */
@@ -113,7 +112,7 @@ class GetSourceFeedsListControl extends BaseControl
             'accessibleMyArticleStatuses' => $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId),
             'showArticleStatusFilter' => $showArticleStatusFilter,
             'showSourceList' => $showSourceList,
-            'showUserGroups' => $showUserGroups
+            'showUserGroups' => $showUserGroups,
         ));
     }
 }
