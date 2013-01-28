@@ -67,6 +67,7 @@
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
+                            <param name="authorAppId">3041910</param>
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
@@ -87,6 +88,7 @@
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
+                            <param name="authorAppId">3295077</param>
                             <param name="appId">2879919</param>
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
@@ -129,6 +131,7 @@
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
+                            <param name="authorAppId">3052947</param>
                             <param name="appId">2879919</param>
                             <param name="password">EKZlmsrrVdNWb6rLUG5o</param>
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>

@@ -1,44 +1,28 @@
 <?php
-    /* Don't Forget to turn on mod_rewrite!  */
+/* Don't Forget to turn on mod_rewrite!  */
 
-    // Initialize Logger
-    include_once 'lib/Eaze.Core/Logger.php';
+define( 'WITH_PACKAGE_COMPILE', false  );
 
-    define( 'WITH_PACKAGE_COMPILE', false  );
-    define( 'WITH_AUTOLOAD', false  );
+include_once 'lib/Eaze.Core/Logger.php';
+// Initialize Logger
+Logger::Init( ELOG_WARNING );
+include_once 'lib/Eaze.Core/Package.php' ;
 
-    include_once 'lib/Eaze.Core/Package.php' ;
+Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
 
-    Package::Load('Eaze.Database/PgSql');
+mb_internal_encoding( 'utf-8' );
+mb_http_output( 'utf-8' );
 
-    Package::Load( 'Base.Tree' );
-    Package::Load( 'Base.VFS' );
+BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
 
-    Package::Load( 'SPS.Common' );
-    Package::Load( 'SPS.System' );
-    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.VK' );
-    Package::Load( 'SPS.FB' );
-    Package::Load( 'SPS.Site' );
-    Package::Load( 'SPS.Site/base' );
-    Package::Load( 'SPS.App' );
-    Package::Load( 'SPS.Site/base' );
+if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
 
-    // Initialize Logger
-    // Logger::Init( ELOG_DEBUG  );
-    Logger::Init( ELOG_WARNING );
+Request::Init();
+$__level = Request::getParameter( '__level' );
+if ( !is_null( $__level ) ) {
+    Logger::LogLevel( $__level );
+}
+SiteManager::DetectSite();
 
-    mb_internal_encoding( 'utf-8' );
-    mb_http_output( 'utf-8' );
-
-    if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
-
-    Request::Init();
-    $__level = Request::getParameter( '__level' );
-    if ( !is_null( $__level ) ) {
-        Logger::LogLevel( $__level );
-    }
-    SiteManager::DetectSite();
-
-    Logger::Info( __METHOD__, 'Done' );
+Logger::Info( __METHOD__, 'Done' );
 ?>

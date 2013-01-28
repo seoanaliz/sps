@@ -99,10 +99,10 @@
                     <actions>SPS.Site.PostDeletePlanControl</actions>
                 </page>
                 <page uri="controls://article-approved/">
-                    <actions>SPS.Site.ApproveArticleAppControl</actions>
+                    <actions>SPS.Site.ApproveArticleControl</actions>
                 </page>
                 <page uri="controls://article-reject/">
-                    <actions>SPS.Site.RejectArticleAppControl</actions>
+                    <actions>SPS.Site.RejectArticleControl</actions>
                 </page>
 
 
@@ -263,6 +263,10 @@
                 <page uri="vt://">
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
+                </page>
+                <page uri="vt://stats/">
+                    <actions>SPS.Common.GetSystemStats</actions>
+                    <template>tmpl://vt/stats.tmpl.php</template>
                 </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
