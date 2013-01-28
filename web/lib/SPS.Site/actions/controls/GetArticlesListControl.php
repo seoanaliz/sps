@@ -140,13 +140,13 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
 
             // в группе ищем записи на рассмотрении
         $this->reviewArticleCount = ArticleFactory::Count(array(
-            'authorId' => $this->getAuthor()->authorId,
-            'articleStatusIn' => array(Article::STATUS_REVIEW),
-            'userGroupId' => Request::getInteger('userGroupId')),
-        array(
-            BaseFactory::CustomSql => 'AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                'authorId' => $this->getAuthor()->authorId,
+                'userGroupId' => Request::getInteger('userGroupId')),
+            array(
+            BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
                 '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))'
         ));
+
 
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
