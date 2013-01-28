@@ -113,6 +113,8 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     }
                 } else {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                    //редактору: только одобренные и на рассмотрении записи этой группы
+                    $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
                 }
 
                 if ($authorsIds) {
