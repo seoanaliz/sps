@@ -40,9 +40,7 @@ class SaveArticleAppControl extends AppBaseControl {
 
         $userGroupId = Request::getInteger('userGroupId');
         if (!$userGroupId || !is_numeric($userGroupId)) {
-            $result['message'] = 'emptyUserGroup';
-            echo ObjectHelper::ToJSON($result);
-            return false;
+            $userGroupId = null;
         }
         // TODO сделать проверку, что пользователь может добавлять статью для это группы
 
