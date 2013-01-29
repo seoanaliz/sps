@@ -78,6 +78,8 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
      * Расширение стандартной выборки
      */
     protected function processRequestCustom(){
+        parent::processRequestCustom();
+
         // сортировка
         $sortType = Request::getString('sortType');
         if ($sortType == 'old') {

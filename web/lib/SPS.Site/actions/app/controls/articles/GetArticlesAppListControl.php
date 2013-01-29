@@ -12,11 +12,6 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         parent::__construct();
         $this->vkId = Session::getInteger('authorId');
     }
-
-    //const MODE_MY = 'my';
-
-    //const MODE_ALL = 'all';
-
     /**
      * @var AuthorEvent[]
      */
@@ -42,14 +37,11 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         return SourceFeedUtility::Authors;
     }
 
+    /**
+     * ТОлк
+     * @return string
+     */
 //    protected function getMode(){
-//        // если есть лента - показываем для нее
-//        // безопасность проверена в parent::processRequest
-//        $targetFeedId = $this->getTargetFeedId();
-//        if ($targetFeedId) {
-//            return self::MODE_ALL;
-//        }
-//
 //        return self::MODE_MY;
 //    }
 
@@ -62,6 +54,15 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
             return substr($mode, 1);
         }
         return null;
+    }
+
+    protected function processRequestCustom(){
+        parent::processRequestCustom();
+
+        $targetFeedId = $this->getTargetFeedId();
+        if ($targetFeedId){
+            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
+        }
     }
 
 
