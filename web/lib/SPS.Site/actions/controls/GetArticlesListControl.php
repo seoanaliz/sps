@@ -159,9 +159,6 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             // рекламка
         }
 
-
-
-
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
         }

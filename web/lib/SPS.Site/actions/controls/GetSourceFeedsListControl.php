@@ -81,7 +81,10 @@ class GetSourceFeedsListControl extends BaseControl
                 }
             } else {
 
-                $showSourceList =  ($type == SourceFeedUtility::Topface || $type == SourceFeedUtility::Source || $type == SourceFeedUtility::Albums);
+                $showSourceList =  ($type == SourceFeedUtility::Topface
+                    || $type == SourceFeedUtility::Source
+                    || $type == SourceFeedUtility::Ads
+                    || $type == SourceFeedUtility::Albums);
 
                 $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
