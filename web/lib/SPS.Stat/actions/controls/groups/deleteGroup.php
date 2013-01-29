@@ -16,7 +16,7 @@
 
         public function Execute() {
 
-//            error_reporting( 0 );
+            error_reporting( 0 );
             $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
@@ -27,9 +27,7 @@
                 $type    = 'Stat';
 
             $m_class    = $type . 'Groups';
-
             $general = $general ? $general : 0;
-
             if ( !$group_id || !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
