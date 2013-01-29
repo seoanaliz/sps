@@ -115,27 +115,29 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     BaseFactory::WithoutPages => true
                 ));
 
-            if ($role == UserFeed::ROLE_AUTHOR) {
-                if ($mode == self::MODE_MY) {
-                    $authorsIds = array($author->authorId);
-                } else if ($mode == self::MODE_DEFERRED) {
-                    // отложенные
-                    $authorsIds = array($author->authorId);
-                    $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
-                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
-                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
-                } else {
-                    // если грузим все посты
-                    $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
-                    $this->options[BaseFactory::WithoutDisabled] = false;
-                    $authorsIds = true;
-                    unset($this->search['articleStatusIn']);
-                }
+            if ($mode == self::MODE_DEFERRED) { // отложенные
+                $authorsIds = array($author->authorId);
+                $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
+                $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                    '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
             } else {
-                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                //редактору: только одобренные и на рассмотрении записи этой группы
-                $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
+
+                if ($role == UserFeed::ROLE_AUTHOR) {
+                    if ($mode == self::MODE_MY) {
+                        $authorsIds = array($author->authorId);
+                    } else {
+                        // если грузим все посты
+                        $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                        $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
+                        $this->options[BaseFactory::WithoutDisabled] = false;
+                        $authorsIds = true;
+                        unset($this->search['articleStatusIn']);
+                    }
+                } else {
+                    $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                    //редактору: только одобренные и на рассмотрении записи этой группы
+                    $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
+                }
             }
 
             if ($authorsIds) {
