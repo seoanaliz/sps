@@ -154,7 +154,8 @@ var app = (function () {
             Events.fire('wall_load', {
                 type: $selectedItem.data('id'),
                 tabType: $selectedTab.data('type'),
-                userGroupId: $selectedTab.data('id')
+                userGroupId: $selectedTab.data('id'),
+                articlesOnly: true
             }, function(data) {
                 $wallList.html(data);
                 _updateItems();
@@ -399,7 +400,8 @@ var app = (function () {
         Events.fire('wall_load', {
             type: $selectedItem.data('id'),
             tabType: $selectedTab.data('type'),
-            userGroupId: $selectedTab.data('id')
+            userGroupId: $selectedTab.data('id'),
+            articlesOnly: true
         }, function(data) {
             $loadMore.remove();
             $wallList.append(data);
@@ -411,17 +413,16 @@ var app = (function () {
         var $selectedTab = $('#groups').find('.tab.selected');
         var $selectedItem = $menu.find('.item.selected');
         var itemType = 'my';
-        var pageId = $selectedItem.data('id');
         var isEmpty = $selectedItem.data('empty');
         if (isEmpty) {
             itemType = 'best';
         }
 
         Events.fire('wall_load', {
-            type: pageId,
-            filter: itemType,
+            type: $selectedItem.data('id'),
             tabType: $selectedTab.data('type'),
-            userGroupId: $selectedTab.data('id')
+            userGroupId: $selectedTab.data('id'),
+            filter: itemType
         }, function(data) {
             $leftColumn.html(data);
             _updateItems();

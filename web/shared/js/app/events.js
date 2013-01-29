@@ -29,11 +29,23 @@ var Events = {
 
 var Eventlist = {
     wall_load: function(options, callback) {
-        options = $.extend({
+        var defaultOptions = {
+            // my, ID ленты
             type: null,
+            // all, queued, sent - статус записи
+            tabType: null,
+            // ID группы автора
+            userGroupId: null,
+            // Загрузить только записи, без поля ввода и т.д.
+            articlesOnly: false,
+            // best, my, ...
             filter: null,
-            page: -1
-        }, options);
+            // Смещение записей
+            page: -1,
+            // my, deferred
+            mode: null
+        };
+        options = $.extend(defaultOptions, options);
 
         $.ajax({
             url: appControlsRoot + 'articles-list/',
