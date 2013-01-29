@@ -20,7 +20,7 @@ class AddReport
         $barter_public_id   =   Request::getString ( 'barterPublicId' );
         $start_looking_time =   Request::getString ( 'startTime' ) ? Request::getString( 'startTime' ) : $now ;
         $stop_looking_time  =   Request::getString ( 'stopTime' );
-        $group_id           =   Request::GetInteger( 'groupId' );
+        $group_id           =   Request::GetString ( 'groupId' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $time_shift         =   Request::getInteger( 'timeShift');
         $user_id            =   AuthVkontakte::IsAuth();
