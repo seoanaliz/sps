@@ -12,11 +12,12 @@ class Group
     /**
      * название группы по умолчанию
      */
-    const DEFAULT_GROUPE_NAME   = 'default_group';
+    const DEFAULT_GROUP_NAME   = 'default_group';
     /**
      * тип группы - обмен
      */
-    const BARTER_GROUP = 1;
+    const BARTER_GROUP      = 1;
+    const MESSAGER_GROUP    = 2;
 
     /** @var int*/
     public $group_id;

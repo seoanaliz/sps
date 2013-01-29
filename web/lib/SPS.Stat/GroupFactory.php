@@ -93,6 +93,11 @@ class GroupFactory
             , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
             , 'complexType' => 'int[]'
         )
+        ,'pageSize' => array(
+              'name'         => 'pageSize'
+            , 'type'       => TYPE_INTEGER
+            , 'default'    => 1000
+        )
     )
     );
 
