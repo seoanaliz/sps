@@ -39,6 +39,9 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         if ($mode == self::MODE_MY) {
             return self::MODE_MY;
         }
+        if ($mode == self::MODE_DEFERRED) {
+            return self::MODE_DEFERRED;
+        }
         return self::MODE_ALL;
     }
 
