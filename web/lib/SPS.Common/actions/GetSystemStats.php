@@ -24,7 +24,7 @@ class GetSystemStats {
             "startDate"::date as "createdAt"
             , count(*) as "totalQueueCount"
             , sum (case when "statusId" = 5 then 1 else 0 end) as "sent"
-            , sum (case when "statusId" <> 5 and "endDate" < @now then 1 else 0 end) as "notSent"
+            , sum (case when "statusId" <> 5 and "endDate" < now() then 1 else 0 end) as "notSent"
         from "getArticleQueues"
         where "startDate"::date > @startDate
         and "startDate"::date <= @endDate
@@ -85,7 +85,6 @@ class GetSystemStats {
         $cmd = new SqlCommand(self::GET_QUEUES, ConnectionFactory::Get());
         $cmd->SetDate('@startDate', $startDate);
         $cmd->SetDate('@endDate', $endDate);
-        $cmd->SetDate('@now', $endDate);
         $Ds = $cmd->Execute();
 
         while ($Ds->Next()) {
