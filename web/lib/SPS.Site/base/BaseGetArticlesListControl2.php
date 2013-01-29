@@ -7,6 +7,8 @@
  */
 class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
 
+    protected $isApp = false;
+
     const MODE_MY = 'my';
 
     const MODE_ALL = 'all';
@@ -92,7 +94,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
 
         $mode = $this->getMode();
         $targetFeedId = $this->getTargetFeedId();
-        if (!$targetFeedId) {
+        if (!$targetFeedId && !$this->isApp) {
             return array('success' => false);
         }
 

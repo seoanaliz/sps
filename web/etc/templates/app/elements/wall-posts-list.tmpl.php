@@ -12,13 +12,12 @@ $type = Request::getString('type');
 $tabType = Request::getString('tabType');
 $currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
-
 ?>
 
 <? if ($showControls): ?>
 <div class="groups" id="groups">
     <div class="tab-bar no-padding">
-        <div class="tab<?=$currentGroup ? '' : ' selected'?>">Все записи</div>
+        <div class="tab<?=$currentGroup && $currentGroup != 'null' ? '' : ' selected'?>">Все записи</div>
         <? foreach ($userGroups as $userGroup) { ?>
         <div class="tab<?=$currentGroup == $userGroup->userGroupId ? ' selected' : ''?>"
              data-id="<?=$userGroup->userGroupId?>">

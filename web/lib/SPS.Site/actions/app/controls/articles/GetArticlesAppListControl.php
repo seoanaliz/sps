@@ -9,6 +9,7 @@
 final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
 
     public function __construct(){
+        $this->isApp = true;
         parent::__construct();
         $this->vkId = Session::getInteger('authorId');
     }
@@ -38,12 +39,15 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
     }
 
     /**
-     * ТОлк
+     * Фича
      * @return string
      */
-//    protected function getMode(){
-//        return self::MODE_MY;
-//    }
+    protected function getMode(){
+        if (Request::getString('type') == 'my') {
+            return self::MODE_MY;
+        }
+        return parent::getMode();
+    }
 
     /**
      * Возвращает идентификатор запрошеной ленты
@@ -159,7 +163,10 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         Response::setArray('authorEvents', $this->authorEvents);
         Response::setArray('__authorCounter', $this->authorCounter);
         Response::setArray('userGroups', $this->userGroups);
-        Response::setBoolean('showControls', $this->search['page'] == 0 && (Request::getString('tabType') == 'null'));
+        Response::setBoolean('showControls',
+            ($this->search['page'] == 0 && (Request::getString('tabType') == 'null')) &&
+                $this->getMode() != self::MODE_DEFERRED
+        );
     }
 
     /**
