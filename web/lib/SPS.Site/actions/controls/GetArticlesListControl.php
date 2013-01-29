@@ -105,39 +105,37 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             // в авторских источники не учитываем, хотя они передаются с клиента
             unset($this->search['_sourceFeedId']);
 
-            // количество на рассмотрении и одобренных и не отправленных
-            $this->reviewArticleCount = ArticleFactory::Count(array(
-                    'authorId' => $author->authorId,
-                    'userGroupId' => Request::getInteger('userGroupId')),
-                array(
-                    BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
-                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
-                    BaseFactory::WithoutPages => true
-                ));
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                // количество на рассмотрении и одобренных и не отправленных
+                $this->reviewArticleCount = ArticleFactory::Count(array(
+                        'authorId' => $author->authorId,
+                        'userGroupId' => Request::getInteger('userGroupId')),
+                    array(
+                        BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
+                            '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
+                        BaseFactory::WithoutPages => true
+                    ));
 
-            if ($mode == self::MODE_DEFERRED) { // отложенные
-                $authorsIds = array($author->authorId);
-                $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
-                $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
-                    '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
-            } else {
-
-                if ($role == UserFeed::ROLE_AUTHOR) {
-                    if ($mode == self::MODE_MY) {
-                        $authorsIds = array($author->authorId);
-                    } else {
-                        // если грузим все посты
-                        $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                        $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
-                        $this->options[BaseFactory::WithoutDisabled] = false;
-                        $authorsIds = true;
-                        unset($this->search['articleStatusIn']);
-                    }
+                if ($mode == self::MODE_MY) {
+                    $authorsIds = array($author->authorId);
+                } else if ($mode == self::MODE_DEFERRED) {
+                    // отложенные
+                    $authorsIds = array($author->authorId);
+                    $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
+                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
                 } else {
+                    // если грузим все посты
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    //редактору: только одобренные и на рассмотрении записи этой группы
-                    $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
+                    $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
+                    $this->options[BaseFactory::WithoutDisabled] = false;
+                    $authorsIds = true;
+                    unset($this->search['articleStatusIn']);
                 }
+            } else {
+                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                //редактору: только одобренные и на рассмотрении записи этой группы
+                $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
             }
 
             if ($authorsIds) {
