@@ -44,7 +44,7 @@ var REPORTS = {
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
 
     GROUP_LIST:
-    '<? if (defaultLists.length && (!count(userLists) || count(userLists) > 1)) { ?>' +
+    '<? if (count(defaultLists) && (!count(userLists) || count(userLists) > 1)) { ?>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
         '</div>' +
@@ -55,7 +55,7 @@ var REPORTS = {
         '<input type="text" placeholder="Введите название списка..." /> ' +
         '<div class="item"><u>Создать список</u></div>' +
     '</div>' +
-    '<? if (sharedLists) { ?>' +
+    '<? if (count(sharedLists)) { ?>' +
         '<div class="title">Общие списки</div>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +

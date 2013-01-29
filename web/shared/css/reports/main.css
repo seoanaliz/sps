@@ -21,6 +21,6 @@
 #main .right-column>div{padding-bottom:0;}
 #main .right-column>#filter>.form{padding:7px 7px 0;}#main .right-column>#filter>.form label{padding:3px;}
 #main .right-column>#filter>.form input{margin-right:5px;}
-#main .right-column>.filter>.list{border-top:none;padding-top:0;}#main .right-column>.filter>.list .item+input{margin-top:10px;}
+#main .right-column>.filter>.list{border-top:none;padding-top:0;margin:10px;}#main .right-column>.filter>.list .item+input{margin-top:10px;}
 #main .right-column>.filter>.list input{display:none;width:138px;}
 #load-more-table{display:block;}
