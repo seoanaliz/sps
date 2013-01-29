@@ -123,19 +123,16 @@ var app = (function () {
 
         /*Right column*/
         $menu.delegate('.item', 'click', function() {
-            var $item = $(this);
-            var itemId = $item.data('id');
-            var itemType = 'my';
-            var isEmpty = $item.data('empty');
+            var $selectedItem = $(this);
+            var itemId = $selectedItem.data('id');
+            $menu.find('.item.selected').removeClass('selected');
+            $selectedItem.addClass('selected');
 
             if (itemId != 'my') {
-                $item.find('.counter').fadeOut(200);
-            }
-            if (isEmpty) {
-                itemType = 'best';
+                $selectedItem.find('.counter').fadeOut(200);
             }
 
-            pageLoad(itemId, itemType);
+            pageLoad();
         });
     }
 
@@ -145,16 +142,20 @@ var app = (function () {
             var $tab = $(this);
             $wallGroups.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            var groupId = $tab.data('id');
-            pageLoad($menu.find('.item.selected').data('id'));
+            pageLoad();
         });
 
         $wallTabs.delegate('.tab', 'click', function() {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            var groupId = $wallGroups.find('.tab.selected').data('id');
-            Events.fire('wall_load', {tabType: $tab.data('type'), page: -1, userGroupId: groupId}, function(data) {
+            var $selectedTab = $('#groups').find('.tab.selected');
+            var $selectedItem = $menu.find('.item.selected');
+            Events.fire('wall_load', {
+                type: $selectedItem.data('id'),
+                tabType: $selectedTab.data('type'),
+                userGroupId: $selectedTab.data('id')
+            }, function(data) {
                 $wallList.html(data);
                 _updateItems();
             });
@@ -165,7 +166,7 @@ var app = (function () {
             if (!$(this).data('autoResize')) $(this).autoResize();
             $newPost.addClass('open');
         });
-        $newPost.find('textarea').bind('keyup', function(e) {
+        $newPost.find('textarea').bind('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
                 _wallPost(this);
             }
@@ -176,24 +177,26 @@ var app = (function () {
         $newPost.delegate('.photo > .delete', 'click', function() {
             $(this).parent().remove();
         });
-        var uploader = new qq.FileUploader({
-            element: $newPost.find('.file-uploader')[0],
-            action: root + 'int/controls/image-upload/',
-            template: '<div class="qq-uploader">' +
-                '<div class="qq-upload-drop-area">Перенесите картинки сюда</div>' +
-                '<div class="qq-upload-button">Прикрепить</div>' +
-                '<ul class="qq-upload-list"></ul>' +
-                '</div>',
-            onComplete: function(id, fileName, res) {
-                var $photo = $(
-                    '<div class="photo">' +
-                        '<img src="' + res.image + '" data-name="' + res.filename + '" />' +
-                        '<div class="delete"></div>' +
-                    '</div>'
-                );
-                $newPost.find('.attachments > .photos').append($photo);
-            }
-        });
+        if ($newPost.find('.file-uploader').length) {
+            var uploader = new qq.FileUploader({
+                element: $newPost.find('.file-uploader')[0],
+                action: root + 'int/controls/image-upload/',
+                template: '<div class="qq-uploader">' +
+                    '<div class="qq-upload-drop-area">Перенесите картинки сюда</div>' +
+                    '<div class="qq-upload-button">Прикрепить</div>' +
+                    '<ul class="qq-upload-list"></ul>' +
+                    '</div>',
+                onComplete: function(id, fileName, res) {
+                    var $photo = $(
+                        '<div class="photo">' +
+                            '<img src="' + res.image + '" data-name="' + res.filename + '" />' +
+                            '<div class="delete"></div>' +
+                        '</div>'
+                    );
+                    $newPost.find('.attachments > .photos').append($photo);
+                }
+            });
+        }
 
         $wall.delegate('.post .hight-light.new', 'hover', function(e) {
             if (e.type != 'mouseenter') return;
@@ -233,9 +236,9 @@ var app = (function () {
             }
         });
         $wall.delegate('.show-cut', 'click', function() {
-            $text = $(this).closest('.text');
-            $shortcut = $text.find('.shortcut');
-            $cut = $text.find('.cut');
+            var $text = $(this).closest('.text');
+            var $shortcut = $text.find('.shortcut');
+            var $cut = $text.find('.cut');
 
             $shortcut.hide();
             $cut.show();
@@ -263,7 +266,7 @@ var app = (function () {
             var $newComment = $(this).closest('.new-comment');
             $newComment.addClass('open');
         });
-        $wall.delegate('.new-comment textarea', 'keyup', function(e) {
+        $wall.delegate('.new-comment textarea', 'keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
                 _commentPost(this);
             }
@@ -295,7 +298,10 @@ var app = (function () {
             var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {postId: postId, all: true}, function(html) {
+            Events.fire('comment_load', {
+                postId: postId,
+                all: true
+            }, function(html) {
                 $target.removeClass('load').html(tmpText);
                 $commentsList.html(html).find('.date').easydate(easydateParams);
             });
@@ -307,17 +313,22 @@ var app = (function () {
             var postId = $post.data('id');
             var tmpText = $target.text();
             $target.addClass('load').html('&nbsp;');
-            Events.fire('comment_load', {postId: postId, all: false}, function(html) {
+            Events.fire('comment_load', {
+                postId: postId,
+                all: false
+            }, function(html) {
                 $target.removeClass('load').html(tmpText);
                 $commentsList.html(html).find('.date').easydate(easydateParams);
             });
         });
         $wall.delegate('.show-all-postponed', 'click', function() {
             var $target = $(this);
-            var groupId = $('#groups').find('.tab.selected').data('id');
-
+            var $selectedTab = $('#groups').find('.tab.selected');
+            var $selectedItem = $menu.find('.item.selected');
             Events.fire('wall_load', {
-                userGroupId: groupId,
+                type: $selectedItem.data('id'),
+                tabType: $selectedTab.data('type'),
+                userGroupId: $selectedTab.data('id'),
                 articlesOnly: true,
                 mode: 'deferred'
             }, function(data) {
@@ -346,11 +357,16 @@ var app = (function () {
             $button.addClass('load');
             var publicId = $menu.find('.item.selected').data('id');
             var groupId = $('#groups').find('.tab.selected').data('id');
-            Events.fire('wall_post', {text: text, publicId: publicId, photos: photos, userGroupId: groupId}, function() {
+            Events.fire('wall_post', {
+                text: text,
+                publicId: publicId,
+                photos: photos,
+                userGroupId: groupId
+            }, function() {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $photos.html('');
-                pageLoad($menu.find('.item.selected').data('id'));
+                pageLoad();
             });
         }
     }
@@ -378,38 +394,35 @@ var app = (function () {
     function showMore() {
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
-        var groupId = $('#groups').find('.tab.selected').data('id');
-        Events.fire('wall_load', {tabType: null, userGroupId: groupId}, function(data) {
+        var $selectedTab = $('#groups').find('.tab.selected');
+        var $selectedItem = $menu.find('.item.selected');
+        Events.fire('wall_load', {
+            type: $selectedItem.data('id'),
+            tabType: $selectedTab.data('type'),
+            userGroupId: $selectedTab.data('id')
+        }, function(data) {
             $loadMore.remove();
             $wallList.append(data);
             _updateItems();
         });
     }
 
-    function pageLoad(id, filter) {
-        var groupId = $('#groups').find('.tab.selected').data('id');
+    function pageLoad() {
+        var $selectedTab = $('#groups').find('.tab.selected');
+        var $selectedItem = $menu.find('.item.selected');
+        var itemType = 'my';
+        var pageId = $selectedItem.data('id');
+        var isEmpty = $selectedItem.data('empty');
+        if (isEmpty) {
+            itemType = 'best';
+        }
+
         Events.fire('wall_load', {
-            type: id,
-            filter: filter,
-            page: -1,
-            tabType: null,
-            userGroupId: groupId
+            type: pageId,
+            filter: itemType,
+            tabType: $selectedTab.data('type'),
+            userGroupId: $selectedTab.data('id')
         }, function(data) {
-            if (id) {
-                var $targetItem = $menu.find('.item[data-id="' + id + '"]');
-                var $targetList = $targetItem.next('.list');
-                var $selectedItem = $menu.find('.item.selected').not($targetItem);
-                var $selectedList = $menu.find('.list.selected');
-
-                $targetItem.addClass('selected');
-                $targetList.addClass('selected').slideDown(100);
-
-                $selectedItem.removeClass('selected');
-                if ($selectedList[0] && $selectedList[0] != $targetItem.closest('.list')[0]) {
-                    $selectedList.removeClass('selected').slideUp(100);
-                }
-            }
-
             $leftColumn.html(data);
             _updateItems();
             _bindLeftColumnEvents();

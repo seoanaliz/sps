@@ -37,7 +37,7 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
     </div>
     <div class="tabs">
         <div class="tab-bar">
-            <div class="tab all <?= (empty($tabType) || ($tabType == 'all')) ? 'selected' : '' ?>" data-type="all">Все
+            <div class="tab all <?= ($tabType || ($tabType == 'all')) ? 'selected' : '' ?>" data-type="all">Все
                 записи
             </div>
             <div class="tab planned <?= (!empty($tabType) && ($tabType == 'queued')) ? 'selected' : '' ?>"
