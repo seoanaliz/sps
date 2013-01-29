@@ -128,6 +128,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
                     // если грузим все посты
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                     $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
+                    $this->options[BaseFactory::WithoutDisabled] = false;
                     $authorsIds = true;
                     unset($this->search['articleStatusIn']);
                 }

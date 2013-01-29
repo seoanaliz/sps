@@ -251,9 +251,9 @@ abstract class BaseGetArticlesListControl extends BaseControl
      */
     protected function getObjects()
     {
-        Logger::LogLevel(ELOG_DEBUG);
+        //Logger::LogLevel(ELOG_DEBUG);
         $this->articles = ArticleFactory::Get($this->search, $this->options);
-        Logger::LogLevel(ELOG_WARNING);
+        //Logger::LogLevel(ELOG_WARNING);
         $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
 
         $this->hasMore = (count($this->articles) > $this->pageSize);
