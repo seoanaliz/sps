@@ -16,9 +16,9 @@
 
         public function Execute() {
 
-            error_reporting( 0 );
+//            error_reporting( 0 );
             $user_id  = AuthVkontakte::IsAuth();
-            $group_id = Request::getInteger ( 'groupId' );
+            $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
             $type     = ucfirst( Request::getString( 'type' ));
 
@@ -37,24 +37,26 @@
             if( $type == 'Barter' ) {
                 $source = 1;
                 $default_group = GroupsUtility::get_default_group( $user_id, $source  );
-                $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if ( !$group )
-                    die(  ObjectHelper::ToJSON(array('response' => false )));
+                $group_ids = explode( ',', $group_id  );
+                foreach( $group_ids as $group_id ) {
 
-                if ( $group->group_id === $default_group->group_id ) {
-                    //дефолтные группы удалять нельзя
-                    die(  ObjectHelper::ToJSON(array('response' => false )));
-                } elseif ( $group && $group->created_by == $user_id ) {
-                    //жесткое удаление группы, только создавший
-                    GroupsUtility::delete_group( $group, $default_group );
+                    $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
+                    if ( !$group )
+                        continue;
 
+                    if ( $group->group_id === $default_group->group_id ) {
+                        //дефолтные группы удалять нельзя
+                        continue;
+                    } elseif ( $group && $group->created_by == $user_id ) {
+                        //жесткое удаление группы, только создавший
+                        GroupsUtility::delete_group( $group, $default_group );
+                    }
+                      else {
+                          //отписываем человека от группы
+                          GroupsUtility::dismiss_from_group( $group, $user_id );
+                    }
                 }
-                  else {
-                      //отписываем человека от группы
-                      $group = GroupFactory::GetOne( array( 'group_id' => $group_id ));
-                      GroupsUtility::dismiss_from_group( $group, $user_id );
-                }
-                die( ObjectHelper::ToJSON(array('response' => true )));
+                die( ObjectHelper::ToJSON( array( 'response' => true )));
             }
 
             if ( $general AND statUsers::is_Sadmin( $user_id ) ) {
