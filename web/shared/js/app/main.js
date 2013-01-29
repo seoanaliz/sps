@@ -319,8 +319,7 @@ var app = (function () {
             Events.fire('wall_load', {
                 userGroupId: groupId,
                 articlesOnly: true,
-                articleStatus: 1,
-                mode: 'my'
+                mode: 'deferred'
             }, function(data) {
                 $target.after(data);
                 $target.remove();

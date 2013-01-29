@@ -120,14 +120,12 @@ function loadArticles(clean) {
     wallPage++;
     articlesLoading = true;
 
-    $('#wall-load').show();
-
-    var sortType = $('.wall-title a').data('type');
+    Elements.getWallLoader().show();
 
     var requestData = {
         sourceFeedIds: Elements.leftdd(),
         page: wallPage,
-        sortType: sortType,
+        sortType: Elements.getSortType(),
         type: sourceType,
         targetFeedId: targetFeedId
     };
@@ -165,7 +163,7 @@ function loadArticles(clean) {
         dataType: "html",
         data: requestData
     }).always(function() {
-        $('#wall-load').hide();
+        Elements.getWallLoader().hide();
         if (clean) {
             $('#wall').empty();
         }
@@ -760,15 +758,14 @@ var Eventlist = {
         var slider = $( "#slider-range" );
         var from = slider.slider( "values", 0 );
         var to = slider.slider( "values", 1 );
-        var sortType = $('.wall-title a').data('type');
 
-        $('#wall-load').show();
+        Elements.getWallLoader().show();
         var requestData =  {
             sourceFeedIds: Elements.leftdd(),
             page: wallPage,
             from: from,
             to: to,
-            sortType: sortType,
+            sortType: Elements.getSortType(),
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd()
         };
@@ -782,7 +779,7 @@ var Eventlist = {
             dataType : "html",
             data: requestData
         }).always(function() {
-            $('#wall-load').hide();
+            Elements.getWallLoader().hide();
         }).done(callback);
     },
 

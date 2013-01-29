@@ -416,25 +416,24 @@ $(document).ready(function(){
         }
 
         var $tab = $(this);
-        var sortType = $('.wall-title a').data('type');
         $leftPanel.find('.authors-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
 
         wallPage = 0;
-        $('#wall-load').show();
+        Elements.getWallLoader().show();
         Control.fire('get_articles', {
             page: wallPage,
-            sortType: sortType,
+            sortType: Elements.getSortType(),
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd(),
-            articleStatus: $tab.data('article-status'),
+            articleStatus: Elements.getArticleStatus(),
             mode: $tab.data('mode')
         }).success(function(html) {
             var $block = $(html);
             $('#wall').html($block);
-            $('#wall-load').hide();
             Elements.initImages($block);
             Elements.initLinks($block);
+            Elements.getWallLoader().hide();
         });
     });
 
@@ -445,24 +444,23 @@ $(document).ready(function(){
         }
 
         var $tab = $(this);
-        var sortType = $('.wall-title a').data('type');
         $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
 
         wallPage = 0;
-        $('#wall-load').show();
+        Elements.getWallLoader().show();
         Control.fire('get_articles', {
             page: wallPage,
-            sortType: sortType,
+            sortType: Elements.getSortType(),
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd(),
             userGroupId: Elements.getUserGroupId()
         }).success(function(html) {
             var $block = $(html);
             $('#wall').html($block);
-            $('#wall-load').hide();
             Elements.initImages($block);
             Elements.initLinks($block);
+            Elements.getWallLoader().hide();
         });
     });
 
@@ -536,29 +534,30 @@ $(document).ready(function(){
                     $posts.show();
                 }
             } else {
-                var $tabs = $leftPanel.find('.user-groups-tabs');
-                var sortType = $('.wall-title a').data('type');
                 $target.data('def-html', $target.html());
-                $target.html('Скрыть записи на рассмотрении');
 
                 wallPage = 0;
-                $('#wall-load').show();
+                Elements.getWallLoader().show();
                 Control.fire('get_articles', {
                     page: wallPage,
-                    sortType: sortType,
+                    sortType: Elements.getSortType(),
                     type: Elements.leftType(),
                     targetFeedId: Elements.rightdd(),
                     userGroupId: Elements.getUserGroupId(),
                     articlesOnly: true,
-                    articleStatus: 1,
-                    mode: 'my'
+                    mode: 'deferred'
                 }).success(function(html) {
-                    var $posts = $(html);
-                    $target.after($posts);
-                    $('#wall-load').hide();
-                    $target.data('block', $posts);
-                    Elements.initImages($posts);
-                    Elements.initLinks($posts);
+                    if (html) {
+                        var $posts = $(html);
+                        $target.data('block', $posts);
+                        $target.after($posts);
+                        $target.html('Скрыть записи на рассмотрении');
+                        Elements.initImages($posts);
+                        Elements.initLinks($posts);
+                    } else {
+                        $target.remove();
+                    }
+                    Elements.getWallLoader().hide();
                 });
             }
         });
@@ -1774,5 +1773,11 @@ var Elements = {
     },
     getArticleStatus: function() {
         return $('.authors-tabs').find('.tab.selected').data('article-status') || 1;
+    },
+    getSortType: function() {
+        return $('.wall-title a').data('type');
+    },
+    getWallLoader: function() {
+        return $('#wall-load');
     }
 };
