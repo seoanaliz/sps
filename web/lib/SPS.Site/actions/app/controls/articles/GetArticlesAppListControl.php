@@ -6,16 +6,16 @@
  * @subpackage Site
  * @author     Shuler
  */
-final class GetArticlesAppListControl extends BaseGetArticlesListControl {
+final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
 
     public function __construct(){
         parent::__construct();
         $this->vkId = Session::getInteger('authorId');
     }
 
-    const MODE_MY = 'my';
+    //const MODE_MY = 'my';
 
-    const MODE_ALL = 'all';
+    //const MODE_ALL = 'all';
 
     /**
      * @var AuthorEvent[]
@@ -42,16 +42,16 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
         return SourceFeedUtility::Authors;
     }
 
-    protected function getMode(){
-        // если есть лента - показываем для нее
-        // безопасность проверена в parent::processRequest
-        $targetFeedId = $this->getTargetFeedId();
-        if ($targetFeedId) {
-            return self::MODE_ALL;
-        }
-
-        return self::MODE_MY;
-    }
+//    protected function getMode(){
+//        // если есть лента - показываем для нее
+//        // безопасность проверена в parent::processRequest
+//        $targetFeedId = $this->getTargetFeedId();
+//        if ($targetFeedId) {
+//            return self::MODE_ALL;
+//        }
+//
+//        return self::MODE_MY;
+//    }
 
     /**
      * Возвращает идентификатор запрошеной ленты
@@ -65,53 +65,53 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl {
     }
 
 
-    protected function processRequestCustom(){
-        $author = $this->getAuthor();
-
-        $mode = $this->getMode();
-        if ($mode == self::MODE_MY) {
-            $this->search['authorId'] = $author->authorId;
-        } else {
-            // получаем доступные ленты
-            $targetFeedIds = $this->ArticleAccessUtility->getAllTargetFeedIds();
-            $targetFeedId = $this->getTargetFeedId();
-            if (!in_array($targetFeedId, $targetFeedIds)) {
-                echo ObjectHelper::ToJSON(array('success' => false));
-                return;
-            }
-        }
-
-        // сортировка
-        $filter = Request::getString('filter');
-        switch ($filter) {
-            case 'best':
-                $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
-                break;
-        }
-
-        $tabType = Request::getString('tabType');
-        Response::setString('tabType', $tabType);
-
-        switch ($tabType) {
-            case 'queued':
-                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
-                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
-                break;
-            case 'sent':
-                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
-                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
-                break;
-        }
-
-        $this->options[BaseFactory::WithoutDisabled] = false;
-
-        $targetFeedId = $this->getTargetFeedId();
-        if ($targetFeedId){
-            //$TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            //$role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
-            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
-        }
-    }
+//    protected function processRequestCustom(){
+//        $author = $this->getAuthor();
+//
+//        $mode = $this->getMode();
+//        if ($mode == self::MODE_MY) {
+//            $this->search['authorId'] = $author->authorId;
+//        } else {
+//            // получаем доступные ленты
+//            $targetFeedIds = $this->ArticleAccessUtility->getAllTargetFeedIds();
+//            $targetFeedId = $this->getTargetFeedId();
+//            if (!in_array($targetFeedId, $targetFeedIds)) {
+//                echo ObjectHelper::ToJSON(array('success' => false));
+//                return;
+//            }
+//        }
+//
+//        // сортировка
+//        $filter = Request::getString('filter');
+//        switch ($filter) {
+//            case 'best':
+//                $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
+//                break;
+//        }
+//
+//        $tabType = Request::getString('tabType');
+//        Response::setString('tabType', $tabType);
+//
+//        switch ($tabType) {
+//            case 'queued':
+//                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
+//                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
+//                break;
+//            case 'sent':
+//                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
+//                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
+//                break;
+//        }
+//
+//        $this->options[BaseFactory::WithoutDisabled] = false;
+//
+//        $targetFeedId = $this->getTargetFeedId();
+//        if ($targetFeedId){
+//            //$TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+//            //$role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+//            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
+//        }
+//    }
 
     /**
      * Загрузка комментариев
