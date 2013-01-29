@@ -12,6 +12,11 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
     const MODE_ALL = 'all';
 
     /**
+     * Отложенные
+     */
+    const MODE_DEFERRED = 'deferred';
+
+    /**
      * @var string
      */
     private $articleLinkPrefix = 'http://vk.com/wall-';
@@ -91,39 +96,42 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
             return array('success' => false);
         }
 
+        $author = $this->getAuthor();
+
         if ($type == SourceFeedUtility::Authors) {
-
-            //$loadAll = !Request::getInteger('userGroupId');
-
+            // в авторских источники не учитываем, хотя они передаются с клиента
             unset($this->search['_sourceFeedId']);
-            //if ($loadAll) {
-                // #11115
-                if ($role == UserFeed::ROLE_AUTHOR) {
 
-                    if ($mode == self::MODE_MY) {
-                        $authorsIds = array($this->getAuthor()->authorId);
-                    } else {
-                        // если грузим все посты
-                        $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                        $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN '.PgSqlConvert::ToList($authorsIds, TYPE_INTEGER).' AND "sentAt" IS NOT NULL )  ';
-                            //'("authorId" = '.PgSqlConvert::ToInt($this->getAuthor()->authorId).' AND "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . '))';
-                        $authorsIds = true;
-                        unset($this->search['articleStatusIn']);
-                    }
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                if ($mode == self::MODE_MY) {
+                    $authorsIds = array($author->authorId);
+                } else if ($mode == self::MODE_DEFERRED) {
+                    // отложенные
+                    $authorsIds = array($author->authorId);
+                    $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
+                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
                 } else {
+                    // если грузим все посты
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
-                    //редактору: только одобренные и на рассмотрении записи этой группы
-                    $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
+                    $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
+                    $authorsIds = true;
+                    unset($this->search['articleStatusIn']);
                 }
+            } else {
+                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                //редактору: только одобренные и на рассмотрении записи этой группы
+                $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED, Article::STATUS_REVIEW);
+            }
 
-                if ($authorsIds) {
-                    if (is_array($authorsIds)){
-                        $this->search['_authorId'] = $authorsIds;
-                    }
-                } else {
-                    $this->search['_authorId'] = array(-1 => -1);
+            if ($authorsIds) {
+                if (is_array($authorsIds)) {
+                    $this->search['_authorId'] = $authorsIds;
                 }
-            //}
+            } else {
+                $this->search['_authorId'] = array(-1 => -1);
+            }
+
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
             $this->search['authorId'] = $this->getAuthor()->authorId;
@@ -138,15 +146,15 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         }
 
 
-            // в группе ищем записи на рассмотрении
+        // количество на рассмотрении и одобренных и не отправленных
         $this->reviewArticleCount = ArticleFactory::Count(array(
-                'authorId' => $this->getAuthor()->authorId,
+                'authorId' => $author->authorId,
                 'userGroupId' => Request::getInteger('userGroupId')),
             array(
             BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
-                '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))'
+                '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
+            BaseFactory::WithoutPages => true
         ));
-
 
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
@@ -182,7 +190,7 @@ class GetArticlesListControl extends BaseGetArticlesListControl {
         Response::setArray('sourceFeeds', $this->sourceFeeds);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
         Response::setBoolean('isWebUserEditor', $isWebUserEditor);
-        Response::setBoolean('reviewArticleCount', $this->reviewArticleCount);
+        Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
         Response::setBoolean('canEditPosts', $this->canEditPosts);
     }
