@@ -14,15 +14,15 @@ var REPORTS = {
                     '<div class="title">Фильтр</div>' +
                     '<div class="form">' +
                         '<label>' +
-                            '<input name="filter" type="radio" value="null" checked="checked">' +
+                            '<input name="filter" type="radio" value="all" checked="checked">' +
                             '<span>Все</span>' +
                         '</label>' +
                         '<label>' +
-                            '<input name="filter" type="radio" value="4,6">' +
+                            '<input name="filter" type="radio" value="complete">' +
                             '<span>Успешные</span>' +
                         '</label>' +
                         '<label>' +
-                            '<input name="filter" type="radio" value="1,2,3,5">' +
+                            '<input name="filter" type="radio" value="false">' +
                             '<span>Неудачные</span>' +
                         '</label>' +
                     '</div>' +
@@ -45,7 +45,6 @@ var REPORTS = {
 
     GROUP_LIST:
     '<? if (!count(userLists) || count(userLists) > 1) { ?>' +
-        '<div class="title">Списки</div>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
         '</div>' +
