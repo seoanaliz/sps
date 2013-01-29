@@ -23,7 +23,7 @@ class AddReport
         $group_id           =   Request::GetInteger( 'groupId' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $time_shift         =   Request::getInteger( 'timeShift');
-        $user_id = AuthVkontakte::IsAuth();
+        $user_id            =   AuthVkontakte::IsAuth();
 
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
@@ -34,9 +34,8 @@ class AddReport
             $group_id = $default_group->group_id;
         }
 
-//        if ( !GroupsUtility::is_author( $group_id, $user_id ))
-//            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
-
+        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
         $publics_info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $publics_info ))
             die( ObjectHelper::ToJSON( array('response' => 'wrong publics data')));
@@ -79,21 +78,10 @@ class AddReport
             $barter_event->groups_ids  = array( $group_id );
             $barter_event->creator_id  = $user_id;
             $barter_events_array[] = $barter_event;
+
         }
 
-        //проверка на эталонность. пока мимо
-//        if ( !$barter_id ) {
-//            $standard_check = StatBarter::get_concrete_events( $publics_info['target']['id'], $publics_info['barter']['id'], 0, 1 );
-//            if ( !empty( $standard_check )) {
-//                foreach( $standard_check as $entry ) {
-//                    if ( $entry->standard_mark ) {
-//                        $entry->standard_mark = false;
-//                        BarterEventFactory::Update( $entry, array(),'tst');
-//                    }
-//                }
-//            }
-//        }
-//        print_r( $barter_events_array );
+
         if( $barter_id ) {
             $check = BarterEventFactory::Update( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {
