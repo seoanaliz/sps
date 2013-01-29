@@ -163,7 +163,13 @@ class CheckWalls
             ,43503460
             ,43503503
             ,43503550
+            ,43503725
+            ,43503431
+            ,43503315
+            ,43503298
+            ,43503235
         );
+
 
         $not_our_array = array(
             35806721,
@@ -232,13 +238,13 @@ class CheckWalls
                 $barter_event->status        =  1;
                 $barter_event->search_string =  $info[$oid]['shortname'];
                 $barter_event->barter_type   =  1;
+                $stop_looking_time             = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
-                $stop_looking_time           = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
                 $barter_event->creator_id    = $group_id->created_by;
-                $barter_event->groups_ids    = array(1,2,3, $group_id->group_id);
+                $barter_event->groups_ids    = array(3, $group_id->group_id);
                 $barter_events_array[] = $barter_event;
             }
         }
