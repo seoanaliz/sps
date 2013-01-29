@@ -11,6 +11,8 @@ $type = Request::getString('type');
 $tabType = Request::getString('tabType');
 $currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
+$reviewArticleCount = 10;
+$showArticlesOnly = false;
 ?>
 
 <? if ($showControls): ?>
@@ -63,7 +65,10 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 
 
     <div class="list">
-         <? endif; ?>
+        <? endif; ?>
+        <? if ($reviewArticleCount && !$showArticlesOnly): ?>
+            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> на рассмотрении</div>
+        <? endif; ?>
         <? if (!empty($articles)) {
             foreach ($articles as $article) {
                 $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();

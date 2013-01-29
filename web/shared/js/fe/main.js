@@ -431,10 +431,10 @@ $(document).ready(function(){
             mode: $tab.data('mode')
         }).success(function(html) {
             var $block = $(html);
-            Elements.initImages($block);
-            Elements.initLinks($block);
             $('#wall').html($block);
             $('#wall-load').hide();
+            Elements.initImages($block);
+            Elements.initLinks($block);
         });
     });
 
@@ -459,10 +459,10 @@ $(document).ready(function(){
             userGroupId: Elements.getUserGroupId()
         }).success(function(html) {
             var $block = $(html);
-            Elements.initImages($block);
-            Elements.initLinks($block);
             $('#wall').html($block);
             $('#wall-load').hide();
+            Elements.initImages($block);
+            Elements.initLinks($block);
         });
     });
 
@@ -532,14 +532,14 @@ $(document).ready(function(){
                     $target.html($target.data('def-html'));
                     $posts.hide();
                 } else {
-                    $target.html('Скрыть отложенные записи');
+                    $target.html('Скрыть записи на рассмотрении');
                     $posts.show();
                 }
             } else {
                 var $tabs = $leftPanel.find('.user-groups-tabs');
                 var sortType = $('.wall-title a').data('type');
                 $target.data('def-html', $target.html());
-                $target.html('Скрыть отложенные записи');
+                $target.html('Скрыть записи на рассмотрении');
 
                 wallPage = 0;
                 $('#wall-load').show();
@@ -554,11 +554,11 @@ $(document).ready(function(){
                     mode: 'my'
                 }).success(function(html) {
                     var $posts = $(html);
-                    Elements.initImages($posts);
-                    Elements.initLinks($posts);
                     $target.after($posts);
                     $('#wall-load').hide();
-                    $target.data('block', $posts)
+                    $target.data('block', $posts);
+                    Elements.initImages($posts);
+                    Elements.initLinks($posts);
                 });
             }
         });

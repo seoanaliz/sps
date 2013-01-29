@@ -1,32 +1,8 @@
+@import "../common/mixins.less";
+
 @link_color: #2B587A;
 @light_blue: #99ADC2;
 @hover_bg: #E1E7ED;
-
-.user-select(@select: text) {
-    -webkit-touch-callout: @select;
-    -webkit-user-select: @select;
-    -khtml-user-select: @select;
-    -moz-user-select: @select;
-    -ms-user-select: @select;
-    -o-user-select: @select;
-    user-select: @select;
-}
-.transition(@params) {
-    -webkit-transition: @params;
-    -moz-transition: @params;
-    -o-transition: @params;
-    transition: @params;
-}
-.border-radius(@params) {
-    -webkit-border-radius: @params;
-    -moz-border-radius: @params;
-    border-radius: @params;
-}
-.opacity(@opacity) {
-    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
-    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
-    opacity: @opacity;
-}
 
 html, body {
     background-color: #f1f1f1;
@@ -739,5 +715,19 @@ html, body {
 
     &:hover {
         text-decoration: underline;
+    }
+}
+.show-all-postponed {
+    background: @bg_light_hover;
+    text-align: center;
+    color: @color_light_blue;
+    padding: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    .user-select(none);
+
+    &:hover {
+        background: @bg_hover;
+        color: @color_blue;
     }
 }

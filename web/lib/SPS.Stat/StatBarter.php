@@ -33,7 +33,13 @@
             $overlaps = ( $overlaps[0] && $barter_event->posted_at )? $overlaps[0] - $barter_event->posted_at->format('U'): 0;
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
             $deleted_at = isset( $barter_event->deleted_at ) ? $barter_event->deleted_at->format('U') : $posted_at + 3600;
-            $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
+            if ( $barter_event->status == 4 || $barter_event->status == 6 )
+                $lifetime = ( $posted_at && $deleted_at ) ? $deleted_at - $posted_at : 0;
+            else {
+                $lifetime = 0;
+            }
+            if(  $barter_event->status == 5 )
+                $posted_at  = $barter_event->start_search_at->format('U');
             $groups = $barter_event->groups_ids;
             $barter_events_res[] = array(
                 'report_id'     =>  $barter_event->barter_event_id,

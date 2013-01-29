@@ -312,6 +312,20 @@ var app = (function () {
                 $commentsList.html(html).find('.date').easydate(easydateParams);
             });
         });
+        $wall.delegate('.show-all-postponed', 'click', function() {
+            var $target = $(this);
+            var groupId = $('#groups').find('.tab.selected').data('id');
+
+            Events.fire('wall_load', {
+                userGroupId: groupId,
+                articlesOnly: true,
+                articleStatus: 1,
+                mode: 'my'
+            }, function(data) {
+                $target.after(data);
+                $target.remove();
+            });
+        });
     }
 
     function _wallPost(target) {
@@ -375,7 +389,13 @@ var app = (function () {
 
     function pageLoad(id, filter) {
         var groupId = $('#groups').find('.tab.selected').data('id');
-        Events.fire('wall_load', {type: id, filter: filter, page: -1, tabType: null, userGroupId: groupId}, function(data) {
+        Events.fire('wall_load', {
+            type: id,
+            filter: filter,
+            page: -1,
+            tabType: null,
+            userGroupId: groupId
+        }, function(data) {
             if (id) {
                 var $targetItem = $menu.find('.item[data-id="' + id + '"]');
                 var $targetList = $targetItem.next('.list');

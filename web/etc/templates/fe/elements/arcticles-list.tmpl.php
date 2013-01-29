@@ -9,7 +9,7 @@
     /** @var $showArticlesOnly bool */
 ?>
 <? if ($reviewArticleCount && !$showArticlesOnly): ?>
-    <div class="show-all-postponed">Показать <?=$reviewArticleCount?> отложенные записи</div>
+    <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> на рассмотрении</div>
 <? endif; ?>
 <?
 
