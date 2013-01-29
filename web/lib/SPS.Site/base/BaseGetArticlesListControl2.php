@@ -114,7 +114,9 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
                 // количество на рассмотрении и одобренных и не отправленных
                 $this->reviewArticleCount = ArticleFactory::Count(array(
                         'authorId' => $author->authorId,
-                        'userGroupId' => Request::getInteger('userGroupId')),
+                        'userGroupId' => Request::getInteger('userGroupId'),
+                        'targetFeedId' => $targetFeedId,
+                    ),
                     array(
                         BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
                             '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
