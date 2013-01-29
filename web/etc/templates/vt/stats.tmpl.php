@@ -6,12 +6,13 @@
                 <tr>
                     <th class=""><span>Дата</span></th>
                     <th class="">&nbsp;</th>
-                    <th class=""><span>Кол-во постов</span></th>
-                    <th class=""><span>Кол-во авторских постов</span></th>
-                    <th class=""><span>Кол-во слитых постов</span></th>
+                    <th class=""><span>Кол-во загруженных постов</span></th>
+                    <th class=""><span>Кол-во загруженных авторских постов</span></th>
+                    <th class=""><span>Кол-во загруженных постов из источников</span></th>
                     <th class="">&nbsp;</th>
                     <th class=""><span>Кол-во запланированных постов</span></th>
                     <th class=""><span>Кол-во отправленных постов</span></th>
+                    <th class=""><span>Кол-во неотправленных постов</span></th>
                     <th class="">&nbsp;</th>
                     <th class=""><span>Кол-во ошибок импорта</span></th>
                     <th class=""><span>Кол-во ошибок экспорта</span></th>
@@ -30,6 +31,7 @@
                             <td>&nbsp;</td>
                             <td>{$statsData[totalQueueCount]}</td>
                             <td>{$statsData[sent]}</td>
+                            <td><strong>{$statsData[notSent]}</strong></td>
                             <td>&nbsp;</td>
                             <td>{$statsData[importErrors]}</td>
                             <td>{$statsData[exportErrors]}</td>
