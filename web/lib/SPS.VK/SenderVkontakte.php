@@ -103,6 +103,7 @@
 
         public function send_post()
         {
+            sleep( rand( 0, 12 ));
             $photo_array = array();
             $meth = 'wall';
             foreach( $this->post_photo_array as $photo_adr ) {
@@ -346,7 +347,7 @@
             $time_after = VkHelper::get_vk_time();
             if ( !$time_after )
                 die();
-            sleep(3);
+            sleep(2);
             $params = array(
                 'owner_id'      =>  '-' . $this->vk_group_id,
                 'count'         =>  5,
@@ -424,11 +425,16 @@
 
             //первый запрос, получение адреса для заливки фото
             $res = VkHelper::api_request( $method_get_server, $params, false );
-            sleep( 0.3 );
+            sleep( 0.4 );
+            if ( !isset( $res->upload_url )) {
+                if ( isset ( $res->error ))
+                    throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
+                        . " in post to vk.com/public" . $this->vk_group_id );
+                else
+                    throw new exception( " Error uploading photo. Response : " . ObjectHelper::ToJSON( $res )
+                        . " in post to vk.com/public" . $this->vk_group_id );
+            }
             $upload_url = $res->upload_url;
-            if ( !$upload_url )
-                throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
-                    . " in post to vk.com/publiic" . $this->vk_group_id );
 
             $photo_size = ImageHelper::GetImageSizes( $path );
 
@@ -441,7 +447,7 @@
             $content = json_decode( $content );
 
             if (empty( $content->$photo_list )) {
-                throw new exception(" Error uploading photo. Response : $content  in post to vk.com/publiic" . $this->vk_group_id );
+                throw new exception(" Error uploading photo. Response : $content  in post to vk.com/public" . $this->vk_group_id );
             }
             sleep( 1 );
 
