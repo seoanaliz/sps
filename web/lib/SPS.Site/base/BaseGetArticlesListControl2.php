@@ -193,7 +193,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
         Response::setBoolean('isWebUserEditor', $isWebUserEditor);
         Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
-        Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articles-only'));
+        Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articlesOnly'));
         Response::setBoolean('canEditPosts', $this->canEditPosts);
     }
 

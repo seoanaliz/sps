@@ -65,6 +65,7 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 
     <div class="list">
         <? endif; ?>
+
         <? if ($reviewArticleCount && !$showArticlesOnly): ?>
             <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> на рассмотрении</div>
         <? endif; ?>
