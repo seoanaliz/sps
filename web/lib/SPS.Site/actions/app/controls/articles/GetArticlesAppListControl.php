@@ -34,6 +34,9 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
 
 
     protected function getSourceFeedType(){
+        if (Request::getString('type') == 'my') {
+            return SourceFeedUtility::My;
+        }
         // показываем только авторские
         return SourceFeedUtility::Authors;
     }
@@ -65,7 +68,14 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
 
         $targetFeedId = $this->getTargetFeedId();
         if ($targetFeedId){
-            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
+
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                $this->userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $this->vkId);
+            } else {
+                $this->userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
+            }
         }
     }
 
@@ -151,7 +161,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         }
 
         if ($mode == self::MODE_MY) {
-            $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->search['authorId']);
+            $this->authorCounter = AuthorEventUtility::GetAuthorCounter($this->getAuthor()->authorId);
         }
     }
 
