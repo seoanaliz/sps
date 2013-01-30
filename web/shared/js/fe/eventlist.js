@@ -6,10 +6,7 @@ Control = $.extend(Control, {
 
     controlMap: {
         get_articles: {
-            name: 'arcticles-list',
-            params: {
-                articlesOnly: 'articles-only'
-            }
+            name: 'arcticles-list'
         },
         authors_get: {
             name: 'authors-list'
