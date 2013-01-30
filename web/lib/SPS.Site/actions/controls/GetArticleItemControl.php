@@ -39,7 +39,7 @@ class GetArticleItemControl extends BaseControl
         }
 
         $articleLinkPrefix = 'http://vk.com/wall-';
-        if ($sourceFeed->type == SourceFeedUtility::Albums) {
+        if ($sourceFeed && $sourceFeed->type == SourceFeedUtility::Albums) {
             $articleLinkPrefix = 'http://vk.com/photo';
         }
 
