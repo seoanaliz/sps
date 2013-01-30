@@ -461,8 +461,21 @@ var Eventlist = {
             }
 
             // группы юзеров
+            $wallSwitcher.hide();
             var $userGroupTabs = $('.user-groups-tabs');
             if (sourceType == 'authors') {
+                if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                    var showSwitcherType;
+                    if (data.authorsFilters.all_my_filter) {
+                        showSwitcherType = 'all';
+                    } else {
+                        showSwitcherType = 'deferred';
+                    }
+                    $wallSwitcher.show();
+                    $wallSwitcher.find('a').hide();
+                    $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+                }
+
                 var userGroups = data.showUserGroups;
                 $userGroupTabs.empty();
                 $userGroupTabs.removeClass('hidden');
@@ -478,15 +491,6 @@ var Eventlist = {
                 }
             } else {
                 $userGroupTabs.addClass('hidden');
-            }
-
-            data.showSwitcherType = 'approved';
-            if (data.showSwitcherType) {
-                $wallSwitcher.show();
-                $wallSwitcher.find('a').hide();
-                $wallSwitcher.find('a[data-type="' + data.showSwitcherType + '"]').show();
-            } else {
-                $wallSwitcher.hide();
             }
 
             var $typeSelector = $('.left-panel div.type-selector');
@@ -506,8 +510,8 @@ var Eventlist = {
 
             $('#source-select option').remove();
 
-            for (var i in data['sourceFeeds']) {
-                var item = data['sourceFeeds'][i];
+            for (var i in data.sourceFeeds) {
+                var item = data.sourceFeeds[i];
                 $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
             }
 
@@ -520,7 +524,7 @@ var Eventlist = {
                 }
             });
 
-            var gridTypes = data['accessibleGridTypes'];
+            var gridTypes = data.accessibleGridTypes;
             var showCount = 0;
             $('.right-panel .type-selector').children('.grid_type').each(function(i, item){
                 item = $(item);
