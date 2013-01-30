@@ -480,10 +480,16 @@ var Eventlist = {
                 $userGroupTabs.addClass('hidden');
             }
 
-            if (data.showSwitcherType) {
+            if (data.authorsFilters) {
+                var showSwitcherType;
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
                 $wallSwitcher.show();
                 $wallSwitcher.find('a').hide();
-                $wallSwitcher.find('a[data-type="' + data.showSwitcherType + '"]').show();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
             } else {
                 $wallSwitcher.hide();
             }
