@@ -380,7 +380,10 @@
                     throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
                 else
                     throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $params ));
-            }
+            } elseif ( !isset( $res[0]))
+                throw new Exception('Error on getting vk.com/public' . $this->page_id .' wall posts count. Response: '
+                    . ObjectHelper::ToJSON( $res ) . ' on params ' . json_encode( $params ));
+
             $this->count = $res[0];
             return (int) $res[0];
         }

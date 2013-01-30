@@ -107,6 +107,15 @@ class GetSourceFeedsListControl extends BaseControl
                 }
             }
 
+        $authorsFilters = array();
+        if ($role == UserFeed::ROLE_AUTHOR) {
+            $authorsFilters['all_my_filter'] = array();
+        }
+
+        if ($role != UserFeed::ROLE_AUTHOR) {
+            $authorsFilters['article_status_filter'] = array();
+        }
+
         echo ObjectHelper::ToJSON(array(
             'type' => $type,
             'sourceFeeds' => $sourceFeedResult,
@@ -117,6 +126,7 @@ class GetSourceFeedsListControl extends BaseControl
             'showArticleStatusFilter' => $showArticleStatusFilter,
             'showSourceList' => $showSourceList,
             'showUserGroups' => $showUserGroups,
+            'authorsFilters' => $authorsFilters
         ));
     }
 }

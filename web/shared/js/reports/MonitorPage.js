@@ -8,6 +8,7 @@ MonitorPage = Page.extend({
         var $listAddMonitor = $('#list-add-monitor');
         var $listHeader = $('#list-header');
         var $results = $('#results');
+        var $filter = $('#filter');
 
         if (!t.inited) {
             t.inited = true;
@@ -29,11 +30,16 @@ MonitorPage = Page.extend({
         }, function(data) {
             try {
                 $listAddMonitor.slideDown(200);
+                $filter.slideUp(200);
                 $listHeader.html(tmpl(REPORTS.MONITOR.LIST_HEADER));
                 $results.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
                 t.makeTime($results.find('.time'));
                 t.makeDate($results.find('.date'));
+                if (data.length < t.limit) {
+                    t.isEnded = true;
+                }
                 $(window).scroll();
+                $('#load-more-table').remove();
             } catch(e) {
                 new Box({
                     title: 'Ошибка',
@@ -156,7 +162,7 @@ MonitorPage = Page.extend({
             t.loaded = false;
             $('#load-more-table').remove();
 
-            if (!data.length) {
+            if (data.length < t.limit) {
                 t.isEnded = true;
             } else {
                 var $tmpElement = $(document.createElement('div'));

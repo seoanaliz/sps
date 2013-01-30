@@ -323,6 +323,7 @@ Pages = Event.extend({
     }
 });
 
+var monthNamesShort = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
 $(document).ready(function() {
     $.mask.definitions['2']='[012]';
     $.mask.definitions['3']='[0123]';
@@ -332,7 +333,7 @@ $(document).ready(function() {
         dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
         dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
         monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        monthNamesShort: monthNamesShort,
         firstDay: 1,
         showAnim: '',
         dateFormat: 'd MM'
