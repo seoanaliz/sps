@@ -66,6 +66,12 @@
                 <span class="filter" id="filter-list">
                     <a data-type="new">новые записи</a>
                 </span>
+                <span class="wall-switcher" id="wall-switcher">
+                    <a data-type="deferred" data-switch-to="approved">к одобренным записям</a>
+                    <a data-type="approved" data-switch-to="deferred">к записям на рассмотрении</a>
+                    <a data-type="my" data-switch-to="all">ко всем записям</a>
+                    <a data-type="all" data-switch-to="my">к моим записям</a>
+                </span>
             </div>
             {increal:tmpl://fe/elements/new-post-form.tmpl.php}
 
