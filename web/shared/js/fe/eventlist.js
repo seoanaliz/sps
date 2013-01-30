@@ -480,7 +480,6 @@ var Eventlist = {
                 $userGroupTabs.addClass('hidden');
             }
 
-            data.showSwitcherType = 'approved';
             if (data.showSwitcherType) {
                 $wallSwitcher.show();
                 $wallSwitcher.find('a').hide();
@@ -506,8 +505,8 @@ var Eventlist = {
 
             $('#source-select option').remove();
 
-            for (var i in data['sourceFeeds']) {
-                var item = data['sourceFeeds'][i];
+            for (var i in data.sourceFeeds) {
+                var item = data.sourceFeeds[i];
                 $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
             }
 
@@ -520,7 +519,7 @@ var Eventlist = {
                 }
             });
 
-            var gridTypes = data['accessibleGridTypes'];
+            var gridTypes = data.accessibleGridTypes;
             var showCount = 0;
             $('.right-panel .type-selector').children('.grid_type').each(function(i, item){
                 item = $(item);
