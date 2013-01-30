@@ -29,7 +29,7 @@ var Events = {
 
 var Eventlist = {
     wall_load: function(options, callback) {
-        var defaultOptions = {
+        var params = $.extend({
             // my, ID ленты
             type: null,
             // all, queued, sent - статус записи
@@ -44,13 +44,12 @@ var Eventlist = {
             page: -1,
             // my, deferred
             mode: null
-        };
-        options = $.extend(defaultOptions, options);
+        }, options);
 
         $.ajax({
             url: appControlsRoot + 'articles-list/',
             dataType : "html",
-            data: options,
+            data: params,
             success: function (data) {
                 callback(data);
             }

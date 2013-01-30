@@ -250,7 +250,7 @@ var app = (function () {
             var postId = $post.data('id');
             Events.fire('wall_delete', postId, function() {
                 $post.data('html', $post.html());
-                $post.addClass('deleted').html('Сообщение удалено. <a class="restore" href="javascript:;">Восстановить</a>.');
+                $post.addClass('deleted').html('Сообщение удалено. <a class="restore">Восстановить</a>.');
             });
         });
         $wall.delegate('.post.deleted > .restore', 'click', function() {
@@ -324,18 +324,37 @@ var app = (function () {
         });
         $wall.delegate('.show-all-postponed', 'click', function() {
             var $target = $(this);
-            var $selectedTab = $('#groups').find('.tab.selected');
-            var $selectedItem = $menu.find('.item.selected');
-            Events.fire('wall_load', {
-                type: $selectedItem.data('id'),
-                tabType: $selectedTab.data('type'),
-                userGroupId: $selectedTab.data('id'),
-                articlesOnly: true,
-                mode: 'deferred'
-            }, function(data) {
-                $target.after(data);
-                $target.remove();
-            });
+            if ($target.data('posts')) {
+                var $posts = $target.data('posts');
+                if ($posts.first().is(':visible')) {
+                    $posts.hide();
+                    $target.html($target.data('def-html'));
+                } else {
+                    $posts.show();
+                    $target.html('Скрыть записи на рассмотрении');
+                }
+            } else {
+                var $selectedTab = $('#groups').find('.tab.selected');
+                var $selectedItem = $menu.find('.item.selected');
+                Events.fire('wall_load', {
+                    type: $selectedItem.data('id'),
+                    tabType: $selectedTab.data('type'),
+                    userGroupId: $selectedTab.data('id'),
+                    articlesOnly: true,
+                    mode: 'deferred'
+                }, function(html) {
+                    if (html) {
+                        var $posts = $(html);
+                        $target.after($posts);
+                        $target.data('def-html', $target.html());
+                        $target.html('Скрыть записи на рассмотрении');
+                        $target.data('posts', $posts);
+                        _updateItems();
+                    } else {
+                        $target.remove();
+                    }
+                });
+            }
         });
     }
 
