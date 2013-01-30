@@ -42,8 +42,8 @@
             $title = trim($title);
             $description = trim($description);
 
-            $result['title'] = !empty($title) ? TextHelper::ToUTF8($title) : $url;
-            if (!empty($description)) $result['description'] = TextHelper::ToUTF8($description);
+            $result['title'] = !empty($title) ? $title : $url;
+            if (!empty($description)) $result['description'] = $description;
 
             if (!empty($img)) {
                 $result['img'] = $img;
