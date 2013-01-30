@@ -9,16 +9,10 @@ var VK = VK || {
 };
 
 $(document).ready(function() {
-    VK.init(function() {
-        var apiResult = getURLParameter('api_result');
-        var obj = window.JSON && JSON.parse(apiResult) || $.parseJSON(apiResult);
-    });
-
-    app.init();
+    App.init();
 });
 
-var app = (function () {
-    var isInitialized = false;
+var App = (function () {
     var $leftColumn;
     var $rightColumn;
     var $wall;
@@ -27,15 +21,17 @@ var app = (function () {
     var $menu;
     var $newPost;
     var $wallTabs;
+    var $wallTitle;
+
+    var isInitialized = false;
     var easydateParams = {
         live: true,
         date_parse: function(date) {
-            if (!date) return;
+            if (!date) {
+                return;
+            }
             var d = date.split('.');
-            var i = d[1];
-            d[1] = d[0];
-            d[0] = i;
-            return Date.parse(d.join('/'));
+            return Date.parse([d[1], d[0], d[2]].join('/'));
         },
         uneasy_format: function(date) {
             return date.toLocaleDateString();
@@ -43,13 +39,17 @@ var app = (function () {
     };
 
     function init() {
-        if (isInitialized) return;
-
-        _updateItems();
-        _initEvents();
-        $menu.find('.item.selected').click();
-
+        if (isInitialized) {
+            return;
+        }
         isInitialized = true;
+
+        VK.init(function() {
+            var apiResult = getURLParameter('api_result');
+            _updateItems();
+            _initEvents();
+            $menu.find('.item.selected').click();
+        });
     }
 
     function _updateItems() {
@@ -61,6 +61,7 @@ var app = (function () {
         $menu = $('#menu');
         $newPost = $('.new-post', $wall);
         $wallTabs = $('.tabs', $wall);
+        $wallTitle = $('> .title', $wall);
 
         $wallList.find('textarea').placeholder();
         $wallList.find('.attachments').imageComposition();
@@ -69,10 +70,7 @@ var app = (function () {
     }
 
     function _initEvents() {
-        /*Window*/
         (function() {
-            var w = $(window);
-
             VK.callMethod('scrollSubscribe');
             VK.addCallback('onScroll', function(scrollTop) {
                 if ($loadMore.is(':visible') && scrollTop + screen.availHeight > ($loadMore.offset().top)) {
@@ -198,6 +196,12 @@ var app = (function () {
                 }
             });
         }
+
+        $wallTitle.find('.wall-switcher a').click(function() {
+            var $target = $(this);
+            $target.hide();
+            $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
+        });
 
         $wall.delegate('.post .hight-light.new', 'hover', function(e) {
             if (e.type != 'mouseenter') return;

@@ -1,8 +1,6 @@
 {increal:tmpl://app/elements/header.tmpl.php}
 <div class="main clear-fix">
-    <div class="left-column" id="left-column">
-
-    </div>
+    <div class="left-column" id="left-column"></div>
     <div class="right-column" id="right-column">
         <div class="header">
             <div class="user-info clear-fix">
