@@ -100,6 +100,7 @@ final class ErrorHandler {
         $msg = '(' . $typeNames[$error['type']] . '): ' . $error['message'];
         $Ex = new ErrorException($msg, $error['type'], 1, $error['file'], $error['line']);
 
+        error_log("Fatal error on page : " . Page::$Uri);
         error_log($Ex);
     }
 }
