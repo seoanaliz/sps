@@ -21,10 +21,10 @@ Page = Event.extend({
 
     getDate: function(timestamp) {
         var date = timestamp ? new Date(timestamp * 1000) : new Date();
-        var m = date.getMonth() + 1;
+        var m = monthNamesShort[date.getMonth()].toLowerCase();
         var y = date.getFullYear() + '';
         var d = date.getDate() + '';
-        return d + '.' + m + '.' + (y.substr(-2));
+        return d + ' ' + m;
     },
 
     getDiffTime: function(time) {
@@ -69,7 +69,7 @@ Page = Event.extend({
             var time_shift = tmpDate.getTimezoneOffset() * 60 + 14400;
             timestamp += time_shift;
             if (!intval(timestamp)) return;
-            $date.html(t.getTime(timestamp) + ', ' + t.getDate(timestamp));
+            $date.html(t.getDate(timestamp) + ' в ' + t.getTime(timestamp));
         });
     },
 
