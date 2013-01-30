@@ -12,6 +12,7 @@ class CheckWalls
     private $walls;
     private $posts_in_progress;
     const time_shift = 0;
+    const DEFAULT_AUTO_EVENTS_GROUP = 46;
 
     public function Execute()
     {
@@ -244,7 +245,7 @@ class CheckWalls
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
                 $barter_event->creator_id    = $group_id->created_by;
-                $barter_event->groups_ids    = array(3, $group_id->group_id);
+                $barter_event->groups_ids    = array( self::DEFAULT_AUTO_EVENTS_GROUP );
                 $barter_events_array[] = $barter_event;
             }
         }

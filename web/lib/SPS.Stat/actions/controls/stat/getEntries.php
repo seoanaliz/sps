@@ -77,7 +77,7 @@ class getEntries {
             if ( isset( $groupId ) ) {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
-            $sql = 'SELECT
+                $sql = 'SELECT
                     publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
                     publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.quantity, gprel.main_admin,
                     publ.in_search,publ.active
@@ -90,7 +90,7 @@ class getEntries {
                      ' AND gprel.group_id=@group_id
                       AND publ.quantity >= @min_quantity
                       AND publ.quantity <= @max_quantity
-                      AND publ.quantity >= 10000
+                      AND closed is false
                       ' . $search . '
                 ORDER BY '
                     . $sortBy .

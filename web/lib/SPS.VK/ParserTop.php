@@ -2,7 +2,7 @@
 
 class ParserTop
 {
-    const TOKEN = 'a0ce7013abfc2f1aabfc2f1a4fabd48797aabfcabfd2f1cfb447340d337eaf2814a1adb';
+    const TOKEN = '7f31f1fe06f3ad988556b38775c15c0a75cf6590aae74f7fe8d965a35c523d00a4c892e8df9c3b3c6ee22';
     const API_URL = 'api.topface.ru';
     const TESTING = false;
     public $counter = 0;
