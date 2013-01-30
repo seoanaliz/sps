@@ -420,21 +420,7 @@ $(document).ready(function(){
         $tab.addClass('selected');
 
         wallPage = 0;
-        Elements.getWallLoader().show();
-        Control.fire('get_articles', {
-            page: wallPage,
-            sortType: Elements.getSortType(),
-            type: Elements.leftType(),
-            targetFeedId: Elements.rightdd(),
-            articleStatus: Elements.getArticleStatus(),
-            mode: $tab.data('mode')
-        }).success(function(html) {
-            var $block = $(html);
-            $('#wall').html($block);
-            Elements.initImages($block);
-            Elements.initLinks($block);
-            Elements.getWallLoader().hide();
-        });
+        loadArticles(true);
     });
 
     // Кастомные подвкладки
@@ -447,22 +433,7 @@ $(document).ready(function(){
         $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
         $tab.addClass('selected');
 
-        wallPage = 0;
-        Elements.getWallLoader().show();
-        Control.fire('get_articles', {
-            page: wallPage,
-            sortType: Elements.getSortType(),
-            type: Elements.leftType(),
-            targetFeedId: Elements.rightdd(),
-            userGroupId: Elements.getUserGroupId(),
-            articleStatus: 1
-        }).success(function(html) {
-            var $block = $(html);
-            $('#wall').html($block);
-            Elements.initImages($block);
-            Elements.initLinks($block);
-            Elements.getWallLoader().hide();
-        });
+        loadArticles(true);
     });
 
     // Вкладки в правом меню

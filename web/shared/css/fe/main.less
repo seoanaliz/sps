@@ -249,12 +249,15 @@ i {font-style: italic;}
         overflow: hidden;
         .border-radius(0 0 2px 2px);
 
+        .wall-empty,
         &:empty {
             color: #aaa;
             font-size: 14px;
-            line-height: 100px;
+            padding: 100px;
             text-align: center;
+        }
 
+        &:empty {
             &:after {
                 content: 'Пусто';
             }
