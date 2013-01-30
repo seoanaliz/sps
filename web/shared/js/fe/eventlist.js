@@ -170,7 +170,7 @@ function loadArticles(clean) {
     }
 
     if (!clean) {
-        requestData['articles-only'] = 1;
+        requestData.articlesOnly = 1;
     }
 
     //clean and load left column
