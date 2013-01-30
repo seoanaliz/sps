@@ -1,6 +1,6 @@
 <?php
 
-class tf_parcer
+class ParserTop
 {
     const TOKEN = 'a0ce7013abfc2f1aabfc2f1a4fabd48797aabfcabfd2f1cfb447340d337eaf2814a1adb';
     const API_URL = 'api.topface.ru';

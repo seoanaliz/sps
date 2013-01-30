@@ -1,5 +1,6 @@
 <?php
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.VK' );
 
     /**
      * SyncTop Action
@@ -28,7 +29,7 @@
                 return;
             }
 
-            $parser = new tf_parcer();
+            $parser = new ParserTop();
 
             $tries  = 3;
             $i      = 0;
