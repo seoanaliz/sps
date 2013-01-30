@@ -117,24 +117,41 @@ function loadArticles(clean) {
 
     var sourceType = Elements.leftType();
     var targetFeedId = Elements.rightdd();
+    var sourceFeedIds = Elements.leftdd();
+    var switcherType = Elements.getSwitcherType();
     wallPage++;
     articlesLoading = true;
 
     Elements.getWallLoader().show();
 
     var requestData = {
-        sourceFeedIds: Elements.leftdd(),
-        page: wallPage,
         sortType: Elements.getSortType(),
+        sourceFeedIds: sourceFeedIds,
+        page: wallPage,
         type: sourceType,
         targetFeedId: targetFeedId
     };
 
     if (sourceType == 'authors') {
         $('.newpost').show();
+
         requestData.userGroupId = Elements.getUserGroupId();
+        switch (switcherType) {
+            case 'approved':
+                requestData.articleStatus = 2;
+                break;
+            case 'deferred':
+                requestData.articleStatus = 1;
+                break;
+            case 'all':
+                requestData.mode = 'all';
+                break;
+            case 'my':
+                requestData.mode = 'my';
+                break;
+        }
     } else {
-        if (Elements.leftdd().length != 1) {
+        if (sourceFeedIds.length != 1) {
             $('.newpost').hide();
         } else {
             $('.newpost').show();
@@ -409,7 +426,8 @@ var Eventlist = {
                 type: sourceType
             }
         }).success(function(data) {
-            var sourceTypes = data['accessibleSourceTypes'];
+            var $wallSwitcher = $('#wall-switcher');
+            var sourceTypes = data.accessibleSourceTypes;
             // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
             var $sourceTypeLink = $('#sourceType-' + data.type);
             if (!$sourceTypeLink.hasClass('active')) {
@@ -420,21 +438,21 @@ var Eventlist = {
             if (sourceType != 'source' && sourceType != 'albums') {
                 $('#slider-text').hide();
                 $('#slider-cont').hide();
-                $('#filter-list a').hide();
+                $('#filter-list').hide();
             } else {
                 $('#slider-text').show();
                 $('#slider-cont').show();
-                $('#filter-list a').show();
+                $('#filter-list').show();
             }
 
-            if (data['showSourceList']) {
+            if (data.showSourceList) {
                 $multiSelect.multiselect('getButton').removeClass('hidden');
             } else {
                 $multiSelect.multiselect('getButton').addClass('hidden');
             }
 
             // фильтры по типу постов
-            if (data['showArticleStatusFilter']) {
+            if (data.showArticleStatusFilter) {
                 $leftPanel.find('.authors-tabs .tab').removeClass('selected');
                 $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
                 $leftPanel.find('.authors-tabs').show();
@@ -445,7 +463,7 @@ var Eventlist = {
             // группы юзеров
             var $userGroupTabs = $('.user-groups-tabs');
             if (sourceType == 'authors') {
-                var userGroups = data['showUserGroups'];
+                var userGroups = data.showUserGroups;
                 $userGroupTabs.empty();
                 $userGroupTabs.removeClass('hidden');
                 $userGroupTabs.append('<div class="tab selected">Все новости</div>');
@@ -460,6 +478,15 @@ var Eventlist = {
                 }
             } else {
                 $userGroupTabs.addClass('hidden');
+            }
+
+            data.showSwitcherType = 'approved';
+            if (data.showSwitcherType) {
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + data.showSwitcherType + '"]').show();
+            } else {
+                $wallSwitcher.hide();
             }
 
             var $typeSelector = $('.left-panel div.type-selector');
@@ -772,7 +799,6 @@ var Eventlist = {
         if (typeof articleStatus != 'undefined'){
             requestData['articleStatus'] = articleStatus;
         }
-
 
         $.ajax({
             url: controlsRoot + 'arcticles-list/',
