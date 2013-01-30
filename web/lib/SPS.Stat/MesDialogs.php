@@ -141,7 +141,7 @@
             $cmd->SetInteger( '@rec_id',  $rec_id  );
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-            if ( $ds->Next() );
+            if ( $ds->Next())
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
             return $id ? $id : false;
         }
