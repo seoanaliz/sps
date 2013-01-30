@@ -454,7 +454,8 @@ $(document).ready(function(){
             sortType: Elements.getSortType(),
             type: Elements.leftType(),
             targetFeedId: Elements.rightdd(),
-            userGroupId: Elements.getUserGroupId()
+            userGroupId: Elements.getUserGroupId(),
+            articleStatus: 1
         }).success(function(html) {
             var $block = $(html);
             $('#wall').html($block);

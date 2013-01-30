@@ -149,6 +149,8 @@ function loadArticles(clean) {
             case 'my':
                 requestData.mode = 'my';
                 break;
+            default:
+                requestData.articleStatus = 1;
         }
     } else {
         if (sourceFeedIds.length != 1) {
@@ -196,6 +198,9 @@ function loadArticles(clean) {
             Elements.initDroppable($('.right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
+            if (!$block.find('.post').length) {
+                $(window).data('disable-load-more', true);
+            }
         }
         articlesLoading = false;
     });
