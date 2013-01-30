@@ -461,8 +461,21 @@ var Eventlist = {
             }
 
             // группы юзеров
+            $wallSwitcher.hide();
             var $userGroupTabs = $('.user-groups-tabs');
             if (sourceType == 'authors') {
+                if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                    var showSwitcherType;
+                    if (data.authorsFilters.all_my_filter) {
+                        showSwitcherType = 'all';
+                    } else {
+                        showSwitcherType = 'deferred';
+                    }
+                    $wallSwitcher.show();
+                    $wallSwitcher.find('a').hide();
+                    $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+                }
+
                 var userGroups = data.showUserGroups;
                 $userGroupTabs.empty();
                 $userGroupTabs.removeClass('hidden');
@@ -478,20 +491,6 @@ var Eventlist = {
                 }
             } else {
                 $userGroupTabs.addClass('hidden');
-            }
-
-            if (data.authorsFilters) {
-                var showSwitcherType;
-                if (data.authorsFilters.all_my_filter) {
-                    showSwitcherType = 'all';
-                } else {
-                    showSwitcherType = 'deferred';
-                }
-                $wallSwitcher.show();
-                $wallSwitcher.find('a').hide();
-                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
-            } else {
-                $wallSwitcher.hide();
             }
 
             var $typeSelector = $('.left-panel div.type-selector');
