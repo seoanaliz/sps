@@ -27,9 +27,14 @@ class AddAuthorControl extends BaseControl
         $vkId = Request::getInteger('vkId');
         AuthorFactory::$mapping['view'] = 'authors';
         $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
-        $Author = new Author();
-        $Author->statusId = 1;
-        $Author->vkId = $vkId;
+        if ($exists){
+            $Author = $exists;
+            $Author->statusId = 1;
+        } else {
+            $Author = new Author();
+            $Author->vkId = $vkId;
+        }
+
         $targetFeedId = Request::getInteger('targetFeedId');
 
         try {
@@ -46,7 +51,7 @@ class AddAuthorControl extends BaseControl
         if (empty($exists)) {
             $result['success'] = AuthorFactory::Add($Author);
         } else {
-            $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId', 'firstName', 'lastName', 'avatar'), array('vkId' => $exists->vkId));
+            $result['success'] = AuthorFactory::UpdateByMask($Author, array('statusId', 'firstName', 'lastName', 'avatar'), array('vkId' => $Author->vkId));
         }
 
         if (!$result['success']){
