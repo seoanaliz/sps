@@ -77,6 +77,20 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
                 $this->userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
             }
         }
+
+        $tabType = Request::getString('tabType');
+        Response::setString('tabType', $tabType);
+
+        switch ($tabType) {
+            case 'queued':
+                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
+                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
+                break;
+            case 'sent':
+                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
+                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
+                break;
+        }
     }
 
 
@@ -104,19 +118,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
 //                break;
 //        }
 //
-//        $tabType = Request::getString('tabType');
-//        Response::setString('tabType', $tabType);
-//
-//        switch ($tabType) {
-//            case 'queued':
-//                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
-//                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
-//                break;
-//            case 'sent':
-//                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
-//                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
-//                break;
-//        }
+
 //
 //        $this->options[BaseFactory::WithoutDisabled] = false;
 //
@@ -174,8 +176,11 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         Response::setArray('__authorCounter', $this->authorCounter);
         Response::setArray('userGroups', $this->userGroups);
         Response::setBoolean('showControls',
-            ($this->search['page'] == 0 && (Request::getString('tabType') == 'null')) &&
-                $this->getMode() != self::MODE_DEFERRED && !Request::getBoolean('articlesOnly')
+            (
+                $this->search['page'] == 0
+                && $this->getMode() != self::MODE_DEFERRED
+                && !Request::getBoolean('articlesOnly')
+            )
         );
     }
 
