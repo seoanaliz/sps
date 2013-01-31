@@ -40,7 +40,7 @@ abstract class AbstractPostLoadDaemon {
         $__mapping = ArticleFactory::$mapping;
         ArticleFactory::$mapping['view'] = 'articles';
         $originalObjects = ArticleFactory::Get(
-            array('_externalId' => $externalIds)
+            array('_externalId' => !empty($externalIds) ? $externalIds : array(-1 => -1))
             , array(
                 BaseFactory::WithColumns => '"articleId", "externalId"'
                 , BaseFactory::WithoutPages => true

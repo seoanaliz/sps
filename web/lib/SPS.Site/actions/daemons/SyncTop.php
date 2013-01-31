@@ -101,7 +101,7 @@
                 $article->statusId      = 1;
 
                 $articleRecord = new ArticleRecord();
-                $articleRecord->content = $post['text'];
+                $articleRecord->content = !empty($post['text']) ? $post['text'] : '';
                 $articleRecord->link    = $post['link'];
                 $articleRecord->likes   = Convert::ToInteger($post['likes']);
                 $articleRecord->photos  = array();
