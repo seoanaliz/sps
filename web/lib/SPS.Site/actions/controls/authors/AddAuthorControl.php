@@ -78,7 +78,7 @@ class AddAuthorControl extends BaseControl
             EditorFactory::Add($Editor);
         }
 
-
+        // добавляем права автора
         $UserFeed = new UserFeed();
         $UserFeed->vkId = $vkId;
         $UserFeed->role = UserFeed::ROLE_AUTHOR;
@@ -88,7 +88,7 @@ class AddAuthorControl extends BaseControl
         $manageEvent = new AuthorManage();
         $manageEvent->createdAt = DateTimeWrapper::Now();
         $manageEvent->authorVkId = $vkId;
-        $manageEvent->editorVkId = AuthUtility::GetCurrentUser('Editor')->vkId;
+        $manageEvent->editorVkId = $this->vkId;
         $manageEvent->action = 'add';
         $manageEvent->targetFeedId = $targetFeedId;
         AuthorManageFactory::Add($manageEvent);

@@ -98,10 +98,12 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
             return array('success' => false);
         }
 
+
         $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
         if (is_null($role)) {
             return array('success' => false);
         }
+
 
         $author = $this->getAuthor();
 
@@ -162,6 +164,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
 
         } else if ($type == SourceFeedUtility::My) {
             unset($this->search['_sourceFeedId']);
+            $this->search['targetFeedId'] = $targetFeedId;
             $this->search['authorId'] = $this->getAuthor()->authorId;
             if ($role == UserFeed::ROLE_AUTHOR){
                 $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
