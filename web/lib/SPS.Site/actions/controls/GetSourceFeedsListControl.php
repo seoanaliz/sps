@@ -108,11 +108,11 @@ class GetSourceFeedsListControl extends BaseControl
             }
 
         $authorsFilters = array();
-        if ($role == UserFeed::ROLE_AUTHOR) {
+        if ($role == UserFeed::ROLE_AUTHOR && $type == SourceFeedUtility::My) {
             $authorsFilters['all_my_filter'] = array();
         }
 
-        if ($role != UserFeed::ROLE_AUTHOR) {
+        if ($role != UserFeed::ROLE_AUTHOR && $type == SourceFeedUtility::Authors) {
             $authorsFilters['article_status_filter'] = array();
         }
 
