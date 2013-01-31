@@ -166,6 +166,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
             unset($this->search['_sourceFeedId']);
             $this->search['targetFeedId'] = $targetFeedId;
             $this->search['authorId'] = $this->getAuthor()->authorId;
+            $this->options[BaseFactory::WithoutDisabled] = false;
             if ($role == UserFeed::ROLE_AUTHOR){
                 $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
             } else {
