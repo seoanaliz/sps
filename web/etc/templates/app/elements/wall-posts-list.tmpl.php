@@ -8,12 +8,12 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $showControls bool */
 /** @var $showArticlesOnly bool */
 /** @var $reviewArticleCount int */
+/** @var $isWebUserEditor bool */
 $type = Request::getString('type');
 $tabType = Request::getString('tabType');
 $currentMode = Request::getString('mode');
 $currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
-$isWebUserEditor = false;
 ?>
 
 <? if ($showControls): ?>
