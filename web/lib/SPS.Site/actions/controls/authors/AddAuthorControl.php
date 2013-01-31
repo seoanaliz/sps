@@ -29,11 +29,11 @@ class AddAuthorControl extends BaseControl
         $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
         if ($exists){
             $Author = $exists;
-            $Author->statusId = 1;
         } else {
             $Author = new Author();
             $Author->vkId = $vkId;
         }
+        $Author->statusId = 1;
 
         $targetFeedId = Request::getInteger('targetFeedId');
 
@@ -55,7 +55,9 @@ class AddAuthorControl extends BaseControl
         }
 
         if (!$result['success']){
+            $result['message'] = 1;
             echo ObjectHelper::ToJSON($result);
+            return;
         }
 
         // copy to editor
