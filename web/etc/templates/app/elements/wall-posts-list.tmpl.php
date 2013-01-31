@@ -17,11 +17,11 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 <? if ($showControls): ?>
 <div class="groups" id="groups">
     <div class="tab-bar no-padding">
-        <div class="tab selected">Все записи</div>
+        <div class="tab<?=$currentGroup || $currentGroup == 'null' ? '' : ' selected'?>">Все записи</div>
         <? foreach ($userGroups as $userGroup) { ?>
-        <div class="tab" data-id="<?=$userGroup->userGroupId?>">
-            <?=$userGroup->name?>
-        </div>
+            <div class="tab<?=$currentGroup == $userGroup->userGroupId ? ' selected' : ''?>" data-id="<?=$userGroup->userGroupId?>">
+                <?=$userGroup->name?>
+            </div>
         <? } ?>
     </div>
 </div>
