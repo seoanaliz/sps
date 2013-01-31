@@ -9,7 +9,7 @@ var VK = VK || {
 };
 
 $(document).ready(function() {
-    App.wallPage = -1;
+    App.wallPage = 0;
     App.init();
 });
 
@@ -431,7 +431,7 @@ var App = (function () {
             articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
             mode: $selectedMode.data('mode'),
             articlesOnly: false,
-            page: -1
+            page: 0
         }, options);
         App.wallPage = params.page;
         if (typeof callback != 'function') {
