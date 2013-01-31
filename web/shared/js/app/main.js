@@ -412,7 +412,7 @@ var App = (function () {
         $loadMore.addClass('load').html('&nbsp;');
         pageLoad({
             articlesOnly: true,
-            page: App.wallPage++
+            page: ++App.wallPage
         }, function(data) {
             $loadMore.remove();
             $wallList.append(data);
