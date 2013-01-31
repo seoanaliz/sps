@@ -125,22 +125,24 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
                         BaseFactory::WithoutPages => true
                     ));
 
-                if ($mode == self::MODE_MY) {
+                if ($mode == self::MODE_MY || $mode == self::MODE_DEFERRED) {
                     $authorsIds = array($author->authorId);
-                } else if ($mode == self::MODE_DEFERRED) {
-                    // отложенные
-                    $authorsIds = array($author->authorId);
-                    $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
-                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
-                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
                 } else {
                     // если грузим все посты
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                }
+
+                if ($mode != self::MODE_DEFERRED){
                     $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
                     $this->options[BaseFactory::WithoutDisabled] = false;
                     $authorsIds = true;
                     unset($this->search['articleStatusIn']);
+                } else {
+                    $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
+                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
                 }
+
             } else {
                 $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                 //редактору: только одобренные и на рассмотрении записи этой группы
@@ -168,7 +170,12 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
             $this->search['authorId'] = $this->getAuthor()->authorId;
             $this->options[BaseFactory::WithoutDisabled] = false;
             if ($role == UserFeed::ROLE_AUTHOR){
-                $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+                $articleStatus = Request::getInteger('articleStatus');
+                if ($articleStatus){
+                    $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+                } else {
+                    $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+                }
             } else {
                 $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
             }
