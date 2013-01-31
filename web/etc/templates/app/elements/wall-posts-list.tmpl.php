@@ -10,8 +10,10 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $reviewArticleCount int */
 $type = Request::getString('type');
 $tabType = Request::getString('tabType');
+$currentMode = Request::getString('mode');
 $currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
+$isWebUserEditor = false;
 ?>
 
 <? if ($showControls): ?>
@@ -32,10 +34,17 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
     <div class="title clear-fix">
         <div class="text"></div>
 
-        <div class="wall-switcher" id="wall-switcher">
-            <a data-mode="all" data-switch-to="my">к моим записям</a>
-            <a data-mode="my" data-switch-to="all">ко всем записям</a>
-        </div>
+        <? if (!$isWebUserEditor) { ?>
+            <div class="wall-switcher" id="wall-switcher">
+                <? if ($currentMode == 'my') { ?>
+                    <a data-mode="my" data-switch-to="all">ко всем записям</a>
+                    <a data-mode="all" data-switch-to="my">к моим записям</a>
+                <? } else { ?>
+                    <a data-mode="all" data-switch-to="my">к моим записям</a>
+                    <a data-mode="my" data-switch-to="all">ко всем записям</a>
+                <? } ?>
+            </div>
+        <? } ?>
     </div>
 
     <div class="tabs" id="statuses">
@@ -91,12 +100,12 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
             <div id="wall-show-more" class="show-more">Еще</div>
         <? } ?>
 
+        <script type="text/javascript">
+            $('#wall > .title .text').text('{$articlesCountText}');
+        </script>
         <? if ($showControls): ?>
     </div>
 
-    <script type="text/javascript">
-        $('#wall > .title .text').text('{$articlesCountText}');
-    </script>
     <script type="text/javascript">
         function setCounter(selector, value) {
             var counter = $(selector);

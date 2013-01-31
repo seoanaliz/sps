@@ -125,12 +125,12 @@ var App = (function () {
             var itemId = $selectedItem.data('id');
             $menu.find('.item.selected').removeClass('selected');
             $selectedItem.addClass('selected');
-
             if (itemId != 'my') {
                 $selectedItem.find('.counter').fadeOut(200);
             }
-
-            pageLoad();
+            pageLoad({
+                userGroupId: null
+            });
         });
     }
 
@@ -147,15 +147,7 @@ var App = (function () {
             var $tab = $(this);
             $wallTabs.find('.tab.selected').removeClass('selected');
             $tab.addClass('selected');
-            var $selectedTab = $('#groups').find('.tab.selected');
-            var $selectedItem = $menu.find('.item.selected');
-            var $selectedStatus = $('#statuses').find('.tab.selected');
-            var $selectedMode = $('#wall-switcher').find('a:visible');
-            Events.fire('wall_load', {
-                type: $selectedItem.data('id'),
-                userGroupId: $selectedTab.data('id'),
-                articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
-                mode: $selectedMode.data('mode'),
+            pageLoad({
                 articlesOnly: true
             }, function(data) {
                 $wallList.html(data);
@@ -204,20 +196,7 @@ var App = (function () {
             var $target = $(this);
             $target.parent().find('a[data-switch-to="' + $target.data('mode') + '"]').show();
             $target.hide();
-            var $selectedTab = $('#groups').find('.tab.selected');
-            var $selectedItem = $menu.find('.item.selected');
-            var $selectedStatus = $('#statuses').find('.tab.selected');
-            var $selectedMode = $('#wall-switcher').find('a:visible');
-            Events.fire('wall_load', {
-                type: $selectedItem.data('id'),
-                userGroupId: $selectedTab.data('id'),
-                articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
-                mode: $selectedMode.data('mode'),
-                articlesOnly: true
-            }, function(data) {
-                $wallList.html(data);
-                _updateItems();
-            });
+            pageLoad();
         });
 
         $wall.delegate('.post .hight-light.new', 'hover', function(e) {
@@ -355,14 +334,7 @@ var App = (function () {
                     $target.html('Скрыть записи на рассмотрении');
                 }
             } else {
-                var $selectedTab = $('#groups').find('.tab.selected');
-                var $selectedItem = $menu.find('.item.selected');
-                var $selectedStatus = $('#statuses').find('.tab.selected');
-                var $selectedMode = $('#wall-switcher').find('a:visible');
-                Events.fire('wall_load', {
-                    type: $selectedItem.data('id'),
-                    userGroupId: $selectedTab.data('id'),
-                    articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+                pageLoad({
                     mode: 'deferred',
                     articlesOnly: true
                 }, function(html) {
@@ -437,15 +409,7 @@ var App = (function () {
     function showMore() {
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
-        var $selectedTab = $('#groups').find('.tab.selected');
-        var $selectedItem = $menu.find('.item.selected');
-        var $selectedStatus = $('#statuses').find('.tab.selected');
-        var $selectedMode = $('#wall-switcher').find('a:visible');
-        Events.fire('wall_load', {
-            type: $selectedItem.data('id'),
-            userGroupId: $selectedTab.data('id'),
-            articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
-            mode: $selectedMode.data('mode'),
+        pageLoad({
             articlesOnly: true
         }, function(data) {
             $loadMore.remove();
@@ -454,22 +418,31 @@ var App = (function () {
         });
     }
 
-    function pageLoad() {
+    function pageLoad(options, callback) {
         var $selectedTab = $('#groups').find('.tab.selected');
         var $selectedItem = $menu.find('.item.selected');
         var $selectedStatus = $('#statuses').find('.tab.selected');
         var $selectedMode = $('#wall-switcher').find('a:visible');
-        Events.fire('wall_load', {
+        var params = $.extend({
             type: $selectedItem.data('id'),
             userGroupId: $selectedTab.data('id'),
             articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
             mode: $selectedMode.data('mode'),
             articlesOnly: false
-        }, function(data) {
-            $leftColumn.html(data);
-            _updateItems();
-            _bindLeftColumnEvents();
-        });
+        }, options);
+        if (typeof callback != 'function') {
+            callback = function(data) {
+                if (params.articlesOnly) {
+                    $wallList.html(data);
+                    _updateItems();
+                } else {
+                    $leftColumn.html(data);
+                    _updateItems();
+                    _bindLeftColumnEvents();
+                }
+            }
+        }
+        Events.fire('wall_load', params, callback);
     }
 
     function refreshSize() {
