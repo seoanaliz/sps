@@ -211,6 +211,7 @@ class CheckWalls
             43503694 ,
             43503630 ,
             43503753 ,
+            38000341 ,
         );
 
         $barter_events_array = array();
