@@ -435,17 +435,12 @@ var App = (function () {
     function pageLoad() {
         var $selectedTab = $('#groups').find('.tab.selected');
         var $selectedItem = $menu.find('.item.selected');
-        var itemType = 'my';
         var isEmpty = $selectedItem.data('empty');
-        if (isEmpty) {
-            itemType = 'best';
-        }
 
         Events.fire('wall_load', {
             type: $selectedItem.data('id'),
             tabType: $selectedTab.data('type'),
-            userGroupId: $selectedTab.data('id'),
-            filter: itemType
+            userGroupId: $selectedTab.data('id')
         }, function(data) {
             $leftColumn.html(data);
             _updateItems();
