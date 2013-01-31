@@ -25,41 +25,32 @@ class AddAuthorControl extends BaseControl
         }
 
         $vkId = Request::getInteger('vkId');
+        AuthorFactory::$mapping['view'] = 'authors';
+        $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
         $Author = new Author();
         $Author->statusId = 1;
         $Author->vkId = $vkId;
         $targetFeedId = Request::getInteger('targetFeedId');
 
-
         try {
-            if (!empty($vkId)) {
-                $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $vkId, 'fields' => 'photo'));
-                $profile = current($profiles);
-                $Author->firstName = $profile['first_name'];
-                $Author->lastName = $profile['last_name'];
-                $Author->avatar = $profile['photo'];
-            }
+             $profiles = VkAPI::GetInstance()->getProfiles(array('uids' => $vkId, 'fields' => 'photo'));
+             $profile = current($profiles);
+             $Author->firstName = $profile['first_name'];
+             $Author->lastName = $profile['last_name'];
+             $Author->avatar = $profile['photo'];
         } catch (Exception $Ex) {
             echo ObjectHelper::ToJSON($result);
             return false;
         }
 
-        AuthorFactory::$mapping['view'] = 'authors';
-        $exists = AuthorFactory::GetOne(array('vkId' => $vkId), array(BaseFactory::WithoutDisabled => false));
-        $vkId = Request::getInteger('vkId');
-        $Author = new Author();
-        $Author->statusId = 1;
-        $Author->vkId = $vkId;
-
         if (empty($exists)) {
             $result['success'] = AuthorFactory::Add($Author);
         } else {
-            $UserFeed = new UserFeed();
-            $UserFeed->vkId = $vkId;
-            $UserFeed->role = UserFeed::ROLE_AUTHOR;
-            $UserFeed->targetFeedId = $targetFeedId;
-            UserFeedFactory::Add($UserFeed);
             $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId'), array('vkId' => $exists->vkId));
+        }
+
+        if (!$result['success']){
+            echo ObjectHelper::ToJSON($result);
         }
 
         // copy to editor
