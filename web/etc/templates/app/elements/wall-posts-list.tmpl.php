@@ -13,7 +13,6 @@ $tabType = Request::getString('tabType');
 $currentMode = Request::getString('mode');
 $currentGroup = Request::getString('userGroupId');
 $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' . LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($articlesCount));
-$isWebUserEditor = false;
 ?>
 
 <? if ($showControls): ?>

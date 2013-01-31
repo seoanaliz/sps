@@ -78,18 +78,10 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
             }
         }
 
-        $tabType = Request::getString('tabType');
-        Response::setString('tabType', $tabType);
+        $type = $this->getSourceFeedType();
 
-        switch ($tabType) {
-            case 'queued':
-                $this->options[BaseFactory::OrderBy] = ' "queuedAt" DESC, "articleId" DESC ';
-                $this->options[BaseFactory::CustomSql] = ' AND "queuedAt" IS NOT NULL ';
-                break;
-            case 'sent':
-                $this->options[BaseFactory::OrderBy] = ' "sentAt" DESC, "articleId" DESC ';
-                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL ';
-                break;
+        if ($type == SourceFeedUtility::My){
+            $this->options[BaseFactory::WithoutDisabled] = false;
         }
     }
 
