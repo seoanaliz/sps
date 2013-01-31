@@ -9,7 +9,6 @@
     if (!empty($article)) {
 
         $extLinkLoader  = false;
-        var_dump($isWebUserEditor, $article->articleStatus);
         $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
 
         if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {

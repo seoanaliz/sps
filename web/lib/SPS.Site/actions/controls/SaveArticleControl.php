@@ -79,7 +79,7 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
-            var_dump($role);
+
             //building data
             $article = new Article();
             $article->createdAt = DateTimeWrapper::Now();

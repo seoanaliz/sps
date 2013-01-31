@@ -203,7 +203,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
         $targetFeedId = $this->getTargetFeedId();
         if ($targetFeedId) {
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $isWebUserEditor = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) == UserFeed::ROLE_EDITOR;
+            $isWebUserEditor = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) != UserFeed::ROLE_AUTHOR;
         }
 
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
