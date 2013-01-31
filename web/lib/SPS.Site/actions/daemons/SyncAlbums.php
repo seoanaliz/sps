@@ -47,6 +47,9 @@ class SyncAlbums extends AbstractPostLoadDaemon {
             } catch (AlbumEndException $exception) {
                 Logger::Info('Album ' . $source->externalId . '  end at ' . $offset . ' offset');
                 continue;
+            } catch (Exception $exception) {
+                Logger::Info('Album ' . $source->externalId . '  end at ' . $offset . ' offset with exception ' . $exception->getMessage());
+                continue;
             }
 
             $this->saveFeedPosts($source, $posts);
