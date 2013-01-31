@@ -8,6 +8,7 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $showControls bool */
 /** @var $showArticlesOnly bool */
 /** @var $reviewArticleCount int */
+/** @var $isWebUserEditor bool */
 $type = Request::getString('type');
 $tabType = Request::getString('tabType');
 $currentMode = Request::getString('mode');
