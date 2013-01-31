@@ -149,10 +149,13 @@ var App = (function () {
             $tab.addClass('selected');
             var $selectedTab = $('#groups').find('.tab.selected');
             var $selectedItem = $menu.find('.item.selected');
+            var $selectedStatus = $('#statuses').find('.tab.selected');
+            var $selectedMode = $('#wall-switcher').find('a:visible');
             Events.fire('wall_load', {
                 type: $selectedItem.data('id'),
-                tabType: $selectedTab.data('type'),
                 userGroupId: $selectedTab.data('id'),
+                articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+                mode: $selectedMode.data('mode'),
                 articlesOnly: true
             }, function(data) {
                 $wallList.html(data);
@@ -197,10 +200,24 @@ var App = (function () {
             });
         }
 
-        $wallTitle.find('.wall-switcher a').click(function() {
+        $wallTitle.find('#wall-switcher a').click(function() {
             var $target = $(this);
+            $target.parent().find('a[data-switch-to="' + $target.data('mode') + '"]').show();
             $target.hide();
-            $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
+            var $selectedTab = $('#groups').find('.tab.selected');
+            var $selectedItem = $menu.find('.item.selected');
+            var $selectedStatus = $('#statuses').find('.tab.selected');
+            var $selectedMode = $('#wall-switcher').find('a:visible');
+            Events.fire('wall_load', {
+                type: $selectedItem.data('id'),
+                userGroupId: $selectedTab.data('id'),
+                articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+                mode: $selectedMode.data('mode'),
+                articlesOnly: true
+            }, function(data) {
+                $wallList.html(data);
+                _updateItems();
+            });
         });
 
         $wall.delegate('.post .hight-light.new', 'hover', function(e) {
@@ -340,12 +357,14 @@ var App = (function () {
             } else {
                 var $selectedTab = $('#groups').find('.tab.selected');
                 var $selectedItem = $menu.find('.item.selected');
+                var $selectedStatus = $('#statuses').find('.tab.selected');
+                var $selectedMode = $('#wall-switcher').find('a:visible');
                 Events.fire('wall_load', {
                     type: $selectedItem.data('id'),
-                    tabType: $selectedTab.data('type'),
                     userGroupId: $selectedTab.data('id'),
-                    articlesOnly: true,
-                    mode: 'deferred'
+                    articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+                    mode: 'deferred',
+                    articlesOnly: true
                 }, function(html) {
                     if (html) {
                         var $posts = $(html);
@@ -420,10 +439,13 @@ var App = (function () {
         $loadMore.addClass('load').html('&nbsp;');
         var $selectedTab = $('#groups').find('.tab.selected');
         var $selectedItem = $menu.find('.item.selected');
+        var $selectedStatus = $('#statuses').find('.tab.selected');
+        var $selectedMode = $('#wall-switcher').find('a:visible');
         Events.fire('wall_load', {
             type: $selectedItem.data('id'),
-            tabType: $selectedTab.data('type'),
             userGroupId: $selectedTab.data('id'),
+            articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+            mode: $selectedMode.data('mode'),
             articlesOnly: true
         }, function(data) {
             $loadMore.remove();
@@ -435,12 +457,14 @@ var App = (function () {
     function pageLoad() {
         var $selectedTab = $('#groups').find('.tab.selected');
         var $selectedItem = $menu.find('.item.selected');
-        var isEmpty = $selectedItem.data('empty');
-
+        var $selectedStatus = $('#statuses').find('.tab.selected');
+        var $selectedMode = $('#wall-switcher').find('a:visible');
         Events.fire('wall_load', {
             type: $selectedItem.data('id'),
-            tabType: $selectedTab.data('type'),
-            userGroupId: $selectedTab.data('id')
+            userGroupId: $selectedTab.data('id'),
+            articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
+            mode: $selectedMode.data('mode'),
+            articlesOnly: false
         }, function(data) {
             $leftColumn.html(data);
             _updateItems();

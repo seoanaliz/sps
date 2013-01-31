@@ -17,10 +17,9 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 <? if ($showControls): ?>
 <div class="groups" id="groups">
     <div class="tab-bar no-padding">
-        <div class="tab<?=$currentGroup && $currentGroup != 'null' ? '' : ' selected'?>">Все записи</div>
+        <div class="tab selected">Все записи</div>
         <? foreach ($userGroups as $userGroup) { ?>
-        <div class="tab<?=$currentGroup == $userGroup->userGroupId ? ' selected' : ''?>"
-             data-id="<?=$userGroup->userGroupId?>">
+        <div class="tab" data-id="<?=$userGroup->userGroupId?>">
             <?=$userGroup->name?>
         </div>
         <? } ?>
@@ -32,30 +31,32 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 
     <div class="title clear-fix">
         <div class="text"></div>
+
         <div class="wall-switcher" id="wall-switcher">
-            <a data-type="deferred" data-switch-to="approved">к одобренным записям</a>
-            <a data-type="approved" data-switch-to="deferred">к записям на рассмотрении</a>
-            <a data-type="my" data-switch-to="all">ко всем записям</a>
-            <a data-type="all" data-switch-to="my">к моим записям</a>
+            <a data-mode="all" data-switch-to="my">к моим записям</a>
+            <a data-mode="my" data-switch-to="all">ко всем записям</a>
         </div>
     </div>
 
-    <div class="tabs">
+    <div class="tabs" id="statuses">
         <div class="tab-bar">
-            <div class="tab all <?= (!$tabType || $tabType == 'all' || $tabType == 'null') ? 'selected' : '' ?>" data-type="all">
-                Все записи
+            <div class="tab all selected" data-article-status="1">
+                Новые
             </div>
-            <div class="tab planned <?= (!empty($tabType) && ($tabType == 'queued')) ? 'selected' : '' ?>"
-                 data-type="queued">Запланированные<span class="counter"></span></div>
-            <div class="tab posted <?= (!empty($tabType) && ($tabType == 'sent')) ? 'selected' : '' ?>"
-                 data-type="sent">Отправленные<span class="counter"></span></div>
+            <div class="tab planned" data-article-status="2">
+                Одобренные
+                <span class="counter"></span>
+            </div>
+            <div class="tab posted" data-article-status="3">
+                Отклоненные
+                <span class="counter"></span>
+            </div>
         </div>
     </div>
 
     <div class="new-post">
         <div class="textarea-wrap">
             <textarea placeholder="Есть чем поделиться?" rows="2"></textarea>
-
             <div class="add-photo"></div>
         </div>
         <div class="attachments">
