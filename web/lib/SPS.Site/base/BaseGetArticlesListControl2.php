@@ -98,7 +98,6 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
             return array('success' => false);
         }
 
-
         $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
         if (is_null($role)) {
             return array('success' => false);
@@ -144,7 +143,12 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
                 }
 
             } else {
-                $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                if ($mode == self::MODE_MY) {
+                    $authorsIds = array($author->authorId);
+                } else {
+                    $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
+                }
+
                 //редактору: только одобренные и на рассмотрении записи этой группы
                 $articleStatus = Request::getInteger('articleStatus');
                 if ($articleStatus) {
