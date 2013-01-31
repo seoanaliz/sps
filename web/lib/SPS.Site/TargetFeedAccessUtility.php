@@ -51,8 +51,8 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @param $targetFeedId
      * @return bool
      */
-    public function canSaveGridLine($targetFeedId) {
-        return $this->hasAccessToTargetFeed($targetFeedId);
+    public function canSaveGridLine($targetFeedId)    {
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
