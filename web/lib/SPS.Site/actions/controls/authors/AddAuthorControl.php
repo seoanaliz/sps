@@ -46,7 +46,7 @@ class AddAuthorControl extends BaseControl
         if (empty($exists)) {
             $result['success'] = AuthorFactory::Add($Author);
         } else {
-            $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId'), array('vkId' => $exists->vkId));
+            $result['success'] = AuthorFactory::UpdateByMask($exists, array('statusId', 'firstName', 'lastName', 'avatar'), array('vkId' => $exists->vkId));
         }
 
         if (!$result['success']){
