@@ -6,10 +6,7 @@ Control = $.extend(Control, {
 
     controlMap: {
         get_articles: {
-            name: 'arcticles-list',
-            params: {
-                articlesOnly: 'articles-only'
-            }
+            name: 'arcticles-list'
         },
         authors_get: {
             name: 'authors-list'
@@ -173,7 +170,7 @@ function loadArticles(clean) {
     }
 
     if (!clean) {
-        requestData['articles-only'] = 1;
+        requestData.articlesOnly = 1;
     }
 
     //clean and load left column
