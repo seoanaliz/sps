@@ -32,12 +32,18 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
 
     <div class="title clear-fix">
         <div class="text"></div>
-        <div class="dropdown" style="visibility: hidden;">мои записи</div>
+        <div class="wall-switcher" id="wall-switcher">
+            <a data-type="deferred" data-switch-to="approved">к одобренным записям</a>
+            <a data-type="approved" data-switch-to="deferred">к записям на рассмотрении</a>
+            <a data-type="my" data-switch-to="all">ко всем записям</a>
+            <a data-type="all" data-switch-to="my">к моим записям</a>
+        </div>
     </div>
+
     <div class="tabs">
         <div class="tab-bar">
-            <div class="tab all <?= (!$tabType || $tabType == 'all' || $tabType == 'null') ? 'selected' : '' ?>" data-type="all">Все
-                записи
+            <div class="tab all <?= (!$tabType || $tabType == 'all' || $tabType == 'null') ? 'selected' : '' ?>" data-type="all">
+                Все записи
             </div>
             <div class="tab planned <?= (!empty($tabType) && ($tabType == 'queued')) ? 'selected' : '' ?>"
                  data-type="queued">Запланированные<span class="counter"></span></div>

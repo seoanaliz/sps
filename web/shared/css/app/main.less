@@ -68,18 +68,18 @@ html, body {
                 &>.text {
                     float: left;
                 }
-                &>.dropdown {
+                &>.wall-switcher {
                     float: right;
-                    cursor: pointer;
-                    color: @link_color;
-                    padding-right: 10px;
-                    background: url('../../images/common/darr_dd_out.gif') right center no-repeat;
 
-                    .opacity(.5);
+                    a + a {
+                        display: none;
+                    }
+                    a {
+                        .opacity(0.6);
 
-                    &.active,
-                    &:hover {
-                        .opacity(1);
+                        &:hover {
+                            .opacity(1);
+                        }
                     }
                 }
             }
