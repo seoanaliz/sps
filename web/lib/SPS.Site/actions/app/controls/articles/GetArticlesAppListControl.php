@@ -175,7 +175,7 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         Response::setArray('userGroups', $this->userGroups);
         Response::setBoolean('showControls',
             ($this->search['page'] == 0 && (Request::getString('tabType') == 'null')) &&
-                $this->getMode() != self::MODE_DEFERRED
+                $this->getMode() != self::MODE_DEFERRED && !Request::getBoolean('articlesOnly')
         );
     }
 
