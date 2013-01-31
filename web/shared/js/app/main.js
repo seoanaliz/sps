@@ -9,6 +9,7 @@ var VK = VK || {
 };
 
 $(document).ready(function() {
+    App.wallPage = -1;
     App.init();
 });
 
@@ -410,7 +411,8 @@ var App = (function () {
         if ($loadMore.hasClass('load')) return;
         $loadMore.addClass('load').html('&nbsp;');
         pageLoad({
-            articlesOnly: true
+            articlesOnly: true,
+            page: App.wallPage++
         }, function(data) {
             $loadMore.remove();
             $wallList.append(data);
@@ -428,8 +430,10 @@ var App = (function () {
             userGroupId: $selectedTab.data('id'),
             articleStatus: $selectedItem.data('id') == 'my' ? $selectedStatus.data('article-status') : null,
             mode: $selectedMode.data('mode'),
-            articlesOnly: false
+            articlesOnly: false,
+            page: -1
         }, options);
+        App.wallPage = params.page;
         if (typeof callback != 'function') {
             callback = function(data) {
                 if (params.articlesOnly) {
