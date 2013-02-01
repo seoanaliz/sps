@@ -37,10 +37,11 @@ class SyncLikes {
             $mode = self::MODE_INTERVAL;
         }
 
+        //если $filter is true, то слабоизменившиеся записи уходят из проверки
+        $filter = false;
+
         if ($mode == self::MODE_INTERVAL) {
             $interval = strtolower( Request::getString( 'interval' ));
-            //если $filter is true, то слабоизменившиеся записи уходят из проверки
-            $filter = false;
             switch( $interval ){
                 case 'minutes':
                     $from = DateTimeWrapper::Now()->sub( new DateInterval('PT10M'));

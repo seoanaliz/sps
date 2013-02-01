@@ -12,6 +12,7 @@ class CheckWalls
     private $walls;
     private $posts_in_progress;
     const time_shift = 0;
+    const DEFAULT_AUTO_EVENTS_GROUP = 46;
 
     public function Execute()
     {
@@ -168,6 +169,7 @@ class CheckWalls
             ,43503315
             ,43503298
             ,43503235
+            ,43503264
         );
 
 
@@ -209,6 +211,7 @@ class CheckWalls
             43503694 ,
             43503630 ,
             43503753 ,
+            38000341 ,
         );
 
         $barter_events_array = array();
@@ -238,13 +241,13 @@ class CheckWalls
                 $barter_event->status        =  1;
                 $barter_event->search_string =  $info[$oid]['shortname'];
                 $barter_event->barter_type   =  1;
-                $stop_looking_time             = date( 'Y-m-d 23:59:59', $now );
+                $stop_looking_time             = date( 'Y-m-d 00:45:00', $now + 86400 );
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
                 $barter_event->creator_id    = $group_id->created_by;
-                $barter_event->groups_ids    = array(3, $group_id->group_id);
+                $barter_event->groups_ids    = array( self::DEFAULT_AUTO_EVENTS_GROUP );
                 $barter_events_array[] = $barter_event;
             }
         }

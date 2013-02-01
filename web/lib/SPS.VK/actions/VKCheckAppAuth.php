@@ -23,6 +23,8 @@ class VKCheckAppAuth {
             $viewer_id = Session::getInteger('authorId');
         }
 
+        $viewer_id = 91088;
+
         // ищем чувака в базе
         if (!empty($viewer_id)) {
             $author = AuthorFactory::GetOne(

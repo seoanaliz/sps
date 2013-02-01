@@ -48,8 +48,8 @@ var REPORTS = {
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
         '</div>' +
-        '<div class="title">Мои списки</div>' +
     '<? } ?>' +
+    '<div class="title">Мои списки</div>' +
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
         '<input type="text" placeholder="Введите название списка..." /> ' +

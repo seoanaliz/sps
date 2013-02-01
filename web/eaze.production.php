@@ -5,7 +5,7 @@
 
     include_once 'lib/Eaze.Core/Logger.php';
     // Initialize Logger
-    Logger::Init( ELOG_WARNING  );
+    Logger::Init( ELOG_WARNING );
     include_once 'lib/Eaze.Core/Package.php' ;
 
     Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset', 'Editor', 'Author', 'User', 'AuthorEvent', 'AuthorEventUtility' );
@@ -19,6 +19,8 @@
     if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
 
     Request::Init();
+    $ErrorHandler = new ErrorHandler();
+    $ErrorHandler->register();
     //if ( Request::getRemoteIp() == '127.0.0.1' ) {
         $__level = Request::getParameter( '__level' );
         if ( !is_null( $__level ) ) {

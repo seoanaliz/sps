@@ -1,5 +1,6 @@
 <?php
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.VK' );
 
     /**
      * SyncTop Action
@@ -28,7 +29,7 @@
                 return;
             }
 
-            $parser = new tf_parcer();
+            $parser = new ParserTop();
 
             $tries  = 3;
             $i      = 0;
@@ -100,7 +101,7 @@
                 $article->statusId      = 1;
 
                 $articleRecord = new ArticleRecord();
-                $articleRecord->content = $post['text'];
+                $articleRecord->content = !empty($post['text']) ? $post['text'] : '';
                 $articleRecord->link    = $post['link'];
                 $articleRecord->likes   = Convert::ToInteger($post['likes']);
                 $articleRecord->photos  = array();

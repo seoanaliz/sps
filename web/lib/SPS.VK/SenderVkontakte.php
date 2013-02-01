@@ -123,7 +123,8 @@
 
             if ( $this->link ) {
                 $attachments[] = $this->link;
-                $this->edit_post( $attachments, end( explode( '_', $check_id )));
+                $arr = explode( '_', $check_id );
+                $this->edit_post( $attachments, array_pop($arr));
             }
 
             sleep(2);

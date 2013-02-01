@@ -18,6 +18,8 @@ BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
 if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
 
 Request::Init();
+    $ErrorHandler = new ErrorHandler();
+    $ErrorHandler->register();
 $__level = Request::getParameter( '__level' );
 if ( !is_null( $__level ) ) {
     Logger::LogLevel( $__level );
