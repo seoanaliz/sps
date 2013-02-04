@@ -1621,9 +1621,9 @@ var Elements = {
         $('.right-panel .images').imageComposition('right');
     },
     initDraggable: function($block) {
-        $block.find(".slot .post .content").addClass("dragged");
+        $block.find('.slot .post.movable .content').addClass('dragged');
 
-        $block.find(".post:not(.blocked) > .content").draggable({
+        $block.find(".post.movable:not(.blocked) > .content").draggable({
             revert: 'invalid',
             appendTo: 'body',
             cursor: 'move',
