@@ -140,7 +140,7 @@
             </div>
 
             <div class="queue-title">&nbsp;</div>
-            <div class="items drop" id="queue" style="display: none;"></div>
+            <div class="items drop" id="queue"></div>
             <div class="queue-footer">
                 <a class="add-button">Добавить ячейку</a>
             </div>

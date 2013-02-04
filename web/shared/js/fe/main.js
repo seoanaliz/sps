@@ -594,7 +594,9 @@ $(document).ready(function(){
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
-                    $post.animate({height: 0}, 200, function() {$(this).remove()});
+                    $post.animate({height: 0}, 200, function() {
+                        $(this).remove();
+                    });
                 }
             }
         })
