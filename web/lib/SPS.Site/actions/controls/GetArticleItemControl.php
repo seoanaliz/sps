@@ -49,6 +49,7 @@ class GetArticleItemControl extends BaseControl
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo(array($sourceFeed)));
         Response::setArray('commentsData', CommentUtility::GetLastComments(array($Article->articleId)));
         Response::setBoolean('canEditPosts', true);
+        Response::setInteger('authorId', $this->getAuthor()->authorId);
         Response::setString('articleLinkPrefix', $articleLinkPrefix);
     }
 }
