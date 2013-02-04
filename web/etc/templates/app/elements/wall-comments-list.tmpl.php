@@ -6,7 +6,6 @@
  * @var bool $isWebUserEditor
  */
 
-
 if (!empty($commentsData[$article->articleId])) {
     if ($commentsData[$article->articleId]['count'] > CommentUtility::LAST_COUNT) {
         if (!empty($showHideBtn)) {

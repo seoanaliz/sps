@@ -10,9 +10,9 @@
         $isEditor = !empty($comment->authorId) ? false : true;
 
         $showDelete = false;
-        if (!empty($comment->authorId) && $comment->authorId == $authorId) {
+        if ($isWebUserEditor) {
             $showDelete = true;
-        } else if (!empty($__Editor)) {
+        } else if (!$isEditor && !empty($comment->authorId) && $comment->authorId == $authorId) {
             $showDelete = true;
         }
 
@@ -49,14 +49,14 @@
             ?>
             <div class="shortcut">
                 <? if ($contentPart) { ?>
-                <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
-                <a href="javascript:;" class="show-cut">Показать полностью...</a>
+                    <?= nl2br(HtmlHelper::RenderToForm($contentPart)) ?>
+                    <a href="javascript:;" class="show-cut">Показать полностью...</a>
                 <? } else { ?>
-                <?= nl2br(HtmlHelper::RenderToForm($content)) ?>
+                    <?= nl2br(HtmlHelper::RenderToForm($content)) ?>
                 <? } ?>
             </div>
             <? if ($contentPart) { ?>
-            <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($content)) ?></div>
+                <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($content)) ?></div>
             <? } ?>
         </div>
 
