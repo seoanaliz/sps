@@ -34,7 +34,7 @@ class LoadCommentsAppControl extends BaseControl
         Response::setParameter('article', $article);
         Response::setArray('commentsData', $commentsData);
         Response::setInteger('authorId', $this->getAuthor()->authorId);
-        Response::setBoolean('isWebUserEditor',  $role && $role != UserFeed::ROLE_AUTHOR);
+        Response::setBoolean('isWebUserEditor',  !is_null($role) && $role != UserFeed::ROLE_AUTHOR);
         Response::setArray('authorEvents', $authorEvents);
 
         if (!empty($all)) {
