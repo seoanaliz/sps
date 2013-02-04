@@ -217,6 +217,7 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
         Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articlesOnly'));
         Response::setBoolean('canEditPosts', $this->canEditPosts);
+        Response::setInteger('authorId', $this->getAuthor()->authorId);
     }
 
 
