@@ -1,8 +1,10 @@
 <?
 /**
  * @var int $authorId - ид автора текущего пользователя
+ * @var bool $isWebUserEditor
+ * @var Comment $comment
  */
-/** @var $comment Comment */
+
     if (!empty($comment)) {
         $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
         $isEditor = !empty($comment->authorId) ? false : true;
