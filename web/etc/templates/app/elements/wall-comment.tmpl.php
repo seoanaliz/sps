@@ -8,7 +8,6 @@
         if (!empty($__Author) && !empty($comment->authorId) && $comment->authorId == $__Author->authorId) {
             $showDelete = true;
         } else if (!empty($__Editor)) {
-            var_dump($__Editor);
             $showDelete = true;
         }
 
