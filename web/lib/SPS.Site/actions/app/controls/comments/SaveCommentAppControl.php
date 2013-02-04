@@ -24,11 +24,10 @@ class SaveCommentAppControl extends BaseControl {
 
         if (empty($article) || $article->sourceFeedId != SourceFeedUtility::FakeSourceAuthors) {
             $result['message'] = 'accessError';
-            //echo ObjectHelper::ToJSON($result);
+            echo ObjectHelper::ToJSON($result);
             return false;
         }
 
-        $__editorMode = false;
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
         if (!$TargetFeedAccessUtility->canSaveArticleComment($article->targetFeedId)) {
@@ -41,12 +40,7 @@ class SaveCommentAppControl extends BaseControl {
         $comment->articleId = $article->articleId;
         $comment->createdAt = DateTimeWrapper::Now();
         $comment->statusId = 1;
-
-        if ($__editorMode) {
-            $comment->editorId = $editor->editorId;
-        } else {
-            $comment->authorId = $author->authorId;
-        }
+        $comment->authorId = $author->authorId;
 
         $errors = CommentFactory::Validate($comment);
         if (!empty($errors)) {
@@ -57,12 +51,16 @@ class SaveCommentAppControl extends BaseControl {
 
         CommentFactory::Add($comment, array(BaseFactory::WithReturningKeys => true));
 
-        if ($__editorMode || $author->authorId != $article->authorId) {
+        if ($author->authorId != $article->authorId) {
             AuthorEventUtility::EventComment($article, $comment->commentId);
         }
 
+        $role = $TargetFeedAccessUtility->getRoleForTargetFeed($article->targetFeedId);
+
         $comment = CommentFactory::GetById($comment->commentId);
         Response::setParameter('comment', $comment);
+        Response::setInteger('authorId', $this->getAuthor()->authorId);
+        Response::setBoolean('isWebUserEditor',  !is_null($role) && $role != UserFeed::ROLE_AUTHOR);
     }
 }
 
