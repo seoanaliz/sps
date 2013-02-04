@@ -118,8 +118,8 @@
                             $sign = 'Ожидает рассмотрения';
                             break;
                     } ?>
+                    {$sign}
                 <? } ?>
-                {$sign}
             </span>
             <? if ($article->rate > 0) { ?>
                 <span class="likes spr"></span><span class="likes-count">
