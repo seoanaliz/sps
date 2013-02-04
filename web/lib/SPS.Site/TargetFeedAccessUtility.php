@@ -121,7 +121,7 @@ class TargetFeedAccessUtility extends RoleAccessUtility {
      * @return bool
      */
     public function canAddArticlesQueue($targetFeedId){
-        return $this->hasAccessToTargetFeed($targetFeedId);
+        return $this->moreThenAuthor($targetFeedId);
     }
 
     /**
