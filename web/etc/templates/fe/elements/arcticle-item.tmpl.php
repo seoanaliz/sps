@@ -9,17 +9,25 @@
     if (!empty($article)) {
 
         $extLinkLoader  = false;
+        $isPostMovable = false;
         $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
 
         if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
             $extLinkLoader = true;
         }
-?>
 
+        if ($isWebUserEditor) {
+            if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->sentAt)) {
+                if (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads) {
+                    $isPostMovable = true;
+                }
+            }
+        }
+?>
 <div
-    class="post bb <?= ($isWebUserEditor && $article->articleStatus == Article::STATUS_APPROVED && (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads)) ? 'movable' : '' ?>"
-    data-group="{$article->sourceFeedId}
-    " data-id="{$article->articleId}">
+    class="post bb <?= ($isPostMovable) ? 'movable' : '' ?>"
+    data-group="{$article->sourceFeedId}"
+    data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
@@ -96,13 +104,28 @@
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if($article->externalId != -1){ ?>
+                <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
                 <? } else { ?>
-                    Добавлена вручную
+                    <? switch ($article->articleStatus) {
+                        case Article::STATUS_APPROVED:
+                            $sign = 'Ожидает публикации';
+                            break;
+                        case Article::STATUS_REJECT:
+                            $sign = 'Отклонено';
+                            break;
+                        case Article::STATUS_REVIEW:
+                            $sign = 'Ожидает рассмотрения';
+                            break;
+                    } ?>
                 <? } ?>
+                {$sign}
             </span>
-            <span class="likes spr"></span><span class="likes-count"><?= ($article->rate > 100) ? 'TOP' : $article->rate ?></span>
+            <? if ($article->rate > 0) { ?>
+                <span class="likes spr"></span><span class="likes-count">
+                    <?= ($article->rate > 100) ? 'TOP' : $article->rate ?>
+                </span>
+            <? } ?>
         </div>
     </div>
         <? if ($canEditPosts): ?>

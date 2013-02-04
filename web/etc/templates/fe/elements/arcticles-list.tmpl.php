@@ -18,7 +18,6 @@
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : new SourceFeed();
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
-            $canEditPosts = $canEditPosts;
             ?>{increal:tmpl://fe/elements/arcticle-item.tmpl.php}<?
         }
     }
