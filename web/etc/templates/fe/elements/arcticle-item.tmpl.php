@@ -107,7 +107,9 @@
                 <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
                 <? } elseif (is_null($article->sentAt)) { ?>
-                    <? switch ($article->articleStatus) {
+                    <?
+                    $sign = '';
+                    switch ($article->articleStatus) {
                         case Article::STATUS_APPROVED:
                             $sign = 'Ожидает публикации';
                             break;
