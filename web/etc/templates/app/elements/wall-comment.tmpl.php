@@ -1,11 +1,14 @@
 <?
-    /** @var $comment Comment */
+/**
+ * @var int $authorId - ид автора текущего пользователя
+ */
+/** @var $comment Comment */
     if (!empty($comment)) {
         $commentAuthor = !empty($comment->authorId) ? $comment->author : $comment->editor;
         $isEditor = !empty($comment->authorId) ? false : true;
 
         $showDelete = false;
-        if (!empty($__Author) && !empty($comment->authorId) && $comment->authorId == $__Author->authorId) {
+        if (!empty($comment->authorId) && $comment->authorId == $authorId) {
             $showDelete = true;
         } else if (!empty($__Editor)) {
             $showDelete = true;
