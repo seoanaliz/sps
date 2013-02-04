@@ -710,10 +710,10 @@
                 $dialogs = MesDialogs::get_all_dialogs( $user, $count );
                 if ( $dialogs == 'no access_token' )
                     return false;
-                if ( $user == 13049517) {
-                    file_put_contents( '1.txt', json_encode($dialogs) );
-                    die();
-                }
+//                if ( $user == 13049517) {
+//                    file_put_contents( '1.txt', json_encode($dialogs) );
+//                    die();
+//                }
                 $default_group = MesGroups::get_unlist_dialogs_group( $user);
                 if ( !$dialogs )
                     continue;
