@@ -12,8 +12,10 @@ class WrTopics extends wrapper
 
     public function Execute()
     {
-        set_time_limit(14000);
         $this->conn = ConnectionFactory::Get( 'tst' );
+
+        set_time_limit(14000);
+
         if (! $this->check_time())
             die('Не сейчас');
         $this->get_id_arr();
@@ -21,7 +23,7 @@ class WrTopics extends wrapper
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
 
-        $this->update_quantity( $this->double_check_quantity() );
+        $this->double_check_quantity();
         $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
@@ -234,8 +236,7 @@ class WrTopics extends wrapper
         while( $ds->Next() ) {
             $res[] = $ds->GetInteger( 'id' );
         }
-        print_r( $res );
-        return $res;
+        $this->update_quantity( $res );
     }
 
     public function get_all_visitors()
