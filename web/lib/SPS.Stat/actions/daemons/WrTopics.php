@@ -16,14 +16,16 @@ class WrTopics extends wrapper
 
         set_time_limit(14000);
 
-        if (! $this->check_time())
+        if (! $this->check_time()) {
+            $this->double_check_quantity();
             die('Не сейчас');
+        }
         $this->get_id_arr();
 //
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
-
         $this->double_check_quantity();
+
         $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
@@ -32,7 +34,7 @@ class WrTopics extends wrapper
     {
         $sql = "select vk_id
                 FROM " . TABLE_STAT_PUBLICS . "
-                WHERE quantity > 100000
+                WHERE quantity > 10000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
@@ -173,7 +175,7 @@ class WrTopics extends wrapper
         foreach( $ids as $b ) {
 
             if ( $i == 25 or !next( $ids )) {
-                if ( !next( $ids ) ) {
+                if ( !next( $ids )) {
                     $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                     $return .= "\" a$b\":a$b,";
                 }
