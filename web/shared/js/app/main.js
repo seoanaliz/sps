@@ -332,7 +332,7 @@ var App = (function () {
                     $target.html($target.data('def-html'));
                 } else {
                     $posts.show();
-                    $target.html('Скрыть записи на рассмотрении');
+                    $target.html('Скрыть записи в очереди');
                 }
             } else {
                 pageLoad({
@@ -343,7 +343,7 @@ var App = (function () {
                         var $posts = $(html);
                         $target.after($posts);
                         $target.data('def-html', $target.html());
-                        $target.html('Скрыть записи на рассмотрении');
+                        $target.html('Скрыть записи в очереди');
                         $target.data('posts', $posts);
                         _updateItems();
                     } else {

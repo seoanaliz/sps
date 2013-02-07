@@ -25,7 +25,7 @@
         }
 ?>
 <div
-    class="post bb <?= ($isPostMovable) ? 'movable' : '' ?>"
+    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPosts) ? ' editable' : '' ?>"
     data-group="{$article->sourceFeedId}"
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
@@ -89,8 +89,8 @@
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
             <? if ($canEditPosts): ?>|
-            <a class="edit">Редактировать</a> |
-            <a class="clear-text">Очистить текст</a>
+                <a class="edit">Редактировать</a> |
+                <a class="clear-text">Очистить текст</a>
             <? endif; ?>
         </div>
         <div class="r">
@@ -130,8 +130,8 @@
             <? } ?>
         </div>
     </div>
-        <? if ($canEditPosts): ?>
-    <div class="delete spr"></div>
+    <? if ($canEditPosts): ?>
+        <div class="delete spr"></div>
     <? endif; ?>
     <div class="clear"></div>
 
