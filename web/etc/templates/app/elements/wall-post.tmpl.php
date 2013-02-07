@@ -4,6 +4,7 @@
     /** @var $author Author */
     /** @var $targetFeed TargetFeed */
     /** @var $targetInfo array */
+    /** @var $isWebUserEditor bool */
 
     if (!empty($article)) {
         $asNew = '';
@@ -18,10 +19,16 @@
             }
         }
         $hasComments = !empty($commentsData[$article->articleId]);
+        $showDelete = false;
+        if ($isWebUserEditor) {
+            $showDelete = $author->authorId == $__Author->authorId;
+        } elseif ($article->articleStatus == Article::STATUS_REVIEW) {
+            $showDelete = true;
+        }
 ?>
 
 <div class="post <?= !$hasComments ? 'no-comments' : '' ?>" data-id="{$article->articleId}">
-    <? if ($author->authorId == $__Author->authorId) { ?>
+    <? if ($showDelete) { ?>
         <div class="delete"></div>
     <? } ?>
     <? if (!empty($author)) { ?>

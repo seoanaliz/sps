@@ -84,7 +84,7 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
         <? endif; ?>
 
         <? if ($reviewArticleCount && !$showArticlesOnly): ?>
-            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> на рассмотрении</div>
+            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> в очереди</div>
         <? endif; ?>
         <? if (!empty($articles)) {
             foreach ($articles as $article) {
