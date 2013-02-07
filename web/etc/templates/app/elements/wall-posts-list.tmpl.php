@@ -9,6 +9,7 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $showArticlesOnly bool */
 /** @var $reviewArticleCount int */
 /** @var $isWebUserEditor bool */
+/** @var $hasMore bool */
 
 $type = Request::getString('type');
 $tabType = Request::getString('tabType');
@@ -100,13 +101,12 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
         <? if ($hasMore) { ?>
             <div id="wall-show-more" class="show-more">Еще</div>
         <? } ?>
-
-        <script type="text/javascript">
-            $('#wall > .title .text').text('{$articlesCountText}');
-        </script>
         <? if ($showControls): ?>
     </div>
 
+    <script type="text/javascript">
+        $('#wall > .title .text').text('{$articlesCountText}');
+    </script>
     <script type="text/javascript">
         function setCounter(selector, value) {
             var counter = $(selector);
