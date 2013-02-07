@@ -460,7 +460,7 @@ $(document).ready(function(){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
                     var $deleteMessage = $('#' + deleteMessageId);
-                    var isHideAllBtn = Elements.leftType() != 'authors';
+                    var isHideAllBtn = /^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
                         $deleteMessage.show();
