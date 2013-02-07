@@ -30,12 +30,6 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
 
     private $reviewArticleCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $canEditPosts = false;
-
-
     protected function getMode(){
         $mode = Request::getString('mode');
         if ($mode == self::MODE_MY) {
@@ -191,10 +185,6 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
         if ($type == SourceFeedUtility::Albums) {
             $this->articleLinkPrefix = 'http://vk.com/photo';
         }
-
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
-        $this->canEditPosts = $TargetFeedAccessUtility->canEditPosts($targetFeedId);
     }
 
     protected function setData() {
@@ -217,7 +207,6 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
         Response::setBoolean('isWebUserEditor', $isWebUserEditor);
         Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articlesOnly'));
-        Response::setBoolean('canEditPosts', $this->canEditPosts);
         Response::setInteger('authorId', $this->getAuthor()->authorId);
     }
 
