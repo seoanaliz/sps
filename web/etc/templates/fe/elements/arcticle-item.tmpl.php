@@ -109,17 +109,22 @@
                 <? } elseif (is_null($article->sentAt)) { ?>
                     <?
                     $sign = '';
-                    switch ($article->articleStatus) {
-                        case Article::STATUS_APPROVED:
-                            $sign = 'Ожидает публикации';
-                            break;
-                        case Article::STATUS_REJECT:
-                            $sign = 'Отклонено';
-                            break;
-                        case Article::STATUS_REVIEW:
-                            $sign = 'Ожидает рассмотрения';
-                            break;
-                    } ?>
+                    if (!is_null($article->sentAt)) {
+                        $sign = 'Опубликовано';
+                    } else {
+                        switch ($article->articleStatus) {
+                            case Article::STATUS_APPROVED:
+                                $sign = 'Ожидает публикации';
+                                break;
+                            case Article::STATUS_REJECT:
+                                $sign = 'Отклонено';
+                                break;
+                            case Article::STATUS_REVIEW:
+                                $sign = 'Ожидает рассмотрения';
+                                break;
+                        }
+                    }
+                    ?>
                     {$sign}
                 <? } ?>
             </span>
