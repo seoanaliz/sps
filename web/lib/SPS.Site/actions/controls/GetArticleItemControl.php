@@ -36,9 +36,9 @@ class GetArticleItemControl extends BaseControl
             return;
         }
 
-        $canEditPosts = true;
+        $canEditPost = true;
         if ($role == UserFeed::ROLE_AUTHOR) {
-            $canEditPosts = $Article->articleStatus != Article::STATUS_APPROVED;
+            $canEditPost = $Article->articleStatus != Article::STATUS_APPROVED;
         }
 
         $sourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
@@ -59,7 +59,7 @@ class GetArticleItemControl extends BaseControl
         Response::setParameter('sourceFeed', $sourceFeed);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo(array($sourceFeed)));
         Response::setArray('commentsData', CommentUtility::GetLastComments(array($Article->articleId)));
-        Response::setBoolean('canEditPosts', $canEditPosts);
+        Response::setBoolean('canEditPost', $canEditPost);
         Response::setInteger('authorId', $this->getAuthor()->authorId);
         Response::setString('articleLinkPrefix', $articleLinkPrefix);
     }

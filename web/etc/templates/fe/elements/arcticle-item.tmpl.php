@@ -4,7 +4,7 @@
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
     /** @var $isWebUserEditor bool */
-    /** @var $canEditPosts boolean */
+    /** @var $canEditPost boolean */
 
     if (!empty($article)) {
 
@@ -88,7 +88,7 @@
     <div class="bottom d-hide">
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
-            <? if ($canEditPosts): ?>|
+            <? if ($canEditPost): ?>|
             <a class="edit">Редактировать</a> |
             <a class="clear-text">Очистить текст</a>
             <? endif; ?>
@@ -130,7 +130,7 @@
             <? } ?>
         </div>
     </div>
-        <? if ($canEditPosts): ?>
+        <? if ($canEditPost): ?>
     <div class="delete spr"></div>
     <? endif; ?>
     <div class="clear"></div>
