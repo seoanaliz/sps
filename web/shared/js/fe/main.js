@@ -460,7 +460,7 @@ $(document).ready(function(){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
                     var $deleteMessage = $('#' + deleteMessageId);
-                    var isHideAllBtn = /^(authors|my)$/.test(Elements.leftType());
+                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
                         $deleteMessage.show();
@@ -469,7 +469,7 @@ $(document).ready(function(){
                         elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
-                                (isHideAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
+                                (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
                         ));
                     }
