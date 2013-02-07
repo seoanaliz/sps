@@ -106,7 +106,7 @@
             <span class="original">
                 <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
-                <? } elseif (is_null($article->sentAt)) { ?>
+                <? } else { ?>
                     <?
                     $sign = '';
                     if (!is_null($article->sentAt)) {
