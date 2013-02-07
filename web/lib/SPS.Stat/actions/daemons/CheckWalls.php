@@ -79,12 +79,12 @@ class CheckWalls
             $ids_array[] = $barter_event->barter_public;
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array );
-
+        print_r($walls);
         foreach( $publics as $barter_event ) {
-            if( !isset( $walls[$barter_event->barter_public ])) {
-                //todo логирование
-                continue;
-            }
+//            if( !isset( $walls[$barter_event->barter_public ])) {
+//                //todo логирование
+//                continue;
+//            }
             if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
