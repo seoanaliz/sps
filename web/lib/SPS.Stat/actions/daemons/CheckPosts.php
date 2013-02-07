@@ -30,15 +30,14 @@ class CheckPosts
         foreach( $chunks as $chunk ) {
             $res = StatPublics::get_publics_walls( $chunk );
             $barter = reset( $chunk );
-            $overposts = '';
+
             foreach( $res as $wall ) {
+                $overposts = '';
                 unset($wall[0]);
                 $trig = false;
 
                 foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
-                        print_r( $barter);
-                        print_r(StatBarter::TIME_INTERVAL + $barter->detected_at->format('U'));
                         if( time() >= StatBarter::TIME_INTERVAL + $barter->detected_at->format('U')) {
                             $barter->status = 4;
                             $barter->deletedAt = $this->now;
@@ -91,8 +90,8 @@ class CheckPosts
                     $time -= 44600;
                     $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
                 }
-
                 $barter_event->end_visitors = $res['visitors'];
+
                 $count = 0;
                 for ( $i = 0; $i < 3; $i++ ) {
                     sleep(0.3);
@@ -103,7 +102,6 @@ class CheckPosts
                     break;
                 }
                 $barter_event->end_subscribers = $count;
-
             }
         }
     }
