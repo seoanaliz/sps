@@ -50,7 +50,7 @@
                 'deleted_at'    =>  $lifetime,
                 'start_search_at' => $barter_event->start_search_at->modify('+ 15 minutes')->format('U'),
                 'stop_search_at' =>  $barter_event->stop_search_at->format('U'),
-                'overlaps'      =>   $overlaps,
+                'overlaps'      =>   array( $overlaps ),
                 'subscribers'   =>   ( $barter_event->end_subscribers && $barter_event->start_subscribers )?
                     $barter_event->end_subscribers - $barter_event->start_subscribers : 0,
                 'visitors'      =>  ( $barter_event->start_visitors && $barter_event->end_visitors ) ?
@@ -58,7 +58,8 @@
                 'status'        =>   $barter_event->status,
                 'active'        =>   in_array( $barter_event->status, array(1,2,3)) ? true : false,
                 'groups'        =>   $groups,
-                'event_creator' =>   $user_id == $barter_event->creator_id
+                'event_creator' =>   $user_id == $barter_event->creator_id,
+                'post_link'     =>   $barter_event->post_id ? 'http://vk.com/wall-' . $barter_event->barter_public . '_' . $barter_event->post_id : ''
 
             );
         };
