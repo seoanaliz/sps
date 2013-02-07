@@ -19,9 +19,13 @@ class GetPublicGrowthAction
 
     protected function get_publics_growth( $creator_id )
     {
-
-        $sql = 'SELECT * FROM stat_our_auditory ORDER BY point_date ';
+        $type = 'all_publics';
+        if ( $creator_id ) {
+            $type = "vld_publics";
+        }
+        $sql = 'SELECT * FROM stat_our_auditory  WHERE type = @type ORDER BY point_date ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetString( '@type', $type );
         $ds  = $cmd->Execute();
         $res = array();
 //        echo '>>>>>>>>>>>>>>>>>' . microtime(1) . '<br>';
