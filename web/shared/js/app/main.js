@@ -13,7 +13,11 @@ $(document).ready(function() {
     App.init();
 });
 
-var App = (function () {
+var App = (function() {
+    this.ARTICLE_STATUS_REVIEW = 1;
+    this.ARTICLE_STATUS_APPROVED = 2;
+    this.ARTICLE_STATUS_REJECT = 3;
+
     var $leftColumn;
     var $rightColumn;
     var $wall;
@@ -130,7 +134,7 @@ var App = (function () {
                 $selectedItem.find('.counter').fadeOut(200);
             }
             pageLoad({
-                articleStatus: 1,
+                articleStatus: App.ARTICLE_STATUS_REVIEW,
                 userGroupId: null
             });
         });
@@ -163,7 +167,7 @@ var App = (function () {
             $newPost.addClass('open');
         });
         $newPost.find('textarea').bind('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
                 _wallPost(this);
             }
         });
@@ -270,7 +274,7 @@ var App = (function () {
             $newComment.addClass('open');
         });
         $wall.delegate('.new-comment textarea', 'keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.keyCode == 13) {
+            if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
                 _commentPost(this);
             }
         });
@@ -365,7 +369,7 @@ var App = (function () {
         var text = $textarea.val();
 
         $photos.find('img').each(function() {
-            photos.push({'filename': $(this).data('name')});
+            photos.push({filename: $(this).data('name')});
         });
 
         if (!text && !photos.length) {
