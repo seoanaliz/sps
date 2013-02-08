@@ -104,20 +104,20 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
             // в авторских источники не учитываем, хотя они передаются с клиента
             unset($this->search['_sourceFeedId']);
 
+
+            // количество на рассмотрении и одобренных и не отправленных
+            $this->reviewArticleCount = ArticleFactory::Count(array(
+                    'authorId' => $author->authorId,
+                    'userGroupId' => Request::getInteger('userGroupId'),
+                    'targetFeedId' => $targetFeedId,
+                ),
+                array(
+                    BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
+                        '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
+                    BaseFactory::WithoutPages => true
+                ));
+
             if ($role == UserFeed::ROLE_AUTHOR) {
-
-                // количество на рассмотрении и одобренных и не отправленных
-                $this->reviewArticleCount = ArticleFactory::Count(array(
-                        'authorId' => $author->authorId,
-                        'userGroupId' => Request::getInteger('userGroupId'),
-                        'targetFeedId' => $targetFeedId,
-                    ),
-                    array(
-                        BaseFactory::CustomSql => ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
-                            '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))',
-                        BaseFactory::WithoutPages => true
-                    ));
-
                 if ($mode == self::MODE_MY || $mode == self::MODE_DEFERRED) {
                     $authorsIds = array($author->authorId);
                 } else {
@@ -125,14 +125,14 @@ class BaseGetArticlesListControl2 extends BaseGetArticlesListControl {
                     $authorsIds = $this->getAuthorsForTargetFeed($targetFeedId);
                 }
 
-                if ($mode != self::MODE_DEFERRED){
+                if ($mode != self::MODE_DEFERRED) {
                     $this->options[BaseFactory::CustomSql] = ' AND ("authorId" IN ' . PgSqlConvert::ToList($authorsIds, TYPE_INTEGER) . ' AND "sentAt" IS NOT NULL )  ';
                     $this->options[BaseFactory::WithoutDisabled] = false;
                     $authorsIds = true;
                     unset($this->search['articleStatusIn']);
                 } else {
                     $this->options['userGroupId'] = Request::getInteger('userGroupId'); // может быть и null
-                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR '.
+                    $this->options[BaseFactory::CustomSql] = ' AND ( "articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_REVIEW) . ' OR ' .
                         '("articleStatus" = ' . PgSqlConvert::ToInt(Article::STATUS_APPROVED) . ' AND "sentAt" IS NULL))';
                 }
 
