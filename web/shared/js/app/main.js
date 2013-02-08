@@ -130,6 +130,7 @@ var App = (function () {
                 $selectedItem.find('.counter').fadeOut(200);
             }
             pageLoad({
+                articleStatus: 1,
                 userGroupId: null
             });
         });
