@@ -48,7 +48,6 @@ class AddReport
 
         $barter_events_array = array();
         for( $i = 0; $i < $count; $i++ ) {
-            $start_looking_time[$i] -=  900;
             $start_looking_time[$i]  += $time_shift;
 
             if( !isset( $stop_looking_time[$i])) {
@@ -59,7 +58,7 @@ class AddReport
 
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
                 $stop_looking_time = $start_looking_time[$i] + 84600;
-            if ( $start_looking_time[$i] <= time()- 900 )
+            if ( $start_looking_time[$i] <= time() + 360 )
                 die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'too late' )));
 
             $barter_event = new BarterEvent();
@@ -75,7 +74,7 @@ class AddReport
             $barter_event->stop_search_at  =  date( 'Y-m-d H:i:s', $stop_looking_time[$i]  );
             $barter_event->created_at      =  date( 'Y-m-d H:i:s', $now );
             $barter_event->standard_mark = true;
-            $barter_event->groups_ids  = array( $group_id );
+            $barter_event->groups_ids  = array( $group_id, 3 );
             $barter_event->creator_id  = $user_id;
             $barter_events_array[] = $barter_event;
 
