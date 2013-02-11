@@ -1,14 +1,14 @@
 <?php
     /* Don't Forget to turn on mod_rewrite!  */
 
-    define( 'WITH_PACKAGE_COMPILE', false  );
+    define( 'WITH_PACKAGE_COMPILE', true  );
 
     include_once 'lib/Eaze.Core/Logger.php';
     // Initialize Logger
     Logger::Init( ELOG_WARNING );
     include_once 'lib/Eaze.Core/Package.php' ;
 
-    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset', 'Editor', 'Author', 'User', 'AuthorEvent', 'AuthorEventUtility' );
+    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset', 'Editor', 'Author', 'User' );
 
     mb_internal_encoding( 'utf-8' );
     mb_http_output( 'utf-8' );
