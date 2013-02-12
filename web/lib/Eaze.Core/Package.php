@@ -346,7 +346,7 @@
          */
         public static function FormatPhpFileForCompile( $content ) {
             $postfix = '';
-            if ( !preg_match('/namespace [{a-zA-Z0-9\\\\_]+/', $content) ) {
+            if ( !preg_match('/^\s*namespace\s*[{a-zA-Z0-9\\\\_]+/m', $content) ) {
                 $content =  '<?php namespace {' . ltrim( $content, '<?phpPHP' );
                 $postfix = ' } ';
             }
