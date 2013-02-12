@@ -7,14 +7,6 @@
      */
     class AddArticleToQueueControl extends BaseControl {
 
-        private function buildDates($object, $timestamp) {
-            $object->startDate = new DateTimeWrapper(date('r', $timestamp));
-            $object->endDate = new DateTimeWrapper(date('r', $timestamp));
-
-            $object->startDate->modify('-5 minutes');
-            $object->endDate->modify('+15 minutes');
-        }
-
         /**
          * Entry Point
          */
