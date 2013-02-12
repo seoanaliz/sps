@@ -51,7 +51,7 @@
                     )
                     , array(
                         BaseFactory::WithoutPages => true
-                        , BaseFactory::OrderBy => ' "sentAt" DESC, "startDate" DESC '
+                        , BaseFactory::OrderBy => ' "startDate" DESC '
                     )
                 );
 
