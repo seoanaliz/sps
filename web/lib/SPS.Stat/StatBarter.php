@@ -48,7 +48,7 @@
                 'posted_at'     =>  $posted_at,
                 'detected_at'   =>  isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0,
                 'deleted_at'    =>  $lifetime,
-                'start_search_at' => $barter_event->start_search_at->modify('+ 15 minutes')->format('U'),
+                'start_search_at' => $barter_event->start_search_at->format('U'),
                 'stop_search_at' =>  $barter_event->stop_search_at->format('U'),
                 'overlaps'      =>   array( $overlaps ),
                 'subscribers'   =>   ( $barter_event->end_subscribers && $barter_event->start_subscribers )?
