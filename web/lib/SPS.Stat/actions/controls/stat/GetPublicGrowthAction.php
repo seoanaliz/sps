@@ -85,7 +85,7 @@ class GetPublicGrowthAction
                     ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $cmd->SetString( '@date', $date );
-            $cmd->SetString( '@creator_id', $creator_id );
+        $cmd->SetString( '@creator_id', $creator_id );
         $ds  = $cmd->Execute();
         $vis  = 0;
         $subs = 0;
@@ -98,6 +98,9 @@ class GetPublicGrowthAction
             $end_visitors   = $ds->GetInteger( 'end_visitors' );
             $start_subscribers = $ds->GetInteger( 'start_subscribers' );
             $end_subscribers   = $ds->GetInteger( 'end_subscribers' );
+            if ( !$start_subscribers || !$end_subscribers )
+                continue;
+
             $a = $ds->GetDateTime( 'detected_at');
             if ( $a )
                 $a = $a->getTimestamp();
