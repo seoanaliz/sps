@@ -670,6 +670,8 @@
                 $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
                 sleep(0.3);
                 foreach( $res as $public ) {
+                    if( !isset($public->gid))
+                        continue;
                     //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
                     $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
                     $cmd = new SqlCommand( $sql, $conn );
