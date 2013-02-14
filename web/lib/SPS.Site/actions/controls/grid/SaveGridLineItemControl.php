@@ -58,6 +58,13 @@
             if (!empty($queueId)) {
                 //актуализируем время запланированного контента
                 ArticleUtility::ChangeQueueDates($queueId, $itemDate->format('U'));
+
+                AuditUtility::CreateEvent(
+                    'gridLineTime'
+                    , 'articleQueue'
+                    , $queueId
+                    , "Changed by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . ", queueId is " . $queueId . ", time is " . $itemDate->modify('+30 seconds')->defaultFormat()
+                );
             }
 
             echo ObjectHelper::ToJSON($result);
