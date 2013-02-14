@@ -475,7 +475,7 @@ class DOMDocumentWrapper {
 		return $contentType[1];
 	}
 	protected function charsetFromXML($markup) {
-		$matches = array();
+		$matches;
 		// find declaration
 		preg_match('@<'.'?xml[^>]+encoding\\s*=\\s*(["|\'])(.*?)\\1@i',
 			$markup, $matches
@@ -514,7 +514,7 @@ class DOMDocumentWrapper {
 			.($xhtml ? '/' : '')
 			.'>';
 		if (strpos($html, '<head') === false) {
-			if (strpos($hltml, '<html') === false) {
+			if (strpos($html, '<html') === false) {
 				return $meta.$html;
 			} else {
 				return preg_replace(

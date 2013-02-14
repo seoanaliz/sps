@@ -11,6 +11,7 @@ class getAuthors
     private $conn;
     private $date_from;
     private $date_to;
+
     public function execute()
     {
 
@@ -109,14 +110,11 @@ class getAuthors
     {
         //выбрать созданные в аппе посты
         $sql = 'SELECT count(*), "authorId" FROM
-                    "articles" a
-                JOIN
-                    "articleQueues" b
-                USING ("articleId")
+                    "articles"
                 WHERE
-                    a."createdAt" < @time_to
-                    AND a."createdAt" > @time_from
-                    AND b."targetFeedId" = @target_feed_id
+                    "createdAt" < @time_to
+                    AND "createdAt" > @time_from
+                    AND "targetFeedId" = @target_feed_id
                 GROUP BY
                     "authorId"
                 ';

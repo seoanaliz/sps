@@ -51,7 +51,7 @@ sql;
                         break;
                     } catch(Exception $exception) {
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
-                        continue 2;
+                        continue;
                     }
                 }
             } else if ($targetFeed->type == TargetFeedUtility::FB) {

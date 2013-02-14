@@ -17,3 +17,5 @@ INSERT INTO "public"."auditEventTypes" ("title", "alias")
 VALUES ('Удаление поста', 'articleDelete');
 INSERT INTO "public"."auditEventTypes" ("title", "alias")
 VALUES ('Планирование поста', 'articleQueue');
+INSERT INTO "public"."auditEventTypes" ("title", "alias")
+VALUES ('Изменение времени сетки', 'gridLineTime');

@@ -15,6 +15,7 @@ class ParserTop
 
     //отправляет данные в json
     private $db;
+
     public function qurl_request_js($url, $arr_of_fields, $headers = '', $uagent = '')
     {
         if (empty($url)) {
@@ -49,14 +50,10 @@ class ParserTop
     {
         $cities = array(
             'Moscow'            =>  1,
-            'Ekaterinburg'      =>  49,
             'Kazan'             =>  60,
             'Kiev'              =>  314,
             'Minsk'             =>  282,
-            'Novosibirsk'       =>  99,
-            'Samara'            =>  123,
             'Saint Petersburg'  =>  2,
-            'Ufa'               =>  151,
             'Harkov'            =>  280
         );
         return $cities;
@@ -137,6 +134,8 @@ class ParserTop
 
             $response = $this->tf_api_wrap('top', $request_params);
             foreach($response->top as &$entry){
+                if ( $entry->liked < 95 )
+                    continue;
                 $uids[] = $entry->uid;
                 $res[] = array(
                     'id'      =>  $entry->uid,
