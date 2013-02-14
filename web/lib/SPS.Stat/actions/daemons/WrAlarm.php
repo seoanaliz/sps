@@ -291,22 +291,7 @@ class WrAlarm
 
     public function get_public_place( $public_id, $page )
     {
-        $sql = '
-            DROP FUNCTION IF EXISTS find_public_place(id int);
-            CREATE FUNCTION find_public_place( id INT ) RETURNS INT AS $$
-            DECLARE
-                i INT := 0;
-                curr INT;
-            BEGIN
-                FOR curr IN select vk_id from stat_publics_50k WHERE page IS @page order by quantity desc
-                LOOP
-                i := i+1;
-                    IF (curr = id ) THEN return i; END IF;
-                END LOOP;
-                RETURN 0;
-            END
-            $$ lANGUAGE plpgsql;
-            SELECT find_public_place( @public_id ) AS place;';
+        $sql = 'SELECT find_public_place( @public_id ) AS place;';
         $cmd = new SqlCommand( $sql, $this->connect);
         $cmd->SetInteger( '@public_id', $public_id );
         $cmd->SetBoolean( '@page', $page ? true : false );
