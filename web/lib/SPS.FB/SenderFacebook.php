@@ -3,15 +3,12 @@
         private $data_array;
         const METH = 'https://graph.facebook.com/';
 
-        public  function __construct($data_array)
+        public  function __construct( $data_array )
         {
             $data_array = json_decode($data_array);
             $data_array->targeting = json_encode($data_array->targeting);
             $data_array->message = $this->remove_tags($data_array->message);
             $this->album = $data_array->album;
-            echo $this->album;
-            //        print_r($data_array);
-
             $this->data_array = $data_array;
         }
 
@@ -36,8 +33,9 @@
 
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_HEADER, 0);
+
             if (is_array($arr_of_fields)) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $arr_of_fields);
+                curl_setopt( $ch, CURLOPT_POSTFIELDS,  $arr_of_fields);
 
             } else return false;
 
@@ -61,15 +59,13 @@
 
         public  function send_photo()
         {
-
             $url = self::METH . $this->album . '/photos/';
-            echo $url . '<br>';
-            echo $url . '<br>'; echo $url . '<br>'; echo $url . '<br>';
 
             unset($this->data_array->page);
             unset($this->data_array->album);
             $this->data_array = (array) $this->data_array;
             $result = $this->qurl_request($url, $this->data_array);
+
             $result = json_decode($result);
 
             if (isset($result->error)) {
@@ -78,5 +74,7 @@
 
             return $result->id;
         }
+
+
     }
 ?>

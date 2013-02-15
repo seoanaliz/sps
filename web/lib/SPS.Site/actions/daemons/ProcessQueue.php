@@ -179,10 +179,7 @@ sql;
                 'access_token'  => $targetFeed->params['token'],
                 'source'        => null,
                 'message'       => $articleRecord->content,
-                'targeting'     => array(
-                    'countries' => array('RU'),
-                    'locales'   => 17
-                )
+                'targeting'     => array()
             );
 
             if (!empty($articleRecord->photos)) {
