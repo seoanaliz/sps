@@ -84,9 +84,6 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
     <div class="list">
         <? endif; ?>
 
-        <? if ($reviewArticleCount && !$showArticlesOnly): ?>
-            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> в очереди</div>
-        <? endif; ?>
         <? if (!empty($articles)) {
             foreach ($articles as $article) {
                 $articleRecord = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
