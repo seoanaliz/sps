@@ -59,13 +59,13 @@ var App = (function() {
         _bindEvents: function() {
             var t = this;
             var $menu = t.$menu;
-            var $loadMore = t.$loadMore;
 
             (function() {
                 VK.callMethod('scrollSubscribe');
                 VK.addCallback('onScroll', function(scrollTop) {
+                    var $loadMore = t.$loadMore;
                     if ($loadMore.is(':visible') && scrollTop + screen.availHeight > ($loadMore.offset().top)) {
-                        $loadMore.click();
+                        t.showMore();
                     }
                 });
             })();
