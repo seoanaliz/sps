@@ -20,7 +20,6 @@ class CheckPosts
         $this->search_for_posts( $barters_for_search );
 
         $this->update_population( $barters_for_search );
-        print_r( $barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -81,8 +80,9 @@ class CheckPosts
     public function update_population( $barter_events_array )
     {
         foreach( $barter_events_array as $barter_event ) {
-            if ( $barter_event->status != 3 ) {
-                $time = time() + self::time_shift;
+            /** @var $barter_event BarterEvent */
+//            if ( $barter_event->status != 3 ) {
+            $time = time() + self::time_shift;
 
                 $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
                 if( !$res ) {
@@ -94,15 +94,39 @@ class CheckPosts
 
                 $count = 0;
                 for ( $i = 0; $i < 3; $i++ ) {
-                    sleep(0.3);
+
                     $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
-                    if( !isset( $res->count ))
+                    if( !isset( $res->count )) {
+                        sleep( 1 );
                         continue;
+                    }
                     $count = $res->count;
                     break;
                 }
+                if( !$count ) {
+                    $count = $this->get_public_members_count( $barter_event->target_public );
+                }
                 $barter_event->end_subscribers = $count;
-            }
+//            }
         }
+    }
+
+    public function get_public_members_count( $public_id )
+    {
+        $count = 0;
+        for ( $i = 0; $i < 3; $i++ ) {
+            $params = array(
+                'gid'       =>  $public_id,
+                'fields'    =>  'members_count'
+            );
+
+            $res = VkHelper::api_request( 'groups.getById', $params, 0 );
+            if ( isset( $count->error))
+                continue;
+            $count = $res[0]->members_count;
+
+            sleep(0.6);
+        }
+        return $count;
     }
 }
