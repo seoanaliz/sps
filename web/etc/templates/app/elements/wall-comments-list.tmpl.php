@@ -16,7 +16,7 @@ if (!empty($commentsData[$article->articleId])) {
         <div class="show-more">
             Показать еще <?= ($commentsData[$article->articleId]['count'] - CommentUtility::LAST_COUNT) ?>
             <? if (!empty($commentsData[$article->articleId]['countNewCollapsed'])) { ?>
-            <span class="counter">+<?=$commentsData[$article->articleId]['countNewCollapsed']?></span>
+<!--            <span class="counter">+--><?//=$commentsData[$article->articleId]['countNewCollapsed']?><!--</span>-->
             <? } ?>
         </div>
         <?
