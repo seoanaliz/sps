@@ -31,7 +31,7 @@
             $general    = $general  ? $general : 0;
             $groupId    = $groupId  ? $groupId : 0;
             $ava        = $ava      ? $ava     : NULL;
-            $comments   = $comments ? comments : NULL;
+            $comments   = $comments ? $comments : NULL;
 
             if ( !$groupName || !$user_id ) {
                 die(ERR_MISSING_PARAMS);

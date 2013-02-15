@@ -79,12 +79,13 @@ class CheckWalls
             $ids_array[] = $barter_event->barter_public;
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array );
+        print_r($walls);
         foreach( $publics as $barter_event ) {
-            if( !isset( $walls[$barter_event->barter_public ])) {
-                //todo логирование
-                continue;
-            }
-            if (empty($walls[ $barter_event->barter_public ]))
+//            if( !isset( $walls[$barter_event->barter_public ])) {
+//                //todo логирование
+//                continue;
+//            }
+            if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
                 if( $post->date < $barter_event->start_search_at->format('U')) {
@@ -120,7 +121,7 @@ class CheckWalls
     {
         $preg_filter = '/(\[\s?(?:club|public)' . $public_id . '\s?\|)/';
         if ( !preg_match( $preg_filter , $search_string ))
-            if( !preg_match( '/(\[\s?' . $public_shortname . '\s?\|)/', $search_string))
+            if( !preg_match( '/(\[\s?' . $public_shortname . '\s?\|)/', $search_string ))
                 return false;
         return true;
     }
@@ -131,10 +132,10 @@ class CheckWalls
             $now =  time();
             $id = $public[ 'target_id' ];
 
-            $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+            $res = StatPublics::get_visitors_from_vk( $id, $now, $now );
             if ( !$res[ 'visitors']) {
                 $now -= 22000;
-                $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+                $res = StatPublics::get_visitors_from_vk( $id, $now, $now );
             }
 
             $public['start_visitors'] =  $res[ 'visitors' ];
@@ -171,7 +172,6 @@ class CheckWalls
             ,43503235
             ,43503264
         );
-
 
         $not_our_array = array(
             35806721,
@@ -221,6 +221,8 @@ class CheckWalls
 
         foreach( $our_array as $oid ) {
             foreach( $not_our_array as $noid ) {
+                if ( $oid == $noid )
+                    continue;
                 $now = time();
                 $check = BarterEventFactory::Get(
                     array(
@@ -241,7 +243,7 @@ class CheckWalls
                 $barter_event->status        =  1;
                 $barter_event->search_string =  $info[$oid]['shortname'];
                 $barter_event->barter_type   =  1;
-                $stop_looking_time             = date( 'Y-m-d 00:45:00', $now + 86400 );
+                $stop_looking_time           = date( 'Y-m-d 00:45:00', $now + 86400 );
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
@@ -253,8 +255,6 @@ class CheckWalls
         }
         BarterEventFactory::AddRange( $barter_events_array, array( BaseFactory::WithReturningKeys => true ), 'tst' );
     }
-
-
 
     public function get_page_name( $urls )
     {

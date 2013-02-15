@@ -20,6 +20,11 @@ class Package {
     const CompiledEaze = 'compiled.eaze';
 
     /**
+         * Class Map
+         */
+        const ClassMap = 'classmap.json';
+
+        /**
      * WITH_PACKAGE_COMPILE constant name
      */
     const WithPackageCompile = 'WITH_PACKAGE_COMPILE';
@@ -77,12 +82,6 @@ class Package {
     private static $isWindows = false;
 
     /**
-     * Last Successful Lock
-     * @var bool
-     */
-    private static $successfulLock = false;
-
-    /**
      * Begin URI
      * @param $uri
      */
@@ -91,7 +90,7 @@ class Package {
 
         // include uri
         if ( Package::WithPackageCompile() ) {
-            $file = self::GetCompiledFilename( 'type', true );
+                $file = self::GetCompiledFilename( 'uri', true );
             if ( is_file( $file ) ) {
                 require_once $file;
             }
@@ -100,15 +99,63 @@ class Package {
 
 
     /**
+         * Load ClassMap from file
+         * @return array system|classes|files
+         */
+        public static function GetClassMap() {
+            Logger::Checkpoint();
+            $filename = self::getClassMapFilename();
+            $result   = array( 'system' => array(), 'classes' => array(), 'uri' => array(), 'md5Uri' => array() );
+
+            if ( is_file( $filename ) ) {
+                $result = json_decode( file_get_contents( $filename ), true );
+            }
+
+            Logger::Debug( 'Loaded classmap' );
+            return $result;
+        }
+
+
+        /**
+         * Save Class Map to file
+         * @param $classmap
+         * @return int
+         */
+        public static function SaveClassMap( $classmap ) {
+            $filename = self::getClassMapFilename();
+            $result   = file_put_contents( $filename, json_encode( $classmap ) );
+
+            return $result;
+        }
+
+
+        /**
+         * Get ClassMap filename with real path
+         * @return string
+         */
+        private static function getClassMapFilename() {
+            return sprintf( '%s/%s/%s', __ROOT__, CONFPATH_CACHE, self::ClassMap );
+        }
+
+
+        /**
      * Get Compiled Filename from Cache
-     * @param string $type system | uri
+         * @param string $type system | uri | mdtUri
      * @param bool   $withRealPath
      * @return string
      */
     public static function GetCompiledFilename( $type, $withRealPath = false ) {
-        $fileType = $type == 'system' ? $type : md5( self::$CurrentUri );
-        $result   = sprintf( 'package_%s.php', $fileType );
+            $fileType = $type;
+            switch( $type ) {
+                case 'uri':
+                    $fileType = md5( self::$CurrentUri );
+                    break;
+                case 'system':
+                    $fileType = 'system';
+                    break;
+            }
 
+            $result = sprintf( 'package_%s.php', $fileType );
         if ( $withRealPath ) {
             $result = __ROOT__ . '/' . CONFPATH_CACHE . '/' . $result;
         }
@@ -159,9 +206,14 @@ class Package {
 
     /**
      * Release Lock (only in WITH_PACKAGE_COMPILE)
+         * @param bool $success if false - do not touch anything)
      * @return bool
      */
-    public static function ReleaseLock() {
+        public static function ReleaseLock( $success ) {
+            if ( !$success ) {
+                return false;
+            }
+
         if ( !self::WithPackageCompile() ) {
             return false;
         }
@@ -178,55 +230,129 @@ class Package {
      * Save Loaded classes to cache file
      */
     public static function Shutdown() {
-        $hasClasses = false;
+            $lock = false;
         foreach( self::$LoadedClasses as $classes ) {
             if ( $classes ) {
-                $hasClasses = true;
+                    $lock = true;
                 break;
             }
         }
 
-        if ( $hasClasses ) {
+
+            if ( $lock ) {
+                $lock = self::GetLock();
+
             if ( self::$DisablePackageCompile ) {
                 Logger::Info( 'Package Compilation was disabled. Total Classes: %d', count( self::$LoadedClasses ) );
-            } else if ( self::$successfulLock ) {
+                } else if ( $lock ) { // Locked section of Package.php
+                    $date     = date( 'c' );
+                    $classmap = self::GetClassMap();
+                    $uri      = md5( Package::$CurrentUri );
+
+                    // initialize uri in classmap
+                    if ( empty( $classmap['uri'][$uri] ) ) {
+                        $classmap['uri'][$uri]    = array();
+                        $classmap['md5Uri'][$uri] = Package::$CurrentUri;
+                    }
+
+                    // Main Loop
                 foreach ( self::$LoadedClasses as $type => $classes ) {
-                    if ( $classes ) {
+                        if ( $classes ) { // classes is system or uri
                         Logger::Checkpoint();
 
                         $buffer = '';
-                        foreach ( $classes as $filenames ) {
+                            foreach ( $classes as $class => $filenames ) {
+                                if ( !self::modifyClassMap( $classmap, $type, $class, $uri, $date ) ) {
+                                    continue;
+                                }
+
                             foreach( $filenames as $filepath ) {
-                                $content  = file_get_contents( $filepath );
-                                $content  = self::FormatPhpFileForCompile( $content );
-                                $buffer .= $content;
+                                    $buffer .= self::FormatPhpFileForCompile( file_get_contents( $filepath ) );
                             }
                         }
 
-                        file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
-                        Logger::Info( 'Writing %d classes to %s', count( $classes ), $type );
-
+                            if ( $buffer ) {
+                                file_put_contents( self::GetCompiledFilename( $type, true ), $buffer, FILE_APPEND | LOCK_EX );
+                                Logger::Info( 'Writing %d classes to %s', count( $classes ), $type );
+                            }
+                        }
                     }
-                }
+
+                    self::SaveClassMap( $classmap );
             } else {
                 Logger::Info( 'Failed to get lock on compiled packages' );
             }
         }
 
-        if ( self::$successfulLock ) {
-            self::ReleaseLock();
+            self::ReleaseLock( $lock );
         }
-    }
+
+
+        /**
+         * @param array $classmap class map
+         * @param string $type     system or uri
+         * @param string $class    name of class
+         * @param string $uri      md5 of uri
+         * @param string $date     date
+         * @return bool
+         */
+        private static function modifyClassMap( &$classmap, $type, $class, $uri, $date ) {
+            if ( $type == 'system' ) {
+                if ( array_key_exists( $class, $classmap['system'] ) ) {
+                    return false;
+                } else {
+                    $classmap['system'][$class] = $date;
+                    if ( array_key_exists( $class, $classmap['classes'] ) ) {
+                        self::rebuildUriPackages( $classmap, $class );
+
+                    }
+                }
+            } else if ( $type == 'uri' ) {
+                if ( array_key_exists( $class, $classmap['uri'][$uri] ) ) {
+                    return false;
+                } else {
+                    $classmap['uri'][$uri][$class]     = $date;
+                    $classmap['classes'][$class][$uri] = $date;
+                }
+            }
+
+            return true;
+        }
 
 
     /**
+         * Rebuild URI Packages (if class was loaded to system and exists in other urls)
+         * @param array $classmap
+         * @param string $class
+         */
+        private static function rebuildUriPackages( &$classmap, $class ) {
+            $uris = array_keys( $classmap['classes'][$class] );
+            foreach( $uris as $uri ) {
+                unset( $classmap['uri'][$uri] );
+
+                $filename = self::GetCompiledFilename( $uri, true );
+                if ( is_file( $filename ) ) {
+                    unlink( $filename );
+                }
+            }
+
+            unset( $classmap['classes'][$class] );
+        }
+
+
+        /**
      * Format PHP File Content For Compilation
      * @param string $content
      * @return string
      */
     public static function FormatPhpFileForCompile( $content ) {
-        // TODO namespaces support
-        $content = rtrim( trim( trim( $content ), PHP_EOL ), '?>' ) . '?>';
+            $postfix = '';
+            if ( !preg_match('/^\s*namespace\s*[{a-zA-Z0-9\\\\_]+/m', $content) ) {
+                $content =  '<?php namespace {' . ltrim( $content, '<?phpPHP' );
+                $postfix = ' } ';
+            }
+
+            $content = rtrim( trim( trim( $content ), PHP_EOL ), '?>' ) . $postfix .  '?>';
         return $content;
     }
 
@@ -353,10 +479,7 @@ class Package {
         }
 
         if ( !Package::$LibStructure ) {
-            if ( self::WithPackageCompile() ) {
-                self::$successfulLock = self::GetLock();
-            }
-
+                Logger::Debug( 'Autoload event on <b>%s</b>', $className );
             Package::initLibStructure();
         }
 
@@ -385,7 +508,12 @@ class Package {
             if ( self::CheckPHPFilename( $file, $cacheDir ) && strpos( $file, 'package_' ) === 0 ) {
                 unlink( $cacheDir . $file );
             }
-        }
+
+                if ( $file == self::ClassMap ) {
+                    unlink( $cacheDir . $file );
+
+                }
+            }
         $d->close();
     }
 

@@ -45,6 +45,12 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
+
+    get_user: function(userId, callback) {
+    simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
+        callback(true);
+    });
+    },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];

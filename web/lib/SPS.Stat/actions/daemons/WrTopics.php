@@ -12,16 +12,20 @@ class WrTopics extends wrapper
 
     public function Execute()
     {
-        set_time_limit(14000);
         $this->conn = ConnectionFactory::Get( 'tst' );
-        if (! $this->check_time())
+
+        set_time_limit(14000);
+
+        if (! $this->check_time()) {
+            $this->double_check_quantity();
             die('Не сейчас');
+        }
         $this->get_id_arr();
 //
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
+        $this->double_check_quantity();
 
-        $this->update_quantity( $this->double_check_quantity() );
         $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
@@ -30,7 +34,7 @@ class WrTopics extends wrapper
     {
         $sql = "select vk_id
                 FROM " . TABLE_STAT_PUBLICS . "
-                WHERE quantity > 100000
+                WHERE quantity > 10000
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
         $ds = $cmd->Execute();
@@ -171,7 +175,7 @@ class WrTopics extends wrapper
         foreach( $ids as $b ) {
 
             if ( $i == 25 or !next( $ids )) {
-                if ( !next( $ids ) ) {
+                if ( !next( $ids )) {
                     $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                     $return .= "\" a$b\":a$b,";
                 }
@@ -184,8 +188,11 @@ class WrTopics extends wrapper
                 $res = VkHelper::api_request( 'execute', array('code' =>  $code), 0);
                 foreach( $res as $key => $entry ) {
                     if ( $entry ) {
+                        $count = isset( $entry->count ) ? $entry->count : 0;
                         $key = str_replace( 'a', '', $key );
                         $this->$act( $key, $entry->count );
+                        if ( $count )
+                            continue;
                         $this->set_public_grow( $key, $entry->count, $timeTo );
                     } else {
                         $this->set_public_closed( $key );
@@ -234,8 +241,7 @@ class WrTopics extends wrapper
         while( $ds->Next() ) {
             $res[] = $ds->GetInteger( 'id' );
         }
-        print_r( $res );
-        return $res;
+        $this->update_quantity( $res );
     }
 
     public function get_all_visitors()

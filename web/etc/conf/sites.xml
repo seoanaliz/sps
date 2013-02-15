@@ -64,6 +64,8 @@
 				<hostname>sps</hostname>
 				<hostname>openapi.lc</hostname>
 				<hostname>im.openapi.lc</hostname>
+                <port>80</port>
+                <port>8080</port>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
@@ -71,7 +73,7 @@
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.sps</param>
+                            <param name="host">media.sps:8081</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
