@@ -119,7 +119,6 @@ var App = (function() {
                     $selectedItem.find('.counter').fadeOut(200);
                 }
                 t.showPage({
-                    articleStatus: App.ARTICLE_STATUS_REVIEWING,
                     userGroupId: null
                 });
             });
