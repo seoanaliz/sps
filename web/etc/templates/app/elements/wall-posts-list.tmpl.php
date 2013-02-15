@@ -9,6 +9,7 @@ $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
 /** @var $showArticlesOnly bool */
 /** @var $reviewArticleCount int */
 /** @var $isWebUserEditor bool */
+/** @var $hasMore bool */
 
 $type = Request::getString('type');
 $tabType = Request::getString('tabType');
@@ -67,7 +68,7 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
     <div class="new-post">
         <div class="textarea-wrap">
             <textarea placeholder="Есть чем поделиться?" rows="2"></textarea>
-            <div class="add-photo"></div>
+            <!--<div class="add-photo"></div>-->
         </div>
         <div class="attachments">
             <div class="photos clear-fix"></div>
@@ -83,8 +84,8 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
     <div class="list">
         <? endif; ?>
 
-        <? if ($reviewArticleCount && !$showArticlesOnly): ?>
-            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> на рассмотрении</div>
+        <? if ($reviewArticleCount && !$showArticlesOnly && !$isWebUserEditor): ?>
+            <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> в очереди</div>
         <? endif; ?>
         <? if (!empty($articles)) {
             foreach ($articles as $article) {
@@ -100,13 +101,12 @@ $articlesCountText = (empty($articlesCount) ? 'нет' : $articlesCount) . ' ' .
         <? if ($hasMore) { ?>
             <div id="wall-show-more" class="show-more">Еще</div>
         <? } ?>
-
-        <script type="text/javascript">
-            $('#wall > .title .text').text('{$articlesCountText}');
-        </script>
         <? if ($showControls): ?>
     </div>
 
+    <script type="text/javascript">
+        $('#wall > .title .text').text('{$articlesCountText}');
+    </script>
     <script type="text/javascript">
         function setCounter(selector, value) {
             var counter = $(selector);

@@ -460,6 +460,7 @@ $(document).ready(function(){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
                     var $deleteMessage = $('#' + deleteMessageId);
+                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
                         $deleteMessage.show();
@@ -468,7 +469,7 @@ $(document).ready(function(){
                         elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
-                                '<span class="button ignore">Не показывать новости сообщества</span>' +
+                                (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
                         ));
                     }
@@ -502,7 +503,7 @@ $(document).ready(function(){
                     $target.html($target.data('def-html'));
                     $posts.hide();
                 } else {
-                    $target.html('Скрыть записи на рассмотрении');
+                    $target.html('Скрыть записи в очереди');
                     $posts.show();
                 }
             } else {
@@ -523,7 +524,7 @@ $(document).ready(function(){
                         var $posts = $(html);
                         $target.data('block', $posts);
                         $target.after($posts);
-                        $target.html('Скрыть записи на рассмотрении');
+                        $target.html('Скрыть записи в очереди');
                         Elements.initImages($posts);
                         Elements.initLinks($posts);
                     } else {
@@ -536,10 +537,10 @@ $(document).ready(function(){
 
     $("#queue")
         // Удаление постов
-        .delegate(".delete", "click", function(){
+        .delegate('.delete', 'click', function() {
             var elem = $(this).closest(".post"),
                 pid = elem.data("id");
-            Events.fire('rightcolumn_deletepost', pid, function(state){
+            Events.fire('rightcolumn_deletepost', pid, function(state) {
                 if(state) {
                     elem.remove();
                 }
@@ -1085,7 +1086,7 @@ $(document).ready(function(){
         });
 
         // Быстрое редактирование поста в левой колонке
-        $leftPanel.delegate(".post .content .shortcut", "click", function(){
+        $leftPanel.delegate('.post.editable .content .shortcut', 'click', function() {
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 postId = $post.data("id");
@@ -1623,9 +1624,9 @@ var Elements = {
         $('.right-panel .images').imageComposition('right');
     },
     initDraggable: function($block) {
-        $block.find('.slot .post.movable .content').addClass('dragged');
+        $block.find('.slot .post.movable:not(.locked) > .content').addClass('dragged');
 
-        $block.find(".post.movable:not(.blocked) > .content").draggable({
+        $block.find('.post.movable:not(.blocked) > .content').draggable({
             revert: 'invalid',
             appendTo: 'body',
             cursor: 'move',
@@ -1650,7 +1651,7 @@ var Elements = {
             Events.fire('post_moved', post, slot, queueId, function(state, newId){
                 if (state) {
                     callback(newId);
-                } else {
+                } else if (typeof failback == 'function') {
                     failback();
                 }
             });

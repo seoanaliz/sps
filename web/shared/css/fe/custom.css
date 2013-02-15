@@ -28,6 +28,7 @@
     padding: 2px 0 2px 5px;
     position: relative;
     float: left;
+    max-width: 250px;
 }
 .ui-multiselect-menu {
     font-size: 12px !important;

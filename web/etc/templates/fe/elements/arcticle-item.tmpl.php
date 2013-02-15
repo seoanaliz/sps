@@ -25,7 +25,7 @@
         }
 ?>
 <div
-    class="post bb <?= ($isPostMovable) ? 'movable' : '' ?>"
+    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPosts) ? ' editable' : '' ?>"
     data-group="{$article->sourceFeedId}"
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
@@ -89,8 +89,8 @@
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
             <? if ($canEditPost): ?>|
-            <a class="edit">Редактировать</a> |
-            <a class="clear-text">Очистить текст</a>
+                <a class="edit">Редактировать</a> |
+                <a class="clear-text">Очистить текст</a>
             <? endif; ?>
         </div>
         <div class="r">
@@ -106,20 +106,25 @@
             <span class="original">
                 <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
-                <? } elseif (is_null($article->sentAt)) { ?>
+                <? } else { ?>
                     <?
                     $sign = '';
-                    switch ($article->articleStatus) {
-                        case Article::STATUS_APPROVED:
-                            $sign = 'Ожидает публикации';
-                            break;
-                        case Article::STATUS_REJECT:
-                            $sign = 'Отклонено';
-                            break;
-                        case Article::STATUS_REVIEW:
-                            $sign = 'Ожидает рассмотрения';
-                            break;
-                    } ?>
+                    if (!is_null($article->sentAt)) {
+                        $sign = 'Опубликовано';
+                    } else {
+                        switch ($article->articleStatus) {
+                            case Article::STATUS_APPROVED:
+                                $sign = 'Ожидает публикации';
+                                break;
+                            case Article::STATUS_REJECT:
+                                $sign = 'Отклонено';
+                                break;
+                            case Article::STATUS_REVIEW:
+                                $sign = 'Ожидает рассмотрения';
+                                break;
+                        }
+                    }
+                    ?>
                     {$sign}
                 <? } ?>
             </span>
@@ -130,8 +135,8 @@
             <? } ?>
         </div>
     </div>
-        <? if ($canEditPost): ?>
-    <div class="delete spr"></div>
+    <? if ($canEditPost): ?>
+        <div class="delete spr"></div>
     <? endif; ?>
     <div class="clear"></div>
 
