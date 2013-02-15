@@ -127,9 +127,6 @@ var App = (function() {
 
         _bindLeftColumnEvents: function() {
             var t = this;
-            var $wall = t.$wall;
-            var $menu = t.$menu;
-            var $newPost = t.$newPost;
             var $wallTabs = t.$wallTabs;
             var $wallTitle = t.$wallTitle;
             var $leftColumn = t.$leftColumn;
@@ -154,49 +151,21 @@ var App = (function() {
                 });
             });
 
-            $newPost.find('textarea').placeholder();
-            $newPost.find('textarea').bind('focus', function() {
-                if (!$(this).data('autoResize')) $(this).autoResize();
-                $newPost.addClass('open');
-            });
-            $newPost.find('textarea').bind('keydown', function(e) {
-                if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
-                    t._wallPost(this);
-                }
-            });
-            $newPost.delegate('.send', 'click', function() {
-                t._wallPost(this);
-            });
-            $newPost.delegate('.photo > .delete', 'click', function() {
-                $(this).parent().remove();
-            });
-            if ($newPost.find('.file-uploader').length) {
-                var uploader = new qq.FileUploader({
-                    element: $newPost.find('.file-uploader')[0],
-                    action: window.root + 'int/controls/image-upload/',
-                    template: '<div class="qq-uploader">' +
-                        '<div class="qq-upload-drop-area">Перенесите картинки сюда</div>' +
-                        '<div class="qq-upload-button">Прикрепить</div>' +
-                        '<ul class="qq-upload-list"></ul>' +
-                        '</div>',
-                    onComplete: function(id, fileName, res) {
-                        var $photo = $(
-                            '<div class="photo">' +
-                                '<img src="' + res.image + '" data-name="' + res.filename + '" />' +
-                                '<div class="delete"></div>' +
-                                '</div>'
-                        );
-                        $newPost.find('.attachments > .photos').append($photo);
-                    }
-                });
-            }
-
             $wallTitle.find('#wall-switcher a').click(function() {
                 var $target = $(this);
                 $target.parent().find('a[data-switch-to="' + $target.data('mode') + '"]').show();
                 $target.hide();
                 t.showPage();
             });
+
+            t._bindNewPostEvents();
+
+            t._bindWallEvents();
+        },
+
+        _bindWallEvents: function() {
+            var t = this;
+            var $wall = t.$wall;
 
             $wall.delegate('.post .hight-light.new', 'hover', function(e) {
                 if (e.type != 'mouseenter') return;
@@ -210,7 +179,7 @@ var App = (function() {
                         }
                         $counter.counter('decrement');
                     }
-                    decCounter($menu.find('.item.selected .counter'));
+                    decCounter(t.$menu.find('.item.selected .counter'));
                     decCounter($wall.find('.tabs .tab.selected .counter'));
                 });
             });
@@ -220,7 +189,7 @@ var App = (function() {
                 var $post = $comment.closest('.post');
                 Events.fire('comment_mark_as_read', $post.data('id'), $comment.data('id'), function() {
                     $comment.removeClass('new');
-                    var $counter = $menu.find('.item.selected .counter');
+                    var $counter = t.$menu.find('.item.selected .counter');
                     if (!$counter.data('counter')) {
                         $counter.counter({prefix: '+'});
                     }
@@ -351,6 +320,49 @@ var App = (function() {
                 }
             });
         },
+
+        _bindNewPostEvents: function() {
+            var t = this;
+            var $newPost = t.$newPost;
+
+            $newPost.find('textarea').placeholder();
+            $newPost.find('textarea').bind('focus', function() {
+                if (!$(this).data('autoResize')) $(this).autoResize();
+                $newPost.addClass('open');
+            });
+            $newPost.find('textarea').bind('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.keyCode == KEY.ENTER) {
+                    t._wallPost(this);
+                }
+            });
+            $newPost.delegate('.send', 'click', function() {
+                t._wallPost(this);
+            });
+            $newPost.delegate('.photo > .delete', 'click', function() {
+                $(this).parent().remove();
+            });
+            if ($newPost.find('.file-uploader').length) {
+                var uploader = new qq.FileUploader({
+                    element: $newPost.find('.file-uploader')[0],
+                    action: window.root + 'int/controls/image-upload/',
+                    template: '<div class="qq-uploader">' +
+                        '<div class="qq-upload-drop-area">Перенесите картинки сюда</div>' +
+                        '<div class="qq-upload-button">Прикрепить</div>' +
+                        '<ul class="qq-upload-list"></ul>' +
+                        '</div>',
+                    onComplete: function(id, fileName, res) {
+                        var $photo = $(
+                            '<div class="photo">' +
+                                '<img src="' + res.image + '" data-name="' + res.filename + '" />' +
+                                '<div class="delete"></div>' +
+                                '</div>'
+                        );
+                        $newPost.find('.attachments > .photos').append($photo);
+                    }
+                });
+            }
+        },
+
         _wallPost: function(target) {
             var t = this;
             var $target = $(target);
@@ -384,6 +396,7 @@ var App = (function() {
                 });
             }
         },
+
         _commentPost: function(target) {
             var $target = $(target);
             var $comment = $target.closest('.new-comment');
@@ -419,6 +432,7 @@ var App = (function() {
                 t._updateItems();
             });
         },
+
         showPage: function(options, callback) {
             var t = this;
             var $selectedTab = $('#groups').find('.tab.selected');
@@ -448,6 +462,7 @@ var App = (function() {
             }
             Events.fire('wall_load', params, callback);
         },
+
         refreshSize: function() {
             VK.callMethod('resizeWindow', false, $('body').height());
         }
