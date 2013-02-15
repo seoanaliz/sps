@@ -121,11 +121,12 @@ class CheckPosts
             );
 
             $res = VkHelper::api_request( 'groups.getById', $params, 0 );
-            if ( isset( $count->error))
+            if ( isset( $count->error)) {
+                sleep(0.6);
                 continue;
+            }
             $count = $res[0]->members_count;
-
-            sleep(0.6);
+            break;
         }
         return $count;
     }
