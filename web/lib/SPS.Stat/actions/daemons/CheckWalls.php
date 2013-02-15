@@ -12,10 +12,11 @@ class CheckWalls
     private $walls;
     private $posts_in_progress;
     const time_shift = 0;
+    const DEFAULT_AUTO_EVENTS_GROUP = 46;
 
     public function Execute()
     {
-//        error_reporting(0);
+        error_reporting(0);
 
         set_time_limit( 0 );
         $this->posts_in_progress = $this->get_posts_under_observation();
@@ -56,7 +57,7 @@ class CheckWalls
         $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ),'_status' => 2 ), null, 'tst' );
         foreach( $events as $event) {
             $event->status = 5;
-            $event->posted_at = $event->stop_search_at;
+            $event->posted_at = $event->start_search_at;
         }
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
     }
@@ -86,8 +87,6 @@ class CheckWalls
             if (empty($walls[ $barter_event->barter_public ]))
                 continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
-
-
                 if( $post->date < $barter_event->start_search_at->format('U')) {
                         echo 'слишком старые посты<br>';
                         break;
@@ -165,7 +164,13 @@ class CheckWalls
             ,43503460
             ,43503503
             ,43503550
+            ,43503725
+            ,43503431
+            ,43503315
+            ,43503298
+            ,43503235
         );
+
 
         $not_our_array = array(
             35806721,
@@ -234,13 +239,13 @@ class CheckWalls
                 $barter_event->status        =  1;
                 $barter_event->search_string =  $info[$oid]['shortname'];
                 $barter_event->barter_type   =  1;
+                $stop_looking_time             = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
-                $stop_looking_time           = date( 'Y-m-d 23:59:59', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
                 $barter_event->created_at    = date ( 'Y-m-d H:i:s', $now );
                 $barter_event->creator_id    = $group_id->created_by;
-                $barter_event->groups_ids    = array(1,2,3,4, $group_id->group_id);
+                $barter_event->groups_ids    = array( self::DEFAULT_AUTO_EVENTS_GROUP );
                 $barter_events_array[] = $barter_event;
             }
         }

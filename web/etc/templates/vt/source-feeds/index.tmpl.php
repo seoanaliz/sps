@@ -81,9 +81,9 @@
                 <td class="header">{$SourceFeed.title}</td>
                 <td>
                     <? if ($SourceFeed->type == SourceFeedUtility::Source) : ?>
-                        <a href="http://vk.com/wall-{form:$object.externalId}" target="_blank">http://vk.com/wall-{form:$SourceFeed.externalId}</a>
+                        <a href="http://vk.com/wall-{form:$SourceFeed.externalId}" target="_blank">http://vk.com/wall-{form:$SourceFeed.externalId}</a>
                     <? elseif ($SourceFeed->type == SourceFeedUtility::Albums): ?>
-                        <a href="http://vk.com/album-{form:$object.externalId}" target="_blank">http://vk.com/album-{form:$SourceFeed.externalId}</a>
+                        <a href="http://vk.com/album-{form:$SourceFeed.externalId}" target="_blank">http://vk.com/album-{form:$SourceFeed.externalId}</a>
                     <? endif; ?>
                 </td>
                 <td><?= StatusUtility::GetBoolTemplate($SourceFeed->useFullExport) ?></td>

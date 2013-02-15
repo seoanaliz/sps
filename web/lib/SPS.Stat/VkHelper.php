@@ -9,6 +9,7 @@
         define ( 'ACC_TOK_WRK', '0b8c8e800086894200868942b100a9af1a000860093b1dc50eb180b9b836874e8ec5f99' );
         define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
+
         class AccessTokenIsDead extends Exception{}
 
         class   VkHelper {
@@ -21,6 +22,7 @@
              */
 
             const TESTING = false;
+            const PAUSE   = 0.5;
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1 )
             {
                 if ( !isset( $request_params['access_token'] ))
@@ -191,7 +193,7 @@
             public static function check_at( $access_token )
             {
                 $res = self::get_vk_time( $access_token );
-                sleep(0.2);
+                sleep( self::PAUSE );
                 if ( isset( $res->error )) {
                     //self::deactivate_at( $access_token );
                     return false;

@@ -93,9 +93,17 @@ class CheckPosts
                 }
 
                 $barter_event->end_visitors = $res['visitors'];
-                $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
-                $barter_event->end_subscribers = $res->count;
-                sleep(0.3);
+                $count = 0;
+                for ( $i = 0; $i < 3; $i++ ) {
+                    sleep(0.3);
+                    $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
+                    if( !isset( $res->count ))
+                        continue;
+                    $count = $res->count;
+                    break;
+                }
+                $barter_event->end_subscribers = $count;
+
             }
         }
     }

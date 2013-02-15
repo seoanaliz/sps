@@ -12,20 +12,16 @@ Configs = {
  */
 GroupModel = Model.extend({
     id: function(id) {
-        if (arguments.length) id = intval(id);
-        return this.data('id', id);
+        return strval(this.data('id', id));
     },
     name: function(name) {
-        if (arguments.length) name += '';
-        return this.data('name', name);
+        return strval(this.data('name', name));
     },
     place: function(place) {
-        if (arguments.length) intval(place);
-        return this.data('place', place);
+        return intval(this.data('place', place));
     },
     type: function(type) {
-        if (arguments.length) intval(type);
-        return this.data('type', type);
+        return intval(this.data('type', type));
     }
 });
 
@@ -90,6 +86,13 @@ Pages = Event.extend({
             t.showResults();
             $header.find('.tab').removeClass('selected');
             $(this).addClass('selected');
+        });
+
+        $('#filter').delegate('input', 'change', function() {
+            var filter = $(this).val();
+            t.monitor.filter = filter;
+            t.result.filter = filter;
+            t.currentPage.update();
         });
 
         $('#tab-monitors').click(function() {
@@ -320,6 +323,7 @@ Pages = Event.extend({
     }
 });
 
+var monthNamesShort = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
 $(document).ready(function() {
     $.mask.definitions['2']='[012]';
     $.mask.definitions['3']='[0123]';
@@ -329,7 +333,7 @@ $(document).ready(function() {
         dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
         dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
         monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        monthNamesShort: monthNamesShort,
         firstDay: 1,
         showAnim: '',
         dateFormat: 'd MM'

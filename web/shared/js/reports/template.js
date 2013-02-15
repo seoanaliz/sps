@@ -10,6 +10,23 @@ var REPORTS = {
                 '</div>' +
             '</td>' +
             '<td id="right-column" class="right-column">' +
+                '<div id="filter">' +
+                    '<div class="title">Фильтр</div>' +
+                    '<div class="form">' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="all" checked="checked">' +
+                            '<span>Все</span>' +
+                        '</label>' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="complete">' +
+                            '<span>Успешные</span>' +
+                        '</label>' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="false">' +
+                            '<span>Неудачные</span>' +
+                        '</label>' +
+                    '</div>' +
+                '</div>' +
                 '<div id="group-list" class="filter"></div>' +
             '</td>' +
         '</tr>' +
@@ -27,16 +44,16 @@ var REPORTS = {
     '<div data-id="<?=id?>" class="item"><?=name?></div>',
 
     GROUP_LIST:
-    '<? if (!count(userLists) || count(userLists) > 1) { ?>' +
+    '<? if (count(defaultLists) && (!count(userLists) || count(userLists) > 1)) { ?>' +
         '<div class="list">' +
             '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
         '</div>' +
-        '<div class="title">Мои списки</div>' +
     '<? } ?>' +
+    '<div class="title">Мои списки</div>' +
     '<div class="list">' +
         '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
         '<input type="text" placeholder="Введите название списка..." /> ' +
-        '<div class="item">Создать список</div>' +
+        '<div class="item"><u>Создать список</u></div>' +
     '</div>' +
     '<? if (count(sharedLists)) { ?>' +
         '<div class="title">Общие списки</div>' +

@@ -20,10 +20,10 @@ class AddReport
         $barter_public_id   =   Request::getString ( 'barterPublicId' );
         $start_looking_time =   Request::getString ( 'startTime' ) ? Request::getString( 'startTime' ) : $now ;
         $stop_looking_time  =   Request::getString ( 'stopTime' );
-        $group_id           =   Request::GetInteger( 'groupId' );
+        $group_id           =   Request::GetString ( 'groupId' );
         $barter_id          =   Request::getInteger( 'reportId' );
         $time_shift         =   Request::getInteger( 'timeShift');
-        $user_id = AuthVkontakte::IsAuth();
+        $user_id            =   AuthVkontakte::IsAuth();
 
         if ( !$target_public_id || !$barter_public_id || !$start_looking_time ) {
             die(ERR_MISSING_PARAMS);
@@ -36,7 +36,6 @@ class AddReport
 
         if ( !GroupsUtility::is_author( $group_id, $user_id ))
             die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
-
         $publics_info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $publics_info ))
             die( ObjectHelper::ToJSON( array('response' => 'wrong publics data')));
@@ -59,7 +58,9 @@ class AddReport
             }
 
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
-                $stop_looking_time[$i] += 84600;
+                $stop_looking_time = $start_looking_time[$i] + 84600;
+            if ( $start_looking_time[$i] <= time()- 900 )
+                die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'too late' )));
 
             $barter_event = new BarterEvent();
             $repeat_check = $this->repeat_check( $publics_info['target']['id'], $publics_info['barter']['id'], $start_looking_time[$i], $stop_looking_time[$i], $user_id );
@@ -74,23 +75,13 @@ class AddReport
             $barter_event->stop_search_at  =  date( 'Y-m-d H:i:s', $stop_looking_time[$i]  );
             $barter_event->created_at      =  date( 'Y-m-d H:i:s', $now );
             $barter_event->standard_mark = true;
-            $barter_event->groups_ids  = array( $group_id,1,2,3 );
+            $barter_event->groups_ids  = array( $group_id );
             $barter_event->creator_id  = $user_id;
             $barter_events_array[] = $barter_event;
+
         }
 
-        //проверка на эталонность. пока мимо
-//        if ( !$barter_id ) {
-//            $standard_check = StatBarter::get_concrete_events( $publics_info['target']['id'], $publics_info['barter']['id'], 0, 1 );
-//            if ( !empty( $standard_check )) {
-//                foreach( $standard_check as $entry ) {
-//                    if ( $entry->standard_mark ) {
-//                        $entry->standard_mark = false;
-//                        BarterEventFactory::Update( $entry, array(),'tst');
-//                    }
-//                }
-//            }
-//        }
+
         if( $barter_id ) {
             $check = BarterEventFactory::Update( $barter_event, array( BaseFactory::WithReturningKeys => true ), 'tst' );
         } else {

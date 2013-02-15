@@ -11,7 +11,7 @@ class GroupFactory
     /** Default Connection Name */
     const DefaultConnection = 'tst';
 
-    /** VfsFile instance mapping  */
+    /** Group instance mapping  */
     public static $mapping = array (
     'class'       => 'Group'
     , 'table'     => 'groups'
@@ -87,11 +87,16 @@ class GroupFactory
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_ARRAY
         )
-        ,'_users_ids' => array(
+        ,'_users_ids_in_array' => array(
                 'name'      => 'users_ids'
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
             , 'complexType' => 'int[]'
+        )
+        ,'pageSize' => array(
+              'name'         => 'pageSize'
+            , 'type'       => TYPE_INTEGER
+            , 'default'    => 1000
         )
     )
     );
@@ -143,17 +148,17 @@ class GroupFactory
         return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return VfsFile[] */
+    /** @return Group[] */
     public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return VfsFile */
+    /** @return Group */
     public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
     }
 
-    /** @return VfsFile */
+    /** @return Group */
     public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
     }
@@ -178,7 +183,7 @@ class GroupFactory
         return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
     }
 
-    /** @return VfsFile */
+    /** @return Group */
     public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
         return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
     }
