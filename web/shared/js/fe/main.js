@@ -215,7 +215,7 @@ $(document).ready(function(){
         Control.fire(method || 'authors_get', {
             targetFeedId: Elements.rightdd()
         }).success(function(data) {
-            var $container = $('#wall > .authors-list');
+            var $container = $('#wall');
             $container.html(data);
 
             var $navigation = $container.find('.authors-types');
@@ -367,7 +367,7 @@ $(document).ready(function(){
                     });
                 })();
             });
-            $container.delegate('.delete', 'click', function() {
+            $container.delegate(' > .authors-list .delete', 'click', function() {
                 var $author = $(this).closest('.author');
                 var authorId = $author.data('id');
                 var confirmDeleteBox = new Box({
