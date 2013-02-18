@@ -16,12 +16,14 @@ class WrTopics extends wrapper
 
         set_time_limit(14000);
 
-        if (! $this->check_time()) {
-            $this->double_check_quantity();
-            die('Не сейчас');
-        }
+//        if (! $this->check_time()) {
+//            $this->double_check_quantity();
+//            die('Не сейчас');
+//        }
         $this->get_id_arr();
 //
+        $this->find_admins();
+        die();
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
         $this->double_check_quantity();
@@ -191,7 +193,7 @@ class WrTopics extends wrapper
                         $count = isset( $entry->count ) ? $entry->count : 0;
                         $key = str_replace( 'a', '', $key );
                         $this->$act( $key, $entry->count );
-                        if ( $count )
+                        if ( !$count )
                             continue;
                         $this->set_public_grow( $key, $entry->count, $timeTo );
                     } else {
@@ -293,29 +295,31 @@ class WrTopics extends wrapper
     public function find_admins( )
     {
         foreach ( $this->ids as $id ) {
-            if ( $id < 38852667 )
+            if ( $id < 0 )
                 continue;
             sleep(0.3);
-            echo $id . '<br>';
+            echo $id . '<br><br>';
             $params = array(
                 'act'   =>  'a_get_contacts',
                 'al'    =>  1,
-                'oid'   =>  $id
+                'oid'   =>  '-' . $id
             );
 
             $url = 'http://vk.com/al_page.php';
             $k = $this->qurl_request( $url, $params );
             $k = explode( '<div class="image">' ,$k );
             unset( $k[0] );
+
             if ( empty( $k ) )
                 continue;
             $this->delete_admins( $id );
+
             foreach( $k as $admin_html ) {
 
                 $admin = $this->get_admin('a href="/' . $admin_html);
-
                 if ( !empty( $admin )) {
                     $this->save_admin( $id, $admin );
+
                 }
                 $admin = array();
             }
