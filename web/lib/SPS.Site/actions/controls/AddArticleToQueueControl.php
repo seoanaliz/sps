@@ -30,6 +30,12 @@
 
             $article = ArticleFactory::GetById($articleId);
 
+            if (!$article){
+                $result['message'] = 'ArticleNotFound';
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
             //check access
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
             $SourceAccessUtility = new SourceAccessUtility($this->vkId);
