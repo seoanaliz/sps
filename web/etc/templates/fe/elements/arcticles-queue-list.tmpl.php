@@ -18,7 +18,6 @@
         } else {
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
-            $articleId = $articlesQueue[$articleQueueId]->articleId;
             $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
                 <div class="slot <?= !empty($gridItem['blocked']) ? 'locked' : '' ?>"
@@ -37,7 +36,7 @@
                     </div>
                     <? endif; ?>
                     <div class="post movable <?= !empty($gridItem['blocked']) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>"
-                         data-id="{$articleId}"
+                         data-id="{$articleQueueId}"
                          data-queue-id="{$articleQueueId}">
                         <div class="content">
                             {increal:tmpl://fe/elements/arcticles-queue-item-content.tmpl.php}
