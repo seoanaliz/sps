@@ -6,7 +6,7 @@
  * @subpackage Site
  * @author     Shuler
  */
-final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
+final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
     public function __construct(){
         $this->isApp = true;
@@ -85,42 +85,6 @@ final class GetArticlesAppListControl extends BaseGetArticlesListControl2 {
         }
     }
 
-
-//    protected function processRequestCustom(){
-//        $author = $this->getAuthor();
-//
-//        $mode = $this->getMode();
-//        if ($mode == self::MODE_MY) {
-//            $this->search['authorId'] = $author->authorId;
-//        } else {
-//            // получаем доступные ленты
-//            $targetFeedIds = $this->ArticleAccessUtility->getAllTargetFeedIds();
-//            $targetFeedId = $this->getTargetFeedId();
-//            if (!in_array($targetFeedId, $targetFeedIds)) {
-//                echo ObjectHelper::ToJSON(array('success' => false));
-//                return;
-//            }
-//        }
-//
-//        // сортировка
-//        $filter = Request::getString('filter');
-//        switch ($filter) {
-//            case 'best':
-//                $this->options[BaseFactory::OrderBy] = ' "rate" DESC, "createdAt" DESC, "articleId" DESC ';
-//                break;
-//        }
-//
-
-//
-//        $this->options[BaseFactory::WithoutDisabled] = false;
-//
-//        $targetFeedId = $this->getTargetFeedId();
-//        if ($targetFeedId){
-//            //$TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-//            //$role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
-//            $this->userGroups = UserGroupFactory::GetForUserTargetFeed($this->getTargetFeedId(), $this->vkId);
-//        }
-//    }
 
     /**
      * Загрузка комментариев

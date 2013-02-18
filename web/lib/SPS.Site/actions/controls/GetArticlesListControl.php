@@ -5,7 +5,7 @@
  * @subpackage Site
  * @author     Shuler
  */
-class GetArticlesListControl extends BaseGetArticlesListControl2 {
+class GetArticlesListControl extends BaseGetArticlesListControl {
 
     
 }

@@ -50,24 +50,6 @@
             $text = $this->convert_line_breaks($text);
             $text = strip_tags($text);
 
-            /*if (empty($id)) {
-                $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
-                if ($sourceFeedId != SourceFeedUtility::FakeSourceAuthors) {
-                    //check access
-                    if (!$SourceAccessUtility->hasAccessToSourceFeed($sourceFeedId)) {
-                        $sourceFeedId = null;
-                    }
-
-                    $sourceFeed     = SourceFeedFactory::GetById($sourceFeedId);
-                    if (empty($sourceFeedId) || empty($sourceFeed)) {
-                        $result['message'] = 'emptySourceFeedId';
-                        echo ObjectHelper::ToJSON($result);
-                        return false;
-                    }
-                }
-            }        */
-
             //parsing link
             $linkInfo = UrlParser::Parse($link);
             if (empty($linkInfo)) {

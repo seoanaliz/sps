@@ -80,6 +80,8 @@
                 if (!empty($originalArticleRecord)) {
                     $this->articleRecord->topfaceData = $originalArticleRecord->topfaceData;
                 }
+                $Article->articleStatus = $originalObject->articleStatus;
+                $Article->userGroupId = $originalObject->userGroupId;
             }
             Response::setParameter( "articleRecord", $this->articleRecord );
 
