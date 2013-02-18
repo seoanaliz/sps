@@ -31,7 +31,8 @@
             $article = ArticleFactory::GetById($articleId);
 
             if (!$article){
-                $result['message'] = 'ArticleNotFound';
+                $result['message'] = 'ArticleNotFound' + $articleId;
+                $result['art'] = print_r($article, true);
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
