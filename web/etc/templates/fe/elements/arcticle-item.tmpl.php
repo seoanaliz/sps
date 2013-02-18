@@ -25,7 +25,7 @@
         }
 ?>
 <div
-    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPosts) ? ' editable' : '' ?>"
+    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPost) ? ' editable' : '' ?>"
     data-group="{$article->sourceFeedId}"
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
