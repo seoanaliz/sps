@@ -21,7 +21,7 @@
             <?
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
-            $articleId = $articleRecord->articleId;
+            $articleId = $gridItem['queue']->articleId;
             $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
             <div class="slot <?= (!$canEditQueue || !empty($gridItem['blocked'])) ? 'locked' : '' ?>"
