@@ -36,7 +36,7 @@ class GetArticleItemControl extends BaseControl
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
         if (is_null($role)){
-            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for target feed'));
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for ' . $this->vkId . ' target feed' . $Article->targetFeedId));
             return;
         }
 
@@ -65,6 +65,7 @@ class GetArticleItemControl extends BaseControl
         Response::setArray('commentsData', CommentUtility::GetLastComments(array($Article->articleId)));
         Response::setBoolean('canEditPost', $canEditPost);
         Response::setInteger('authorId', $this->getAuthor()->authorId);
+        Response::setInteger('isWebUserEditor', $role != UserFeed::ROLE_AUTHOR);
         Response::setString('articleLinkPrefix', $articleLinkPrefix);
     }
 }
