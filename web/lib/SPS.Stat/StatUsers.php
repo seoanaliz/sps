@@ -47,7 +47,7 @@
 
             foreach( $result as $user )
             {
-                if( isset ( $user->uid ))
+                if( !isset ( $user->uid ))
                     continue;
 
                 $users[ $user->uid ] = array(
