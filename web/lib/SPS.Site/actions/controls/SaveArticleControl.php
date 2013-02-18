@@ -35,6 +35,7 @@
             $photos         = Request::getArray( 'photos' );
             $targetFeedId   = Request::getInteger('targetFeedId');
             $userGroupId   = Request::getInteger('userGroupId');
+            $sourceFeedId = Request::getInteger('sourceFeedId');
             if (!$userGroupId){
                 $userGroupId = null;
             }
@@ -76,6 +77,16 @@
             $article->statusId = 1;
             $article->userGroupId = $userGroupId;
             $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+
+            if ($sourceFeedId){
+                $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
+                if ($SourceFeed){
+                    $article->sourceFeedId = $SourceFeed->sourceFeedId;
+                    if ($SourceFeed->type == SourceFeedUtility::Ads){
+                        $article->articleStatus = Article::STATUS_APPROVED;
+                    }
+                }
+            }
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $text;
