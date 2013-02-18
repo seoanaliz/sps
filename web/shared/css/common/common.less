@@ -243,6 +243,14 @@ input {
             }
         }
     }
+    &>.wrap {
+        margin-right: 10px;
+        padding: 3px;
+
+        input {
+            width: 100%;
+        }
+    }
 }
 
 .ui-tags {
@@ -268,7 +276,7 @@ input {
             width: 1em;
             height: 1em;
             cursor: pointer;
-            background: url('http://st0.userapi.com/images/blob_x.gif') center no-repeat;
+            background: url('../../images/common/blob_x.gif') center no-repeat;
         }
     }
 }
@@ -356,11 +364,14 @@ input {
 .tab-bar {
     padding: .7em;
     padding-top: 0;
-    min-height: 2.5em;
+
+    &.no-padding {
+        padding: 0;
+    }
 
     &>.tab {
-        margin-top: .7em;
-        margin-right: .6em;
+        margin-right: 0.6em;
+        margin-top: 0.7em;
         color: #45688E;
         font-weight: bold;
         padding: 0.46em 1em;
@@ -371,6 +382,7 @@ input {
         white-space: nowrap;
         font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
         font-size: 11px;
+        line-height: 1.2;
 
         .border-radius(0.3em);
 
@@ -551,7 +563,7 @@ input {
 
             &>.box-loading {
                 min-height: 200px;
-                background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+                background: #fff url(../../images/common/progress.gif) no-repeat center;
             }
         }
 

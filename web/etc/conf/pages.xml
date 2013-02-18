@@ -98,6 +98,24 @@
                 <page uri="controls://plan-post-delete/">
                     <actions>SPS.Site.PostDeletePlanControl</actions>
                 </page>
+                <page uri="controls://article-approved/">
+                    <actions>SPS.Site.ApproveArticleControl</actions>
+                </page>
+                <page uri="controls://article-reject/">
+                    <actions>SPS.Site.RejectArticleControl</actions>
+                </page>
+
+
+                <page uri="controls://add-user-group/">
+                    <actions>SPS.Site.AddUserGroup</actions>
+                </page>
+                <page uri="controls://add-user-to-group/">
+                    <actions>SPS.Site.AddUserToUserGroup</actions>
+                </page>
+                <page uri="controls://remove-user-from-group/">
+                    <actions>SPS.Site.RemoveUserFromUserGroup</actions>
+                </page>
+
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -488,7 +506,6 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -501,6 +518,16 @@
                         <actions>SPS.Common.DeleteDaemonLock</actions>
                     </page>
                 </pageGroup>
+
+                <pageGroup name="scripts">
+                    <page uri="vt://scripts/UserMigrate">
+                        <actions>SPS.Common.UserMigrateAction</actions>
+                    </page>
+                    <page uri="vt://scripts/articlesStatusSet">
+                        <actions>SPS.Common.ArticlesStatusSetAction</actions>
+                    </page>
+                </pageGroup>
+
                 <pageGroup name="vfs">
                     <page uri="vt://vfs(/mce|/|/fldr|/sfldr)([0-9]*)">
                         <actions>Base.VFS.InitBrowseScreen</actions>
@@ -601,6 +628,9 @@
                 <page uri="appControls://articles-list/">
                     <actions>SPS.Site.GetArticlesAppListControl</actions>
                     <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://user-groups/">
+                    <actions>SPS.Site.GetUserGroups</actions>
                 </page>
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>

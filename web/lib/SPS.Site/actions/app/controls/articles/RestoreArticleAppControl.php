@@ -1,19 +1,19 @@
 <?php
+Package::Load( 'SPS.Site' );
+
 /**
  * RestoreArticleAppControl Action
  * @package    SPS
  * @subpackage Site
  * @author     Shuler
  */
-class RestoreArticleAppControl extends AppBaseControl
-{
+class RestoreArticleAppControl extends AppBaseControl {
 
     /**
      * Entry Point
      */
-    public function Execute()
-    {
-        $id = Request::getInteger('id');
+    public function Execute() {
+        $id = Request::getInteger( 'id' );
         if ($id) {
             $author = $this->getAuthor();
 
@@ -27,5 +27,4 @@ class RestoreArticleAppControl extends AppBaseControl
         }
     }
 }
-
 ?>

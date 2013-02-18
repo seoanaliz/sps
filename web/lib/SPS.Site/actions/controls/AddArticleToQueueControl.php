@@ -11,6 +11,8 @@
          * Entry Point
          */
         public function Execute() {
+
+
             $result = array(
                 'success' => false
             );
@@ -26,6 +28,17 @@
                 return false;
             }
 
+            $article = ArticleFactory::GetById($articleId);
+
+            //check access
+            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+            if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)
+                || !$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
+                echo ObjectHelper::ToJSON(array('success' => false));
+                return false;
+            }
+
             if (!empty($queueId)) {
                 //просто перемещаем элемент очереди
                 ArticleUtility::ChangeQueueDates($queueId, $timestamp);
@@ -38,21 +51,11 @@
                 return true;
             }
 
-            $article = ArticleFactory::GetById($articleId);
+
             $targetFeed = TargetFeedFactory::GetById($targetFeedId);
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
 
             if (empty($article) || empty($targetFeed) || empty($articleRecord)) {
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
-            //check access
-            $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-            //check access
-            if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)
-                || !$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }

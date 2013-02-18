@@ -3,6 +3,11 @@
     define( 'METHOD_GET',     'get' );
     define( 'METHOD_REQUEST', 'request' );
 
+    define( 'MODE_GET',       'get' );
+    define( 'MODE_SET',       'set' );
+
+    define( 'TYPE_PARAMETER', 'parameter' );
+
     /**
      * Web Request Class
      *

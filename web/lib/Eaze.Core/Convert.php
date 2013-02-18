@@ -1,4 +1,7 @@
 <?php
+if (!defined('DEFAULT_TIMEZONE')){
+    define( 'DEFAULT_TIMEZONE', date_default_timezone_get() );
+}
     /**
      * Convert Class
      *

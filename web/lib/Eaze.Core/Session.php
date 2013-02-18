@@ -1,5 +1,5 @@
 <?php
-    Package::Load( 'Eaze.Core' );
+    Package::Load('Eaze.Core');
 
     /**
      * Session

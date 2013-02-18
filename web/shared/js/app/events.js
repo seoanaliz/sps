@@ -1,5 +1,6 @@
 /**
  * Events
+ * @var string appControlsRoot
  */
 var Events = {
     delay: 0,
@@ -28,11 +29,29 @@ var Events = {
 
 var Eventlist = {
     wall_load: function(options, callback) {
-        var params = $.extend({
+        options = $.extend({
+            // my - мои записи. Или ID ленты
             type: null,
-            clear: null,
-            filter: null
+            // Статус записи: all - Все, queued - На рассмотрении, sent - Отправленные
+            tabType: null,
+            // ID группы автора
+            userGroupId: null,
+            // Загрузить только записи, без поля ввода и т.д.
+            articlesOnly: false,
+            // Смещение записей
+            page: -1,
+            // all - Все записи, my - Мои записи
+            mode: null,
+            // Статус записи: 1 - На рассмотрении, 2 - Одобренные, 3 - Отклоненные
+            articleStatus: null
         }, options);
+
+        var params = {};
+        for (var paramName  in options) {
+            if (options.hasOwnProperty(paramName) && options[paramName] != null) {
+                params[paramName] = options[paramName];
+            }
+        }
 
         $.ajax({
             url: appControlsRoot + 'articles-list/',

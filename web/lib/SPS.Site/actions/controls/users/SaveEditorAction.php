@@ -59,7 +59,7 @@
          * @param Editor $object
          * @return bool
          */
-        protected function add( $object ) {
+        protected function add($object) {
             EditorFactory::$mapping['view'] = 'editors';
             $exists = EditorFactory::GetOne(array('vkId' => $object->vkId), array(BaseFactory::WithoutDisabled => false));
 
@@ -69,6 +69,10 @@
                 //update
                 $object->editorId = $exists->editorId;
                 $result = parent::$factory->Update( $object );
+            }
+
+            if ($result) {
+                $this->afterSaveEditor($object);
             }
             
             return $result;
