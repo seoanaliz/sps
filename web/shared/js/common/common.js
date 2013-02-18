@@ -30,6 +30,9 @@ if (!window.console) {
     window.console = {
         log: function(params) {},
         dir: function(params) {},
+        group: function(groupName) {},
+        groupCollapsed: function(groupName) {},
+        groupEnd: function(groupName) {},
         error: function(params) {}
     };
 }

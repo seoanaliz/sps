@@ -1,27 +1,34 @@
 <?
-    /** @var $article Article */
-    /** @var $articleRecord ArticleRecord */
-    /** @var $author Author */
-    /** @var $targetFeed TargetFeed */
-    /** @var $targetInfo array */
+/** @var $article Article */
+/** @var $articleRecord ArticleRecord */
+/** @var $author Author */
+/** @var $targetFeed TargetFeed */
+/** @var $targetInfo array */
+/** @var $isWebUserEditor bool */
 
-    if (!empty($article)) {
-        $asNew = '';
-        $newPostType = '';
-        if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
-            if ($authorEvents[$article->articleId]->isQueued && $tabType == 'queued') {
-                $asNew = 'new';
-                $newPostType = 'queued';
-            } else if ($authorEvents[$article->articleId]->isSent && $tabType == 'sent') {
-                $asNew = 'new';
-                $newPostType = 'sent';
-            }
+if (!empty($article)) {
+    $asNew = '';
+    $newPostType = '';
+    if (!empty($authorEvents[$article->articleId]) && !empty($__Author) && $article->authorId == $__Author->authorId) {
+        if ($authorEvents[$article->articleId]->isQueued && $tabType == 'queued') {
+            $asNew = 'new';
+            $newPostType = 'queued';
+        } else if ($authorEvents[$article->articleId]->isSent && $tabType == 'sent') {
+            $asNew = 'new';
+            $newPostType = 'sent';
         }
-        $hasComments = !empty($commentsData[$article->articleId]);
+    }
+    $hasComments = !empty($commentsData[$article->articleId]);
+    $showDelete = false;
+    if ($isWebUserEditor) {
+        $showDelete = $author->authorId == $__Author->authorId;
+    } elseif ($article->articleStatus == Article::STATUS_REVIEW) {
+        $showDelete = true;
+    }
 ?>
 
 <div class="post <?= !$hasComments ? 'no-comments' : '' ?>" data-id="{$article->articleId}">
-    <? if ($author->authorId == $__Author->authorId) { ?>
+    <? if ($showDelete) { ?>
         <div class="delete"></div>
     <? } ?>
     <? if (!empty($author)) { ?>

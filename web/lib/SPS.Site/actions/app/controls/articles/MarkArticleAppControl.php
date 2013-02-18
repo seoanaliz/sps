@@ -1,13 +1,11 @@
 <?php
-Package::Load('SPS.Site');
-
 /**
  * MarkArticleAppControl Action
  * @package    SPS
  * @subpackage Site
  * @author     Shuler
  */
-class MarkArticleAppControl extends AppBaseControl
+class MarkArticleAppControl extends BaseControl
 {
 
     /**

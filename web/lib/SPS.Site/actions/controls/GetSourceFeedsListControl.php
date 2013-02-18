@@ -7,62 +7,85 @@
  */
 class GetSourceFeedsListControl extends BaseControl
 {
-
     /**
      * Entry Point
      */
     public function Execute()
     {
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
         $targetFeedId = Request::getInteger('targetFeedId');
 
+        $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
+
         $type = Request::getString('type');
         if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
-            $type = $TargetFeedAccessUtility->getDefaultType($targetFeedId);
+            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
         }
 
-        if (!$TargetFeedAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
+        if (!$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
             // запросили недоступный тип, но мы тогда вернем дефолтный
-            $type = $TargetFeedAccessUtility->getDefaultType($targetFeedId);
+            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
         }
 
-        $result = array();
-        if (!empty($targetFeedId)) {
-            if ($type == SourceFeedUtility::Authors) {
-                $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
-                $authors = array();
-                /**
-                 * Если у юзера роль - автор - то мы ему возвращаем в источнике только себя,
-                 * Если нет - то всех авторов в этой ленте
-                 */
-                if ($role == UserFeed::ROLE_AUTHOR) {
-                    $authors = AuthorFactory::Get(
-                        array('vkId' => $this->vkId),
-                        array(BaseFactory::WithoutPages => true)
-                    );
-                } else {
-                    $UserFeeds = UserFeedFactory::Get(array('targetFeedId' => $targetFeedId));
-                    if ($UserFeeds){
-                        $vkIds = array();
-                        foreach ($UserFeeds as $UserFeed) {
-                            $vkIds[] = $UserFeed->vkId;
-                        }
+        /**
+         * Показывать фильтр по типам постов
+         */
+        $showArticleStatusFilter = false;
 
-                        $authors = AuthorFactory::Get(
-                            array('vkIdIn' => $vkIds),
-                            array(BaseFactory::WithoutPages => true)
-                        );
-                    }
+        /**
+         * Показывать список источников
+         */
+        $showSourceList = false;
+
+        /**
+         *  Показывать группы юзеров
+         */
+        $showUserGroups = false;
+
+        $sourceFeedResult = array();
+
+        if ($type == SourceFeedUtility::My) {
+            if ($role == UserFeed::ROLE_AUTHOR) {
+                $showArticleStatusFilter = true;
+            }
+        } else
+            if ($type == SourceFeedUtility::Authors) {
+
+                if ($role != UserFeed::ROLE_AUTHOR) {
+                    //$showArticleStatusFilter = true;
+                    $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
+                } else {
+                    $userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $this->vkId);
                 }
 
+                $showUserGroups = array();
+                foreach ($userGroups as $userGroup) {
+                    /** @var $userGroup UserGroup */
+                    $showUserGroups[] = $userGroup->toArray();
+                }
+
+                $authors = AuthorFactory::Get(
+                    array(),
+                    array(
+                        BaseFactory::WithoutPages => true,
+                        BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
+                    )
+                );
+
                 foreach ($authors as $author) {
-                    $result[] = array(
+                    $sourceFeedResult[] = array(
                         'id' => $author->authorId,
                         'title' => $author->FullName()
                     );
                 }
             } else {
+
+                $showSourceList =  ($type == SourceFeedUtility::Topface
+                    || $type == SourceFeedUtility::Source
+                    || $type == SourceFeedUtility::Ads
+                    || $type == SourceFeedUtility::Albums);
+
                 $SourceAccessUtility = new SourceAccessUtility($this->vkId);
 
                 $sourceIds = $SourceAccessUtility->getSourceIdsForTargetFeed($targetFeedId);
@@ -77,24 +100,33 @@ class GetSourceFeedsListControl extends BaseControl
                 }
 
                 foreach ($sourceFeeds as $sourceFeed) {
-                    $result[] = array(
+                    $sourceFeedResult[] = array(
                         'id' => $sourceFeed->sourceFeedId,
                         'title' => $sourceFeed->title
                     );
                 }
             }
-        } else {
-            echo('Unknown source feed identifier');
+
+        $authorsFilters = array();
+        if ($role == UserFeed::ROLE_AUTHOR && $type == SourceFeedUtility::Authors) {
+            $authorsFilters['all_my_filter'] = array();
         }
 
+        if ($role != UserFeed::ROLE_AUTHOR && $type == SourceFeedUtility::Authors) {
+            $authorsFilters['article_status_filter'] = array();
+        }
 
         echo ObjectHelper::ToJSON(array(
             'type' => $type,
-            'sourceFeeds' => $result,
-            'accessibleSourceTypes' => $TargetFeedAccessUtility->getAccessibleSourceTypes($targetFeedId),
-            'canShowAuthorsList' => $TargetFeedAccessUtility->canShowAuthorList($targetFeedId),
-            'accessibleGridTypes' => array_keys($TargetFeedAccessUtility->getAccessibleGridTypes($targetFeedId)),
-            'canAddPlanCell' => $TargetFeedAccessUtility->canAddPlanCell($targetFeedId)
+            'sourceFeeds' => $sourceFeedResult,
+            'accessibleSourceTypes' => $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId),
+            'accessibleGridTypes' => array_keys($ArticleAccessUtility->getAccessibleGridTypes($targetFeedId)),
+            'canAddPlanCell' => $ArticleAccessUtility->canAddPlanCell($targetFeedId),
+            'accessibleMyArticleStatuses' => $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId),
+            'showArticleStatusFilter' => $showArticleStatusFilter,
+            'showSourceList' => $showSourceList,
+            'showUserGroups' => $showUserGroups,
+            'authorsFilters' => $authorsFilters
         ));
     }
 }

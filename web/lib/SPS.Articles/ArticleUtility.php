@@ -22,11 +22,28 @@
         }
 
         public static function ChangeQueueDates($queueId, $timestamp) {
-            $object = new ArticleQueue();
+            $object = ArticleQueueFactory::GetById($queueId);
+
+            $oldDate = new DateTimeWrapper($object->startDate->DefaultFormat());
             self::BuildDates($object, $timestamp);
+            $newDate = new DateTimeWrapper($object->startDate->DefaultFormat());
+
             $object->isDeleted = false;
             $object->deleteAt = null;
             ArticleQueueFactory::UpdateByMask($object, array('startDate', 'endDate', 'isDeleted', 'deleteAt'), array('articleQueueId' => $queueId, 'statusId' => 1));
+
+            $targetFeed = TargetFeedFactory::GetById($object->targetFeedId);
+
+            AuditUtility::CreateEvent(
+                'gridLineTime'
+                , 'articleQueue'
+                , $queueId
+                , "Changed by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId
+                    . ", queueId is " . $queueId
+                    . ", old time is " . $oldDate->modify('+1 minute')->defaultFormat()
+                    . ", new time is " . $newDate->modify('+1 minute')->defaultFormat()
+                    . ", public is " . $targetFeed->title
+            );
         }
 
         public static function BuildDates($object, $timestamp) {

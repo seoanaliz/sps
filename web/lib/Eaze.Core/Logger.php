@@ -32,6 +32,11 @@
         const TextMode = 'text';
 
         /**
+         * Text Output Mode
+         */
+        const FileMode = 'file';
+
+        /**
          * Output Mode
          * Can be html or fb.
          *
@@ -347,6 +352,21 @@ xhtml;
                     );
 
                     break;
+
+                case self::FileMode:
+                     $line = sprintf( '[%2.4f] [%s Mb] %s >> %s: %s %s' . PHP_EOL
+                        , $result['relativeTime']
+                        , $result['memoryUsage']
+                        , $result['levelName']
+                        , html_entity_decode( self::getCallingMethodString( $result['trace'] ) )
+                        , $result['message']
+                        , !empty( $result['checkPoint'] ) ? sprintf( '[%f] [%s Mb]', $result['checkPoint'], $result['memPoint'] ) : ''
+                    );
+                     $f = fopen('log.log', 'a');
+                     fwrite($f, $line);
+                     fclose($f);
+
+                 break;
             }
         }
 

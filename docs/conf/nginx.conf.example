@@ -1,0 +1,144 @@
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    #main app
+    server {
+        listen 8080;
+        server_name openapi.lc;
+
+        charset utf-8;
+        error_log "/Users/eugeneshulepin/www/logs/openapi.lc-error_log-nginx";
+
+        root "/Users/eugeneshulepin/www/SPS/web";
+
+        location = /favicon.ico {break;}
+        location = /crossdomain.xml {break;}
+        location = /robots.txt {break;}
+
+        location /cache/ {
+            deny all;
+            break;
+        }
+
+        location ~* /etc/(conf|locale)/ {
+            deny all;
+            break;
+        }
+
+        location ~ ^/shared/files/ {
+            expires       1d;
+            add_header    Pragma  public;
+            add_header    Cache-control must-revalidate;
+            types {
+                text/css css;
+                application/x-javascript js;
+                text/plain php php3 php4 php5 phtml phps pl pm;
+            }
+            break;
+        }
+
+
+        location ~ ^/shared/.+\.php {
+            fastcgi_pass   unix:/opt/local/var/run/php/php-fastcgi.sock;
+            fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+
+        location ~ ^/shared/(temp|images|css|js)/ {
+            expires       1d;
+            add_header    Pragma  public;
+            add_header    Cache-control must-revalidate;
+            types {
+                text/css css;
+                application/x-javascript js;
+                text/plain php php3 php4 php5 phtml phps pl pm;
+                text/html html htm shtml;
+            }
+            break;
+        }
+
+        location / {
+            root "/Users/eugeneshulepin/www/SPS/web";
+            client_body_temp_path  /tmp/;
+
+            fastcgi_pass   unix:/opt/local/var/run/php/php-fastcgi.sock;
+            fastcgi_index  eaze.php;
+            fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+
+            rewrite ^/(vt)$ /$1/? permanent;
+            rewrite .* /eaze.php break;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /home/merger/www/current/html;
+        }
+    }
+
+    server {
+        listen       8001;
+        server_name  media.sps;
+        client_max_body_size 32M;
+        #access_log /var/log/nginx/media.sps.access.log realip;
+        #error_log /var/log/nginx/media.sps.error.log info;
+
+        location / {
+            root                   "/Users/eugeneshulepin/www/SPS/photos/";
+            #client_body_temp_path  "/Users/eugeneshulepin/www/SPS/photos/temp/";
+            #dav_methods  PUT DELETE MKCOL COPY MOVE;
+            #create_full_put_path   on;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+
+    server {
+        listen       8081;
+        server_name  media.sps;
+        #access_log /var/log/nginx/media.sps.access.log realip;
+        #error_log /var/log/nginx/media.sps.error.log info;
+
+        location / {
+            root "/Users/eugeneshulepin/www/SPS/photos/";
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}

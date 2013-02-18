@@ -1,5 +1,5 @@
 <?php
-Package::Load('SPS.Site');
+Package::Load( 'SPS.Site' );
 
 /**
  * MarkCommentAppControl Action
@@ -7,16 +7,14 @@ Package::Load('SPS.Site');
  * @subpackage Site
  * @author     Shuler
  */
-class MarkCommentAppControl extends AppBaseControl
-{
+class MarkCommentAppControl extends AppBaseControl {
 
     /**
      * Entry Point
      */
-    public function Execute()
-    {
-        $articleId = Request::getInteger('articleId');
-        $commentId = Request::getInteger('commentId');
+    public function Execute() {
+        $articleId = Request::getInteger( 'articleId' );
+        $commentId = Request::getInteger( 'commentId' );
 
         if (empty($articleId) || empty($commentId)) {
             return;

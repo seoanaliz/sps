@@ -40,6 +40,7 @@ abstract class AbstractPostLoadDaemon {
         $__mapping = ArticleFactory::$mapping;
         ArticleFactory::$mapping['view'] = 'articles';
         $originalObjects = ArticleFactory::Get(
+
             array('_externalId' => !empty($externalIds) ? $externalIds : array(-1 => -1))
             , array(
                 BaseFactory::WithColumns => '"articleId", "externalId"'
@@ -70,6 +71,8 @@ abstract class AbstractPostLoadDaemon {
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 1;
+            // демон загружает уже одобренные посты
+            $article->articleStatus = Article::STATUS_APPROVED;
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $post['text'];
