@@ -1,30 +1,30 @@
 <?php
-/* Don't Forget to turn on mod_rewrite!  */
+    /* Don't Forget to turn on mod_rewrite!  */
 
-define( 'WITH_PACKAGE_COMPILE', false  );
+    define( 'WITH_PACKAGE_COMPILE', false  );
 
-include_once 'lib/Eaze.Core/Logger.php';
-// Initialize Logger
-Logger::Init( ELOG_WARNING );
-include_once 'lib/Eaze.Core/Package.php' ;
+    include_once 'lib/Eaze.Core/Logger.php';
+    // Initialize Logger
+    Logger::Init( ELOG_WARNING );
+    include_once 'lib/Eaze.Core/Package.php' ;
 
-Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
+    Package::LoadClasses( 'Convert', 'DateTimeWrapper', 'IFactory', 'Dataset' );
 
-mb_internal_encoding( 'utf-8' );
-mb_http_output( 'utf-8' );
+    mb_internal_encoding( 'utf-8' );
+    mb_http_output( 'utf-8' );
 
-BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
+    BaseTreeFactory::SetCurrentMode( TREEMODE_ADJ );
 
-if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
+    if ( defined( 'WITH_PACKAGE_COMPILE' ) && WITH_PACKAGE_COMPILE ) Logger::Info( 'With package compiled' );
 
-Request::Init();
+    Request::Init();
     $ErrorHandler = new ErrorHandler();
     $ErrorHandler->register();
-$__level = Request::getParameter( '__level' );
-if ( !is_null( $__level ) ) {
-    Logger::LogLevel( $__level );
-}
-SiteManager::DetectSite();
+    $__level = Request::getParameter( '__level' );
+    if ( !is_null( $__level ) ) {
+        Logger::LogLevel( $__level );
+    }
+    SiteManager::DetectSite();
 
-Logger::Info( __METHOD__, 'Done' );
+    Logger::Info( __METHOD__, 'Done' );
 ?>
