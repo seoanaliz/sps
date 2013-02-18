@@ -28,7 +28,19 @@
                 return false;
             }
 
-            $article = ArticleFactory::GetById($articleId, null, array(BaseFactory::WithoutDisabled => false));
+            if (!empty($queueId)) {
+                //просто перемещаем элемент очереди
+                ArticleUtility::ChangeQueueDates($queueId, $timestamp);
+
+                $result = array(
+                    'success' => true,
+                    'id' => $queueId
+                );
+                echo ObjectHelper::ToJSON($result);
+                return true;
+            }
+
+            $article = ArticleFactory::GetById($articleId);
 
             if (!$article){
                 $result['message'] = 'ArticleNotFound:' . $articleId;
@@ -45,19 +57,6 @@
                 echo ObjectHelper::ToJSON(array('success' => false));
                 return false;
             }
-
-            if (!empty($queueId)) {
-                //просто перемещаем элемент очереди
-                ArticleUtility::ChangeQueueDates($queueId, $timestamp);
-
-                $result = array(
-                    'success' => true,
-                    'id' => $queueId
-                );
-                echo ObjectHelper::ToJSON($result);
-                return true;
-            }
-
 
             $targetFeed = TargetFeedFactory::GetById($targetFeedId);
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
