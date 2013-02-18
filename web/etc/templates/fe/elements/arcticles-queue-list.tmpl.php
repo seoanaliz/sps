@@ -40,7 +40,7 @@
                     </div>
                 <? endif; ?>
                 <div class="post movable <?= (!$canEditQueue || !empty($gridItem['blocked'])) ? 'blocked' : '' ?> <?= !empty($gridItem['failed']) ? 'failed' : '' ?>"
-                     data-id="{$articleId}"
+                         data-id="{$articleId}"
                      data-queue-id="{$articleQueueId}">
                     <div class="content">
                         {increal:tmpl://fe/elements/arcticles-queue-item-content.tmpl.php}

@@ -20,16 +20,15 @@ class getAuthors
         $this->conn         =   ConnectionFactory::Get();
         $user_id            =   AuthVkontakte::IsAuth();
         $public_sb_id       =   Request::getInteger('groupId');
-        //если диапазон не задан, выбирает данные за прошлый месяц
+        //РµСЃР»Рё РґРёР°РїР°Р·РѕРЅ РЅРµ Р·Р°РґР°РЅ, РІС‹Р±РёСЂР°РµС‚ РґР°РЅРЅС‹Рµ Р·Р° РїСЂРѕС€Р»С‹Р№ РјРµСЃСЏС†
         $this->date_from    =   Request::getInteger('dateFrom') ? date( 'Y-m-d 00:00:01', Request::getInteger('dateFrom'))
-                : date( 'Y-m-01 00:00:01', strtotime('-1 month'));
+            : date( 'Y-m-01 00:00:01', strtotime('-1 month'));
         $this->date_to      =   Request::getInteger('dateTo')   ? date( 'Y-m-d 00:00:01', Request::getInteger('dateFrom'))
-                : date( 'Y-m-01 00:00:01');
+            : date( 'Y-m-01 00:00:01');
 
 
-        $res = array();
-        $authors = AuthorFactory::Get( array( '_targetFeedIds' => array( $public_sb_id ), 'pageSize'=>200));
 
+        $authors = $this->get_public_authors( $public_sb_id );
         if ( !$authors )
             die( ObjectHelper::ToJSON( array( 'response' => array( 'authors' => array()))));
 
@@ -41,11 +40,11 @@ class getAuthors
         }
 
         $total_posts          =     $this->get_all_authors_app_posts( $public_sb_id );
+
         $total_posts          =     $this->get_all_authors_sb_posts( $public_sb_id, $total_posts );
         $average_public_data  =     $this->get_average_rate( $public_sb_id );
 
         $users_info = StatUsers::get_vk_user_info( $users_line );
-
         foreach( $authors as $author ) {
             if ($author->vkId == 106175502 )
                 continue;
@@ -66,7 +65,7 @@ class getAuthors
                 )
             );
         }
-        $sort = $this->compare( 'b' );
+        // $sort = $this->compare( 'b' );
         usort( $res, $sort);
         if(!$res )
             $res = array();
@@ -75,7 +74,7 @@ class getAuthors
 
     public function get_sent_authors_posts( $target_feed_id, $author_id, $author_vk_id )
     {
-        //выбрать отправленные посты
+        //РІС‹Р±СЂР°С‚СЊ РѕС‚РїСЂР°РІР»РµРЅРЅС‹Рµ РїРѕСЃС‚С‹
         $sql = 'SELECT avg("externalLikes")as likes,avg("externalRetweets") as reposts, count(*) FROM
                     "articles" a
                 JOIN
@@ -105,10 +104,10 @@ class getAuthors
         );
     }
 
-    //возвращает массив id=>количество сделанных постов
+    //РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ id=>РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРґРµР»Р°РЅРЅС‹С… РїРѕСЃС‚РѕРІ
     public function get_all_authors_app_posts( $target_feed_id )
     {
-        //выбрать созданные в аппе посты
+        //РІС‹Р±СЂР°С‚СЊ СЃРѕР·РґР°РЅРЅС‹Рµ РІ Р°РїРїРµ РїРѕСЃС‚С‹
         $sql = 'SELECT count(*), "authorId" FROM
                     "articles"
                 WHERE
@@ -136,7 +135,7 @@ class getAuthors
     public function get_all_authors_sb_posts( $target_feed_id, $prev_res )
     {
 
-        //выбрать созданные в sb посты
+        //РІС‹Р±СЂР°С‚СЊ СЃРѕР·РґР°РЅРЅС‹Рµ РІ sb РїРѕСЃС‚С‹
         $sql = 'SELECT count(*), "editor" FROM
                     "articles" a
                 JOIN
@@ -205,8 +204,23 @@ class getAuthors
     private function compare( $field, $rev = 1 )
     {
         $rev = $rev ? -1 : 1;
-        $code = "
-        return  $rev * strnatcmp(\$a['metrick1']['$field'], \$b['metrick1']['$field']);";
+        $code = "return  $rev * strnatcmp(\$a['metrick1']['$field'], \$b['metrick1']['$field']);";
         return create_function('$a,$b', $code );
+    }
+
+    public function get_public_authors( $targetFeedId ) {
+        $sql = 'SELECT * FROM "userFeed" WHERE "targetFeedId" = @targetFeedId';
+        $cmd = new SqlCommand( $sql, $this->conn);
+        $cmd->SetInt( '@targetFeedId', $targetFeedId );
+
+        $ds = $cmd->Execute();
+        $res = array();
+        while( $ds->Next()) {
+
+            $res[] = $ds->getValue('vkId');
+        }
+        if ( empty( $res ))
+            return false;
+        return AuthorFactory::Get( array( 'vkIdIn' => $res, 'pageSize'=>400));
     }
 }
