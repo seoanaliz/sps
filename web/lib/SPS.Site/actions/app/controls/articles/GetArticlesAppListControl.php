@@ -8,11 +8,18 @@
  */
 final class GetArticlesAppListControl extends BaseGetArticlesListControl {
 
+    /**
+     * Констуктор
+     */
     public function __construct(){
         $this->isApp = true;
         parent::__construct();
         $this->vkId = Session::getInteger('authorId');
+        if (!$this->vkId){
+            throw new Exception('VkId is empty on GetArticlesAppListControl:__construct');
+        }
     }
+
     /**
      * @var AuthorEvent[]
      */
