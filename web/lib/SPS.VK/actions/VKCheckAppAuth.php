@@ -39,7 +39,7 @@ class VKCheckAppAuth {
             return 'empty';
         }
         Response::setObject('__Author', $author);
-        Session::setInteger('authorId', $viewer_id);
+        Session::setInteger('authorId', $author->vkId);
     }
 }
 ?>
