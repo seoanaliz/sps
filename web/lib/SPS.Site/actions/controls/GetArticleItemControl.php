@@ -15,11 +15,13 @@ class GetArticleItemControl extends BaseControl
         $id = Request::getInteger('id');
 
         if (empty($id)) {
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty article id'));
             return;
         }
 
         $Article = ArticleFactory::GetById($id);
         if (empty($Article)) {
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Cant load article'));
             return;
         }
 
@@ -27,12 +29,14 @@ class GetArticleItemControl extends BaseControl
 
         //check access
         if (!$SourceAccessUtility->hasAccessToSourceFeed($Article->sourceFeedId)) {
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Access denied'));
             return;
         }
 
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
         if (is_null($role)){
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for target feed'));
             return;
         }
 
