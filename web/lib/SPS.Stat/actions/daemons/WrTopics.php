@@ -16,14 +16,14 @@ class WrTopics extends wrapper
 
         set_time_limit(14000);
 
-//        if (! $this->check_time()) {
-//            $this->double_check_quantity();
-//            die('Не сейчас');
-//        }
+        if (! $this->check_time()) {
+            $this->double_check_quantity();
+            die('Не сейчас');
+        }
         $this->get_id_arr();
 //
-        $this->find_admins();
-        die();
+//        $this->find_admins();
+//        die();
         StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
         $this->double_check_quantity();

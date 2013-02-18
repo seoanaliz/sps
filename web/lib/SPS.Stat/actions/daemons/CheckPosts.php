@@ -81,7 +81,7 @@ class CheckPosts
     {
         foreach( $barter_events_array as $barter_event ) {
             /** @var $barter_event BarterEvent */
-//            if ( $barter_event->status != 3 ) {
+            if ( $barter_event->status != 3 ) {
             $time = time() + self::time_shift;
 
                 $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
@@ -107,7 +107,7 @@ class CheckPosts
                     $count = $this->get_public_members_count( $barter_event->target_public );
                 }
                 $barter_event->end_subscribers = $count;
-//            }
+            }
         }
     }
 
