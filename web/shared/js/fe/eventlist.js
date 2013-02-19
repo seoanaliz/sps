@@ -488,6 +488,8 @@ var Eventlist = {
                         $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                     }
                 }
+            } else if (sourceType == 'ads') {
+                $userGroupTabs.removeClass('hidden');
             } else {
                 $userGroupTabs.addClass('hidden');
             }
