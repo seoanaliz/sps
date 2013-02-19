@@ -34,9 +34,27 @@ class GetArticleItemControl extends BaseControl
         }
 
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-        $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
+
+        $role = null;
+
+        // лента есть не у всех постов. У спарсеных нет. Проверяем при необходимости.
+        if ($Article->targetFeedId){
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
+        } else {
+            $SourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
+            if ($SourceFeed) {
+                $roles = array();
+                foreach (explode(',', $SourceFeed->targetFeedIds) as $targetFeedId){
+                    $roles = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+                }
+                if ($roles) {
+                    $role = max($roles);
+                }
+            }
+        }
+
         if (is_null($role)){
-            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for ' . $this->vkId . ' target feed' . $Article->targetFeedId));
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for ' . $this->vkId . ' target feed' . $targetFeedId));
             return;
         }
 
