@@ -78,10 +78,7 @@ $(document).ready(function(){
     // Приведение вида календаря из 22.12.2012 в 22 декабря
     (function() {
         var d = $("#calendar").val().split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
+        var date = [d[1], d[0], d[2]].join('/');
         $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
     })();
 
@@ -1700,11 +1697,12 @@ var Elements = {
         return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        if(typeof value == 'undefined') {
-            var timestamp = $("#calendar").datepicker("getDate");
-            return timestamp ? timestamp.getTime() / 1000 : null;
+        if (typeof value == 'undefined') {
+            var time = $('#calendar').datepicker('getDate').getTime();
+            var timestamp = Math.round(time / 1000) - (new Date().getTimezoneOffset() * 60) + 14400;
+            return timestamp;
         } else {
-            $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
+            $('#calendar').datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
     initLinkLoader: function(obj, full){
