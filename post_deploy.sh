@@ -19,3 +19,4 @@ rm $1/web/eaze.php
 mv $1/web/eaze.production.php $1/web/eaze.php
 
 echo -e "Done!"
+date
