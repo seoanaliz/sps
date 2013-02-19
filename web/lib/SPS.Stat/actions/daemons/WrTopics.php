@@ -192,10 +192,10 @@ class WrTopics extends wrapper
                     if ( $entry ) {
                         $count = isset( $entry->count ) ? $entry->count : 0;
                         $key = str_replace( 'a', '', $key );
-                        $this->$act( $key, $entry->count );
+                        $this->$act( $key, $count );
                         if ( !$count )
                             continue;
-                        $this->set_public_grow( $key, $entry->count, $timeTo );
+                        $this->set_public_grow( $key, $count, $timeTo );
                     } else {
                         $this->set_public_closed( $key );
                     }
