@@ -13,6 +13,7 @@ class GetArticleItemControl extends BaseControl
     public function Execute()
     {
         $id = Request::getInteger('id');
+        $targetFeedId = Request::getInteger('targetFeedId');
 
         if (empty($id)) {
             echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty article id'));
@@ -39,17 +40,19 @@ class GetArticleItemControl extends BaseControl
 
         // лента есть не у всех постов. У спарсеных нет. Проверяем при необходимости.
         if ($Article->targetFeedId){
+            $targetFeedId = $Article->targetFeedId;
             $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
         } else {
             $SourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
-            if ($SourceFeed) {
-                $roles = array();
-                foreach (explode(',', $SourceFeed->targetFeedIds) as $targetFeedId){
-                    $roles = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if ($SourceFeed){
+                $sourceFeedTargetFeeds = explode(',', $SourceFeed->targetFeedIds);
+                if (in_array($targetFeedId, $sourceFeedTargetFeeds)){
+                    $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
+                } else {
+                    throw new Exception('TargetFeed ' . $targetFeedId . ' not in source feed targets ' . $Article->sourceFeedId);
                 }
-                if ($roles) {
-                    $role = max($roles);
-                }
+            } else {
+                throw new Exception('Cant find SourceFeed::' . $Article->sourceFeedId);
             }
         }
 
