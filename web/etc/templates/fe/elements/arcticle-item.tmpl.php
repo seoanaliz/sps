@@ -20,6 +20,9 @@
             if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->sentAt)) {
                 $isPostMovable = true;
             }
+            if (!empty($sourceFeed) && $sourceFeed->type != SourceFeedUtility::Ads){
+                $isPostMovable = true;
+            }
         }
 ?>
 <div
