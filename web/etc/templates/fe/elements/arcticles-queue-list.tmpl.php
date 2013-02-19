@@ -5,7 +5,7 @@
         $id = $gridItem['dateTime']->format('U');
         if (empty($gridItem['queue'])) { ?>
             <? if ($canEditQueue) { ?>
-                <div class="slot <?= empty($gridItem['blocked']) ? 'empty' : '' ?>"
+                <div class="slot<?= empty($gridItem['blocked']) ? ' empty' : ' locked' ?>"
                      data-id="{$id}"
                      data-grid-id="{$gridItem[gridLineId]}"
                      data-grid-item-id="{$gridItem[gridLineItemId]}"
@@ -23,7 +23,7 @@
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
-            <div class="slot <?= (!$canEditQueue || !empty($gridItem['blocked'])) ? 'locked' : '' ?>"
+            <div class="slot<?= (!$canEditQueue || !empty($gridItem['blocked'])) ? ' locked' : '' ?>"
                  data-id="{$id}"
                  data-grid-id="{$gridItem[gridLineId]}"
                  data-grid-item-id="{$gridItem[gridLineItemId]}"
