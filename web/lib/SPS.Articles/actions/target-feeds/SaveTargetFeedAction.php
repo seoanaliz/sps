@@ -41,7 +41,6 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             return $result;
         }
 
-
         Response::setParameter('UserFeeds', $UserFeeds );
         Response::setParameter('roles', array(
             UserFeed::ROLE_ADMINISTRATOR => 'Администратор',
@@ -278,7 +277,9 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             SourceFeedUtility::SaveRemoteImage($this->currentObject->externalId);
         }
 
-        UserFeedFactory::DeleteForTargetFeed($this->objectId);
+        if (is_numeric($this->objectId) && $this->objectId) {
+            UserFeedFactory::DeleteForTargetFeed($this->objectId);
+        }
 
         $rawUserFeeds = Request::getArray('UserFeed');
         $UserFeeds = array();

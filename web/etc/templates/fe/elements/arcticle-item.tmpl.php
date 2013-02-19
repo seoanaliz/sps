@@ -18,9 +18,10 @@
 
         if ($isWebUserEditor) {
             if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->sentAt)) {
-                if (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads) {
-                    $isPostMovable = true;
-                }
+                $isPostMovable = true;
+            }
+            if (!empty($sourceFeed) && $sourceFeed->type != SourceFeedUtility::Ads){
+                $isPostMovable = true;
             }
         }
 ?>
