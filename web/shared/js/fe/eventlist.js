@@ -150,11 +150,7 @@ function loadArticles(clean) {
                 requestData.articleStatus = 1;
         }
     } else {
-        if (sourceType == 'source' || sourceFeedIds.length != 1) {
-            $('.newpost').hide();
-        } else {
-            $('.newpost').show();
-        }
+        $('.newpost').hide();
     }
 
     if (sourceType == 'my') {
