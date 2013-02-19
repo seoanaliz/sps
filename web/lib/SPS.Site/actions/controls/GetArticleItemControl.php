@@ -38,11 +38,9 @@ class GetArticleItemControl extends BaseControl
 
         $role = null;
 
-        // лента есть не у всех постов. У спарсеных нет. Проверяем при необходимости.
-        if ($Article->targetFeedId){
-            $targetFeedId = $Article->targetFeedId;
-            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
-        } else {
+        // определяем роль
+        if ($Article->sourceFeedId){
+            // если у поста есть источник, то проверяем, привязана ли он к ленте и по ленте определяем роль
             $SourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
             if ($SourceFeed){
                 $sourceFeedTargetFeeds = explode(',', $SourceFeed->targetFeedIds);
@@ -54,10 +52,15 @@ class GetArticleItemControl extends BaseControl
             } else {
                 throw new Exception('Cant find SourceFeed::' . $Article->sourceFeedId);
             }
+        } elseif ($Article->targetFeedId and $Article->targetFeedId == $targetFeedId){
+            // нет источника - пробуем определить по ленте
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($Article->targetFeedId);
+        } else {
+            // пока других вариантов нет
         }
 
         if (is_null($role)){
-            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for ' . $this->vkId . ' target feed' . $targetFeedId));
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty role for vk::' . $this->vkId . ' target feed::' . $targetFeedId));
             return;
         }
 
