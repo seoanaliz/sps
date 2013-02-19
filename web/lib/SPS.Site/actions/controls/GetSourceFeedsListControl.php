@@ -53,7 +53,6 @@ class GetSourceFeedsListControl extends BaseControl
             if ($type == SourceFeedUtility::Authors) {
 
                 if ($role != UserFeed::ROLE_AUTHOR) {
-                    //$showArticleStatusFilter = true;
                     $userGroups = UserGroupFactory::GetForTargetFeed($targetFeedId);
                 } else {
                     $userGroups = UserGroupFactory::GetForUserTargetFeed($targetFeedId, $this->vkId);
@@ -64,14 +63,24 @@ class GetSourceFeedsListControl extends BaseControl
                     /** @var $userGroup UserGroup */
                     $showUserGroups[] = $userGroup->toArray();
                 }
+                // FIXME Вообще в авторских источники не нужны, наверное нужно будет вырезать...
+                $UserFeedByRole = UserFeedFactory::GetForTargetFeed($targetFeedId);
+                $authorVkIds = array();
+                if (isset($UserFeedByRole[UserFeed::ROLE_AUTHOR])){
+                    $authorVkIds = array_keys($UserFeedByRole[UserFeed::ROLE_AUTHOR]);
+                }
 
-                $authors = AuthorFactory::Get(
-                    array(),
-                    array(
-                        BaseFactory::WithoutPages => true,
-                        BaseFactory::CustomSql => ' AND "targetFeedIds" @> ARRAY[' . PgSqlConvert::ToInt($targetFeedId) . '] '
-                    )
-                );
+                $authors = array();
+                if ($authorVkIds){
+                    $authors = AuthorFactory::Get(
+                        array(
+                           'vkIdIn' => $authorVkIds,
+                        ),
+                        array(
+                            BaseFactory::WithoutPages => true,
+                        )
+                    );
+                }
 
                 foreach ($authors as $author) {
                     $sourceFeedResult[] = array(
@@ -79,6 +88,7 @@ class GetSourceFeedsListControl extends BaseControl
                         'title' => $author->FullName()
                     );
                 }
+
             } else {
 
                 $showSourceList =  ($type == SourceFeedUtility::Topface
