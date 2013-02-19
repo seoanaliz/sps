@@ -33,6 +33,7 @@ class CheckWalls
         $this->turn_on_search();
 
         $barters_for_search = BarterEventFactory::Get( array( '_status' => 2 ), null, 'tst' );
+
         $search_results = $this->wall_search( $barters_for_search );
         $search_results = $this->get_population( $search_results );
 
@@ -65,7 +66,7 @@ class CheckWalls
     public function turn_on_search()
     {
         //ищем записи, которые включаются в поиск
-        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift + StatBarter::TIME_INTERVAL), '_status' => 1 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ), '_status' => 1 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 2;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
@@ -78,8 +79,7 @@ class CheckWalls
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
 
-        $walls = StatPublics::get_public_walls_mk2( $ids_array );
-        print_r($walls);
+        $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $publics as $barter_event ) {
 //            if( !isset( $walls[$barter_event->barter_public ])) {
 //                //todo логирование
@@ -132,16 +132,16 @@ class CheckWalls
             $now =  time();
             $id = $public[ 'target_id' ];
 
-            $res = StatPublics::get_visitors_from_vk( $id, $now, $now );
+            $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
             if ( !$res[ 'visitors']) {
                 $now -= 22000;
-                $res = StatPublics::get_visitors_from_vk( $id, $now, $now );
+                $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
             }
 
             $public['start_visitors'] =  $res[ 'visitors' ];
             sleep(0.3);
 
-            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0 );
+            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0, 'barter' );
 
             $public[ 'start_subscribers' ] = $res->count;
             sleep(0.3);

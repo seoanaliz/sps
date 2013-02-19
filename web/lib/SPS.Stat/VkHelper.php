@@ -15,18 +15,22 @@
         class   VkHelper {
 
             /**
-             *wrap for VkAPI
-             *
-             * @static
-             * @return array
+             *id аппа статистки
              */
+            const APP_ID_STATISTICS = 2642172;
 
-            const TESTING = false;
+            /**
+             *id аппа обмена
+             */
+            const APP_ID_BARTER = 3391730;
+
             const PAUSE   = 0.5;
-            public static function api_request( $method, $request_params, $throw_exc_on_errors = 1 )
+
+            public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
+                $app_id = $app == 'barter' ? self::APP_ID_BARTER : self::APP_ID_STATISTICS;
                 if ( !isset( $request_params['access_token'] ))
-                    $request_params['access_token']  =  self::get_service_access_token();
+                    $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
                 $a = VkHelper::qurl_request( $url, $request_params );
                 if ( $method == 'stats.get')
@@ -153,7 +157,7 @@
                 }
             }
 
-            public static function get_service_access_token()
+            public static function get_service_access_token( $app_id = self::APP_ID_STATISTICS )
             {
                 $connect =  ConnectionFactory::Get( 'tst' );
                 $count = 0;
@@ -163,14 +167,15 @@
                     $sql = 'SELECT access_token
                             FROM serv_access_tokens
                             WHERE active IS TRUE
+                            AND app_id = @app_id
                             ORDER BY random()
                             LIMIT 1';
                     $cmd = new SqlCommand( $sql, $connect );
+                    $cmd->SetInt( '@app_id', $app_id );
                     $ds  = $cmd->Execute();
                     $ds->Next();
                     $at  = $ds->GetString( 'access_token' );
                     if ( !$at ) {
-                        wrapper::mailer( 'закончились сервисные токены!');
                         throw new Exception ('закончились сервисные токены!');
                     }
                     if ( self::check_at( $at ))

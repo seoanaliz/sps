@@ -27,7 +27,7 @@ class CheckPosts
     {
         $chunks = array_chunk( $barter_events_array, 25 );
         foreach( $chunks as $chunk ) {
-            $res = StatPublics::get_publics_walls( $chunk );
+            $res = StatPublics::get_publics_walls( $chunk, 'barter' );
             $barter = reset( $chunk );
 
             foreach( $res as $wall ) {
@@ -68,7 +68,7 @@ class CheckPosts
     public function check_post_existence( $barter_event )
     {
         $res = VkHelper::api_request( 'wall.getById', array(
-            'posts' => '-' . $barter_event->barter_public . '_' . $barter_event->post_id ), 0 );
+            'posts' => '-' . $barter_event->barter_public . '_' . $barter_event->post_id ), 0, 'barter' );
         //todo ошибки
         if ( empty( $res )) {
             $barter_event->status = 5;
@@ -84,18 +84,18 @@ class CheckPosts
             if ( $barter_event->status != 3 ) {
             $time = time() + self::time_shift;
 
-                $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
+                $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );
                 if( !$res ) {
                     sleep(1);
                     $time -= 44600;
-                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
+                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time, 'barter' );
                 }
                 $barter_event->end_visitors = $res['visitors'];
 
                 $count = 0;
                 for ( $i = 0; $i < 3; $i++ ) {
 
-                    $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
+                    $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
                     if( !isset( $res->count )) {
                         sleep( 1 );
                         continue;
@@ -120,7 +120,7 @@ class CheckPosts
                 'fields'    =>  'members_count'
             );
 
-            $res = VkHelper::api_request( 'groups.getById', $params, 0 );
+            $res = VkHelper::api_request( 'groups.getById', $params, 0, 'barter' );
             if ( isset( $count->error)) {
                 sleep(0.6);
                 continue;

@@ -45,12 +45,12 @@
             return $res;
         }
 
-        public static function get_publics_info( $public_ids )
+        public static function get_publics_info( $public_ids, $app = '' )
         {
             if( is_array( $public_ids ))
                 $public_ids = implode( ',', $public_ids );
             $result = array();
-            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0, $app );
             if( isset( $res->error ))
                 return false;
             $result = array();
@@ -565,7 +565,7 @@
         }
 
         //РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚РµРЅС‹ РґРѕ 25 РїР°Р±Р»РёРєРѕРІ
-        public static function get_publics_walls( $barter_events_array )
+        public static function get_publics_walls( $barter_events_array, $app = '' )
         {
             $code = '';
             $return = "return{";
@@ -578,11 +578,11 @@
                 $i++;
             }
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
             return $res;
         }
 
-        public static function get_public_walls_mk2( $walls_array )
+        public static function get_public_walls_mk2( $walls_array, $app = '' )
         {
             $walls = array();
             $walls_array = array_unique( $walls_array );
@@ -599,7 +599,7 @@
                     $i++;
                 }
                 $code .= trim( $return, ',' ) . "};";
-                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
                 if( isset( $res->error ))
                     continue;
                 foreach( $res as $id => $content ) {
@@ -610,7 +610,7 @@
             return $walls;
         }
 
-        public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
+        public static function get_visitors_from_vk( $public_id, $time_from, $time_to, $app = '' )
         {
 //            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
 //            if ( !empty( $public )) {
@@ -626,7 +626,7 @@
             );
             for( $i = 0; $i < 3; $i++ ) {
                 sleep(0.6);
-                $res = VkHelper::api_request( 'stats.get', $params, 0 );
+                $res = VkHelper::api_request( 'stats.get', $params, 0, $app );
                 if ( empty ( $res->error ) && !empty( $res ))
                     break;
             }
