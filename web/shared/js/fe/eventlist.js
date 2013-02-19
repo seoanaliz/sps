@@ -255,7 +255,8 @@ function reloadArticle(id) {
         url: controlsRoot + 'arcticle-item/',
         dataType: "html",
         data: {
-            id: id
+            id: id,
+            targetFeedId: Elements.rightdd()
         },
         success: function(data) {
             var $elem = $("div.post[data-id=" + id + "]");
