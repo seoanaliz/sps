@@ -150,7 +150,7 @@ function loadArticles(clean) {
                 requestData.articleStatus = 1;
         }
     } else {
-        if (sourceFeedIds.length != 1) {
+        if (sourceType == 'source' || sourceFeedIds.length != 1) {
             $('.newpost').hide();
         } else {
             $('.newpost').show();
