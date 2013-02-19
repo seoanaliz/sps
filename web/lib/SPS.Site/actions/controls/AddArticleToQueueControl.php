@@ -56,8 +56,6 @@ class AddArticleToQueueControl extends BaseControl
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-
-
         $targetFeed = TargetFeedFactory::GetById($targetFeedId);
         $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
 
@@ -97,7 +95,7 @@ class AddArticleToQueueControl extends BaseControl
         $ArticleQueue->articleId = $article->articleId;
         $ArticleQueue->targetFeedId = $targetFeed->targetFeedId;
         $ArticleQueue->type = $type;
-        $ArticleQueue->author = AuthVkontakte::IsAuth();
+        $ArticleQueue->author = $this->vkId;
         ArticleUtility::BuildDates($ArticleQueue, $timestamp);
         $ArticleQueue->isDeleted = false;
         $ArticleQueue->collectLikes = true;
@@ -148,6 +146,8 @@ class AddArticleToQueueControl extends BaseControl
             } else {
                 $result['moved'] = false;
             }
+        } else {
+            $result['message'] = 'Cant Create Article Queue';
         }
         echo ObjectHelper::ToJSON($result);
     }
