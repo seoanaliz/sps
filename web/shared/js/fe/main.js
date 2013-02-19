@@ -215,8 +215,8 @@ $(document).ready(function(){
         Control.fire(method || 'authors_get', {
             targetFeedId: Elements.rightdd()
         }).success(function(data) {
-            var $container = $('#wall');
-            $container.html(data);
+            $('#wall').html(data);
+            var $container = $('#wall > .authors-list');
 
             var $navigation = $container.find('.authors-types');
             $navigation.delegate('.tab', 'click', function() {
