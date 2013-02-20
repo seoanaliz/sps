@@ -58,7 +58,7 @@ class AddReport
 
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
                 $stop_looking_time = $start_looking_time[$i] + 84600;
-            if ( $start_looking_time[$i] <= time() + 360 )
+            if ( $start_looking_time[$i] <= time() - 300 )
                 die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'too late' )));
 
             $barter_event = new BarterEvent();
