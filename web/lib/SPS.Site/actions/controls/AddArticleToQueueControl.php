@@ -108,10 +108,10 @@ class AddArticleToQueueControl extends BaseControl
 
         ConnectionFactory::BeginTransaction();
 
-        $sqlResult = ArticleQueueFactory::Add($ArticleQueue);
+        $sqlResult = ArticleQueueFactory::Add($ArticleQueue, array(BaseFactory::WithReturningKeys => true));
 
         if ($sqlResult) {
-            $articleQueueRecord->articleQueueId = ArticleQueueFactory::GetCurrentId();
+            $articleQueueRecord->articleQueueId = $ArticleQueue->articleQueueId;
 
             $sqlResult = ArticleRecordFactory::Add($articleQueueRecord);
         }

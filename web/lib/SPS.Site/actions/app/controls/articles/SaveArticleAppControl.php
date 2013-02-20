@@ -124,11 +124,9 @@ class SaveArticleAppControl extends AppBaseControl {
     private function add($article, $articleRecord)
     {
         ConnectionFactory::BeginTransaction();
-        $result = ArticleFactory::Add($article);
+        $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
         if ($result) {
-            $article->articleId = ArticleFactory::GetCurrentId();
             $articleRecord->articleId = $article->articleId;
-
             $result = ArticleRecordFactory::Add($articleRecord);
         }
 
