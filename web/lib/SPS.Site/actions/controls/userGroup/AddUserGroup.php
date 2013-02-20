@@ -35,10 +35,9 @@ class AddUserGroup extends BaseControl {
         $UserGroup = new UserGroup();
         $UserGroup->name = $name;
         $UserGroup->targetFeedId = $targetFeedId;
-        $addResult = UserGroupFactory::Add($UserGroup);
+        $addResult = UserGroupFactory::Add($UserGroup, array(BaseFactory::WithReturningKeys => true));
 
         if ($addResult) {
-            $UserGroup->userGroupId = UserGroupFactory::GetCurrentId();
             $result = array(
                 'success' => true,
                 'userGroup' => $UserGroup->toArray(),
