@@ -149,10 +149,10 @@ abstract class AbstractPostLoadDaemon {
         $conn = ConnectionFactory::Get();
         $conn->begin();
 
-        $result = ArticleFactory::Add($article);
+        $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
 
         if ($result) {
-            $articleRecord->articleId = ArticleFactory::GetCurrentId();
+            $articleRecord->articleId = $article->articleId;
             $result = ArticleRecordFactory::Add($articleRecord);
         }
 
