@@ -421,10 +421,12 @@
             $res = VkHelper::api_request( $method_get_server, $params, false );
             sleep( 0.4 );
             if ( !isset( $res->upload_url )) {
-                if ( isset ( $res->error ))
+                if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
+                    throw new ChangeSenderException();
+                } elseif(isset ( $res->error)) {
                     throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
                         . " in post to vk.com/public" . $this->vk_group_id );
-                else
+                } else
                     throw new exception( " Error uploading photo. Response : " . ObjectHelper::ToJSON( $res )
                         . " in post to vk.com/public" . $this->vk_group_id );
             }

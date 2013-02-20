@@ -83,6 +83,7 @@ sql;
                     return false;
                 }
 
+                shuffle( $targetFeed->publishers );
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
