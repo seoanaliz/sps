@@ -88,10 +88,10 @@ class CheckWalls
             if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
-                if( $post->date < $barter_event->start_search_at->format('U')) {
-                        echo 'слишком старые посты<br>';
-                        break;
-                }
+//                if( $post->date < $barter_event->start_search_at->format('U')) {
+//                        echo 'слишком старые посты<br>';
+//                        break;
+//                }
 
                 //Если этот пост уже наблюдается
                 if ( is_array($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
