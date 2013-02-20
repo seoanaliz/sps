@@ -149,6 +149,8 @@ function loadArticles(clean) {
             default:
                 requestData.articleStatus = 1;
         }
+    } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
+        $('.newpost').show();
     } else {
         $('.newpost').hide();
     }
