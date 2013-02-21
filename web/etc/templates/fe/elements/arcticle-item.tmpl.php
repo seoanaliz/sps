@@ -5,31 +5,39 @@
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
 /** @var $canEditPost boolean */
+/** @var $sourceFeedType String */
 /**
  * @var $forceDisabledPublishing bool|null -  принудительно отключить редактирование
  */
 
 if (!empty($article)) {
-        $forceDisabledPublishing = isset($forceDisabledPublishing) && $forceDisabledPublishing;
-        $extLinkLoader  = false;
-        $isPostMovable = false;
-        $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
+    $forceDisabledPublishing = isset($forceDisabledPublishing) && $forceDisabledPublishing;
+    $extLinkLoader = false;
+    $isPostMovable = false;
+    $isPostRelocatable = true;
+    $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
 
-        if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
-            $extLinkLoader = true;
-        }
+    if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
+        $extLinkLoader = true;
+    }
 
-        if ($isWebUserEditor && !$forceDisabledPublishing) {
-            if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
-                $isPostMovable = true;
-            }
-            if (!empty($sourceFeed) && $sourceFeed->type != SourceFeedUtility::Ads){
-                $isPostMovable = true;
-            }
+    if ($sourceFeedType == SourceFeedUtility::Ads) {
+        $isPostRelocatable = false;
+    }
+    if ($isWebUserEditor && !$forceDisabledPublishing) {
+        if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
+            $isPostMovable = true;
         }
+        if (!empty($sourceFeed)) {
+            $isPostMovable = true;
+        }
+    }
 ?>
 <div
-    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPost) ? ' editable' : '' ?>"
+    class="post bb
+    <?= $isPostMovable ? 'movable' : '' ?>
+    <?= $canEditPost ? 'editable' : '' ?>
+    <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>

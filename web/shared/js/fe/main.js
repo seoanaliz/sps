@@ -1670,51 +1670,55 @@ var Elements = {
             img.src = src;
         });
 
-        $block.find(".timestamp").easydate(easydateParams);
-        $block.find(".date").easydate(easydateParams);
+        $block.find('.timestamp').easydate(easydateParams);
+        $block.find('.date').easydate(easydateParams);
         $block.find('.images-ready').imageComposition();
         $('#right-panel').find('.images').imageComposition('right');
     },
     initDraggable: function($block) {
-        $block.find('.post.movable:not(.blocked) > .content').draggable({
-            revert: 'invalid',
-            appendTo: 'body',
-            cursor: 'move',
-            cursorAt: {left: 100, top: 20},
-            helper: function() {
-                return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
-            },
-            start: function() {
-                var self = $(this),
-                    $post = self.closest('.post');
-                $post.addClass('moving');
-            },
-            stop: function() {
-                var self = $(this),
-                    $post = self.closest('.post');
-                $post.removeClass('moving');
-            }
+        $block.find('.post.movable:not(.blocked) > .content').each(function() {
+            $(this).draggable({
+                revert: 'invalid',
+                appendTo: 'body',
+                cursor: 'move',
+                cursorAt: {left: 100, top: 20},
+                helper: function() {
+                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+                },
+                start: function() {
+                    var self = $(this),
+                        $post = self.closest('.post');
+                    $post.addClass('moving');
+                },
+                stop: function() {
+                    var self = $(this),
+                        $post = self.closest('.post');
+                    $post.removeClass('moving');
+                }
+            });
         });
     },
     initDroppable: function($block) {
-        $block.find('.items .slot').droppable({
-            activeClass: 'ui-state-active',
-            hoverClass: 'ui-state-hover',
-            drop: function(e, ui) {
-                var $target = $(this),
-                    $post = $(ui.draggable).closest('.post');
+        $block.find('.items .slot').each(function() {
+            $(this).droppable({
+                activeClass: 'ui-state-active',
+                hoverClass: 'ui-state-hover',
+                drop: function(e, ui) {
+                    var $target = $(this),
+                        $post = $(ui.draggable).closest('.post');
 
-                if ($target.hasClass('empty')) {
-                    Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
-                        if (state) {
-                            if ($post.hasClass('movable')) {
-                                $target.html($post);
+                    if ($target.hasClass('empty')) {
+                        Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
+                            if (state) {
+                                if ($post.hasClass('relocatable')) {
+                                    $target.html($post);
+                                }
+                                $target.addClass('image-compositing');
                             }
-                            $target.addClass('image-compositing');
-                        }
-                    });
+                        });
+                    }
                 }
-            }
+            });
         });
     },
     initLinks: function($block) {
