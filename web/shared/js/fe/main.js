@@ -78,10 +78,7 @@ $(document).ready(function(){
     // Приведение вида календаря из 22.12.2012 в 22 декабря
     (function() {
         var d = $("#calendar").val().split('.');
-        var i = d[1];
-        d[1] = d[0];
-        d[0] = i;
-        var date = d.join('/');
+        var date = [d[1], d[0], d[2]].join('/');
         $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
     })();
 
@@ -1624,8 +1621,6 @@ var Elements = {
         $('.right-panel .images').imageComposition('right');
     },
     initDraggable: function($block) {
-        $block.find('.slot .post.movable:not(.locked) > .content').addClass('dragged');
-
         $block.find('.post.movable:not(.blocked) > .content').draggable({
             revert: 'invalid',
             appendTo: 'body',
@@ -1647,31 +1642,22 @@ var Elements = {
         });
     },
     initDroppable: function($block) {
-        var dragdrop = function(post, slot, queueId, callback, failback){
-            Events.fire('post_moved', post, slot, queueId, function(state, newId){
-                if (state) {
-                    callback(newId);
-                } else if (typeof failback == 'function') {
-                    failback();
-                }
-            });
-        };
-
         $block.find('.items .slot').droppable({
-            activeClass: "ui-state-active",
-            hoverClass: "ui-state-hover",
-
+            activeClass: 'ui-state-active',
+            hoverClass: 'ui-state-hover',
             drop: function(e, ui) {
                 var $target = $(this),
                     $post = $(ui.draggable).closest('.post');
 
                 if ($target.hasClass('empty')) {
-                    dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
-                        if ($post.hasClass('movable')) {
-                          if ($('.sourceType.active').attr('data-type') != 'ads')
-                                $target.html($post);
+                    Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
+                        if (state) {
+                            if ($post.hasClass('movable')) {
+                                if ($('.sourceType.active').attr('data-type') != 'ads')
+                                    $target.html($post);
+                            }
+                            $target.addClass('image-compositing');
                         }
-                        $target.addClass('image-compositing');
                     });
                 }
             }
@@ -1701,11 +1687,12 @@ var Elements = {
         return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        if(typeof value == 'undefined') {
-            var timestamp = $("#calendar").datepicker("getDate");
-            return timestamp ? timestamp.getTime() / 1000 : null;
+        if (typeof value == 'undefined') {
+            var time = $('#calendar').datepicker('getDate').getTime();
+            var timestamp = Math.round(time / 1000) - (new Date().getTimezoneOffset() * 60) + 14400;
+            return timestamp;
         } else {
-            $("#calendar").datepicker("setDate", value).closest(".calendar").find(".caption").html("&nbsp;");
+            $('#calendar').datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
     initLinkLoader: function(obj, full){
