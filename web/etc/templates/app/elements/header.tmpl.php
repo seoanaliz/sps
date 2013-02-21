@@ -42,6 +42,7 @@ $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/jquery.easydate-0.2.4.js',
     'js://common/common.js',
+    'js://common/class.js',
     'js://fe/file-uploader/fileuploader.js',
     'js://app/main.js',
     'js://app/events.js',

@@ -33,6 +33,7 @@ class CheckWalls
         $this->turn_on_search();
 
         $barters_for_search = BarterEventFactory::Get( array( '_status' => 2 ), null, 'tst' );
+
         $search_results = $this->wall_search( $barters_for_search );
         $search_results = $this->get_population( $search_results );
 
@@ -65,7 +66,7 @@ class CheckWalls
     public function turn_on_search()
     {
         //ищем записи, которые включаются в поиск
-        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift + StatBarter::TIME_INTERVAL), '_status' => 1 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ), '_status' => 1 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 2;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
@@ -78,19 +79,19 @@ class CheckWalls
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
 
-        $walls = StatPublics::get_public_walls_mk2( $ids_array );
+        $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $publics as $barter_event ) {
-            if( !isset( $walls[$barter_event->barter_public ])) {
-                //todo логирование
-                continue;
-            }
-            if (empty($walls[ $barter_event->barter_public ]))
+//            if( !isset( $walls[$barter_event->barter_public ])) {
+//                //todo логирование
+//                continue;
+//            }
+            if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
-                if( $post->date < $barter_event->start_search_at->format('U')) {
-                        echo 'слишком старые посты<br>';
-                        break;
-                }
+//                if( $post->date < $barter_event->start_search_at->format('U')) {
+//                        echo 'слишком старые посты<br>';
+//                        break;
+//                }
 
                 //Если этот пост уже наблюдается
                 if ( is_array($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
@@ -120,7 +121,7 @@ class CheckWalls
     {
         $preg_filter = '/(\[\s?(?:club|public)' . $public_id . '\s?\|)/';
         if ( !preg_match( $preg_filter , $search_string ))
-            if( !preg_match( '/(\[\s?' . $public_shortname . '\s?\|)/', $search_string))
+            if( !preg_match( '/(\[\s?' . $public_shortname . '\s?\|)/', $search_string ))
                 return false;
         return true;
     }
@@ -131,16 +132,16 @@ class CheckWalls
             $now =  time();
             $id = $public[ 'target_id' ];
 
-            $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+            $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
             if ( !$res[ 'visitors']) {
                 $now -= 22000;
-                $res = StatPublics::get_visitors_from_vk( $id, $now, $now);
+                $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
             }
 
             $public['start_visitors'] =  $res[ 'visitors' ];
             sleep(0.3);
 
-            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0 );
+            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0, 'barter' );
 
             $public[ 'start_subscribers' ] = $res->count;
             sleep(0.3);
@@ -169,8 +170,8 @@ class CheckWalls
             ,43503315
             ,43503298
             ,43503235
+            ,43503264
         );
-
 
         $not_our_array = array(
             35806721,
@@ -210,6 +211,7 @@ class CheckWalls
             43503694 ,
             43503630 ,
             43503753 ,
+            38000341 ,
         );
 
         $barter_events_array = array();
@@ -219,6 +221,8 @@ class CheckWalls
 
         foreach( $our_array as $oid ) {
             foreach( $not_our_array as $noid ) {
+                if ( $oid == $noid )
+                    continue;
                 $now = time();
                 $check = BarterEventFactory::Get(
                     array(
@@ -239,7 +243,7 @@ class CheckWalls
                 $barter_event->status        =  1;
                 $barter_event->search_string =  $info[$oid]['shortname'];
                 $barter_event->barter_type   =  1;
-                $stop_looking_time             = date( 'Y-m-d 23:59:59', $now );
+                $stop_looking_time           = date( 'Y-m-d 00:45:00', $now + 86400 );
                 $barter_event->start_search_at =  date( 'Y-m-d H:i:s', $now );
                 $barter_event->stop_search_at  =  $stop_looking_time;
                 $barter_event->standard_mark = true;
@@ -251,8 +255,6 @@ class CheckWalls
         }
         BarterEventFactory::AddRange( $barter_events_array, array( BaseFactory::WithReturningKeys => true ), 'tst' );
     }
-
-
 
     public function get_page_name( $urls )
     {

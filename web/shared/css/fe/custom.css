@@ -9,10 +9,11 @@
 
 .ui-multiselect {
     font-family: inherit;
+    margin-top: 8px;
 }
 .ui-multiselect .gray {
     color: gray;
-    font-size: .8em;
+    font-size: 0.8em;
 }
 .ui-multiselect .counter {
     background-color: #DEE5EB;
@@ -26,6 +27,8 @@
     line-height: 19px;
     padding: 2px 0 2px 5px;
     position: relative;
+    float: left;
+    max-width: 250px;
 }
 .ui-multiselect-menu {
     font-size: 12px !important;
@@ -144,10 +147,6 @@
     opacity: 1;
 }
 
-div.type-selector {
-    margin-bottom: 8px;
-}
-
 div.type-selector .counter {
     border-radius: 3px;
     padding: 2px 5px;
@@ -160,7 +159,7 @@ div.type-selector a {
     display: -moz-inline-box;
     display: inline-block;
     margin-right: 5px;
-    padding: 0 8px;
+    padding: 0 10px;
     text-decoration: none;
     line-height: 1.8em;
     font-weight: bold;

@@ -3,18 +3,32 @@
     /** @var $articleRecord ArticleRecord */
     /** @var $sourceFeed SourceFeed */
     /** @var $sourceInfo array */
-    /** @var $canEditPosts boolean */
+    /** @var $isWebUserEditor bool */
+    /** @var $canEditPost boolean */
 
     if (!empty($article)) {
 
         $extLinkLoader  = false;
+        $isPostMovable = false;
+        $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
 
         if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
             $extLinkLoader = true;
         }
-?>
 
-<div class="post bb <?= (empty($sourceFeed) || $sourceFeed->type != SourceFeedUtility::Ads) ? 'movable' : '' ?>" data-group="{$article->sourceFeedId}" data-id="{$article->articleId}">
+        if ($isWebUserEditor) {
+            if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
+                $isPostMovable = true;
+            }
+            if (!empty($sourceFeed) && $sourceFeed->type != SourceFeedUtility::Ads){
+                $isPostMovable = true;
+            }
+        }
+?>
+<div
+    class="post bb<?= ($isPostMovable) ? ' movable' : '' ?><?= ($canEditPost) ? ' editable' : '' ?>"
+    data-group="{$article->sourceFeedId}"
+    data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
@@ -34,7 +48,7 @@
         ?>
         <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>
         <? if($contentPart2) { ?>
-        <a href="javascript:;" class="show-cut">Показать полностью...</a>
+        <a class="show-cut">Показать полностью...</a>
         <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
         <? } ?>
 
@@ -75,9 +89,9 @@
     <div class="bottom d-hide">
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
-            <? if ($canEditPosts): ?>|
-            <a class="edit" href="javascript:;">Редактировать</a> |
-            <a class="clear-text" href="javascript:;">Очистить текст</a>
+            <? if ($canEditPost): ?>|
+                <a class="edit">Редактировать</a> |
+                <a class="clear-text">Очистить текст</a>
             <? endif; ?>
         </div>
         <div class="r">
@@ -91,17 +105,39 @@
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if($article->externalId != -1){ ?>
+                <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
                 <? } else { ?>
-                    Добавлена вручную
+                    <?
+                    $sign = '';
+                    if (!is_null($article->sentAt)) {
+                        $sign = 'Опубликовано';
+                    } else {
+                        switch ($article->articleStatus) {
+                            case Article::STATUS_APPROVED:
+                                $sign = 'Ожидает публикации';
+                                break;
+                            case Article::STATUS_REJECT:
+                                $sign = 'Отклонено';
+                                break;
+                            case Article::STATUS_REVIEW:
+                                $sign = 'Ожидает рассмотрения';
+                                break;
+                        }
+                    }
+                    ?>
+                    {$sign}
                 <? } ?>
             </span>
-            <span class="likes spr"></span><span class="likes-count"><?= ($article->rate > 100) ? 'TOP' : $article->rate ?></span>
+            <? if ($article->rate > 0) { ?>
+                <span class="likes spr"></span><span class="likes-count">
+                    <?= ($article->rate > 100) ? 'TOP' : $article->rate ?>
+                </span>
+            <? } ?>
         </div>
     </div>
-        <? if ($canEditPosts): ?>
-    <div class="delete spr"></div>
+    <? if ($canEditPost): ?>
+        <div class="delete spr"></div>
     <? endif; ?>
     <div class="clear"></div>
 
@@ -110,7 +146,7 @@
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
         </div>
-        <div class="new-comment">
+        <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
             <div class="photo">
                 <img src="{$__Editor->avatar}" alt="" />
             </div>
@@ -122,6 +158,14 @@
                 <span class="text">Ctrl+Enter</span>
             </div>
         </div>
+        <? if ($showApproveBlock): ?>
+        <div class="moderation">
+            <div class="actions">
+                <button class="button approve">Одобрить</button>
+                <button class="button white reject">Отклонить</button>
+            </div>
+        </div>
+        <? endif; ?>
     </div>
     <? } ?>
     <div class="clear"></div>

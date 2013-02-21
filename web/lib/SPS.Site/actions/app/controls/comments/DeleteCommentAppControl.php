@@ -16,11 +16,13 @@ class DeleteCommentAppControl extends BaseControl
         $id = Request::getInteger('id');
 
         if (empty($id)) {
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Empty comment id'));
             return;
         }
 
         $comment = CommentFactory::GetById($id);
         if (empty($comment)) {
+            echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Cant find comment'));
             return;
         }
 
@@ -29,17 +31,16 @@ class DeleteCommentAppControl extends BaseControl
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed($article->targetFeedId);
 
-        if ($role == UserFeed::ROLE_EDITOR) {
+        if ($role != UserFeed::ROLE_AUTHOR) {
             // ок, редактор может удалять комменты
         } elseif ($role == UserFeed::ROLE_AUTHOR) {
             // ок, автор может удалять свои комменты
             /** @var $author Author */
             $author = $this->getAuthor();
             if ($author->authorId != $comment->authorId) {
+                echo ObjectHelper::ToJSON(array('result' => false, 'message' => 'Author not equal'));
                 return;
             }
-        } else {
-            return;
         }
 
         $comment->statusId = 3;

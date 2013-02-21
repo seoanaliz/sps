@@ -256,14 +256,7 @@
                 'access_token'  =>  $this->vk_access_token
             );
 
-            $url = self::METH . 'wall.delete';
-            $fwd = $raw_json = $this->qurl_request($url, $params);
-            $fwd = json_decode($fwd);
-
-            if (!empty ($fwd->error)) {
-                $fwd3 = $fwd->error;
-                throw new Exception("Error in wall.delete [$post_id => $id[0] $id[1]] : $fwd->error_msg ::" . $raw_json);
-            }
+            VkHelper::api_request( 'wall.delete', $params );
 
             return true;
         }
@@ -392,7 +385,7 @@
         //todo описания фоток матьматьмать
         public function load_photo( $path, $destination = 'wall', $caption = '' )
         {
-            if ( !is_file( $path ))
+            if ( !file_exists( $path ))
                 throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
 
             $aid = '';
@@ -428,10 +421,12 @@
             $res = VkHelper::api_request( $method_get_server, $params, false );
             sleep( 0.4 );
             if ( !isset( $res->upload_url )) {
-                if ( isset ( $res->error ))
+                if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
+                    throw new ChangeSenderException();
+                } elseif(isset ( $res->error)) {
                     throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
                         . " in post to vk.com/public" . $this->vk_group_id );
-                else
+                } else
                     throw new exception( " Error uploading photo. Response : " . ObjectHelper::ToJSON( $res )
                         . " in post to vk.com/public" . $this->vk_group_id );
             }
@@ -447,7 +442,7 @@
             $content = $this->qurl_request( $upload_url, array('file1' => '@' . $path ) );
             $content = json_decode( $content );
 
-            if (empty( $content->$photo_list )) {
+            if ( empty( $content->$photo_list )) {
                 throw new exception(" Error uploading photo. Response : $content  in post to vk.com/public" . $this->vk_group_id );
             }
             sleep( 1 );

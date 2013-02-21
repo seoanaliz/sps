@@ -88,6 +88,16 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
+                )
+                ,'userGroupId' => array(
+                    'name'          => 'userGroupId'
+                    , 'type'        => TYPE_INTEGER
+                    , 'foreignKey'  => 'UserGroup'
+                )
+                ,'articleStatus' => array(
+                    'name'          => 'articleStatus'
+                    , 'type'        => TYPE_INTEGER
+                    , 'nullable'    => 'CheckEmpty'
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -95,6 +105,11 @@
                     'name'         => 'articleId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
+                ),
+                'articleStatusIn' => array(
+                    'name'         => 'articleStatus',
+                    'type'       => TYPE_INTEGER,
+                    'searchType' => SEARCHTYPE_ARRAY,
                 )
                 , '_externalId' => array(
                     'name'         => 'externalId'

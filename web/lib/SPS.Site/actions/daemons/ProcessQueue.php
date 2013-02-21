@@ -83,6 +83,7 @@ sql;
                     return false;
                 }
 
+                shuffle( $targetFeed->publishers );
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
@@ -179,10 +180,7 @@ sql;
                 'access_token'  => $targetFeed->params['token'],
                 'source'        => null,
                 'message'       => $articleRecord->content,
-                'targeting'     => array(
-                    'countries' => array('RU'),
-                    'locales'   => 17
-                )
+                'targeting'     => array()
             );
 
             if (!empty($articleRecord->photos)) {

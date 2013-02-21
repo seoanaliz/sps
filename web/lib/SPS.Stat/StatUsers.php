@@ -47,6 +47,9 @@
 
             foreach( $result as $user )
             {
+                if( !isset ( $user->uid ))
+                    continue;
+
                 $users[ $user->uid ] = array(
                                     'userId'    =>  $user->uid,
                                     'ava'       =>  $user->photo,

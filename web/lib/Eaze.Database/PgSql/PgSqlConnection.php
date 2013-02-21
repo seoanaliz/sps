@@ -107,7 +107,6 @@
          */
         public function GetConnectionString() {
             $connectionString = sprintf( 'host=%s port=%s dbname=%s user=%s password=%s', $this->host, $this->port, $this->dbname, $this->user, $this->password );
-
             return $connectionString;
         }
 

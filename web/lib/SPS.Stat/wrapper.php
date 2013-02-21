@@ -15,8 +15,7 @@ class wrapper
     public function __construct()
     {
         /*require_once 'config.inc.php';*/
-        if (!$this->db_wrap('connect'))
-            die('bd lost');
+
 
     }
 

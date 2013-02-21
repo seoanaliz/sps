@@ -3,12 +3,38 @@ var easydateParams = {
     date_parse: function(date) {
         if (!date) return;
         var d = date.split('.');
-        return new Date([d[1], d[0], d[2]].join('/'));
+        return Date.parse([d[1], d[0], d[2]].join('/'));
     },
     uneasy_format: function(date) {
         return date.toLocaleDateString();
     }
 };
+
+var UserGroupModel = Model.extend({
+    init: function() {
+        this.defData('id', null);
+        this.defData('name', '...');
+        this.defData('isSelected', false);
+        this._super.apply(this, arguments);
+    },
+
+    id: function(id) {
+        if (arguments.length) id = intval(id);
+        return this.data('id', id);
+    },
+    name: function(name) {
+        if (arguments.length) name = name + '';
+        return this.data('name', name);
+    },
+    isSelected: function(isSelected) {
+        if (arguments.length) isSelected = !!isSelected;
+        return this.data('isSelected', isSelected);
+    }
+});
+var UserGroupCollection = Collection.extend({
+    modelClass: UserGroupModel
+});
+var userGroupCollection = new UserGroupCollection();
 
 $(document).ready(function(){
     $.mask.definitions['2']='[012]';
@@ -23,7 +49,9 @@ $(document).ready(function(){
         monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         firstDay: 1,
         showAnim: '',
-        dateFormat: 'd MM yy'
+        dateFormat: 'd MM yy',
+        altField: '#calendar-fix',
+        altFormat: 'd MM'
     });
 
     var $leftPanel = $('.left-panel');
@@ -34,33 +62,35 @@ $(document).ready(function(){
     $calendar
         .datepicker()
         .keydown(function(e){
-            if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) e.preventDefault();
+            if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
+                e.preventDefault();
+            }
         })
         .change(function(){
             $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change', []);
+            Events.fire('calendar_change');
         });
-    $(".calendar .tip").click(function(){
-        $(this).closest(".calendar").find("input").focus();
+
+    $(".calendar .tip, #calendar-fix").click(function(){
+        $calendar.focus();
     });
 
     // Приведение вида календаря из 22.12.2012 в 22 декабря
     (function() {
-        var d = $calendar.val().split('.');
-        $calendar.datepicker('setDate', new Date([d[1], d[0], d[2]].join('/'))).trigger('change');
+        var d = $("#calendar").val().split('.');
+        var date = [d[1], d[0], d[2]].join('/');
+        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
     })();
 
     // Кнопки вперед-назад в календаре
     (function() {
-        var day = (86000 * 1000);
-
         $(".calendar .prev").click(function(){
-            var date = $('#calendar').datepicker('getDate').getTime();
-            $("#calendar").datepicker('setDate', new Date(date - day)).trigger('change');
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
         });
         $(".calendar .next").click(function(){
-            var date = $('#calendar').datepicker('getDate').getTime();
-            $("#calendar").datepicker('setDate', new Date(date + day * 2)).trigger('change');
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
         });
     })();
 
@@ -68,6 +98,7 @@ $(document).ready(function(){
     $multiSelect.multiselect({
         minWidth: 250,
         height: 250,
+        classes: $multiSelect.data('classes'),
         checkAllText: 'Выделить все',
         uncheckAllText: 'Сбросить',
         noneSelectedText: '<span class="gray">Источник не выбран</span>',
@@ -76,14 +107,14 @@ $(document).ready(function(){
                 + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
         },
         checkAll: function(){
-            Events.fire('leftcolumn_dropdown_change', []);
+            Events.fire('leftcolumn_dropdown_change');
         },
         uncheckAll: function(){
-            Events.fire('leftcolumn_dropdown_change', []);
+            Events.fire('leftcolumn_dropdown_change');
         }
     });
-    $multiSelect.bind("multiselectclick", function(event, ui) {
-        Events.fire('leftcolumn_dropdown_change', []);
+    $multiSelect.bind("multiselectclick", function(event, ui){
+        Events.fire('leftcolumn_dropdown_change');
     });
 
     // right dropdown
@@ -126,7 +157,7 @@ $(document).ready(function(){
             $(".right-panel .type-selector a").removeClass('active');
             targetType.addClass('active');
 
-            Events.fire('rightcolumn_dropdown_change', []);
+            Events.fire('rightcolumn_dropdown_change');
         },
         oncreate: function() {
             $(this).find('.default').removeClass('default');
@@ -134,11 +165,11 @@ $(document).ready(function(){
         }
     });
 
-    $(".left-panel .drop-down").change(function(){
-        Events.fire('leftcolumn_dropdown_change', []);
+    $('.left-panel .drop-down').change(function() {
+        Events.fire('leftcolumn_dropdown_change');
     });
 
-    $('.wall-title a').dropdown({
+    $('.wall-title .filter a').dropdown({
         width: 'auto',
         addClass: 'wall-title-menu',
         position: 'right',
@@ -152,166 +183,254 @@ $(document).ready(function(){
         onclose: function() {},
         onchange: function(item) {
             $('.wall-title a').text(item.title).data('type', item.type);
-            Events.fire('leftcolumn_sort_type_change', []);
+            Events.fire('leftcolumn_sort_type_change');
         }
     });
 
-    // Вкладки "Источники", "Реклама" в левон меню
-    $(".left-panel .type-selector a").click(function(e){
+    // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
+    $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
         if (articlesLoading) {
             return;
         }
 
-        $(".left-panel .type-selector a").removeClass('active');
+        $leftPanel.find(".type-selector .sourceType").removeClass('active');
         $(this).addClass('active');
 
         if ($(this).data('type') == 'authors-list') {
-             var BOX_AUTHOR =
-            '<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
-                '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                    '<img src="<?=user.photo?>" alt="" />' +
-                '</a>' +
-            '</div>' +
-            '<div class="info">' +
-                '<?=text?>' +
-            '</div>';
-
-             var BOX_ADD_AUTHOR =
-            'Вы действительно хотите назначить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' автором?';
-
-             var BOX_DELETE_AUTHOR =
-            'Вы действительно хотите удалить ' +
-            '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
-                '<?=user.name?>' +
-            '</a>' +
-            ' из списка авторов?';
-
-           (function updatePage(method) {
-                Events.fire(method || 'authors_get', function(data) {
-                    $('body').addClass('editor-mode');
-                    var $container = $('#wall');
-                    $container.html(data);
-
-                    var $navigation = $container.find('.authors-types');
-                    $navigation.delegate('.tab', 'click', function() {
-                        $navigation.find('.tab.selected').removeClass('selected');
-                        $(this).addClass('selected');
-                        updatePage('authors_get');
-                    });
-
-                    var $input = $container.find('.author-link');
-                    $input.placeholder();
-                    $input.keyup(function(e) {
-                        if (e.keyCode == KEY.ENTER) {
-                            $input.blur();
-                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
-                            var confirmBox = new Box({
-                                id: 'addAuthor' + authorId,
-                                title: 'Добавление автора',
-                                html: tmpl(BOX_LOADING, {height: 100}),
-                                buttons: [
-                                    {label: 'Добавить автора', onclick: addAuthor},
-                                    {label: 'Отменить', isWhite: true}
-                                ],
-                                onshow: function($box) {
-                                    var box = this;
-
-                                    VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                        if (!dataVK.response) {
-                                            return box.setHTML('Пользователь не найден');
-                                        }
-                                        var user = dataVK.response[0];
-                                        var clearUser = {
-                                            id: user.uid,
-                                            name: user.first_name + ' ' + user.last_name,
-                                            photo: user.photo_medium_rec
-                                        };
-                                        authorId = clearUser.id;
-                                        var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
-                                        box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                    });
-                                }
-                            });
-                            confirmBox.show();
-                        }
-                        function addAuthor() {
-                            var box = this;
-                            box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-                            box.setButtons([{label: 'Закрыть', isWhite: true}]);
-                            Events.fire('author_add', [authorId, function(data) {
-                                box.remove();
-                                updatePage();
-                            }]);
-                        }
-                    });
-
-                    if ($container.data('initedList')) return;
-                    $container.data('initedList', true);
-                    $container.delegate('.delete', 'click', function() {
-                        var $author = $(this).closest('.author');
-                        var authorId = $author.data('id');
-                        var confirmDeleteBox = new Box({
-                            id: 'confirmDeleteBox' + authorId,
-                            title: 'Удаление автора',
-                            html: tmpl(BOX_LOADING, {height: 100}),
-                            buttons: [
-                                {label: 'Удалить', onclick: function() {
-                                    Events.fire('author_remove', [authorId, function(data) {
-                                        $author.remove();
-                                        confirmDeleteBox.hide();
-                                    }]);
-                                }},
-                                {label: 'Отменить', isWhite: true}
-                            ],
-                            onshow: function($box) {
-                                var box = this;
-
-                                VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                    if (!dataVK.response) {
-                                        return box.setHTML('Пользователь не найден');
-                                    }
-                                    var user = dataVK.response[0];
-                                    var clearUser = {
-                                        id: user.uid,
-                                        name: user.first_name + ' ' + user.last_name,
-                                        photo: user.photo_medium_rec
-                                    };
-                                    authorId = clearUser.id;
-                                    var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
-                                    box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                });
-                            }
-                        }).show();
-                    });
-
-                    $container.delegate('.description', 'click', function() {
-                        var $input = $(this);
-                        var $author = $(this).closest('.author');
-                        $input.attr('contenteditable', 'true').focus();
-                    });
-                    $container.delegate('.description', 'keyup', function(e) {
-                        if (!e.originalEvent) return;
-
-                        if (e.keyCode == KEY.ENTER) {
-                            var $input = $(this);
-                            var $author = $(this).closest('.author');
-                            var clearText = $input.text();
-
-                            $input.blur().removeAttr('contenteditable').html(clearText);
-                            Events.fire('author_edit_desc', [$author.data('id'), clearText, function() {}]);
-                        }
-                    });
-                });
-            })();
+            $('body').addClass('editor-mode');
+            $(window).data('disable-load-more', true);
+            updateAuthorListPage();
         } else {
             $('body').removeClass('editor-mode');
-            Events.fire('rightcolumn_dropdown_change', []);
+            $(window).data('disable-load-more', false);
+            Events.fire('rightcolumn_dropdown_change');
+        }
+    });
+
+    // Список авторов
+    function updateAuthorListPage(method) {
+        Control.fire(method || 'authors_get', {
+            targetFeedId: Elements.rightdd()
+        }).success(function(data) {
+            $('#wall').html(data);
+            var $container = $('#wall > .authors-list');
+
+            var $navigation = $container.find('.authors-types');
+            $navigation.delegate('.tab', 'click', function() {
+                $navigation.find('.tab.selected').removeClass('selected');
+                $(this).addClass('selected');
+                updateAuthorListPage('authors_get');
+            });
+
+            var $input = $container.find('.author-link');
+            $input.placeholder();
+            $input.keyup(function(e) {
+                if (e.keyCode == KEY.ENTER) {
+                    $input.blur();
+                    var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                    var confirmBox = new Box({
+                        id: 'addAuthor' + authorId,
+                        title: 'Добавление автора',
+                        html: tmpl(BOX_LOADING, {height: 100}),
+                        buttons: [
+                            {label: 'Добавить автора', onclick: addAuthor},
+                            {label: 'Отменить', isWhite: true}
+                        ],
+                        onshow: function($box) {
+                            var box = this;
+
+                            VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                if (!dataVK.response) {
+                                    return box.setHTML('Пользователь не найден');
+                                }
+                                var user = dataVK.response[0];
+                                var clearUser = {
+                                    id: user.uid,
+                                    name: user.first_name + ' ' + user.last_name,
+                                    photo: user.photo_medium_rec
+                                };
+                                authorId = clearUser.id;
+                                var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
+                                box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                            });
+                        }
+                    });
+                    confirmBox.show();
+                }
+                function addAuthor() {
+                    var box = this;
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Control.fire('author_add', {
+                        authorId: authorId,
+                        targetFeedId: Elements.rightdd()
+                    }).success(function(data) {
+                        box.remove();
+                        updateAuthorListPage();
+                    });
+                }
+            });
+
+            if ($container.data('initedList')) {
+                return;
+            }
+            $container.data('initedList', true);
+            $container.delegate('.add-to-list', 'click', function() {
+                var $target = $(this);
+                var $author = $target.closest('.author');
+                (function updateDropdown() {
+                    var authorId = $author.data('id');
+
+                    var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
+                    var authorGroups = [];
+                    $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                        if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
+                            userGroupModel.isSelected(true);
+                        } else {
+                            userGroupModel.isSelected(false);
+                        }
+                        authorGroups.push({
+                            id: userGroupModel.id(),
+                            title: userGroupModel.name(),
+                            isActive: userGroupModel.isSelected()
+                        });
+                    });
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        data: $.merge(authorGroups, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ]),
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            var newUserGroupModel = new UserGroupModel();
+                                            newUserGroupModel.name($input.val());
+                                            Control.fire('add_list', {
+                                                name: newUserGroupModel.name(),
+                                                targetFeedId: Elements.rightdd()
+                                            }).success(function(data) {
+                                                newUserGroupModel.id(data.userGroup.id);
+                                                userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
+                                                updateDropdown();
+                                            });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                authorGroupIds.push(item.id + '');
+                                $author.data('group-ids', authorGroupIds.join(','));
+                                Control.fire('add_to_list', {
+                                    userId: authorId,
+                                    listId: item.id
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            var index = $.inArray(item.id + '', authorGroupIds);
+                            if (index !== -1) {
+                                authorGroupIds.splice(index, 1);
+                            }
+                            $author.data('group-ids', authorGroupIds.join(','));
+                            Control.fire('remove_from_list', {
+                                userId: authorId,
+                                listId: item.id
+                            });
+                        }
+                    });
+                })();
+            });
+            $container.delegate('.delete', 'click', function() {
+                var $author = $(this).closest('.author');
+                var authorId = $author.data('id');
+                var confirmDeleteBox = new Box({
+                    id: 'confirmDeleteBox' + authorId,
+                    title: 'Удаление автора',
+                    html: tmpl(BOX_LOADING, {height: 100}),
+                    buttons: [
+                        {label: 'Удалить', onclick: function() {
+                            Control.fire('author_remove', {
+                                authorId: authorId,
+                                targetFeedId: Elements.rightdd()
+                            }).success(function(data) {
+                                $author.remove();
+                                confirmDeleteBox.hide();
+                            });
+                        }},
+                        {label: 'Отменить', isWhite: true}
+                    ],
+                    onshow: function($box) {
+                        var box = this;
+
+                        VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                            if (!dataVK.response) {
+                                return box.setHTML('Пользователь не найден');
+                            }
+                            var user = dataVK.response[0];
+                            var clearUser = {
+                                id: user.uid,
+                                name: user.first_name + ' ' + user.last_name,
+                                photo: user.photo_medium_rec
+                            };
+                            authorId = clearUser.id;
+                            var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
+                            box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                        });
+                    }
+                }).show();
+            });
+        });
+    }
+
+    // Подвкладки Авторов: Новые Одобренные Отклоненные
+    $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
+        if (articlesLoading) {
+            return;
         }
 
+        var $tab = $(this);
+        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+        $tab.addClass('selected');
+
+        wallPage = 0;
+        loadArticles(true);
+    });
+
+    // Кастомные подвкладки
+    $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
+        if (articlesLoading) {
+            return;
+        }
+
+        var $tab = $(this);
+        $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
+        $tab.addClass('selected');
+
+        loadArticles(true);
     });
 
     // Вкладки в правом меню
@@ -325,19 +444,20 @@ $(document).ready(function(){
         $(".right-panel .type-selector a").removeClass('active');
         $(this).addClass('active');
 
-        Events.fire('rightcolumn_type_change', []);
+        Events.fire('rightcolumn_type_change');
     });
 
     // Wall init
-    $(".wall")
+    $("#wall")
         .delegate(".post > .delete", "click", function(){
             var elem = $(this).closest(".post"),
                 pid = elem.data("id"),
                 gid = elem.data('group');
-            Events.fire('leftcolumn_deletepost', [pid, function(state){
+            Events.fire('leftcolumn_deletepost', pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
                     var $deleteMessage = $('#' + deleteMessageId);
+                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
                         // если уже удаляли пост, то сообщение об удалении уже в DOMе
                         $deleteMessage.show();
@@ -346,14 +466,14 @@ $(document).ready(function(){
                         elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
-                                '<span class="button ignore">Не показывать новости сообщества</span>' +
+                                (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
                         ));
                     }
 
                     elem.hide();
                 }
-            }]);
+            });
         })
         .delegate('.post .ignore', 'click', function() {
             var elem = $(this).closest(".post"),
@@ -366,23 +486,62 @@ $(document).ready(function(){
         .delegate('.post .recover', 'click', function() {
             var elem = $(this).closest(".post"),
                 pid = elem.data("id");
-            Events.fire('leftcolumn_recoverpost', [pid, function(state){
+            Events.fire('leftcolumn_recoverpost', pid, function(state){
                 if(state) {
                     elem.hide().next().show();
                 }
-            }]);
+            });
+        })
+        .delegate('.show-all-postponed', 'click', function() {
+            var $target = $(this);
+            if ($target.data('block')) {
+                var $posts = $target.data('block');
+                if ($posts.first().is(':visible')) {
+                    $target.html($target.data('def-html'));
+                    $posts.hide();
+                } else {
+                    $target.html('Скрыть записи в очереди');
+                    $posts.show();
+                }
+            } else {
+                $target.data('def-html', $target.html());
+
+                wallPage = 0;
+                Elements.getWallLoader().show();
+                Control.fire('get_articles', {
+                    page: wallPage,
+                    sortType: Elements.getSortType(),
+                    type: Elements.leftType(),
+                    targetFeedId: Elements.rightdd(),
+                    userGroupId: Elements.getUserGroupId(),
+                    articlesOnly: true,
+                    mode: 'deferred'
+                }).success(function(html) {
+                    if (html) {
+                        var $posts = $(html);
+                        $target.data('block', $posts);
+                        $target.after($posts);
+                        $target.html('Скрыть записи в очереди');
+                        Elements.initImages($posts);
+                        Elements.initLinks($posts);
+                    } else {
+                        $target.remove();
+                    }
+                    Elements.getWallLoader().hide();
+                });
+            }
         });
 
     $("#queue")
         // Удаление постов
-        .delegate(".delete", "click", function(){
+        .delegate('.delete', 'click', function() {
             var elem = $(this).closest(".post"),
                 pid = elem.data("id");
-            Events.fire('rightcolumn_deletepost', [pid, function(state){
+            Events.fire('rightcolumn_deletepost', pid, function(state) {
                 if(state) {
                     elem.remove();
                 }
-            }]);
+            });
         })
         // Смена даты
         .delegate('.time', 'click', function() {
@@ -427,17 +586,19 @@ $(document).ready(function(){
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
-                    }]);
+                    });
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
-                    $post.animate({height: 0}, 200, function() {$(this).remove()});
+                    $post.animate({height: 0}, 200, function() {
+                        $(this).remove();
+                    });
                 }
             }
         })
-        .delegate('.time-of-removal', 'click', function(e) {
+        .delegate('.time-of-removal', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
             var $input = $time.data('time-of-removal-edit');
@@ -474,9 +635,9 @@ $(document).ready(function(){
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_removal_time_edit', [gridLineId, gridLineItemId, time, qid, function(state){
+                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                     if (state) {}
-                }]);
+                });
             }
         })
         .delegate('.datepicker', 'click', function() {
@@ -487,7 +648,6 @@ $(document).ready(function(){
                 var $datepicker = $('<input type="text" />');
                 var $post = $target.closest('.slot');
                 var $time = $post.find('.time');
-                var pid = $post.data('id');
                 var gridLineId = $post.data('grid-id');
                 var startDate = $post.data('start-date');
                 var endDate = $post.data('end-date');
@@ -524,25 +684,22 @@ $(document).ready(function(){
                         $('#queue').css('overflow', 'auto');
                         if ($post.hasClass('new')) {
                             // Добавление ячейки
-                            // console.log([gridLineId, time, startDate, endDate]);
-                            Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state){
+                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
                                 if (state) {}
-                            }]);
+                            });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
-                                console.log([gridLineId, time, startDate, endDate]);
-                                Events.fire('rightcolumn_save_slot', [gridLineId, time, startDate, endDate, function(state) {
+                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
                                     if (state) {}
-                                }]);
+                                });
                             }
                         }
                     }
                 });
                 $datepicker.val(startDate + ' - ' + endDate).focus();
             }
-        })
-    ;
+        });
 
     $('.queue-footer .add-button').click(function() {
         $("#queue").scrollTo(0);
@@ -557,42 +714,46 @@ $(document).ready(function(){
         $newPost.find('.time').click();
     });
 
-    // Загрузка стены по клику
-    $("#wallloadmore").click(function(){
-        var b = $(this);
-        if(b.hasClass("disabled")) { return; }
-        b.addClass("disabled");
-        Events.fire('wall_load_more', function(state){
-            b.removeClass("disabled");
-            if(!state) {
-                b.addClass("disabled");
-            }
-        });
-    });
-
     // Очистка текста
     $leftPanel.delegate(".clear-text", "click", function(){
-        var id = $(this).closest(".post").data("id");
-        var post = $(this).closest(".post");
+        var $post = $(this).closest(".post");
+        var postId = $post.data("id");
 
         if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
-            Events.fire('leftcolumn_clear_post_text', [id, function(state){
-                if(state) {
-                    post.find('div.shortcut').html('');
-                    post.find('div.cut').html('');
-                    post.find('a.show-cut').remove();
+            Events.fire('leftcolumn_clear_post_text', postId, function(state){
+                if (state) {
+                    $post.find('div.shortcut').html('');
+                    $post.find('div.cut').html('');
+                    $post.find('a.show-cut').remove();
                 }
-            }]);
+            });
         }
     });
 
+    // Отклонение или одобрения авторских постов
+    $leftPanel.delegate('.moderation .button.approve', 'click', function() {
+        var $post = $(this).closest('.post');
+        var postId = $post.data('id');
+        Events.fire('leftcolumn_approve_post', postId, function() {
+            $post.slideUp(200);
+        });
+    });
+    $leftPanel.delegate('.moderation .button.reject', 'click', function() {
+        var $post = $(this).closest('.post');
+        var postId = $post.data('id');
+        var $newComment = $post.find('.new-comment');
+        var $moderation = $post.find('.moderation');
+        $moderation.hide();
+        $newComment.show();
+        $newComment.find('textarea').focus();
+    });
+
     // Автоподгрузка записей
-    (function(){
-        var w = $(window),
-            b = $("#wallloadmore");
-        w.scroll(function() {
-            if (b.is(':visible') && w.scrollTop() > (b.offset().top - w.outerHeight(true) - w.height())) {
-                b.click();
+    (function() {
+        var $window = $(window);
+        $window.scroll(function() {
+            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                Events.fire('wall_load_more', function(state) {});
             }
         });
     })();
@@ -636,68 +797,65 @@ $(document).ready(function(){
                 foundLink   = matches[0];
                 foundDomain = matches[2];
 
-                Events.fire("post_describe_link", [
-                    foundLink,
-                    function(result) {
-                        if (result) {
-                            $linkDescription.empty();
-                            $linkStatus.empty();
+                Events.fire("post_describe_link", foundLink, function(result) {
+                    if (result) {
+                        $linkDescription.empty();
+                        $linkStatus.empty();
 
-                            var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
-                            $linkDescription.append($descriptionLayout);
+                        var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
+                        $linkDescription.append($descriptionLayout);
 
-                            // отрисовываем ссылку
-                            if (result.img) {
-                                var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css(
-                                    {
-                                        'background-image' : 'url('+result.img+')'
-                                    }
-                                );
+                        // отрисовываем ссылку
+                        if (result.img) {
+                            var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css(
+                                {
+                                    'background-image' : 'url('+result.img+')'
+                                }
+                            );
 
-                                $linkDescription.prepend($imgBlock);
-                            }
-                            if (result.title) {
-                                var $a = $('<a />', {
-                                    href: foundLink,
-                                    target: '_blank',
-                                    html: '<span>'+result.title+'</span>',
-                                    title:'Редактировать заголовок'
-                                });
-                                var $h = $('<div></div>',{'class':'post_describe_header'});
-                                $h.append($a);
-                                $descriptionLayout.append($h);
-                            }
-                            if (result.description) {
-                                var $p = $('<p />', {
-                                    html: '<span>'+result.description+'</span>',
-                                    title:'Редактировать описание'
-                                });
-                                $descriptionLayout.append($p);
-                            }
-
-                            editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
-
-                            var $span = $('<span />', { text: 'Ссылка: ' });
-                            $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
-
-                            var $deleteLink = $('<a />', { href: 'javascript:;', 'class': 'delete-link', text: 'удалить' }).click(function() {
-                                // убираем аттач ссылки
-                                deleteLink();
-                            });
-                            var $reloadLink = $('<a />', { href: 'javascript:;', 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
-                                link = foundLink;
-                                deleteLink();
-                                parseUrl(link);
-                            });
-                            $span.append($deleteLink);
-                            $span.append($reloadLink);
-
-                            $linkStatus.html($span);
-
-                            $linkInfo.show();
+                            $linkDescription.prepend($imgBlock);
                         }
+                        if (result.title) {
+                            var $a = $('<a />', {
+                                href: foundLink,
+                                target: '_blank',
+                                html: '<span>'+result.title+'</span>',
+                                title:'Редактировать заголовок'
+                            });
+                            var $h = $('<div></div>',{'class':'post_describe_header'});
+                            $h.append($a);
+                            $descriptionLayout.append($h);
+                        }
+                        if (result.description) {
+                            var $p = $('<p />', {
+                                html: '<span>'+result.description+'</span>',
+                                title:'Редактировать описание'
+                            });
+                            $descriptionLayout.append($p);
+                        }
+
+                        editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
+
+                        var $span = $('<span />', { text: 'Ссылка: ' });
+                        $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
+
+                        var $deleteLink = $('<a />', { 'class': 'delete-link', text: 'удалить' }).click(function() {
+                            // убираем аттач ссылки
+                            deleteLink();
+                        });
+                        var $reloadLink = $('<a />', { 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
+                            link = foundLink;
+                            deleteLink();
+                            parseUrl(link);
+                        });
+                        $span.append($deleteLink);
+                        $span.append($reloadLink);
+
+                        $linkStatus.html($span);
+
+                        $linkInfo.show();
                     }
-                ]);
+                });
             }
         };
 
@@ -813,10 +971,6 @@ $(document).ready(function(){
                             '</div>',
                         onComplete: function(id, fileName, responseJSON) {
                             popupNotice('Не реализовано');
-//                            $('.jcrop-holder').remove();
-//                            t.originalImage.attr({src:responseJSON.image}).show();
-//                            t.previewImage.attr({src:responseJSON.image});
-//                            t.crop();
                         }
                     });
                 } catch (e) {}
@@ -858,9 +1012,9 @@ $(document).ready(function(){
 
                 $('.editImagePopup .close').click();
 
-                Events.fire('post_link_data', [data, function(state){
+                Events.fire('post_link_data', data, function(state){
 
-                }]);
+                });
             }
         };
 
@@ -901,7 +1055,7 @@ $(document).ready(function(){
                 return $input.focus();
             } else {
                 $form.addClass("spinner");
-                Events.fire("post", [
+                Events.fire("post",
                     $input.val(),
                     photos,
                     link,
@@ -914,7 +1068,7 @@ $(document).ready(function(){
                         $form.removeClass("spinner");
                         $input.blur();
                     }
-                ]);
+                );
             }
         });
         $form.delegate(".cancel", "click" ,function(e){
@@ -929,23 +1083,22 @@ $(document).ready(function(){
         });
 
         // Быстрое редактирование поста в левой колонке
-        $leftPanel.delegate(".post .content .shortcut", "click", function(){
+        $leftPanel.delegate('.post.editable .content .shortcut', 'click', function() {
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 postId = $post.data("id");
 
             if ($post.editing) return;
 
-            Events.fire('load_post_edit', [postId, function(state, data){
+            Events.fire('load_post_edit', postId, function(state, data){
                 if (state && data) {
                     new SimpleEditPost(postId, $post, $content, data);
                 }
-            }]);
+            });
         });
 
         // Редактирование поста в левом меню
         $leftPanel.delegate(".post .edit", "click", function(){
-
             var $post = $(this).closest(".post"),
                 $content = $post.find('> .content'),
                 $buttonPanel = $post.find('> .bottom.d-hide'),
@@ -953,7 +1106,7 @@ $(document).ready(function(){
 
             if ($post.editing) return;
 
-            Events.fire('load_post_edit', [postId, function(state, data){
+            Events.fire('load_post_edit', postId, function(state, data){
                 if (state && data) {
 
                     (function($post, $el, data) {
@@ -984,127 +1137,124 @@ $(document).ready(function(){
                             }
                         }
                         function addLink(link, domain, el) {
-                            Events.fire("post_describe_link", [
-                                link,
-                                function(data) {
-                                    var savePost = function(d) {
-                                        d = d || {};
-                                        Events.fire('post_link_data', [
-                                            {
-                                                link: d.link || link,
-                                                header: d.title || data.title,
-                                                coords: d.coords || data.coords,
-                                                description: d.description || data.description
-                                            }, function(data) {
-                                                if (data) {
-                                                    if (data.img) {
-                                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
-                                                    }
-                                                    popupSuccess('Изменения сохранены');
+                            Events.fire("post_describe_link", link, function(data) {
+                                var savePost = function(d) {
+                                    d = d || {};
+                                    Events.fire('post_link_data', [
+                                        {
+                                            link: d.link || link,
+                                            header: d.title || data.title,
+                                            coords: d.coords || data.coords,
+                                            description: d.description || data.description
+                                        }, function(data) {
+                                            if (data) {
+                                                if (data.img) {
+                                                    el.find('.link-img').css('background-image', 'url(' + data.img + ')');
                                                 }
+                                                popupSuccess('Изменения сохранены');
                                             }
-                                        ]);
-                                    };
-                                    var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
-                                        $links.html('');
-                                    });
-                                    el.html(linkTplFull);
-                                    el.find('a').attr('href', link).html(domain);
-                                    el.find('.link-status-content').append($del);
+                                        }
+                                    ]);
+                                };
+                                var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                                    $links.html('');
+                                });
+                                el.html(linkTplFull);
+                                el.find('a').attr('href', link).html(domain);
+                                el.find('.link-status-content').append($del);
 
-                                    if (data.img) {
-                                        el.find('.link-img')
-                                            .css('background-image', 'url(' + data.img + ')')
-                                            .click(function() {
-                                                var originalImage = new Image();
-                                                originalImage.src = data.imgOriginal;
-                                                originalImage.onload = function () {
-                                                    var linkImageCoords = {};
-                                                    var closePopup = function() {
-                                                        $popup.remove();
-                                                        $bg.remove();
-                                                    };
-                                                    var showPreview = function(coords)
-                                                    {
-                                                        linkImageCoords = coords;
-                                                        var $preview = $popup.find('.preview');
-                                                        var rx = $preview.width() / coords.w;
-                                                        var ry = $preview.height() / coords.h;
+                                if (data.img) {
+                                    el.find('.link-img')
+                                        .css('background-image', 'url(' + data.img + ')')
+                                        .click(function() {
+                                            var originalImage = new Image();
+                                            originalImage.src = data.imgOriginal;
+                                            originalImage.onload = function () {
+                                                var linkImageCoords = {};
+                                                var closePopup = function() {
+                                                    $popup.remove();
+                                                    $bg.remove();
+                                                };
+                                                var showPreview = function(coords)
+                                                {
+                                                    linkImageCoords = coords;
+                                                    var $preview = $popup.find('.preview');
+                                                    var rx = $preview.width() / coords.w;
+                                                    var ry = $preview.height() / coords.h;
 
-                                                        $preview.find('> img').css({
-                                                            width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
-                                                            height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
-                                                            marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-                                                            marginTop: '-' + Math.round(ry * coords.y) + 'px'
-                                                        });
-                                                    };
-                                                    var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
-                                                    var $popup = $('<div/>', {
-                                                            'class': 'popup-image-edit',
-                                                            'html': '<div class="title">Редактировать изображение</div>'+
-                                                                '<div class="close"></div>' +
-                                                                '<div class="left-column">' +
-                                                                    '<div class="original"><img src="'+originalImage.src+'" /></div>' +
-                                                                '</div>' +
-                                                                '<div class="right-column">' +
-                                                                    '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                                                    '<div class="button save">Сохранить</div>'+
-                                                                '</div>'
-                                                        })
-                                                        .appendTo('body');
-
-                                                    $bg.click(closePopup);
-                                                    $popup.css({'margin-left': -$popup.width()/2});
-                                                    $popup.find('.close').click(closePopup);
-                                                    $popup.find('.save').click(function() {
-                                                        data.coords = linkImageCoords;
-                                                        savePost({coords: linkImageCoords});
-                                                        closePopup();
-                                                    });
-                                                    $popup.find('.original > img').Jcrop({
-                                                        onChange: showPreview,
-                                                        onSelect: showPreview,
-                                                        aspectRatio: 2.06,
-                                                        minSize: [130,63],
-                                                        setSelect: [0,0,130,63]
+                                                    $preview.find('> img').css({
+                                                        width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+                                                        height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+                                                        marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                                                        marginTop: '-' + Math.round(ry * coords.y) + 'px'
                                                     });
                                                 };
-                                            });
-                                    } else {
-                                        el.find('.link-img').remove();
-                                    }
-                                    if (data.title) {
-                                        el.find('div.link-description-text a')
-                                            .text(data.title)
-                                            .click(function() {
-                                                var $title = $(this);
-                                                $title.attr('contenteditable', true).focus();
-                                                return false;
-                                            })
-                                            .blur(function() {
-                                                var $title = $(this);
-                                                $title.attr('contenteditable', false);
-                                                data.title = $title.text();
-                                                savePost({title: $title.text()});
-                                            });
-                                    }
-                                    if (data.description) {
-                                        el.find('div.link-description-text p')
-                                            .text(data.description)
-                                            .click(function() {
-                                                var $description = $(this);
-                                                $description.attr('contenteditable', true).focus();
-                                                return false;
-                                            })
-                                            .blur(function() {
-                                                var $description = $(this);
-                                                $description.attr('contenteditable', false);
-                                                data.description = $description.text();
-                                                savePost({description: $description.text()});
-                                            });
-                                    }
+                                                var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
+                                                var $popup = $('<div/>', {
+                                                        'class': 'popup-image-edit',
+                                                        'html': '<div class="title">Редактировать изображение</div>'+
+                                                            '<div class="close"></div>' +
+                                                            '<div class="left-column">' +
+                                                                '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                                            '</div>' +
+                                                            '<div class="right-column">' +
+                                                                '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                                                '<div class="button save">Сохранить</div>'+
+                                                            '</div>'
+                                                    })
+                                                    .appendTo('body');
+
+                                                $bg.click(closePopup);
+                                                $popup.css({'margin-left': -$popup.width()/2});
+                                                $popup.find('.close').click(closePopup);
+                                                $popup.find('.save').click(function() {
+                                                    data.coords = linkImageCoords;
+                                                    savePost({coords: linkImageCoords});
+                                                    closePopup();
+                                                });
+                                                $popup.find('.original > img').Jcrop({
+                                                    onChange: showPreview,
+                                                    onSelect: showPreview,
+                                                    aspectRatio: 2.06,
+                                                    minSize: [130,63],
+                                                    setSelect: [0,0,130,63]
+                                                });
+                                            };
+                                        });
+                                } else {
+                                    el.find('.link-img').remove();
                                 }
-                            ]);
+                                if (data.title) {
+                                    el.find('div.link-description-text a')
+                                        .text(data.title)
+                                        .click(function() {
+                                            var $title = $(this);
+                                            $title.attr('contenteditable', true).focus();
+                                            return false;
+                                        })
+                                        .blur(function() {
+                                            var $title = $(this);
+                                            $title.attr('contenteditable', false);
+                                            data.title = $title.text();
+                                            savePost({title: $title.text()});
+                                        });
+                                }
+                                if (data.description) {
+                                    el.find('div.link-description-text p')
+                                        .text(data.description)
+                                        .click(function() {
+                                            var $description = $(this);
+                                            $description.attr('contenteditable', true).focus();
+                                            return false;
+                                        })
+                                        .blur(function() {
+                                            var $description = $(this);
+                                            $description.attr('contenteditable', false);
+                                            data.description = $description.text();
+                                            savePost({description: $description.text()});
+                                        });
+                                }
+                            });
                         }
                         function addPhoto(path, filename, url, el) {
                             var $photo = $('<span/>', {class: 'attachment'})
@@ -1155,9 +1305,9 @@ $(document).ready(function(){
                         var onSave = function() {
                             var text = $text.val();
                             var link = $links.find('a').attr('href');
-                            var photos = new Array();
+                            var photos = [];
                             $photos.children().each(function() {
-                                var photo = new Object();
+                                var photo = {};
                                 photo.filename = $(this).find('.filename').val();
                                 photo.url = $(this).find('.url').val();
                                 photos.push(photo);
@@ -1165,13 +1315,13 @@ $(document).ready(function(){
                             if (!($.trim(text) || link || photos.length)) {
                                 return $text.focus();
                             } else {
-                                Events.fire("post", [
+                                Events.fire("post",
                                     text,
                                     photos,
                                     link,
                                     postId,
                                     function(data) {}
-                                ]);
+                                );
                             }
                         };
                         var onCancel = function() {
@@ -1221,16 +1371,11 @@ $(document).ready(function(){
                         }
                     })($post, $content, data);
                 }
-            }]);
+            });
         });
     })();
 
     // Комментирование записи
-    $leftPanel.delegate('.post > .bottom .comment', 'click', function(e) {
-        var $target = $(this);
-        var $post = $target.closest('.post');
-        var postId = $post.data('id');
-    });
     $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
         $(this).autoResize();
         var $newComment = $(this).closest('.new-comment');
@@ -1247,36 +1392,44 @@ $(document).ready(function(){
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
-        Events.fire('comment_delete', [commentId, function() {
+        Events.fire('comment_delete', commentId, function() {
             $comment.data('html', $comment.html());
-            $comment.addClass('deleted').html('Комментарий удален. <a class="restore" href="javascript:;">Восстановить</a>.');
-        }]);
+            $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
+        });
     });
     $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
         var $target = $(this);
         var $comment = $target.closest('.comment');
         var commentId = $comment.data('id');
-        Events.fire('comment_restore', [commentId, function() {
+        Events.fire('comment_restore', commentId, function() {
             $comment.removeClass('deleted').html($comment.data('html'));
-        }]);
+        });
     });
     $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
         var $target = $(this);
-        var $comment = $target.closest('.new-comment');
-        var $textarea = $comment.find('textarea');
-        var $button = $comment.find('.send:not(.load)');
-        var $post = $comment.closest('.post');
+        var $post = $target.closest('.post');
+        var $newComment = $target.closest('.new-comment');
+        var $textarea = $newComment.find('textarea');
+        var $button = $newComment.find('.send:not(.load)');
         var $commentsList = $('.comments > .list', $post);
         var postId = $post.data('id');
         if (!$textarea.val()) {
             $textarea.focus();
         } else {
             $button.addClass('load');
-            Events.fire('comment_post', [postId, $textarea.val(), function(html) {
+            Events.fire('comment_post', postId, $textarea.val(), function(html) {
                 $button.removeClass('load');
                 $textarea.val('').focus();
                 $commentsList.append(html).find('.date').easydate(easydateParams);
-            }]);
+
+                var $moderation = $newComment.next('.moderation');
+                if ($moderation.length && !$moderation.data('checked')) {
+                    $moderation.data('checked', true);
+                    Events.fire('leftcolumn_reject_post', postId, function() {
+                        $post.slideUp(200);
+                    });
+                }
+            });
         }
     });
     $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
@@ -1286,10 +1439,10 @@ $(document).ready(function(){
         var postId = $post.data('id');
         var tmpText = $target.text();
         $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', [{postId: postId, all: true}, function(html) {
+        Events.fire('comment_load', {postId: postId, all: true}, function(html) {
             $target.removeClass('load').html(tmpText);
             $commentsList.html(html).find('.date').easydate(easydateParams);
-        }]);
+        });
     });
     $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
         var $target = $(this);
@@ -1298,20 +1451,26 @@ $(document).ready(function(){
         var postId = $post.data('id');
         var tmpText = $target.text();
         $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', [{postId: postId, all: false}, function(html) {
+        Events.fire('comment_load', {postId: postId, all: false}, function(html) {
             $target.removeClass('load').html(tmpText);
             $commentsList.html(html).find('.date').easydate(easydateParams);
-        }]);
+        });
     });
-    $(document).bind('mousedown', function(e) {
+    $(document).on('mousedown', function(e) {
         var $newComment = $(e.target).closest('.new-comment.open');
         if (!$newComment.length) {
             $('.new-comment.open').each(function() {
-                var $comment = $(this);
-                var $textarea = $comment.find('textarea');
+                var $newComment = $(this);
+                var $textarea = $newComment.find('textarea');
                 if (!$textarea.val()) {
-                    $comment.removeClass('open');
+                    $newComment.removeClass('open');
                     $textarea.height('auto');
+
+                    var $moderation = $newComment.next('.moderation');
+                    if ($moderation.length && !$moderation.data('checked')) {
+                        $newComment.hide();
+                        $moderation.show();
+                    }
                 }
             });
         }
@@ -1328,6 +1487,13 @@ $(document).ready(function(){
         $(this).remove();
 
         e.preventDefault();
+    });
+
+    $('#wall-switcher a').click(function() {
+        var $target = $(this);
+        $target.hide();
+        $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
+        loadArticles(true);
     });
 
     // Показать полностью в правом меню
@@ -1378,9 +1544,6 @@ $(document).ready(function(){
             }
         }
     })();
-
-    // ===
-    Elements.addEvents();
 });
 
 var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
@@ -1396,51 +1559,45 @@ var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href=
 var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
             </div>';
 
-var Events = {
-    isDebug: false,
-    delay: 0,
-    eventList: Eventlist,
-    fire: function(name, args){
-        var t = this;
-        if (typeof args != "undefined") {
-            if (!$.isArray(args)) args = [args];
-        } else {
-            args = [];
-        }
-        if ($.isFunction(t.eventList[name])) {
-            try {
-                setTimeout(function() {
-                    if (window.console && console.log && t.isDebug) {
-                        console.log(name + ':');
-                        console.log(args.slice(0, -1));
-                        console.log('-------');
-                    }
-                    t.eventList[name].apply(window, args);
-                }, t.delay);
-            } catch(e) {
-                if (window.console && console.log) {
-                    console.log(e);
-                }
-            }
-        }
-    }
-};
+ var BOX_AUTHOR =
+'<div class="photo" style="float: left; margin-right: 10px; height: 100px;">' +
+    '<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+        '<img src="<?=user.photo?>" alt="" />' +
+    '</a>' +
+'</div>' +
+'<div class="info">' +
+    '<?=text?>' +
+'</div>';
+
+ var BOX_ADD_AUTHOR =
+'Вы действительно хотите назначить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' автором?';
+
+ var BOX_DELETE_AUTHOR =
+'Вы действительно хотите удалить ' +
+'<a href="http://vk.com/id<?=user.id?>" target="_blank">' +
+    '<?=user.name?>' +
+'</a>' +
+' из списка авторов?';
 
 var Elements = {
-    initImages: function(selector){
-        $(".fancybox-thumb").fancybox({
-            prevEffect		: 'none',
-            nextEffect		: 'none',
-            closeBtn		: false,
-            fitToView       : false,
-            helpers		: {
-                title	: { type : 'inside' },
-                buttons	: {}
+    initImages: function($block) {
+        $block.find(".fancybox-thumb").fancybox({
+            prevEffect: 'none',
+            nextEffect: 'none',
+            closeBtn:false,
+            fitToView: false,
+            helpers: {
+                title: {type : 'inside'},
+                buttons: {}
             }
         });
 
         //логика картинок топа
-        $("div.post-image-top img").bind("load", function () {
+        $block.find(".post-image-top img").bind("load", function () {
             var src = $(this).attr('src');
             var img = new Image();
             var link = $(this).closest(".post").find('.ajax-loader-ext');
@@ -1458,76 +1615,64 @@ var Elements = {
             img.src = src;
         });
 
-
-        $(".left-panel .timestamp").easydate(easydateParams);
-        $(".left-panel .date").easydate(easydateParams);
-        $('.left-panel .images-ready').imageComposition();
+        $block.find(".timestamp").easydate(easydateParams);
+        $block.find(".date").easydate(easydateParams);
+        $block.find('.images-ready').imageComposition();
         $('.right-panel .images').imageComposition('right');
     },
-    addEvents: function(){
-        (function(){
-            $(".slot .post .content").addClass("dragged");
-            var target = false;
-            var dragdrop = function(post, slot, queueId, callback, failback){
-                Events.fire('post_moved', [post, slot, queueId, function(state, newId){
-                    if (state) {
-                        callback(newId);
-                    } else {
-                        failback();
-                    }
-                }]);
-            };
+    initDraggable: function($block) {
+        $block.find('.post.movable:not(.blocked) > .content').draggable({
+            revert: 'invalid',
+            appendTo: 'body',
+            cursor: 'move',
+            cursorAt: {left: 100, top: 20},
+            helper: function() {
+                return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+            },
+            start: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.addClass('moving');
+            },
+            stop: function() {
+                var self = $(this),
+                    $post = self.closest('.post');
+                $post.removeClass('moving');
+            }
+        });
+    },
+    initDroppable: function($block) {
+        $block.find('.items .slot').droppable({
+            activeClass: 'ui-state-active',
+            hoverClass: 'ui-state-hover',
+            drop: function(e, ui) {
+                var $target = $(this),
+                    $post = $(ui.draggable).closest('.post');
 
-            var draggableParams = {
-                revert: 'invalid',
-                appendTo: 'body',
-                cursor: 'move',
-                cursorAt: {left: 100, top: 20},
-                helper: function() {
-                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
-                },
-                start: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.addClass('moving');
-                },
-                stop: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.removeClass('moving');
-                }
-            };
-
-            $(".post:not(.blocked) > .content").draggable(draggableParams);
-
-            $('.items .slot').droppable({
-                activeClass: "ui-state-active",
-                hoverClass: "ui-state-hover",
-
-                drop: function(e, ui) {
-                    var $target = $(this),
-                        $post = $(ui.draggable).closest('.post'),
-                        $slot = $post.closest('.slot'),
-                        $helper = $(ui.helper);
-
-                    if ($target.hasClass('empty')) {
-                        dragdrop($post.data("id"), $target.data("id"), $post.data("queue-id"), function(newId){
+                if ($target.hasClass('empty')) {
+                    Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
+                        if (state) {
                             if ($post.hasClass('movable')) {
                                 $target.html($post);
                             }
                             $target.addClass('image-compositing');
-                        });
-                    }
+                        }
+                    });
                 }
-            });
-        })();
+            }
+        });
+    },
+    initLinks: function($block) {
+        $block.find('img.ajax-loader').each(function(){
+            Elements.initLinkLoader($(this), true);
+        });
     },
     leftdd: function(){
         return $("#source-select").multiselect("getChecked").map(function(){
             return this.value;
         }).get();
     },
-    rightdd:function(value){
+    rightdd: function(value){
         if (typeof value == 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
@@ -1541,13 +1686,12 @@ var Elements = {
         return $('.right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        var $calendar = $('#calendar');
         if (typeof value == 'undefined') {
-            var date = $calendar.datepicker('getDate');
-            var timestamp = Math.floor(date.getTime() / 1000) - (new Date().getTimezoneOffset() * 60);
-            return timestamp ? timestamp : null;
+            var time = $('#calendar').datepicker('getDate').getTime();
+            var timestamp = Math.round(time / 1000) - (new Date().getTimezoneOffset() * 60) + 14400;
+            return timestamp;
         } else {
-            $calendar.datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
+            $('#calendar').datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
     initLinkLoader: function(obj, full){
@@ -1584,7 +1728,7 @@ var Elements = {
 
                 var matches = link.match(pattern);
 
-                shortLink = link;
+                var shortLink = link;
                 if (matches[2]) {
                     shortLink = matches[2];
                 }
@@ -1592,35 +1736,19 @@ var Elements = {
             }
         });
     },
-    initLinks: function(){
-        $('img.ajax-loader').each(function(){
-            Elements.initLinkLoader($(this), true);
-        });
+    getUserGroupId: function() {
+        return $('.user-groups-tabs').find('.tab.selected').data('user-group-id') || null;
+    },
+    getArticleStatus: function() {
+        return $('.authors-tabs').find('.tab.selected').data('article-status') || 1;
+    },
+    getSortType: function() {
+        return $('.wall-title a').data('type');
+    },
+    getWallLoader: function() {
+        return $('#wall-load');
+    },
+    getSwitcherType: function() {
+        return $('#wall-switcher').find('a:visible').data('type');
     }
-};
-
-$.fn.dd_sel = function(id){
-    var elem = $(this);
-    if(!elem.hasClass("drop-down")) return;
-    if(id) {
-        elem = elem.find("li[data-id=" + id + "]");
-    } else {
-        elem = elem.find("li:first");
-    }
-
-    $(this).find('li.active').removeClass('active');
-    elem.addClass('active');
-
-    if(elem.length) {
-        $(this)
-            .data("selected",elem.data("id"))
-            .find(".caption")
-            .text(elem.text())
-            .removeClass("default");
-    } else {
-        $(this)
-            .data("selected",0)
-            .find(".caption").text('Источник').addClass("default");
-    }
-    $(this).trigger("change");
 };

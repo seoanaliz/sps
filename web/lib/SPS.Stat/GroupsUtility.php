@@ -60,14 +60,14 @@
             GroupFactory::UpdateRange( $groups );
         }
 
-        //возвращает дефолтню группу для этого типа групп. Нет - создаст
+        //возвращает дефолтную группу для этого типа групп. Нет - создаст
         public static function get_default_group( $user_id, $groupe_sourse ) {
 
             $default_group = GroupFactory::Get( array( '_created_by' => $user_id, 'source' => $groupe_sourse, 'type' => 2 ));
             if( empty( $default_group )) {
                 $default_group = new Group;
                 $default_group->created_by  =   $user_id;
-                $default_group->name        =   Group::DEFAULT_GROUPE_NAME;
+                $default_group->name        =   'default_group';
                 $default_group->source      =   $groupe_sourse;
                 $default_group->status      =   1;
                 $default_group->type        =   2;
@@ -140,9 +140,9 @@
                     if( $group->type == 2 ) {
                         if( !is_array( $res['user_lists']))
                             $res['user_lists'] = array();
-                            array_unshift( $res['user_lists'], $tmp);
+                        array_unshift( $res['user_lists'], $tmp );
                     } else {
-                        $res['user_lists'][]=$tmp;
+                        $res['user_lists'][] = $tmp;
                     }
                 }
             }
@@ -165,7 +165,7 @@
         }
 
         //проверяет, является ли юзер автором группы
-        public static function is_author( $group_id, $user_id)
+        public static function is_author( $group_id, $user_id )
         {
             $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by'=> $user_id ));
             if ( $group )

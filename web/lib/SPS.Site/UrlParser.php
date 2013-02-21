@@ -15,6 +15,7 @@
 
             $result = array();
             $html = self::GetUrlContent($url);
+            $html = mb_check_encoding($html, 'UTF-8') ? $html : utf8_encode($html);
             if (empty($html)) {
                 return $result;
             }

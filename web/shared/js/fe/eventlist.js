@@ -1,7 +1,50 @@
 var articlesLoading = false;
 
-function initSlider(targetFeedId, sourceType) {
+Control = $.extend(Control, {
+    root: controlsRoot,
+    dataType: 'html',
 
+    controlMap: {
+        get_articles: {
+            name: 'arcticles-list'
+        },
+        authors_get: {
+            name: 'authors-list'
+        },
+        author_remove: {
+            name: 'author-delete',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+        author_add: {
+            name: 'author-add',
+            params: {
+                authorId: 'vkId'
+            }
+        },
+        add_list: {
+            name: 'add-user-group',
+            dataType: 'json'
+        },
+        add_to_list: {
+            name: 'add-user-to-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
+        },
+        remove_from_list: {
+            name: 'remove-user-from-group',
+            params: {
+                userId: 'vkId',
+                listId: 'userGroupId'
+            }
+        }
+    }
+});
+
+function initSlider(targetFeedId, sourceType) {
     var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
     var from = sourceType == 'albums' ? 0 : 50;
     var to = 100;
@@ -20,7 +63,7 @@ function initSlider(targetFeedId, sourceType) {
         }
     }
     var sliderRange = $("#slider-range");
-    sliderRange.data('sourceType', sourceType)
+    sliderRange.data('sourceType', sourceType);
 
     if (!sliderRange.data('slider')) {
         sliderRange.slider({
@@ -58,55 +101,104 @@ function changeRange() {
     }
 }
 
+var wallPage = -1;
+
 function loadArticles(clean) {
-    if (articlesLoading) return;
-
-    articlesLoading = true;
-
-    $('#wall-load').show();
-
-    if (Elements.leftdd().length != 1) {
-        $('.newpost').hide();
-    } else {
-        $('.newpost').show();
+    if (articlesLoading) {
+        return;
+    }
+    if (clean){
+        wallPage = -1;
+        $(window).data('disable-load-more', false);
     }
 
-    var from = $( "#slider-range" ).slider( "values", 0 );
-    var to = $( "#slider-range" ).slider( "values", 1 );
-    var sortType = $('.wall-title a').data('type');
+    var sourceType = Elements.leftType();
+    var targetFeedId = Elements.rightdd();
+    var sourceFeedIds = Elements.leftdd();
+    var switcherType = Elements.getSwitcherType();
+    wallPage++;
+    articlesLoading = true;
 
-    if ($('.type-selector a.active').data('type') == 'ads') {
-        from = 0;
-        to = 100;
+    Elements.getWallLoader().show();
+
+    var requestData = {
+        sortType: Elements.getSortType(),
+        sourceFeedIds: sourceFeedIds,
+        page: wallPage,
+        type: sourceType,
+        targetFeedId: targetFeedId
+    };
+
+    if (sourceType == 'authors') {
+        $('.newpost').show();
+
+        requestData.userGroupId = Elements.getUserGroupId();
+        switch (switcherType) {
+            case 'approved':
+                requestData.articleStatus = 2;
+                break;
+            case 'deferred':
+                requestData.articleStatus = 1;
+                break;
+            case 'all':
+                requestData.mode = 'all';
+                break;
+            case 'my':
+                requestData.mode = 'my';
+                break;
+            default:
+                requestData.articleStatus = 1;
+        }
+    } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
+        $('.newpost').show();
+    } else {
+        $('.newpost').hide();
+    }
+
+    if (sourceType == 'my') {
+        requestData.articleStatus = Elements.getArticleStatus();
+        requestData.mode = 'my';
+    } else if (sourceType == 'ads') {
+        requestData.from = 0;
+        requestData.to = 100;
+    } else {
+        var $slider = $("#slider-range");
+        requestData.from = $slider.slider("values", 0);
+        requestData.to = $slider.slider("values", 1);
+    }
+
+    if (!clean) {
+        requestData.articlesOnly = 1;
     }
 
     //clean and load left column
     $.ajax({
-            url: controlsRoot + 'arcticles-list/',
-            dataType : "html",
-            data: {
-                sourceFeedIds: Elements.leftdd(),
-                clean: clean,
-                from : from,
-                to : to,
-                sortType : sortType,
-                type: Elements.leftType(),
-                targetFeedId: Elements.rightdd()
+        url: controlsRoot + 'arcticles-list/',
+        dataType: "html",
+        data: requestData
+    }).always(function() {
+        Elements.getWallLoader().hide();
+        if (clean) {
+            $('#wall').empty();
+        }
+    }).done(function(data) {
+        if (!data) {
+            $(window).data('disable-load-more', true);
+            $('.wall-title span.count').text('нет записей');
+        } else {
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            $('#wall').append($block);
+            Elements.initDraggable($block);
+            Elements.initDroppable($('.right-panel'));
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            if (!$block.find('.post').length) {
+                $(window).data('disable-load-more', true);
             }
-        })
-        .always(function() {
-            $('#wall-load').hide();
-            if (clean) {
-                $('div#wall').empty();
-            }
-        })
-        .done(function(data) {
-            $('div#wall').append(data);
-            articlesLoading = false;
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
-        });
+        }
+        articlesLoading = false;
+    });
 }
 
 function loadQueue() {
@@ -115,7 +207,7 @@ function loadQueue() {
         return;
     }
 
-    $.cookie('currentTargetFeedId', targetFeedId, { expires: 7, path: '/', secure: false });
+    $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
 
     var type = Elements.rightType();
 
@@ -128,20 +220,25 @@ function loadQueue() {
     //clean and load right column
     $.ajax({
         url: controlsRoot + 'arcticles-queue-list/',
-        dataType : "html",
+        dataType: "html",
         data: {
             targetFeedId: Elements.rightdd(),
             timestamp: Elements.calendar(),
             type: type
-        },
-        success: function (data) {
-            $('div#queue').show().html(data);
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
-
-            $('.post.blocked').draggable('disable');
+        }
+    }).success(function (data) {
+        if (data) {
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            $('#queue').show().html($block);
+            Elements.initDraggable($block);
+            Elements.initDroppable($('.right-panel'));
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $block.find('.post.blocked').draggable('disable');
             renderQueueSize();
+        } else {
+            $('#queue').empty();
         }
     });
 }
@@ -154,17 +251,18 @@ function renderQueueSize() {
 function reloadArticle(id) {
     $.ajax({
         url: controlsRoot + 'arcticle-item/',
-        dataType : "html",
+        dataType: "html",
         data: {
-            id: id
+            id: id,
+            targetFeedId: Elements.rightdd()
         },
-        success: function (data) {
-            elem = $("div.post[data-id=" + id + "]");
-            elem.replaceWith(data);
-
-            Elements.addEvents();
-            Elements.initImages('.post .images');
-            Elements.initLinks();
+        success: function(data) {
+            var $elem = $("div.post[data-id=" + id + "]");
+            $elem.replaceWith(data);
+            Elements.initDraggable($elem);
+            Elements.initDroppable($('.right-panel'));
+            Elements.initImages($elem);
+            Elements.initLinks($elem);
         }
     });
 }
@@ -199,6 +297,28 @@ var Eventlist = {
                 id: post_id
             },
             success: function (data) {
+                callback(1);
+            }
+        });
+    },
+    leftcolumn_approve_post: function(post_id, callback) {
+        $.ajax({
+            url: controlsRoot + 'article-approved/',
+            data: {
+                id: post_id
+            },
+            success: function(data) {
+                callback(1);
+            }
+        });
+    },
+    leftcolumn_reject_post: function(post_id, callback) {
+        $.ajax({
+            url: controlsRoot + 'article-reject/',
+            data: {
+                id: post_id
+            },
+            success: function(data) {
                 callback(1);
             }
         });
@@ -295,26 +415,8 @@ var Eventlist = {
 
         var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
-
-        if (sourceType != 'source' && sourceType != 'albums') {
-            $('#slider-text').hide();
-            $('#slider-cont').hide();
-            $('#filter-list a').hide();
-        } else {
-            $('#slider-text').show();
-            $('#slider-cont').show();
-            $('#filter-list a').show();
-        }
-
-        $.cookie('sourceTypes' + targetFeedId, sourceType);
-
-        //init slider
-        initSlider(targetFeedId, sourceType);
-
-        $('#source-select option').remove();
-        $('#source-select').multiselect("refresh");
-
-
+        var $multiSelect = $("#source-select");
+        var $leftPanel = $('.left-panel');
 
         //грузим источники для этого паблика
         $.ajax({
@@ -323,84 +425,151 @@ var Eventlist = {
             data: {
                 targetFeedId: targetFeedId,
                 type: sourceType
-            },
-            success: function (data) {
-                var sourceSelector = $('#source-select');
-                for (var i in data['sourceFeeds']) {
-                    var item = data['sourceFeeds'][i];
-                     sourceSelector.append('<option value="' + item.id + '">' + item.title + '</option>');
-                }
-
-                var sourceTypes = data['accessibleSourceTypes'];
-                var $typeSelector = $('.left-panel div.type-selector');
-                $typeSelector.children('.sourceType').each(function(i, item){
-                      item = $(item);
-                      if ($.inArray(item.data('type'), sourceTypes) == -1){
-                        item.hide();
-                      } else {
-                          item.show();
-                      }
-                });
-                if (data['canShowAuthorsList']){
-                    $typeSelector.children('.tab-authors-list').show();
-                } else {
-                    $typeSelector.children('.tab-authors-list').hide();
-                }
-
-                var gridTypes = data['accessibleGridTypes'];
-                var showCount = 0;
-                $('.right-panel div.type-selector').children('.grid_type').each(function(i, item){
-                    item = $(item);
-                    if ($.inArray(item.data('type'), gridTypes) == -1){
-                        item.hide();
-                    } else {
-                        showCount ++
-                        item.show();
-                    }
-                });
-                if (showCount > 2) {
-                    $('a.grid_type.all').show();
-                } else {
-                    $('a.grid_type.all').hide();
-                }
-
-                var addCellButton = $('div.queue-footer > a.add-button');
-                if (data['canAddPlanCell']) {
-                    addCellButton.show();
-                } else {
-                    addCellButton.hide();
-                }
-
-                // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
-                var sourceTypeLink = $('#sourceType-' + data.type);
-                if (!sourceTypeLink.hasClass('active')) {
-                    $('.sourceType.active').removeClass('active');
-                    sourceTypeLink.addClass('active');
-                }
-
-                loadQueue();
-
-                //get data from cookie
-                var cookie = $.cookie('sourceFeedIds' + targetFeedId);
-                if (cookie) {
-                    var selectedSources = cookie.split(',');
-                    if (selectedSources) {
-                        var $options = $('#source-select option');
-                        for (i in selectedSources) {
-                            $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
-                        }
-                    }
-                }
-
-                sourceSelector.multiselect("refresh");
-
-                if (Elements.leftdd().length == 0) {
-                     sourceSelector.multiselect("checkAll").multiselect("refresh");
-                }
-
-                articlesLoading = false;
-                Events.fire('leftcolumn_dropdown_change', []);
             }
+        }).success(function(data) {
+            var $wallSwitcher = $('#wall-switcher');
+            var sourceTypes = data.accessibleSourceTypes;
+            // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+            var $sourceTypeLink = $('#sourceType-' + data.type);
+            if (!$sourceTypeLink.hasClass('active')) {
+                $('.sourceType.active').removeClass('active');
+                $sourceTypeLink.addClass('active');
+            }
+            sourceType = $sourceTypeLink.data('type');
+            if (sourceType != 'source' && sourceType != 'albums') {
+                $('#slider-text').hide();
+                $('#slider-cont').hide();
+                $('#filter-list').hide();
+            } else {
+                $('#slider-text').show();
+                $('#slider-cont').show();
+                $('#filter-list').show();
+            }
+
+            if (data.showSourceList) {
+                $multiSelect.multiselect('getButton').removeClass('hidden');
+            } else {
+                $multiSelect.multiselect('getButton').addClass('hidden');
+            }
+
+            // фильтры по типу постов
+            if (data.showArticleStatusFilter) {
+                $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+                $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
+                $leftPanel.find('.authors-tabs').show();
+            } else {
+                $leftPanel.find('.authors-tabs').hide();
+            }
+
+            // группы юзеров
+            $wallSwitcher.hide();
+            var $userGroupTabs = $('.user-groups-tabs');
+            if (sourceType == 'authors') {
+                if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                    var showSwitcherType;
+                    if (data.authorsFilters.all_my_filter) {
+                        showSwitcherType = 'all';
+                    } else {
+                        showSwitcherType = 'deferred';
+                    }
+                    $wallSwitcher.show();
+                    $wallSwitcher.find('a').hide();
+                    $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+                }
+
+                var userGroups = data.showUserGroups;
+                $userGroupTabs.empty();
+                $userGroupTabs.removeClass('hidden');
+                $userGroupTabs.append('<div class="tab selected">Все новости</div>');
+                if (userGroups) {
+                    for (var i in userGroups) {
+                        var userGroupModel = new UserGroupModel();
+                        userGroupModel.id(userGroups[i]['id']);
+                        userGroupModel.name(userGroups[i]['name']);
+                        userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                        $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                    }
+                }
+            } else {
+                $userGroupTabs.addClass('hidden');
+            }
+
+            var $typeSelector = $('.left-panel div.type-selector');
+            $typeSelector.children('.sourceType').each(function(i, item) {
+                item = $(item);
+                if ($.inArray(item.data('type'), sourceTypes) == -1) {
+                    item.hide();
+                } else {
+                    item.show();
+                }
+            });
+
+            $.cookie('sourceTypes' + targetFeedId, sourceType);
+
+            //init slider
+            initSlider(targetFeedId, sourceType);
+
+            $('#source-select option').remove();
+
+            for (var i in data.sourceFeeds) {
+                var item = data.sourceFeeds[i];
+                $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
+            }
+
+            $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
+                item = $(item);
+                if ($.inArray(item.data('type'), sourceTypes) == -1){
+                    item.hide();
+                } else {
+                    item.show();
+                }
+            });
+
+            var gridTypes = data.accessibleGridTypes;
+            var showCount = 0;
+            $('.right-panel .type-selector').children('.grid_type').each(function(i, item){
+                item = $(item);
+                if ($.inArray(item.data('type'), gridTypes) == -1){
+                    item.hide();
+                } else {
+                    showCount++;
+                    item.show();
+                }
+            });
+            if (showCount > 2) {
+                $('a.grid_type.all').show();
+            } else {
+                $('a.grid_type.all').hide();
+            }
+
+            var addCellButton = $('div.queue-footer > a.add-button');
+            if (data['canAddPlanCell']) {
+                addCellButton.show();
+            } else {
+                addCellButton.hide();
+            }
+
+            loadQueue();
+
+            //get data from cookie
+            var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+            if (cookie) {
+                var selectedSources = cookie.split(',');
+                if (selectedSources) {
+                    var $options = $('#source-select option');
+                    for (i in selectedSources) {
+                        $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
+                    }
+                }
+            }
+
+            $multiSelect.multiselect("refresh");
+            if (Elements.leftdd().length == 0) {
+                $multiSelect.multiselect("checkAll").multiselect("refresh");
+            }
+
+            articlesLoading = false;
+            Events.fire('leftcolumn_dropdown_change');
         });
     },
     calendar_change: function(){
@@ -411,10 +580,7 @@ var Eventlist = {
         loadQueue();
     },
     wall_load_more: function(callback){
-        if (!$("#wallloadmore").hasClass('hidden')) {
-            $("#wallloadmore").addClass('hidden');
-            loadArticles(false);
-        }
+        loadArticles(false);
         callback(true);
     },
     post_moved: function(post_id, slot_id, queueId, callback){
@@ -483,7 +649,8 @@ var Eventlist = {
     },
 
     post: function(text, photos, link, id, callback){
-        $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedId;
         if ($sourceFeedIds.length != 1) {
             $sourceFeedId = null;
         } else {
@@ -500,7 +667,8 @@ var Eventlist = {
                 photos: photos,
                 link: link,
                 sourceFeedId: $sourceFeedId,
-                targetFeedId: Elements.rightdd()
+                targetFeedId: Elements.rightdd(),
+                userGroupId: Elements.getUserGroupId()
             },
             success: function (data) {
                 if(data.success) {
@@ -544,25 +712,14 @@ var Eventlist = {
         });
     },
 
-    authors_get: function(callback) {
+    add_article_group: function(targetFeedId, name, callback) {
         $.ajax({
-            url: controlsRoot + 'authors-list/',
-            data : {
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(data);
-            }
-        });
-    },
-    author_add: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-add/',
-            type: 'GET',
+            url: controlsRoot + 'add-user-group/',
+            type: 'POST',
             dataType : "json",
             data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
+                name: name,
+                targetFeedId: targetFeedId
             },
             success: function (data) {
                 if(data.success) {
@@ -574,24 +731,6 @@ var Eventlist = {
         });
     },
 
-    author_remove: function(userId, callback) {
-        $.ajax({
-            url: controlsRoot + 'author-delete/',
-            type: 'GET',
-            dataType : "json",
-            data: {
-                vkId: userId,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function (data) {
-                callback(true);
-            }
-        });
-    },
-
-    author_edit_desc: function(userId, description, callback) {
-        callback();
-    },
 
     leftcolumn_sort_type_change: function() {
         loadArticles(true);
@@ -647,7 +786,68 @@ var Eventlist = {
         });
     },
 
+    get_author_articles: function(articleStatus, callback) {
+        var slider = $( "#slider-range" );
+        var from = slider.slider( "values", 0 );
+        var to = slider.slider( "values", 1 );
+
+        Elements.getWallLoader().show();
+        var requestData =  {
+            sourceFeedIds: Elements.leftdd(),
+            page: wallPage,
+            from: from,
+            to: to,
+            sortType: Elements.getSortType(),
+            type: Elements.leftType(),
+            targetFeedId: Elements.rightdd()
+        };
+        if (typeof articleStatus != 'undefined'){
+            requestData['articleStatus'] = articleStatus;
+        }
+
+        $.ajax({
+            url: controlsRoot + 'arcticles-list/',
+            dataType : "html",
+            data: requestData
+        }).always(function() {
+            Elements.getWallLoader().hide();
+        }).done(callback);
+    },
+
     eof: null
+};
+
+var Events = {
+    delay: 0,
+    isDebug: false,
+    eventList: Eventlist,
+    fire: function(name){
+        var t = this;
+        var args;
+        if (arguments.length == 2 && (typeof arguments[1] == 'object') && arguments[1].length) {
+            args = arguments[1];
+        } else {
+            args = Array.prototype.slice.call(arguments, 1);
+        }
+        if ($.isFunction(t.eventList[name])) {
+            try {
+                setTimeout(function() {
+                    if (window.console && console.log && t.isDebug) {
+                        console.groupCollapsed(name);
+                        console.log('args: ' + args.slice(0, -1));
+                        console.groupEnd(name);
+                    }
+                    t.eventList[name].apply(window, args);
+                }, t.delay);
+            } catch(e) {
+                if (window.console && console.log && t.isDebug) {
+                    console.groupCollapsed('Error');
+                    console.log(e);
+                    console.groupEnd('Error');
+                }
+            }
+        }
+    }
 };
 
 function popupSuccess( message ) {

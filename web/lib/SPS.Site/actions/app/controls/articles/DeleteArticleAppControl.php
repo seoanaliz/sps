@@ -1,21 +1,17 @@
 <?php
-Package::Load('SPS.Site');
-
 /**
  * DeleteArticleAppControl Action
  * @package    SPS
  * @subpackage Site
  * @author     Shuler
  */
-class DeleteArticleAppControl extends AppBaseControl
-{
+class DeleteArticleAppControl extends AppBaseControl {
 
     /**
      * Entry Point
      */
-    public function Execute()
-    {
-        $id = Request::getInteger('id');
+    public function Execute() {
+        $id = Request::getInteger( 'id' );
 
         if (empty($id)) {
             return;
@@ -28,5 +24,4 @@ class DeleteArticleAppControl extends AppBaseControl
         ArticleFactory::UpdateByMask($o, array('statusId'), array('articleId' => $id, 'authorId' => $author->authorId));
     }
 }
-
 ?>

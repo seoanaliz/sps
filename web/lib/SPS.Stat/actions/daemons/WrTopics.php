@@ -4,7 +4,7 @@ Package::Load( 'SPS.Stat' );
 
 set_time_limit(13600);
 //error_reporting( 0 );
-new StatTables();
+new stat_tables();
 class WrTopics extends wrapper
 {
     private $ids;
@@ -13,16 +13,22 @@ class WrTopics extends wrapper
     public function Execute()
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
-        if (! $this->check_time())
+
+        set_time_limit(14000);
+
+        if (! $this->check_time()) {
+            $this->double_check_quantity();
             die('Не сейчас');
-
+        }
         $this->get_id_arr();
-        echo "start_time = " . date( 'H:i' ) . '<br>';
-        StatPublics::update_public_info( $this->ids, $this->conn );
-
-        $this->update_quantity();
-        $this->update_visitors();
+//
 //        $this->find_admins();
+//        die();
+        StatPublics::update_public_info( $this->ids, $this->conn );
+        $this->update_quantity();
+        $this->double_check_quantity();
+
+        $this->update_visitors();
         echo "end_time = " . date( 'H:i') . '<br>';
     }
 
@@ -47,7 +53,11 @@ class WrTopics extends wrapper
         $res[] = '43503460';
         $res[] = '43503503';
         $res[] = '43503550';
-
+        $res[] = '43503235';
+        $res[] = '43503264';
+        $res[] = '43503298';
+        $res[] = '43503315';
+        $res[] = '43503431';
 
         $this->ids = $res;
 
@@ -71,14 +81,14 @@ class WrTopics extends wrapper
     public function set_public_grow( $publ_id, $quantity )
     {
         $sql = 'SELECT quantity FROM ' . TABLE_STAT_PUBLICS_POINTS .
-            ' WHERE
+              ' WHERE
                     id=@publ_id
                     AND (
-                            time=CURRENT_DATE - interval \'2 day\'
+                               time=CURRENT_DATE - interval \'2 day\'
                             or time=CURRENT_DATE - interval \'8 day\'
                             or time=CURRENT_DATE - interval \'31 day\'
                         )
-               ORDER BY time DESC';
+                ORDER BY time DESC';
 
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',  $publ_id );
@@ -139,18 +149,35 @@ class WrTopics extends wrapper
         $cmd->Execute();
     }
 
-    //собирает количество посетителей в пабликах
-    public function update_quantity()
+    public function set_public_closed( $public_id )
     {
+        $sql = "UPDATE " . TABLE_STAT_PUBLICS . " SET closed = 't' WHERE vk_id=@id ";
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger( '@id', $public_id );
+        $cmd->Execute();
+    }
+
+    //собирает количество посетителей в пабликах
+    public function update_quantity( $ids = null )
+    {
+        $act = 'update';
+        if( !is_array( $ids )) {
+            $ids = $this->ids;
+            $act = 'save';
+        }
+        if( empty( $ids ))
+            return true;
+        $act .= '_point';
         $time = $this->morning(time());
         $i = 0;
         $return = "return{";
         $code = '';
-        $timeTo = StatPublics::get_last_update_time();
-        foreach( $this->ids as $b ) {
 
-            if ( $i == 25 or !next( $this->ids )) {
-                if ( !next( $this->ids ) ) {
+        $timeTo = StatPublics::get_last_update_time();
+        foreach( $ids as $b ) {
+
+            if ( $i == 25 or !next( $ids )) {
+                if ( !next( $ids )) {
                     $code   .= "var a$b = API.groups.getMembers({\"gid\":$b, \"count\":1});";
                     $return .= "\" a$b\":a$b,";
                 }
@@ -159,16 +186,19 @@ class WrTopics extends wrapper
 
                 if (self::TESTING)
                     echo '<br>' . $code;
-                $res = VkHelper::api_request( 'execute', array('code' =>  $code), 0);
 
-                foreach($res as $key => $entry) {
-                    $key = str_replace( 'a', '', $key );
-                    $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,current_timestamp - interval '1 day',@quantity)";
-                    $cmd = new SqlCommand( $sql, $this->conn );
-                    $cmd->SetInteger( '@id',        $key );
-                    $cmd->SetInteger( '@quantity',  $entry->count );
-                    $cmd->Execute();
-                    $this->set_public_grow( $key, $entry->count, $timeTo );
+                $res = VkHelper::api_request( 'execute', array('code' =>  $code), 0);
+                foreach( $res as $key => $entry ) {
+                    if ( $entry ) {
+                        $count = isset( $entry->count ) ? $entry->count : 0;
+                        $key = str_replace( 'a', '', $key );
+                        $this->$act( $key, $count );
+                        if ( !$count )
+                            continue;
+                        $this->set_public_grow( $key, $count, $timeTo );
+                    } else {
+                        $this->set_public_closed( $key );
+                    }
                 }
 
                 sleep(0.3);
@@ -180,6 +210,40 @@ class WrTopics extends wrapper
             $return .= "\" a$b\":a$b,";
             $i++;
         }
+    }
+
+    public function save_point( $public_id, $quantity )
+    {
+        $sql = "INSERT INTO " . TABLE_STAT_PUBLICS_POINTS . " (id,time,quantity) values(@id,current_timestamp - interval '1 day',@quantity)";
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger( '@id',        $public_id );
+        $cmd->SetInteger( '@quantity',  $quantity ? $quantity : -1 );
+        $cmd->Execute();
+    }
+
+    public function update_point( $public_id, $quantity )
+    {
+        $sql = "UPDATE " . TABLE_STAT_PUBLICS_POINTS . " SET quantity = @quantity WHERE id=@id AND time = (now() - interval '1 day')::date";
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger( '@id',        $public_id );
+        $cmd->SetInteger( '@quantity',  $quantity ? $quantity : -1 );
+        $cmd->Execute();
+    }
+
+    public function double_check_quantity()
+    {
+        $sql = 'SELECT id FROM '
+            . TABLE_STAT_PUBLICS_POINTS . '
+           WHERE time > now() - interval \'2 day\'
+           AND   ( quantity is null or quantity < 1)
+           AND   id > 0';
+        $cmd = new SqlCommand( $sql, $this->conn );
+        $ds = $cmd->Execute();
+        $res = array();
+        while( $ds->Next() ) {
+            $res[] = $ds->GetInteger( 'id' );
+        }
+        $this->update_quantity( $res );
     }
 
     public function get_all_visitors()
@@ -231,29 +295,31 @@ class WrTopics extends wrapper
     public function find_admins( )
     {
         foreach ( $this->ids as $id ) {
-            if ( $id < 38852667 )
+            if ( $id < 0 )
                 continue;
             sleep(0.3);
-            echo $id . '<br>';
+            echo $id . '<br><br>';
             $params = array(
                 'act'   =>  'a_get_contacts',
                 'al'    =>  1,
-                'oid'   =>  $id
+                'oid'   =>  '-' . $id
             );
 
             $url = 'http://vk.com/al_page.php';
             $k = $this->qurl_request( $url, $params );
             $k = explode( '<div class="image">' ,$k );
             unset( $k[0] );
+
             if ( empty( $k ) )
                 continue;
             $this->delete_admins( $id );
+
             foreach( $k as $admin_html ) {
 
                 $admin = $this->get_admin('a href="/' . $admin_html);
-
                 if ( !empty( $admin )) {
                     $this->save_admin( $id, $admin );
+
                 }
                 $admin = array();
             }

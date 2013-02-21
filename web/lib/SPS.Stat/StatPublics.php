@@ -45,12 +45,12 @@
             return $res;
         }
 
-        public static function get_publics_info( $public_ids )
+        public static function get_publics_info( $public_ids, $app = '' )
         {
             if( is_array( $public_ids ))
                 $public_ids = implode( ',', $public_ids );
             $result = array();
-            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0, $app );
             if( isset( $res->error ))
                 return false;
             $result = array();
@@ -565,7 +565,7 @@
         }
 
         //РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚РµРЅС‹ РґРѕ 25 РїР°Р±Р»РёРєРѕРІ
-        public static function get_publics_walls( $barter_events_array )
+        public static function get_publics_walls( $barter_events_array, $app = '' )
         {
             $code = '';
             $return = "return{";
@@ -578,11 +578,11 @@
                 $i++;
             }
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
             return $res;
         }
 
-        public static function get_public_walls_mk2( $walls_array )
+        public static function get_public_walls_mk2( $walls_array, $app = '' )
         {
             $walls = array();
             $walls_array = array_unique( $walls_array );
@@ -599,7 +599,7 @@
                     $i++;
                 }
                 $code .= trim( $return, ',' ) . "};";
-                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
                 if( isset( $res->error ))
                     continue;
                 foreach( $res as $id => $content ) {
@@ -610,7 +610,7 @@
             return $walls;
         }
 
-        public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
+        public static function get_visitors_from_vk( $public_id, $time_from, $time_to, $app = '' )
         {
 //            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
 //            if ( !empty( $public )) {
@@ -626,7 +626,7 @@
             );
             for( $i = 0; $i < 3; $i++ ) {
                 sleep(0.6);
-                $res = VkHelper::api_request( 'stats.get', $params, 0 );
+                $res = VkHelper::api_request( 'stats.get', $params, 0, $app );
                 if ( empty ( $res->error ) && !empty( $res ))
                     break;
             }
@@ -670,29 +670,14 @@
                 $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
                 sleep(0.3);
                 foreach( $res as $public ) {
+                    if( !isset($public->gid) || !isset($public->photo) || !isset($public->name) || !isset($public->type))
+                        continue;
                     //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
-                    $sql = '
-                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar, page boolean);
-                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar, page boolean) RETURNS varchar AS $$
-                    DECLARE
-                        curr_name CHARACTER VARYING := \'_\';
-                    BEGIN
-                        SELECT name INTO curr_name FROM stat_publics_50k WHERE vk_id=$1;
-                        IF( curr_name=p_name )
-                        THEN
-                            curr_name := \'\';
-                        ELSE
-                            INSERT INTO stat_public_audit(public_id,name,changed_at,act) VALUES ($1,curr_name,CURRENT_TIMESTAMP,\'name\');
-                        END IF;
-                        UPDATE stat_publics_50k SET name = $2, ava=$3, page=$4 WHERE vk_id=$1;
-                        RETURN curr_name;
-                    END
-                    $$ lANGUAGE plpgsql;
-                    SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
+                    $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
-                    $cmd->SetString(  '@name', $public->name );
-                    $cmd->SetString(  '@photo', $public->photo);
+                    $cmd->SetString(  '@name',   $public->name );
+                    $cmd->SetString(  '@photo',  $public->photo);
                     $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
                     $cmd->Execute();
                 }
@@ -704,24 +689,7 @@
         //записывает изменения в
         public static function set_state( $public_id, $parameter, $state, $conn )
         {
-            $sql =
-                "DROP FUNCTION IF EXISTS set_state( id integer, column_name varchar , new_value boolean );
-                CREATE FUNCTION set_state( id integer, column_name varchar , state boolean ) RETURNS boolean AS $$
-                DECLARE
-                old_value boolean    := 0;
-                curr_state boolean := false;
-                BEGIN
-                    execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
-                    IF $3=old_value THEN
-                        return false;
-                    ELSE
-                        execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
-                        execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
-                        return true;
-                    END IF;
-                END
-                $$ LANGUAGE plpgsql;
-                SELECT set_state( @public_id, @name, @state) AS cnanged;";
+            $sql = "SELECT set_state( @public_id, @name, @state) AS cnanged;";
                 $cmd = new SqlCommand( $sql, $conn );
                 $cmd->SetInteger( '@public_id', $public_id );
                 $cmd->SetString(  '@name',      $parameter );
@@ -780,7 +748,7 @@
                         ( name ILIKE @search_string
                         OR vk_id = @int_search )
                         AND active IS TRUE
-                        AND quantity > 50000
+                        AND quantity > 10000
                     ORDER BY quantity DESC
                    ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -794,7 +762,7 @@
                     'quantity'  =>  $ds->GetInteger('quantity'),
                     'name'      =>  $ds->GetString('name'),
                     'ava'       =>  $ds->GetString('ava'),
-                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'groupe',
+                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'group',
                 );
             }
             return $res;

@@ -4,16 +4,16 @@
     $prefix = "targetFeed";
 
     if ( empty( $errors ) ) $errors = array();
-	if ( empty( $jsonErrors ) ) $jsonErrors = '{}';
+    if ( empty( $jsonErrors ) ) $jsonErrors = '{}';
 
     if ( !empty($errors["fatal"] ) ) {
-		?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
-	}
+        ?><h3 class="error"><?= LocaleLoader::Translate( 'errors.fatal.' . $errors["fatal"] ); ?></h3><?
+    }
 
 JsHelper::PushFile('js://vt/targetFeedEdit.js');
 ?>
 <div class="tabs">
-	<?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
+    <?= FormHelper::FormHidden( 'selectedTab', !empty( $selectedTab ) ? $selectedTab : 0, 'selectedTab' ); ?>
     <ul class="tabs-list">
         <li><a href="#page-0">{lang:vt.common.commonInfo}</a></li>
         <li><a href="#page-1">{lang:vt.targetFeed.grids}</a></li>
@@ -82,7 +82,7 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
             <label>{lang:vt.targetFeed.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
         </div>
-	</div>
+    </div>
     <div id="page-1" class="tab-page rows">
         <div data-row="grids" class="row" style="display: none;"></div>
         <table class="objects objects-inner" style="width: 40%;" id="grids-table">
@@ -98,8 +98,8 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
     </div>
 </div>
 <script type="text/javascript">
-	var jsonErrors = {$jsonErrors};
-	var gridData = {$gridData};
+    var jsonErrors = {$jsonErrors};
+    var gridData = {$gridData};
 
     var gridRows = 0;
 
