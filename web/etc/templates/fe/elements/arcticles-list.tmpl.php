@@ -16,7 +16,7 @@
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
-            $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : new SourceFeed();
+            $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : null;
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
             $canEditPost    = $isWebUserEditor || $article->articleStatus != Article::STATUS_APPROVED;
             ?>{increal:tmpl://fe/elements/arcticle-item.tmpl.php}<?
