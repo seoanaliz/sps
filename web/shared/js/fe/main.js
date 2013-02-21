@@ -9,6 +9,22 @@ var easydateParams = {
         return date.toLocaleDateString();
     }
 };
+$.mask.definitions['2']='[012]';
+$.mask.definitions['3']='[0123]';
+$.mask.definitions['5']='[012345]';
+$.datepick.setDefaults($.datepick.regional['ru']);
+$.datepicker.setDefaults({
+    dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+    monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+    firstDay: 1,
+    showAnim: '',
+    dateFormat: 'd MM yy',
+    altField: '#calendar-fix',
+    altFormat: 'd MM'
+});
 
 var UserGroupModel = Model.extend({
     init: function() {
@@ -36,730 +52,890 @@ var UserGroupCollection = Collection.extend({
 });
 var userGroupCollection = new UserGroupCollection();
 
-$(document).ready(function(){
-    $.mask.definitions['2']='[012]';
-    $.mask.definitions['3']='[0123]';
-    $.mask.definitions['5']='[012345]';
-    $.datepick.setDefaults($.datepick.regional['ru']);
-    $.datepicker.setDefaults({
-        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-        monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-        firstDay: 1,
-        showAnim: '',
-        dateFormat: 'd MM yy',
-        altField: '#calendar-fix',
-        altFormat: 'd MM'
-    });
+var App = Event.extend({
+    init: function() {
+        var t = this;
+        t.$leftPanel = $('#left-panel');
+        t.$rightPanel = $('#right-panel');
+        t.$multiSelect = $('#source-select');
+        t.$calendar = $('#calendar');
 
-    var $leftPanel = $('.left-panel');
-    var $multiSelect = $("#source-select");
-    var $calendar = $('#calendar');
+        t.initCalendar();
+        t.initMultiSelect();
+        t.initLeftColumn();
+        t.initRightColumn();
+        t.initLeftPanelTabs();
+        t.initWall();
+        t.initWallFilter();
+        t.initQueue();
+        t.initAddPost();
+        // Кнопка "наверх"
+        t.initGoToTop();
+        // Подгрузка имени и аватара
+        t.initVkAvatar();
+    },
 
-    // Календарь
-    $calendar
-        .datepicker()
-        .keydown(function(e){
-            if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
-                e.preventDefault();
-            }
-        })
-        .change(function(){
-            $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
-            Events.fire('calendar_change');
-        });
-
-    $(".calendar .tip, #calendar-fix").click(function(){
-        $calendar.focus();
-    });
-
-    // Приведение вида календаря из 22.12.2012 в 22 декабря
-    (function() {
-        var d = $("#calendar").val().split('.');
-        var date = [d[1], d[0], d[2]].join('/');
-        $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
-    })();
-
-    // Кнопки вперед-назад в календаре
-    (function() {
-        $(".calendar .prev").click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
-        });
-        $(".calendar .next").click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
-        });
-    })();
-
-    // Left menu multiselect
-    $multiSelect.multiselect({
-        minWidth: 250,
-        height: 250,
-        classes: $multiSelect.data('classes'),
-        checkAllText: 'Выделить все',
-        uncheckAllText: 'Сбросить',
-        noneSelectedText: '<span class="gray">Источник не выбран</span>',
-        selectedText: function(i) {
-            return '<span class="counter">' + i + '</span> '
-                + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
-        },
-        checkAll: function(){
-            Events.fire('leftcolumn_dropdown_change');
-        },
-        uncheckAll: function(){
-            Events.fire('leftcolumn_dropdown_change');
-        }
-    });
-    $multiSelect.bind("multiselectclick", function(event, ui){
-        Events.fire('leftcolumn_dropdown_change');
-    });
-
-    // right dropdown
-    $("#right-drop-down").dropdown({
-        data: rightPanelData,
-        type: 'radio',
-        addClass: 'right',
-        onchange: function(item) {
-            $(this)
-                .data('selected', item.id)
-                .find('.caption').text(item.title);
-            if (item.icon) {
-                var icon = $(this).find('.icon img');
-                if (!icon.length) {
-                    icon = $('<img src="' + item.icon + '"/>').appendTo($(this).find('.icon'))
+    initCalendar: function() {
+        var t = this;
+        var $calendar = t.$calendar;
+        $calendar
+            .datepicker()
+            .keydown(function(e){
+                if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
+                    e.preventDefault();
                 }
-                icon.attr('src', item.icon);
-            }
-
-            var targetFeedId = Elements.rightdd(),
-                cookieData = '',
-                sourceType = '',
-                targetType = '';
-
-            // проставление типа источника
-            cookieData = $.cookie('sourceTypes' + targetFeedId);
-            sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
-            if (sourceType.length == 0) {
-                sourceType = $('.left-panel .type-selector a[data-type="source"]');
-            }
-            $(".left-panel .type-selector a").removeClass('active');
-            sourceType.addClass('active');
-
-            // проставление типа ленты отправки
-            cookieData = $.cookie('targetTypes' + targetFeedId);
-            targetType = $('.right-panel .type-selector a[data-type="' + cookieData + '"]');
-            if (targetType.length == 0) {
-                targetType = $('.right-panel .type-selector a[data-type="content"]');
-            }
-            $(".right-panel .type-selector a").removeClass('active');
-            targetType.addClass('active');
-
-            Events.fire('rightcolumn_dropdown_change');
-        },
-        oncreate: function() {
-            $(this).find('.default').removeClass('default');
-            Elements.rightdd($("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item.active').data('id'));
-        }
-    });
-
-    $('.left-panel .drop-down').change(function() {
-        Events.fire('leftcolumn_dropdown_change');
-    });
-
-    $('.wall-title .filter a').dropdown({
-        width: 'auto',
-        addClass: 'wall-title-menu',
-        position: 'right',
-        data: [
-            {title: 'новые записи', type : 'new'},
-            {title: 'старые записи', type : 'old'},
-            {title: 'лучшие записи', type : 'best'}
-        ],
-        oncreate: function() {},
-        onopen: function() {},
-        onclose: function() {},
-        onchange: function(item) {
-            $('.wall-title a').text(item.title).data('type', item.type);
-            Events.fire('leftcolumn_sort_type_change');
-        }
-    });
-
-    // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
-    $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
-        if (articlesLoading) {
-            return;
-        }
-
-        $leftPanel.find(".type-selector .sourceType").removeClass('active');
-        $(this).addClass('active');
-
-        if ($(this).data('type') == 'authors-list') {
-            $('body').addClass('editor-mode');
-            $(window).data('disable-load-more', true);
-            updateAuthorListPage();
-        } else {
-            $('body').removeClass('editor-mode');
-            $(window).data('disable-load-more', false);
-            Events.fire('rightcolumn_dropdown_change');
-        }
-    });
-
-    // Список авторов
-    function updateAuthorListPage(method) {
-        Control.fire(method || 'authors_get', {
-            targetFeedId: Elements.rightdd()
-        }).success(function(data) {
-            $('#wall').html(data);
-            var $container = $('#wall > .authors-list');
-
-            var $navigation = $container.find('.authors-types');
-            $navigation.delegate('.tab', 'click', function() {
-                $navigation.find('.tab.selected').removeClass('selected');
-                $(this).addClass('selected');
-                updateAuthorListPage('authors_get');
+            })
+            .change(function(){
+                $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
+                Events.fire('calendar_change');
             });
 
-            var $input = $container.find('.author-link');
-            $input.placeholder();
-            $input.keyup(function(e) {
-                if (e.keyCode == KEY.ENTER) {
-                    $input.blur();
-                    var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
-                    var confirmBox = new Box({
-                        id: 'addAuthor' + authorId,
-                        title: 'Добавление автора',
-                        html: tmpl(BOX_LOADING, {height: 100}),
-                        buttons: [
-                            {label: 'Добавить автора', onclick: addAuthor},
-                            {label: 'Отменить', isWhite: true}
-                        ],
-                        onshow: function($box) {
-                            var box = this;
+        $(".calendar .tip, #calendar-fix").click(function(){
+            $calendar.focus();
+        });
 
-                            VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                if (!dataVK.response) {
-                                    return box.setHTML('Пользователь не найден');
-                                }
-                                var user = dataVK.response[0];
-                                var clearUser = {
-                                    id: user.uid,
-                                    name: user.first_name + ' ' + user.last_name,
-                                    photo: user.photo_medium_rec
-                                };
-                                authorId = clearUser.id;
-                                var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
-                                box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                            });
-                        }
-                    });
-                    confirmBox.show();
-                }
-                function addAuthor() {
-                    var box = this;
-                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-                    box.setButtons([{label: 'Закрыть'}]);
-                    Control.fire('author_add', {
-                        authorId: authorId,
-                        targetFeedId: Elements.rightdd()
-                    }).success(function(data) {
-                        box.remove();
-                        updateAuthorListPage();
-                    });
-                }
+        // Приведение вида календаря из 22.12.2012 в 22 декабря
+        (function() {
+            var d = $("#calendar").val().split('.');
+            var date = [d[1], d[0], d[2]].join('/');
+            $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
+        })();
+
+        // Кнопки вперед-назад в календаре
+        (function() {
+            $(".calendar .prev").click(function(){
+                var date = $calendar.datepicker('getDate').getTime();
+                $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
             });
+            $(".calendar .next").click(function(){
+                var date = $calendar.datepicker('getDate').getTime();
+                $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
+            });
+        })();
+    },
 
-            if ($container.data('initedList')) {
+    initMultiSelect: function() {
+        var t = this;
+        var $multiSelect = t.$multiSelect;
+        $multiSelect.multiselect({
+            minWidth: 250,
+            height: 250,
+            classes: $multiSelect.data('classes'),
+            checkAllText: 'Выделить все',
+            uncheckAllText: 'Сбросить',
+            noneSelectedText: '<span class="gray">Источник не выбран</span>',
+            selectedText: function(i) {
+                return '<span class="counter">' + i + '</span> '
+                    + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
+            },
+            checkAll: function(){
+                Events.fire('leftcolumn_dropdown_change');
+            },
+            uncheckAll: function(){
+                Events.fire('leftcolumn_dropdown_change');
+            }
+        });
+        $multiSelect.bind("multiselectclick", function(event, ui){
+            Events.fire('leftcolumn_dropdown_change');
+        });
+    },
+
+    initRightColumn: function() {
+        var t = this;
+        $("#right-drop-down").dropdown({
+            data: rightPanelData,
+            type: 'radio',
+            addClass: 'right',
+            onchange: function(item) {
+                $(this)
+                    .data('selected', item.id)
+                    .find('.caption').text(item.title);
+                if (item.icon) {
+                    var icon = $(this).find('.icon img');
+                    if (!icon.length) {
+                        icon = $('<img src="' + item.icon + '"/>').appendTo($(this).find('.icon'))
+                    }
+                    icon.attr('src', item.icon);
+                }
+
+                var targetFeedId = Elements.rightdd(),
+                    cookieData = '',
+                    sourceType = '',
+                    targetType = '';
+
+                // проставление типа источника
+                cookieData = $.cookie('sourceTypes' + targetFeedId);
+                sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
+                if (sourceType.length == 0) {
+                    sourceType = $('.left-panel .type-selector a[data-type="source"]');
+                }
+                $(".left-panel .type-selector a").removeClass('active');
+                sourceType.addClass('active');
+
+                // проставление типа ленты отправки
+                cookieData = $.cookie('targetTypes' + targetFeedId);
+                targetType = t.$rightPanel.find('.type-selector a[data-type="' + cookieData + '"]');
+                if (targetType.length == 0) {
+                    targetType = t.$rightPanel.find('.type-selector a[data-type="content"]');
+                }
+                t.$rightPanel.find('.type-selector a').removeClass('active');
+                targetType.addClass('active');
+
+                Events.fire('rightcolumn_dropdown_change');
+            },
+            oncreate: function() {
+                $(this).find('.default').removeClass('default');
+                Elements.rightdd($("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item.active').data('id'));
+            }
+        });
+
+        // Вкладки в правом меню
+        t.$rightPanel.find('.type-selector a').click(function(e) {
+            e.preventDefault();
+
+            if (articlesLoading) {
                 return;
             }
-            $container.data('initedList', true);
-            $container.delegate('.add-to-list', 'click', function() {
-                var $target = $(this);
-                var $author = $target.closest('.author');
-                (function updateDropdown() {
-                    var authorId = $author.data('id');
 
-                    var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
-                    var authorGroups = [];
-                    $.each(userGroupCollection.get(), function(id, userGroupModel) {
-                        if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
-                            userGroupModel.isSelected(true);
-                        } else {
-                            userGroupModel.isSelected(false);
-                        }
-                        authorGroups.push({
-                            id: userGroupModel.id(),
-                            title: userGroupModel.name(),
-                            isActive: userGroupModel.isSelected()
-                        });
+            t.$rightPanel.find('.type-selector a').removeClass('active');
+            $(this).addClass('active');
+
+            Events.fire('rightcolumn_type_change');
+        });
+
+        // Показать полностью в правом меню
+        t.$rightPanel.delegate('.toggle-text', 'click', function(e) {
+            $(this).parent().toggleClass('collapsed');
+        });
+    },
+
+    initWallFilter: function() {
+        $('.left-panel .drop-down').change(function() {
+            Events.fire('leftcolumn_dropdown_change');
+        });
+
+        $('.wall-title .filter a').dropdown({
+            width: 'auto',
+            addClass: 'wall-title-menu',
+            position: 'right',
+            data: [
+                {title: 'новые записи', type : 'new'},
+                {title: 'старые записи', type : 'old'},
+                {title: 'лучшие записи', type : 'best'}
+            ],
+            oncreate: function() {},
+            onopen: function() {},
+            onclose: function() {},
+            onchange: function(item) {
+                $('.wall-title a').text(item.title).data('type', item.type);
+                Events.fire('leftcolumn_sort_type_change');
+            }
+        });
+    },
+
+    initLeftPanelTabs: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+
+        // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
+        $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
+            if (articlesLoading) {
+                return;
+            }
+
+            $leftPanel.find(".type-selector .sourceType").removeClass('active');
+            $(this).addClass('active');
+
+            if ($(this).data('type') == 'authors-list') {
+                $('body').addClass('editor-mode');
+                $(window).data('disable-load-more', true);
+                updateAuthorListPage();
+            } else {
+                $('body').removeClass('editor-mode');
+                $(window).data('disable-load-more', false);
+                Events.fire('rightcolumn_dropdown_change');
+            }
+        });
+
+        // Список авторов
+        function updateAuthorListPage(method) {
+            Control.fire(method || 'authors_get', {
+                targetFeedId: Elements.rightdd()
+            }).success(function(data) {
+                    $('#wall').html(data);
+                    var $container = $('#wall > .authors-list');
+
+                    var $navigation = $container.find('.authors-types');
+                    $navigation.delegate('.tab', 'click', function() {
+                        $navigation.find('.tab.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                        updateAuthorListPage('authors_get');
                     });
-                    $target.dropdown({
-                        isShow: true,
-                        position: 'right',
-                        width: 'auto',
-                        type: 'checkbox',
-                        addClass: 'ui-dropdown-add-to-list',
-                        data: $.merge(authorGroups, [
-                            {id: 'add_list', title: 'Создать список'}
-                        ]),
-                        onopen: function() {
-                            $target.addClass('active');
-                        },
-                        onclose: function() {
-                            $target.removeClass('active');
-                        },
-                        onchange: function(item) {
-                            $(this).dropdown('open');
-                        },
-                        onselect: function(item) {
-                            if (item.id == 'add_list') {
-                                var $item = $(this).dropdown('getItem', 'add_list');
-                                var $menu = $(this).dropdown('getMenu');
-                                var $input = $menu.find('input');
-                                $item.removeClass('active');
-                                if ($input.length) {
-                                    $input.focus();
-                                } else {
-                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
-                                    $input = $menu.find('input');
-                                    $input.focus();
-                                    $input.keydown(function(e) {
-                                        if (e.keyCode == KEY.ENTER) {
-                                            var newUserGroupModel = new UserGroupModel();
-                                            newUserGroupModel.name($input.val());
-                                            Control.fire('add_list', {
-                                                name: newUserGroupModel.name(),
-                                                targetFeedId: Elements.rightdd()
-                                            }).success(function(data) {
-                                                newUserGroupModel.id(data.userGroup.id);
-                                                userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
-                                                updateDropdown();
-                                            });
+
+                    var $input = $container.find('.author-link');
+                    $input.placeholder();
+                    $input.keyup(function(e) {
+                        if (e.keyCode == KEY.ENTER) {
+                            $input.blur();
+                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                            var confirmBox = new Box({
+                                id: 'addAuthor' + authorId,
+                                title: 'Добавление автора',
+                                html: tmpl(BOX_LOADING, {height: 100}),
+                                buttons: [
+                                    {label: 'Добавить автора', onclick: addAuthor},
+                                    {label: 'Отменить', isWhite: true}
+                                ],
+                                onshow: function($box) {
+                                    var box = this;
+
+                                    VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                        if (!dataVK.response) {
+                                            return box.setHTML('Пользователь не найден');
                                         }
+                                        var user = dataVK.response[0];
+                                        var clearUser = {
+                                            id: user.uid,
+                                            name: user.first_name + ' ' + user.last_name,
+                                            photo: user.photo_medium_rec
+                                        };
+                                        authorId = clearUser.id;
+                                        var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
+                                        box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
                                     });
-                                    $(this).dropdown('refreshPosition');
                                 }
-                            } else {
-                                authorGroupIds.push(item.id + '');
-                                $author.data('group-ids', authorGroupIds.join(','));
-                                Control.fire('add_to_list', {
-                                    userId: authorId,
-                                    listId: item.id
-                                });
-                            }
-                        },
-                        onunselect: function(item) {
-                            var index = $.inArray(item.id + '', authorGroupIds);
-                            if (index !== -1) {
-                                authorGroupIds.splice(index, 1);
-                            }
-                            $author.data('group-ids', authorGroupIds.join(','));
-                            Control.fire('remove_from_list', {
-                                userId: authorId,
-                                listId: item.id
                             });
+                            confirmBox.show();
                         }
-                    });
-                })();
-            });
-            $container.delegate('.delete', 'click', function() {
-                var $author = $(this).closest('.author');
-                var authorId = $author.data('id');
-                var confirmDeleteBox = new Box({
-                    id: 'confirmDeleteBox' + authorId,
-                    title: 'Удаление автора',
-                    html: tmpl(BOX_LOADING, {height: 100}),
-                    buttons: [
-                        {label: 'Удалить', onclick: function() {
-                            Control.fire('author_remove', {
+                        function addAuthor() {
+                            var box = this;
+                            box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                            box.setButtons([{label: 'Закрыть'}]);
+                            Control.fire('author_add', {
                                 authorId: authorId,
                                 targetFeedId: Elements.rightdd()
                             }).success(function(data) {
-                                $author.remove();
-                                confirmDeleteBox.hide();
-                            });
-                        }},
-                        {label: 'Отменить', isWhite: true}
-                    ],
-                    onshow: function($box) {
-                        var box = this;
+                                    box.remove();
+                                    updateAuthorListPage();
+                                });
+                        }
+                    });
 
-                        VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                            if (!dataVK.response) {
-                                return box.setHTML('Пользователь не найден');
+                    if ($container.data('initedList')) {
+                        return;
+                    }
+                    $container.data('initedList', true);
+                    $container.delegate('.add-to-list', 'click', function() {
+                        var $target = $(this);
+                        var $author = $target.closest('.author');
+                        (function updateDropdown() {
+                            var authorId = $author.data('id');
+
+                            var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
+                            var authorGroups = [];
+                            $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                                if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
+                                    userGroupModel.isSelected(true);
+                                } else {
+                                    userGroupModel.isSelected(false);
+                                }
+                                authorGroups.push({
+                                    id: userGroupModel.id(),
+                                    title: userGroupModel.name(),
+                                    isActive: userGroupModel.isSelected()
+                                });
+                            });
+                            $target.dropdown({
+                                isShow: true,
+                                position: 'right',
+                                width: 'auto',
+                                type: 'checkbox',
+                                addClass: 'ui-dropdown-add-to-list',
+                                data: $.merge(authorGroups, [
+                                    {id: 'add_list', title: 'Создать список'}
+                                ]),
+                                onopen: function() {
+                                    $target.addClass('active');
+                                },
+                                onclose: function() {
+                                    $target.removeClass('active');
+                                },
+                                onchange: function(item) {
+                                    $(this).dropdown('open');
+                                },
+                                onselect: function(item) {
+                                    if (item.id == 'add_list') {
+                                        var $item = $(this).dropdown('getItem', 'add_list');
+                                        var $menu = $(this).dropdown('getMenu');
+                                        var $input = $menu.find('input');
+                                        $item.removeClass('active');
+                                        if ($input.length) {
+                                            $input.focus();
+                                        } else {
+                                            $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                            $input = $menu.find('input');
+                                            $input.focus();
+                                            $input.keydown(function(e) {
+                                                if (e.keyCode == KEY.ENTER) {
+                                                    var newUserGroupModel = new UserGroupModel();
+                                                    newUserGroupModel.name($input.val());
+                                                    Control.fire('add_list', {
+                                                        name: newUserGroupModel.name(),
+                                                        targetFeedId: Elements.rightdd()
+                                                    }).success(function(data) {
+                                                            newUserGroupModel.id(data.userGroup.id);
+                                                            userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
+                                                            updateDropdown();
+                                                        });
+                                                }
+                                            });
+                                            $(this).dropdown('refreshPosition');
+                                        }
+                                    } else {
+                                        authorGroupIds.push(item.id + '');
+                                        $author.data('group-ids', authorGroupIds.join(','));
+                                        Control.fire('add_to_list', {
+                                            userId: authorId,
+                                            listId: item.id
+                                        });
+                                    }
+                                },
+                                onunselect: function(item) {
+                                    var index = $.inArray(item.id + '', authorGroupIds);
+                                    if (index !== -1) {
+                                        authorGroupIds.splice(index, 1);
+                                    }
+                                    $author.data('group-ids', authorGroupIds.join(','));
+                                    Control.fire('remove_from_list', {
+                                        userId: authorId,
+                                        listId: item.id
+                                    });
+                                }
+                            });
+                        })();
+                    });
+                    $container.delegate('.delete', 'click', function() {
+                        var $author = $(this).closest('.author');
+                        var authorId = $author.data('id');
+                        var confirmDeleteBox = new Box({
+                            id: 'confirmDeleteBox' + authorId,
+                            title: 'Удаление автора',
+                            html: tmpl(BOX_LOADING, {height: 100}),
+                            buttons: [
+                                {label: 'Удалить', onclick: function() {
+                                    Control.fire('author_remove', {
+                                        authorId: authorId,
+                                        targetFeedId: Elements.rightdd()
+                                    }).success(function(data) {
+                                            $author.remove();
+                                            confirmDeleteBox.hide();
+                                        });
+                                }},
+                                {label: 'Отменить', isWhite: true}
+                            ],
+                            onshow: function($box) {
+                                var box = this;
+
+                                VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                    if (!dataVK.response) {
+                                        return box.setHTML('Пользователь не найден');
+                                    }
+                                    var user = dataVK.response[0];
+                                    var clearUser = {
+                                        id: user.uid,
+                                        name: user.first_name + ' ' + user.last_name,
+                                        photo: user.photo_medium_rec
+                                    };
+                                    authorId = clearUser.id;
+                                    var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
+                                    box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                                });
                             }
-                            var user = dataVK.response[0];
-                            var clearUser = {
-                                id: user.uid,
-                                name: user.first_name + ' ' + user.last_name,
-                                photo: user.photo_medium_rec
-                            };
-                            authorId = clearUser.id;
-                            var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
-                            box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                        }).show();
+                    });
+                });
+        }
+
+        // Подвкладки Авторов: Новые Одобренные Отклоненные
+        $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
+            if (articlesLoading) {
+                return;
+            }
+
+            var $tab = $(this);
+            $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+            $tab.addClass('selected');
+
+            wallPage = 0;
+            loadArticles(true);
+        });
+
+        // Кастомные подвкладки
+        $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
+            if (articlesLoading) {
+                return;
+            }
+
+            var $tab = $(this);
+            $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
+            $tab.addClass('selected');
+
+            loadArticles(true);
+        });
+    },
+
+    initWall: function() {
+        $("#wall")
+            .delegate(".post > .delete", "click", function(){
+                var elem = $(this).closest(".post"),
+                    pid = elem.data("id"),
+                    gid = elem.data('group');
+                Events.fire('leftcolumn_deletepost', pid, function(state){
+                    if (state) {
+                        var deleteMessageId = 'deleted-post-' + pid;
+                        var $deleteMessage = $('#' + deleteMessageId);
+                        var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
+                        if ($deleteMessage.length) {
+                            // если уже удаляли пост, то сообщение об удалении уже в DOMе
+                            $deleteMessage.show();
+                        } else {
+                            // иначе добавляем
+                            elem.before($(
+                                '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                                    'Пост удален. <a class="recover">Восстановить</a><br/>' +
+                                    (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
+                                    '</div>'
+                            ));
+                        }
+
+                        elem.hide();
+                    }
+                });
+            })
+            .delegate('.post .ignore', 'click', function() {
+                var elem = $(this).closest(".post"),
+                    gid = elem.data("group");
+                var $menu = $multiSelect.multiselect('widget');
+                $menu.find('[value=' + gid + ']:checkbox').each(function() {
+                    this.click();
+                });
+            })
+            .delegate('.post .recover', 'click', function() {
+                var elem = $(this).closest(".post"),
+                    pid = elem.data("id");
+                Events.fire('leftcolumn_recoverpost', pid, function(state){
+                    if(state) {
+                        elem.hide().next().show();
+                    }
+                });
+            })
+            .delegate('.show-all-postponed', 'click', function() {
+                var $target = $(this);
+                if ($target.data('block')) {
+                    var $posts = $target.data('block');
+                    if ($posts.first().is(':visible')) {
+                        $target.html($target.data('def-html'));
+                        $posts.hide();
+                    } else {
+                        $target.html('Скрыть записи в очереди');
+                        $posts.show();
+                    }
+                } else {
+                    $target.data('def-html', $target.html());
+
+                    wallPage = 0;
+                    Elements.getWallLoader().show();
+                    Control.fire('get_articles', {
+                        page: wallPage,
+                        sortType: Elements.getSortType(),
+                        type: Elements.leftType(),
+                        targetFeedId: Elements.rightdd(),
+                        userGroupId: Elements.getUserGroupId(),
+                        articlesOnly: true,
+                        mode: 'deferred'
+                    }).success(function(html) {
+                        if (html) {
+                            var $posts = $(html);
+                            $target.data('block', $posts);
+                            $target.after($posts);
+                            $target.html('Скрыть записи в очереди');
+                            Elements.initImages($posts);
+                            Elements.initLinks($posts);
+                        } else {
+                            $target.remove();
+                        }
+                        Elements.getWallLoader().hide();
+                    });
+                }
+            });
+
+    },
+
+    initQueue: function() {
+        $("#queue")
+            // Удаление постов
+            .delegate('.delete', 'click', function() {
+                var elem = $(this).closest(".post"),
+                    pid = elem.data("id");
+                Events.fire('rightcolumn_deletepost', pid, function(state) {
+                    if(state) {
+                        elem.remove();
+                    }
+                });
+            })
+            // Смена даты
+            .delegate('.time', 'click', function() {
+                var $time = $(this);
+                var $post = $time.closest('.slot-header');
+                var $input = $time.data('time-edit');
+
+                if (!$input) {
+                    $input = $('<input />')
+                        .attr('type', 'text')
+                        .attr('class', 'time-edit')
+                        .width($time.width() + 2)
+                        .val($time.text())
+                        .mask('29:59')
+                        .appendTo($post);
+                    $time.data('time-edit', $input);
+                } else {
+                    $input.show();
+                }
+                $input.focus().select();
+            })
+            .delegate('.time-edit', 'blur keydown', function(e) {
+                var $input = $(this);
+
+                if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                    return;
+                }
+                if (e.type == 'focusout' && !e.originalEvent) {
+                    return;
+                }
+
+                var $post = $input.closest('.slot');
+                var $time = $post.find('.time');
+                var gridLineId = $post.data('grid-id');
+                var gridLineItemId = $post.data('grid-item-id');
+
+                var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
+                var qid = $post.find('.post').data('queue-id');
+                $input.blur().hide().val(time);
+
+                if (time && time != $time.text()) {
+                    $time.text(time);
+                    if (!$post.hasClass('new')) {
+                        // Редактирование времени ячейки для текущего дня
+                        Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
+                            if (state) {}
                         });
                     }
-                }).show();
-            });
-        });
-    }
-
-    // Подвкладки Авторов: Новые Одобренные Отклоненные
-    $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
-        if (articlesLoading) {
-            return;
-        }
-
-        var $tab = $(this);
-        $leftPanel.find('.authors-tabs .tab').removeClass('selected');
-        $tab.addClass('selected');
-
-        wallPage = 0;
-        loadArticles(true);
-    });
-
-    // Кастомные подвкладки
-    $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
-        if (articlesLoading) {
-            return;
-        }
-
-        var $tab = $(this);
-        $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
-        $tab.addClass('selected');
-
-        loadArticles(true);
-    });
-
-    // Вкладки в правом меню
-    $(".right-panel .type-selector a").click(function(e){
-        e.preventDefault();
-
-        if (articlesLoading) {
-            return;
-        }
-
-        $(".right-panel .type-selector a").removeClass('active');
-        $(this).addClass('active');
-
-        Events.fire('rightcolumn_type_change');
-    });
-
-    // Wall init
-    $("#wall")
-        .delegate(".post > .delete", "click", function(){
-            var elem = $(this).closest(".post"),
-                pid = elem.data("id"),
-                gid = elem.data('group');
-            Events.fire('leftcolumn_deletepost', pid, function(state){
-                if (state) {
-                    var deleteMessageId = 'deleted-post-' + pid;
-                    var $deleteMessage = $('#' + deleteMessageId);
-                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
-                    if ($deleteMessage.length) {
-                        // если уже удаляли пост, то сообщение об удалении уже в DOMе
-                        $deleteMessage.show();
-                    } else {
-                        // иначе добавляем
-                        elem.before($(
-                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
-                                'Пост удален. <a class="recover">Восстановить</a><br/>' +
-                                (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
-                            '</div>'
-                        ));
+                } else if (!time) {
+                    if ($post.hasClass('new')) {
+                        $post.animate({height: 0}, 200, function() {
+                            $(this).remove();
+                        });
                     }
+                }
+            })
+            .delegate('.time-of-removal', 'click', function() {
+                var $time = $(this);
+                var $post = $time.closest('.slot-header');
+                var $input = $time.data('time-of-removal-edit');
 
-                    elem.hide();
-                }
-            });
-        })
-        .delegate('.post .ignore', 'click', function() {
-            var elem = $(this).closest(".post"),
-                gid = elem.data("group");
-            var $menu = $multiSelect.multiselect('widget');
-            $menu.find('[value=' + gid + ']:checkbox').each(function() {
-                this.click();
-            });
-        })
-        .delegate('.post .recover', 'click', function() {
-            var elem = $(this).closest(".post"),
-                pid = elem.data("id");
-            Events.fire('leftcolumn_recoverpost', pid, function(state){
-                if(state) {
-                    elem.hide().next().show();
-                }
-            });
-        })
-        .delegate('.show-all-postponed', 'click', function() {
-            var $target = $(this);
-            if ($target.data('block')) {
-                var $posts = $target.data('block');
-                if ($posts.first().is(':visible')) {
-                    $target.html($target.data('def-html'));
-                    $posts.hide();
+                if (!$input) {
+                    $input = $('<input />')
+                        .attr('type', 'text')
+                        .attr('class', 'time-of-removal-edit')
+                        .width($time.width() + 2)
+                        .mask('29:59')
+                        .appendTo($post);
+                    $time.data('time-of-removal-edit', $input);
                 } else {
-                    $target.html('Скрыть записи в очереди');
-                    $posts.show();
+                    $input.show();
                 }
-            } else {
-                $target.data('def-html', $target.html());
+                $input.focus().select();
+            })
+            .delegate('.time-of-removal-edit', 'blur keydown', function(e) {
+                var $input = $(this);
 
-                wallPage = 0;
-                Elements.getWallLoader().show();
-                Control.fire('get_articles', {
-                    page: wallPage,
-                    sortType: Elements.getSortType(),
-                    type: Elements.leftType(),
-                    targetFeedId: Elements.rightdd(),
-                    userGroupId: Elements.getUserGroupId(),
-                    articlesOnly: true,
-                    mode: 'deferred'
-                }).success(function(html) {
-                    if (html) {
-                        var $posts = $(html);
-                        $target.data('block', $posts);
-                        $target.after($posts);
-                        $target.html('Скрыть записи в очереди');
-                        Elements.initImages($posts);
-                        Elements.initLinks($posts);
-                    } else {
-                        $target.remove();
-                    }
-                    Elements.getWallLoader().hide();
-                });
-            }
-        });
-
-    $("#queue")
-        // Удаление постов
-        .delegate('.delete', 'click', function() {
-            var elem = $(this).closest(".post"),
-                pid = elem.data("id");
-            Events.fire('rightcolumn_deletepost', pid, function(state) {
-                if(state) {
-                    elem.remove();
+                if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
+                    return;
                 }
-            });
-        })
-        // Смена даты
-        .delegate('.time', 'click', function() {
-            var $time = $(this);
-            var $post = $time.closest('.slot-header');
-            var $input = $time.data('time-edit');
+                if (e.type == 'focusout' && !e.originalEvent) {
+                    return;
+                }
 
-            if (!$input) {
-                $input = $('<input />')
-                    .attr('type', 'text')
-                    .attr('class', 'time-edit')
-                    .width($time.width() + 2)
-                    .val($time.text())
-                    .mask('29:59')
-                    .appendTo($post);
-                $time.data('time-edit', $input);
-            } else {
-                $input.show();
-            }
-            $input.focus().select();
-        })
-        .delegate('.time-edit', 'blur keydown', function(e) {
-            var $input = $(this);
+                var $post = $input.closest('.slot');
+                var gridLineId = $post.data('grid-id');
+                var gridLineItemId = $post.data('grid-item-id');
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
-                return;
-            }
-            if (e.type == 'focusout' && !e.originalEvent) {
-                return;
-            }
+                var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
+                var qid = $post.find('.post').data('queue-id');
+                $input.blur().hide().val(time);
 
-            var $post = $input.closest('.slot');
-            var $time = $post.find('.time');
-            var gridLineId = $post.data('grid-id');
-            var gridLineItemId = $post.data('grid-item-id');
-
-            var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
-            var qid = $post.find('.post').data('queue-id');
-            $input.blur().hide().val(time);
-
-            if (time && time != $time.text()) {
-                $time.text(time);
-                if (!$post.hasClass('new')) {
-                    // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
+                if (time) {
+                    Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {}
                     });
                 }
-            } else if (!time) {
-                if ($post.hasClass('new')) {
-                    $post.animate({height: 0}, 200, function() {
-                        $(this).remove();
-                    });
-                }
-            }
-        })
-        .delegate('.time-of-removal', 'click', function() {
-            var $time = $(this);
-            var $post = $time.closest('.slot-header');
-            var $input = $time.data('time-of-removal-edit');
+            })
+            .delegate('.datepicker', 'click', function() {
+                var $target = $(this);
+                var $header = $target.parent();
 
-            if (!$input) {
-                $input = $('<input />')
-                    .attr('type', 'text')
-                    .attr('class', 'time-of-removal-edit')
-                    .width($time.width() + 2)
-                    .mask('29:59')
-                    .appendTo($post);
-                $time.data('time-of-removal-edit', $input);
-            } else {
-                $input.show();
-            }
-            $input.focus().select();
-        })
-        .delegate('.time-of-removal-edit', 'blur keydown', function(e) {
-            var $input = $(this);
+                if (!$header.data('datepicker')) {
+                    var $datepicker = $('<input type="text" />');
+                    var $post = $target.closest('.slot');
+                    var $time = $post.find('.time');
+                    var gridLineId = $post.data('grid-id');
+                    var startDate = $post.data('start-date');
+                    var endDate = $post.data('end-date');
+                    var defStartDate = $post.data('start-date');
+                    var defEndDate = $post.data('end-date');
+                    var time = $time.text();
 
-            if (e.type == 'keydown' && e.keyCode != KEY.ENTER) {
-                return;
-            }
-            if (e.type == 'focusout' && !e.originalEvent) {
-                return;
-            }
-
-            var $post = $input.closest('.slot');
-            var gridLineId = $post.data('grid-id');
-            var gridLineItemId = $post.data('grid-item-id');
-
-            var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
-            var qid = $post.find('.post').data('queue-id');
-            $input.blur().hide().val(time);
-
-            if (time) {
-                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
-                    if (state) {}
-                });
-            }
-        })
-        .delegate('.datepicker', 'click', function() {
-            var $target = $(this);
-            var $header = $target.parent();
-
-            if (!$header.data('datepicker')) {
-                var $datepicker = $('<input type="text" />');
-                var $post = $target.closest('.slot');
-                var $time = $post.find('.time');
-                var gridLineId = $post.data('grid-id');
-                var startDate = $post.data('start-date');
-                var endDate = $post.data('end-date');
-                var defStartDate = $post.data('start-date');
-                var defEndDate = $post.data('end-date');
-                var time = $time.text();
-
-                $header.data('datepicker', $datepicker);
-                $target.after($datepicker);
-                $target.remove();
-                $datepicker.datepick({
-                    rangeSelect: true,
-                    showTrigger: $target,
-                    showAnim: 'fadeIn',
-                    showSpeed: 'fast',
-                    monthsToShow: 2,
-                    minDate: 0,
-                    renderer: $.extend($.datepick.defaultRenderer, {
-                        picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
-                    }),
-                    onSelect: function(dates) {
-                        $post.data('start-date', $.datepick.formatDate(dates[0]));
-                        $post.data('end-date', $.datepick.formatDate(dates[1]));
-                        startDate = $post.data('start-date');
-                        endDate = $post.data('end-date');
-                    },
-                    onShow: function() {
-                        $header.find('span.datepicker').addClass('active');
-                        $('#queue').css('overflow', 'hidden');
-                    },
-                    onClose: function() {
-                        time = $time.text();
-                        $header.find('span.datepicker').removeClass('active');
-                        $('#queue').css('overflow', 'auto');
-                        if ($post.hasClass('new')) {
-                            // Добавление ячейки
-                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
-                                if (state) {}
-                            });
-                        } else {
-                            // Редактироваиние ячейки
-                            if (defStartDate != startDate || defEndDate != endDate) {
-                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
+                    $header.data('datepicker', $datepicker);
+                    $target.after($datepicker);
+                    $target.remove();
+                    $datepicker.datepick({
+                        rangeSelect: true,
+                        showTrigger: $target,
+                        showAnim: 'fadeIn',
+                        showSpeed: 'fast',
+                        monthsToShow: 2,
+                        minDate: 0,
+                        renderer: $.extend($.datepick.defaultRenderer, {
+                            picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
+                        }),
+                        onSelect: function(dates) {
+                            $post.data('start-date', $.datepick.formatDate(dates[0]));
+                            $post.data('end-date', $.datepick.formatDate(dates[1]));
+                            startDate = $post.data('start-date');
+                            endDate = $post.data('end-date');
+                        },
+                        onShow: function() {
+                            $header.find('span.datepicker').addClass('active');
+                            $('#queue').css('overflow', 'hidden');
+                        },
+                        onClose: function() {
+                            time = $time.text();
+                            $header.find('span.datepicker').removeClass('active');
+                            $('#queue').css('overflow', 'auto');
+                            if ($post.hasClass('new')) {
+                                // Добавление ячейки
+                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
                                     if (state) {}
                                 });
+                            } else {
+                                // Редактироваиние ячейки
+                                if (defStartDate != startDate || defEndDate != endDate) {
+                                    Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
+                                        if (state) {}
+                                    });
+                                }
                             }
+                        }
+                    });
+                    $datepicker.val(startDate + ' - ' + endDate).focus();
+                }
+            });
+
+        $('.queue-footer .add-button').click(function() {
+            $("#queue").scrollTo(0);
+            var $newPost = $(
+                '<div class="new slot empty">' +
+                    '<div class="slot-header">' +
+                    '<span class="time">__:__</span>' +
+                    '<span class="datepicker"></span>' +
+                    '</div>' +
+                    '</div>'
+            ).prependTo('#queue').animate({height: 105}, 200);
+            $newPost.find('.time').click();
+        });
+    },
+
+    initLeftColumn: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+
+        // Очистка текста
+        $leftPanel.delegate(".clear-text", "click", function(){
+            var $post = $(this).closest(".post");
+            var postId = $post.data("id");
+
+            if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
+                Events.fire('leftcolumn_clear_post_text', postId, function(state){
+                    if (state) {
+                        $post.find('div.shortcut').html('');
+                        $post.find('div.cut').html('');
+                        $post.find('a.show-cut').remove();
+                    }
+                });
+            }
+        });
+
+        // Отклонение или одобрения авторских постов
+        $leftPanel.delegate('.moderation .button.approve', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            Events.fire('leftcolumn_approve_post', postId, function() {
+                $post.slideUp(200);
+            });
+        });
+
+        $leftPanel.delegate('.moderation .button.reject', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            var $newComment = $post.find('.new-comment');
+            var $moderation = $post.find('.moderation');
+            $moderation.hide();
+            $newComment.show();
+            $newComment.find('textarea').focus();
+        });
+
+        // Комментирование записи
+        $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
+            $(this).autoResize();
+            var $newComment = $(this).closest('.new-comment');
+            $newComment.addClass('open');
+        });
+
+        $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
+            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+                var $newComment = $(this).closest('.new-comment');
+                var $sendBtn = $newComment.find('.send');
+                $sendBtn.click();
+            }
+        });
+
+        $leftPanel.delegate('.post > .comments .comment > .delete', 'click', function(e) {
+            var $target = $(this);
+            var $comment = $target.closest('.comment');
+            var commentId = $comment.data('id');
+            Events.fire('comment_delete', commentId, function() {
+                $comment.data('html', $comment.html());
+                $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
+            });
+        });
+
+        $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
+            var $target = $(this);
+            var $comment = $target.closest('.comment');
+            var commentId = $comment.data('id');
+            Events.fire('comment_restore', commentId, function() {
+                $comment.removeClass('deleted').html($comment.data('html'));
+            });
+        });
+
+        $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
+            var $target = $(this);
+            var $post = $target.closest('.post');
+            var $newComment = $target.closest('.new-comment');
+            var $textarea = $newComment.find('textarea');
+            var $button = $newComment.find('.send:not(.load)');
+            var $commentsList = $('.comments > .list', $post);
+            var postId = $post.data('id');
+            if (!$textarea.val()) {
+                $textarea.focus();
+            } else {
+                $button.addClass('load');
+                Events.fire('comment_post', postId, $textarea.val(), function(html) {
+                    $button.removeClass('load');
+                    $textarea.val('').focus();
+                    $commentsList.append(html).find('.date').easydate(easydateParams);
+
+                    var $moderation = $newComment.next('.moderation');
+                    if ($moderation.length && !$moderation.data('checked')) {
+                        $moderation.data('checked', true);
+                        Events.fire('leftcolumn_reject_post', postId, function() {
+                            $post.slideUp(200);
+                        });
+                    }
+                });
+            }
+        });
+
+        $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
+            var $target = $(this);
+            var $post = $target.closest('.post');
+            var $commentsList = $('.comments > .list', $post);
+            var postId = $post.data('id');
+            var tmpText = $target.text();
+            $target.addClass('load').html('&nbsp;');
+            Events.fire('comment_load', {postId: postId, all: true}, function(html) {
+                $target.removeClass('load').html(tmpText);
+                $commentsList.html(html).find('.date').easydate(easydateParams);
+            });
+        });
+
+        $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
+            var $target = $(this);
+            var $post = $target.closest('.post');
+            var $commentsList = $('.comments > .list', $post);
+            var postId = $post.data('id');
+            var tmpText = $target.text();
+            $target.addClass('load').html('&nbsp;');
+            Events.fire('comment_load', {postId: postId, all: false}, function(html) {
+                $target.removeClass('load').html(tmpText);
+                $commentsList.html(html).find('.date').easydate(easydateParams);
+            });
+        });
+
+        $(document).on('mousedown', function(e) {
+            var $newComment = $(e.target).closest('.new-comment.open');
+            if (!$newComment.length) {
+                $('.new-comment.open').each(function() {
+                    var $newComment = $(this);
+                    var $textarea = $newComment.find('textarea');
+                    if (!$textarea.val()) {
+                        $newComment.removeClass('open');
+                        $textarea.height('auto');
+
+                        var $moderation = $newComment.next('.moderation');
+                        if ($moderation.length && !$moderation.data('checked')) {
+                            $newComment.hide();
+                            $moderation.show();
                         }
                     }
                 });
-                $datepicker.val(startDate + ' - ' + endDate).focus();
             }
         });
 
-    $('.queue-footer .add-button').click(function() {
-        $("#queue").scrollTo(0);
-        var $newPost = $(
-            '<div class="new slot empty">' +
-                '<div class="slot-header">' +
-                    '<span class="time">__:__</span>' +
-                    '<span class="datepicker"></span>' +
-                '</div>' +
-            '</div>'
-        ).prependTo('#queue').animate({height: 105}, 200);
-        $newPost.find('.time').click();
-    });
+        // Показать полностью в левом меню
+        $leftPanel.delegate(".show-cut", "click" ,function(e){
+            var $content = $(this).closest('.content'),
+                $shortcut = $content.find('.shortcut'),
+                shortcut = $shortcut.html(),
+                cut      = $content.find('.cut').html();
 
-    // Очистка текста
-    $leftPanel.delegate(".clear-text", "click", function(){
-        var $post = $(this).closest(".post");
-        var postId = $post.data("id");
+            $shortcut.html(shortcut + ' ' + cut);
+            $(this).remove();
 
-        if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
-            Events.fire('leftcolumn_clear_post_text', postId, function(state){
-                if (state) {
-                    $post.find('div.shortcut').html('');
-                    $post.find('div.cut').html('');
-                    $post.find('a.show-cut').remove();
+            e.preventDefault();
+        });
+
+        // Автоподгрузка записей
+        (function() {
+            var $window = $(window);
+            $window.scroll(function() {
+                if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                    Events.fire('wall_load_more', function(state) {});
                 }
             });
-        }
-    });
+        })();
 
-    // Отклонение или одобрения авторских постов
-    $leftPanel.delegate('.moderation .button.approve', 'click', function() {
-        var $post = $(this).closest('.post');
-        var postId = $post.data('id');
-        Events.fire('leftcolumn_approve_post', postId, function() {
-            $post.slideUp(200);
+        $('#wall-switcher a').click(function() {
+            var $target = $(this);
+            $target.hide();
+            $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
+            loadArticles(true);
         });
-    });
-    $leftPanel.delegate('.moderation .button.reject', 'click', function() {
-        var $post = $(this).closest('.post');
-        var postId = $post.data('id');
-        var $newComment = $post.find('.new-comment');
-        var $moderation = $post.find('.moderation');
-        $moderation.hide();
-        $newComment.show();
-        $newComment.find('textarea').focus();
-    });
+    },
 
-    // Автоподгрузка записей
-    (function() {
-        var $window = $(window);
-        $window.scroll(function() {
-            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
-                Events.fire('wall_load_more', function(state) {});
-            }
-        });
-    })();
-
-    // Добавление записи в борд
-    (function(){
+    initAddPost: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
         var $form = $(".newpost"),
             $input = $("textarea", $form),
             $tip = $(".tip", $form);
@@ -786,8 +962,7 @@ $(document).ready(function(){
                 if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                     $form.find('.save').click();
                 }
-            }).keyup()
-        ;
+            }).keyup();
 
         var parseUrl = function(txt){
             var matches = txt.match(pattern);
@@ -1027,7 +1202,7 @@ $(document).ready(function(){
         var stop = function(){
             $(window).unbind("click", stop);
 
-            if(!$input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
+            if (!$input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
                 $input.data("id", 0);
                 $form.addClass("collapsed");
                 deleteLink();
@@ -1191,17 +1366,17 @@ $(document).ready(function(){
                                                 };
                                                 var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
                                                 var $popup = $('<div/>', {
-                                                        'class': 'popup-image-edit',
-                                                        'html': '<div class="title">Редактировать изображение</div>'+
-                                                            '<div class="close"></div>' +
-                                                            '<div class="left-column">' +
-                                                                '<div class="original"><img src="'+originalImage.src+'" /></div>' +
-                                                            '</div>' +
-                                                            '<div class="right-column">' +
-                                                                '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                                                '<div class="button save">Сохранить</div>'+
-                                                            '</div>'
-                                                    })
+                                                    'class': 'popup-image-edit',
+                                                    'html': '<div class="title">Редактировать изображение</div>'+
+                                                        '<div class="close"></div>' +
+                                                        '<div class="left-column">' +
+                                                        '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                                        '</div>' +
+                                                        '<div class="right-column">' +
+                                                        '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                                        '<div class="button save">Сохранить</div>'+
+                                                        '</div>'
+                                                })
                                                     .appendTo('body');
 
                                                 $bg.click(closePopup);
@@ -1260,7 +1435,7 @@ $(document).ready(function(){
                             var $photo = $('<span/>', {class: 'attachment'})
                                 .append('<img src="' + path + '" alt="" />')
                                 .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
-                                .click(function() {
+                                    .click(function() {
                                         $photo.remove();
                                     })
                                 )
@@ -1373,177 +1548,57 @@ $(document).ready(function(){
                 }
             });
         });
-    })();
+    },
 
-    // Комментирование записи
-    $leftPanel.delegate('.post > .comments .new-comment textarea', 'focus', function() {
-        $(this).autoResize();
-        var $newComment = $(this).closest('.new-comment');
-        $newComment.addClass('open');
-    });
-    $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
-        if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-            var $newComment = $(this).closest('.new-comment');
-            var $sendBtn = $newComment.find('.send');
-            $sendBtn.click();
-        }
-    });
-    $leftPanel.delegate('.post > .comments .comment > .delete', 'click', function(e) {
-        var $target = $(this);
-        var $comment = $target.closest('.comment');
-        var commentId = $comment.data('id');
-        Events.fire('comment_delete', commentId, function() {
-            $comment.data('html', $comment.html());
-            $comment.addClass('deleted').html('Комментарий удален. <a class="restore">Восстановить</a>.');
-        });
-    });
-    $leftPanel.delegate('.post > .comments .comment.deleted > .restore', 'click', function() {
-        var $target = $(this);
-        var $comment = $target.closest('.comment');
-        var commentId = $comment.data('id');
-        Events.fire('comment_restore', commentId, function() {
-            $comment.removeClass('deleted').html($comment.data('html'));
-        });
-    });
-    $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
-        var $target = $(this);
-        var $post = $target.closest('.post');
-        var $newComment = $target.closest('.new-comment');
-        var $textarea = $newComment.find('textarea');
-        var $button = $newComment.find('.send:not(.load)');
-        var $commentsList = $('.comments > .list', $post);
-        var postId = $post.data('id');
-        if (!$textarea.val()) {
-            $textarea.focus();
-        } else {
-            $button.addClass('load');
-            Events.fire('comment_post', postId, $textarea.val(), function(html) {
-                $button.removeClass('load');
-                $textarea.val('').focus();
-                $commentsList.append(html).find('.date').easydate(easydateParams);
-
-                var $moderation = $newComment.next('.moderation');
-                if ($moderation.length && !$moderation.data('checked')) {
-                    $moderation.data('checked', true);
-                    Events.fire('leftcolumn_reject_post', postId, function() {
-                        $post.slideUp(200);
-                    });
+    initGoToTop: function() {
+        (function(w) {
+            var $elem = $('#go-to-top');
+            $elem.click(function() {
+                $(w).scrollTop(0);
+            });
+            $(w).bind('scroll', function(e) {
+                if (e.currentTarget.scrollY <= 0) {
+                    $elem.hide();
+                } else if (!$elem.is(':visible')) {
+                    $elem.show();
                 }
             });
-        }
-    });
-    $leftPanel.delegate('.post > .comments .show-more:not(.hide):not(.load)', 'click', function() {
-        var $target = $(this);
-        var $post = $target.closest('.post');
-        var $commentsList = $('.comments > .list', $post);
-        var postId = $post.data('id');
-        var tmpText = $target.text();
-        $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', {postId: postId, all: true}, function(html) {
-            $target.removeClass('load').html(tmpText);
-            $commentsList.html(html).find('.date').easydate(easydateParams);
-        });
-    });
-    $leftPanel.delegate('.post > .comments .show-more.hide:not(.load)', 'click', function() {
-        var $target = $(this);
-        var $post = $target.closest('.post');
-        var $commentsList = $('.comments > .list', $post);
-        var postId = $post.data('id');
-        var tmpText = $target.text();
-        $target.addClass('load').html('&nbsp;');
-        Events.fire('comment_load', {postId: postId, all: false}, function(html) {
-            $target.removeClass('load').html(tmpText);
-            $commentsList.html(html).find('.date').easydate(easydateParams);
-        });
-    });
-    $(document).on('mousedown', function(e) {
-        var $newComment = $(e.target).closest('.new-comment.open');
-        if (!$newComment.length) {
-            $('.new-comment.open').each(function() {
-                var $newComment = $(this);
-                var $textarea = $newComment.find('textarea');
-                if (!$textarea.val()) {
-                    $newComment.removeClass('open');
-                    $textarea.height('auto');
+        })(window);
+    },
 
-                    var $moderation = $newComment.next('.moderation');
-                    if ($moderation.length && !$moderation.data('checked')) {
-                        $newComment.hide();
-                        $moderation.show();
+    initVkAvatar: function() {
+        (function() {
+            VK.init({
+                apiId: vk_appId,
+                nameTransportPath: '/xd_receiver.htm'
+            });
+            getInitData();
+
+            function getInitData() {
+                var code;
+                code = 'return {';
+                code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
+                code += '};';
+                VK.Api.call('execute', {'code': code}, onGetInitData);
+            }
+            function onGetInitData(data) {
+                var r;
+                if (data.response) {
+                    r = data.response;
+                    if (r.me) {
+                        var $userInfo = $('.user-info');
+                        $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
+                        $('.user-name a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
+                        $('.user-photo img', $userInfo).attr('src', r.me.photo);
                     }
                 }
-            });
-        }
-    });
-
-    // Показать полностью в левом меню
-    $leftPanel.delegate(".show-cut", "click" ,function(e){
-        var $content = $(this).closest('.content'),
-            $shortcut = $content.find('.shortcut'),
-            shortcut = $shortcut.html(),
-            cut      = $content.find('.cut').html();
-
-        $shortcut.html(shortcut + ' ' + cut);
-        $(this).remove();
-
-        e.preventDefault();
-    });
-
-    $('#wall-switcher a').click(function() {
-        var $target = $(this);
-        $target.hide();
-        $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
-        loadArticles(true);
-    });
-
-    // Показать полностью в правом меню
-    $(".right-panel").delegate(".toggle-text", "click", function(e) {
-        $(this).parent().toggleClass('collapsed');
-    });
-
-    // Кнопка "наверх"
-    (function(w) {
-        var $elem = $('#go-to-top');
-        $elem.click(function() {
-            $(w).scrollTop(0);
-        });
-        $(w).bind('scroll', function(e) {
-            if (e.currentTarget.scrollY <= 0) {
-                $elem.hide();
-            } else if (!$elem.is(':visible')) {
-                $elem.show();
             }
-        });
-    })(window);
+        })();
+    }
+});
 
-    // Подгрузка имени и аватара
-    (function() {
-        VK.init({
-            apiId: vk_appId,
-            nameTransportPath: '/xd_receiver.htm'
-        });
-        getInitData();
-
-        function getInitData() {
-            var code;
-            code = 'return {';
-            code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
-            code += '};';
-            VK.Api.call('execute', {'code': code}, onGetInitData);
-        }
-        function onGetInitData(data) {
-            var r;
-            if (data.response) {
-                r = data.response;
-                if (r.me) {
-                    var $userInfo = $('.user-info');
-                    $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
-                    $('.user-name a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
-                    $('.user-photo img', $userInfo).attr('src', r.me.photo);
-                }
-            }
-        }
-    })();
+$(document).ready(function() {
+    window.app = new App();
 });
 
 var linkTplFull = '<div class="link-status-content"><span>Ссылка: <a href="" target="_blank"></a></span></div>\
@@ -1615,51 +1670,55 @@ var Elements = {
             img.src = src;
         });
 
-        $block.find(".timestamp").easydate(easydateParams);
-        $block.find(".date").easydate(easydateParams);
+        $block.find('.timestamp').easydate(easydateParams);
+        $block.find('.date').easydate(easydateParams);
         $block.find('.images-ready').imageComposition();
-        $('.right-panel .images').imageComposition('right');
+        $('#right-panel').find('.images').imageComposition('right');
     },
     initDraggable: function($block) {
-        $block.find('.post.movable:not(.blocked) > .content').draggable({
-            revert: 'invalid',
-            appendTo: 'body',
-            cursor: 'move',
-            cursorAt: {left: 100, top: 20},
-            helper: function() {
-                return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
-            },
-            start: function() {
-                var self = $(this),
-                    $post = self.closest('.post');
-                $post.addClass('moving');
-            },
-            stop: function() {
-                var self = $(this),
-                    $post = self.closest('.post');
-                $post.removeClass('moving');
-            }
+        $block.find('.post.movable:not(.blocked) > .content').each(function() {
+            $(this).draggable({
+                revert: 'invalid',
+                appendTo: 'body',
+                cursor: 'move',
+                cursorAt: {left: 100, top: 20},
+                helper: function() {
+                    return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
+                },
+                start: function() {
+                    var self = $(this),
+                        $post = self.closest('.post');
+                    $post.addClass('moving');
+                },
+                stop: function() {
+                    var self = $(this),
+                        $post = self.closest('.post');
+                    $post.removeClass('moving');
+                }
+            });
         });
     },
     initDroppable: function($block) {
-        $block.find('.items .slot').droppable({
-            activeClass: 'ui-state-active',
-            hoverClass: 'ui-state-hover',
-            drop: function(e, ui) {
-                var $target = $(this),
-                    $post = $(ui.draggable).closest('.post');
+        $block.find('.items .slot').each(function() {
+            $(this).droppable({
+                activeClass: 'ui-state-active',
+                hoverClass: 'ui-state-hover',
+                drop: function(e, ui) {
+                    var $target = $(this),
+                        $post = $(ui.draggable).closest('.post');
 
-                if ($target.hasClass('empty')) {
-                    Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
-                        if (state) {
-                            if ($post.hasClass('movable')) {
-                                $target.html($post);
+                    if ($target.hasClass('empty')) {
+                        Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
+                            if (state) {
+                                if ($post.hasClass('relocatable')) {
+                                    $target.html($post);
+                                }
+                                $target.addClass('image-compositing');
                             }
-                            $target.addClass('image-compositing');
-                        }
-                    });
+                        });
+                    }
                 }
-            }
+            });
         });
     },
     initLinks: function($block) {
@@ -1680,10 +1739,10 @@ var Elements = {
         }
     },
     leftType: function(){
-        return $('.left-panel .type-selector a.active').data('type');
+        return $('#left-panel .type-selector a.active').data('type');
     },
     rightType: function(){
-        return $('.right-panel .type-selector a.active').data('type');
+        return $('#right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
         if (typeof value == 'undefined') {
