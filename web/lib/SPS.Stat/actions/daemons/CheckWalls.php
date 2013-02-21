@@ -14,6 +14,17 @@ class CheckWalls
     const time_shift = 0;
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
 
+    private  $monitoring_array = array(
+        43005314,
+        42933269,
+        43503298,
+        41611636,
+        42841673,
+        26675756,
+        43005314,
+        39930420,
+    );
+
     public function Execute()
     {
         error_reporting(0);
@@ -78,8 +89,16 @@ class CheckWalls
         $ids_array = array();
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
+        //левая тема для записи последнего поста паблика, нудна для отлова левых постов
+        $ids_array = array_merge( $ids_array, $this->monitoring_array);
+        $ids_array = array_unique( $ids_array );
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
+        foreach( $this->monitoring_array as $public_id ) {
+            $post = $walls[$public_id ][1];
+            $this->save_post( $public_id, $post->id, $post->text);
+        }
+
         foreach( $publics as $barter_event ) {
 //            if( !isset( $walls[$barter_event->barter_public ])) {
 //                //todo логирование
@@ -308,5 +327,27 @@ class CheckWalls
             $result[$event->creator_id][] = $event->barter_public . '_' . $event->post_id;
         }
         return $result;
+    }
+
+    private function get_post_from_monitiring( $public_id, $post_id )
+    {
+        $sql = 'SELECT count(*) FROM barter_monitoring WHERE post_id = @post_id and public_id = @public_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetInteger( 'public_id', $public_id );
+        $cmd->SetInteger( '@post_id', $post_id );
+        $ds = $cmd->Execute();
+        return $ds->GetSize();
+    }
+
+    private function save_post( $public_id, $post_id, $text )
+    {
+        if( !$this->get_post_from_monitiring ) {
+            $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, null)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( 'public_id', $public_id );
+            $cmd->SetInteger( '@post_id',  $post_id );
+            $cmd->SetString ( '@text',     $text );
+            $cmd->Execute();
+        }
     }
 }
