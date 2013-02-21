@@ -71,7 +71,7 @@
             $article->targetFeedId = $targetFeedId;
             $article->externalId = -1;
             $article->rate = 0;
-            $article->editor = AuthUtility::GetCurrentUser('Editor')->vkId;
+            $article->editor = $this->vkId;
             $article->authorId = $authorId;
             $article->isCleaned = false;
             $article->statusId = 1;
@@ -84,6 +84,7 @@
                     $article->sourceFeedId = $SourceFeed->sourceFeedId;
                     if ($SourceFeed->type == SourceFeedUtility::Ads){
                         $article->articleStatus = Article::STATUS_APPROVED;
+                        $article->authorId = null;
                     }
                 }
             }
