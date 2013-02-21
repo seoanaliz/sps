@@ -1,13 +1,16 @@
 <?
-    /** @var $article Article */
-    /** @var $articleRecord ArticleRecord */
-    /** @var $sourceFeed SourceFeed */
-    /** @var $sourceInfo array */
-    /** @var $isWebUserEditor bool */
-    /** @var $canEditPost boolean */
+/** @var $article Article */
+/** @var $articleRecord ArticleRecord */
+/** @var $sourceFeed SourceFeed|null */
+/** @var $sourceInfo array */
+/** @var $isWebUserEditor bool */
+/** @var $canEditPost boolean */
+/**
+ * @var $forceDisabledPublishing bool|null -  принудительно отключить редактирование
+ */
 
-    if (!empty($article)) {
-
+if (!empty($article)) {
+        $forceDisabledPublishing = isset($forceDisabledPublishing) && $forceDisabledPublishing;
         $extLinkLoader  = false;
         $isPostMovable = false;
         $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
@@ -16,7 +19,7 @@
             $extLinkLoader = true;
         }
 
-        if ($isWebUserEditor) {
+        if ($isWebUserEditor && !$forceDisabledPublishing) {
             if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
                 $isPostMovable = true;
             }
