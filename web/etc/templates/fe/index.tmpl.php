@@ -11,7 +11,7 @@
 <script src="{web:js://fe/main.js}" type="text/javascript"></script>
 <div id="go-to-top">Наверх</div>
 <div class="layer clear-fix">
-    <div class="left-panel">
+    <div id="left-panel" class="left-panel">
         <div class="block">
             <div class="header">
 
@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <div class="right-panel">
+    <div id="right-panel" class="right-panel">
         <div class="block">
             <div class="header bb">
 

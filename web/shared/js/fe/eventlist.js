@@ -190,7 +190,7 @@ function loadArticles(clean) {
             var $block = $(tmpEl).html(data);
             $('#wall').append($block);
             Elements.initDraggable($block);
-            Elements.initDroppable($('.right-panel'));
+            Elements.initDroppable($('#right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
             if (!$block.find('.post').length) {
@@ -232,7 +232,7 @@ function loadQueue() {
             var $block = $(tmpEl).html(data);
             $('#queue').show().html($block);
             Elements.initDraggable($block);
-            Elements.initDroppable($('.right-panel'));
+            Elements.initDroppable($('#right-panel'));
             Elements.initImages($block);
             Elements.initLinks($block);
             $block.find('.post.blocked').draggable('disable');
@@ -260,7 +260,7 @@ function reloadArticle(id) {
             var $elem = $("div.post[data-id=" + id + "]");
             $elem.replaceWith(data);
             Elements.initDraggable($elem);
-            Elements.initDroppable($('.right-panel'));
+            Elements.initDroppable($('#right-panel'));
             Elements.initImages($elem);
             Elements.initLinks($elem);
         }
@@ -527,7 +527,7 @@ var Eventlist = {
 
             var gridTypes = data.accessibleGridTypes;
             var showCount = 0;
-            $('.right-panel .type-selector').children('.grid_type').each(function(i, item){
+            $('#right-panel .type-selector').children('.grid_type').each(function(i, item){
                 item = $(item);
                 if ($.inArray(item.data('type'), gridTypes) == -1){
                     item.hide();
