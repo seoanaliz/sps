@@ -1653,7 +1653,8 @@ var Elements = {
                     Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
                         if (state) {
                             if ($post.hasClass('movable')) {
-                                $target.html($post);
+                                if ($('.sourceType.active').attr('data-type') != 'ads')
+                                        $target.html($post);
                             }
                             $target.addClass('image-compositing');
                         }
