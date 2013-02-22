@@ -339,7 +339,6 @@ class CheckWalls
         return $result;
     }
 
-
     //пост для мониторинга
     private function get_post_from_monitiring( $public_id, $post_id )
     {
@@ -348,7 +347,7 @@ class CheckWalls
         $cmd->SetInteger( 'public_id', $public_id );
         $cmd->SetInteger( '@post_id', $post_id );
         $ds = $cmd->Execute();
-        return $ds->GetSize();
+        return $ds->Next();
     }
 
 
@@ -376,7 +375,8 @@ class CheckWalls
 
     private function get_publics_for_mentions() {
         return array(
-            34468364
+            34468364,
+            32348256
         );
     }
 
@@ -392,6 +392,7 @@ class CheckWalls
         }
         print_r($this->cookie);
         foreach( $publics_for_men_search as $public_id ) {
+            echo 'mentions of ' . $public_id . '<br>';
             $page = VkHelper::connect( 'http://vk.com/feed?section=mentions&obj=-' . $public_id, $this->cookie );
             $this->parse( $page, $public_id );
         }
@@ -406,18 +407,21 @@ class CheckWalls
             $feed_row = pq($post);
             $a = $feed_row->find('div.post');
             $source = $a->attr('id');
-            if( !substr_count( $source, '-'))
+            if( !substr_count( $source, '-')) {
                 continue;
-
+            }
             $a = $feed_row->find('[mention_id]');
             $mention = ($a->Attr('mention_id'));
             $mention = str_replace( array( 'public', 'club' ), '', $mention );
-            if( $mention != $public_id )
+            if( $mention != $public_id ){
                 continue;
+            }
+
 
             preg_match( '/-(\d*?)_(\d*)/', $source, $matches );
-            if( count( $matches) != 3 )
+            if( count( $matches) != 3 ){
                 continue;
+            }
 
             $source_public_id = $matches[1];
             $source_post_id   = $matches[2];
