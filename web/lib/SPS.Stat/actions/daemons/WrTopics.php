@@ -24,7 +24,7 @@ class WrTopics extends wrapper
 //
 //        $this->find_admins();
 //        die();
-        StatPublics::update_public_info( $this->ids, $this->conn );
+//        StatPublics::update_public_info( $this->ids, $this->conn );
         $this->update_quantity();
         $this->double_check_quantity();
 
@@ -124,7 +124,8 @@ class WrTopics extends wrapper
             $diff_abs = 0;
         }
 
-
+        if( !$diff_abs || !$diff_rel )
+//            die('111');
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
             SET
                 quantity        =   @new_quantity,
@@ -133,7 +134,8 @@ class WrTopics extends wrapper
                 diff_abs_week   =   @diff_abs_week,
                 diff_rel_week   =   @diff_rel_week,
                 diff_abs_month  =   @diff_abs_month,
-                diff_rel_month  =   @diff_rel_month
+                diff_rel_month  =   @diff_rel_month,
+                updated_at      =   current_date
             WHERE
                 vk_id = @publ_id';
 
@@ -199,6 +201,7 @@ class WrTopics extends wrapper
                     } else {
                         $this->set_public_closed( $key );
                     }
+                    die();
                 }
 
                 sleep(0.3);

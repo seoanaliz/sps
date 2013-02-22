@@ -12,11 +12,303 @@
         /**
          * Entry Point
          */
-        public function Execute()
+
+        public function get_public_stats_page( $public_id, $time_from = 0, $time_to = 0 )
+        {
+            $page = file_get_contents( 'http://vk.com/stats?gid=' . $public_id );
+            file_put_contents( '1.txt', $page );
+
+        }
+
+        public function connect($link,$cookie=null,$post=null){
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,$link);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+            if($cookie !== null)
+                curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+            if($post !== null)
+            {
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+            }
+            $otvet = curl_exec($ch);
+            curl_close($ch);
+            return $otvet;
+        }
+
+        #стата - виджет
+        private $samorost_publics_array = array(
+            43503725,
+            36959676
+            ,35806721
+            ,35807148
+            ,36959733
+            ,35807199
+            ,35806476
+            ,36959959
+            ,36621543
+            ,35807284
+            ,37140953
+            ,38000303
+            ,35807044
+            ,38000455
+            ,36621560
+            ,35807216
+            ,37140910
+            ,36959798
+            ,37140977
+            ,36959483
+            ,35806378
+            ,35807213
+            ,38000361
+            ,36621513
+            ,35806186
+            ,38000467
+            ,38000487
+            ,35807190
+            ,38000341
+            ,38000435
+            ,43503681
+            ,43503725
+            ,35807071
+            ,43503694
+            ,35807273
+            ,38000323
+            ,38000382
+            ,38000393
+            ,43503630
+            ,38000555
+            ,43503753
+            ,43157718
+            ,43503575
+            ,43503503
+            ,43503550
+            ,43503460
+            ,43503264
+            ,43503298
+            ,43503235
+            ,43503431
+            ,43503315
+        );
+#стата - виджет
+        private $samorost = array(
+            400,
+            350,
+            450,
+            550,
+            200,
+            150,
+            550,
+            350,
+            700,
+            450,
+            300,
+            350,
+            150,
+            200,
+            100,
+            200,
+            200,
+            100,
+            80,
+            550,
+            150,
+            150,
+            350,
+            250,
+            150,
+            60,
+            200,
+            200,
+            100,
+            100,
+            70,
+            80,
+            120,
+            80,
+            100,
+            70,
+            50,
+            60,
+            200,
+            60,
+            200,
+            50,
+            50,
+            50,
+            30,
+            30,
+            30,
+            20,
+            20,
+            20
+       );
+#стата - виджет
+        public function create_excel_list( $data_array, $from = 0, $to = 10000000000000)
         {
 
-            VkHelper::set_service_at( '155537426', '1522740c1c67241e1c67241e351c4f74e211c671c721c804ce60e280b3be15cdc42254c', '2642172' );
+            include_once 'C:/wrk/classes/PHPExcel.php';
+            $pExcel = new PHPExcel();
+            $pExcel->setActiveSheetIndex(0);
+            $aSheet = $pExcel->getActiveSheet();
+            $aSheet->setTitle('Первый лист');
+
+            for( $i = 2; $i < 33; $i ++) {
+                $cell = $aSheet->getCellByColumnAndRow( $i, 1);
+                $cell->setValue( $i-1 );
+            }
+
+            $row = 2;
+            $samorost = current( $this->samorost);
+            foreach( $data_array as $public_id=>$public ) {
+                $t = 0;
+                $cell = $aSheet->getCellByColumnAndRow( $t++, $row );
+                $cell->setValue( $public_id);
+                $cell = $aSheet->getCellByColumnAndRow( $t, $row );
+                $cell->setValue( $samorost );
+
+                $public2  = array_reverse( $public, true );
+                foreach( $public2 as $time => $value ) {
+                    echo '<br>';
+                    if( $time < $from )
+                        continue;
+                    if( $time > $to )
+                        break;
+
+                    $cell = $aSheet->getCellByColumnAndRow( ++$t, $row );
+                    $cell->setValue( ( $value['members_growth'] - $value['vidget_members'] - $samorost ));
+                }
+                $samorost = next( $this->samorost);
+                $row++;
+            }
+
+            //отдаем пользователю в браузер
+            include("C:/wrk/classes/PHPExcel/Writer/Excel5.php");
+            $objWriter = new PHPExcel_Writer_Excel5($pExcel);
+//            header('Content-Type: application/vnd.ms-excel');
+//            header('Content-Disposition: attachment;filename="rate.xls"');
+//            header('Cache-Control: max-age=0');
+            file_put_contents('c:/wrk/1.xls', '');
+            $objWriter->save('c:/wrk/1.xls');
+
+        }
+#стата - виджет
+        public function get_public_stats_wo_api()
+        {
+            $mail = "akalie@list.ru";
+            $pass = "7n@tion@rmy";
+
+            $otvet=$this->connect("http://login.vk.com/?act=login&email=$mail&pass=$pass");
+            if(!preg_match("/hash=([a-z0-9]{1,32})/",$otvet, $hash )) {
+                die("Login incorrect");
+            }
+            $otvet=$this->connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
+            preg_match( "/remixsid=(.*?);/", $otvet, $sid );
+            $cookie = "remixchk=5; remixsid=$sid[1]";
+
+            $res = array();
+//            $fct = 0;
+//            $ict = 0;
+            foreach( $this->samorost_publics_array as $public_id ) {
+                $res[$public_id] = array();
+                $page = $this->connect( 'http://vk.com/stats?act=reach&gid=' . $public_id, $cookie );
+                file_put_contents( '1.txt', $page );
+                $page = file_get_contents('1.txt');
+
+                preg_match( '/Total members",(.*?\:\[\[.*?]])/', $page, $tot_members );
+                preg_match( '/f":1,"name":"New members".*?("d"\:\[\[.*?]])/', $page, $members_growth );
+//                preg_match( '/"Members lost",(.*?\:\[\[.*?]])/', $page, $members_loss );
+                preg_match( '/{"name":"New members","l".*?,("d".*?]])/', $page, $vidget_members );
+                preg_match( '/unique visitors.*?,("d".*?]])/', $page, $unique_visitors );
+                preg_match( '/Pageviews.*?,("d".*?]])/', $page, $views );
+//                preg_match( '/Full coverage.*?,("d".*?]])/', $page, $full_coverage );
+//                preg_match( '/Followers coverage.*?,("d".*?]])/', $page, $followers_coverage );
+
+
+                preg_match( '/Pageviews.*?,("d".*?]])/', $page, $views );
+//                $full_coverage  = json_decode( '{' . $full_coverage[1] .  '}' )->d;
+//                $fct += $full_coverage[1][1];
+
+
+//                $followers_coverage  = json_decode( '{' . $followers_coverage[1] . '}' )->d;
+//                $ict += $followers_coverage[1][1];
+
+                $views           = json_decode( '{' . $views[1] .           '}' )->d;
+                $tot_members     = json_decode( '{' . $tot_members[1] .     '}' )->d;
+//                $members_loss    = json_decode( '{' . $members_loss[1] .    '}' )->d;
+                $vidget_members  = json_decode( '{' . $vidget_members[1] .  '}' )->d;
+                $members_growth  = json_decode( '{' . $members_growth[1] .  '}' )->d;
+                $unique_visitors = json_decode( '{' . $unique_visitors[1] . '}' )->d;
+
+                $res[$public_id] = $this->key_maker( $tot_members, $vidget_members, $unique_visitors, $views, $members_growth );
+            }
+
+            $this->create_excel_list( $res, 1356998400, 1359676800  );
+        }
+#стата - виджет
+        public function key_maker( $total_members, $vidget_members, $unique_visitors, $views, $members_growth )
+        {
+            $count = count( $total_members );
+            $res = array();
+            for( $i = 0; $i < $count; $i++ ) {
+                $date = $total_members[$i][0];
+                $res[$date]['views']            = isset( $views[$i][1] ) ? $views[$i][1] : 0;
+                $res[$date]['total_members']    = $total_members[$i][1];
+                $res[$date]['members_growth']   = $members_growth[$i][1] ;
+                $res[$date]['vidget_members']   = isset( $vidget_members[$i][1]  ) ? $vidget_members[$i][1]  : 0;
+                $res[$date]['unique_visitors']  = isset( $unique_visitors[$i][1] ) ? $unique_visitors[$i][1] : 0;
+            }
+            return $res;
+        }
+
+        public function Execute()
+        {
+            #AAAGaXJpoV1IBAPpnQZCxnmeC4qZC7Ng0BXQgEqPSt6YsO7HULFtV0UazDcSbmZB3T1FZAPlWs6YgjGVd7dLO8t3RKaDEekYVU5zNyZBdn09ao1NwPlYUd
+            #344521148954851
+            $fields_arr = array(
+                'album'         => '344521148954851',
+                'access_token'  => 'AAAGaXJpoV1IBAPpnQZCxnmeC4qZC7Ng0BXQgEqPSt6YsO7HULFtV0UazDcSbmZB3T1FZAPlWs6YgjGVd7dLO8t3RKaDEekYVU5zNyZBdn09ao1NwPlYUd',
+                'source'        => '@C:\wrk\2.jpg',
+                'message'       => 12,
+                'targeting'     => array(
+                    'countries' => array('RU'),
+                    'locales'   => 17
+                )
+            );
+
+
+            $a = new SenderFacebook( json_encode( $fields_arr));
+            $a->send_photo();
             die();
+//            $this->create_excel_list( $tot_members );
+            die();
+            $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
+            $this->post_text        =   $this->text_corrector( $post_data['text'] );
+            $this->vk_group_id      =   $post_data['group_id'] ;
+            $this->vk_app_seckey    =   $post_data['vk_app_seckey'];
+            $this->vk_access_token  =   $post_data['vk_access_token'];
+            $this->audio_id         =   isset( $post_data['audio_id'] ) ? $post_data['audio_id'] : array();//массив вида array('videoXXXX_YYYYYYY','...')
+            $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
+            $this->link             =   $post_data['link'];
+            $this->header           =   $post_data['header'];
+            $post = array(
+                    'photo_array' => array( '' )
+            );
+
+            die();
+            $check = DialogFactory::Get(array( 'user_id' => 670456, 'rec_id' => 670456 ));
+            print_r($check);
+            die();
+            for( $i = 0 ; $i < 20;$i++ )
+            {
+                $at = VkHelper::api_request('wall.get', array(),0);
+                print_r ( $at );
+
+            }
+            die() ;
 //            error_reporting( 0 );
             $a = new ParserVkontakte( 35807213 );
             print_r( $a->get_posts( 0 ));
