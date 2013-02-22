@@ -5,7 +5,6 @@
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
 /** @var $canEditPost boolean */
-/** @var $sourceFeedType String */
 /**
  * @var $forceDisabledPublishing bool|null -  принудительно отключить редактирование
  */
@@ -19,11 +18,11 @@ if (!empty($article)) {
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
+        if ($sourceFeed->type == SourceFeedUtility::Ads) {
+            $isPostRelocatable = false;
+        }
     }
 
-    if ($sourceFeedType == SourceFeedUtility::Ads) {
-        $isPostRelocatable = false;
-    }
     if ($isWebUserEditor && !$forceDisabledPublishing) {
         if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
             $isPostMovable = true;
