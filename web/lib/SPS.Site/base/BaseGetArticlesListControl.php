@@ -477,6 +477,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         }
 
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
+        Response::setString('sourceFeedType', $this->getSourceFeedType());
         Response::setArray('sourceFeeds', $this->sourceFeeds);
         Response::setArray('sourceInfo', SourceFeedUtility::GetInfo($this->sourceFeeds));
         Response::setBoolean('isWebUserEditor', $isWebUserEditor);
