@@ -244,7 +244,7 @@ function loadQueue() {
 }
 
 function renderQueueSize() {
-    var size = $('div#queue div.post').length;
+    var size = $('#queue .post').length;
     $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
 }
 
@@ -257,12 +257,12 @@ function reloadArticle(id) {
             targetFeedId: Elements.rightdd()
         },
         success: function(data) {
-            var $elem = $("div.post[data-id=" + id + "]");
-            $elem.replaceWith(data);
-            Elements.initDraggable($elem);
-            Elements.initDroppable($('#right-panel'));
-            Elements.initImages($elem);
-            Elements.initLinks($elem);
+            var $elem = $('.post[data-id=' + id + ']');
+            var $newElem = $(data);
+            $elem.replaceWith($newElem);
+            Elements.initDraggable($newElem);
+            Elements.initImages($newElem);
+            Elements.initLinks($newElem);
         }
     });
 }

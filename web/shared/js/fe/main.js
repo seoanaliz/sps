@@ -972,7 +972,7 @@ var App = Event.extend({
                 foundLink   = matches[0];
                 foundDomain = matches[2];
 
-                Events.fire("post_describe_link", foundLink, function(result) {
+                Events.fire('post_describe_link', foundLink, function(result) {
                     if (result) {
                         $linkDescription.empty();
                         $linkStatus.empty();
@@ -1200,11 +1200,11 @@ var App = Event.extend({
         };
 
         var stop = function(){
-            $(window).unbind("click", stop);
+            $(window).unbind('click', stop);
 
-            if (!$input.val().length && !$(".qq-upload-list li").length && !$linkInfo.is(":visible")) {
-                $input.data("id", 0);
-                $form.addClass("collapsed");
+            if (!$input.val().length && !$('.qq-upload-list li').length && !$linkInfo.is(':visible')) {
+                $input.data('id', 0);
+                $form.addClass('collapsed');
                 deleteLink();
             }
         };
@@ -1217,7 +1217,7 @@ var App = Event.extend({
             foundDomain = false;
         };
 
-        $form.delegate(".save", "click", function(e){
+        $form.delegate('.save', 'click', function(e){
             var link = $linkStatus.find('a').attr('href');
             var photos = [];
             $('.newpost .qq-upload-success').each(function(){
@@ -1229,18 +1229,18 @@ var App = Event.extend({
             if (!($.trim($input.val() || photos.length || link))) {
                 return $input.focus();
             } else {
-                $form.addClass("spinner");
-                Events.fire("post",
+                $form.addClass('spinner');
+                Events.fire('post',
                     $input.val(),
                     photos,
                     link,
-                    $input.data("id"),
+                    $input.data('id'),
                     function(state){
-                        if(state) {
+                        if (state) {
                             clearForm();
                             stop();
                         }
-                        $form.removeClass("spinner");
+                        $form.removeClass('spinner');
                         $input.blur();
                     }
                 );
@@ -1484,7 +1484,7 @@ var App = Event.extend({
                         if (!($.trim(text) || link || photos.length)) {
                             return $text.focus();
                         } else {
-                            Events.fire("post",
+                            Events.fire('post',
                                 text,
                                 photos,
                                 link,
@@ -1643,10 +1643,10 @@ var Elements = {
         });
 
         //логика картинок топа
-        $block.find(".post-image-top img").bind("load", function () {
+        $block.find('.post-image-top img').bind('load', function () {
             var src = $(this).attr('src');
             var img = new Image();
-            var link = $(this).closest(".post").find('.ajax-loader-ext');
+            var link = $(this).closest('.post').find('.ajax-loader-ext');
 
             img.onload = function() {
                 if (this.width < 250 && this.height < 250) {
@@ -1666,9 +1666,15 @@ var Elements = {
         $block.find('.images-ready').imageComposition();
         $('#right-panel').find('.images').imageComposition('right');
     },
-    initDraggable: function($block) {
-        $block.find('.post.movable:not(.blocked) > .content').each(function() {
-            $(this).draggable({
+    initDraggable: function($elem, islog) {
+        var $block = $elem.find('.post');
+        if ($block.length) {
+            $block.each(function() {
+                Elements.initDraggable($(this));
+            });
+        } else if ($elem.is('.movable:not(.blocked)')) {
+            islog && console.log($elem.find('> .content'));
+            $elem.find('> .content').draggable({
                 revert: 'invalid',
                 appendTo: 'body',
                 cursor: 'move',
@@ -1677,21 +1683,22 @@ var Elements = {
                     return $('<div/>').html('Укажите, куда поместить пост...').addClass('moving dragged');
                 },
                 start: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.addClass('moving');
+                    $(this).closest('.post').addClass('moving');
                 },
                 stop: function() {
-                    var self = $(this),
-                        $post = self.closest('.post');
-                    $post.removeClass('moving');
+                    $(this).closest('.post').removeClass('moving');
                 }
             });
-        });
+        }
     },
-    initDroppable: function($block) {
-        $block.find('.items .slot').each(function() {
-            $(this).droppable({
+    initDroppable: function($elem) {
+        var $block = $elem.find('.slot');
+        if ($block.length) {
+            $block.each(function() {
+                Elements.initDroppable($(this));
+            });
+        } else {
+            $elem.droppable({
                 activeClass: 'ui-state-active',
                 hoverClass: 'ui-state-hover',
                 drop: function(e, ui) {
@@ -1710,7 +1717,7 @@ var Elements = {
                     }
                 }
             });
-        });
+        }
     },
     initLinks: function($block) {
         $block.find('img.ajax-loader').each(function(){
