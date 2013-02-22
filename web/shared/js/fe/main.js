@@ -63,15 +63,15 @@ var App = Event.extend({
         t.initCalendar();
         t.initMultiSelect();
         t.initLeftColumn();
+        t.wallAutoloadInit();
+        t.initModeration();
         t.initRightColumn();
         t.initLeftPanelTabs();
         t.initWall();
         t.initWallFilter();
         t.initQueue();
         t.initAddPost();
-        // Кнопка "наверх"
         t.initGoToTop();
-        // Подгрузка имени и аватара
         t.initVkAvatar();
     },
 
@@ -86,32 +86,28 @@ var App = Event.extend({
                 }
             })
             .change(function(){
-                $(this).parent().find(".caption").toggleClass("default", !$(this).val().length);
+                $(this).parent().find('.caption').toggleClass('default', !$(this).val().length);
                 Events.fire('calendar_change');
             });
 
-        $(".calendar .tip, #calendar-fix").click(function(){
+        $('.calendar .tip, #calendar-fix').click(function(){
             $calendar.focus();
         });
 
         // Приведение вида календаря из 22.12.2012 в 22 декабря
-        (function() {
-            var d = $("#calendar").val().split('.');
-            var date = [d[1], d[0], d[2]].join('/');
-            $("#calendar").datepicker('setDate', new Date(date)).trigger('change');
-        })();
+        var d = $calendar.val().split('.');
+        var date = [d[1], d[0], d[2]].join('/');
+        $calendar.datepicker('setDate', new Date(date)).trigger('change');
 
         // Кнопки вперед-назад в календаре
-        (function() {
-            $(".calendar .prev").click(function(){
-                var date = $calendar.datepicker('getDate').getTime();
-                $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
-            });
-            $(".calendar .next").click(function(){
-                var date = $calendar.datepicker('getDate').getTime();
-                $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
-            });
-        })();
+        $('.calendar .prev').click(function(){
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
+        });
+        $('.calendar .next').click(function(){
+            var date = $calendar.datepicker('getDate').getTime();
+            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
+        });
     },
 
     initMultiSelect: function() {
@@ -142,7 +138,8 @@ var App = Event.extend({
 
     initRightColumn: function() {
         var t = this;
-        $("#right-drop-down").dropdown({
+        var $leftPanel = t.$leftPanel;
+        $('#right-drop-down').dropdown({
             data: rightPanelData,
             type: 'radio',
             addClass: 'right',
@@ -167,9 +164,9 @@ var App = Event.extend({
                 cookieData = $.cookie('sourceTypes' + targetFeedId);
                 sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
                 if (sourceType.length == 0) {
-                    sourceType = $('.left-panel .type-selector a[data-type="source"]');
+                    sourceType = $leftPanel.find('.type-selector a[data-type="source"]');
                 }
-                $(".left-panel .type-selector a").removeClass('active');
+                $leftPanel.find('.type-selector a').removeClass('active');
                 sourceType.addClass('active');
 
                 // проставление типа ленты отправки
@@ -210,7 +207,9 @@ var App = Event.extend({
     },
 
     initWallFilter: function() {
-        $('.left-panel .drop-down').change(function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+        $leftPanel.find('.drop-down').change(function() {
             Events.fire('leftcolumn_dropdown_change');
         });
 
@@ -249,212 +248,13 @@ var App = Event.extend({
             if ($(this).data('type') == 'authors-list') {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
-                updateAuthorListPage();
+                t.updateAuthorListPage();
             } else {
                 $('body').removeClass('editor-mode');
                 $(window).data('disable-load-more', false);
                 Events.fire('rightcolumn_dropdown_change');
             }
         });
-
-        // Список авторов
-        function updateAuthorListPage(method) {
-            Control.fire(method || 'authors_get', {
-                targetFeedId: Elements.rightdd()
-            }).success(function(data) {
-                    $('#wall').html(data);
-                    var $container = $('#wall > .authors-list');
-
-                    var $navigation = $container.find('.authors-types');
-                    $navigation.delegate('.tab', 'click', function() {
-                        $navigation.find('.tab.selected').removeClass('selected');
-                        $(this).addClass('selected');
-                        updateAuthorListPage('authors_get');
-                    });
-
-                    var $input = $container.find('.author-link');
-                    $input.placeholder();
-                    $input.keyup(function(e) {
-                        if (e.keyCode == KEY.ENTER) {
-                            $input.blur();
-                            var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
-                            var confirmBox = new Box({
-                                id: 'addAuthor' + authorId,
-                                title: 'Добавление автора',
-                                html: tmpl(BOX_LOADING, {height: 100}),
-                                buttons: [
-                                    {label: 'Добавить автора', onclick: addAuthor},
-                                    {label: 'Отменить', isWhite: true}
-                                ],
-                                onshow: function($box) {
-                                    var box = this;
-
-                                    VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                        if (!dataVK.response) {
-                                            return box.setHTML('Пользователь не найден');
-                                        }
-                                        var user = dataVK.response[0];
-                                        var clearUser = {
-                                            id: user.uid,
-                                            name: user.first_name + ' ' + user.last_name,
-                                            photo: user.photo_medium_rec
-                                        };
-                                        authorId = clearUser.id;
-                                        var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
-                                        box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                    });
-                                }
-                            });
-                            confirmBox.show();
-                        }
-                        function addAuthor() {
-                            var box = this;
-                            box.setHTML(tmpl(BOX_LOADING, {height: 100}));
-                            box.setButtons([{label: 'Закрыть'}]);
-                            Control.fire('author_add', {
-                                authorId: authorId,
-                                targetFeedId: Elements.rightdd()
-                            }).success(function(data) {
-                                    box.remove();
-                                    updateAuthorListPage();
-                                });
-                        }
-                    });
-
-                    if ($container.data('initedList')) {
-                        return;
-                    }
-                    $container.data('initedList', true);
-                    $container.delegate('.add-to-list', 'click', function() {
-                        var $target = $(this);
-                        var $author = $target.closest('.author');
-                        (function updateDropdown() {
-                            var authorId = $author.data('id');
-
-                            var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
-                            var authorGroups = [];
-                            $.each(userGroupCollection.get(), function(id, userGroupModel) {
-                                if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
-                                    userGroupModel.isSelected(true);
-                                } else {
-                                    userGroupModel.isSelected(false);
-                                }
-                                authorGroups.push({
-                                    id: userGroupModel.id(),
-                                    title: userGroupModel.name(),
-                                    isActive: userGroupModel.isSelected()
-                                });
-                            });
-                            $target.dropdown({
-                                isShow: true,
-                                position: 'right',
-                                width: 'auto',
-                                type: 'checkbox',
-                                addClass: 'ui-dropdown-add-to-list',
-                                data: $.merge(authorGroups, [
-                                    {id: 'add_list', title: 'Создать список'}
-                                ]),
-                                onopen: function() {
-                                    $target.addClass('active');
-                                },
-                                onclose: function() {
-                                    $target.removeClass('active');
-                                },
-                                onchange: function(item) {
-                                    $(this).dropdown('open');
-                                },
-                                onselect: function(item) {
-                                    if (item.id == 'add_list') {
-                                        var $item = $(this).dropdown('getItem', 'add_list');
-                                        var $menu = $(this).dropdown('getMenu');
-                                        var $input = $menu.find('input');
-                                        $item.removeClass('active');
-                                        if ($input.length) {
-                                            $input.focus();
-                                        } else {
-                                            $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
-                                            $input = $menu.find('input');
-                                            $input.focus();
-                                            $input.keydown(function(e) {
-                                                if (e.keyCode == KEY.ENTER) {
-                                                    var newUserGroupModel = new UserGroupModel();
-                                                    newUserGroupModel.name($input.val());
-                                                    Control.fire('add_list', {
-                                                        name: newUserGroupModel.name(),
-                                                        targetFeedId: Elements.rightdd()
-                                                    }).success(function(data) {
-                                                            newUserGroupModel.id(data.userGroup.id);
-                                                            userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
-                                                            updateDropdown();
-                                                        });
-                                                }
-                                            });
-                                            $(this).dropdown('refreshPosition');
-                                        }
-                                    } else {
-                                        authorGroupIds.push(item.id + '');
-                                        $author.data('group-ids', authorGroupIds.join(','));
-                                        Control.fire('add_to_list', {
-                                            userId: authorId,
-                                            listId: item.id
-                                        });
-                                    }
-                                },
-                                onunselect: function(item) {
-                                    var index = $.inArray(item.id + '', authorGroupIds);
-                                    if (index !== -1) {
-                                        authorGroupIds.splice(index, 1);
-                                    }
-                                    $author.data('group-ids', authorGroupIds.join(','));
-                                    Control.fire('remove_from_list', {
-                                        userId: authorId,
-                                        listId: item.id
-                                    });
-                                }
-                            });
-                        })();
-                    });
-                    $container.delegate('.delete', 'click', function() {
-                        var $author = $(this).closest('.author');
-                        var authorId = $author.data('id');
-                        var confirmDeleteBox = new Box({
-                            id: 'confirmDeleteBox' + authorId,
-                            title: 'Удаление автора',
-                            html: tmpl(BOX_LOADING, {height: 100}),
-                            buttons: [
-                                {label: 'Удалить', onclick: function() {
-                                    Control.fire('author_remove', {
-                                        authorId: authorId,
-                                        targetFeedId: Elements.rightdd()
-                                    }).success(function(data) {
-                                            $author.remove();
-                                            confirmDeleteBox.hide();
-                                        });
-                                }},
-                                {label: 'Отменить', isWhite: true}
-                            ],
-                            onshow: function($box) {
-                                var box = this;
-
-                                VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
-                                    if (!dataVK.response) {
-                                        return box.setHTML('Пользователь не найден');
-                                    }
-                                    var user = dataVK.response[0];
-                                    var clearUser = {
-                                        id: user.uid,
-                                        name: user.first_name + ' ' + user.last_name,
-                                        photo: user.photo_medium_rec
-                                    };
-                                    authorId = clearUser.id;
-                                    var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
-                                    box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
-                                });
-                            }
-                        }).show();
-                    });
-                });
-        }
 
         // Подвкладки Авторов: Новые Одобренные Отклоненные
         $leftPanel.find('.authors-tabs').delegate('.tab', 'click', function() {
@@ -484,11 +284,211 @@ var App = Event.extend({
         });
     },
 
+    // Список авторов
+    updateAuthorListPage: function(method) {
+        var t = this;
+        Control.fire(method || 'authors_get', {
+            targetFeedId: Elements.rightdd()
+        }).success(function(data) {
+            $('#wall').html(data);
+            var $container = $('#wall > .authors-list');
+
+            var $navigation = $container.find('.authors-types');
+            $navigation.delegate('.tab', 'click', function() {
+                $navigation.find('.tab.selected').removeClass('selected');
+                $(this).addClass('selected');
+                t.updateAuthorListPage('authors_get');
+            });
+
+            var $input = $container.find('.author-link');
+            $input.placeholder();
+            $input.keyup(function(e) {
+                if (e.keyCode == KEY.ENTER) {
+                    $input.blur();
+                    var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                    var confirmBox = new Box({
+                        id: 'addAuthor' + authorId,
+                        title: 'Добавление автора',
+                        html: tmpl(BOX_LOADING, {height: 100}),
+                        buttons: [
+                            {label: 'Добавить автора', onclick: addAuthor},
+                            {label: 'Отменить', isWhite: true}
+                        ],
+                        onshow: function($box) {
+                            var box = this;
+
+                            VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                                if (!dataVK.response) {
+                                    return box.setHTML('Пользователь не найден');
+                                }
+                                var user = dataVK.response[0];
+                                var clearUser = {
+                                    id: user.uid,
+                                    name: user.first_name + ' ' + user.last_name,
+                                    photo: user.photo_medium_rec
+                                };
+                                authorId = clearUser.id;
+                                var text = tmpl(BOX_ADD_AUTHOR, {user: clearUser});
+                                box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                            });
+                        }
+                    });
+                    confirmBox.show();
+                }
+                function addAuthor() {
+                    var box = this;
+                    box.setHTML(tmpl(BOX_LOADING, {height: 100}));
+                    box.setButtons([{label: 'Закрыть'}]);
+                    Control.fire('author_add', {
+                        authorId: authorId,
+                        targetFeedId: Elements.rightdd()
+                    }).success(function(data) {
+                        box.remove();
+                        t.updateAuthorListPage();
+                    });
+                }
+            });
+
+            if ($container.data('initedList')) {
+                return;
+            }
+            $container.data('initedList', true);
+            $container.delegate('.add-to-list', 'click', function() {
+                var $target = $(this);
+                var $author = $target.closest('.author');
+                (function updateDropdown() {
+                    var authorId = $author.data('id');
+
+                    var authorGroupIds = $author.data('group-ids') ? ($author.data('group-ids') + '').split(',') : [];
+                    var authorGroups = [];
+                    $.each(userGroupCollection.get(), function(id, userGroupModel) {
+                        if ($.inArray(userGroupModel.id() + '', authorGroupIds) !== -1) {
+                            userGroupModel.isSelected(true);
+                        } else {
+                            userGroupModel.isSelected(false);
+                        }
+                        authorGroups.push({
+                            id: userGroupModel.id(),
+                            title: userGroupModel.name(),
+                            isActive: userGroupModel.isSelected()
+                        });
+                    });
+                    $target.dropdown({
+                        isShow: true,
+                        position: 'right',
+                        width: 'auto',
+                        type: 'checkbox',
+                        addClass: 'ui-dropdown-add-to-list',
+                        data: $.merge(authorGroups, [
+                            {id: 'add_list', title: 'Создать список'}
+                        ]),
+                        onopen: function() {
+                            $target.addClass('active');
+                        },
+                        onclose: function() {
+                            $target.removeClass('active');
+                        },
+                        onchange: function(item) {
+                            $(this).dropdown('open');
+                        },
+                        onselect: function(item) {
+                            if (item.id == 'add_list') {
+                                var $item = $(this).dropdown('getItem', 'add_list');
+                                var $menu = $(this).dropdown('getMenu');
+                                var $input = $menu.find('input');
+                                $item.removeClass('active');
+                                if ($input.length) {
+                                    $input.focus();
+                                } else {
+                                    $item.before('<div class="wrap"><input type="text" placeholder="Название списка..." /></div>');
+                                    $input = $menu.find('input');
+                                    $input.focus();
+                                    $input.keydown(function(e) {
+                                        if (e.keyCode == KEY.ENTER) {
+                                            var newUserGroupModel = new UserGroupModel();
+                                            newUserGroupModel.name($input.val());
+                                            Control.fire('add_list', {
+                                                name: newUserGroupModel.name(),
+                                                targetFeedId: Elements.rightdd()
+                                            }).success(function(data) {
+                                                    newUserGroupModel.id(data.userGroup.id);
+                                                    userGroupCollection.add(newUserGroupModel.id(), newUserGroupModel);
+                                                    updateDropdown();
+                                                });
+                                        }
+                                    });
+                                    $(this).dropdown('refreshPosition');
+                                }
+                            } else {
+                                authorGroupIds.push(item.id + '');
+                                $author.data('group-ids', authorGroupIds.join(','));
+                                Control.fire('add_to_list', {
+                                    userId: authorId,
+                                    listId: item.id
+                                });
+                            }
+                        },
+                        onunselect: function(item) {
+                            var index = $.inArray(item.id + '', authorGroupIds);
+                            if (index !== -1) {
+                                authorGroupIds.splice(index, 1);
+                            }
+                            $author.data('group-ids', authorGroupIds.join(','));
+                            Control.fire('remove_from_list', {
+                                userId: authorId,
+                                listId: item.id
+                            });
+                        }
+                    });
+                })();
+            });
+            $container.delegate('.delete', 'click', function() {
+                var $author = $(this).closest('.author');
+                var authorId = $author.data('id');
+                var confirmDeleteBox = new Box({
+                    id: 'confirmDeleteBox' + authorId,
+                    title: 'Удаление автора',
+                    html: tmpl(BOX_LOADING, {height: 100}),
+                    buttons: [
+                        {label: 'Удалить', onclick: function() {
+                            Control.fire('author_remove', {
+                                authorId: authorId,
+                                targetFeedId: Elements.rightdd()
+                            }).success(function(data) {
+                                $author.remove();
+                                confirmDeleteBox.hide();
+                            });
+                        }},
+                        {label: 'Отменить', isWhite: true}
+                    ],
+                    onshow: function($box) {
+                        var box = this;
+
+                        VK.Api.call('users.get', {uids: authorId, fields: 'photo_medium_rec', name_case: 'acc'}, function(dataVK) {
+                            if (!dataVK.response) {
+                                return box.setHTML('Пользователь не найден');
+                            }
+                            var user = dataVK.response[0];
+                            var clearUser = {
+                                id: user.uid,
+                                name: user.first_name + ' ' + user.last_name,
+                                photo: user.photo_medium_rec
+                            };
+                            authorId = clearUser.id;
+                            var text = tmpl(BOX_DELETE_AUTHOR, {user: clearUser});
+                            box.setHTML(tmpl(BOX_AUTHOR, {text: text, user: clearUser}));
+                        });
+                    }
+                }).show();
+            });
+        });
+    },
+
     initWall: function() {
-        $("#wall")
-            .delegate(".post > .delete", "click", function(){
-                var elem = $(this).closest(".post"),
-                    pid = elem.data("id"),
+        $('#wall')
+            .delegate('.post > .delete', 'click', function(){
+                var elem = $(this).closest('.post'),
+                    pid = elem.data('id'),
                     gid = elem.data('group');
                 Events.fire('leftcolumn_deletepost', pid, function(state){
                     if (state) {
@@ -572,16 +572,12 @@ var App = Event.extend({
     },
 
     initQueue: function() {
-        $("#queue")
+        $('#queue')
             // Удаление постов
             .delegate('.delete', 'click', function() {
-                var elem = $(this).closest(".post"),
-                    pid = elem.data("id");
-                Events.fire('rightcolumn_deletepost', pid, function(state) {
-                    if(state) {
-                        elem.remove();
-                    }
-                });
+                var $post = $(this).closest('.post'),
+                    pid = $post.data('id');
+                Events.fire('rightcolumn_deletepost', pid);
             })
             // Смена даты
             .delegate('.time', 'click', function() {
@@ -742,7 +738,7 @@ var App = Event.extend({
             });
 
         $('.queue-footer .add-button').click(function() {
-            $("#queue").scrollTo(0);
+            $('#queue').scrollTo(0);
             var $newPost = $(
                 '<div class="new slot empty">' +
                     '<div class="slot-header">' +
@@ -760,38 +756,19 @@ var App = Event.extend({
         var $leftPanel = t.$leftPanel;
 
         // Очистка текста
-        $leftPanel.delegate(".clear-text", "click", function(){
-            var $post = $(this).closest(".post");
-            var postId = $post.data("id");
+        $leftPanel.delegate('.clear-text', 'click', function(){
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
 
-            if (confirm("Вы уверены, что хотите очистить текст записи?") ) {
+            if (confirm('Вы уверены, что хотите очистить текст записи?') ) {
                 Events.fire('leftcolumn_clear_post_text', postId, function(state){
                     if (state) {
-                        $post.find('div.shortcut').html('');
-                        $post.find('div.cut').html('');
+                        $post.find('.shortcut').html('');
+                        $post.find('.cut').html('');
                         $post.find('a.show-cut').remove();
                     }
                 });
             }
-        });
-
-        // Отклонение или одобрения авторских постов
-        $leftPanel.delegate('.moderation .button.approve', 'click', function() {
-            var $post = $(this).closest('.post');
-            var postId = $post.data('id');
-            Events.fire('leftcolumn_approve_post', postId, function() {
-                $post.slideUp(200);
-            });
-        });
-
-        $leftPanel.delegate('.moderation .button.reject', 'click', function() {
-            var $post = $(this).closest('.post');
-            var postId = $post.data('id');
-            var $newComment = $post.find('.new-comment');
-            var $moderation = $post.find('.moderation');
-            $moderation.hide();
-            $newComment.show();
-            $newComment.find('textarea').focus();
         });
 
         // Комментирование записи
@@ -903,11 +880,11 @@ var App = Event.extend({
         });
 
         // Показать полностью в левом меню
-        $leftPanel.delegate(".show-cut", "click" ,function(e){
+        $leftPanel.delegate('.show-cut', 'click' ,function(e){
             var $content = $(this).closest('.content'),
                 $shortcut = $content.find('.shortcut'),
                 shortcut = $shortcut.html(),
-                cut      = $content.find('.cut').html();
+                cut = $content.find('.cut').html();
 
             $shortcut.html(shortcut + ' ' + cut);
             $(this).remove();
@@ -915,21 +892,44 @@ var App = Event.extend({
             e.preventDefault();
         });
 
-        // Автоподгрузка записей
-        (function() {
-            var $window = $(window);
-            $window.scroll(function() {
-                if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
-                    Events.fire('wall_load_more', function(state) {});
-                }
-            });
-        })();
-
         $('#wall-switcher a').click(function() {
             var $target = $(this);
             $target.hide();
             $target.parent().find('a[data-switch-to="' + $target.data('type') + '"]').show();
             loadArticles(true);
+        });
+    },
+
+    // Автоподгрузка записей
+    wallAutoloadInit: function() {
+        var $window = $(window);
+        $window.scroll(function() {
+            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                Events.fire('wall_load_more', function(state) {});
+            }
+        });
+    },
+
+    // Отклонение или одобрения авторских постов
+    initModeration: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+        $leftPanel.delegate('.moderation .button.approve', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            Events.fire('leftcolumn_approve_post', postId, function() {
+                $post.slideUp(200);
+            });
+        });
+
+        $leftPanel.delegate('.moderation .button.reject', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            var $newComment = $post.find('.new-comment');
+            var $moderation = $post.find('.moderation');
+            $moderation.hide();
+            $newComment.show();
+            $newComment.find('textarea').focus();
         });
     },
 
@@ -1246,22 +1246,22 @@ var App = Event.extend({
                 );
             }
         });
-        $form.delegate(".cancel", "click" ,function(e){
+        $form.delegate('.cancel', 'click' ,function(e){
             clearForm();
             $input.val('').blur();
             $form.addClass('collapsed');
             e.preventDefault();
         });
-        $form.delegate(".image-attach", "click" ,function(e){
+        $form.delegate('.image-attach', 'click' ,function(e){
             $input.focus();
             $('.newpost .qq-upload-button').trigger('focus');
         });
 
         // Быстрое редактирование поста в левой колонке
         $leftPanel.delegate('.post.editable .content .shortcut', 'click', function() {
-            var $post = $(this).closest(".post"),
+            var $post = $(this).closest('.post'),
                 $content = $post.find('> .content'),
-                postId = $post.data("id");
+                postId = $post.data('id');
 
             if ($post.editing) return;
 
@@ -1273,327 +1273,318 @@ var App = Event.extend({
         });
 
         // Редактирование поста в левом меню
-        $leftPanel.delegate(".post .edit", "click", function(){
-            var $post = $(this).closest(".post"),
-                $content = $post.find('> .content'),
+        $leftPanel.delegate('.post .edit', 'click', function(){
+            var $post = $(this).closest('.post'),
+                $el = $post.find('> .content'),
                 $buttonPanel = $post.find('> .bottom.d-hide'),
-                postId = $post.data("id");
+                postId = $post.data('id');
 
             if ($post.editing) return;
 
             Events.fire('load_post_edit', postId, function(state, data){
                 if (state && data) {
-
-                    (function($post, $el, data) {
-
-                        function setSelectionRange(input, selectionStart, selectionEnd) {
-                            if (input.setSelectionRange) {
-                                input.focus();
-                                input.setSelectionRange(selectionStart, selectionEnd);
-                            }
-                            else if (input.createTextRange) {
-                                var range = input.createTextRange();
-                                range.collapse(true);
-                                range.moveEnd('character', selectionEnd);
-                                range.moveStart('character', selectionStart);
-                                range.select();
-                            }
+                    function setSelectionRange(input, selectionStart, selectionEnd) {
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(selectionStart, selectionEnd);
                         }
-                        function setCaretToPos (input, pos) {
-                            setSelectionRange(input, pos, pos);
+                        else if (input.createTextRange) {
+                            var range = input.createTextRange();
+                            range.collapse(true);
+                            range.moveEnd('character', selectionEnd);
+                            range.moveStart('character', selectionStart);
+                            range.select();
                         }
+                    }
+                    function setCaretToPos (input, pos) {
+                        setSelectionRange(input, pos, pos);
+                    }
 
-                        function parseUrl(txt, callback) {
-                            var matches = txt.match(pattern);
-                            if (matches && matches[0] && matches[1]) {
-                                var foundLink = matches[0];
-                                var foundDomain = matches[2];
-                                if ($.isFunction(callback)) callback(foundLink, foundDomain);
-                            }
+                    function parseUrl(txt, callback) {
+                        var matches = txt.match(pattern);
+                        if (matches && matches[0] && matches[1]) {
+                            var foundLink = matches[0];
+                            var foundDomain = matches[2];
+                            if ($.isFunction(callback)) callback(foundLink, foundDomain);
                         }
-                        function addLink(link, domain, el) {
-                            Events.fire("post_describe_link", link, function(data) {
-                                var savePost = function(d) {
-                                    d = d || {};
-                                    Events.fire('post_link_data', [
-                                        {
-                                            link: d.link || link,
-                                            header: d.title || data.title,
-                                            coords: d.coords || data.coords,
-                                            description: d.description || data.description
-                                        }, function(data) {
-                                            if (data) {
-                                                if (data.img) {
-                                                    el.find('.link-img').css('background-image', 'url(' + data.img + ')');
-                                                }
-                                                popupSuccess('Изменения сохранены');
-                                            }
+                    }
+                    function addLink(link, domain, el) {
+                        Events.fire('post_describe_link', link, function(data) {
+                            var savePost = function(d) {
+                                d = d || {};
+                                Events.fire('post_link_data', {
+                                    link: d.link || link,
+                                    header: d.title || data.title,
+                                    coords: d.coords || data.coords,
+                                    description: d.description || data.description
+                                }, function(data) {
+                                    if (data) {
+                                        if (data.img) {
+                                            el.find('.link-img').css('background-image', 'url(' + data.img + ')');
                                         }
-                                    ]);
-                                };
-                                var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
-                                    $links.html('');
+                                        popupSuccess('Изменения сохранены');
+                                    }
                                 });
-                                el.html(linkTplFull);
-                                el.find('a').attr('href', link).html(domain);
-                                el.find('.link-status-content').append($del);
+                            };
+                            var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                                $links.html('');
+                            });
+                            el.html(linkTplFull);
+                            el.find('a').attr('href', link).html(domain);
+                            el.find('.link-status-content').append($del);
 
-                                if (data.img) {
-                                    el.find('.link-img')
-                                        .css('background-image', 'url(' + data.img + ')')
-                                        .click(function() {
-                                            var originalImage = new Image();
-                                            originalImage.src = data.imgOriginal;
-                                            originalImage.onload = function () {
-                                                var linkImageCoords = {};
-                                                var closePopup = function() {
-                                                    $popup.remove();
-                                                    $bg.remove();
-                                                };
-                                                var showPreview = function(coords)
-                                                {
-                                                    linkImageCoords = coords;
-                                                    var $preview = $popup.find('.preview');
-                                                    var rx = $preview.width() / coords.w;
-                                                    var ry = $preview.height() / coords.h;
+                            if (data.img) {
+                                el.find('.link-img')
+                                    .css('background-image', 'url(' + data.img + ')')
+                                    .click(function() {
+                                        var originalImage = new Image();
+                                        originalImage.src = data.imgOriginal;
+                                        originalImage.onload = function () {
+                                            var linkImageCoords = {};
+                                            var closePopup = function() {
+                                                $popup.remove();
+                                                $bg.remove();
+                                            };
+                                            var showPreview = function(coords) {
+                                                linkImageCoords = coords;
+                                                var $preview = $popup.find('.preview');
+                                                var rx = $preview.width() / coords.w;
+                                                var ry = $preview.height() / coords.h;
 
-                                                    $preview.find('> img').css({
-                                                        width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
-                                                        height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
-                                                        marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-                                                        marginTop: '-' + Math.round(ry * coords.y) + 'px'
-                                                    });
-                                                };
-                                                var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
-                                                var $popup = $('<div/>', {
-                                                    'class': 'popup-image-edit',
-                                                    'html': '<div class="title">Редактировать изображение</div>'+
-                                                        '<div class="close"></div>' +
-                                                        '<div class="left-column">' +
-                                                        '<div class="original"><img src="'+originalImage.src+'" /></div>' +
-                                                        '</div>' +
-                                                        '<div class="right-column">' +
-                                                        '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                                        '<div class="button save">Сохранить</div>'+
-                                                        '</div>'
-                                                })
-                                                    .appendTo('body');
-
-                                                $bg.click(closePopup);
-                                                $popup.css({'margin-left': -$popup.width()/2});
-                                                $popup.find('.close').click(closePopup);
-                                                $popup.find('.save').click(function() {
-                                                    data.coords = linkImageCoords;
-                                                    savePost({coords: linkImageCoords});
-                                                    closePopup();
-                                                });
-                                                $popup.find('.original > img').Jcrop({
-                                                    onChange: showPreview,
-                                                    onSelect: showPreview,
-                                                    aspectRatio: 2.06,
-                                                    minSize: [130,63],
-                                                    setSelect: [0,0,130,63]
+                                                $preview.find('> img').css({
+                                                    width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+                                                    height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+                                                    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                                                    marginTop: '-' + Math.round(ry * coords.y) + 'px'
                                                 });
                                             };
-                                        });
-                                } else {
-                                    el.find('.link-img').remove();
-                                }
-                                if (data.title) {
-                                    el.find('div.link-description-text a')
-                                        .text(data.title)
-                                        .click(function() {
-                                            var $title = $(this);
-                                            $title.attr('contenteditable', true).focus();
-                                            return false;
-                                        })
-                                        .blur(function() {
-                                            var $title = $(this);
-                                            $title.attr('contenteditable', false);
-                                            data.title = $title.text();
-                                            savePost({title: $title.text()});
-                                        });
-                                }
-                                if (data.description) {
-                                    el.find('div.link-description-text p')
-                                        .text(data.description)
-                                        .click(function() {
-                                            var $description = $(this);
-                                            $description.attr('contenteditable', true).focus();
-                                            return false;
-                                        })
-                                        .blur(function() {
-                                            var $description = $(this);
-                                            $description.attr('contenteditable', false);
-                                            data.description = $description.text();
-                                            savePost({description: $description.text()});
-                                        });
-                                }
-                            });
-                        }
-                        function addPhoto(path, filename, url, el) {
-                            var $photo = $('<span/>', {class: 'attachment'})
-                                .append('<img src="' + path + '" alt="" />')
-                                .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
+                                            var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
+                                            var $popup = $('<div/>', {
+                                                'class': 'popup-image-edit',
+                                                'html': '<div class="title">Редактировать изображение</div>'+
+                                                    '<div class="close"></div>' +
+                                                    '<div class="left-column">' +
+                                                    '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                                    '</div>' +
+                                                    '<div class="right-column">' +
+                                                    '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                                    '<div class="button save">Сохранить</div>'+
+                                                    '</div>'
+                                            })
+                                                .appendTo('body');
+
+                                            $bg.click(closePopup);
+                                            $popup.css({'margin-left': -$popup.width()/2});
+                                            $popup.find('.close').click(closePopup);
+                                            $popup.find('.save').click(function() {
+                                                data.coords = linkImageCoords;
+                                                savePost({coords: linkImageCoords});
+                                                closePopup();
+                                            });
+                                            $popup.find('.original > img').Jcrop({
+                                                onChange: showPreview,
+                                                onSelect: showPreview,
+                                                aspectRatio: 2.06,
+                                                minSize: [130,63],
+                                                setSelect: [0,0,130,63]
+                                            });
+                                        };
+                                    });
+                            } else {
+                                el.find('.link-img').remove();
+                            }
+                            if (data.title) {
+                                el.find('div.link-description-text a')
+                                    .text(data.title)
                                     .click(function() {
-                                        $photo.remove();
+                                        var $title = $(this);
+                                        $title.attr('contenteditable', true).focus();
+                                        return false;
                                     })
-                                )
-                                .append($('<input />', {type: 'hidden', name: 'filename', value: filename, "class" : 'filename'}))
-                                .append($('<input />', {type: 'hidden', name: 'url', value: url, "class" : 'url'}))
-                                .appendTo(el);
-                        }
-
-                        var cache = {
-                            html: $el.html(),
-                            scroll: $(window).scrollTop()
-                        };
-                        $post.find('> .content').draggable('disable');
-                        $post.editing = true;
-                        $buttonPanel.hide();
-                        $el.html('');
-
-                        var $edit = $('<div/>', {class: 'editing'}).appendTo($el);
-                        var $content = $('<div/>').appendTo($edit);
-                        var $attachments = $('<div/>', {class: 'attachments'}).appendTo($edit);
-                        var $text = $('<textarea/>').appendTo($content);
-                        var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
-                        var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
-                        var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
-                        var $saveBtn = $('<div/>', {class: 'save button l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
-                        var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
-                        var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
-
-                        var uploader = new qq.FileUploader({
-                            debug: true,
-                            element: $uploadBtn.get(0),
-                            action: root + 'int/controls/image-upload/',
-                            template: '<div class="qq-uploader">' +
-                                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-                                '<div class="qq-upload-button">Прикрепить</div>' +
-                                '<ul class="qq-upload-list"></ul>' +
-                                '</div>',
-                            onComplete: function(id, fileName, res) {
-                                addPhoto(res.image, res.filename, res.url, $photos);
+                                    .blur(function() {
+                                        var $title = $(this);
+                                        $title.attr('contenteditable', false);
+                                        data.title = $title.text();
+                                        savePost({title: $title.text()});
+                                    });
+                            }
+                            if (data.description) {
+                                el.find('div.link-description-text p')
+                                    .text(data.description)
+                                    .click(function() {
+                                        var $description = $(this);
+                                        $description.attr('contenteditable', true).focus();
+                                        return false;
+                                    })
+                                    .blur(function() {
+                                        var $description = $(this);
+                                        $description.attr('contenteditable', false);
+                                        data.description = $description.text();
+                                        savePost({description: $description.text()});
+                                    });
                             }
                         });
-                        var onSave = function() {
-                            var text = $text.val();
-                            var link = $links.find('a').attr('href');
-                            var photos = [];
-                            $photos.children().each(function() {
-                                var photo = {};
-                                photo.filename = $(this).find('.filename').val();
-                                photo.url = $(this).find('.url').val();
-                                photos.push(photo);
-                            });
-                            if (!($.trim(text) || link || photos.length)) {
-                                return $text.focus();
-                            } else {
-                                Events.fire("post",
-                                    text,
-                                    photos,
-                                    link,
-                                    postId,
-                                    function(data) {}
-                                );
-                            }
-                        };
-                        var onCancel = function() {
-                            $post.find('> .content').draggable('enable');
-                            $post.editing = false;
-                            $buttonPanel.show();
-                            $el.html(cache.html);
-                            $edit.remove();
-                        };
-
-                        if (true || data.text) {
-                            var text = data.text;
-                            $text
-                                .val(text.split('<br />').join('')) // because it's textarea
-                                .appendTo($content)
-                                .bind('paste', function(e) {
-                                    setTimeout(function() {
-                                        parseUrl($text.val(), function(link, domain) {
-                                            if ($text.link && $links.html() || $text.link == link) return;
-                                            $text.link = link;
-                                            addLink(link, domain, $links);
-                                        });
-                                    }, 0);
+                    }
+                    function addPhoto(path, filename, url, el) {
+                        var $photo = $('<span/>', {class: 'attachment'})
+                            .append('<img src="' + path + '" alt="" />')
+                            .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
+                                .click(function() {
+                                    $photo.remove();
                                 })
-                                .bind('keyup', function(e) {
-                                    if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                                        onSave();
-                                    }
-                                })
-                                .autoResize()
-                                .keyup().focus();
-                            setCaretToPos($text.get(0), text.length);
-                        }
+                            )
+                            .append($('<input />', {type: 'hidden', name: 'filename', value: filename, "class" : 'filename'}))
+                            .append($('<input />', {type: 'hidden', name: 'url', value: url, "class" : 'url'}))
+                            .appendTo(el);
+                    }
 
-                        if (data.link) {
-                            var link = data.link;
-                            parseUrl(data.link, function(link, domain) {
-                                addLink(link, domain, $links);
-                            });
-                        }
+                    var cache = {
+                        html: $el.html(),
+                        scroll: $(window).scrollTop()
+                    };
+                    $post.find('> .content').draggable('disable');
+                    $post.editing = true;
+                    $buttonPanel.hide();
+                    $el.html('');
 
-                        if (data.photos) {
-                            var photos = eval(data.photos);
-                            $(photos).each(function() {
-                                addPhoto(this.path, this.filename, this.url, $photos);
-                            });
+                    var $edit = $('<div/>', {class: 'editing'}).appendTo($el);
+                    var $content = $('<div/>').appendTo($edit);
+                    var $attachments = $('<div/>', {class: 'attachments'}).appendTo($edit);
+                    var $text = $('<textarea/>').appendTo($content);
+                    var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
+                    var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
+                    var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
+                    var $saveBtn = $('<div/>', {class: 'save button l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                    var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
+                    var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
+
+                    var uploader = new qq.FileUploader({
+                        debug: true,
+                        element: $uploadBtn.get(0),
+                        action: root + 'int/controls/image-upload/',
+                        template: '<div class="qq-uploader">' +
+                            '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
+                            '<div class="qq-upload-button">Прикрепить</div>' +
+                            '<ul class="qq-upload-list"></ul>' +
+                            '</div>',
+                        onComplete: function(id, fileName, res) {
+                            addPhoto(res.image, res.filename, res.url, $photos);
                         }
-                    })($post, $content, data);
+                    });
+                    var onSave = function() {
+                        var text = $text.val();
+                        var link = $links.find('a').attr('href');
+                        var photos = [];
+                        $photos.children().each(function() {
+                            var photo = {};
+                            photo.filename = $(this).find('.filename').val();
+                            photo.url = $(this).find('.url').val();
+                            photos.push(photo);
+                        });
+                        if (!($.trim(text) || link || photos.length)) {
+                            return $text.focus();
+                        } else {
+                            Events.fire("post",
+                                text,
+                                photos,
+                                link,
+                                postId,
+                                function(data) {}
+                            );
+                        }
+                    };
+                    var onCancel = function() {
+                        $post.find('> .content').draggable('enable');
+                        $post.editing = false;
+                        $buttonPanel.show();
+                        $el.html(cache.html);
+                        $edit.remove();
+                    };
+
+                    if (true || data.text) {
+                        var text = data.text;
+                        $text
+                            .val(text.split('<br />').join(''))
+                            .appendTo($content)
+                            .bind('paste', function(e) {
+                                setTimeout(function() {
+                                    parseUrl($text.val(), function(link, domain) {
+                                        if ($text.link && $links.html() || $text.link == link) return;
+                                        $text.link = link;
+                                        addLink(link, domain, $links);
+                                    });
+                                }, 0);
+                            })
+                            .bind('keyup', function(e) {
+                                if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+                                    onSave();
+                                }
+                            })
+                            .autoResize()
+                            .keyup().focus();
+                        setCaretToPos($text.get(0), text.length);
+                    }
+
+                    if (data.link) {
+                        var link = data.link;
+                        parseUrl(data.link, function(link, domain) {
+                            addLink(link, domain, $links);
+                        });
+                    }
+
+                    if (data.photos) {
+                        var photos = eval(data.photos);
+                        $(photos).each(function() {
+                            addPhoto(this.path, this.filename, this.url, $photos);
+                        });
+                    }
                 }
             });
         });
     },
 
+    // Кнопка "наверх"
     initGoToTop: function() {
-        (function(w) {
-            var $elem = $('#go-to-top');
-            $elem.click(function() {
-                $(w).scrollTop(0);
-            });
-            $(w).bind('scroll', function(e) {
-                if (e.currentTarget.scrollY <= 0) {
-                    $elem.hide();
-                } else if (!$elem.is(':visible')) {
-                    $elem.show();
-                }
-            });
-        })(window);
+        var $elem = $('#go-to-top');
+        $elem.click(function() {
+            $(window).scrollTop(0);
+        });
+        $(window).bind('scroll', function(e) {
+            if (e.currentTarget.scrollY <= 0) {
+                $elem.hide();
+            } else if (!$elem.is(':visible')) {
+                $elem.show();
+            }
+        });
     },
 
+    // Подгрузка имени и аватара
     initVkAvatar: function() {
-        (function() {
-            VK.init({
-                apiId: vk_appId,
-                nameTransportPath: '/xd_receiver.htm'
-            });
-            getInitData();
+        VK.init({
+            apiId: vk_appId,
+            nameTransportPath: '/xd_receiver.htm'
+        });
+        getInitData();
 
-            function getInitData() {
-                var code;
-                code = 'return {';
-                code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
-                code += '};';
-                VK.Api.call('execute', {'code': code}, onGetInitData);
-            }
-            function onGetInitData(data) {
-                var r;
-                if (data.response) {
-                    r = data.response;
-                    if (r.me) {
-                        var $userInfo = $('.user-info');
-                        $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
-                        $('.user-name a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
-                        $('.user-photo img', $userInfo).attr('src', r.me.photo);
-                    }
+        function getInitData() {
+            var code;
+            code = 'return {';
+            code += 'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]';
+            code += '};';
+            VK.Api.call('execute', {'code': code}, onGetInitData);
+        }
+        function onGetInitData(data) {
+            var r;
+            if (data.response) {
+                r = data.response;
+                if (r.me) {
+                    var $userInfo = $('.user-info');
+                    $('.user-name a', $userInfo).text(r.me.first_name + ' ' + r.me.last_name);
+                    $('.user-name a', $userInfo).attr('href', 'http://vk.com/id' + r.me.uid);
+                    $('.user-photo img', $userInfo).attr('src', r.me.photo);
                 }
             }
-        })();
+        }
     }
 });
 
@@ -1777,10 +1768,10 @@ var Elements = {
                     container.find('.link-img').remove();
                 }
                 if (data.title) {
-                    container.find('div.link-description-text a').text(data.title);
+                    container.find('.link-description-text a').text(data.title);
                 }
                 if (data.description) {
-                    container.find('div.link-description-text p').text(data.description);
+                    container.find('.link-description-text p').text(data.description);
                 }
 
                 container.find('a').attr('href', link);
@@ -1791,7 +1782,7 @@ var Elements = {
                 if (matches[2]) {
                     shortLink = matches[2];
                 }
-                container.find('div.link-status-content span a').text(shortLink);
+                container.find('.link-status-content span a').text(shortLink);
             }
         });
     },

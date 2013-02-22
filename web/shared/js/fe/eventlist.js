@@ -329,9 +329,11 @@ var Eventlist = {
             data: {
                 id: post_id
             },
-            success: function (data) {
-                callback(1);
-                renderQueueSize();
+            success: function(data) {
+                loadQueue();
+                if (typeof callback == 'function') {
+                    callback(true);
+                }
             }
         });
     },
