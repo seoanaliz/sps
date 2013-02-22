@@ -6,19 +6,40 @@
  * Time: 21:06
  * To change this template use File | Settings | File Templates.
  */
+
 class CheckWalls
 {
 
-    private $walls;
     private $posts_in_progress;
+    private $cookie = null;
+
+    const url_mentions = 'http://vk.com/feed?section=mentions&obj=';
     const time_shift = 0;
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
+    const MONITORING_TYPE_WALL = 'wall';
+    const MONITORING_TYPE_MENTIONS = 'mentions';
+
+    private  $monitoring_array = array(
+        43005314,
+        42933269,
+        43503298,
+        41611636,
+        42841673,
+        26675756,
+        43005314,
+        39930420,
+        43503681
+    );
 
     public function Execute()
     {
-        error_reporting(0);
+//        error_reporting(0);
 
         set_time_limit( 0 );
+
+        $this->get_mentions();
+//        die();
+
         $this->posts_in_progress = $this->get_posts_under_observation();
         if ( date('H') == 1 && date('i') < 15 ) {
             //установка новых заданных бартеров
@@ -78,8 +99,16 @@ class CheckWalls
         $ids_array = array();
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
+        //левая тема для записи последнего поста паблика, нужна для отлова левых постов
+        $ids_array = array_merge( $ids_array, $this->monitoring_array);
+        $ids_array = array_unique( $ids_array );
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
+        foreach( $this->monitoring_array as $public_id ) {
+            $post = $walls[$public_id ][1];
+            $this->save_post( $public_id, $post->id, $post->text);
+        }
+
         foreach( $publics as $barter_event ) {
 //            if( !isset( $walls[$barter_event->barter_public ])) {
 //                //todo логирование
@@ -155,7 +184,7 @@ class CheckWalls
         $our_publics = StatPublics::get_our_publics_list();
     }
 
-    //омг
+    //омг. задание автомониторов
     public function temp_barter_creater()
     {
         $our_array = array(
@@ -308,5 +337,105 @@ class CheckWalls
             $result[$event->creator_id][] = $event->barter_public . '_' . $event->post_id;
         }
         return $result;
+    }
+
+    //пост для мониторинга
+    private function get_post_from_monitiring( $public_id, $post_id )
+    {
+        $sql = 'SELECT * FROM barter_monitoring WHERE post_id = @post_id and public_id = @public_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetInteger( '@public_id', $public_id );
+        $cmd->SetInteger( '@post_id', $post_id );
+        $ds = $cmd->Execute();
+        return $ds->Next();
+    }
+
+
+    private function save_post( $public_id, $post_id, $text, $type = self::MONITORING_TYPE_WALL, $link = null, $mentioned_public = null )
+    {
+        if( $type == self::MONITORING_TYPE_WALL ) {
+            preg_match( '/\[(.*?)\|/', $text, $matches );
+            if( empty( $matches ))
+                return false;
+            $link = $matches[1];
+        }
+
+        if( !$this->get_post_from_monitiring( $public_id, $post_id )) {
+            $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, @link, @type, @mentioned_public)';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@mentioned_public', $mentioned_public );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetInteger( '@post_id',  $post_id );
+            $cmd->SetString ( '@text',     $text );
+            $cmd->SetString ( '@link',     $link );
+            $cmd->SetString ( '@type',     $type );
+            $cmd->Execute();
+        }
+    }
+
+    private function get_publics_for_mentions() {
+        return array(
+            34468364,
+            32348256,
+            48356824,
+            43064547
+        );
+    }
+
+    private function get_mentions()
+    {
+        $publics_for_men_search = $this->get_publics_for_mentions();
+
+        $i = 0;
+        while( $i < 10 ) {
+            $this->cookie = VkHelper::vk_authorize();
+            if ($this->cookie ) break;
+            sleep(3);
+        }
+        print_r($this->cookie);
+        foreach( $publics_for_men_search as $public_id ) {
+            echo 'mentions of ' . $public_id . '<br>';
+
+            $page = VkHelper::connect( 'http://vk.com/feed?section=mentions&obj=-' . $public_id, $this->cookie );
+//            print_r( $page );
+//            echo '<br>';
+            $this->parse( $page, $public_id );
+        }
+
+    }
+
+    private function parse( $page, $public_id ) {
+
+        $document = phpQuery::newDocument( $page );
+        $posts = $document->find('div.feed_row');
+        foreach( $posts as $post ) {
+            $feed_row = pq($post);
+            $a = $feed_row->find('div.post');
+            $source = $a->attr('id');
+            if( !substr_count( $source, '-')) {
+                continue;
+            }
+            $a = $feed_row->find('[mention_id]');
+            $mention = ($a->Attr('mention_id'));
+            $mention = str_replace( array( 'public', 'club' ), '', $mention );
+            if( $mention != $public_id ){
+                continue;
+            }
+
+
+            preg_match( '/-(\d*?)_(\d*)/', $source, $matches );
+            if( count( $matches) != 3 ){
+                continue;
+            }
+            print_r( $matches);
+            echo '<br>';
+            $source_public_id = $matches[1];
+            $source_post_id   = $matches[2];
+            $text = $feed_row->find('.wall_post_text');
+            $text = $text->getString();
+            $text = trim( strip_tags( $text[0] ));
+            $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );
+
+        }
     }
 }
