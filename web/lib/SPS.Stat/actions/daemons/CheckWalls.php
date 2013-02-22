@@ -342,9 +342,9 @@ class CheckWalls
     //пост для мониторинга
     private function get_post_from_monitiring( $public_id, $post_id )
     {
-        $sql = 'SELECT count(*) FROM barter_monitoring WHERE post_id = @post_id and public_id = @public_id';
+        $sql = 'SELECT * FROM barter_monitoring WHERE post_id = @post_id and public_id = @public_id';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
-        $cmd->SetInteger( 'public_id', $public_id );
+        $cmd->SetInteger( '@public_id', $public_id );
         $cmd->SetInteger( '@post_id', $post_id );
         $ds = $cmd->Execute();
         return $ds->Next();
@@ -376,7 +376,9 @@ class CheckWalls
     private function get_publics_for_mentions() {
         return array(
             34468364,
-            32348256
+            32348256,
+            48356824,
+            43064547
         );
     }
 
@@ -393,7 +395,10 @@ class CheckWalls
         print_r($this->cookie);
         foreach( $publics_for_men_search as $public_id ) {
             echo 'mentions of ' . $public_id . '<br>';
+
             $page = VkHelper::connect( 'http://vk.com/feed?section=mentions&obj=-' . $public_id, $this->cookie );
+//            print_r( $page );
+//            echo '<br>';
             $this->parse( $page, $public_id );
         }
 
@@ -422,7 +427,8 @@ class CheckWalls
             if( count( $matches) != 3 ){
                 continue;
             }
-
+            print_r( $matches);
+            echo '<br>';
             $source_public_id = $matches[1];
             $source_post_id   = $matches[2];
             $text = $feed_row->find('.wall_post_text');
