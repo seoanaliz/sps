@@ -305,7 +305,7 @@ var App = Event.extend({
             $input.keyup(function(e) {
                 if (e.keyCode == KEY.ENTER) {
                     $input.blur();
-                    var authorId = $input.val().replace(new RegExp('(/)*(http:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
+                    var authorId = $input.val().replace(new RegExp('(/)*(http[s]?:)?(vk.com)?(id[0-9]+)?', 'g'), '$4');
                     var confirmBox = new Box({
                         id: 'addAuthor' + authorId,
                         title: 'Добавление автора',
