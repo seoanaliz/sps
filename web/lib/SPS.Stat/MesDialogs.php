@@ -365,7 +365,7 @@
             $cmd->SetInt( '@rec_id' , $rec_id  );
             $cmd->SetInt( '@time'   , $time );
             $cmd->SetInt( '@state'  , MesDialogs::calculate_state( $read, $in ));
-            echo $cmd->GetQuery() . '<br>';
+//            echo $cmd->GetQuery() . '<br>';
             $cmd->Execute();
         }
 
