@@ -49,11 +49,11 @@ foreach ($grid as $gridItem) {
                     <div class="delete"></div>
                 <? } ?>
             </div>
-            <div class="expanded-post">
-                <div class="content">
-                    {increal:tmpl://fe/elements/article-item-content.tmpl.php}
-                </div>
-            </div>
+<!--            <div class="expanded-post">-->
+<!--                <div class="content">-->
+<!--                    {increal:tmpl://fe/elements/article-item-content.tmpl.php}-->
+<!--                </div>-->
+<!--            </div>-->
         <? } ?>
     </div>
 <? } ?>
