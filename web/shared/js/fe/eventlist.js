@@ -6,7 +6,7 @@ Control = $.extend(Control, {
 
     controlMap: {
         get_articles: {
-            name: 'arcticles-list'
+            name: 'articles-list'
         },
         authors_get: {
             name: 'authors-list'
@@ -173,7 +173,7 @@ function loadArticles(clean) {
 
     //clean and load left column
     $.ajax({
-        url: controlsRoot + 'arcticles-list/',
+        url: controlsRoot + 'articles-list/',
         dataType: "html",
         data: requestData
     }).always(function() {
@@ -219,7 +219,7 @@ function loadQueue() {
 
     //clean and load right column
     $.ajax({
-        url: controlsRoot + 'arcticles-queue-list/',
+        url: controlsRoot + 'articles-queue-list/',
         dataType: "html",
         data: {
             targetFeedId: Elements.rightdd(),
@@ -250,7 +250,7 @@ function renderQueueSize() {
 
 function reloadArticle(id) {
     $.ajax({
-        url: controlsRoot + 'arcticle-item/',
+        url: controlsRoot + 'article-item/',
         dataType: "html",
         data: {
             id: id,
@@ -270,7 +270,7 @@ function reloadArticle(id) {
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-delete/',
+            url: controlsRoot + 'article-delete/',
             data: {
                 id: post_id
             },
@@ -281,7 +281,7 @@ var Eventlist = {
     },
     leftcolumn_clear_post_text: function(post_id, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-clear-text/',
+            url: controlsRoot + 'article-clear-text/',
             data: {
                 id: post_id
             },
@@ -292,7 +292,7 @@ var Eventlist = {
     },
     leftcolumn_recoverpost: function(post_id, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-restore/',
+            url: controlsRoot + 'article-restore/',
             data: {
                 id: post_id
             },
@@ -325,7 +325,7 @@ var Eventlist = {
     },
     rightcolumn_deletepost: function(post_id, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-queue-delete/',
+            url: controlsRoot + 'article-queue-delete/',
             data: {
                 id: post_id
             },
@@ -587,7 +587,7 @@ var Eventlist = {
     },
     post_moved: function(post_id, slot_id, queueId, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-add-to-queue/',
+            url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
             data: {
                 articleId: post_id,
@@ -621,7 +621,7 @@ var Eventlist = {
 
     load_post_edit: function(id, callback){
         $.ajax({
-            url: controlsRoot + 'arcticle-get/',
+            url: controlsRoot + 'article-get/',
             dataType : "json",
             data: {
                 articleId: id
@@ -660,7 +660,7 @@ var Eventlist = {
         }
 
         $.ajax({
-            url: controlsRoot + 'arcticle-save/',
+            url: controlsRoot + 'article-save/',
             type: 'POST',
             dataType : "json",
             data: {
@@ -808,7 +808,7 @@ var Eventlist = {
         }
 
         $.ajax({
-            url: controlsRoot + 'arcticles-list/',
+            url: controlsRoot + 'articles-list/',
             dataType : "html",
             data: requestData
         }).always(function() {
