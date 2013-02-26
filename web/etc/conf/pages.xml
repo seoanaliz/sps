@@ -31,37 +31,37 @@
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
-                <page uri="controls://arcticles-list/">
+                <page uri="controls://articles-list/">
                     <actions>SPS.Site.GetArticlesListControl</actions>
-                    <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
+                    <template>tmpl://fe/elements/articles-list.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-item/">
+                <page uri="controls://article-item/">
                     <actions>SPS.Site.GetArticleItemControl</actions>
-                    <template>tmpl://fe/elements/arcticle-item.tmpl.php</template>
+                    <template>tmpl://fe/elements/article-item.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-delete/">
+                <page uri="controls://article-delete/">
                     <actions>SPS.Site.DeleteArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-clear-text/">
+                <page uri="controls://article-clear-text/">
                     <actions>SPS.Site.ClearArticleTextControl</actions>
                 </page>
-                <page uri="controls://arcticles-queue-list/">
+                <page uri="controls://articles-queue-list/">
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
-                    <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
+                    <template>tmpl://fe/elements/articles-queue-list.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-queue-delete/">
+                <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
-                <page uri="controls://arcticle-add-to-queue/">
+                <page uri="controls://article-add-to-queue/">
                     <actions>SPS.Site.AddArticleToQueueControl</actions>
                 </page>
-                <page uri="controls://arcticle-save/">
+                <page uri="controls://article-save/">
                     <actions>SPS.Site.SaveArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-get/">
+                <page uri="controls://article-get/">
                     <actions>SPS.Site.GetArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-restore/">
+                <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
                 <page uri="controls://parse-url/">

@@ -45,3 +45,13 @@
     filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
     opacity: @opacity;
 }
+.box-shadow(@params) {
+    -webkit-box-shadow: @params;
+    -moz-box-shadow: @params;
+    box-shadow: @params;
+}
+.pointer-events(@params) {
+    -webkit-pointer-events: @params;
+    -moz-pointer-events: @params;
+    pointer-events: @params;
+}
