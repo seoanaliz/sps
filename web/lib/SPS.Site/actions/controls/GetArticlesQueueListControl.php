@@ -85,6 +85,33 @@ class GetArticlesQueueListControl extends BaseControl {
                     }
                 }
 
+                // load art queue editors
+                $vkIds = array();
+                foreach ($articlesQueues as $articlesQueue) {
+                    if ($articlesQueue->author) {
+                        $vkIds[] = $articlesQueue->author;
+                    }
+                }
+
+                if ($vkIds) {
+                    $editors = array();
+                    foreach (AuthorFactory::Get(array('vkIdIn' => $vkIds), array(BaseFactory::WithoutPages => true)) as $author) {
+                        $editors[$author->vkId] = $author;
+                    }
+
+                    if ($editors) {
+                        foreach ($articlesQueues as $articlesQueue) {
+                            if (isset($editors[$articlesQueue->author])) {
+                                $articlesQueue->articleQueueCreator = $editors[$articlesQueue->author];
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                // load art records
                 $articleRecords = ArticleRecordFactory::Get(
                     array('_articleQueueId' => array_keys($articlesQueues))
                 );

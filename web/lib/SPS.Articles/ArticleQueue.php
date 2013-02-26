@@ -51,6 +51,9 @@ class ArticleQueue {
     /** @var Author */
     public $articleAuthor;
 
+    /** @var Author */
+    public $articleQueueCreator;
+
     /** @var int */
     public $targetFeedId;
 
