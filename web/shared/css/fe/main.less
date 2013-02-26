@@ -362,24 +362,27 @@ i {font-style: italic;}
             text-decoration: none;
         }
     }
-    .images-ready {
-        width: 510px;
-        height: 310px;
-        overflow: hidden;
+}
+.images-ready {
+    width: 510px;
+    height: 310px;
+    overflow: hidden;
+    margin-top: 10px;
+    overflow: hidden;
 
-        .post-image {
-            background-color: #eee;
-            padding: 0;
-            outline: 3px solid #fff;
-            overflow: hidden;
-            text-align: center;
-        }
+    .post-image {
+        background-color: #eee;
+        padding: 0;
+        outline: 3px solid #fff;
+        overflow: hidden;
+        text-align: center;
     }
-    .images-ready > * {
+
+    & > * {
         position: relative;
         display: block;
     }
-    .images-ready > *:first-child {
+    & > *:first-child {
         z-index: 1;
     }
 }
@@ -858,11 +861,6 @@ i {font-style: italic;}
             display: none;
         }
     }
-}
-
-.images-ready {
-    margin-top: 10px;
-    overflow: hidden;
 }
 
 .post-image {
