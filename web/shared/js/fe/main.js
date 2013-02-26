@@ -232,6 +232,7 @@ var App = Event.extend({
         var $rightPanelExpander = t.$rightPanelExpander;
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanel.addClass('expanded');
+        $rightPanel.find('.images-ready').imageComposition();
         $rightPanelBackground.show();
         $('body').width($('body').width()).css('overflow-y', 'hidden');;
     },
@@ -1704,7 +1705,7 @@ var Elements = {
         $block.find('.timestamp').easydate(easydateParams);
         $block.find('.date').easydate(easydateParams);
         $block.find('.images-ready').imageComposition();
-        $('#right-panel').find('.images').imageComposition('right');
+        $('#right-panel').find('.post .images').imageComposition('right');
     },
     initDraggable: function($elem, islog) {
         var $block = $elem.find('.post');
