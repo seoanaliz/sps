@@ -186,8 +186,8 @@ class CheckWalls
             sleep(0.3);
 
             $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0, 'barter' );
-
-            $public[ 'start_subscribers' ] = $res->count;
+            if( !isset( $res->error ))
+                $public[ 'start_subscribers' ] = $res->count;
             sleep(0.3);
         }
 
