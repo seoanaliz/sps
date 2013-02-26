@@ -1704,7 +1704,7 @@ var Elements = {
 
         $block.find('.timestamp').easydate(easydateParams);
         $block.find('.date').easydate(easydateParams);
-        $block.find('.images-ready').imageComposition();
+        $block.find('.images-ready:visible').imageComposition();
         $('#right-panel').find('.post .images').imageComposition('right');
     },
     initDraggable: function($elem, islog) {
