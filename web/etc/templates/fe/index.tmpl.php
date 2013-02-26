@@ -79,7 +79,11 @@
         </div>
     </div>
 
+    <div id="right-panel-background" class="right-panel-background"></div>
     <div id="right-panel" class="right-panel">
+        <div id="right-panel-expander" class="right-panel-expander">
+            <div class="arrow"></div>
+        </div>
         <div class="block">
             <div class="header bb">
 

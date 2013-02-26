@@ -57,15 +57,18 @@ var App = Event.extend({
         var t = this;
         t.$leftPanel = $('#left-panel');
         t.$rightPanel = $('#right-panel');
+        t.$rightPanelExpander = $('#right-panel-expander');
+        t.$rightPanelBackground = $('#right-panel-background');
         t.$multiSelect = $('#source-select');
         t.$calendar = $('#calendar');
 
         t.initCalendar();
         t.initMultiSelect();
-        t.initLeftColumn();
+        t.initLeftPanel();
         t.wallAutoloadInit();
         t.initModeration();
-        t.initRightColumn();
+        t.initRightPanel();
+        t.initRightPanelExpander();
         t.initLeftPanelTabs();
         t.initWall();
         t.initWallFilter();
@@ -136,7 +139,7 @@ var App = Event.extend({
         });
     },
 
-    initRightColumn: function() {
+    initRightPanel: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
         $('#right-drop-down').dropdown({
@@ -204,6 +207,43 @@ var App = Event.extend({
         t.$rightPanel.delegate('.toggle-text', 'click', function(e) {
             $(this).parent().toggleClass('collapsed');
         });
+    },
+
+    initRightPanelExpander: function() {
+        var t = this;
+        var $rightPanel = t.$rightPanel;
+        var $rightPanelExpander = t.$rightPanelExpander;
+        var $rightPanelBackground = t.$rightPanelBackground;
+        $rightPanelExpander.click(function() {
+            if ($rightPanel.hasClass('expanded')) {
+                t.compactRightPanel();
+            } else {
+                t.expandRightPanel();
+            }
+        });
+        $rightPanelBackground.click(function() {
+            t.compactRightPanel();
+        });
+    },
+
+    expandRightPanel: function() {
+        var t = this;
+        var $rightPanel = t.$rightPanel;
+        var $rightPanelExpander = t.$rightPanelExpander;
+        var $rightPanelBackground = t.$rightPanelBackground;
+        $rightPanel.addClass('expanded');
+        $rightPanelBackground.show();
+        $('body').width($('body').width()).css('overflow-y', 'hidden');;
+    },
+
+    compactRightPanel: function() {
+        var t = this;
+        var $rightPanel = t.$rightPanel;
+        var $rightPanelExpander = t.$rightPanelExpander;
+        var $rightPanelBackground = t.$rightPanelBackground;
+        $rightPanel.removeClass('expanded');
+        $rightPanelBackground.hide();
+        $('body').width('auto').css('overflow-y', 'scroll');
     },
 
     initWallFilter: function() {
@@ -751,7 +791,7 @@ var App = Event.extend({
         });
     },
 
-    initLeftColumn: function() {
+    initLeftPanel: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
 
