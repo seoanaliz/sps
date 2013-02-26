@@ -236,10 +236,10 @@ function loadQueue() {
             Elements.initImages($block);
             Elements.initLinks($block);
             $block.find('.post.blocked').draggable('disable');
-            renderQueueSize();
         } else {
             $('#queue').empty();
         }
+        renderQueueSize();
     });
 }
 
