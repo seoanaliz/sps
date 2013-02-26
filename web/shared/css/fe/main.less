@@ -261,12 +261,10 @@ i {font-style: italic;}
 .block {
     background: #f1f1f1;
     border: 1px solid #C4CDE0;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
     height: 100%;
     position: relative;
     overflow: hidden;
+    .border-radius(3px)
 }
 .header {
     padding: 10px;
@@ -274,8 +272,8 @@ i {font-style: italic;}
     border-top: 1px solid white;
     border-left: 1px solid white;
     border-right: 1px solid white;
-    border-radius: 3px 3px 0 0;
     font-family: Lucida Grande, Arial, tahoma, verdana, sans-serif;
+    .border-radius(3px 3px 0 0);
 }
 
 .left-panel {
@@ -362,24 +360,28 @@ i {font-style: italic;}
             text-decoration: none;
         }
     }
-    .images-ready {
-        width: 510px;
-        height: 310px;
-        overflow: hidden;
+}
 
-        .post-image {
-            background-color: #eee;
-            padding: 0;
-            outline: 3px solid #fff;
-            overflow: hidden;
-            text-align: center;
-        }
+.images-ready {
+    width: 510px;
+    height: 310px;
+    overflow: hidden;
+    margin-top: 10px;
+    overflow: hidden;
+
+    .post-image {
+        background-color: #eee;
+        padding: 0;
+        outline: 3px solid #fff;
+        overflow: hidden;
+        text-align: center;
     }
-    .images-ready > * {
+
+    & > * {
         position: relative;
         display: block;
     }
-    .images-ready > *:first-child {
+    & > *:first-child {
         z-index: 1;
     }
 }
@@ -397,9 +399,6 @@ i {font-style: italic;}
 
 .show-cut {
     font-weight: 800;
-}
-.right-panel .show-cut {
-    font-size: 14px;
 }
 .cut {
     display: none;
@@ -488,7 +487,7 @@ i {font-style: italic;}
     background-color: #fff;
     z-index: 1;
     overflow-y: scroll;
-    .opacity(0.5);
+    .opacity(0.7);
 }
 .right-panel {
     position: fixed;
@@ -508,7 +507,7 @@ i {font-style: italic;}
         padding: 0 10px;
         border: 1px solid #fff;
         border-top-color: #C4CDE0;
-        border-radius: 0 0 3px 3px;
+        .border-radius(0 0 3px 3px);
     }
 
     .items {
@@ -625,6 +624,7 @@ i {font-style: italic;}
 
     .expanded-post {
         display: none;
+        padding: 30px 10px 10px;
     }
 
     .post {
@@ -664,6 +664,10 @@ i {font-style: italic;}
                     }
                 }
             }
+        }
+
+        .show-cut {
+            font-size: 14px;
         }
     }
     .header {
@@ -715,7 +719,6 @@ i {font-style: italic;}
     }
 
     .right-panel-expander {
-        display: none;
         position: absolute;
         top: 0;
         bottom: -2px;
@@ -858,11 +861,6 @@ i {font-style: italic;}
             display: none;
         }
     }
-}
-
-.images-ready {
-    margin-top: 10px;
-    overflow: hidden;
 }
 
 .post-image {
@@ -1105,10 +1103,10 @@ i {font-style: italic;}
 }
 .dragged.moving {
     background-color: #fff;
-    border-radius: 5px;
     overflow: hidden;
     padding: 5px 10px;
     pointer-events: none;
+    .border-radius(5px);
     .box-shadow(0px 20px 60px rgba(0,0,0,0.3));
 
     img {
@@ -1358,9 +1356,8 @@ i {font-style: italic;}
         background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
         cursor: pointer;
         border: 3px solid white;
-        border-radius: 2px;
-        opacity: .8;
-        filter: alpha(opacity=80);
+        .border-radius(2px);
+        .opacity(0.8);
     }
     .attachments {
         margin-top: 5px;
@@ -1369,12 +1366,13 @@ i {font-style: italic;}
         position: relative;
         display: inline-block;
         margin: 7px 7px 0 0;
-    }
-    .attachment img {
-        border-radius: 3px;
-        width: 60px;
-        height: 60px;
-        .box-shadow(0 1px 1px rgba(0, 0, 0, .4));
+
+        img {
+            border-radius: 3px;
+            width: 60px;
+            height: 60px;
+            .box-shadow(0 1px 1px rgba(0, 0, 0, .4));
+        }
     }
 
     &>.comments {
@@ -1557,7 +1555,6 @@ body.editor-mode {
     display: none;
     background-color: @bg_light_gray;
     padding: 10px;
-
     .border-radius(0 0 2px 2px);
 
     .authors-types {
