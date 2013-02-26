@@ -65,7 +65,7 @@ var App = Event.extend({
         t.initCalendar();
         t.initMultiSelect();
         t.initLeftPanel();
-        t.wallAutoloadInit();
+        t.initWallAutoload();
         t.initModeration();
         t.initRightPanel();
         t.initRightPanelExpander();
@@ -206,6 +206,19 @@ var App = Event.extend({
         // Показать полностью в правом меню
         t.$rightPanel.delegate('.toggle-text', 'click', function(e) {
             $(this).parent().toggleClass('collapsed');
+        });
+
+        // Показать полностью в раскрытом правом меню
+        t.$rightPanel.delegate('.show-cut', 'click', function(e){
+            var $content = $(this).closest('.content'),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
+            cut = $content.find('.cut').html();
+
+            $shortcut.html(shortcut + ' ' + cut);
+            $(this).remove();
+
+            e.preventDefault();
         });
     },
 
@@ -921,7 +934,7 @@ var App = Event.extend({
         });
 
         // Показать полностью в левом меню
-        $leftPanel.delegate('.show-cut', 'click' ,function(e){
+        $leftPanel.delegate('.show-cut', 'click', function(e){
             var $content = $(this).closest('.content'),
                 $shortcut = $content.find('.shortcut'),
                 shortcut = $shortcut.html(),
@@ -942,7 +955,7 @@ var App = Event.extend({
     },
 
     // Автоподгрузка записей
-    wallAutoloadInit: function() {
+    initWallAutoload: function() {
         var $window = $(window);
         $window.scroll(function() {
             if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
