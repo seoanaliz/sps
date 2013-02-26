@@ -52,50 +52,7 @@ if (!empty($article)) {
         <div class="name d-hide">{$author->FullName()}</div>
     <? } ?>
     <div class="content">
-        <?
-        $contentPart1 = mb_substr($articleRecord->content, 0, 300);
-        $contentPart2 = mb_substr($articleRecord->content, 300);
-        $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
-        ?>
-        <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>
-        <? if($contentPart2) { ?>
-        <a class="show-cut">Показать полностью...</a>
-        <div class="cut"><?= nl2br(HtmlHelper::RenderToForm($contentPart2)) ?></div>
-        <? } ?>
-
-        <?
-        if (!empty($articleRecord->link)) {
-            ?>
-            <div class="link-info-content">
-                <div class="link-description-content">
-                    <img src="{web:images://fe/ajax-loader.gif}" alt="" class="<?= ($extLinkLoader) ? 'ajax-loader-ext' : 'ajax-loader' ?>" rel="{form:$articleRecord->link}" />
-                </div>
-            </div>
-            <?
-        }
-        ?>
-
-        <?
-        if (!empty($articleRecord->photos)) {
-            $i = 0;
-
-            ?><div class="images-ready"><?
-                foreach($articleRecord->photos as $photoItem) {
-                    $i++;
-                    $path = MediaUtility::GetArticlePhoto($photoItem);
-                    $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
-                    $photoTitle = nl2br($photoTitle);
-
-                    ?><a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
-                        <div class="post-image <?= SourceFeedUtility::IsTopFeed($sourceFeed) ? 'post-image-top' : '' ?>">
-                            <img src="{$path}" alt="" />
-                        </div>
-                    </a>
-                    <?
-                }
-                ?></div><?
-        }
-        ?>
+        {increal:tmpl://fe/elements/article-item-content.tmpl.php}
     </div>
     <div class="bottom d-hide">
         <div class="l">
@@ -118,8 +75,7 @@ if (!empty($article)) {
             <span class="original">
                 <? if ($article->externalId != -1) { ?>
                     <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
-                <? } else { ?>
-                    <?
+                <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {
                         $sign = 'Опубликовано';

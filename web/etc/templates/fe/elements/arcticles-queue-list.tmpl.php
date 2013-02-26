@@ -50,7 +50,9 @@ foreach ($grid as $gridItem) {
                 <? } ?>
             </div>
             <div class="expanded-post">
-                <? var_dump($articleRecord); ?>
+                <div class="content">
+                    {increal:tmpl://fe/elements/article-item-content.tmpl.php}
+                </div>
             </div>
         <? } ?>
     </div>
