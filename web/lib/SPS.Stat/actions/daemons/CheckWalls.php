@@ -18,6 +18,7 @@ class CheckWalls
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
     const MONITORING_TYPE_WALL = 'wall';
     const MONITORING_TYPE_MENTIONS = 'mentions';
+    const MONITORING_TYPE_NOT_SB_POSTS = 'not_sb';
 
     private  $monitoring_array = array(
         43005314,
@@ -34,7 +35,6 @@ class CheckWalls
     public function Execute()
     {
 //        error_reporting(0);
-
         set_time_limit( 0 );
 
         $this->get_mentions();
@@ -97,16 +97,34 @@ class CheckWalls
     {
         $barters   = array();
         $ids_array = array();
+        $our_publics = StatPublics::get_our_publics_list();
+        $our_publics_ids = array_keys( $our_publics);
+        print_r( $our_publics_ids );
+
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
         //левая тема для записи последнего поста паблика, нужна для отлова левых постов
-        $ids_array = array_merge( $ids_array, $this->monitoring_array);
+        $ids_array = array_merge( $ids_array, $this->monitoring_array, $our_publics_ids);
         $ids_array = array_unique( $ids_array );
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
-            $post = $walls[$public_id ][1];
+            $post = $walls[ $public_id ][1];
             $this->save_post( $public_id, $post->id, $post->text);
+        }
+
+        $s = 0;
+        //сохраняем активность наших пабликов
+        foreach( $our_publics_ids as $public_id ) {
+            if ( !isset( $walls[ $public_id ][1] ))
+                continue;
+            $post = $walls[ $public_id ][1];
+            $link = $this->find_memlink( $post->text );
+
+            //не сохраняем текст для опубликованных чз sb постов
+            $text =  ( $this->check_if_via_sb( $public_id, $post->id ) && $link ) ? 'with bare hands' : $post->text;
+//            echo $text .'<br>';
+            $this->save_post( $public_id, $post->id, $text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
         }
 
         foreach( $publics as $barter_event ) {
@@ -116,11 +134,8 @@ class CheckWalls
 //            }
             if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
+
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
-//                if( $post->date < $barter_event->start_search_at->format('U')) {
-//                        echo 'слишком старые посты<br>';
-//                        break;
-//                }
 
                 //Если этот пост уже наблюдается
                 if ( is_array($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
@@ -179,10 +194,6 @@ class CheckWalls
         return $publics;
     }
 
-    public function get_search_array()
-    {
-        $our_publics = StatPublics::get_our_publics_list();
-    }
 
     //омг. задание автомониторов
     public function temp_barter_creater()
@@ -350,15 +361,20 @@ class CheckWalls
         return $ds->Next();
     }
 
+    private function find_memlink( $text )
+    {
+        $matches = array();
+        if ( preg_match( '/\[(.*?)\|/', $text, $matches ))
+            return $matches[1];
+        return null;
+    }
 
     private function save_post( $public_id, $post_id, $text, $type = self::MONITORING_TYPE_WALL, $link = null, $mentioned_public = null )
     {
-        if( $type == self::MONITORING_TYPE_WALL ) {
-            preg_match( '/\[(.*?)\|/', $text, $matches );
-            if( empty( $matches ))
-                return false;
-            $link = $matches[1];
+        if( !$link ) {
+            $link = $this->find_memlink( $text );
         }
+        if( $link && $type == self::MONITORING_TYPE_WALL )  return false;
 
         if( !$this->get_post_from_monitiring( $public_id, $post_id )) {
             $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, @link, @type, @mentioned_public)';
@@ -366,7 +382,7 @@ class CheckWalls
             $cmd->SetInteger( '@mentioned_public', $mentioned_public );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetInteger( '@post_id',  $post_id );
-            $cmd->SetString ( '@text',     $text );
+            $cmd->SetString ( '@text',     trim( strip_tags( $text )));
             $cmd->SetString ( '@link',     $link );
             $cmd->SetString ( '@type',     $type );
             $cmd->Execute();
@@ -378,7 +394,9 @@ class CheckWalls
             34468364,
             32348256,
             48356824,
-            43064547
+            43064547,
+            19069441,
+            33258470
         );
     }
 
@@ -397,11 +415,8 @@ class CheckWalls
             echo 'mentions of ' . $public_id . '<br>';
 
             $page = VkHelper::connect( 'http://vk.com/feed?section=mentions&obj=-' . $public_id, $this->cookie );
-//            print_r( $page );
-//            echo '<br>';
             $this->parse( $page, $public_id );
         }
-
     }
 
     private function parse( $page, $public_id ) {
@@ -412,30 +427,43 @@ class CheckWalls
             $feed_row = pq($post);
             $a = $feed_row->find('div.post');
             $source = $a->attr('id');
+            //проверка на тип стены(если личная страница - мимо)
             if( !substr_count( $source, '-')) {
                 continue;
             }
-            $a = $feed_row->find('[mention_id]');
-            $mention = ($a->Attr('mention_id'));
-            $mention = str_replace( array( 'public', 'club' ), '', $mention );
-            if( $mention != $public_id ){
+            //проверка, не является ли пост ответом на стене группы
+            $reply = $feed_row->find( 'a.reply_parent_link' );
+            if( $reply->length()) {
+                echo '$reply is empty';
                 continue;
             }
 
+            $a = $feed_row->find('[mention_id]');
+            $mention = ($a->Attr('mention_id'));
+            //проверка на упоминание именно этого паблика. не нужна вроде
+            $mention = str_replace( array( 'public', 'club' ), '', $mention );
+            if( $mention != $public_id ) {
+                continue;
+            }
 
+            //регэкспим id паблика и поста. если нет - мимо
             preg_match( '/-(\d*?)_(\d*)/', $source, $matches );
             if( count( $matches) != 3 ){
                 continue;
             }
-            print_r( $matches);
-            echo '<br>';
             $source_public_id = $matches[1];
             $source_post_id   = $matches[2];
-            $text = $feed_row->find('.wall_post_text');
+            $text = $feed_row->find('.wall_post_text' );
             $text = $text->getString();
-            $text = trim( strip_tags( $text[0] ));
+            $text = $text[0];
             $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );
 
         }
+    }
+
+    public function check_if_via_sb( $public_id, $post_id)
+    {
+        $check = ArticleQueueFactory::Get( array( 'externalId' => '-' . $public_id . '_' . $post_id ));
+        return !empty( $check );
     }
 }
