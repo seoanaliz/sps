@@ -246,19 +246,35 @@
         }
 
         //$post_id  = idпаблика_idпоста
-        public function delete_post( $post_id )
+        public function delete_post( $full_post_id )
         {
-            $post_id = trim($post_id, '-');
-            $id = explode('_', $post_id);
-            $params = array(
-                'owner_id'      =>  '-' . $id[0],
-                'post_id'       =>  $id[1],
-                'access_token'  =>  $this->vk_access_token
-            );
+            list( $owner_id, $post_id ) = explode( '_', $full_post_id );
+            if( $post_id) {
+                $params = array(
+                    'owner_id'      =>  '-' . $owner_id,
+                    'post_id'       =>  $post_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
+                if( VkHelper::api_request( 'wall.delete', $params ))
+                    return true;
+            }
+            return false;
+        }
 
-            VkHelper::api_request( 'wall.delete', $params );
+        public function delete_photo( $full_photo_id )
+        {
+            list( $owner_id, $photo_id ) = explode( '_', $full_photo_id );
+            if( $photo_id) {
+                $params = array(
+                    'oid'           =>  $owner_id,
+                    'pid'           =>  $photo_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
 
-            return true;
+                if( VkHelper::api_request( 'photos.delete', $params ))
+                    return true;
+            }
+            return false;
         }
 
         //нужно для однотипных названий (альбом 1, альбом 2)
