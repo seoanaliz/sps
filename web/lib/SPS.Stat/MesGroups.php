@@ -529,7 +529,7 @@
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@user_id', $user_id);
             $ds = $cmd->Execute();
-            echo $cmd->GetQuery();
+//            echo $cmd->GetQuery();
             $ds->Next();
 
             return  $ds->GetValue( 'count', TYPE_INTEGER ) ? $ds->GetValue( 'count', TYPE_INTEGER ) : 0;
