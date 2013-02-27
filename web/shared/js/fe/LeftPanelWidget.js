@@ -681,7 +681,6 @@ var LeftPanelWidget = Event.extend({
             crop: function() {
                 var t = this;
                 this.originalImage = $('#originalImage');
-                this.previewImage = $('#preview');
                 this.originalImage.load(function (){
                     t.Jcrop = $.Jcrop($(this), {
                         onChange: t.showPreview,
@@ -725,15 +724,15 @@ var LeftPanelWidget = Event.extend({
                 var t = this;
                 $elem.find('span').hide();
                 $elem.find('input,textarea')
-                .css({display: 'block'})
-                .trigger('focus')
-                .unbind('blur')
-                .bind('blur',function(){
-                    var $this = $(this);
-                    $elem.find('span').text($this.val()).show();
-                    $this.hide();
-                    t.post();
-                });
+                    .css({display: 'block'})
+                    .trigger('focus')
+                    .unbind('blur')
+                    .bind('blur',function(){
+                        var $this = $(this);
+                        $elem.find('span').text($this.val()).show();
+                        $this.hide();
+                        t.post();
+                    });
             },
             post: function() {
                 var t = this,
@@ -779,30 +778,24 @@ var LeftPanelWidget = Event.extend({
         $form.delegate('.save', 'click', function(e){
             var link = $linkStatus.find('a').attr('href');
             var photos = [];
+            var text = $.trim($input.val());
             $('.newpost .qq-upload-success').each(function(){
                 var photo = {};
                 photo.filename = $(this).find('input:hidden').val();
                 photo.title = $(this).find('textarea').val();
                 photos.push(photo);
             });
-            if (!($.trim($input.val() || photos.length || link))) {
+            if (!text && !photos.length && !link) {
                 return $input.focus();
             } else {
                 $form.addClass('spinner');
-                Events.fire('post',
-                $input.val(),
-                photos,
-                link,
-                $input.data('id'),
-                function(state){
-                    if (state) {
-                        clearForm();
-                        stop();
-                    }
+                Events.fire('post', text, photos, link, $input.data('id'), function() {
+                    clearForm();
+                    stop();
                     $form.removeClass('spinner');
                     $input.blur();
-                }
-                );
+                    t.reloadArticle();
+                });
             }
         });
         $form.delegate('.cancel', 'click' ,function(e){
@@ -1043,13 +1036,9 @@ var LeftPanelWidget = Event.extend({
                         if (!($.trim(text) || link || photos.length)) {
                             return $text.focus();
                         } else {
-                            Events.fire('post',
-                            text,
-                            photos,
-                            link,
-                            postId,
-                            function(data) {}
-                            );
+                            Events.fire('post', text, photos, link, postId, function(data) {
+                                t.reloadArticle(data.id);
+                            });
                         }
                     };
                     var onCancel = function() {

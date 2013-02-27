@@ -282,7 +282,15 @@ var QueueWidget = Event.extend({
         var $textarea = $slot.find('textarea');
         var text = $.trim($textarea.val());
         if (text) {
-            t.load();
+            $slot.addClass('locked');
+            Events.fire('post', text, [], '', null, function(data) {
+                if (data && data.articleId) {
+                    var postId = data.articleId;
+                    Events.fire('post_moved', postId, $slot.data('id'), null, function() {
+                        t.load();
+                    });
+                }
+            });
         } else {
             $textarea.focus();
         }

@@ -421,23 +421,8 @@ var Eventlist = {
                 targetFeedId: Elements.rightdd(),
                 userGroupId: Elements.getUserGroupId()
             },
-            success: function (data) {
-                if(data.success) {
-                    if (id) {
-                        //перезагружаем тело поста
-                        app.reloadArticle(id);
-                    } else {
-                        //перезагружаем весь левый блок
-                        app.loadArticles(true);
-                    }
-
-                    callback(true);
-                } else {
-                    if (data.message) {
-                        popupError(Lang[data.message]);
-                    }
-                    callback(false);
-                }
+            success: function(data) {
+                callback(data);
             }
         });
     },
