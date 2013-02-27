@@ -208,8 +208,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $this->search['targetFeedId'] = $targetFeedId;
         }
 
-        // если запрашиваем авторские посты
-        if ($sourceFeedType == SourceFeedUtility::Authors) {
+        // если запрашиваем авторские/альбомные посты
+        if ($sourceFeedType == SourceFeedUtility::Authors || $sourceFeedType == SourceFeedUtility::Albums) {
 
             if ($this->ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
                 $useArticleStatusFilter= true;
@@ -255,7 +255,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         if ($useArticleStatusFilter) {
             $articleStatuses = $this->ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
 
-            // фильтр по статусам - только для авторских постов
+            // фильтр по статусам - только для авторских и альбомных постов
             // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
             $reqArticleStatus = $this->getArticleStatus();
             if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
