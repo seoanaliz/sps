@@ -179,14 +179,7 @@ var Eventlist = {
             }
         });
     },
-    leftcolumn_dropdown_change: function(){
-        var targetFeedId = Elements.rightdd();
-        var leftType = Elements.leftType();
-        if (leftType == 'source') {
-            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
-        }
-        app.loadArticles(true);
-    },
+    // TODO: перенести в RightPanelWidget.js
     rightcolumn_dropdown_change: function(){
         articlesLoading = true;
 
@@ -346,20 +339,10 @@ var Eventlist = {
             }
 
             articlesLoading = false;
-            Events.fire('leftcolumn_dropdown_change');
+            app.onLeftPanelDropdownChange();
         });
     },
-    calendar_change: function(){
-        app.loadQueue();
-    },
-    rightcolumn_type_change: function(){
-        $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
-        app.loadQueue();
-    },
-    wall_load_more: function(callback){
-        app.loadArticles(false);
-        callback(true);
-    },
+
     post_moved: function(post_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
@@ -480,26 +463,6 @@ var Eventlist = {
         });
     },
 
-    add_article_group: function(targetFeedId, name, callback) {
-        $.ajax({
-            url: controlsRoot + 'add-user-group/',
-            type: 'POST',
-            dataType : "json",
-            data: {
-                name: name,
-                targetFeedId: targetFeedId
-            },
-            success: function (data) {
-                if(data.success) {
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            }
-        });
-    },
-
-
     leftcolumn_sort_type_change: function() {
         app.loadArticles(true);
     },
@@ -554,34 +517,6 @@ var Eventlist = {
         });
     },
 
-    get_author_articles: function(articleStatus, callback) {
-        var slider = $( "#slider-range" );
-        var from = slider.slider( "values", 0 );
-        var to = slider.slider( "values", 1 );
-
-        Elements.getWallLoader().show();
-        var requestData =  {
-            sourceFeedIds: Elements.leftdd(),
-            page: wallPage,
-            from: from,
-            to: to,
-            sortType: Elements.getSortType(),
-            type: Elements.leftType(),
-            targetFeedId: Elements.rightdd()
-        };
-        if (typeof articleStatus != 'undefined'){
-            requestData['articleStatus'] = articleStatus;
-        }
-
-        $.ajax({
-            url: controlsRoot + 'articles-list/',
-            dataType : "html",
-            data: requestData
-        }).always(function() {
-            Elements.getWallLoader().hide();
-        }).done(callback);
-    },
-
     eof: null
 };
 
@@ -617,84 +552,3 @@ var Events = {
         }
     }
 };
-
-function popupSuccess( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#EBF0DA url('  + root +  'shared/images/vt/ui/icon_v.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}
-
-function popupError( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#FEDADA url('  + root +  'shared/images/vt/ui/icon_x.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}
-
-function popupNotice( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#FBFFBF url('  + root +  'shared/images/vt/ui/icon_i.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}

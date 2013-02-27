@@ -178,110 +178,122 @@ var LeftPanelWidget = Event.extend({
                 + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
             },
             checkAll: function(){
-                Events.fire('leftcolumn_dropdown_change');
+                t.onDropdownChange();
             },
             uncheckAll: function(){
-                Events.fire('leftcolumn_dropdown_change');
+                t.onDropdownChange();
             }
         });
         $multiSelect.bind("multiselectclick", function(event, ui){
-            Events.fire('leftcolumn_dropdown_change');
+            t.onDropdownChange();
         });
+    },
+
+    onDropdownChange: function() {
+        var targetFeedId = Elements.rightdd();
+        var leftType = Elements.leftType();
+        if (leftType == 'source') {
+            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
+        }
+        this.loadArticles(true);
     },
 
     initWall: function() {
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
-        $wall
-            .delegate('.post > .delete', 'click', function(){
-                var elem = $(this).closest('.post'),
-                    pid = elem.data('id'),
-                    gid = elem.data('group');
-                Events.fire('leftcolumn_deletepost', pid, function(state){
-                    if (state) {
-                        var deleteMessageId = 'deleted-post-' + pid;
-                        var $deleteMessage = $('#' + deleteMessageId);
-                        var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
-                        if ($deleteMessage.length) {
-                            // если уже удаляли пост, то сообщение об удалении уже в DOMе
-                            $deleteMessage.show();
-                        } else {
-                            // иначе добавляем
-                            elem.before($(
-                                '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
-                                    'Пост удален. <a class="recover">Восстановить</a><br/>' +
-                                    (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
-                                    '</div>'
-                            ));
-                        }
 
-                        elem.hide();
-                    }
-                });
-            })
-            .delegate('.post .ignore', 'click', function() {
-                var elem = $(this).closest(".post"),
-                    gid = elem.data("group");
-                var $menu = $multiSelect.multiselect('widget');
-                $menu.find('[value=' + gid + ']:checkbox').each(function() {
-                    this.click();
-                });
-            })
-            .delegate('.post .recover', 'click', function() {
-                var elem = $(this).closest(".post"),
-                    pid = elem.data("id");
-                Events.fire('leftcolumn_recoverpost', pid, function(state){
-                    if (state) {
-                        elem.hide().next().show();
-                    }
-                });
-            })
-            .delegate('.show-all-postponed', 'click', function() {
-                var $target = $(this);
-                if ($target.data('block')) {
-                    var $posts = $target.data('block');
-                    if ($posts.first().is(':visible')) {
-                        $target.html($target.data('def-html'));
-                        $posts.hide();
+        $wall.delegate('.post > .delete', 'click', function(){
+            var elem = $(this).closest('.post'),
+                pid = elem.data('id'),
+                gid = elem.data('group');
+            Events.fire('leftcolumn_deletepost', pid, function(state){
+                if (state) {
+                    var deleteMessageId = 'deleted-post-' + pid;
+                    var $deleteMessage = $('#' + deleteMessageId);
+                    var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
+                    if ($deleteMessage.length) {
+                        // если уже удаляли пост, то сообщение об удалении уже в DOMе
+                        $deleteMessage.show();
                     } else {
-                        $target.html('Скрыть записи в очереди');
-                        $posts.show();
+                        // иначе добавляем
+                        elem.before($(
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                                'Пост удален. <a class="recover">Восстановить</a><br/>' +
+                                (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
+                            '</div>'
+                        ));
                     }
-                } else {
-                    $target.data('def-html', $target.html());
 
-                    wallPage = 0;
-                    Elements.getWallLoader().show();
-                    Control.fire('get_articles', {
-                        page: wallPage,
-                        sortType: Elements.getSortType(),
-                        type: Elements.leftType(),
-                        targetFeedId: Elements.rightdd(),
-                        userGroupId: Elements.getUserGroupId(),
-                        articlesOnly: true,
-                        mode: 'deferred'
-                    }).success(function(html) {
-                        if (html) {
-                            var $posts = $(html);
-                            $target.data('block', $posts);
-                            $target.after($posts);
-                            $target.html('Скрыть записи в очереди');
-                            Elements.initImages($posts);
-                            Elements.initLinks($posts);
-                        } else {
-                            $target.remove();
-                        }
-                        Elements.getWallLoader().hide();
-                    });
+                    elem.hide();
                 }
             });
+        });
+
+        $wall.delegate('.post .ignore', 'click', function() {
+            var elem = $(this).closest(".post"),
+                gid = elem.data("group");
+            var $menu = $multiSelect.multiselect('widget');
+            $menu.find('[value=' + gid + ']:checkbox').each(function() {
+                this.click();
+            });
+        });
+
+        $wall.delegate('.post .recover', 'click', function() {
+            var elem = $(this).closest(".post"),
+                pid = elem.data("id");
+            Events.fire('leftcolumn_recoverpost', pid, function(state){
+                if (state) {
+                    elem.hide().next().show();
+                }
+            });
+        });
+
+        $wall.delegate('.show-all-postponed', 'click', function() {
+            var $target = $(this);
+            if ($target.data('block')) {
+                var $posts = $target.data('block');
+                if ($posts.first().is(':visible')) {
+                    $target.html($target.data('def-html'));
+                    $posts.hide();
+                } else {
+                    $target.html('Скрыть записи в очереди');
+                    $posts.show();
+                }
+            } else {
+                $target.data('def-html', $target.html());
+
+                wallPage = 0;
+                Elements.getWallLoader().show();
+                Control.fire('get_articles', {
+                    page: wallPage,
+                    sortType: Elements.getSortType(),
+                    type: Elements.leftType(),
+                    targetFeedId: Elements.rightdd(),
+                    userGroupId: Elements.getUserGroupId(),
+                    articlesOnly: true,
+                    mode: 'deferred'
+                }).success(function(html) {
+                    if (html) {
+                        var $posts = $(html);
+                        $target.data('block', $posts);
+                        $target.after($posts);
+                        $target.html('Скрыть записи в очереди');
+                        Elements.initImages($posts);
+                        Elements.initLinks($posts);
+                    } else {
+                        $target.remove();
+                    }
+                    Elements.getWallLoader().hide();
+                });
+            }
+        });
     },
 
     initWallFilter: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
         $leftPanel.find('.drop-down').change(function() {
-            Events.fire('leftcolumn_dropdown_change');
+            t.onDropdownChange();
         });
 
         $('.wall-title .filter a').dropdown({
@@ -1092,10 +1104,11 @@ var LeftPanelWidget = Event.extend({
 
     // Автоподгрузка записей
     initWallAutoload: function() {
+        var t = this;
         var $window = $(window);
         $window.scroll(function() {
             if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
-                Events.fire('wall_load_more', function(state) {});
+                t.loadArticles(false);
             }
         });
     },

@@ -54,6 +54,88 @@ var UserGroupCollection = Collection.extend({
 });
 var userGroupCollection = new UserGroupCollection();
 
+
+function popupSuccess( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#EBF0DA url('  + root +  'shared/images/vt/ui/icon_v.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
+function popupError( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#FEDADA url('  + root +  'shared/images/vt/ui/icon_x.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
+function popupNotice( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#FBFFBF url('  + root +  'shared/images/vt/ui/icon_i.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
 var App = Event.extend({
     init: function() {
         this.initRightPanel();
@@ -103,6 +185,10 @@ var App = Event.extend({
 
     loadArticles: function(clean) {
         this.getLeftPanelWidget().loadArticles(clean);
+    },
+
+    onLeftPanelDropdownChange: function() {
+        this.getLeftPanelWidget().onDropdownChange();
     },
 
     loadQueue: function() {

@@ -53,13 +53,16 @@ var QueueWidget = Event.extend({
     },
 
     initQueue: function() {
+        var t = this;
         var $queue = this.$queue;
+
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
             var $post = $(this).closest('.post'),
             pid = $post.data('id');
             Events.fire('rightcolumn_deletepost', pid);
         });
+
         // Смена даты
         $queue.delegate('.time', 'click', function() {
             var $time = $(this);
@@ -80,6 +83,7 @@ var QueueWidget = Event.extend({
             }
             $input.focus().select();
         });
+
         $queue.delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
@@ -115,6 +119,7 @@ var QueueWidget = Event.extend({
                 }
             }
         });
+
         $queue.delegate('.time-of-removal', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
@@ -133,6 +138,7 @@ var QueueWidget = Event.extend({
             }
             $input.focus().select();
         });
+
         $queue.delegate('.time-of-removal-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
@@ -157,6 +163,7 @@ var QueueWidget = Event.extend({
                 });
             }
         });
+
         $queue.delegate('.datepicker', 'click', function() {
             var $target = $(this);
             var $header = $target.parent();
@@ -216,6 +223,31 @@ var QueueWidget = Event.extend({
                 });
                 $datepicker.val(startDate + ' - ' + endDate).focus();
             }
+        });
+
+
+        // Показать полностью в правом меню
+        $queue.delegate('.toggle-text', 'click', function(e) {
+            $(this).parent().toggleClass('collapsed');
+        });
+
+        // Показать полностью в раскрытом правом меню
+        $queue.delegate('.show-cut', 'click', function(e) {
+            var $content = $(this).closest('.content'),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
+            cut = $content.find('.cut').html();
+
+            $shortcut.html(shortcut + ' ' + cut);
+            $(this).remove();
+
+            e.preventDefault();
+        });
+
+        $queue.delegate('.slot.empty:not(.new)', 'click', function() {
+            console.log(1);
+            $queue.html('ХУЙ');
+            t.load();
         });
 
         $('.queue-footer .add-button').click(function() {

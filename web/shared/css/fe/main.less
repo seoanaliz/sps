@@ -526,22 +526,33 @@ i {font-style: italic;}
 
             &.new {
                 min-height: 0;
-                background-color: #E8EEF2;
+                cursor: default !important;
+                background-color: #E8EEF2 !important;
             }
+
             &.ui-state-active {
                 background: #edf4f8;
                 border: none;
                 border-bottom: 1px solid #ddd
             }
+
             &.ui-state-hover {
                 background: #e9eff2;
                 .box-shadow(inset 0 2px 4px -2px rgba(0, 0, 0, 0.15));
             }
-            &.new,
-            &:hover {
+
+            &.new, &:hover {
                 .time-of-removal,
                 .datepicker {
                     opacity: 0.5;
+                }
+            }
+
+            &.empty {
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f9f9f9;
                 }
             }
 
