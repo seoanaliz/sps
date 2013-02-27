@@ -72,7 +72,13 @@
         'js://fe/jquery.maskedinput-1.3.js',
         'js://fe/jquery.multiselect.min.js',
         'js://fe/edit-post.js',
-        'js://fe/files.js'
+        'js://fe/files.js',
+        'js://fe/LeftPanelWidget.js',
+        'js://fe/RightPanelWidget.js',
+        'js://fe/QueueWidget.js',
+        'js://fe/elements.js',
+        'js://fe/templates.js',
+        'js://fe/main.js',
     );
 
     CssHelper::Init( true );
@@ -113,8 +119,5 @@
 	<link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
-    <?= JsHelper::Flush(); ?>
-
-    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>
