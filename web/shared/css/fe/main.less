@@ -625,6 +625,21 @@ i {font-style: italic;}
     .expanded-post {
         display: none;
         padding: 30px 10px 10px;
+        position: relative;
+
+        .photo {
+            position: absolute;
+            width: 30px;
+            text-align: center;
+
+            img {
+                max-width: 100%;
+            }
+        }
+
+        .content {
+            margin-left: 40px;
+        }
     }
 
     .post {
