@@ -76,7 +76,7 @@
         'js://fe/LeftPanelWidget.js',
         'js://fe/RightPanelWidget.js',
         'js://fe/QueueWidget.js',
-        'js://fe/elements.js',
+        'js://fe/Elements.js',
         'js://fe/templates.js',
         'js://fe/main.js',
     );
