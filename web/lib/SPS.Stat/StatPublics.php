@@ -5,6 +5,8 @@
 
     class StatPublics
     {
+
+        const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
@@ -768,5 +770,43 @@
             }
             return $res;
         }
+
+        public static  function update_population( $barter_events_array, $point = 'end' )
+        {
+            $subscribers =  $point . '_subscribers';
+            $visitors    =  $point . '_visitors';
+
+            foreach( $barter_events_array as $barter_event ) {
+                /** @var $barter_event BarterEvent */
+                if ( $barter_event->status != 3 || $point = 'start' ) {
+                    $time = time() + self::time_shift;
+
+                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );
+                    if( !$res ) {
+                        sleep(1);
+                        $time -= 44600;
+                        $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time, 'barter' );
+                    }
+                    $barter_event->$visitors = $res['visitors'];
+
+                    $count = 0;
+                    for ( $i = 0; $i < 3; $i++ ) {
+
+                        $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
+                        if( !isset( $res->count )) {
+                            sleep( 1 );
+                            continue;
+                        }
+                        $count = $res->count;
+                        break;
+                    }
+//                if( !$count ) {
+//                    $count = $this->get_public_members_count( $barter_event->target_public );
+//                }
+                    $barter_event->$subscribers = $count;
+                }
+            }
+        }
+
     }
 ?>
