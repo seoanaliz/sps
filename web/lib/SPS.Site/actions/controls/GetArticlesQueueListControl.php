@@ -98,9 +98,9 @@ class GetArticlesQueueListControl extends BaseControl {
         Response::setArray('articlesQueue', $articlesQueues);
 
         if ($isHistory) {
-            Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-history.tmpl.php';
+            Page::$TemplatePath = 'tmpl://fe/elements/articles-queue-history.tmpl.php';
         } else if ($type == GridLineUtility::TYPE_ALL) {
-            Page::$TemplatePath = 'tmpl://fe/elements/arcticles-queue-view.tmpl.php';
+            Page::$TemplatePath = 'tmpl://fe/elements/articles-queue-view.tmpl.php';
         } else {
             $this->setGrid($targetFeedId, $date, $type, $articlesQueues);
         }
