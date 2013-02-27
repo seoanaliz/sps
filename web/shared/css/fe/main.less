@@ -522,39 +522,7 @@ i {font-style: italic;}
             background: #fff;
             position: relative;
             border-bottom: 1px solid #ddd;
-            min-height: 105px;
-
-            &.new {
-                min-height: 0;
-                cursor: default !important;
-                background-color: #E8EEF2 !important;
-            }
-
-            &.ui-state-active {
-                background: #edf4f8;
-                border: none;
-                border-bottom: 1px solid #ddd
-            }
-
-            &.ui-state-hover {
-                background: #e9eff2;
-                .box-shadow(inset 0 2px 4px -2px rgba(0, 0, 0, 0.15));
-            }
-
-            &.new, &:hover {
-                .time-of-removal,
-                .datepicker {
-                    opacity: 0.5;
-                }
-            }
-
-            &.empty {
-                cursor: pointer;
-
-                &:hover {
-                    background-color: #f9f9f9;
-                }
-            }
+            min-height: 114px;
 
             .slot-header {
                 font-size: 11px;
@@ -630,6 +598,44 @@ i {font-style: italic;}
                 height: 12px;
                 min-width: 30px;
             }
+
+            &.new {
+                min-height: 0;
+                cursor: default !important;
+                background-color: #E8EEF2 !important;
+            }
+
+            &.ui-state-active {
+                background: #edf4f8;
+                border: none;
+                border-bottom: 1px solid #ddd
+            }
+
+            &.ui-state-hover {
+                background: #e9eff2;
+                .box-shadow(inset 0 2px 4px -2px rgba(0, 0, 0, 0.15));
+            }
+
+            &.new, &:hover {
+                .time-of-removal,
+                .datepicker {
+                    opacity: 0.5;
+                }
+            }
+
+            &.empty {
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f9f9f9;
+                }
+            }
+
+            &.edit {
+                .editing-post {
+                    display: block;
+                }
+            }
         }
     }
 
@@ -653,10 +659,33 @@ i {font-style: italic;}
         }
     }
 
+    .editing-post {
+        display: none;
+        padding: 30px 10px 10px;
+        background-color: #f9f9f9;
+
+        .textarea-wrap {
+            margin-right: 10px;
+
+            textarea {
+                width: 100%;
+                padding: 4px;
+            }
+        }
+
+        .actions {
+            padding-top: 7px;
+
+            .button + .button {
+                margin-left: 5px;
+            }
+        }
+    }
+
     .post {
         position: relative;
         line-height: 16px;
-        min-height: 70px;
+        min-height: 74px;
         padding-top: 30px;
 
         .content {

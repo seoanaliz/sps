@@ -6,6 +6,9 @@
 foreach ($grid as $gridItem) {
     $id = $gridItem['dateTime']->format('U');
     $isEmptyItem = empty($gridItem['queue']);
+    if ($isEmptyItem && !$canEditQueue) {
+        continue;
+    }
     ?>
     <div class="slot
         <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : '' ?>
@@ -16,12 +19,20 @@ foreach ($grid as $gridItem) {
          data-start-date="<?= $gridItem['startDate']->format('d.m.Y') ?>"
          data-end-date="<?= $gridItem['endDate']->format('d.m.Y') ?>">
         <? if ($isEmptyItem) { ?>
-            <? if ($canEditQueue) { ?>
-                <div class="slot-header">
-                    <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
-                    <span class="datepicker"></span>
+            <div class="slot-header">
+                <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                <span class="datepicker"></span>
+            </div>
+            <div class="editing-post">
+                <div class="textarea-wrap">
+                    <textarea></textarea>
                 </div>
-            <? } ?>
+                <div class="attachments"></div>
+                <div class="actions">
+                    <div class="save button">Сохранить</div>
+                    <div class="cancel button">Отменить</div>
+                </div>
+            </div>
         <? } else { ?>
             <?
             $articleQueueId = $gridItem['queue']->articleQueueId;

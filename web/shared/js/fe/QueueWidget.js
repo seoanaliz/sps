@@ -244,23 +244,47 @@ var QueueWidget = Event.extend({
             e.preventDefault();
         });
 
-        $queue.delegate('.slot.empty:not(.new)', 'click', function() {
-            console.log(1);
-            $queue.html('ХУЙ');
-            t.load();
+        $queue.delegate('.slot.empty:not(.new):not(.edit)', 'click', function(e) {
+            if (e.target == e.currentTarget) {
+                $queue.find('.slot.edit').removeClass('edit');
+                var $slot = $(this);
+                var $textarea = $slot.find('textarea');
+                $slot.addClass('edit');
+                $textarea.focus();
+                $textarea.keyup(function(e) {
+                    if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+                        t.saveArticle($slot);
+                    }
+                });
+            }
+        });
+
+        $queue.delegate('.slot.edit .cancel', 'click', function() {
+            var $slot = $(this).closest('.slot');
+            $slot.removeClass('edit');
+        });
+
+        $queue.delegate('.slot.edit .save', 'click', function() {
+            var $slot = $(this).closest('.slot');
+            t.saveArticle($slot);
         });
 
         $('.queue-footer .add-button').click(function() {
             $queue.scrollTo(0);
-            var $newPost = $(
-            '<div class="new slot empty">' +
-                '<div class="slot-header">' +
-                    '<span class="time">__:__</span>' +
-                    '<span class="datepicker"></span>' +
-                '</div>' +
-            '</div>'
-            ).prependTo($queue).animate({height: 105}, 200);
+            var $newPost = $(QUEUE_SLOT_ADD);
+            $newPost.prependTo($queue).animate({height: 110}, 200);
             $newPost.find('.time').click();
         });
+    },
+
+    saveArticle: function($slot) {
+        var t = this;
+        var $textarea = $slot.find('textarea');
+        var text = $.trim($textarea.val());
+        if (text) {
+            t.load();
+        } else {
+            $textarea.focus();
+        }
     }
 });
