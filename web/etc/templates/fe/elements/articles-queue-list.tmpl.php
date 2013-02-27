@@ -64,9 +64,22 @@ foreach ($grid as $gridItem) {
             ?>
             <div class="expanded-post">
                 <div class="photo">
-                    <img src="{$author->avatar}" alt="" />
+                    <? if ($author->vkId) { ?>
+                        <a target="_blank" href="http://vk.com/id{$author->vkId}">
+                            <img src="{$author->avatar}" alt="" />
+                        </a>
+                    <? } else { ?>
+                        <img src="{$author->avatar}" alt="" />
+                    <? } ?>
                 </div>
                 <div class="content">
+                    <? if ($author->vkId) { ?>
+                        <div class="name">
+                            <a target="_blank" href="http://vk.com/id{$author->vkId}">
+                                <b>{$author->FullName()}</b>
+                            </a>
+                        </div>
+                    <? } ?>
                     {increal:tmpl://fe/elements/article-item-content.tmpl.php}
                 </div>
             </div>
