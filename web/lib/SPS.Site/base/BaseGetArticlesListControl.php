@@ -200,7 +200,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
 
         // тип источника
         $sourceFeedType = $this->getSourceFeedType();
-
         // для какой ленты
         // только для ТопФейса и Авторских, т.к. у них это заранее определено
         $targetFeedId = $this->getTargetFeedId();
@@ -216,7 +215,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
             } else {
                 throw new Exception('Access error');
             }
-
+             if( $sourceFeedType == SourceFeedUtility::Albums )
+                 $useSourceFilter = true;
             $this->userRateFilter = false;
         } // источник - топфейс
         elseif ($sourceFeedType == SourceFeedUtility::Topface) {

@@ -558,6 +558,9 @@
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>
                 </page>
+                <page uri="daemons://delete-photo/">
+                    <actions>SPS.Site.DeletePhoto</actions>
+                </page>
                 <page uri="daemons://sync-albums/">
                     <actions>SPS.Site.SyncAlbums</actions>
                 </page>

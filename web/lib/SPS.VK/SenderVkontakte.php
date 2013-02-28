@@ -263,14 +263,14 @@
 
         public function delete_photo( $full_photo_id )
         {
+            sleep(1);
             list( $owner_id, $photo_id ) = explode( '_', $full_photo_id );
-            if( $photo_id) {
+            if( $photo_id ) {
                 $params = array(
                     'oid'           =>  $owner_id,
                     'pid'           =>  $photo_id,
                     'access_token'  =>  $this->vk_access_token
                 );
-
                 if( VkHelper::api_request( 'photos.delete', $params ))
                     return true;
             }
@@ -307,6 +307,22 @@
 
             return false;
 
+        }
+
+        public function get_album_size( $full_album_id )
+        {
+            sleep(0.4);
+            list( $public_id, $album_id ) = explode( '_', $full_album_id );
+            if( $album_id ) {
+                $params = array(
+                    'gid'           =>  $public_id,
+                    'aids'          =>  $album_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
+                $res = VkHelper::api_request( 'photos.getAlbums', $params );
+                return $res[0]->size;
+            }
+            return false;
         }
 
         private function create_album( $counter = 1, $privacy = 1, $title = '' )
