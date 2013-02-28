@@ -232,8 +232,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $useArticleStatusFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Source) {
             $useSourceFilter = true;
-        } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
-            $useSourceFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Ads) {
             $useSourceFilter = true;
         }
