@@ -410,6 +410,10 @@ abstract class BaseGetArticlesListControl extends BaseControl
                 /**
                  * Мои отправленные
                  */
+                $authorId = Request::getInteger('authorId');
+                if (is_numeric($authorId) && $authorId){
+                    $this->search['authorId'] = $authorId;
+                }
                 unset($this->search['articleStatusIn']);
                 $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL';
                 $this->options[BaseFactory::WithoutDisabled] = false;
