@@ -193,6 +193,40 @@ var App = Event.extend({
 
     loadQueue: function() {
         this.getRightPanelWidget().loadQueue();
+    },
+
+    imageUploader: function(options) {
+        if (!(options.$element instanceof jQuery)) {
+            throw new TypeError('$element must be instance of jQuery');
+        }
+
+        if (!(options.$listElement instanceof jQuery)) {
+            throw new TypeError('$listElement must be instance of jQuery');
+        }
+
+        var element = options.$element[0];
+        var listElement = options.$listElement[0];
+
+        options = $.extend({
+            element: element,
+            listElement: listElement,
+            action: root + 'int/controls/image-upload/',
+            template: '<div class="qq-uploader">' +
+            '<div class="qq-upload-drop-area">+</div>' +
+            '<a class="qq-upload-button">Прикрепить</a>' +
+            '</div>',
+            fileTemplate: '<div class="attachment">' +
+            '<span class="qq-upload-file"></span>' +
+            '<span class="qq-upload-spinner"></span>' +
+            '<span class="qq-upload-size"></span>' +
+            '<a class="qq-upload-cancel">Отмена</a>' +
+            '<span class="qq-upload-failed-text">Ошибка</span>' +
+            '</div>',
+            onComplete: function(id, fileName, res) {
+                console.log(arguments);
+            }
+        }, options);
+        new qq.FileUploader(options);
     }
 });
 

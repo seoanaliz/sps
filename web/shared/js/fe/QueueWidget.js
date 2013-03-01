@@ -250,28 +250,20 @@ var QueueWidget = Event.extend({
             }
 
             var $slot = $(this);
+            var $textarea = $slot.find('textarea');
+            $queue.find('.slot.edit').removeClass('edit');
+            $slot.addClass('edit');
+            $textarea.focus();
+
             if ($slot.data('new-post-inited')) {
                 return;
             }
             $slot.data('new-post-inited', true);
 
-            var $textarea = $slot.find('textarea');
-            var uploader = new qq.FileUploader({
-                debug: true,
-                element: $slot.find('.upload')[0],
-                action: root + 'int/controls/image-upload/',
-                template: '<div class="qq-uploader">' +
-                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-                '<div class="qq-upload-button">Прикрепить</div>' +
-                '<ul class="qq-upload-list"></ul>' +
-                '</div>',
-                onComplete: function(id, fileName, res) {
-//                    addPhoto(res.image, res.filename, res.url, $photos);
-                }
+            app.imageUploader({
+                $element: $slot.find('.upload'),
+                $listElement: $slot.find('.attachments')
             });
-            $queue.find('.slot.edit').removeClass('edit');
-            $slot.addClass('edit');
-            $textarea.focus();
             $textarea.keyup(function(e) {
                 if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                     t.saveArticle($slot);
