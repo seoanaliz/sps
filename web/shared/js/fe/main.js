@@ -207,7 +207,7 @@ var App = Event.extend({
         var element = options.$element[0];
         var listElement = options.$listElement[0];
 
-        options = $.extend({
+        new qq.FileUploader($.extend({
             element: element,
             listElement: listElement,
             action: root + 'int/controls/image-upload/',
@@ -222,12 +222,27 @@ var App = Event.extend({
             '<a class="qq-upload-cancel">Отмена</a>' +
             '<span class="qq-upload-failed-text">Ошибка</span>' +
             '</div>',
-            onComplete: function(id, fileName, res) {
-                var $attachmentNode = $(options.$listElement.find('> div')[id]);
-                $attachmentNode.html('<img src="' + res.image + '" /><div class="delete-attach" title="Удалить"></div>');
+            onComplete: function(id, fileName, response) {
+                var $attachmentNode = $(options.$listElement.find('> .attachment')[id]);
+                $attachmentNode.data('filename', response.filename);
+                $attachmentNode.data('image', response.image);
+                $attachmentNode.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
             }
-        }, options);
-        new qq.FileUploader(options);
+        }, options));
+
+        options.$listElement.delegate('.delete-attach', 'click', function() {
+            $(this).closest('.attachment').remove();
+        });
+
+        return {
+            getFiles: function() {
+                var photos = [];
+                options.$listElement.find('> .attachment').each(function(){
+                    photos.push({ filename: $(this).data('filename') });
+                });
+                return photos;
+            }
+        }
     }
 });
 
