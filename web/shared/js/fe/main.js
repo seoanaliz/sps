@@ -224,7 +224,7 @@ var App = Event.extend({
             '</div>',
             onComplete: function(id, fileName, res) {
                 var $attachmentNode = $(options.$listElement.find('> div')[id]);
-                $attachmentNode.html('<img src="' + res.image + '" />');
+                $attachmentNode.html('<img src="' + res.image + '" /><div class="delete-attach" title="Удалить"></div>');
             }
         }, options);
         new qq.FileUploader(options);
