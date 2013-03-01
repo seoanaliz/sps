@@ -223,7 +223,8 @@ var App = Event.extend({
             '<span class="qq-upload-failed-text">Ошибка</span>' +
             '</div>',
             onComplete: function(id, fileName, res) {
-                console.log(arguments);
+                var $attachmentNode = $(options.$listElement.find('> div')[id]);
+                $attachmentNode.html('<img src="' + res.image + '" />');
             }
         }, options);
         new qq.FileUploader(options);
