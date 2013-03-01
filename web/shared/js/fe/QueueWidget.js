@@ -53,13 +53,16 @@ var QueueWidget = Event.extend({
     },
 
     initQueue: function() {
+        var t = this;
         var $queue = this.$queue;
+
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
             var $post = $(this).closest('.post'),
             pid = $post.data('id');
             Events.fire('rightcolumn_deletepost', pid);
         });
+
         // Смена даты
         $queue.delegate('.time', 'click', function() {
             var $time = $(this);
@@ -80,6 +83,7 @@ var QueueWidget = Event.extend({
             }
             $input.focus().select();
         });
+
         $queue.delegate('.time-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
@@ -115,6 +119,7 @@ var QueueWidget = Event.extend({
                 }
             }
         });
+
         $queue.delegate('.time-of-removal', 'click', function() {
             var $time = $(this);
             var $post = $time.closest('.slot-header');
@@ -133,6 +138,7 @@ var QueueWidget = Event.extend({
             }
             $input.focus().select();
         });
+
         $queue.delegate('.time-of-removal-edit', 'blur keydown', function(e) {
             var $input = $(this);
 
@@ -157,6 +163,7 @@ var QueueWidget = Event.extend({
                 });
             }
         });
+
         $queue.delegate('.datepicker', 'click', function() {
             var $target = $(this);
             var $header = $target.parent();
@@ -218,17 +225,89 @@ var QueueWidget = Event.extend({
             }
         });
 
+
+        // Показать полностью в правом меню
+        $queue.delegate('.toggle-text', 'click', function(e) {
+            $(this).parent().toggleClass('collapsed');
+        });
+
+        // Показать полностью в раскрытом правом меню
+        $queue.delegate('.show-cut', 'click', function(e) {
+            var $content = $(this).closest('.content'),
+            $shortcut = $content.find('.shortcut'),
+            shortcut = $shortcut.html(),
+            cut = $content.find('.cut').html();
+
+            $shortcut.html(shortcut + ' ' + cut);
+            $(this).remove();
+
+            e.preventDefault();
+        });
+
+        $queue.delegate('.slot.empty:not(.new):not(.edit)', 'click', function(e) {
+            if (e.target != e.currentTarget) {
+                return;
+            }
+
+            var $slot = $(this);
+            var $textarea = $slot.find('textarea');
+            $queue.find('.slot.edit').removeClass('edit');
+            $slot.addClass('edit');
+            $textarea.focus();
+
+            if ($slot.data('new-post-inited')) {
+                return;
+            }
+            $slot.data('new-post-inited', true);
+
+            $slot.data('imageUploader', app.imageUploader({
+                $element: $slot.find('.upload'),
+                $listElement: $slot.find('.attachments')
+            }));
+
+            $textarea.keyup(function(e) {
+                if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+                    t.saveArticle($slot);
+                }
+            });
+        });
+
+        $queue.delegate('.slot.edit .cancel', 'click', function() {
+            var $slot = $(this).closest('.slot');
+            $slot.removeClass('edit');
+        });
+
+        $queue.delegate('.slot.edit .save', 'click', function() {
+            var $slot = $(this).closest('.slot');
+            t.saveArticle($slot);
+        });
+
         $('.queue-footer .add-button').click(function() {
             $queue.scrollTo(0);
-            var $newPost = $(
-            '<div class="new slot empty">' +
-                '<div class="slot-header">' +
-                    '<span class="time">__:__</span>' +
-                    '<span class="datepicker"></span>' +
-                '</div>' +
-            '</div>'
-            ).prependTo($queue).animate({height: 105}, 200);
+            var $newPost = $(QUEUE_SLOT_ADD);
+            $newPost.prependTo($queue).animate({height: 110}, 200);
             $newPost.find('.time').click();
         });
+    },
+
+    saveArticle: function($slot) {
+        var t = this;
+        var $textarea = $slot.find('textarea');
+        var text = $.trim($textarea.val());
+        var imageUploader = $slot.data('imageUploader');
+        var files = imageUploader && imageUploader.getFiles();
+        if (text || files) {
+            $slot.addClass('locked');
+            Events.fire('post', text, files, '', null, function(data) {
+                if (data && data.articleId) {
+                    var postId = data.articleId;
+                    Events.fire('post_moved', postId, $slot.data('id'), null, function() {
+                        t.load();
+                    });
+                }
+            });
+        } else {
+            $textarea.focus();
+        }
     }
 });

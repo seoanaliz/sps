@@ -54,6 +54,88 @@ var UserGroupCollection = Collection.extend({
 });
 var userGroupCollection = new UserGroupCollection();
 
+
+function popupSuccess( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#EBF0DA url('  + root +  'shared/images/vt/ui/icon_v.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
+function popupError( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#FEDADA url('  + root +  'shared/images/vt/ui/icon_x.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
+function popupNotice( message ) {
+    $.blockUI({
+        message: message,
+        fadeIn: 600,
+        fadeOut: 1000,
+        timeout: 2500,
+        showOverlay: false,
+        centerY: false,
+        css: {
+            width: 'auto',
+            'max-width': '200px',
+            top: '15px',
+            left: 'auto',
+            right: '15px',
+            border: 'none',
+            padding: '25px 30px 25px 60px',
+            'font-size': '13px',
+            'text-align': 'left',
+            color: '#333',
+            'background': '#FBFFBF url('  + root +  'shared/images/vt/ui/icon_i.png) no-repeat 25px 50%',
+            'border-radius': '5px',
+            opacity: 1,
+            'box-shadow': '0 0 6px #000'
+        }
+    });
+}
+
 var App = Event.extend({
     init: function() {
         this.initRightPanel();
@@ -105,8 +187,62 @@ var App = Event.extend({
         this.getLeftPanelWidget().loadArticles(clean);
     },
 
+    onLeftPanelDropdownChange: function() {
+        this.getLeftPanelWidget().onDropdownChange();
+    },
+
     loadQueue: function() {
         this.getRightPanelWidget().loadQueue();
+    },
+
+    imageUploader: function(options) {
+        if (!(options.$element instanceof jQuery)) {
+            throw new TypeError('$element must be instance of jQuery');
+        }
+
+        if (!(options.$listElement instanceof jQuery)) {
+            throw new TypeError('$listElement must be instance of jQuery');
+        }
+
+        var element = options.$element[0];
+        var listElement = options.$listElement[0];
+
+        new qq.FileUploader($.extend({
+            element: element,
+            listElement: listElement,
+            action: root + 'int/controls/image-upload/',
+            template: '<div class="qq-uploader">' +
+            '<div class="qq-upload-drop-area">+</div>' +
+            '<a class="qq-upload-button">Прикрепить</a>' +
+            '</div>',
+            fileTemplate: '<div class="attachment">' +
+            '<span class="qq-upload-file"></span>' +
+            '<span class="qq-upload-spinner"></span>' +
+            '<span class="qq-upload-size"></span>' +
+            '<a class="qq-upload-cancel">Отмена</a>' +
+            '<span class="qq-upload-failed-text">Ошибка</span>' +
+            '</div>',
+            onComplete: function(id, fileName, response) {
+                var $attachmentNode = $(options.$listElement.find('> .attachment')[id]);
+                $attachmentNode.data('filename', response.filename);
+                $attachmentNode.data('image', response.image);
+                $attachmentNode.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
+            }
+        }, options));
+
+        options.$listElement.delegate('.delete-attach', 'click', function() {
+            $(this).closest('.attachment').remove();
+        });
+
+        return {
+            getFiles: function() {
+                var photos = [];
+                options.$listElement.find('> .attachment').each(function(){
+                    photos.push({ filename: $(this).data('filename') });
+                });
+                return photos;
+            }
+        }
     }
 });
 

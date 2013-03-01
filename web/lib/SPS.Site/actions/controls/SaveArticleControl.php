@@ -113,6 +113,10 @@ class SaveArticleControl extends BaseControl
             }
         }
 
+        if ($result['success']) {
+            $result['articleId'] = $article->articleId;
+        }
+
         echo ObjectHelper::ToJSON($result);
     }
 
