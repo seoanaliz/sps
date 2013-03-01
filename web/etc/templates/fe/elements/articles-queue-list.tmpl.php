@@ -53,10 +53,10 @@ foreach ($grid as $gridItem) {
 
             <?
             $author = array();
-            if (!empty($articleQueue->articleQueueCreator)) {
-                $author = $articleQueue->articleQueueCreator;
-            } elseif (!empty($articleQueue->articleAuthor)) {
+            if (!empty($articleQueue->articleAuthor)) {
                 $author = $articleQueue->articleAuthor;
+            } elseif (!empty($articleQueue->articleQueueCreator)) {
+                $author = $articleQueue->articleQueueCreator;
             } else {
                 $author = new Author();
                 $author->avatar = 'http://vk.com/images/camera_c.gif';
