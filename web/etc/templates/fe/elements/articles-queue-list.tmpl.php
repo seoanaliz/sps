@@ -31,6 +31,7 @@ foreach ($grid as $gridItem) {
                 <div class="actions">
                     <div class="save button">Сохранить</div>
                     <div class="cancel button">Отменить</div>
+                    <div class="upload r">Прикрепить</div>
                 </div>
             </div>
         <? } else { ?>
@@ -38,14 +39,14 @@ foreach ($grid as $gridItem) {
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
-            $delete_at = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
+            $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
             <? if ($canEditQueue) { ?>
                 <div class="slot-header">
                     <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                     <span class="datepicker"></span>
                     <span class="time-of-removal"></span>
-                    <span class="time-of-remove"><?= $delete_at ? $delete_at : '' ?></span>
+                    <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                     {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
                 </div>
             <? } ?>
