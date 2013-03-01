@@ -260,10 +260,11 @@ var QueueWidget = Event.extend({
             }
             $slot.data('new-post-inited', true);
 
-            app.imageUploader({
+            $slot.data('imageUploader', app.imageUploader({
                 $element: $slot.find('.upload'),
                 $listElement: $slot.find('.attachments')
-            });
+            }));
+
             $textarea.keyup(function(e) {
                 if (e.ctrlKey && e.keyCode == KEY.ENTER) {
                     t.saveArticle($slot);
@@ -293,9 +294,11 @@ var QueueWidget = Event.extend({
         var t = this;
         var $textarea = $slot.find('textarea');
         var text = $.trim($textarea.val());
-        if (text) {
+        var imageUploader = $slot.data('imageUploader');
+        var files = imageUploader && imageUploader.getFiles();
+        if (text || files) {
             $slot.addClass('locked');
-            Events.fire('post', text, [], '', null, function(data) {
+            Events.fire('post', text, files, '', null, function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
