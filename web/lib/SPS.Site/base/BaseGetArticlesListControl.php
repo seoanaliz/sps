@@ -21,6 +21,11 @@ abstract class BaseGetArticlesListControl extends BaseControl
     const MODE_DEFERRED = 'deferred';
 
     /**
+     * Отправленные
+     */
+    const MODE_POSTED = 'posted';
+
+    /**
      * @var string
      */
     private $articleLinkPrefix = 'http://vk.com/wall-';
@@ -89,6 +94,12 @@ abstract class BaseGetArticlesListControl extends BaseControl
     protected $userRateFilter = true;
 
     /**
+     * Нужна ли лента в запросе
+     * @var bool
+     */
+    protected $needTargetFeed = true;
+
+    /**
      * @var ArticleAccessUtility
      */
     protected $ArticleAccessUtility;
@@ -97,6 +108,9 @@ abstract class BaseGetArticlesListControl extends BaseControl
         $mode = Request::getString('mode');
         if ($mode == self::MODE_MY) {
             return self::MODE_MY;
+        }
+        if ($mode == self::MODE_POSTED) {
+            return self::MODE_POSTED;
         }
         if ($mode == self::MODE_DEFERRED) {
             return self::MODE_DEFERRED;
@@ -201,6 +215,8 @@ abstract class BaseGetArticlesListControl extends BaseControl
         // тип источника
         $sourceFeedType = $this->getSourceFeedType();
 
+        $mode = $this->getMode();
+
         // для какой ленты
         // только для ТопФейса и Авторских, т.к. у них это заранее определено
         $targetFeedId = $this->getTargetFeedId();
@@ -230,6 +246,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $this->userRateFilter = false;
             $this->search['authorId'] = $this->getAuthor()->authorId;
             $useArticleStatusFilter = true;
+            $this->needTargetFeed = $mode != self::MODE_POSTED;
         } elseif ($sourceFeedType == SourceFeedUtility::Source) {
             $useSourceFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
@@ -306,13 +323,19 @@ abstract class BaseGetArticlesListControl extends BaseControl
 
         $mode = $this->getMode();
         $targetFeedId = $this->getTargetFeedId();
-        if (!$targetFeedId && !$this->isApp) {
+        var_dump($this->needTargetFeed);
+        if ($this->needTargetFeed  && !$targetFeedId && !$this->isApp) {
             return array('success' => false);
         }
 
-        $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
-        if (is_null($role)) {
-            return array('success' => false);
+
+        // если мы юзаем ленту то у нас должна быть роль
+        $role = null;
+        if ($this->needTargetFeed) {
+            $role = $this->ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
+            if (is_null($role)) {
+                return array('success' => false);
+            }
         }
 
 
@@ -381,19 +404,30 @@ abstract class BaseGetArticlesListControl extends BaseControl
             }
 
         } else if ($type == SourceFeedUtility::My) {
-            unset($this->search['_sourceFeedId']);
-            $this->search['targetFeedId'] = $targetFeedId;
-            $this->search['authorId'] = $this->getAuthor()->authorId;
-            $this->options[BaseFactory::WithoutDisabled] = false;
-            if ($role == UserFeed::ROLE_AUTHOR){
-                $articleStatus = Request::getInteger('articleStatus');
-                if ($articleStatus){
-                    $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
-                } else {
-                    $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
-                }
+
+
+            if ($mode == self::MODE_POSTED) {
+                /**
+                 * Мои отправленные
+                 */
+                unset($this->search['articleStatusIn']);
+                $this->options[BaseFactory::CustomSql] = ' AND "sentAt" IS NOT NULL';
+                $this->options[BaseFactory::WithoutDisabled] = false;
             } else {
-                $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
+                unset($this->search['_sourceFeedId']);
+                $this->search['targetFeedId'] = $targetFeedId;
+                $this->search['authorId'] = $this->getAuthor()->authorId;
+                $this->options[BaseFactory::WithoutDisabled] = false;
+                if ($role == UserFeed::ROLE_AUTHOR){
+                    $articleStatus = Request::getInteger('articleStatus');
+                    if ($articleStatus){
+                        $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+                    } else {
+                        $this->search['articleStatusIn'] = array(Request::getInteger('articleStatus'));
+                    }
+                } else {
+                    $this->search['articleStatusIn'] = array(Article::STATUS_APPROVED);
+                }
             }
 
         } else if ($type == SourceFeedUtility::Ads) {
