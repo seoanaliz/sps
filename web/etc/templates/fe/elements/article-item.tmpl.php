@@ -37,19 +37,27 @@ if (!empty($article)) {
     class="post bb
     <?= $isPostMovable ? 'movable' : '' ?>
     <?= $canEditPost ? 'editable' : '' ?>
+    <?= !empty($author) ? 'author' : '' ?>
     <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
+    <? if (!empty($author)) { ?>
+        data-author-id="{$author->authorId}"
+    <? } ?>
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
-            <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
+            <div class="userpic">
+                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
+            </div>
         </div>
-        <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
+        <div class="name d-hide">
+            <?=$sourceInfo[$article->sourceFeedId]['name']?>
+        </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="{$author->avatar}" alt="" /></div>
         </div>
-        <div class="name author d-hide">{$author->FullName()}</div>
+        <div class="name d-hide">{$author->FullName()}</div>
     <? } ?>
     <div class="content">
         {increal:tmpl://fe/elements/article-item-content.tmpl.php}

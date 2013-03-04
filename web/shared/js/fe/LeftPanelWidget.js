@@ -1394,8 +1394,8 @@ var LeftPanelWidget = Event.extend({
     initUserFilter: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
-        $leftPanel.delegate('.name', 'click', function() {
-            var userId = $(this).data('author-id');
+        $leftPanel.delegate('.post.author .name', 'click', function() {
+            var userId = $(this).closest('.post').data('author-id');
             t.userFilter(userId);
         });
     },
