@@ -412,57 +412,63 @@ var LeftPanelWidget = Event.extend({
 
         var sourceType = Elements.leftType();
         var targetFeedId = Elements.rightdd();
-        var sourceFeedIds = Elements.leftdd();
         var switcherType = Elements.getSwitcherType();
+        var $newPost = $('.newpost');
+        var $wallLoader = Elements.getWallLoader();
         t.wallPage++;
         articlesLoading = true;
 
-        Elements.getWallLoader().show();
+        $wallLoader.show();
+        $newPost.hide();
 
         var requestData = {
             sortType: Elements.getSortType(),
-            sourceFeedIds: sourceFeedIds,
             page: t.wallPage,
             type: sourceType,
             targetFeedId: targetFeedId
         };
 
-        if (sourceType == 'authors') {
-            $('.newpost').show();
+        switch (sourceType) {
+            case 'authors':
+                $newPost.show();
 
-            requestData.userGroupId = Elements.getUserGroupId();
-            switch (switcherType) {
-                case 'approved':
-                    requestData.articleStatus = 2;
-                    break;
-                case 'deferred':
-                    requestData.articleStatus = 1;
-                    break;
-                case 'all':
-                    requestData.mode = 'all';
-                    break;
-                case 'my':
-                    requestData.mode = 'my';
-                    break;
-                default:
-                    requestData.articleStatus = 1;
-            }
-        } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
-            $('.newpost').show();
-        } else {
-            $('.newpost').hide();
-        }
-
-        if (sourceType == 'my') {
-            requestData.articleStatus = Elements.getArticleStatus();
-            requestData.mode = 'my';
-        } else if (sourceType == 'ads') {
-            requestData.from = 0;
-            requestData.to = 100;
-        } else {
-            var $slider = $('#slider-range');
-            requestData.from = $slider.slider('values', 0);
-            requestData.to = $slider.slider('values', 1);
+                requestData.userGroupId = Elements.getUserGroupId();
+                switch (switcherType) {
+                    case 'approved':
+                        requestData.articleStatus = 2;
+                        break;
+                    case 'deferred':
+                        requestData.articleStatus = 1;
+                        break;
+                    case 'all':
+                        requestData.mode = 'all';
+                        break;
+                    case 'my':
+                        requestData.mode = 'my';
+                        break;
+                    default:
+                        requestData.articleStatus = 1;
+                }
+                break;
+            case 'my':
+                requestData.articleStatus = Elements.getArticleStatus();
+                requestData.mode = 'my';
+                break;
+            case 'ads':
+                requestData.sourceFeedIds = Elements.leftdd();
+                requestData.from = 0;
+                requestData.to = 100;
+                if (requestData.sourceFeedIds.length == 1) {
+                    $newPost.show();
+                }
+                break;
+            case 'topface':
+            case 'albums':
+            case 'source':
+                requestData.sourceFeedIds = Elements.leftdd();
+                break;
+            default:
+                break;
         }
 
         if (filterAuthorId) {
@@ -480,7 +486,7 @@ var LeftPanelWidget = Event.extend({
             dataType: 'html',
             data: requestData
         }).always(function() {
-            Elements.getWallLoader().hide();
+            $wallLoader.hide();
             if (clean) {
                 t.$wall.empty();
             }
