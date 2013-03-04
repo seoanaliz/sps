@@ -1121,6 +1121,52 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
+    // Скрытие постов, которые сейчас не видны в ленте
+    initWallAutohide: function() {
+        var t = this;
+        var $window = $(window);
+        var $wall = t.$wall;
+        $window.scroll(function() {
+            var scrollTop = $window.scrollTop();
+            if (scrollTop % 10 == 0) {
+                var wallPostsPositionsTop = t.getWallPostsPositionsTop();
+                var focusedElements = [];
+                for (var i in wallPostsPositionsTop) {
+                    if (!wallPostsPositionsTop.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    i = +i;
+                    var positionTop = wallPostsPositionsTop[i];
+                    if (positionTop.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
+                        focusedElements.push({id: positionTop.id, top: positionTop.top});
+                    }
+                }
+
+
+                t.$wall.find('.post.show-images').removeClass('show-images');
+                for (var i in focusedElements) {
+                    if (!focusedElements.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
+                }
+            }
+        });
+    },
+
+    getWallPostsPositionsTop: function() {
+        var t = this;
+        var $wall = t.$wall;
+        var positionsTop = [];
+        $wall.find('.post').each(function() {
+            positionsTop.push({
+                id: $(this).data('id'),
+                top: $(this).offset().top
+            });
+        });
+        return positionsTop;
+    },
+
     initLeftPanelTabs: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
