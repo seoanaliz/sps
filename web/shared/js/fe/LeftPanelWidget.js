@@ -506,6 +506,7 @@ var LeftPanelWidget = Event.extend({
                 if (!$block.find('.post').length) {
                     $(window).data('disable-load-more', true);
                 }
+                t.wallPostsPositionsTop = t.getWallPostsPositionsTop();
             }
             articlesLoading = false;
         });
@@ -1116,9 +1117,12 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $window = $(window);
         $window.scroll(function() {
-            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
-                t.loadArticles(false);
-            }
+            clearTimeout(t.wallScrollTimeoutAutoload);
+            t.wallScrollTimeoutAutoload = setTimeout(function() {
+                if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                    t.loadArticles(false);
+                }
+            }, 200);
         });
     },
 
@@ -1126,31 +1130,33 @@ var LeftPanelWidget = Event.extend({
     initWallAutohide: function() {
         var t = this;
         var $window = $(window);
-        var $wall = t.$wall;
+
         $window.scroll(function() {
-            var scrollTop = $window.scrollTop();
-            var wallPostsPositionsTop = t.getWallPostsPositionsTop();
-            var focusedElements = [];
-            for (var i in wallPostsPositionsTop) {
-                if (!wallPostsPositionsTop.hasOwnProperty(i)) {
-                    continue;
+            clearTimeout(t.wallScrollTimeoutAutohide);
+            t.wallScrollTimeoutAutohide = setTimeout(function() {
+                var wallPostsPositionsTop = t.wallPostsPositionsTop || t.getWallPostsPositionsTop();
+                var scrollTop = $window.scrollTop();
+                var focusedElements = [];
+                for (var i in wallPostsPositionsTop) {
+                    if (!wallPostsPositionsTop.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    i = +i;
+                    var positionTop = wallPostsPositionsTop[i];
+                    var positionTopNext = wallPostsPositionsTop[i + 1];
+                    if (positionTopNext && positionTopNext.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
+                        focusedElements.push({id: positionTop.id, top: positionTop.top});
+                    }
                 }
-                i = +i;
-                var positionTop = wallPostsPositionsTop[i];
-                var positionTopNext = wallPostsPositionsTop[i + 1];
-                if (positionTopNext && positionTopNext.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
-                    focusedElements.push({id: positionTop.id, top: positionTop.top});
-                }
-            }
 
-
-            t.$wall.find('.post.show-images').removeClass('show-images');
-            for (var i in focusedElements) {
-                if (!focusedElements.hasOwnProperty(i)) {
-                    continue;
+                t.$wall.find('.post.show-images').removeClass('show-images');
+                for (var i in focusedElements) {
+                    if (!focusedElements.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
                 }
-                t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
-            }
+            }, 200);
         });
     },
 

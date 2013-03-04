@@ -213,8 +213,10 @@ i{font-style:italic;}
 .post.removed img{opacity:.6;}
 .post.deleted-post{color:#767875;text-align:center;}.post.deleted-post .button{margin-top:7px;}
 .post.author .name{cursor:pointer;color:#2B587A;}.post.author .name:hover{text-decoration:underline;}
-.post img{visibility:hidden !important;}
-.post.show-images img{visibility:visible !important;}
+.post *{visibility:hidden;}
+.post img{display:none;}
+.post.show-images *{visibility:visible;}
+.post.show-images img{display:inline-block;}
 .attachments .attachment{margin-top:5px;position:relative;display:inline-block;margin:7px 7px 0 0;}.attachments .attachment img{border-radius:3px;width:60px;height:60px;-webkit-box-shadow:0 1px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow:0 1px 1px rgba(0, 0, 0, 0.4);box-shadow:0 1px 1px rgba(0, 0, 0, 0.4);}
 .attachments .attachment .delete-attach{position:absolute;top:0;right:0;width:10px;height:10px;margin:0;background:#ffffff url(../../images/fe/controls.png) no-repeat -44px -2px;cursor:pointer;border:3px solid white;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(opacity=(80));filter:alpha(opacity = (80));opacity:0.8;}
 body.editor-mode .authors-list{display:block;}
