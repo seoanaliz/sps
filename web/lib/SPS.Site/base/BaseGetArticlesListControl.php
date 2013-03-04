@@ -323,7 +323,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
 
         $mode = $this->getMode();
         $targetFeedId = $this->getTargetFeedId();
-        var_dump($this->needTargetFeed);
         if ($this->needTargetFeed  && !$targetFeedId && !$this->isApp) {
             return array('success' => false);
         }
