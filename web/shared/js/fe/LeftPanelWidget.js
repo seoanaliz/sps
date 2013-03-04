@@ -399,6 +399,7 @@ var LeftPanelWidget = Event.extend({
 
     loadArticles: function(clean) {
         var t = this;
+        var filterAuthorId = t.filterAuthorId;
 
         if (articlesLoading) {
             return;
@@ -413,7 +414,6 @@ var LeftPanelWidget = Event.extend({
         var targetFeedId = Elements.rightdd();
         var sourceFeedIds = Elements.leftdd();
         var switcherType = Elements.getSwitcherType();
-        var filterAuthorId = t.filterAuthorId;
         t.wallPage++;
         articlesLoading = true;
 
