@@ -1129,28 +1129,27 @@ var LeftPanelWidget = Event.extend({
         var $wall = t.$wall;
         $window.scroll(function() {
             var scrollTop = $window.scrollTop();
-            if (scrollTop % 10 == 0) {
-                var wallPostsPositionsTop = t.getWallPostsPositionsTop();
-                var focusedElements = [];
-                for (var i in wallPostsPositionsTop) {
-                    if (!wallPostsPositionsTop.hasOwnProperty(i)) {
-                        continue;
-                    }
-                    i = +i;
-                    var positionTop = wallPostsPositionsTop[i];
-                    if (positionTop.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
-                        focusedElements.push({id: positionTop.id, top: positionTop.top});
-                    }
+            var wallPostsPositionsTop = t.getWallPostsPositionsTop();
+            var focusedElements = [];
+            for (var i in wallPostsPositionsTop) {
+                if (!wallPostsPositionsTop.hasOwnProperty(i)) {
+                    continue;
                 }
+                i = +i;
+                var positionTop = wallPostsPositionsTop[i];
+                var positionTopNext = wallPostsPositionsTop[i + 1];
+                if (positionTopNext && positionTopNext.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
+                    focusedElements.push({id: positionTop.id, top: positionTop.top});
+                }
+            }
 
 
-                t.$wall.find('.post.show-images').removeClass('show-images');
-                for (var i in focusedElements) {
-                    if (!focusedElements.hasOwnProperty(i)) {
-                        continue;
-                    }
-                    t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
+            t.$wall.find('.post.show-images').removeClass('show-images');
+            for (var i in focusedElements) {
+                if (!focusedElements.hasOwnProperty(i)) {
+                    continue;
                 }
+                t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
             }
         });
     },
