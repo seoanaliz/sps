@@ -16,6 +16,7 @@ var LeftPanelWidget = Event.extend({
         this.initLeftPanelTabs();
         this.initModeration();
         this.initUserFilter();
+        this.initWallAutohide();
     },
 
     initLeftPanel: function() {
