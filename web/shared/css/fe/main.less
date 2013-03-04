@@ -1292,6 +1292,7 @@ i {font-style: italic;}
         color: @color_blue;
     }
 }
+
 .post {
     background: #fff;
     position: relative;
@@ -1361,7 +1362,16 @@ i {font-style: italic;}
         font-weight: bold;
         font-size: 12px;
         font-family: Lucida Grande, Arial, tahoma, verdana, sans-serif;
-        color: #2B587A;
+        color: #777;
+
+        &.author {
+            cursor: pointer;
+            color: #2B587A;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
 
     .bottom {

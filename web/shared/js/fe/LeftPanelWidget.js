@@ -1,4 +1,7 @@
 var LeftPanelWidget = Event.extend({
+    filterAuthorId: null,
+    wallPage: -1,
+
     init: function() {
         this.$leftPanel = $('#left-panel');
         this.$multiSelect = $('#source-select');
@@ -12,6 +15,7 @@ var LeftPanelWidget = Event.extend({
         this.initWallAutoload();
         this.initLeftPanelTabs();
         this.initModeration();
+        this.initUserFilter();
     },
 
     initLeftPanel: function() {
@@ -199,6 +203,7 @@ var LeftPanelWidget = Event.extend({
     },
 
     initWall: function() {
+        var t = this;
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
 
@@ -262,10 +267,10 @@ var LeftPanelWidget = Event.extend({
             } else {
                 $target.data('def-html', $target.html());
 
-                wallPage = 0;
+                t.wallPage = 0;
                 Elements.getWallLoader().show();
                 Control.fire('get_articles', {
-                    page: wallPage,
+                    page: t.wallPage,
                     sortType: Elements.getSortType(),
                     type: Elements.leftType(),
                     targetFeedId: Elements.rightdd(),
@@ -393,20 +398,23 @@ var LeftPanelWidget = Event.extend({
     },
 
     loadArticles: function(clean) {
+        var t = this;
+
         if (articlesLoading) {
             return;
         }
-        if (clean){
-            wallPage = -1;
+        if (clean) {
+            t.filterAuthorId = null;
+            t.wallPage = -1;
             $(window).data('disable-load-more', false);
         }
 
-        var t = this;
         var sourceType = Elements.leftType();
         var targetFeedId = Elements.rightdd();
         var sourceFeedIds = Elements.leftdd();
         var switcherType = Elements.getSwitcherType();
-        wallPage++;
+        var filterAuthorId = t.filterAuthorId;
+        t.wallPage++;
         articlesLoading = true;
 
         Elements.getWallLoader().show();
@@ -414,7 +422,7 @@ var LeftPanelWidget = Event.extend({
         var requestData = {
             sortType: Elements.getSortType(),
             sourceFeedIds: sourceFeedIds,
-            page: wallPage,
+            page: t.wallPage,
             type: sourceType,
             targetFeedId: targetFeedId
         };
@@ -452,9 +460,14 @@ var LeftPanelWidget = Event.extend({
             requestData.from = 0;
             requestData.to = 100;
         } else {
-            var $slider = $("#slider-range");
-            requestData.from = $slider.slider("values", 0);
-            requestData.to = $slider.slider("values", 1);
+            var $slider = $('#slider-range');
+            requestData.from = $slider.slider('values', 0);
+            requestData.to = $slider.slider('values', 1);
+        }
+
+        if (filterAuthorId) {
+            requestData.mode = 'posted';
+            requestData.authorId = filterAuthorId;
         }
 
         if (!clean) {
@@ -464,7 +477,7 @@ var LeftPanelWidget = Event.extend({
         //clean and load left column
         $.ajax({
             url: controlsRoot + 'articles-list/',
-            dataType: "html",
+            dataType: 'html',
             data: requestData
         }).always(function() {
             Elements.getWallLoader().hide();
@@ -1135,8 +1148,6 @@ var LeftPanelWidget = Event.extend({
             var $tab = $(this);
             $leftPanel.find('.authors-tabs .tab').removeClass('selected');
             $tab.addClass('selected');
-
-            wallPage = 0;
             t.loadArticles(true);
         });
 
@@ -1368,12 +1379,35 @@ var LeftPanelWidget = Event.extend({
 
         $leftPanel.delegate('.moderation .button.reject', 'click', function() {
             var $post = $(this).closest('.post');
-            var postId = $post.data('id');
             var $newComment = $post.find('.new-comment');
             var $moderation = $post.find('.moderation');
             $moderation.hide();
             $newComment.show();
             $newComment.find('textarea').focus();
         });
+    },
+
+    /**
+     * Инициализация фильтра ленты по пользователю
+     * @task 13477 Лента пользователя
+     */
+    initUserFilter: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+        $leftPanel.delegate('.name', 'click', function() {
+            var userId = $(this).data('author-id');
+            t.userFilter(userId);
+        });
+    },
+
+    /**
+     * Фильтрация ленты по пользователю
+     * @task 13477 Лента пользователя
+     */
+    userFilter: function(userId) {
+        var t = this;
+        t.filterAuthorId = userId;
+        t.$leftPanel.find('.header .tab.selected').removeClass('selected');
+        t.loadArticles(true);
     }
 });

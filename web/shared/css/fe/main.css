@@ -188,7 +188,7 @@ i{font-style:italic;}
 .post.deleted-post{color:#767875;text-align:center;}.post.deleted-post .button{margin-top:7px;}
 .post .userpic{float:left;width:30px;height:30px;overflow:hidden;}.post .userpic img{width:30px;}
 .post .likes-count{color:#45688E;font-weight:bold;}
-.post .name{padding-bottom:5px;font-weight:bold;font-size:12px;font-family:Lucida Grande,Arial,tahoma,verdana,sans-serif;color:#2B587A;}
+.post .name{padding-bottom:5px;font-weight:bold;font-size:12px;font-family:Lucida Grande,Arial,tahoma,verdana,sans-serif;color:#777;}.post .name.author{cursor:pointer;color:#2B587A;}.post .name.author:hover{text-decoration:underline;}
 .post .bottom{overflow:hidden;font-size:11px;color:#888;margin-top:5px;}.post .bottom .original{color:#999;}
 .post .bottom .original a{opacity:0.5;}
 .post .bottom .original a:hover{opacity:.99;}

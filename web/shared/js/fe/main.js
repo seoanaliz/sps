@@ -1,5 +1,4 @@
 var articlesLoading = false;
-var wallPage = -1;
 var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 var easydateParams = {
     date_parse: function(date) {

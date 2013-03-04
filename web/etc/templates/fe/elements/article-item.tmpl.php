@@ -49,7 +49,7 @@ if (!empty($article)) {
         <div class="l d-hide">
             <div class="userpic"><img src="{$author->avatar}" alt="" /></div>
         </div>
-        <div class="name d-hide">{$author->FullName()}</div>
+        <div class="name author d-hide">{$author->FullName()}</div>
     <? } ?>
     <div class="content">
         {increal:tmpl://fe/elements/article-item-content.tmpl.php}
