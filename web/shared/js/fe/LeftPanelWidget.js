@@ -794,7 +794,7 @@ var LeftPanelWidget = Event.extend({
                     stop();
                     $form.removeClass('spinner');
                     $input.blur();
-                    t.reloadArticle();
+                    t.loadArticles(true);
                 });
             }
         });
