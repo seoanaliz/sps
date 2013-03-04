@@ -1,6 +1,7 @@
 var LeftPanelWidget = Event.extend({
     filterAuthorId: null,
     wallPage: -1,
+    wallAutohideEnabled: false,
 
     init: function() {
         this.$leftPanel = $('#left-panel');
@@ -16,7 +17,9 @@ var LeftPanelWidget = Event.extend({
         this.initLeftPanelTabs();
         this.initModeration();
         this.initUserFilter();
-        this.initWallAutohide();
+        if (this.wallAutohideEnabled) {
+            this.initWallAutohide();
+        }
     },
 
     initLeftPanel: function() {
@@ -481,6 +484,11 @@ var LeftPanelWidget = Event.extend({
             requestData.articlesOnly = 1;
         }
 
+        if (t.wallPage > 3) {
+            t.wallAutohideEnabled = true;
+            t.initWallAutohide();
+        }
+
         //clean and load left column
         $.ajax({
             url: controlsRoot + 'articles-list/',
@@ -506,7 +514,10 @@ var LeftPanelWidget = Event.extend({
                 if (!$block.find('.post').length) {
                     $(window).data('disable-load-more', true);
                 }
-                t.wallPostsPositionsTop = t.getWallPostsPositionsTop();
+                if (t.wallAutohideEnabled) {
+                    t.wallPostsPositionsTop = t.getWallPostsPositionsTop();
+                    $(window).scroll();
+                }
             }
             articlesLoading = false;
         });
@@ -1129,9 +1140,17 @@ var LeftPanelWidget = Event.extend({
     // Скрытие постов, которые сейчас не видны в ленте
     initWallAutohide: function() {
         var t = this;
-        var $window = $(window);
 
-        $window.scroll(function() {
+        if (t.wallAutohideInited) {
+            return;
+        }
+        t.wallAutohideInited = true;
+
+        var $window = $(window);
+        $window.scroll(onScroll);
+        t.$wall.addClass('autohide-enabled');
+
+        function onScroll() {
             clearTimeout(t.wallScrollTimeoutAutohide);
             t.wallScrollTimeoutAutohide = setTimeout(function() {
                 var wallPostsPositionsTop = t.wallPostsPositionsTop || t.getWallPostsPositionsTop();
@@ -1144,7 +1163,7 @@ var LeftPanelWidget = Event.extend({
                     i = +i;
                     var positionTop = wallPostsPositionsTop[i];
                     var positionTopNext = wallPostsPositionsTop[i + 1];
-                    if (positionTopNext && positionTopNext.top >= scrollTop && positionTop.top <= scrollTop + $window.height()) {
+                    if ((positionTopNext ? positionTopNext.top >= scrollTop : true) && positionTop.top <= scrollTop + $window.height()) {
                         focusedElements.push({id: positionTop.id, top: positionTop.top});
                     }
                 }
@@ -1156,8 +1175,8 @@ var LeftPanelWidget = Event.extend({
                     }
                     t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
                 }
-            }, 200);
-        });
+            }, 500);
+        }
     },
 
     getWallPostsPositionsTop: function() {

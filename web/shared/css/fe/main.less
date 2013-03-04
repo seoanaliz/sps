@@ -1581,13 +1581,20 @@ i {font-style: italic;}
             }
         }
     }
+}
 
-    * {
-        visibility: hidden;
-    }
-    &.show-images {
+.autohide-enabled {
+    .post {
         * {
-            visibility: visible;
+            visibility: hidden;
+            .opacity(0);
+            .transition(0.2s opacity);
+        }
+        &.show-images {
+            *:not(.delete) {
+                visibility: visible;
+                .opacity(1);
+            }
         }
     }
 }
