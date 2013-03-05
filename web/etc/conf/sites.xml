@@ -87,6 +87,7 @@
             <host name="beta">
                 <hostname>beta.socialboard.ru</hostname>
                 <hostname>im.beta.socialboard.ru</hostname>
+                <hostname>web470.verumnets.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
