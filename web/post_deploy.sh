@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/sh
 echo "[PERM] Changing Directory Permissions"
 echo -e "\t $1 to 644, dirs to 755"
 chmod -f -R 664 $1
