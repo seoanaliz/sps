@@ -1,5 +1,3 @@
-var articlesLoading = false;
-
 Control = $.extend(Control, {
     root: controlsRoot,
     dataType: 'html',
@@ -43,230 +41,6 @@ Control = $.extend(Control, {
         }
     }
 });
-
-function initSlider(targetFeedId, sourceType) {
-    var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
-    var from = sourceType == 'albums' ? 0 : 50;
-    var to = 100;
-    if (cookie) {
-        var ranges = cookie.split(':');
-        if (ranges.length == 2) {
-            from = parseInt(ranges[0]);
-            to = parseInt(ranges[1]);
-
-            if (from < 0 || from > 100) {
-                from = 50;
-            }
-            if (to < 0 || to > 100) {
-                to = 100;
-            }
-        }
-    }
-    var sliderRange = $("#slider-range");
-    sliderRange.data('sourceType', sourceType);
-
-    if (!sliderRange.data('slider')) {
-        sliderRange.slider({
-            range: true,
-            min: 0,
-            max: 100,
-            animate: 100,
-            values: [from, to],
-            create: function(event, ui) {
-                changeRange();
-            },
-            slide: function(event, ui) {
-                changeRange();
-            },
-            change: function(event, ui) {
-                changeRange();
-                loadArticles(true);
-            }
-        });
-    } else {
-        sliderRange.slider("values", 0, from);
-        sliderRange.slider("values", 1, to);
-    }
-}
-
-function changeRange() {
-    var sliderRange = $("#slider-range");
-    var top = sliderRange.slider("values", 1);
-    sliderRange.find('a:first').html(sliderRange.slider("values", 0));
-    sliderRange.find('a:last').html(top == 100 ? 'TOP' : top);
-
-    var targetFeedId = Elements.rightdd();
-    if (targetFeedId) {
-        $.cookie(sliderRange.data('sourceType') + 'FeedRange' + targetFeedId, sliderRange.slider("values", 0) + ':' + sliderRange.slider("values", 1), { expires: 7, path: '/', secure: false });
-    }
-}
-
-var wallPage = -1;
-
-function loadArticles(clean) {
-    if (articlesLoading) {
-        return;
-    }
-    if (clean){
-        wallPage = -1;
-        $(window).data('disable-load-more', false);
-    }
-
-    var sourceType = Elements.leftType();
-    console.log(sourceType);
-    var targetFeedId = Elements.rightdd();
-    var sourceFeedIds = Elements.leftdd();
-    var switcherType = Elements.getSwitcherType();
-    wallPage++;
-    articlesLoading = true;
-
-    Elements.getWallLoader().show();
-
-    var requestData = {
-        sortType: Elements.getSortType(),
-        sourceFeedIds: sourceFeedIds,
-        page: wallPage,
-        type: sourceType,
-        targetFeedId: targetFeedId
-    };
-
-    if (sourceType == 'authors' || sourceType == 'albums') {
-        $('.newpost').show();
-
-        requestData.userGroupId = Elements.getUserGroupId();
-        switch (switcherType) {
-            case 'approved':
-                requestData.articleStatus = 2;
-                break;
-            case 'deferred':
-                requestData.articleStatus = 1;
-                break;
-            case 'all':
-                requestData.mode = 'all';
-                break;
-            case 'my':
-                requestData.mode = 'my';
-                break;
-            default:
-                requestData.articleStatus = 1;
-        }
-    } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
-        $('.newpost').show();
-    } else {
-        $('.newpost').hide();
-    }
-
-    if (sourceType == 'my') {
-        requestData.articleStatus = Elements.getArticleStatus();
-        requestData.mode = 'my';
-    } else if (sourceType == 'ads') {
-        requestData.from = 0;
-        requestData.to = 100;
-    } else {
-        var $slider = $("#slider-range");
-        requestData.from = $slider.slider("values", 0);
-        requestData.to = $slider.slider("values", 1);
-    }
-
-    if (!clean) {
-        requestData.articlesOnly = 1;
-    }
-
-    //clean and load left column
-    $.ajax({
-        url: controlsRoot + 'articles-list/',
-        dataType: "html",
-        data: requestData
-    }).always(function() {
-        Elements.getWallLoader().hide();
-        if (clean) {
-            $('#wall').empty();
-        }
-    }).done(function(data) {
-        if (!data) {
-            $(window).data('disable-load-more', true);
-            $('.wall-title span.count').text('нет записей');
-        } else {
-            var tmpEl = document.createElement('div');
-            var $block = $(tmpEl).html(data);
-            $('#wall').append($block);
-            Elements.initDraggable($block);
-            Elements.initDroppable($('#right-panel'));
-            Elements.initImages($block);
-            Elements.initLinks($block);
-            if (!$block.find('.post').length) {
-                $(window).data('disable-load-more', true);
-            }
-        }
-        articlesLoading = false;
-    });
-}
-
-function loadQueue() {
-    var targetFeedId = Elements.rightdd();
-    if (!targetFeedId) {
-        return;
-    }
-
-    $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
-
-    var type = Elements.rightType();
-
-    if (type == 'all') {
-        $('.queue-footer').hide();
-    } else {
-        $('.queue-footer').show();
-    }
-
-    //clean and load right column
-    $.ajax({
-        url: controlsRoot + 'articles-queue-list/',
-        dataType: "html",
-        data: {
-            targetFeedId: Elements.rightdd(),
-            timestamp: Elements.calendar(),
-            type: type
-        }
-    }).success(function (data) {
-        if (data) {
-            var tmpEl = document.createElement('div');
-            var $block = $(tmpEl).html(data);
-            $('#queue').show().html($block);
-            Elements.initDraggable($block);
-            Elements.initDroppable($('#right-panel'));
-            Elements.initImages($block);
-            Elements.initLinks($block);
-            $block.find('.post.blocked').draggable('disable');
-        } else {
-            $('#queue').empty();
-        }
-        renderQueueSize();
-    });
-}
-
-function renderQueueSize() {
-    var size = $('#queue .post').length;
-    $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
-}
-
-function reloadArticle(id) {
-    $.ajax({
-        url: controlsRoot + 'article-item/',
-        dataType: "html",
-        data: {
-            id: id,
-            targetFeedId: Elements.rightdd()
-        },
-        success: function(data) {
-            var $elem = $('.post[data-id=' + id + ']');
-            var $newElem = $(data);
-            $elem.replaceWith($newElem);
-            Elements.initDraggable($newElem);
-            Elements.initImages($newElem);
-            Elements.initLinks($newElem);
-        }
-    });
-}
 
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
@@ -331,7 +105,7 @@ var Eventlist = {
                 id: post_id
             },
             success: function(data) {
-                loadQueue();
+                app.loadQueue();
                 if (typeof callback == 'function') {
                     callback(true);
                 }
@@ -353,7 +127,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    loadQueue();
+                    app.loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -377,7 +151,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    loadQueue();
+                    app.loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -398,21 +172,14 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    loadQueue();
+                    app.loadQueue();
                 } else {
                     callback(false);
                 }
             }
         });
     },
-    leftcolumn_dropdown_change: function(){
-        var targetFeedId = Elements.rightdd();
-        var leftType = Elements.leftType();
-        if (leftType == 'source') {
-            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
-        }
-        loadArticles(true);
-    },
+    // TODO: перенести в RightPanelWidget.js
     rightcolumn_dropdown_change: function(){
         articlesLoading = true;
 
@@ -510,7 +277,7 @@ var Eventlist = {
             $.cookie('sourceTypes' + targetFeedId, sourceType);
 
             //init slider
-            initSlider(targetFeedId, sourceType);
+            app.initSlider(targetFeedId, sourceType);
 
             $('#source-select option').remove();
 
@@ -552,7 +319,7 @@ var Eventlist = {
                 addCellButton.hide();
             }
 
-            loadQueue();
+            app.loadQueue();
 
             //get data from cookie
             var cookie = $.cookie('sourceFeedIds' + targetFeedId);
@@ -572,20 +339,10 @@ var Eventlist = {
             }
 
             articlesLoading = false;
-            Events.fire('leftcolumn_dropdown_change');
+            app.onLeftPanelDropdownChange();
         });
     },
-    calendar_change: function(){
-        loadQueue();
-    },
-    rightcolumn_type_change: function(){
-        $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
-        loadQueue();
-    },
-    wall_load_more: function(callback){
-        loadArticles(false);
-        callback(true);
-    },
+
     post_moved: function(post_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
@@ -600,7 +357,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(1, data.id);
-                    loadQueue();
+                    app.loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -610,15 +367,6 @@ var Eventlist = {
             }
         });
     },
-
-    /* после выполнения запроса к сервису. Вызвать callback(state) state = {}|false */
-    leftcolumn_source_edited: function(val,id, callback){callback({value: val});},
-    leftcolumn_source_deleted: function(id, callback){callback(true)},
-    leftcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
-
-    rightcolumn_source_edited: function(val,id, callback){callback({value: val});},
-    rightcolumn_source_deleted: function(id, callback){callback(true)},
-    rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
 
     load_post_edit: function(id, callback){
         $.ajax({
@@ -673,23 +421,8 @@ var Eventlist = {
                 targetFeedId: Elements.rightdd(),
                 userGroupId: Elements.getUserGroupId()
             },
-            success: function (data) {
-                if(data.success) {
-                    if (id) {
-                        //перезагружаем тело поста
-                        reloadArticle(id);
-                    } else {
-                        //перезагружаем весь левый блок
-                        loadArticles(true);
-                    }
-
-                    callback(true);
-                } else {
-                    if (data.message) {
-                        popupError(Lang[data.message]);
-                    }
-                    callback(false);
-                }
+            success: function(data) {
+                callback(data);
             }
         });
     },
@@ -715,28 +448,8 @@ var Eventlist = {
         });
     },
 
-    add_article_group: function(targetFeedId, name, callback) {
-        $.ajax({
-            url: controlsRoot + 'add-user-group/',
-            type: 'POST',
-            dataType : "json",
-            data: {
-                name: name,
-                targetFeedId: targetFeedId
-            },
-            success: function (data) {
-                if(data.success) {
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            }
-        });
-    },
-
-
     leftcolumn_sort_type_change: function() {
-        loadArticles(true);
+        app.loadArticles(true);
     },
 
     comment_load: function(options, callback) {
@@ -789,34 +502,6 @@ var Eventlist = {
         });
     },
 
-    get_author_articles: function(articleStatus, callback) {
-        var slider = $( "#slider-range" );
-        var from = slider.slider( "values", 0 );
-        var to = slider.slider( "values", 1 );
-
-        Elements.getWallLoader().show();
-        var requestData =  {
-            sourceFeedIds: Elements.leftdd(),
-            page: wallPage,
-            from: from,
-            to: to,
-            sortType: Elements.getSortType(),
-            type: Elements.leftType(),
-            targetFeedId: Elements.rightdd()
-        };
-        if (typeof articleStatus != 'undefined'){
-            requestData['articleStatus'] = articleStatus;
-        }
-
-        $.ajax({
-            url: controlsRoot + 'articles-list/',
-            dataType : "html",
-            data: requestData
-        }).always(function() {
-            Elements.getWallLoader().hide();
-        }).done(callback);
-    },
-
     eof: null
 };
 
@@ -852,84 +537,3 @@ var Events = {
         }
     }
 };
-
-function popupSuccess( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#EBF0DA url('  + root +  'shared/images/vt/ui/icon_v.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}
-
-function popupError( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#FEDADA url('  + root +  'shared/images/vt/ui/icon_x.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}
-
-function popupNotice( message ) {
-    $.blockUI({
-        message: message,
-        fadeIn: 600,
-        fadeOut: 1000,
-        timeout: 2500,
-        showOverlay: false,
-        centerY: false,
-        css: {
-            width: 'auto',
-            'max-width': '200px',
-            top: '15px',
-            left: 'auto',
-            right: '15px',
-            border: 'none',
-            padding: '25px 30px 25px 60px',
-            'font-size': '13px',
-            'text-align': 'left',
-            color: '#333',
-            'background': '#FBFFBF url('  + root +  'shared/images/vt/ui/icon_i.png) no-repeat 25px 50%',
-            'border-radius': '5px',
-            opacity: 1,
-            'box-shadow': '0 0 6px #000'
-        }
-    });
-}

@@ -113,12 +113,29 @@ i {font-style: italic;}
     }
 }
 
-.attach-file .qq-upload-button {
-    float: right;
-    margin: 0;
-    background: none;
-    border: none;
-    color: #205F82;
+.qq-uploader {
+    .qq-upload-drop-area {
+        display: block;
+        background: #fff;
+        text-align: center;
+        color: #777;
+        font-weight: bold;
+        font-size: 24px;
+        min-height: 1em;
+        line-height: 1em;
+        .box-shadow(0 1px 3px rgba(0,0,0, 0.3));
+    }
+    .qq-upload-button {
+        float: right;
+        margin: 0;
+        background: none;
+        border: none;
+        color: #205F82;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 
 .calendar,
@@ -522,28 +539,7 @@ i {font-style: italic;}
             background: #fff;
             position: relative;
             border-bottom: 1px solid #ddd;
-            min-height: 105px;
-
-            &.new {
-                min-height: 0;
-                background-color: #E8EEF2;
-            }
-            &.ui-state-active {
-                background: #edf4f8;
-                border: none;
-                border-bottom: 1px solid #ddd
-            }
-            &.ui-state-hover {
-                background: #e9eff2;
-                .box-shadow(inset 0 2px 4px -2px rgba(0, 0, 0, 0.15));
-            }
-            &.new,
-            &:hover {
-                .time-of-removal,
-                .datepicker {
-                    opacity: 0.5;
-                }
-            }
+            min-height: 114px;
 
             .slot-header {
                 font-size: 11px;
@@ -619,6 +615,44 @@ i {font-style: italic;}
                 height: 12px;
                 min-width: 30px;
             }
+
+            &.new {
+                min-height: 0;
+                cursor: default !important;
+                background-color: #E8EEF2 !important;
+            }
+
+            &.ui-state-active {
+                background: #edf4f8;
+                border: none;
+                border-bottom: 1px solid #ddd
+            }
+
+            &.ui-state-hover {
+                background: #e9eff2;
+                .box-shadow(inset 0 2px 4px -2px rgba(0, 0, 0, 0.15));
+            }
+
+            &.new, &:hover {
+                .time-of-removal,
+                .datepicker {
+                    opacity: 0.5;
+                }
+            }
+
+            &.empty {
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f9f9f9;
+                }
+            }
+
+            &.edit {
+                .editing-post {
+                    display: block;
+                }
+            }
         }
     }
 
@@ -642,10 +676,33 @@ i {font-style: italic;}
         }
     }
 
+    .editing-post {
+        display: none;
+        padding: 30px 10px 10px;
+        background-color: #f9f9f9;
+
+        .textarea-wrap {
+            margin-right: 10px;
+
+            textarea {
+                width: 100%;
+                padding: 4px;
+            }
+        }
+
+        .actions {
+            padding-top: 7px;
+
+            .button + .button {
+                margin-left: 5px;
+            }
+        }
+    }
+
     .post {
         position: relative;
         line-height: 16px;
-        min-height: 70px;
+        min-height: 74px;
         padding-top: 30px;
 
         .content {
@@ -1334,19 +1391,21 @@ i {font-style: italic;}
     .actions {
         margin-top: 10px;
         position: relative;
-    }
-    .actions a {
-        margin-left: 10px;
-        line-height: 30px;
-        height: 30px;
-        cursor: pointer;
-    }
-    .actions .upload * {
-        background: none;
-        margin: 0;
-        padding: 0;
-        color: #205F82;
-        border: none;
+
+        .upload * {
+            background: none;
+            margin: 0;
+            padding: 0;
+            color: #205F82;
+            border: none;
+        }
+
+        a {
+            margin-left: 10px;
+            line-height: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
     }
     .link-description-text > a:hover,
     .link-description-text > p:hover,
@@ -1360,34 +1419,6 @@ i {font-style: italic;}
         padding: 0 2px;
         opacity: 1;
         cursor: text;
-    }
-    .delete-attach {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 10px;
-        height: 10px;
-        margin: 0;
-        background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
-        cursor: pointer;
-        border: 3px solid white;
-        .border-radius(2px);
-        .opacity(0.8);
-    }
-    .attachments {
-        margin-top: 5px;
-    }
-    .attachment {
-        position: relative;
-        display: inline-block;
-        margin: 7px 7px 0 0;
-
-        img {
-            border-radius: 3px;
-            width: 60px;
-            height: 60px;
-            .box-shadow(0 1px 1px rgba(0, 0, 0, .4));
-        }
     }
 
     &>.comments {
@@ -1532,6 +1563,36 @@ i {font-style: italic;}
                     margin-left: 7px;
                 }
             }
+        }
+    }
+}
+
+.attachments {
+    .attachment {
+        margin-top: 5px;
+        position: relative;
+        display: inline-block;
+        margin: 7px 7px 0 0;
+
+        img {
+            border-radius: 3px;
+            width: 60px;
+            height: 60px;
+            .box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+        }
+
+        .delete-attach {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            margin: 0;
+            background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
+            cursor: pointer;
+            border: 3px solid white;
+            .border-radius(2px);
+            .opacity(0.8);
         }
     }
 }

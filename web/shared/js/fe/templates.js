@@ -34,3 +34,11 @@ var linkTplShort = '<div class="link-status-content"><span>Ссылка: <a href
     '<?=user.name?>' +
 '</a>' +
 ' из списка авторов?';
+
+var QUEUE_SLOT_ADD =
+'<div class="new slot empty">' +
+    '<div class="slot-header">' +
+        '<span class="time">__:__</span>' +
+        '<span class="datepicker"></span>' +
+    '</div>' +
+'</div>';

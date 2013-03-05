@@ -53,9 +53,9 @@ abstract class SaveVkUserAction extends BaseSaveAction
         $Author->lastName = $Editor->lastName;
         $Author->statusId = $Editor->statusId;
         if ($exist){
-            AuthorFactory::Update($Editor);
+            AuthorFactory::Update($Author);
         } else {
-            AuthorFactory::Add($Editor);
+            AuthorFactory::Add($Author);
         }
     }
 

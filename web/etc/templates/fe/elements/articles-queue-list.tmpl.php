@@ -6,6 +6,9 @@
 foreach ($grid as $gridItem) {
     $id = $gridItem['dateTime']->format('U');
     $isEmptyItem = empty($gridItem['queue']);
+    if ($isEmptyItem && !$canEditQueue) {
+        continue;
+    }
     ?>
     <div class="slot
         <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : '' ?>
@@ -16,25 +19,34 @@ foreach ($grid as $gridItem) {
          data-start-date="<?= $gridItem['startDate']->format('d.m.Y') ?>"
          data-end-date="<?= $gridItem['endDate']->format('d.m.Y') ?>">
         <? if ($isEmptyItem) { ?>
-            <? if ($canEditQueue) { ?>
-                <div class="slot-header">
-                    <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
-                    <span class="datepicker"></span>
+            <div class="slot-header">
+                <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
+                <span class="datepicker"></span>
+            </div>
+            <div class="editing-post">
+                <div class="textarea-wrap">
+                    <textarea></textarea>
                 </div>
-            <? } ?>
+                <div class="attachments"></div>
+                <div class="actions">
+                    <div class="save button">Сохранить</div>
+                    <div class="cancel button">Отменить</div>
+                    <div class="upload r">Прикрепить</div>
+                </div>
+            </div>
         <? } else { ?>
             <?
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
             $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
-            $delete_at = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
+            $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
             <? if ($canEditQueue) { ?>
                 <div class="slot-header">
                     <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
                     <span class="datepicker"></span>
                     <span class="time-of-removal"></span>
-                    <span class="time-of-remove"><?= $delete_at ? $delete_at : '' ?></span>
+                    <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                     {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
                 </div>
             <? } ?>
@@ -53,10 +65,10 @@ foreach ($grid as $gridItem) {
 
             <?
             $author = array();
-            if (!empty($articleQueue->articleQueueCreator)) {
-                $author = $articleQueue->articleQueueCreator;
-            } elseif (!empty($articleQueue->articleAuthor)) {
+            if (!empty($articleQueue->articleAuthor)) {
                 $author = $articleQueue->articleAuthor;
+            } elseif (!empty($articleQueue->articleQueueCreator)) {
+                $author = $articleQueue->articleQueueCreator;
             } else {
                 $author = new Author();
                 $author->avatar = 'http://vk.com/images/camera_c.gif';

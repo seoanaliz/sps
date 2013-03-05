@@ -61,7 +61,7 @@ var RightPanelWidget = Event.extend({
             },
             oncreate: function() {
                 $(this).find('.default').removeClass('default');
-                Elements.rightdd($("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item.active').data('id'));
+                Elements.rightdd($('#right-drop-down').dropdown('getMenu').find('.ui-dropdown-menu-item.active').data('id'));
             }
         });
 
@@ -76,25 +76,8 @@ var RightPanelWidget = Event.extend({
             $rightPanel.find('.type-selector a').removeClass('active');
             $(this).addClass('active');
 
-            Events.fire('rightcolumn_type_change');
-        });
-
-        // Показать полностью в правом меню
-        $rightPanel.delegate('.toggle-text', 'click', function(e) {
-            $(this).parent().toggleClass('collapsed');
-        });
-
-        // Показать полностью в раскрытом правом меню
-        $rightPanel.delegate('.show-cut', 'click', function(e){
-            var $content = $(this).closest('.content'),
-            $shortcut = $content.find('.shortcut'),
-            shortcut = $shortcut.html(),
-            cut = $content.find('.cut').html();
-
-            $shortcut.html(shortcut + ' ' + cut);
-            $(this).remove();
-
-            e.preventDefault();
+            $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
+            t.loadQueue();
         });
     },
 
@@ -110,7 +93,7 @@ var RightPanelWidget = Event.extend({
             })
             .change(function(){
                 $(this).parent().find('.caption').toggleClass('default', !$(this).val().length);
-                Events.fire('calendar_change');
+                t.loadQueue();
             });
 
         $('.calendar .tip, #calendar-fix').click(function(){
