@@ -15,7 +15,6 @@ chmod -f -R 777 $1/shared/temp/
 
 echo -e "\t Production Version"
 rm $1cache/compiled.eaze
-rm $1cache/*
 rm $1/eaze.php
 mv $1/eaze.production.php $1/eaze.php
 
