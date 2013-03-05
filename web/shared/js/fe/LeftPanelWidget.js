@@ -14,7 +14,7 @@ var LeftPanelWidget = Event.extend({
         this.initWallFilter();
         this.initAddPost();
         this.initWallAutoload();
-        this.initLeftPanelTabs();
+        this.initTabs();
         this.initModeration();
         this.initUserFilter();
     },
@@ -469,7 +469,7 @@ var LeftPanelWidget = Event.extend({
             case 'topface':
             case 'albums':
             case 'source':
-                requestData.sourceFeedIds = Elements.leftdd();
+                    requestData.sourceFeedIds = Elements.leftdd();
                 break;
             default:
                 break;
@@ -484,23 +484,17 @@ var LeftPanelWidget = Event.extend({
             requestData.articlesOnly = 1;
         }
 
-        //clean and load left column
-        $.ajax({
-            url: controlsRoot + 'articles-list/',
-            dataType: 'html',
-            data: requestData
-        }).always(function() {
+        Control.fire('get_articles', requestData).success(function(html) {
             $wallLoader.hide();
             if (clean) {
                 t.$wall.empty();
             }
-        }).done(function(data) {
-            if (!data) {
+            if (!html) {
                 $(window).data('disable-load-more', true);
                 $('.wall-title span.count').text('нет записей');
             } else {
                 var tmpEl = document.createElement('div');
-                var $block = $(tmpEl).html(data);
+                var $block = $(tmpEl).html(html);
                 t.$wall.append($block);
                 Elements.initDraggable($block);
                 Elements.initDroppable($('#right-panel'));
@@ -1184,7 +1178,7 @@ var LeftPanelWidget = Event.extend({
         return positionsTop;
     },
 
-    initLeftPanelTabs: function() {
+    initTabs: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
 
@@ -1194,7 +1188,7 @@ var LeftPanelWidget = Event.extend({
                 return;
             }
 
-            $leftPanel.find(".type-selector .sourceType").removeClass('active');
+            $leftPanel.find('.type-selector .sourceType').removeClass('active');
             $(this).addClass('active');
 
             if ($(this).data('type') == 'authors-list') {
