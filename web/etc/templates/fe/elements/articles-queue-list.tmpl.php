@@ -26,7 +26,8 @@ foreach ($grid as $gridItem) {
             <?
             $articleQueueId = $gridItem['queue']->articleQueueId;
             $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
-            $delete_at = !empty($articlesQueue[$articleQueueId]->deleteAt) ? $articlesQueue[$articleQueueId]->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
+            $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
+            $delete_at = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
             ?>
             <? if ($canEditQueue) { ?>
                 <div class="slot-header">
@@ -49,8 +50,36 @@ foreach ($grid as $gridItem) {
                     <div class="delete"></div>
                 <? } ?>
             </div>
+
+            <?
+            $author = array();
+            if (!empty($articleQueue->articleQueueCreator)) {
+                $author = $articleQueue->articleQueueCreator;
+            } elseif (!empty($articleQueue->articleAuthor)) {
+                $author = $articleQueue->articleAuthor;
+            } else {
+                $author = new Author();
+                $author->avatar = 'http://vk.com/images/camera_c.gif';
+            }
+            ?>
             <div class="expanded-post">
+                <div class="photo">
+                    <? if ($author->vkId) { ?>
+                        <a target="_blank" href="http://vk.com/id{$author->vkId}">
+                            <img src="{$author->avatar}" alt="" />
+                        </a>
+                    <? } else { ?>
+                        <img src="{$author->avatar}" alt="" />
+                    <? } ?>
+                </div>
                 <div class="content">
+                    <? if ($author->vkId) { ?>
+                        <div class="name">
+                            <a target="_blank" href="http://vk.com/id{$author->vkId}">
+                                <b>{$author->FullName()}</b>
+                            </a>
+                        </div>
+                    <? } ?>
                     {increal:tmpl://fe/elements/article-item-content.tmpl.php}
                 </div>
             </div>

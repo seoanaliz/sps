@@ -28,7 +28,7 @@ $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
             $photoTitle = !empty($photoItem['title']) ? $photoItem['title'] : '';
             $photoTitle = nl2br($photoTitle);
             ?>
-            <a class="fancybox-thumb" rel="fancybox-thumb-{$article->articleId}" href="{$path}" title="{form:$photoTitle}">
+            <a class="fancybox-thumb" rel="fancybox-thumb-{$articleRecord->articleId}" href="{$path}" title="{form:$photoTitle}">
                 <div class="post-image <?= !empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) ? 'post-image-top' : '' ?>">
                     <img src="{$path}" alt="" />
                 </div>
