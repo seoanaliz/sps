@@ -148,30 +148,6 @@ class CheckWalls
         return true;
     }
 
-    public function get_population( $publics )
-    {
-        foreach( $publics as &$public ) {
-            $now =  time();
-            $id = $public[ 'target_id' ];
-
-            $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
-            if ( !$res[ 'visitors']) {
-                $now -= 22000;
-                $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
-            }
-
-            $public['start_visitors'] =  $res[ 'visitors' ];
-            sleep(0.3);
-
-            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0, 'barter' );
-            if( !isset( $res->error ))
-                $public[ 'start_subscribers' ] = $res->count;
-            sleep(0.3);
-        }
-
-        return $publics;
-    }
-
     //омг. задание автомониторов
     public function temp_barter_creater()
     {
@@ -432,7 +408,7 @@ class CheckWalls
             }
             $source_public_id = $matches[1];
             $source_post_id   = $matches[2];
-            $text = $feed_row->find('.wall_post_text' );
+            $text = $feed_row->find( '.wall_post_text' );
             $text = $text->getString();
             $text = $text[0];
             $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );

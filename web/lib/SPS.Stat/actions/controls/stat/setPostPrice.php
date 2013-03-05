@@ -20,7 +20,8 @@
 
         }
 
-        public function connect($link,$cookie=null,$post=null){
+        public function connect($link,$cookie=null,$post=null)
+        {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL,$link);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -41,8 +42,8 @@
 
         #стата - виджет
         private $samorost_publics_array = array(
-            43503725,
-            36959676
+
+             36959676
             ,35806721
             ,35807148
             ,36959733
@@ -93,37 +94,37 @@
             ,43503431
             ,43503315
         );
-#стата - виджет
+        #стата - виджет
         private $samorost = array(
             400,
-            350,
+            250,
             450,
-            550,
+            500,
             200,
             150,
-            550,
+            300,
             350,
-            700,
+            550,
             450,
             300,
             350,
             150,
-            200,
+            150,
             100,
             200,
+            150,
             200,
-            100,
             80,
-            550,
+            500,
             150,
             150,
-            350,
+            250,
             250,
             150,
             60,
             200,
             200,
-            100,
+            150,
             100,
             70,
             80,
@@ -134,19 +135,19 @@
             50,
             60,
             200,
-            60,
+            100,
             200,
+            100,
+            100,
+            100,
+            100,
+            70,
             50,
-            50,
-            50,
-            30,
-            30,
-            30,
-            20,
-            20,
-            20
+            40,
+            40,
+            40
        );
-#стата - виджет
+        #стата - виджет
         public function create_excel_list( $data_array, $from = 0, $to = 10000000000000)
         {
 
@@ -163,49 +164,63 @@
 
             $row = 2;
             $samorost = current( $this->samorost);
+
+            $total_views = 0;
+            $total_subs_coverage = 0;
+            $total_full_coverage = 0;
             foreach( $data_array as $public_id=>$public ) {
                 $t = 0;
                 $cell = $aSheet->getCellByColumnAndRow( $t++, $row );
                 $cell->setValue( $public_id);
                 $cell = $aSheet->getCellByColumnAndRow( $t, $row );
                 $cell->setValue( $samorost );
-
+                $total_vidget = 0;
+                $public_visitors = 0;
                 $public2  = array_reverse( $public, true );
                 foreach( $public2 as $time => $value ) {
-                    echo '<br>';
                     if( $time < $from )
                         continue;
                     if( $time > $to )
                         break;
-
+                    $public_visitors +=  $value['unique_visitors'];
+                    $total_vidget += $value['vidget_members'];
+                    $total_views  += $value['unique_visitors'];
+//                    $total_subs_coverage += $value['followers_coverage'];
+//                    $total_full_coverage += $value['full_coverage'];
                     $cell = $aSheet->getCellByColumnAndRow( ++$t, $row );
                     $cell->setValue( ( $value['members_growth'] - $value['vidget_members'] - $samorost ));
                 }
+//                echo '<br>' .  $total_subs_coverage . ' | ' . $public_id ;
+
                 $samorost = next( $this->samorost);
                 $row++;
             }
 
-            //отдаем пользователю в браузер
+//            echo '<br>';
+//            echo  'full coverage = ' . $total_full_coverage;
+//            echo  'subs coverage = ' . $total_subs_coverage;
+
+//отдаем пользователю в браузер
             include("C:/wrk/classes/PHPExcel/Writer/Excel5.php");
             $objWriter = new PHPExcel_Writer_Excel5($pExcel);
-//            header('Content-Type: application/vnd.ms-excel');
-//            header('Content-Disposition: attachment;filename="rate.xls"');
-//            header('Cache-Control: max-age=0');
+////            header('Content-Type: application/vnd.ms-excel');
+////            header('Content-Disposition: attachment;filename="rate.xls"');
+////            header('Cache-Control: max-age=0');
             file_put_contents('c:/wrk/1.xls', '');
             $objWriter->save('c:/wrk/1.xls');
 
         }
-#стата - виджет
+        #стата - виджет, entry point
         public function get_public_stats_wo_api()
         {
             $mail = "akalie@list.ru";
             $pass = "7n@tion@rmy";
 
-            $otvet=$this->connect("http://login.vk.com/?act=login&email=$mail&pass=$pass");
+            $otvet=VkHelper::connect("http://login.vk.com/?act=login&email=$mail&pass=$pass");
             if(!preg_match("/hash=([a-z0-9]{1,32})/",$otvet, $hash )) {
                 die("Login incorrect");
             }
-            $otvet=$this->connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
+            $otvet=VkHelper::connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
             preg_match( "/remixsid=(.*?);/", $otvet, $sid );
             $cookie = "remixchk=5; remixsid=$sid[1]";
 
@@ -214,8 +229,10 @@
 //            $ict = 0;
             foreach( $this->samorost_publics_array as $public_id ) {
                 $res[$public_id] = array();
-                $page = $this->connect( 'http://vk.com/stats?act=reach&gid=' . $public_id, $cookie );
+                $page = VkHelper::connect( 'http://vk.com/stats?gid=' . $public_id, $cookie );
+//                $page = VkHelper::connect( 'http://vk.com/stats?act=reach&gid=' . $public_id, $cookie );
                 file_put_contents( '1.txt', $page );
+
                 $page = file_get_contents('1.txt');
 
                 preg_match( '/Total members",(.*?\:\[\[.*?]])/', $page, $tot_members );
@@ -224,15 +241,13 @@
                 preg_match( '/{"name":"New members","l".*?,("d".*?]])/', $page, $vidget_members );
                 preg_match( '/unique visitors.*?,("d".*?]])/', $page, $unique_visitors );
                 preg_match( '/Pageviews.*?,("d".*?]])/', $page, $views );
-//                preg_match( '/Full coverage.*?,("d".*?]])/', $page, $full_coverage );
-//                preg_match( '/Followers coverage.*?,("d".*?]])/', $page, $followers_coverage );
+                preg_match( '/Full coverage.*?,("d".*?]])/', $page, $full_coverage );
+                preg_match( '/Followers coverage.*?,("d".*?]])/', $page, $followers_coverage );
 
 
                 preg_match( '/Pageviews.*?,("d".*?]])/', $page, $views );
 //                $full_coverage  = json_decode( '{' . $full_coverage[1] .  '}' )->d;
 //                $fct += $full_coverage[1][1];
-
-
 //                $followers_coverage  = json_decode( '{' . $followers_coverage[1] . '}' )->d;
 //                $ict += $followers_coverage[1][1];
 
@@ -242,48 +257,64 @@
                 $vidget_members  = json_decode( '{' . $vidget_members[1] .  '}' )->d;
                 $members_growth  = json_decode( '{' . $members_growth[1] .  '}' )->d;
                 $unique_visitors = json_decode( '{' . $unique_visitors[1] . '}' )->d;
+//                $full_coverage = json_decode( '{' . $full_coverage[1] . '}' )->d;
+//                $followers_coverage = json_decode( '{' . $followers_coverage[1] . '}' )->d;
 
-                $res[$public_id] = $this->key_maker( $tot_members, $vidget_members, $unique_visitors, $views, $members_growth );
+
+//                $res[$public_id] = $this->key_maker( 1 , 1, 1, 1, 1, $full_coverage, $followers_coverage );
+                $res[$public_id] = $this->key_maker( $tot_members , $vidget_members, $unique_visitors, $views, $members_growth   );
             }
 
-            $this->create_excel_list( $res, 1356998400, 1359676800  );
+            $this->create_excel_list( $res, 1359677096, 1362096649 );
         }
-#стата - виджет
-        public function key_maker( $total_members, $vidget_members, $unique_visitors, $views, $members_growth )
+        #стата - виджет
+        public function key_maker( $total_members, $vidget_members, $unique_visitors, $views, $members_growth, $full_coverage=array(), $followers_coverage = array())
         {
-            $count = count( $total_members );
+
+            $count = !empty( $full_coverage) ? count( $full_coverage)  : count( $total_members );
             $res = array();
             for( $i = 0; $i < $count; $i++ ) {
-                $date = $total_members[$i][0];
-                $res[$date]['views']            = isset( $views[$i][1] ) ? $views[$i][1] : 0;
-                $res[$date]['total_members']    = $total_members[$i][1];
-                $res[$date]['members_growth']   = $members_growth[$i][1] ;
-                $res[$date]['vidget_members']   = isset( $vidget_members[$i][1]  ) ? $vidget_members[$i][1]  : 0;
-                $res[$date]['unique_visitors']  = isset( $unique_visitors[$i][1] ) ? $unique_visitors[$i][1] : 0;
+                $date = !empty( $full_coverage) ?  $full_coverage[$i][0] : $total_members[$i][0];
+
+                if( !empty( $full_coverage )) {
+                    $res[$date]['full_coverage']       = isset( $full_coverage[$i][1] ) ? $full_coverage[$i][1] : 0;
+                    $res[$date]['followers_coverage']  = isset( $followers_coverage[$i][1] ) ? $followers_coverage[$i][1] : 0;
+                } else {
+                    $res[$date]['views']            = isset( $views[$i][1] ) ? $views[$i][1] : 0;
+                    $res[$date]['total_members']    = $total_members[$i][1];
+                    $res[$date]['members_growth']   = $members_growth[$i][1] ;
+                    $res[$date]['vidget_members']   = isset( $vidget_members[$i][1]  ) ? $vidget_members[$i][1]  : 0;
+                    $res[$date]['unique_visitors']  = isset( $unique_visitors[$i][1] ) ? $unique_visitors[$i][1] : 0;
+                }
+
             }
             return $res;
+
         }
 
         public function Execute()
         {
-            #AAAGaXJpoV1IBAPpnQZCxnmeC4qZC7Ng0BXQgEqPSt6YsO7HULFtV0UazDcSbmZB3T1FZAPlWs6YgjGVd7dLO8t3RKaDEekYVU5zNyZBdn09ao1NwPlYUd
-            #344521148954851
-            $fields_arr = array(
-                'album'         => '344521148954851',
-                'access_token'  => 'AAAGaXJpoV1IBAPpnQZCxnmeC4qZC7Ng0BXQgEqPSt6YsO7HULFtV0UazDcSbmZB3T1FZAPlWs6YgjGVd7dLO8t3RKaDEekYVU5zNyZBdn09ao1NwPlYUd',
-                'source'        => '@C:\wrk\2.jpg',
-                'message'       => 12,
-                'targeting'     => array(
-                    'countries' => array('RU'),
-                    'locales'   => 17
-                )
-            );
-
-
-            $a = new SenderFacebook( json_encode( $fields_arr));
-            $a->send_photo();
+            $this->get_public_stats_wo_api();
             die();
-//            $this->create_excel_list( $tot_members );
+
+//            print_r( StatPublics::get_our_publics_list());
+//
+//            die();
+//            $data = 'AGACGGTGCTTGGGAGGGAGTCTTGCTAGGGACGGTGGACGGACCTTGAAGGTTATGGCTAGATTGGTAGAGACAGGGTGATGGATTGGGATGGTTATACCTCGCTTCCCCAATCCACTTCTAAGAACCCAGGCGGCCCTTTTACGCGTAACGTAGATTCGTCTACCCACGAAATCGTTGGTAGCTATCTTTGGATTCGTTGTATACGGGAAAAGAGACTGAGACCCCCTCCTGTCTCACAGTCGCCTCGTTTGTCTCCGAGCGCTATCCAGCTATCGAAATCTGCGTTTGCGGGCAGTTTAAACGCTTACCATGCGCGCAATATAGGTAACAGCGCCTTTGTGACTTCATTAACTTAATGATGAACAATAACGACGTATCGTCGGTCCATCGAGCAAGAACTTGTGCACCTAGGTTCGACGTTGCCGAACTGCGGAGTATTAGATTGGAGCAGTATAGTCTACGTGGTTCACGTCTCCTCCCAGTCGACAGCGGGTATCAACATCGGTAAAACAGTACAGTGGTAACTTACCTAAAATTACTCCGACAATAACCGCCTAAGGCCACACAACTCTGGCTAATCATTATCAAGAACCCTAACATCCGGCCTTATTAAGGCTGAGCTGAGAGATGTGGACATTACTGGGTAATCCTTCCCTAGCTCCCGTTCGGCTGCGGTACTATCCTAGTTGTAAGGCCCGCCTTGACTTGCCACCAGGTTCTGCTGTAGTTTAGACCTTGGACATATTCGGAGCGCGTGAGGGCAGAATGTGATGCACGCTTTGAGGGCGACGCACCGAGTATACTCGGCAATTACAGCGTAGTTCGGATTTAGGACTGGAAGTCTTGGGTGGCACGGTGTTAAGACGGATAGACCACATATAGAGTTCGGTCGCCAGTGGCGC
+//';
+//            $length = strlen( $data );
+//            $res = array();
+//            for( $i = 0; $i < $length; $i++ ) {
+//                if( !isset( $res[$data[$i]]))
+//                     $res[$data[$i]] = 1;
+//                else
+//                    $res[$data[$i]]++;
+//            }
+//            foreach($res as $number)
+//                echo $number . ' ';
+//            print_r($res);
+//            die();
+           $this->get_public_stats_wo_api();
             die();
             $this->post_photo_array =   isset( $post_data['photo_array'] ) ? $post_data['photo_array'] : array();
             $this->post_text        =   $this->text_corrector( $post_data['text'] );

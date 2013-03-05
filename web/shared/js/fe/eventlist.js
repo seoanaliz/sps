@@ -1,3 +1,5 @@
+var articlesLoading = false;
+
 Control = $.extend(Control, {
     root: controlsRoot,
     dataType: 'html',
@@ -41,6 +43,230 @@ Control = $.extend(Control, {
         }
     }
 });
+
+function initSlider(targetFeedId, sourceType) {
+    var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
+    var from = sourceType == 'albums' ? 0 : 50;
+    var to = 100;
+    if (cookie) {
+        var ranges = cookie.split(':');
+        if (ranges.length == 2) {
+            from = parseInt(ranges[0]);
+            to = parseInt(ranges[1]);
+
+            if (from < 0 || from > 100) {
+                from = 50;
+            }
+            if (to < 0 || to > 100) {
+                to = 100;
+            }
+        }
+    }
+    var sliderRange = $("#slider-range");
+    sliderRange.data('sourceType', sourceType);
+
+    if (!sliderRange.data('slider')) {
+        sliderRange.slider({
+            range: true,
+            min: 0,
+            max: 100,
+            animate: 100,
+            values: [from, to],
+            create: function(event, ui) {
+                changeRange();
+            },
+            slide: function(event, ui) {
+                changeRange();
+            },
+            change: function(event, ui) {
+                changeRange();
+                loadArticles(true);
+            }
+        });
+    } else {
+        sliderRange.slider("values", 0, from);
+        sliderRange.slider("values", 1, to);
+    }
+}
+
+function changeRange() {
+    var sliderRange = $("#slider-range");
+    var top = sliderRange.slider("values", 1);
+    sliderRange.find('a:first').html(sliderRange.slider("values", 0));
+    sliderRange.find('a:last').html(top == 100 ? 'TOP' : top);
+
+    var targetFeedId = Elements.rightdd();
+    if (targetFeedId) {
+        $.cookie(sliderRange.data('sourceType') + 'FeedRange' + targetFeedId, sliderRange.slider("values", 0) + ':' + sliderRange.slider("values", 1), { expires: 7, path: '/', secure: false });
+    }
+}
+
+var wallPage = -1;
+
+function loadArticles(clean) {
+    if (articlesLoading) {
+        return;
+    }
+    if (clean){
+        wallPage = -1;
+        $(window).data('disable-load-more', false);
+    }
+
+    var sourceType = Elements.leftType();
+    console.log(sourceType);
+    var targetFeedId = Elements.rightdd();
+    var sourceFeedIds = Elements.leftdd();
+    var switcherType = Elements.getSwitcherType();
+    wallPage++;
+    articlesLoading = true;
+
+    Elements.getWallLoader().show();
+
+    var requestData = {
+        sortType: Elements.getSortType(),
+        sourceFeedIds: sourceFeedIds,
+        page: wallPage,
+        type: sourceType,
+        targetFeedId: targetFeedId
+    };
+
+    if (sourceType == 'authors' || sourceType == 'albums') {
+        $('.newpost').show();
+
+        requestData.userGroupId = Elements.getUserGroupId();
+        switch (switcherType) {
+            case 'approved':
+                requestData.articleStatus = 2;
+                break;
+            case 'deferred':
+                requestData.articleStatus = 1;
+                break;
+            case 'all':
+                requestData.mode = 'all';
+                break;
+            case 'my':
+                requestData.mode = 'my';
+                break;
+            default:
+                requestData.articleStatus = 1;
+        }
+    } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
+        $('.newpost').show();
+    } else {
+        $('.newpost').hide();
+    }
+
+    if (sourceType == 'my') {
+        requestData.articleStatus = Elements.getArticleStatus();
+        requestData.mode = 'my';
+    } else if (sourceType == 'ads') {
+        requestData.from = 0;
+        requestData.to = 100;
+    } else {
+        var $slider = $("#slider-range");
+        requestData.from = $slider.slider("values", 0);
+        requestData.to = $slider.slider("values", 1);
+    }
+
+    if (!clean) {
+        requestData.articlesOnly = 1;
+    }
+
+    //clean and load left column
+    $.ajax({
+        url: controlsRoot + 'articles-list/',
+        dataType: "html",
+        data: requestData
+    }).always(function() {
+        Elements.getWallLoader().hide();
+        if (clean) {
+            $('#wall').empty();
+        }
+    }).done(function(data) {
+        if (!data) {
+            $(window).data('disable-load-more', true);
+            $('.wall-title span.count').text('нет записей');
+        } else {
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            $('#wall').append($block);
+            Elements.initDraggable($block);
+            Elements.initDroppable($('#right-panel'));
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            if (!$block.find('.post').length) {
+                $(window).data('disable-load-more', true);
+            }
+        }
+        articlesLoading = false;
+    });
+}
+
+function loadQueue() {
+    var targetFeedId = Elements.rightdd();
+    if (!targetFeedId) {
+        return;
+    }
+
+    $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
+
+    var type = Elements.rightType();
+
+    if (type == 'all') {
+        $('.queue-footer').hide();
+    } else {
+        $('.queue-footer').show();
+    }
+
+    //clean and load right column
+    $.ajax({
+        url: controlsRoot + 'articles-queue-list/',
+        dataType: "html",
+        data: {
+            targetFeedId: Elements.rightdd(),
+            timestamp: Elements.calendar(),
+            type: type
+        }
+    }).success(function (data) {
+        if (data) {
+            var tmpEl = document.createElement('div');
+            var $block = $(tmpEl).html(data);
+            $('#queue').show().html($block);
+            Elements.initDraggable($block);
+            Elements.initDroppable($('#right-panel'));
+            Elements.initImages($block);
+            Elements.initLinks($block);
+            $block.find('.post.blocked').draggable('disable');
+        } else {
+            $('#queue').empty();
+        }
+        renderQueueSize();
+    });
+}
+
+function renderQueueSize() {
+    var size = $('#queue .post').length;
+    $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
+}
+
+function reloadArticle(id) {
+    $.ajax({
+        url: controlsRoot + 'article-item/',
+        dataType: "html",
+        data: {
+            id: id,
+            targetFeedId: Elements.rightdd()
+        },
+        success: function(data) {
+            var $elem = $('.post[data-id=' + id + ']');
+            var $newElem = $(data);
+            $elem.replaceWith($newElem);
+            Elements.initDraggable($newElem);
+            Elements.initImages($newElem);
+            Elements.initLinks($newElem);
+        }
+    });
+}
 
 var Eventlist = {
     leftcolumn_deletepost: function(post_id, callback){
@@ -105,7 +331,7 @@ var Eventlist = {
                 id: post_id
             },
             success: function(data) {
-                app.loadQueue();
+                loadQueue();
                 if (typeof callback == 'function') {
                     callback(true);
                 }
@@ -127,7 +353,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.loadQueue();
+                    loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -151,7 +377,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.loadQueue();
+                    loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -172,7 +398,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.loadQueue();
+                    loadQueue();
                 } else {
                     callback(false);
                 }
@@ -185,7 +411,7 @@ var Eventlist = {
         if (leftType == 'source') {
             $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
         }
-        app.loadArticles(true);
+        loadArticles(true);
     },
     rightcolumn_dropdown_change: function(){
         articlesLoading = true;
@@ -284,7 +510,7 @@ var Eventlist = {
             $.cookie('sourceTypes' + targetFeedId, sourceType);
 
             //init slider
-            app.initSlider(targetFeedId, sourceType);
+            initSlider(targetFeedId, sourceType);
 
             $('#source-select option').remove();
 
@@ -326,7 +552,7 @@ var Eventlist = {
                 addCellButton.hide();
             }
 
-            app.loadQueue();
+            loadQueue();
 
             //get data from cookie
             var cookie = $.cookie('sourceFeedIds' + targetFeedId);
@@ -350,14 +576,14 @@ var Eventlist = {
         });
     },
     calendar_change: function(){
-        app.loadQueue();
+        loadQueue();
     },
     rightcolumn_type_change: function(){
         $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
-        app.loadQueue();
+        loadQueue();
     },
     wall_load_more: function(callback){
-        app.loadArticles(false);
+        loadArticles(false);
         callback(true);
     },
     post_moved: function(post_id, slot_id, queueId, callback){
@@ -374,7 +600,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(1, data.id);
-                    app.loadQueue();
+                    loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -384,6 +610,15 @@ var Eventlist = {
             }
         });
     },
+
+    /* после выполнения запроса к сервису. Вызвать callback(state) state = {}|false */
+    leftcolumn_source_edited: function(val,id, callback){callback({value: val});},
+    leftcolumn_source_deleted: function(id, callback){callback(true)},
+    leftcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
+
+    rightcolumn_source_edited: function(val,id, callback){callback({value: val});},
+    rightcolumn_source_deleted: function(id, callback){callback(true)},
+    rightcolumn_source_added: function(val, callback){callback({value: val, id: parseInt(Math.random()*100)})},
 
     load_post_edit: function(id, callback){
         $.ajax({
@@ -442,10 +677,10 @@ var Eventlist = {
                 if(data.success) {
                     if (id) {
                         //перезагружаем тело поста
-                        app.reloadArticle(id);
+                        reloadArticle(id);
                     } else {
                         //перезагружаем весь левый блок
-                        app.loadArticles(true);
+                        loadArticles(true);
                     }
 
                     callback(true);
@@ -501,7 +736,7 @@ var Eventlist = {
 
 
     leftcolumn_sort_type_change: function() {
-        app.loadArticles(true);
+        loadArticles(true);
     },
 
     comment_load: function(options, callback) {
