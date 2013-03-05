@@ -17,9 +17,6 @@ var LeftPanelWidget = Event.extend({
         this.initLeftPanelTabs();
         this.initModeration();
         this.initUserFilter();
-        if (this.wallAutohideEnabled) {
-            this.initWallAutohide();
-        }
     },
 
     initLeftPanel: function() {
@@ -92,14 +89,6 @@ var LeftPanelWidget = Event.extend({
                     $button.removeClass('load');
                     $textarea.val('').focus();
                     $commentsList.append(html).find('.date').easydate(easydateParams);
-
-                    var $moderation = $newComment.next('.moderation');
-                    if ($moderation.length && !$moderation.data('checked')) {
-                        $moderation.data('checked', true);
-                        Events.fire('leftcolumn_reject_post', postId, function() {
-                            $post.slideUp(200);
-                        });
-                    }
                 });
             }
         });
@@ -132,22 +121,19 @@ var LeftPanelWidget = Event.extend({
 
         $(document).on('mousedown', function(e) {
             var $newComment = $(e.target).closest('.new-comment.open');
-            if (!$newComment.length) {
-                $('.new-comment.open').each(function() {
-                    var $newComment = $(this);
-                    var $textarea = $newComment.find('textarea');
-                    if (!$textarea.val()) {
-                        $newComment.removeClass('open');
-                        $textarea.height('auto');
-
-                        var $moderation = $newComment.next('.moderation');
-                        if ($moderation.length && !$moderation.data('checked')) {
-                            $newComment.hide();
-                            $moderation.show();
-                        }
-                    }
-                });
+            if ($newComment.length) {
+                return;
             }
+
+            $('.new-comment.open').each(function() {
+                var $newComment = $(this);
+                var $textarea = $newComment.find('textarea');
+                if (!$textarea.val()) {
+                    $newComment.removeClass('open');
+                    $textarea.height('auto');
+                    $newComment.trigger('close');
+                }
+            });
         });
 
         // Показать полностью в левом меню
@@ -484,11 +470,6 @@ var LeftPanelWidget = Event.extend({
             requestData.articlesOnly = 1;
         }
 
-        if (t.wallPage > 3) {
-            t.wallAutohideEnabled = true;
-            t.initWallAutohide();
-        }
-
         //clean and load left column
         $.ajax({
             url: controlsRoot + 'articles-list/',
@@ -513,10 +494,6 @@ var LeftPanelWidget = Event.extend({
                 Elements.initLinks($block);
                 if (!$block.find('.post').length) {
                     $(window).data('disable-load-more', true);
-                }
-                if (t.wallAutohideEnabled) {
-                    t.wallPostsPositionsTop = t.getWallPostsPositionsTop();
-                    $(window).scroll();
                 }
             }
             articlesLoading = false;
@@ -1145,6 +1122,7 @@ var LeftPanelWidget = Event.extend({
             return;
         }
         t.wallAutohideInited = true;
+        t.wallPostsPositionsTop = null;
 
         var $window = $(window);
         $window.scroll(onScroll);
@@ -1446,6 +1424,7 @@ var LeftPanelWidget = Event.extend({
     initModeration: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
+
         $leftPanel.delegate('.moderation .button.approve', 'click', function() {
             var $post = $(this).closest('.post');
             var postId = $post.data('id');
@@ -1457,10 +1436,40 @@ var LeftPanelWidget = Event.extend({
         $leftPanel.delegate('.moderation .button.reject', 'click', function() {
             var $post = $(this).closest('.post');
             var $newComment = $post.find('.new-comment');
+            if (!$newComment.length) {
+                var postId = $post.data('id');
+                Events.fire('leftcolumn_reject_post', postId, function() {
+                    $post.slideUp(200);
+                });
+            } else {
+                var $moderation = $post.find('.moderation');
+                $moderation.hide();
+                $newComment.show();
+                $newComment.find('.button.send').text('Отклонить');
+                $newComment.find('textarea').focus();
+            }
+        });
+
+        $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
+            var $post = $(this).closest('.post');
             var $moderation = $post.find('.moderation');
-            $moderation.hide();
-            $newComment.show();
-            $newComment.find('textarea').focus();
+            var postId = $post.data('id');
+            if ($moderation.length && !$moderation.data('checked')) {
+                $moderation.data('checked', true);
+                Events.fire('leftcolumn_reject_post', postId, function() {
+                    $post.slideUp(200);
+                });
+            }
+        });
+
+        $leftPanel.delegate('.new-comment', 'close', function() {
+            var $newComment = $(this);
+            var $post = $newComment.closest('.post');
+            var $moderation = $post.find('.moderation');
+            if ($moderation.length && !$moderation.data('checked')) {
+                $moderation.show();
+                $newComment.hide();
+            }
         });
     },
 

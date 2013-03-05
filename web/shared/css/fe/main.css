@@ -204,7 +204,7 @@ i{font-style:italic;}
 .post>.comments>.new-comment.open>.photo{position:absolute;width:32px;height:32px;}.post>.comments>.new-comment.open>.photo img{max-width:100%;}
 .post>.comments>.new-comment.open>.actions{margin-top:6px;margin-left:38px;}.post>.comments>.new-comment.open>.actions>.text{color:gray;margin-left:5px;}
 .post>.comments>.new-comment.open>.textarea-wrap{margin-left:38px;}.post>.comments>.new-comment.open>.textarea-wrap textarea{height:20px;}
-.post>.comments>.moderation>.actions{padding:7px;background-color:#f1f1f1;}.post>.comments>.moderation>.actions .button+.button{margin-left:7px;}
+.post>.moderation{margin-left:40px;}.post>.moderation>.actions{padding:7px;background-color:#f1f1f1;}.post>.moderation>.actions .button+.button{margin-left:7px;}
 .post:hover{background-color:#fff;}.post:hover .post-image,.post:hover .img{outline-color:#fff !important;}
 .post:hover .image-compositing:after{background-color:#fff;}
 .post:hover .delete{opacity:0.3;}

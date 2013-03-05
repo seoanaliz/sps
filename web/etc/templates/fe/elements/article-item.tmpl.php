@@ -111,37 +111,37 @@ if (!empty($article)) {
             <? } ?>
         </div>
     </div>
-    <? if ($canEditPost): ?>
+    <? if ($canEditPost) { ?>
         <div class="delete spr"></div>
-    <? endif; ?>
+    <? } ?>
     <div class="clear"></div>
 
     <? if (!empty($article->authorId)) { ?>
-    <div class="comments">
-        <div class="list">
-            {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
-        </div>
-        <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
-            <div class="photo">
-                <img src="{$__Editor->avatar}" alt="" />
+        <div class="comments">
+            <div class="list">
+                {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
             </div>
-            <div class="textarea-wrap">
-                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
-            </div>
-            <div class="actions">
-                <button class="button send">Отправить</button>
-                <span class="text">Ctrl+Enter</span>
-            </div>
-        </div>
-        <? if ($showApproveBlock): ?>
-        <div class="moderation">
-            <div class="actions">
-                <button class="button approve">Одобрить</button>
-                <button class="button white reject">Отклонить</button>
+            <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
+                <div class="photo">
+                    <img src="{$__Editor->avatar}" alt="" />
+                </div>
+                <div class="textarea-wrap">
+                    <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+                </div>
+                <div class="actions">
+                    <button class="button send">Отправить</button>
+                    <span class="text">Ctrl+Enter</span>
+                </div>
             </div>
         </div>
-        <? endif; ?>
-    </div>
+        <? if ($showApproveBlock) { ?>
+            <div class="moderation">
+                <div class="actions">
+                    <button class="button approve">Одобрить</button>
+                    <button class="button white reject">Отклонить</button>
+                </div>
+            </div>
+        <? } ?>
     <? } ?>
     <div class="clear"></div>
 </div>
