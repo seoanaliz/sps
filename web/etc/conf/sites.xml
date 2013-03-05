@@ -87,6 +87,7 @@
             <host name="beta">
                 <hostname>beta.socialboard.ru</hostname>
                 <hostname>im.beta.socialboard.ru</hostname>
+                <hostname>web470.verumnets.ru</hostname>
                 <settings>
                     <modules>
                         <vkapi class="AuthVkontakte">
@@ -116,12 +117,14 @@
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
+                            <port>54320</port>
                         </database>
                         <database driver="PgSql" name="tst">
                             <name>tst-beta</name>
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
+                            <port>54320</port>
                         </database>
                     </databases>
                 </settings>
