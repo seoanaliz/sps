@@ -172,24 +172,38 @@ var LeftPanelWidget = Event.extend({
                 + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
             },
             checkAll: function(){
-                t.onDropdownChange();
+                t.updateMultiSelect();
             },
             uncheckAll: function(){
-                t.onDropdownChange();
+                t.updateMultiSelect();
             }
         });
-        $multiSelect.bind("multiselectclick", function(event, ui){
-            t.onDropdownChange();
+        $multiSelect.bind('multiselectclick', function(event, ui) {
+            t.updateMultiSelect();
         });
     },
 
-    onDropdownChange: function() {
+    updateMultiSelect: function() {
         var targetFeedId = Elements.rightdd();
         var leftType = Elements.leftType();
         if (leftType == 'source') {
             $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
         }
         this.loadArticles(true);
+    },
+
+    setMultiSelectData: function(sourceFeeds) {
+        var t = this;
+        var $multiSelect = t.$multiSelect;
+        $multiSelect.find('option').remove();
+        for (var i in sourceFeeds) {
+            var item = sourceFeeds[i];
+            $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
+        }
+        $multiSelect.multiselect('refresh');
+        if (Elements.leftdd().length == 0) {
+            $multiSelect.multiselect('checkAll').multiselect('refresh');
+        }
     },
 
     initWall: function() {
@@ -288,7 +302,7 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $leftPanel = t.$leftPanel;
         $leftPanel.find('.drop-down').change(function() {
-            t.onDropdownChange();
+            t.updateMultiSelect();
         });
 
         $('.wall-title .filter a').dropdown({
@@ -310,7 +324,7 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
-    initSlider: function(targetFeedId, sourceType) {
+    updateSlider: function(targetFeedId, sourceType) {
         var t = this;
         var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
         var from = sourceType == 'albums' ? 0 : 50;

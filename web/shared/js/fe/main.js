@@ -170,8 +170,8 @@ var App = Event.extend({
         return this.rightPanelWidget || (this.rightPanelWidget = new RightPanelWidget());
     },
 
-    initSlider: function(targetFeedId, sourceType) {
-        this.getLeftPanelWidget().initSlider(targetFeedId, sourceType);
+    updateSlider: function(targetFeedId, sourceType) {
+        this.getLeftPanelWidget().updateSlider(targetFeedId, sourceType);
     },
 
     changeSliderRange: function() {
@@ -186,8 +186,16 @@ var App = Event.extend({
         this.getLeftPanelWidget().loadArticles(clean);
     },
 
-    onLeftPanelDropdownChange: function() {
-        this.getLeftPanelWidget().onDropdownChange();
+    updateMultiSelect: function() {
+        this.getLeftPanelWidget().updateMultiSelect();
+    },
+
+    setMultiSelectData: function(sourceFeeds) {
+        this.getLeftPanelWidget().setMultiSelectData(sourceFeeds);
+    },
+
+    onRightPanelDropdownChange: function(data) {
+        this.getRightPanelWidget().dropdownChange(data);
     },
 
     loadQueue: function() {

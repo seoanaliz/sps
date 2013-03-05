@@ -158,8 +158,10 @@ var QueueWidget = Event.extend({
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
-                    if (state) {}
+                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
+                    if (state) {
+                        t.loadQueue();
+                    }
                 });
             }
         });
