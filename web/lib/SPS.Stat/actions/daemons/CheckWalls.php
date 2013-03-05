@@ -14,7 +14,6 @@ class CheckWalls
     private $cookie = null;
 
     const url_mentions = 'http://vk.com/feed?section=mentions&obj=';
-    const time_shift = 0;
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
     const MONITORING_TYPE_WALL = 'wall';
     const MONITORING_TYPE_MENTIONS = 'mentions';
@@ -38,45 +37,25 @@ class CheckWalls
         set_time_limit( 0 );
 
         $this->get_mentions();
-//        die();
-
         $this->posts_in_progress = $this->get_posts_under_observation();
         if ( date('H') == 1 && date('i') < 15 ) {
-            //установка новых заданных бартеров
+            //установка новых автомониторов
             $this->temp_barter_creater();
-            //создание новых событий активных мониторов
-            //допустим, ставим монитор на неделю. нам нужно мониторить все эти события, а не только первое.
-//            $this->refresh_monitrs();
         }
-        else
-            echo 'not now!';
         $this->kill_overtimed();
         $this->turn_on_search();
 
         $barters_for_search = BarterEventFactory::Get( array( '_status' => 2 ), null, 'tst' );
-
         $search_results = $this->wall_search( $barters_for_search );
-        $search_results = $this->get_population( $search_results );
+        StatPublics::update_population( $search_results, 'start' );
+        BarterEventFactory::UpdateRange( $search_results, null, 'tst' );
 
-        foreach( $barters_for_search as $barter_event )
-        {
-            if( isset( $search_results[ $barter_event->barter_event_id ])) {
-                $barter_event->posted_at  =   date('Y-m-d H:i:s', $search_results[ $barter_event->barter_event_id ]['time']);
-                $barter_event->post_id    =   $search_results[ $barter_event->barter_event_id ]['post_id'];
-                $barter_event->status     =   3;
-                $barter_event->start_visitors   =   $search_results[ $barter_event->barter_event_id ]['start_visitors'];
-                $barter_event->start_subscribers     =   $search_results[ $barter_event->barter_event_id ]['start_subscribers'];
-                $barter_event->detected_at = date( 'Y-m-d H:i:s', time());
-                $barter_event->stop_search_at = date( 'Y-m-d H:i:s', time() + 4000);
-            }
-        }
-        BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
     public function kill_overtimed()
     {
         //ищем просроченные
-        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ),'_status' => 2 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_stop_search_atLE' => date('Y-m-d H:i:s',time() + StatPublics::time_shift ),'_status' => 2 ), null, 'tst' );
         foreach( $events as $event) {
             $event->status = 5;
             $event->posted_at = $event->start_search_at;
@@ -87,19 +66,18 @@ class CheckWalls
     public function turn_on_search()
     {
         //ищем записи, которые включаются в поиск
-        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + self::time_shift ), '_status' => 1 ), null, 'tst' );
+        $events  = BarterEventFactory::Get( array( '_start_search_atLE' => date('Y-m-d H:i:s',time() + StatPublics::time_shift ), '_status' => 1 ), null, 'tst' );
         foreach( $events as $event)
             $event->status = 2;
         BarterEventFactory::UpdateRange( $events, null, 'tst' );
     }
 
+    /** return BarterEvent[] */
     public function wall_search( $publics )
     {
-        $barters   = array();
         $ids_array = array();
         $our_publics = StatPublics::get_our_publics_list();
         $our_publics_ids = array_keys( $our_publics);
-        print_r( $our_publics_ids );
 
         foreach( $publics as $barter_event )
             $ids_array[] = $barter_event->barter_public;
@@ -113,9 +91,8 @@ class CheckWalls
             $this->save_post( $public_id, $post->id, $post->text);
         }
 
-        $s = 0;
         //сохраняем активность наших пабликов
-        foreach( $our_publics_ids as $public_id ) {
+        foreach( $our_publics_ids as  $public_id ) {
             if ( !isset( $walls[ $public_id ][1] ))
                 continue;
             $post = $walls[ $public_id ][1];
@@ -123,15 +100,14 @@ class CheckWalls
 
             //не сохраняем текст для опубликованных чз sb постов
             $text =  ( $this->check_if_via_sb( $public_id, $post->id ) && $link ) ? 'with bare hands' : $post->text;
-//            echo $text .'<br>';
             $this->save_post( $public_id, $post->id, $text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
         }
 
+        //перебор мониторов, поиск постов на соответств. стенах
+        $result = array();
         foreach( $publics as $barter_event ) {
-//            if( !isset( $walls[$barter_event->barter_public ])) {
-//                //todo логирование
-//                continue;
-//            }
+            /* @var $barter_event BarterEvent*/
+
             if ( empty( $walls[ $barter_event->barter_public] ))
                 continue;
 
@@ -147,18 +123,20 @@ class CheckWalls
                 //если в тексте есть вики ссылка, или это репост с нашего паблика
                 if ( $barter_post
                     || ( isset( $post->copy_owner_id ) && ltrim( $post->copy_owner_id, '-' ) == $barter_event->target_public )) {
-                    $barters[ $barter_event->barter_event_id ] = array(
-                        'time'      =>  $post->date,
-                        'post_id'   =>  $post->id ,
-                        'target_id' =>  trim( $barter_event->target_public )
-                    );
+                    $barter_event->status       =   3;
+                    $barter_event->posted_at    =   date('Y-m-d H:i:s', $post->date);
+                    $barter_event->post_id      =   $post->id;
+                    $barter_event->detected_at  =   date( 'Y-m-d H:i:s', time());
+                    $barter_event->stop_search_at = date( 'Y-m-d H:i:s', time() + 4000);
+
+                    $result[] = $barter_event;
                     //добавляем в список наблюдаемых постов
                     $this->posts_in_progress[$barter_event->creator_id][] = $barter_event->barter_public . '_' . $post->id;
                     break;
                 }
             }
         }
-        return $barters;
+        return $result;
     }
 
     public function find_barter( $search_string, $public_shortname, $public_id )
@@ -169,31 +147,6 @@ class CheckWalls
                 return false;
         return true;
     }
-
-    public function get_population( $publics )
-    {
-        foreach( $publics as &$public ) {
-            $now =  time();
-            $id = $public[ 'target_id' ];
-
-            $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
-            if ( !$res[ 'visitors']) {
-                $now -= 22000;
-                $res = StatPublics::get_visitors_from_vk( $id, $now, $now, 'barter' );
-            }
-
-            $public['start_visitors'] =  $res[ 'visitors' ];
-            sleep(0.3);
-
-            $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $id, 'count' => 1 ), 0, 'barter' );
-            if( !isset( $res->error ))
-                $public[ 'start_subscribers' ] = $res->count;
-            sleep(0.3);
-        }
-
-        return $publics;
-    }
-
 
     //омг. задание автомониторов
     public function temp_barter_creater()
@@ -350,8 +303,7 @@ class CheckWalls
         return $result;
     }
 
-    //пост для мониторинга
-    private function get_post_from_monitiring( $public_id, $post_id )
+    private function check_if_post_registered( $public_id, $post_id )
     {
         $sql = 'SELECT * FROM barter_monitoring WHERE post_id = @post_id and public_id = @public_id';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
@@ -376,7 +328,7 @@ class CheckWalls
         }
         if( $link && $type == self::MONITORING_TYPE_WALL )  return false;
 
-        if( !$this->get_post_from_monitiring( $public_id, $post_id )) {
+        if( !$this->check_if_post_registered( $public_id, $post_id )) {
             $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, @link, @type, @mentioned_public)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger( '@mentioned_public', $mentioned_public );
@@ -389,7 +341,8 @@ class CheckWalls
         }
     }
 
-    private function get_publics_for_mentions() {
+    private function get_publics_for_mentions()
+    {
         return array(
             34468364,
             32348256,
@@ -400,6 +353,7 @@ class CheckWalls
         );
     }
 
+    //собирает упоминания пабликов
     private function get_mentions()
     {
         $publics_for_men_search = $this->get_publics_for_mentions();
@@ -415,26 +369,27 @@ class CheckWalls
             echo 'mentions of ' . $public_id . '<br>';
 
             $page = VkHelper::connect( 'http://vk.com/feed?section=mentions&obj=-' . $public_id, $this->cookie );
-            $this->parse( $page, $public_id );
+            $this->parse_mentions_page( $page, $public_id );
         }
     }
 
-    private function parse( $page, $public_id ) {
 
+    private function parse_mentions_page( $page, $public_id )
+    {
         $document = phpQuery::newDocument( $page );
         $posts = $document->find('div.feed_row');
         foreach( $posts as $post ) {
             $feed_row = pq($post);
             $a = $feed_row->find('div.post');
             $source = $a->attr('id');
-            //проверка на тип стены(если личная страница - мимо)
+            //проверка на тип стены( если личная страница - мимо)
             if( !substr_count( $source, '-')) {
                 continue;
             }
             //проверка, не является ли пост ответом на стене группы
             $reply = $feed_row->find( 'a.reply_parent_link' );
             if( $reply->length()) {
-                echo '$reply is empty';
+                echo '$reply is not empty';
                 continue;
             }
 
@@ -453,7 +408,7 @@ class CheckWalls
             }
             $source_public_id = $matches[1];
             $source_post_id   = $matches[2];
-            $text = $feed_row->find('.wall_post_text' );
+            $text = $feed_row->find( '.wall_post_text' );
             $text = $text->getString();
             $text = $text[0];
             $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );

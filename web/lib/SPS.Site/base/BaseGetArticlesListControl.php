@@ -224,15 +224,16 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $this->search['targetFeedId'] = $targetFeedId;
         }
 
-        // если запрашиваем авторские посты
-        if ($sourceFeedType == SourceFeedUtility::Authors) {
+        // если запрашиваем авторские/альбомные посты
+        if ($sourceFeedType == SourceFeedUtility::Authors || $sourceFeedType == SourceFeedUtility::Albums) {
 
             if ($this->ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $sourceFeedType)) {
                 $useArticleStatusFilter= true;
             } else {
                 throw new Exception('Access error');
             }
-
+             if( $sourceFeedType == SourceFeedUtility::Albums )
+                 $useSourceFilter = true;
             $this->userRateFilter = false;
         } // источник - топфейс
         elseif ($sourceFeedType == SourceFeedUtility::Topface) {
@@ -248,8 +249,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $useArticleStatusFilter = true;
             $this->needTargetFeed = $mode != self::MODE_POSTED;
         } elseif ($sourceFeedType == SourceFeedUtility::Source) {
-            $useSourceFilter = true;
-        } elseif ($sourceFeedType == SourceFeedUtility::Albums) {
             $useSourceFilter = true;
         } elseif ($sourceFeedType == SourceFeedUtility::Ads) {
             $useSourceFilter = true;
@@ -272,7 +271,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         if ($useArticleStatusFilter) {
             $articleStatuses = $this->ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId);
 
-            // фильтр по статусам - только для авторских постов
+            // фильтр по статусам - только для авторских и альбомных постов
             // если мы запросили определенный статус и он входит в список разрешенных, то берем только его
             $reqArticleStatus = $this->getArticleStatus();
             if ($reqArticleStatus && in_array($reqArticleStatus, $articleStatuses)) {
