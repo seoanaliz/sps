@@ -190,7 +190,7 @@
                     $cell = $aSheet->getCellByColumnAndRow( ++$t, $row );
                     $cell->setValue( ( $value['members_growth'] - $value['vidget_members'] - $samorost ));
                 }
-//                echo '<br>' .  $total_subs_coverage . ' | ' . $public_id ;
+                echo '<br>' .  $total_subs_coverage . ' | ' . $public_id ;
 
                 $samorost = next( $this->samorost);
                 $row++;
@@ -227,6 +227,7 @@
             $res = array();
 //            $fct = 0;
 //            $ict = 0;
+            $total_vidgets_members = 0;
             foreach( $this->samorost_publics_array as $public_id ) {
                 $res[$public_id] = array();
                 $page = VkHelper::connect( 'http://vk.com/stats?gid=' . $public_id, $cookie );
@@ -261,9 +262,11 @@
 //                $followers_coverage = json_decode( '{' . $followers_coverage[1] . '}' )->d;
 
 
-//                $res[$public_id] = $this->key_maker( 1 , 1, 1, 1, 1, $full_coverage, $followers_coverage );
+                $res[$public_id] = $this->key_maker( 1 , 1, 1, 1, 1, $full_coverage, $followers_coverage );
                 $res[$public_id] = $this->key_maker( $tot_members , $vidget_members, $unique_visitors, $views, $members_growth   );
+
             }
+
 
             $this->create_excel_list( $res, 1359677096, 1362096649 );
         }
