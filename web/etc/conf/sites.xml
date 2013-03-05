@@ -113,10 +113,11 @@
                     </modules>
                     <databases>
                         <database driver="PgSql">
-                            <name>sps-beta</name>
+                            <name>spstst</name>
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
+                            <port>54320</port>
                         </database>
                         <database driver="PgSql" name="tst">
                             <name>tst-beta</name>
