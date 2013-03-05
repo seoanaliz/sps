@@ -1,4 +1,6 @@
-﻿<? if (!empty( $__params[SiteParamHelper::GoogleAnalytics] ) ) { ?>
+﻿    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <?= JsHelper::Flush(); ?>
+<? if (!empty( $__params[SiteParamHelper::GoogleAnalytics] ) ) { ?>
 	<!-- GoogleAnalytics counter -->
 	<script type="text/javascript">
 	  var _gaq = _gaq || [];

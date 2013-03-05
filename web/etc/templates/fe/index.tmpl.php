@@ -8,10 +8,9 @@
  */
 ?>
 {increal:tmpl://fe/elements/header.tmpl.php}
-<script src="{web:js://fe/main.js}" type="text/javascript"></script>
 <div id="go-to-top">Наверх</div>
 <div class="layer clear-fix">
-    <div class="left-panel">
+    <div id="left-panel" class="left-panel">
         <div class="block">
             <div class="header">
 
@@ -79,7 +78,11 @@
         </div>
     </div>
 
-    <div class="right-panel">
+    <div id="right-panel-background" class="right-panel-background"></div>
+    <div id="right-panel" class="right-panel">
+        <div id="right-panel-expander" class="right-panel-expander">
+            <div class="arrow"></div>
+        </div>
         <div class="block">
             <div class="header bb">
 

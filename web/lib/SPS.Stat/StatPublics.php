@@ -6,6 +6,7 @@
     class StatPublics
     {
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
+        //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
          25678227
         ,26776509
@@ -31,7 +32,7 @@
         public static function get_our_publics_list()
         {
             $publics = TargetFeedFactory::Get();
-            //массив пабликов, которые не надо включать в сбор/отбражение данных
+
             $res = array();
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
@@ -40,7 +41,7 @@
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
-                $res[] = $a;
+                $res[$public->externalId] = $a;
             }
             return $res;
         }

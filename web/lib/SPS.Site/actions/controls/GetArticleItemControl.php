@@ -92,6 +92,7 @@ class GetArticleItemControl extends BaseControl
         Response::setInteger('authorId', $this->getAuthor()->authorId);
         Response::setInteger('isWebUserEditor', $role != UserFeed::ROLE_AUTHOR);
         Response::setString('articleLinkPrefix', $articleLinkPrefix);
+        Response::setString('sourceFeedType', $sourceFeed->type);
     }
 }
 

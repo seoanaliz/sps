@@ -23,8 +23,23 @@
              *id аппа обмена
              */
             const APP_ID_BARTER = 3391730;
-
             const PAUSE   = 0.5;
+            public static  $serv_bots = array(
+                array(
+                    'login'     =>  '79531648056',
+                    'pass'      =>  'SdfW3@4R4$'
+                ),
+                array(
+                    'login'     =>  '79531648839',
+                    'pass'      =>  'Kjhy&^d^9h'
+                ),
+                array(
+                    'login'     =>  '79531647915',
+                    'pass'      =>  'JHh97)&%lui'
+                ),
+
+            );
+
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
@@ -215,6 +230,45 @@
                 $cmd->SetInteger( '@user_id ',      $user_id );
                 $cmd->SetInteger( '@app_id',        $app_id );
                 $cmd->Execute();
+            }
+
+            public static function connect( $link, $cookie=null, $post=null ) {
+                $ch = curl_init();
+
+                curl_setopt( $ch, CURLOPT_URL, $link );
+                curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+                curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
+                curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
+                curl_setopt($ch, CURLOPT_USERAGENT,
+                    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');
+                if( $cookie !== null )
+                    curl_setopt( $ch, CURLOPT_COOKIE, $cookie );
+                if( $post !== null )
+                {
+                    curl_setopt( $ch, CURLOPT_POST, 1 );
+                    curl_setopt( $ch, CURLOPT_POSTFIELDS, $post );
+                }
+                $res = curl_exec( $ch );
+                curl_close( $ch );
+                return $res;
+            }
+
+            public static function vk_authorize( $login = null, $pass = null )
+            {
+                if( !$login) {
+                    shuffle( self::$serv_bots);
+                    $login = self::$serv_bots[0]['login'];
+                    $pass  = self::$serv_bots[0]['pass'];
+                }
+                $res = self::connect("http://login.vk.com/?act=login&email=$login&pass=$pass");
+                if( !preg_match("/hash=([a-z0-9]{1,32})/", $res, $hash )) {
+                    return false;
+                }
+                $res = self::connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
+                if( preg_match( "/remixsid=(.*?);/", $res, $sid ))
+                    return "remixchk=5; remixsid=$sid[1]";
+                return false;
             }
         }
     ?>
