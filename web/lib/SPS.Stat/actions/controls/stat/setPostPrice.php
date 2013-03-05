@@ -168,6 +168,7 @@
             $total_views = 0;
             $total_subs_coverage = 0;
             $total_full_coverage = 0;
+            $full_total_vidget = 0;
             foreach( $data_array as $public_id=>$public ) {
                 $t = 0;
                 $cell = $aSheet->getCellByColumnAndRow( $t++, $row );
@@ -188,15 +189,16 @@
 //                    $total_subs_coverage += $value['followers_coverage'];
 //                    $total_full_coverage += $value['full_coverage'];
                     $cell = $aSheet->getCellByColumnAndRow( ++$t, $row );
-                    $cell->setValue( ( $value['members_growth'] - $value['vidget_members'] - $samorost ));
+                    $cell->setValue(( $value['members_growth'] - $value['vidget_members'] - $samorost ));
                 }
-//                echo '<br>' .  $total_subs_coverage . ' | ' . $public_id ;
-
+                echo '<br>' .  $total_vidget . ' | ' . $public_id ;
+                $full_total_vidget += $total_vidget;
                 $samorost = next( $this->samorost);
                 $row++;
             }
 
-//            echo '<br>';
+            echo '<br>';
+            echo $full_total_vidget;
 //            echo  'full coverage = ' . $total_full_coverage;
 //            echo  'subs coverage = ' . $total_subs_coverage;
 
@@ -227,6 +229,7 @@
             $res = array();
 //            $fct = 0;
 //            $ict = 0;
+            $total_vidgets_members = 0;
             foreach( $this->samorost_publics_array as $public_id ) {
                 $res[$public_id] = array();
                 $page = VkHelper::connect( 'http://vk.com/stats?gid=' . $public_id, $cookie );
@@ -261,9 +264,11 @@
 //                $followers_coverage = json_decode( '{' . $followers_coverage[1] . '}' )->d;
 
 
-//                $res[$public_id] = $this->key_maker( 1 , 1, 1, 1, 1, $full_coverage, $followers_coverage );
+                $res[$public_id] = $this->key_maker( 1 , 1, 1, 1, 1, $full_coverage, $followers_coverage );
                 $res[$public_id] = $this->key_maker( $tot_members , $vidget_members, $unique_visitors, $views, $members_growth   );
+
             }
+
 
             $this->create_excel_list( $res, 1359677096, 1362096649 );
         }
