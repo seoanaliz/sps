@@ -168,7 +168,6 @@
             $total_views = 0;
             $total_subs_coverage = 0;
             $total_full_coverage = 0;
-            $full_total_vidget = 0;
             foreach( $data_array as $public_id=>$public ) {
                 $t = 0;
                 $cell = $aSheet->getCellByColumnAndRow( $t++, $row );
@@ -189,16 +188,15 @@
 //                    $total_subs_coverage += $value['followers_coverage'];
 //                    $total_full_coverage += $value['full_coverage'];
                     $cell = $aSheet->getCellByColumnAndRow( ++$t, $row );
-                    $cell->setValue(( $value['members_growth'] - $value['vidget_members'] - $samorost ));
+                    $cell->setValue( ( $value['members_growth'] - $value['vidget_members'] - $samorost ));
                 }
-                echo '<br>' .  $total_vidget . ' | ' . $public_id ;
-                $full_total_vidget += $total_vidget;
+                echo '<br>' .  $total_subs_coverage . ' | ' . $public_id ;
+
                 $samorost = next( $this->samorost);
                 $row++;
             }
 
-            echo '<br>';
-            echo $full_total_vidget;
+//            echo '<br>';
 //            echo  'full coverage = ' . $total_full_coverage;
 //            echo  'subs coverage = ' . $total_subs_coverage;
 
