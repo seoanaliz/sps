@@ -344,7 +344,7 @@ var LeftPanelWidget = Event.extend({
     updateSlider: function(targetFeedId, sourceType) {
         var t = this;
         var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
-        var from = sourceType == 'albums' ? 0 : 50;
+        var from = sourceType == App.FEED_TYPE_ALBUMS ? 0 : 50;
         var to = 100;
         if (cookie) {
             var ranges = cookie.split(':');
@@ -451,7 +451,7 @@ var LeftPanelWidget = Event.extend({
         };
 
         switch (sourceType) {
-            case 'authors':
+            case App.FEED_TYPE_AUTHORS:
                 requestData.userGroupId = Elements.getUserGroupId();
                 $newPost.show();
                 switch (switcherType) {
@@ -463,7 +463,7 @@ var LeftPanelWidget = Event.extend({
                         break;
                 }
                 break;
-            case 'albums':
+            case App.FEED_TYPE_ALBUMS:
                 requestData.sourceFeedIds = Elements.leftdd();
                 switch (switcherType) {
                     case 'approved':
@@ -474,11 +474,11 @@ var LeftPanelWidget = Event.extend({
                         break;
                 }
                 break;
-            case 'my':
+            case App.FEED_TYPE_MY:
                 requestData.articleStatus = Elements.getArticleStatus();
-                requestData.mode = 'my';
+                requestData.mode = App.FEED_TYPE_MY;
                 break;
-            case 'ads':
+            case App.FEED_TYPE_ADS:
                 requestData.sourceFeedIds = Elements.leftdd();
                 requestData.from = 0;
                 requestData.to = 100;
@@ -486,8 +486,8 @@ var LeftPanelWidget = Event.extend({
                     $newPost.show();
                 }
                 break;
-            case 'topface':
-            case 'source':
+            case App.FEED_TYPE_TOPFACE:
+            case App.FEED_TYPE_SOURCE:
                     requestData.sourceFeedIds = Elements.leftdd();
                     var $slider = $('#slider-range');
                     requestData.from = $slider.slider('values', 0);
@@ -1217,7 +1217,7 @@ var LeftPanelWidget = Event.extend({
             $leftPanel.find('.type-selector .sourceType').removeClass('active');
             $(this).addClass('active');
 
-            if ($(this).data('type') == 'authors-list') {
+            if ($(this).data('type') == App.FEED_TYPE_AUTHORS_LIST) {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
                 t.updateAuthorListPage();
@@ -1463,7 +1463,9 @@ var LeftPanelWidget = Event.extend({
             var $post = $(this).closest('.post');
             var postId = $post.data('id');
             Events.fire('leftcolumn_approve_post', postId, function() {
-                $post.slideUp(200);
+                $post.slideUp(200, function() {
+                    $(this).remove();
+                });
             });
         });
 
@@ -1473,7 +1475,9 @@ var LeftPanelWidget = Event.extend({
             if (!$newComment.length) {
                 var postId = $post.data('id');
                 Events.fire('leftcolumn_reject_post', postId, function() {
-                    $post.slideUp(200);
+                    $post.slideUp(200, function() {
+                        $(this).remove();
+                    });
                 });
             } else {
                 var $moderation = $post.find('.moderation');
@@ -1491,7 +1495,9 @@ var LeftPanelWidget = Event.extend({
             if ($moderation.length && !$moderation.data('checked')) {
                 $moderation.data('checked', true);
                 Events.fire('leftcolumn_reject_post', postId, function() {
-                    $post.slideUp(200);
+                    $post.slideUp(200, function() {
+                        $(this).remove();
+                    });
                 });
             }
         });
@@ -1542,7 +1548,7 @@ var LeftPanelWidget = Event.extend({
         var sourceType = Elements.leftType();
         var sourceTypes = data.accessibleSourceTypes;
 
-        if (sourceType != 'source') {
+        if (sourceType != App.FEED_TYPE_SOURCE) {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list').hide();
@@ -1601,7 +1607,7 @@ var LeftPanelWidget = Event.extend({
             $userGroupTabs.addClass('hidden');
         }
 
-        if (sourceType == 'albums') {
+        if (sourceType == App.FEED_TYPE_ALBUMS) {
             if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
                 if (data.authorsFilters.all_my_filter) {
                     showSwitcherType = 'all';
@@ -1613,6 +1619,10 @@ var LeftPanelWidget = Event.extend({
                 $wallSwitcher.find('a').hide();
                 $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
             }
+
+            $leftPanel.addClass('albums');
+        } else {
+            $leftPanel.removeClass('albums');
         }
 
         $leftPanelTabs.children('.sourceType').each(function(i, item) {

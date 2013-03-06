@@ -114,5 +114,13 @@ var App = (function() {
     App.ARTICLE_STATUS_APPROVED = 2;
     App.ARTICLE_STATUS_REJECTED = 3;
 
+    App.FEED_TYPE_MY = 'my';
+    App.FEED_TYPE_ADS = 'ads';
+    App.FEED_TYPE_SOURCE = 'source';
+    App.FEED_TYPE_ALBUMS = 'albums';
+    App.FEED_TYPE_AUTHORS = 'authors';
+    App.FEED_TYPE_TOPFACE = 'topface';
+    App.FEED_TYPE_AUTHORS_LIST = 'authors-list';
+
     return App;
 })();

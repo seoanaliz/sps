@@ -312,16 +312,11 @@ i {font-style: italic;}
             line-height: 12px;
         }
     }
+
     .wall {
         background: #fff;
         overflow: hidden;
         .border-radius(0 0 2px 2px);
-
-        .post .name,
-        .post .content,
-        .post .bottom {
-            margin-left: 40px;
-        }
 
         .wall-empty,
         &:empty {
@@ -337,6 +332,7 @@ i {font-style: italic;}
             }
         }
     }
+
     .wall-title {
         .filter {
             position: absolute;
@@ -372,6 +368,7 @@ i {font-style: italic;}
             }
         }
     }
+
     .show-cut {
         display: block;
         color: #8fa3bb;
@@ -379,6 +376,18 @@ i {font-style: italic;}
         &:hover {
             color: #205F82;
             text-decoration: none;
+        }
+    }
+
+    &.albums {
+        .moderation {
+            display: block;
+        }
+
+        .post + .post {
+            .moderation {
+                display: none;
+            }
         }
     }
 }
@@ -1305,6 +1314,14 @@ i {font-style: italic;}
     .box-shadow(0px 1px 4px 0px rgba(0, 0, 0, 0.1));
     .user-select(none);
 
+    .name,
+    .content,
+    .comments,
+    .moderation,
+    .bottom {
+        margin-left: 40px;
+    }
+
     .userpic {
         float: left;
         width: 30px;
@@ -1348,11 +1365,13 @@ i {font-style: italic;}
             margin-left: 5px;
         }
     }
+
     .editing {
         textarea {
             width: 516px;
         }
     }
+
     .actions {
         margin-top: 10px;
         position: relative;
@@ -1372,6 +1391,7 @@ i {font-style: italic;}
             cursor: pointer;
         }
     }
+
     .link-description-text {
         & > a:hover,
         & > p:hover,
@@ -1389,7 +1409,6 @@ i {font-style: italic;}
 
     &>.comments {
         margin-top: 10px;
-        margin-left: 40px;
 
         &>.list {
             &>.show-more {
@@ -1522,8 +1541,6 @@ i {font-style: italic;}
     }
 
     &>.moderation {
-        margin-left: 40px;
-
         &>.actions {
             padding: 7px;
             background-color: #f1f1f1;
