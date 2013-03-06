@@ -20,13 +20,20 @@ if (!empty($article)) {
     if ($sourceFeedType == SourceFeedUtility::Ads) {
         $isPostRelocatable = false;
     }
-    if ($isWebUserEditor && $sourceFeedType != SourceFeedUtility::My && $sourceFeedType != SourceFeedUtility::Albums) {
-        if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
-            $isPostMovable = true;
-        }
-        if (!empty($sourceFeed)) {
-            $isPostMovable = true;
-        }
+    if ($isWebUserEditor) {
+       switch ($sourceFeedType) {
+           case SourceFeedUtility::Ads:
+           case SourceFeedUtility::Source:
+           case SourceFeedUtility::Topface:
+                $isPostMovable = true;
+               break;
+           case SourceFeedUtility::Authors:
+           case SourceFeedUtility::Albums:
+                if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
+                    $isPostMovable = true;
+                }
+               break;
+       }
     }
 ?>
 <div
