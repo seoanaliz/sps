@@ -191,7 +191,7 @@ var LeftPanelWidget = Event.extend({
     saveMultiSelectData: function() {
         var targetFeedId = Elements.rightdd();
         var leftType = Elements.leftType();
-        if (leftType == 'source' || leftType == 'ads') {
+        if (leftType == 'source') {
             $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
         }
     },

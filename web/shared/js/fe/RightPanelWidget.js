@@ -193,8 +193,8 @@ var RightPanelWidget = Event.extend({
     },
 
     dropdownChange: function(data) {
-        this.dropdownChangeLeftPanel(data);
         this.dropdownChangeRightPanel(data);
+        this.dropdownChangeLeftPanel(data);
     },
 
     dropdownChangeRightPanel: function(data) {
