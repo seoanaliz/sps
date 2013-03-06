@@ -1462,11 +1462,7 @@ var LeftPanelWidget = Event.extend({
         $leftPanel.delegate('.moderation .button.approve', 'click', function() {
             var $post = $(this).closest('.post');
             var postId = $post.data('id');
-            Events.fire('leftcolumn_approve_post', postId, function() {
-                $post.slideUp(200, function() {
-                    $(this).remove();
-                });
-            });
+            t.acceptArticle(postId);
         });
 
         $leftPanel.delegate('.moderation .button.reject', 'click', function() {
@@ -1474,11 +1470,7 @@ var LeftPanelWidget = Event.extend({
             var $newComment = $post.find('.new-comment');
             if (!$newComment.length) {
                 var postId = $post.data('id');
-                Events.fire('leftcolumn_reject_post', postId, function() {
-                    $post.slideUp(200, function() {
-                        $(this).remove();
-                    });
-                });
+                t.declineArticle(postId);
             } else {
                 var $moderation = $post.find('.moderation');
                 $moderation.hide();
@@ -1494,11 +1486,7 @@ var LeftPanelWidget = Event.extend({
             var postId = $post.data('id');
             if ($moderation.length && !$moderation.data('checked')) {
                 $moderation.data('checked', true);
-                Events.fire('leftcolumn_reject_post', postId, function() {
-                    $post.slideUp(200, function() {
-                        $(this).remove();
-                    });
-                });
+                t.declineArticle(postId);
             }
         });
 
@@ -1510,6 +1498,42 @@ var LeftPanelWidget = Event.extend({
                 $moderation.show();
                 $newComment.hide();
             }
+        });
+    },
+
+    /**
+     * Одобряет запись и скрывает её
+     * @param articleId
+     * @return Deferred|bool
+     */
+    acceptArticle: function(articleId) {
+        var $post = this.$leftPanel.find('.post[data-id="' + articleId + '"]');
+        if (!$post.length) {
+            return false;
+        }
+
+        return Control.fire('accept_article', {articleId: articleId}, function() {
+            $post.slideUp(200, function() {
+                $(this).remove();
+            });
+        });
+    },
+
+    /**
+     * Отклоняет запись и скрывает её
+     * @param articleId
+     * @return Deferred|bool
+     */
+    declineArticle: function(articleId) {
+        var $post = this.$leftPanel.find('.post[data-id="' + articleId + '"]');
+        if (!$post.length) {
+            return false;
+        }
+
+        return Control.fire('decline_article', {articleId: articleId}, function() {
+            $post.slideUp(200, function() {
+                $(this).remove();
+            });
         });
     },
 
@@ -1621,8 +1645,10 @@ var LeftPanelWidget = Event.extend({
             }
 
             $leftPanel.addClass('albums');
+            t.enableKeyboardDecision();
         } else {
             $leftPanel.removeClass('albums');
+            t.disableKeyboardDecision();
         }
 
         $leftPanelTabs.children('.sourceType').each(function(i, item) {
@@ -1640,5 +1666,27 @@ var LeftPanelWidget = Event.extend({
         t.setMultiSelectData(data.sourceFeeds, targetFeedId);
         articlesLoading = false;
         t.loadArticles(true);
+    },
+
+    enableKeyboardDecision: function() {
+        var t = this;
+        $(window).on('keydown.keyboardDecision', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (String.fromCharCode(e.which).toLowerCase()) {
+                    case 'd':
+                        t.declineArticle(t.$leftPanel.find('.post:first').data('id'));
+                        e.preventDefault();
+                        break;
+                    case 'a':
+                        t.acceptArticle(t.$leftPanel.find('.post:first').data('id'));
+                        e.preventDefault();
+                        break;
+                }
+            }
+        });
+    },
+
+    disableKeyboardDecision: function() {
+        $(window).off('keydown.keyboardDecision');
     }
 });

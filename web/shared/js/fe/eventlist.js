@@ -42,6 +42,18 @@ Control = $.extend(Control, {
         get_source_list: {
             name: 'source-feeds-list',
             dataType: 'json'
+        },
+        accept_article: {
+            name: 'article-approved',
+            params: {
+                articleId: 'id'
+            }
+        },
+        decline_article: {
+            name: 'article-reject',
+            params: {
+                articleId: 'id'
+            }
         }
     }
 });
@@ -76,28 +88,6 @@ var Eventlist = {
                 id: post_id
             },
             success: function (data) {
-                callback(1);
-            }
-        });
-    },
-    leftcolumn_approve_post: function(post_id, callback) {
-        $.ajax({
-            url: controlsRoot + 'article-approved/',
-            data: {
-                id: post_id
-            },
-            success: function(data) {
-                callback(1);
-            }
-        });
-    },
-    leftcolumn_reject_post: function(post_id, callback) {
-        $.ajax({
-            url: controlsRoot + 'article-reject/',
-            data: {
-                id: post_id
-            },
-            success: function(data) {
                 callback(1);
             }
         });
