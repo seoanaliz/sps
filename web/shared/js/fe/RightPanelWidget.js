@@ -193,6 +193,11 @@ var RightPanelWidget = Event.extend({
     },
 
     dropdownChange: function(data) {
+        this.dropdownChangeLeftPanel(data);
+        this.dropdownChangeRightPanel(data);
+    },
+
+    dropdownChangeRightPanel: function(data) {
         // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
@@ -201,8 +206,6 @@ var RightPanelWidget = Event.extend({
         }
 
         var t = this;
-        var $multiSelect = $('#source-select');
-        var targetFeedId = Elements.rightdd();
         var sourceType = Elements.leftType();
         var gridTypes = data.accessibleGridTypes;
         var showCount = 0;
@@ -229,19 +232,6 @@ var RightPanelWidget = Event.extend({
             addCellButton.hide();
         }
 
-        //get data from cookie
-        var cookie = $.cookie('sourceFeedIds' + targetFeedId);
-        if (cookie) {
-            var selectedSources = cookie.split(',');
-            if (selectedSources) {
-                var $options = $multiSelect.find('option');
-                for (i in selectedSources) {
-                    $options.filter('[value="' + selectedSources[i] + '"]').prop('selected', true);
-                }
-            }
-        }
-
-        t.dropdownChangeLeftPanel(data);
         t.loadQueue();
     },
 
@@ -324,7 +314,10 @@ var RightPanelWidget = Event.extend({
         });
 
         $.cookie('sourceTypes' + targetFeedId, sourceType);
-        app.setMultiSelectData(data.sourceFeeds);
+        articlesLoading = true;
         app.updateSlider(targetFeedId, sourceType);
+        app.setMultiSelectData(data.sourceFeeds, targetFeedId);
+        articlesLoading = false;
+        app.loadArticles(true);
     }
 });

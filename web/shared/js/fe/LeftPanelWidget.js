@@ -178,21 +178,25 @@ var LeftPanelWidget = Event.extend({
                 t.updateMultiSelect();
             }
         });
-        $multiSelect.bind('multiselectclick', function(event, ui) {
+        $multiSelect.bind('multiselectclick', function() {
             t.updateMultiSelect();
         });
     },
 
     updateMultiSelect: function() {
-        var targetFeedId = Elements.rightdd();
-        var leftType = Elements.leftType();
-        if (leftType == 'source') {
-            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
-        }
+        this.saveMultiSelectData();
         this.loadArticles(true);
     },
 
-    setMultiSelectData: function(sourceFeeds) {
+    saveMultiSelectData: function() {
+        var targetFeedId = Elements.rightdd();
+        var leftType = Elements.leftType();
+        if (leftType == 'source' || leftType == 'ads') {
+            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
+        }
+    },
+
+    setMultiSelectData: function(sourceFeeds, targetFeedId) {
         var t = this;
         var $multiSelect = t.$multiSelect;
         $multiSelect.find('option').remove();
@@ -200,6 +204,19 @@ var LeftPanelWidget = Event.extend({
             var item = sourceFeeds[i];
             $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
         }
+
+        //get data from cookie
+        var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+        if (cookie) {
+            var selectedSources = cookie.split(',');
+            if (selectedSources) {
+                var $options = $multiSelect.find('option');
+                for (i in selectedSources) {
+                    $options.filter('[value="' + selectedSources[i] + '"]').prop('selected', true);
+                }
+            }
+        }
+
         $multiSelect.multiselect('refresh');
         if (Elements.leftdd().length == 0) {
             $multiSelect.multiselect('checkAll').multiselect('refresh');
@@ -408,6 +425,7 @@ var LeftPanelWidget = Event.extend({
         if (articlesLoading) {
             return;
         }
+
         if (clean) {
             t.filterAuthorId = null;
             t.wallPage = -1;
@@ -434,9 +452,8 @@ var LeftPanelWidget = Event.extend({
 
         switch (sourceType) {
             case 'authors':
-                $newPost.show();
-
                 requestData.userGroupId = Elements.getUserGroupId();
+                $newPost.show();
                 switch (switcherType) {
                     case 'approved':
                         requestData.articleStatus = 2;
@@ -470,6 +487,9 @@ var LeftPanelWidget = Event.extend({
             case 'albums':
             case 'source':
                     requestData.sourceFeedIds = Elements.leftdd();
+                    var $slider = $('#slider-range');
+                    requestData.from = $slider.slider('values', 0);
+                    requestData.to = $slider.slider('values', 1);
                 break;
             default:
                 break;

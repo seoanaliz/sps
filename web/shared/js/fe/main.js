@@ -190,8 +190,8 @@ var App = Event.extend({
         this.getLeftPanelWidget().updateMultiSelect();
     },
 
-    setMultiSelectData: function(sourceFeeds) {
-        this.getLeftPanelWidget().setMultiSelectData(sourceFeeds);
+    setMultiSelectData: function(sourceFeeds, targetFeedId) {
+        this.getLeftPanelWidget().setMultiSelectData(sourceFeeds, targetFeedId);
     },
 
     onRightPanelDropdownChange: function(data) {
