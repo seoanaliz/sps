@@ -148,7 +148,6 @@
         //              группы или посетителей(от последних отсеивается)
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
-
         public function get_posts( $page_number )
         {
             sleep(rand( 1,12 ));
@@ -394,7 +393,7 @@
         }
 
         private function get_page($page = '')
-    {
+        {
 
     if ($page == '')
     $page = $this->page_adr;
@@ -430,7 +429,7 @@ else
 return $a;
 }
 
-private function remove_tags($text)
+        private function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
             $text = str_replace( '&#189;',  "½",    $text );
@@ -449,25 +448,25 @@ private function remove_tags($text)
 
         //$post_ids  = массив idпаблика_idпоста
         //ограничение - 90 постов
-public static function get_post_likes( $post_ids, $access_token = '')
-{
-    $post_ids = implode( ',', $post_ids );
-    $params = array(
-        'posts'   =>   $post_ids
-    );
-    if ( $access_token )
-        $params['access_token'] = $access_token;
-    $res = VkHelper::api_request( 'wall.getById', $params );
-    sleep( self::PAUSE );
-    $result = array();
-    foreach( $res as $post ) {
-        $result[ $post->to_id . '_' . $post->id ] = array(
-              'likes'   =>     $post->likes->count,
-              'reposts' =>     $post->reposts->count,
-        );
-    }
-    return $result;
-}
+        public static function get_post_likes( $post_ids, $access_token = '')
+        {
+            $post_ids = implode( ',', $post_ids );
+            $params = array(
+                'posts'   =>   $post_ids
+            );
+            if ( $access_token )
+                $params['access_token'] = $access_token;
+            $res = VkHelper::api_request( 'wall.getById', $params );
+            sleep( self::PAUSE );
+            $result = array();
+            foreach( $res as $post ) {
+                $result[ $post->to_id . '_' . $post->id ] = array(
+                      'likes'   =>     $post->likes->count,
+                      'reposts' =>     $post->reposts->count,
+                );
+            }
+            return $result;
+        }
 
         public function get_album_as_posts( $public_id, $album_id, $limit = false, $offset = false)
         {
@@ -534,5 +533,18 @@ public static function get_post_likes( $post_ids, $access_token = '')
                    throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
                }
             }
+        }
+
+        public function get_public_albums( $public_id )
+        {
+            $res = array();
+            $response = VkHelper::api_request('photos.getAlbums', array( 'gid' => $public_id ), 0 );
+            if( !isset( $response->error )) {
+                sleep( self::PAUSE );
+                foreach( $response as $album ) {
+                    $res[$album->aid] = array('title' => $album->title );
+                }
+            }
+            return $res;
         }
 }
