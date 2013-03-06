@@ -29,7 +29,7 @@ class DeleteAlbumPhoto
                   "sourceFeeds" as sf
                 USING ("sourceFeedId")
                 WHERE
-                      a."externalId" LIKE '%-@targetFeedExternalId_%'
+                      a."externalId" LIKE '%@targetFeedExternalId_%'
                   AND sf."type" = @sourceType
                   AND a."articleStatus" = @articleStatus
                   AND a."statusId" = @status
