@@ -140,7 +140,7 @@ var RightPanelWidget = Event.extend({
         $rightPanel.addClass('expanded');
         $rightPanel.find('.images-ready').imageComposition();
         $rightPanelBackground.show();
-        $('html').width($('html').width()).css('overflow-y', 'hidden');
+        $('body').width($('body').width()).css('overflow-y', 'hidden');
     },
 
     compact: function() {
@@ -149,7 +149,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanel.removeClass('expanded');
         $rightPanelBackground.hide();
-        $('html').width('auto').css('overflow-y', 'scroll');
+        $('body').width('auto').css('overflow-y', 'scroll');
     },
 
     initVkAvatar: function() {
