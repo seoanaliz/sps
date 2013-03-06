@@ -506,11 +506,13 @@ var LeftPanelWidget = Event.extend({
             requestData.articlesOnly = 1;
         }
 
-        Control.fire('get_articles', requestData).success(function(html) {
-            $wallLoader.hide();
+        Control.fire('get_articles', requestData).always(function() {
             if (clean) {
                 t.$wall.empty();
             }
+            $wallLoader.hide();
+            articlesLoading = false;
+        }).success(function(html) {
             if (!html) {
                 $(window).data('disable-load-more', true);
                 $('.wall-title span.count').text('нет записей');
@@ -526,7 +528,9 @@ var LeftPanelWidget = Event.extend({
                     $(window).data('disable-load-more', true);
                 }
             }
-            articlesLoading = false;
+            t.trigger('articlesLoaded', true);
+        }).error(function() {
+            t.trigger('articlesLoaded', false);
         });
     },
 
