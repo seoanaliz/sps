@@ -38,7 +38,7 @@ if (!empty($article)) {
     }
 
     $canEditPost = true;
-    if ($role == UserFeed::ROLE_AUTHOR) {
+    if (!$isWebUserEditor) {
         $canEditPost = $Article->articleStatus != Article::STATUS_APPROVED;
     }
     if (!empty($sourceFeed) && $sourceFeed->type == SourceFeedUtility::Albums) {
