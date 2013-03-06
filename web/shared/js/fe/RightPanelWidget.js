@@ -41,7 +41,7 @@ var RightPanelWidget = Event.extend({
 
                 // проставление типа источника
                 cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
+                sourceType = $leftPanel.find('.type-selector a[data-type="' + cookieData + '"]');
                 if (sourceType.length == 0) {
                     sourceType = $leftPanel.find('.type-selector a[data-type="source"]');
                 }
@@ -190,5 +190,149 @@ var RightPanelWidget = Event.extend({
 
     loadQueue: function() {
         this.getQueueWidget().load();
+    },
+
+    dropdownChange: function(data) {
+        this.dropdownChangeRightPanel(data);
+        this.dropdownChangeLeftPanel(data);
+    },
+
+    dropdownChangeRightPanel: function(data) {
+        // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+        var $sourceTypeLink = $('#sourceType-' + data.type);
+        if (!$sourceTypeLink.hasClass('active')) {
+            $('.sourceType.active').removeClass('active');
+            $sourceTypeLink.addClass('active');
+        }
+
+        var t = this;
+        var sourceType = Elements.leftType();
+        var gridTypes = data.accessibleGridTypes;
+        var showCount = 0;
+
+        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(i, item){
+            item = $(item);
+            if ($.inArray(item.data('type'), gridTypes) == -1){
+                item.hide();
+            } else {
+                showCount++;
+                item.show();
+            }
+        });
+        if (showCount > 2) {
+            $('.grid_type.all').show();
+        } else {
+            $('.grid_type.all').hide();
+        }
+
+        var addCellButton = $('.queue-footer > a.add-button');
+        if (data.canAddPlanCell) {
+            addCellButton.show();
+        } else {
+            addCellButton.hide();
+        }
+
+        t.loadQueue();
+    },
+
+    dropdownChangeLeftPanel: function(data) {
+        var t = this;
+        var $wallSwitcher = $('#wall-switcher');
+        var $multiSelect = $('#source-select');
+        var $leftPanel = t.$leftPanel;
+        var $leftPanelTabs = $leftPanel.find('.type-selector');
+        var $userGroupTabs = $('.user-groups-tabs');
+        var targetFeedId = Elements.rightdd();
+        var sourceType = Elements.leftType();
+        var sourceTypes = data.accessibleSourceTypes;
+
+        if (sourceType != 'source') {
+            $('#slider-text').hide();
+            $('#slider-cont').hide();
+            $('#filter-list').hide();
+        } else {
+            $('#slider-text').show();
+            $('#slider-cont').show();
+            $('#filter-list').show();
+        }
+
+        if (data.showSourceList) {
+            $multiSelect.multiselect('getButton').removeClass('hidden');
+        } else {
+            $multiSelect.multiselect('getButton').addClass('hidden');
+        }
+
+        // фильтры по типу постов
+        if (data.showArticleStatusFilter) {
+            $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+            $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
+            $leftPanel.find('.authors-tabs').show();
+        } else {
+            $leftPanel.find('.authors-tabs').hide();
+        }
+
+        // группы юзеров
+        $wallSwitcher.hide();
+
+        if (sourceType == 'authors') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                var showSwitcherType;
+
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+
+            var userGroups = data.showUserGroups;
+            $userGroupTabs.empty();
+            $userGroupTabs.removeClass('hidden');
+            $userGroupTabs.append('<div class="tab selected">Все новости</div>');
+            if (userGroups) {
+                for (var i in userGroups) {
+                    var userGroupModel = new UserGroupModel();
+                    userGroupModel.id(userGroups[i]['id']);
+                    userGroupModel.name(userGroups[i]['name']);
+                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                }
+            }
+        } else {
+            $userGroupTabs.addClass('hidden');
+        }
+
+        if (sourceType == 'albums') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+        }
+
+        $leftPanelTabs.children('.sourceType').each(function(i, item) {
+            item = $(item);
+            if ($.inArray(item.data('type'), sourceTypes) == -1) {
+                item.hide();
+            } else {
+                item.show();
+            }
+        });
+
+        $.cookie('sourceTypes' + targetFeedId, sourceType);
+        articlesLoading = true;
+        app.updateSlider(targetFeedId, sourceType);
+        app.setMultiSelectData(data.sourceFeeds, targetFeedId);
+        articlesLoading = false;
+        app.loadArticles(true);
     }
 });

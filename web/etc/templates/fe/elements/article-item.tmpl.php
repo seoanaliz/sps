@@ -37,14 +37,22 @@ if (!empty($article)) {
     class="post bb
     <?= $isPostMovable ? 'movable' : '' ?>
     <?= $canEditPost ? 'editable' : '' ?>
+    <?= !empty($author) ? 'author' : '' ?>
     <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
+    <? if (!empty($author)) { ?>
+        data-author-id="{$author->authorId}"
+    <? } ?>
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
-            <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
+            <div class="userpic">
+                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
+            </div>
         </div>
-        <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
+        <div class="name d-hide">
+            <?=$sourceInfo[$article->sourceFeedId]['name']?>
+        </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="{$author->avatar}" alt="" /></div>
@@ -97,45 +105,45 @@ if (!empty($article)) {
                 <? } ?>
             </span>
             <? if ($article->rate > 0) { ?>
-                <span class="likes spr"></span><span class="likes-count">
+                <span class="likes spr"></span>
+                <span class="likes-count">
                     <?= ($article->rate > 100) ? 'TOP' : $article->rate ?>
                 </span>
             <? } ?>
         </div>
     </div>
-    <? if ($canEditPost): ?>
+    <? if ($canEditPost) { ?>
         <div class="delete spr"></div>
-    <? endif; ?>
+    <? } ?>
     <div class="clear"></div>
 
-    <? if (!empty($article->authorId )) { ?>
-    <div class="comments">
-        <div class="list">
-            {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+    <? if (!empty($article->authorId)) { ?>
+        <div class="comments">
+            <div class="list">
+                {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+            </div>
+            <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
+                <div class="photo">
+                    <img src="{$__Editor->avatar}" alt="" />
+                </div>
+                <div class="textarea-wrap">
+                    <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+                </div>
+                <div class="actions">
+                    <button class="button send">Отправить</button>
+                    <span class="text">Ctrl+Enter</span>
+                </div>
+            </div>
         </div>
-        <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
-            <div class="photo">
-                <img src="{$__Editor->avatar}" alt="" />
-            </div>
-            <div class="textarea-wrap">
-                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
-            </div>
-            <div class="actions">
-                <button class="button send">Отправить</button>
-                <span class="text">Ctrl+Enter</span>
-            </div>
-        </div>
-
-    </div>
     <? } ?>
-    <? if ($showApproveBlock): ?>
-    <div class="moderation">
-        <div class="actions">
-            <button class="button approve">Одобрить</button>
-            <button class="button white reject">Отклонить</button>
+    <? if ($showApproveBlock) { ?>
+        <div class="moderation">
+            <div class="actions">
+                <button class="button approve">Одобрить</button>
+                <button class="button white reject">Отклонить</button>
+            </div>
         </div>
-    </div>
-    <? endif; ?>
+    <? } ?>
     <div class="clear"></div>
 </div>
 <? } ?>
