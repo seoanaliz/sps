@@ -6,12 +6,8 @@
 /** @var $isWebUserEditor bool */
 /** @var $canEditPost boolean */
 /** @var $sourceFeedType String */
-/**
- * @var $forceDisabledPublishing bool|null -  принудительно отключить редактирование
- */
 
 if (!empty($article)) {
-    $forceDisabledPublishing = isset($forceDisabledPublishing) && $forceDisabledPublishing;
     $extLinkLoader = false;
     $isPostMovable = false;
     $isPostRelocatable = true;
@@ -24,7 +20,7 @@ if (!empty($article)) {
     if ($sourceFeedType == SourceFeedUtility::Ads) {
         $isPostRelocatable = false;
     }
-    if ($isWebUserEditor && !$forceDisabledPublishing) {
+    if ($isWebUserEditor && $sourceFeedType != SourceFeedUtility::My && $sourceFeedType != SourceFeedUtility::Albums) {
         if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
             $isPostMovable = true;
         }
