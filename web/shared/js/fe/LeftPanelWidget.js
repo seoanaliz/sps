@@ -456,19 +456,22 @@ var LeftPanelWidget = Event.extend({
                 $newPost.show();
                 switch (switcherType) {
                     case 'approved':
-                        requestData.articleStatus = 2;
+                        requestData.articleStatus = App.ARTICLE_STATUS_APPROVED;
                         break;
                     case 'deferred':
-                        requestData.articleStatus = 1;
+                        requestData.articleStatus = App.ARTICLE_STATUS_REVIEWING;
                         break;
-                    case 'all':
-                        requestData.mode = 'all';
+                }
+                break;
+            case 'albums':
+                requestData.sourceFeedIds = Elements.leftdd();
+                switch (switcherType) {
+                    case 'approved':
+                        requestData.articleStatus = App.ARTICLE_STATUS_APPROVED;
                         break;
-                    case 'my':
-                        requestData.mode = 'my';
+                    case 'deferred':
+                        requestData.articleStatus = App.ARTICLE_STATUS_REVIEWING;
                         break;
-                    default:
-                        requestData.articleStatus = 1;
                 }
                 break;
             case 'my':
@@ -484,7 +487,6 @@ var LeftPanelWidget = Event.extend({
                 }
                 break;
             case 'topface':
-            case 'albums':
             case 'source':
                     requestData.sourceFeedIds = Elements.leftdd();
                     var $slider = $('#slider-range');

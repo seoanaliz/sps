@@ -105,7 +105,8 @@ if (!empty($article)) {
                 <? } ?>
             </span>
             <? if ($article->rate > 0) { ?>
-                <span class="likes spr"></span><span class="likes-count">
+                <span class="likes spr"></span>
+                <span class="likes-count">
                     <?= ($article->rate > 100) ? 'TOP' : $article->rate ?>
                 </span>
             <? } ?>
@@ -134,14 +135,14 @@ if (!empty($article)) {
                 </div>
             </div>
         </div>
-        <? if ($showApproveBlock) { ?>
-            <div class="moderation">
-                <div class="actions">
-                    <button class="button approve">Одобрить</button>
-                    <button class="button white reject">Отклонить</button>
-                </div>
+    <? } ?>
+    <? if ($showApproveBlock) { ?>
+        <div class="moderation">
+            <div class="actions">
+                <button class="button approve">Одобрить</button>
+                <button class="button white reject">Отклонить</button>
             </div>
-        <? } ?>
+        </div>
     <? } ?>
     <div class="clear"></div>
 </div>

@@ -246,7 +246,7 @@ var RightPanelWidget = Event.extend({
         var sourceType = Elements.leftType();
         var sourceTypes = data.accessibleSourceTypes;
 
-        if (sourceType != 'source' && sourceType != 'albums') {
+        if (sourceType != 'source') {
             $('#slider-text').hide();
             $('#slider-cont').hide();
             $('#filter-list').hide();
@@ -277,6 +277,7 @@ var RightPanelWidget = Event.extend({
         if (sourceType == 'authors') {
             if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
                 var showSwitcherType;
+
                 if (data.authorsFilters.all_my_filter) {
                     showSwitcherType = 'all';
                 } else {
@@ -302,6 +303,20 @@ var RightPanelWidget = Event.extend({
             }
         } else {
             $userGroupTabs.addClass('hidden');
+        }
+
+        if (sourceType == 'albums') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
         }
 
         $leftPanelTabs.children('.sourceType').each(function(i, item) {
