@@ -1668,6 +1668,11 @@ var LeftPanelWidget = Event.extend({
         t.loadArticles(true);
     },
 
+    /**
+     * Включение горячих клавиш для одобрения
+     * и отклонения фоток в альбомах
+     * @task 13636
+     */
     enableKeyboardDecision: function() {
         var t = this;
         $(window).on('keydown.keyboardDecision', function(e) {
@@ -1686,6 +1691,11 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
+    /**
+     * Оключение горячих клавиш для одобрения
+     * и отклонения фоток в альбомах
+     * @task 13636
+     */
     disableKeyboardDecision: function() {
         $(window).off('keydown.keyboardDecision');
     }
