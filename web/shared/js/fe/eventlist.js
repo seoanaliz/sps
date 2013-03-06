@@ -38,6 +38,10 @@ Control = $.extend(Control, {
                 userId: 'vkId',
                 listId: 'userGroupId'
             }
+        },
+        get_source_list: {
+            name: 'source-feeds-list',
+            dataType: 'json'
         }
     }
 });
@@ -169,32 +173,13 @@ var Eventlist = {
                 time: time,
                 queueId: qid
             },
-            success: function (data) {
+            success: function(data) {
                 if (data.success) {
                     callback(true);
                 } else {
                     callback(false);
                 }
             }
-        });
-    },
-
-    rightcolumn_dropdown_change: function() {
-        articlesLoading = true;
-        var targetFeedId = Elements.rightdd();
-        var sourceType = Elements.leftType();
-
-        //грузим источники для этого паблика
-        $.ajax({
-            url: controlsRoot + 'source-feeds-list/',
-            dataType : 'json',
-            data: {
-                targetFeedId: targetFeedId,
-                type: sourceType
-            }
-        }).success(function(data) {
-            articlesLoading = false;
-            app.onRightPanelDropdownChange(data);
         });
     },
 
@@ -360,6 +345,9 @@ var Eventlist = {
     eof: null
 };
 
+/**
+ * @deprecated
+ */
 var Events = {
     delay: 0,
     isDebug: false,

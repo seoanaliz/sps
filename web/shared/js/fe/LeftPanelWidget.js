@@ -528,9 +528,9 @@ var LeftPanelWidget = Event.extend({
                     $(window).data('disable-load-more', true);
                 }
             }
-            t.trigger('articlesLoaded', true);
+            t.trigger('loadArticles', html);
         }).error(function() {
-            t.trigger('articlesLoaded', false);
+            t.trigger('loadArticles', false);
         });
     },
 
@@ -1224,7 +1224,7 @@ var LeftPanelWidget = Event.extend({
             } else {
                 $('body').removeClass('editor-mode');
                 $(window).data('disable-load-more', false);
-                Events.fire('rightcolumn_dropdown_change');
+                app.updateRightPanelDropdown();
             }
         });
 
@@ -1528,6 +1528,107 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         t.filterAuthorId = userId;
         t.$leftPanel.find('.header .tab.selected').removeClass('selected');
+        t.loadArticles(true);
+    },
+
+    dropdownChangeLeftPanel: function(data) {
+        var t = this;
+        var $wallSwitcher = $('#wall-switcher');
+        var $multiSelect = $('#source-select');
+        var $leftPanel = t.$leftPanel;
+        var $leftPanelTabs = $leftPanel.find('.type-selector');
+        var $userGroupTabs = $('.user-groups-tabs');
+        var targetFeedId = Elements.rightdd();
+        var sourceType = Elements.leftType();
+        var sourceTypes = data.accessibleSourceTypes;
+
+        if (sourceType != 'source') {
+            $('#slider-text').hide();
+            $('#slider-cont').hide();
+            $('#filter-list').hide();
+        } else {
+            $('#slider-text').show();
+            $('#slider-cont').show();
+            $('#filter-list').show();
+        }
+
+        if (data.showSourceList) {
+            $multiSelect.multiselect('getButton').removeClass('hidden');
+        } else {
+            $multiSelect.multiselect('getButton').addClass('hidden');
+        }
+
+        // фильтры по типу постов
+        if (data.showArticleStatusFilter) {
+            $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+            $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
+            $leftPanel.find('.authors-tabs').show();
+        } else {
+            $leftPanel.find('.authors-tabs').hide();
+        }
+
+        // группы юзеров
+        $wallSwitcher.hide();
+
+        if (sourceType == 'authors') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                var showSwitcherType;
+
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+
+            var userGroups = data.showUserGroups;
+            $userGroupTabs.empty();
+            $userGroupTabs.removeClass('hidden');
+            $userGroupTabs.append('<div class="tab selected">Все новости</div>');
+            if (userGroups) {
+                for (var i in userGroups) {
+                    var userGroupModel = new UserGroupModel();
+                    userGroupModel.id(userGroups[i]['id']);
+                    userGroupModel.name(userGroups[i]['name']);
+                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                }
+            }
+        } else {
+            $userGroupTabs.addClass('hidden');
+        }
+
+        if (sourceType == 'albums') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+        }
+
+        $leftPanelTabs.children('.sourceType').each(function(i, item) {
+            item = $(item);
+            if ($.inArray(item.data('type'), sourceTypes) == -1) {
+                item.hide();
+            } else {
+                item.show();
+            }
+        });
+
+        $.cookie('sourceTypes' + targetFeedId, sourceType);
+        articlesLoading = true;
+        t.updateSlider(targetFeedId, sourceType);
+        t.setMultiSelectData(data.sourceFeeds, targetFeedId);
+        articlesLoading = false;
         t.loadArticles(true);
     }
 });
