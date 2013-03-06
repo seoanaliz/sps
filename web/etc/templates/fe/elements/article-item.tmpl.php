@@ -4,10 +4,10 @@
 /** @var $sourceFeed SourceFeed|null */
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
-/** @var $canEditPost boolean */
 /** @var $sourceFeedType String */
 
 if (!empty($article)) {
+    $canEditPost = true;
     $extLinkLoader = false;
     $isPostMovable = false;
     $isPostRelocatable = true;
@@ -20,20 +20,29 @@ if (!empty($article)) {
     if ($sourceFeedType == SourceFeedUtility::Ads) {
         $isPostRelocatable = false;
     }
+
     if ($isWebUserEditor) {
-       switch ($sourceFeedType) {
-           case SourceFeedUtility::Ads:
-           case SourceFeedUtility::Source:
-           case SourceFeedUtility::Topface:
+        switch ($sourceFeedType) {
+            case SourceFeedUtility::Ads:
+            case SourceFeedUtility::Source:
+            case SourceFeedUtility::Topface:
                 $isPostMovable = true;
-               break;
-           case SourceFeedUtility::Authors:
-           case SourceFeedUtility::Albums:
+                break;
+            case SourceFeedUtility::Authors:
+            case SourceFeedUtility::Albums:
                 if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
                     $isPostMovable = true;
                 }
-               break;
-       }
+                break;
+        }
+    }
+
+    $canEditPost = true;
+    if ($role == UserFeed::ROLE_AUTHOR) {
+        $canEditPost = $Article->articleStatus != Article::STATUS_APPROVED;
+    }
+    if (!empty($sourceFeed) && $sourceFeed->type == SourceFeedUtility::Albums) {
+        $canEditPost = false;
     }
 ?>
 <div
@@ -68,10 +77,10 @@ if (!empty($article)) {
     <div class="bottom d-hide">
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
-            <? if ($canEditPost): ?>|
+            <? if ($canEditPost) { ?>|
                 <a class="edit">Редактировать</a> |
                 <a class="clear-text">Очистить текст</a>
-            <? endif; ?>
+            <? } ?>
         </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
