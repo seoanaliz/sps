@@ -187,7 +187,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
-                $text       =   $this->remove_tags( $post->text);
+                $text       =   self::remove_tags( $post->text);
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -429,7 +429,7 @@ else
 return $a;
 }
 
-        private function remove_tags($text)
+        public static  function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
             $text = str_replace( '&#189;',  "½",    $text );
