@@ -124,7 +124,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   0;
                 $time       =   $post->created;
-                $text       =   $post->text;
+                $text       =   ParserVkontakte::remove_tags( $post->text );
                 $photo = array();
                 $photo[] = array(
                     'id'   =>  $post->owner_id . '_' . $post->pid,
