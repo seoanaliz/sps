@@ -8,7 +8,6 @@
  */
 class CheckPosts
 {
-    const time_shift = 0;
     private $now;
 
     public function Execute()
@@ -19,7 +18,7 @@ class CheckPosts
 
         $this->search_for_posts( $barters_for_search );
 
-        $this->update_population( $barters_for_search );
+        StatPublics::update_population( $barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -48,7 +47,7 @@ class CheckPosts
                         $barter->deleted_at = $this->now;
                         break;
                     } else {
-                        if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + self::time_shift )))> 0  )
+                        if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + StatPublics::time_shift )))> 0  )
                             $overposts .= $post->date . ',';
                     }
                 }
@@ -75,40 +74,6 @@ class CheckPosts
             return false;
         }
         return true;
-    }
-
-    public function update_population( $barter_events_array )
-    {
-        foreach( $barter_events_array as $barter_event ) {
-            /** @var $barter_event BarterEvent */
-            if ( $barter_event->status != 3 ) {
-            $time = time() + self::time_shift;
-
-                $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );
-                if( !$res ) {
-                    sleep(1);
-                    $time -= 44600;
-                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time, 'barter' );
-                }
-                $barter_event->end_visitors = $res['visitors'];
-
-                $count = 0;
-                for ( $i = 0; $i < 3; $i++ ) {
-
-                    $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
-                    if( !isset( $res->count )) {
-                        sleep( 1 );
-                        continue;
-                    }
-                    $count = $res->count;
-                    break;
-                }
-                if( !$count ) {
-                    $count = $this->get_public_members_count( $barter_event->target_public );
-                }
-                $barter_event->end_subscribers = $count;
-            }
-        }
     }
 
     public function get_public_members_count( $public_id )

@@ -246,19 +246,35 @@
         }
 
         //$post_id  = idпаблика_idпоста
-        public function delete_post( $post_id )
+        public function delete_post( $full_post_id )
         {
-            $post_id = trim($post_id, '-');
-            $id = explode('_', $post_id);
-            $params = array(
-                'owner_id'      =>  '-' . $id[0],
-                'post_id'       =>  $id[1],
-                'access_token'  =>  $this->vk_access_token
-            );
+            list( $owner_id, $post_id ) = explode( '_', $full_post_id );
+            if( $post_id) {
+                $params = array(
+                    'owner_id'      =>  '-' . $owner_id,
+                    'post_id'       =>  $post_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
+                if( VkHelper::api_request( 'wall.delete', $params ))
+                    return true;
+            }
+            return false;
+        }
 
-            VkHelper::api_request( 'wall.delete', $params );
-
-            return true;
+        public function delete_photo( $full_photo_id )
+        {
+            sleep(1);
+            list( $owner_id, $photo_id ) = explode( '_', $full_photo_id );
+            if( $photo_id ) {
+                $params = array(
+                    'oid'           =>  $owner_id,
+                    'pid'           =>  $photo_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
+                if( VkHelper::api_request( 'photos.delete', $params ))
+                    return true;
+            }
+            return false;
         }
 
         //нужно для однотипных названий (альбом 1, альбом 2)
@@ -291,6 +307,22 @@
 
             return false;
 
+        }
+
+        public function get_album_size( $full_album_id )
+        {
+            sleep(0.4);
+            list( $public_id, $album_id ) = explode( '_', $full_album_id );
+            if( $album_id ) {
+                $params = array(
+                    'gid'           =>  $public_id,
+                    'aids'          =>  $album_id,
+                    'access_token'  =>  $this->vk_access_token
+                );
+                $res = VkHelper::api_request( 'photos.getAlbums', $params );
+                return $res[0]->size;
+            }
+            return false;
         }
 
         private function create_album( $counter = 1, $privacy = 1, $title = '' )

@@ -108,7 +108,7 @@ if (!empty($article)) {
     <? endif; ?>
     <div class="clear"></div>
 
-    <? if (!empty($article->authorId)) { ?>
+    <? if (!empty($article->authorId )) { ?>
     <div class="comments">
         <div class="list">
             {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
@@ -125,16 +125,17 @@ if (!empty($article)) {
                 <span class="text">Ctrl+Enter</span>
             </div>
         </div>
-        <? if ($showApproveBlock): ?>
-        <div class="moderation">
-            <div class="actions">
-                <button class="button approve">Одобрить</button>
-                <button class="button white reject">Отклонить</button>
-            </div>
-        </div>
-        <? endif; ?>
+
     </div>
     <? } ?>
+    <? if ($showApproveBlock): ?>
+    <div class="moderation">
+        <div class="actions">
+            <button class="button approve">Одобрить</button>
+            <button class="button white reject">Отклонить</button>
+        </div>
+    </div>
+    <? endif; ?>
     <div class="clear"></div>
 </div>
 <? } ?>

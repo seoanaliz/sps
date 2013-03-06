@@ -122,7 +122,7 @@ class GetSourceFeedsListControl extends BaseControl
             $authorsFilters['all_my_filter'] = array();
         }
 
-        if ($role != UserFeed::ROLE_AUTHOR && $type == SourceFeedUtility::Authors) {
+        if ($role != UserFeed::ROLE_AUTHOR && ( $type == SourceFeedUtility::Authors || $type == SourceFeedUtility::Albums)) {
             $authorsFilters['article_status_filter'] = array();
         }
 
@@ -140,5 +140,4 @@ class GetSourceFeedsListControl extends BaseControl
         ));
     }
 }
-
 ?>
