@@ -318,7 +318,7 @@ var QueueWidget = Event.extend({
                 if (data && data.articleId) {
                     var postId = data.articleId;
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.load();
+                        t.update();
                     });
                 }
             });
