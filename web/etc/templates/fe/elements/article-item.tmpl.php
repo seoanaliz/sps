@@ -39,7 +39,7 @@ if (!empty($article)) {
 
     $canEditPost = true;
     if (!$isWebUserEditor) {
-        $canEditPost = $Article->articleStatus != Article::STATUS_APPROVED;
+        $canEditPost = $article->articleStatus != Article::STATUS_APPROVED;
     }
     if (!empty($sourceFeed) && $sourceFeed->type == SourceFeedUtility::Albums) {
         $canEditPost = false;
