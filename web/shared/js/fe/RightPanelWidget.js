@@ -77,7 +77,7 @@ var RightPanelWidget = Event.extend({
             $(this).addClass('active');
 
             $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
-            t.loadQueue();
+            t.updateQueue();
         });
     },
 
@@ -93,7 +93,7 @@ var RightPanelWidget = Event.extend({
             })
             .change(function(){
                 $(this).parent().find('.caption').toggleClass('default', !$(this).val().length);
-                t.loadQueue();
+                t.updateQueue();
             });
 
         $('.calendar .tip, #calendar-fix').click(function(){
@@ -188,8 +188,8 @@ var RightPanelWidget = Event.extend({
         this.getQueueWidget().initQueue();
     },
 
-    loadQueue: function() {
-        this.getQueueWidget().load();
+    updateQueue: function() {
+        this.getQueueWidget().update();
     },
 
     updateDropdown: function() {
@@ -241,6 +241,6 @@ var RightPanelWidget = Event.extend({
             addCellButton.hide();
         }
 
-        t.loadQueue();
+        t.updateQueue();
     }
 });

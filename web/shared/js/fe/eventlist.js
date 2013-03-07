@@ -54,6 +54,9 @@ Control = $.extend(Control, {
             params: {
                 articleId: 'id'
             }
+        },
+        get_queue: {
+            name: 'articles-queue-list'
         }
     }
 });
@@ -99,7 +102,7 @@ var Eventlist = {
                 id: post_id
             },
             success: function(data) {
-                app.loadQueue();
+                app.updateQueue();
                 if (typeof callback == 'function') {
                     callback(true);
                 }
@@ -121,7 +124,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.loadQueue();
+                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -145,7 +148,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.loadQueue();
+                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -187,7 +190,7 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(1, data.id);
-                    app.loadQueue();
+                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);

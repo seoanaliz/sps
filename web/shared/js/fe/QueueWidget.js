@@ -3,12 +3,16 @@ var QueueWidget = Event.extend({
         this.$queue = $('#queue');
     },
 
-    load: function() {
+    /**
+     * Обновление ленты очереди
+     * @return Deferred|bool
+     */
+    update: function() {
         var t = this;
         var targetFeedId = Elements.rightdd();
 
         if (!targetFeedId) {
-            return;
+            return false;
         }
 
         $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
@@ -21,16 +25,11 @@ var QueueWidget = Event.extend({
             $('.queue-footer').show();
         }
 
-        //clean and load right column
-        $.ajax({
-            url: controlsRoot + 'articles-queue-list/',
-            dataType: "html",
-            data: {
-                targetFeedId: Elements.rightdd(),
-                timestamp: Elements.calendar(),
-                type: type
-            }
-        }).success(function (data) {
+        return Control.fire('get_queue', {
+            targetFeedId: Elements.rightdd(),
+            timestamp: Elements.calendar(),
+            type: type
+        }).success(function(data) {
             if (data) {
                 var tmpEl = document.createElement('div');
                 var $block = $(tmpEl).html(data);
@@ -160,7 +159,7 @@ var QueueWidget = Event.extend({
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
                     if (state) {
-                        t.loadQueue();
+                        t.updateQueue();
                     }
                 });
             }
@@ -227,7 +226,6 @@ var QueueWidget = Event.extend({
             }
         });
 
-
         // Показать полностью в правом меню
         $queue.delegate('.toggle-text', 'click', function(e) {
             $(this).parent().toggleClass('collapsed');
@@ -245,6 +243,24 @@ var QueueWidget = Event.extend({
 
             e.preventDefault();
         });
+
+        $('.queue-footer .add-button').click(function() {
+            $queue.scrollTo(0);
+            var $newPost = $(QUEUE_SLOT_ADD);
+            $newPost.prependTo($queue).animate({height: 110}, 200);
+            $newPost.find('.time').click();
+        });
+
+        t.initInlineCreate();
+    },
+
+    /**
+     * Инициализация создания публикации в ячейке
+     * @task 13268
+     */
+    initInlineCreate: function() {
+        var t = this;
+        var $queue = this.$queue;
 
         $queue.delegate('.slot.empty:not(.new):not(.edit)', 'click', function(e) {
             if (e.target != e.currentTarget) {
@@ -283,15 +299,13 @@ var QueueWidget = Event.extend({
             var $slot = $(this).closest('.slot');
             t.saveArticle($slot);
         });
-
-        $('.queue-footer .add-button').click(function() {
-            $queue.scrollTo(0);
-            var $newPost = $(QUEUE_SLOT_ADD);
-            $newPost.prependTo($queue).animate({height: 110}, 200);
-            $newPost.find('.time').click();
-        });
     },
 
+    /**
+     * Сохранение ячейки в очереди
+     * @task 13268
+     * @param $slot - ячейка, которую нужно сохранить
+     */
     saveArticle: function($slot) {
         var t = this;
         var $textarea = $slot.find('textarea');

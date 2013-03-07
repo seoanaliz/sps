@@ -15,15 +15,15 @@ var Elements = {
         $block.find('.post-image-top img').bind('load', function () {
             var src = $(this).attr('src');
             var img = new Image();
-            var link = $(this).closest('.post').find('.ajax-loader-ext');
+            var $link = $(this).closest('.post').find('.ajax-loader-ext');
 
             img.onload = function() {
                 if (this.width < 250 && this.height < 250) {
                     //small
-                    Elements.initLinkLoader(link, true);
+                    Elements.initLinkLoader($link, true);
                 } else {
                     //big
-                    Elements.initLinkLoader(link, false);
+                    Elements.initLinkLoader($link, false);
                 }
             };
 
@@ -120,9 +120,9 @@ var Elements = {
             $('#calendar').datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
-    initLinkLoader: function(obj, full){
-        var container   = obj.parents('div.link-info-content');
-        var link        = obj.attr('rel');
+    initLinkLoader: function($link, full){
+        var container   = $link.parents('div.link-info-content');
+        var link        = $link.attr('rel');
 
         $.ajax({
             url: 'http://im.' + hostname + '/int/controls/parse-url/',
