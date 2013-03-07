@@ -46,3 +46,5 @@
 0      6      *       *       *         /usr/bin/curl -s http://socialboard.ru/int/daemons/PublicsGrowFixer/ > /dev/null
 
 #*/10     *       *       *       *         /usr/bin/curl -s http://socialboard.ru/int/daemons/clear-posts/ > /dev/null
+
+0     *       *       *       *      /home/sps/bin/rnginx
