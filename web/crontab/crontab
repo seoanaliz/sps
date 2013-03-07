@@ -1,48 +1,48 @@
-*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
-#*/1     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/2     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/2     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/2     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
+#*/1     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-sources/ > /dev/null
 
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
+*/2     *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/process-queue/ > /dev/null
 
 
-0     1       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
-0     2       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
-0     3       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
+0     1       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
+0     2       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
+0     3       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-top/ > /dev/null
 
-59     23       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/SyncLikes/ > /dev/null
-#*/5    *       *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/SyncLikes/?all > /dev/null
+59     23       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/SyncLikes/ > /dev/null
+#*/5    *       *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/SyncLikes/?all > /dev/null
 
-0     */3   *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/wr-topics/ > /dev/null
-*/20  *      *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/MesCheckUpdates/ > /dev/null
-0   *      *       *       *      /usr/local/bin/curl -s http://socialboard.ru/int/daemons/WrAlarm/ > /dev/null
+0     */3   *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/wr-topics/ > /dev/null
+*/20  *      *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/MesCheckUpdates/ > /dev/null
+0   *      *       *       *      /usr/bin/curl -s http://socialboard.ru/int/daemons/WrAlarm/ > /dev/null
 
-*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/sync-albums/ > /dev/null
-*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/delete-post/ > /dev/null
-*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/CheckPosts/ > /dev/null
-*/3     *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/CheckWalls/ > /dev/null
+*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/sync-albums/ > /dev/null
+*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/delete-post/ > /dev/null
+*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/CheckPosts/ > /dev/null
+*/3     *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/CheckWalls/ > /dev/null
 
-0       *       *       *       *       /usr/local/bin/curl -s http://socialboard.ru/int/daemons/token-checker/ > /dev/null
+0       *       *       *       *       /usr/bin/curl -s http://socialboard.ru/int/daemons/token-checker/ > /dev/null
 
 #0     6       *       *       *       /home/sps/update-test-db.sh > /tmp/update-test-db.result 2>&1
-0      6      *       *       *         /usr/local/bin/curl -s http://socialboard.ru/int/daemons/PublicsGrowFixer/ > /dev/null
+0      6      *       *       *         /usr/bin/curl -s http://socialboard.ru/int/daemons/PublicsGrowFixer/ > /dev/null
 
-#*/10     *       *       *       *         /usr/local/bin/curl -s http://socialboard.ru/int/daemons/clear-posts/ > /dev/null
+#*/10     *       *       *       *         /usr/bin/curl -s http://socialboard.ru/int/daemons/clear-posts/ > /dev/null
