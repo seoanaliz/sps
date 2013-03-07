@@ -1,3 +1,4 @@
+html{overflow-y:scroll;}
 #main .list-add-monitor{padding:0 10px 10px;}#main .list-add-monitor .form input+input{margin-left:10px;}
 #main .list-add-monitor .form .button{margin-left:10px;}
 #main .left-column>.content .list-head{padding:0 10px;background-color:#DEE5EB;color:#45688E;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}#main .left-column>.content .list-head .item .icon{opacity:0;margin-right:-1.5em;background-position:center .5em;}

@@ -38,6 +38,22 @@ Control = $.extend(Control, {
                 userId: 'vkId',
                 listId: 'userGroupId'
             }
+        },
+        get_source_list: {
+            name: 'source-feeds-list',
+            dataType: 'json'
+        },
+        accept_article: {
+            name: 'article-approved',
+            params: {
+                articleId: 'id'
+            }
+        },
+        decline_article: {
+            name: 'article-reject',
+            params: {
+                articleId: 'id'
+            }
         }
     }
 });
@@ -72,28 +88,6 @@ var Eventlist = {
                 id: post_id
             },
             success: function (data) {
-                callback(1);
-            }
-        });
-    },
-    leftcolumn_approve_post: function(post_id, callback) {
-        $.ajax({
-            url: controlsRoot + 'article-approved/',
-            data: {
-                id: post_id
-            },
-            success: function(data) {
-                callback(1);
-            }
-        });
-    },
-    leftcolumn_reject_post: function(post_id, callback) {
-        $.ajax({
-            url: controlsRoot + 'article-reject/',
-            data: {
-                id: post_id
-            },
-            success: function(data) {
                 callback(1);
             }
         });
@@ -169,177 +163,13 @@ var Eventlist = {
                 time: time,
                 queueId: qid
             },
-            success: function (data) {
-                if(data.success) {
+            success: function(data) {
+                if (data.success) {
                     callback(true);
-                    app.loadQueue();
                 } else {
                     callback(false);
                 }
             }
-        });
-    },
-    // TODO: перенести в RightPanelWidget.js
-    rightcolumn_dropdown_change: function(){
-        articlesLoading = true;
-
-        var targetFeedId = Elements.rightdd();
-        var sourceType = Elements.leftType();
-        var $multiSelect = $("#source-select");
-        var $leftPanel = $('.left-panel');
-
-        //грузим источники для этого паблика
-        $.ajax({
-            url: controlsRoot + 'source-feeds-list/',
-            dataType : "json",
-            data: {
-                targetFeedId: targetFeedId,
-                type: sourceType
-            }
-        }).success(function(data) {
-            var $wallSwitcher = $('#wall-switcher');
-            var sourceTypes = data.accessibleSourceTypes;
-            // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
-            var $sourceTypeLink = $('#sourceType-' + data.type);
-            if (!$sourceTypeLink.hasClass('active')) {
-                $('.sourceType.active').removeClass('active');
-                $sourceTypeLink.addClass('active');
-            }
-            sourceType = $sourceTypeLink.data('type');
-            if (sourceType != 'source' && sourceType != 'albums') {
-                $('#slider-text').hide();
-                $('#slider-cont').hide();
-                $('#filter-list').hide();
-            } else {
-                $('#slider-text').show();
-                $('#slider-cont').show();
-                $('#filter-list').show();
-            }
-
-            if (data.showSourceList) {
-                $multiSelect.multiselect('getButton').removeClass('hidden');
-            } else {
-                $multiSelect.multiselect('getButton').addClass('hidden');
-            }
-
-            // фильтры по типу постов
-            if (data.showArticleStatusFilter) {
-                $leftPanel.find('.authors-tabs .tab').removeClass('selected');
-                $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
-                $leftPanel.find('.authors-tabs').show();
-            } else {
-                $leftPanel.find('.authors-tabs').hide();
-            }
-
-            // группы юзеров
-            $wallSwitcher.hide();
-            var $userGroupTabs = $('.user-groups-tabs');
-            if (sourceType == 'authors') {
-                if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
-                    var showSwitcherType;
-                    if (data.authorsFilters.all_my_filter) {
-                        showSwitcherType = 'all';
-                    } else {
-                        showSwitcherType = 'deferred';
-                    }
-                    $wallSwitcher.show();
-                    $wallSwitcher.find('a').hide();
-                    $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
-                }
-
-                var userGroups = data.showUserGroups;
-                $userGroupTabs.empty();
-                $userGroupTabs.removeClass('hidden');
-                $userGroupTabs.append('<div class="tab selected">Все новости</div>');
-                if (userGroups) {
-                    for (var i in userGroups) {
-                        var userGroupModel = new UserGroupModel();
-                        userGroupModel.id(userGroups[i]['id']);
-                        userGroupModel.name(userGroups[i]['name']);
-                        userGroupCollection.add(userGroupModel.id(), userGroupModel);
-                        $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
-                    }
-                }
-            } else {
-                $userGroupTabs.addClass('hidden');
-            }
-
-            var $typeSelector = $('.left-panel div.type-selector');
-            $typeSelector.children('.sourceType').each(function(i, item) {
-                item = $(item);
-                if ($.inArray(item.data('type'), sourceTypes) == -1) {
-                    item.hide();
-                } else {
-                    item.show();
-                }
-            });
-
-            $.cookie('sourceTypes' + targetFeedId, sourceType);
-
-            //init slider
-            app.initSlider(targetFeedId, sourceType);
-
-            $('#source-select option').remove();
-
-            for (var i in data.sourceFeeds) {
-                var item = data.sourceFeeds[i];
-                $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
-            }
-
-            $('.left-panel div.type-selector').children('.sourceType').each(function(i, item){
-                item = $(item);
-                if ($.inArray(item.data('type'), sourceTypes) == -1){
-                    item.hide();
-                } else {
-                    item.show();
-                }
-            });
-
-            var gridTypes = data.accessibleGridTypes;
-            var showCount = 0;
-            $('#right-panel .type-selector').children('.grid_type').each(function(i, item){
-                item = $(item);
-                if ($.inArray(item.data('type'), gridTypes) == -1){
-                    item.hide();
-                } else {
-                    showCount++;
-                    item.show();
-                }
-            });
-            if (showCount > 2) {
-                $('a.grid_type.all').show();
-            } else {
-                $('a.grid_type.all').hide();
-            }
-
-            var addCellButton = $('div.queue-footer > a.add-button');
-            if (data['canAddPlanCell']) {
-                addCellButton.show();
-            } else {
-                addCellButton.hide();
-            }
-
-            app.loadQueue();
-
-            //get data from cookie
-            var cookie = $.cookie('sourceFeedIds' + targetFeedId);
-            if (cookie) {
-                var selectedSources = cookie.split(',');
-                if (selectedSources) {
-                    var $options = $('#source-select option');
-                    for (i in selectedSources) {
-                        $options.filter('[value="'+selectedSources[i]+'"]').prop('selected', true);
-                    }
-                }
-            }
-
-            $multiSelect.multiselect("refresh");
-            if (Elements.leftdd().length == 0) {
-                $multiSelect.multiselect("checkAll").multiselect("refresh");
-            }
-
-            articlesLoading = false;
-            app.onLeftPanelDropdownChange();
         });
     },
 
@@ -505,6 +335,9 @@ var Eventlist = {
     eof: null
 };
 
+/**
+ * @deprecated
+ */
 var Events = {
     delay: 0,
     isDebug: false,

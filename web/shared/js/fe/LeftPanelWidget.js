@@ -1,4 +1,8 @@
 var LeftPanelWidget = Event.extend({
+    filterAuthorId: null,
+    wallPage: -1,
+    wallAutohideEnabled: false,
+
     init: function() {
         this.$leftPanel = $('#left-panel');
         this.$multiSelect = $('#source-select');
@@ -10,8 +14,9 @@ var LeftPanelWidget = Event.extend({
         this.initWallFilter();
         this.initAddPost();
         this.initWallAutoload();
-        this.initLeftPanelTabs();
+        this.initTabs();
         this.initModeration();
+        this.initUserFilter();
     },
 
     initLeftPanel: function() {
@@ -84,14 +89,6 @@ var LeftPanelWidget = Event.extend({
                     $button.removeClass('load');
                     $textarea.val('').focus();
                     $commentsList.append(html).find('.date').easydate(easydateParams);
-
-                    var $moderation = $newComment.next('.moderation');
-                    if ($moderation.length && !$moderation.data('checked')) {
-                        $moderation.data('checked', true);
-                        Events.fire('leftcolumn_reject_post', postId, function() {
-                            $post.slideUp(200);
-                        });
-                    }
                 });
             }
         });
@@ -124,22 +121,19 @@ var LeftPanelWidget = Event.extend({
 
         $(document).on('mousedown', function(e) {
             var $newComment = $(e.target).closest('.new-comment.open');
-            if (!$newComment.length) {
-                $('.new-comment.open').each(function() {
-                    var $newComment = $(this);
-                    var $textarea = $newComment.find('textarea');
-                    if (!$textarea.val()) {
-                        $newComment.removeClass('open');
-                        $textarea.height('auto');
-
-                        var $moderation = $newComment.next('.moderation');
-                        if ($moderation.length && !$moderation.data('checked')) {
-                            $newComment.hide();
-                            $moderation.show();
-                        }
-                    }
-                });
+            if ($newComment.length) {
+                return;
             }
+
+            $('.new-comment.open').each(function() {
+                var $newComment = $(this);
+                var $textarea = $newComment.find('textarea');
+                if (!$textarea.val()) {
+                    $newComment.removeClass('open');
+                    $textarea.height('auto');
+                    $newComment.trigger('close');
+                }
+            });
         });
 
         // Показать полностью в левом меню
@@ -178,27 +172,59 @@ var LeftPanelWidget = Event.extend({
                 + Lang.declOfNum(i, ['источник выбран', 'источника выбрано', 'источников выбрано']);
             },
             checkAll: function(){
-                t.onDropdownChange();
+                t.updateMultiSelect();
             },
             uncheckAll: function(){
-                t.onDropdownChange();
+                t.updateMultiSelect();
             }
         });
-        $multiSelect.bind("multiselectclick", function(event, ui){
-            t.onDropdownChange();
+        $multiSelect.bind('multiselectclick', function() {
+            t.updateMultiSelect();
         });
     },
 
-    onDropdownChange: function() {
+    updateMultiSelect: function() {
+        this.saveMultiSelectData();
+        this.loadArticles(true);
+    },
+
+    saveMultiSelectData: function() {
         var targetFeedId = Elements.rightdd();
         var leftType = Elements.leftType();
         if (leftType == 'source') {
             $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
         }
-        this.loadArticles(true);
+    },
+
+    setMultiSelectData: function(sourceFeeds, targetFeedId) {
+        var t = this;
+        var $multiSelect = t.$multiSelect;
+        $multiSelect.find('option').remove();
+        for (var i in sourceFeeds) {
+            var item = sourceFeeds[i];
+            $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
+        }
+
+        //get data from cookie
+        var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+        if (cookie) {
+            var selectedSources = cookie.split(',');
+            if (selectedSources) {
+                var $options = $multiSelect.find('option');
+                for (i in selectedSources) {
+                    $options.filter('[value="' + selectedSources[i] + '"]').prop('selected', true);
+                }
+            }
+        }
+
+        $multiSelect.multiselect('refresh');
+        if (Elements.leftdd().length == 0) {
+            $multiSelect.multiselect('checkAll').multiselect('refresh');
+        }
     },
 
     initWall: function() {
+        var t = this;
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
 
@@ -262,10 +288,10 @@ var LeftPanelWidget = Event.extend({
             } else {
                 $target.data('def-html', $target.html());
 
-                wallPage = 0;
+                t.wallPage = 0;
                 Elements.getWallLoader().show();
                 Control.fire('get_articles', {
-                    page: wallPage,
+                    page: t.wallPage,
                     sortType: Elements.getSortType(),
                     type: Elements.leftType(),
                     targetFeedId: Elements.rightdd(),
@@ -293,7 +319,7 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $leftPanel = t.$leftPanel;
         $leftPanel.find('.drop-down').change(function() {
-            t.onDropdownChange();
+            t.updateMultiSelect();
         });
 
         $('.wall-title .filter a').dropdown({
@@ -315,10 +341,10 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
-    initSlider: function(targetFeedId, sourceType) {
+    updateSlider: function(targetFeedId, sourceType) {
         var t = this;
         var cookie = $.cookie(sourceType + 'FeedRange' + targetFeedId);
-        var from = sourceType == 'albums' ? 0 : 50;
+        var from = sourceType == App.FEED_TYPE_ALBUMS ? 0 : 50;
         var to = 100;
         if (cookie) {
             var ranges = cookie.split(':');
@@ -393,91 +419,106 @@ var LeftPanelWidget = Event.extend({
     },
 
     loadArticles: function(clean) {
+        var t = this;
+        var filterAuthorId = t.filterAuthorId;
+
         if (articlesLoading) {
             return;
         }
-        if (clean){
-            wallPage = -1;
+
+        if (clean) {
+            t.filterAuthorId = null;
+            t.wallPage = -1;
             $(window).data('disable-load-more', false);
         }
 
-        var t = this;
         var sourceType = Elements.leftType();
         var targetFeedId = Elements.rightdd();
-        var sourceFeedIds = Elements.leftdd();
         var switcherType = Elements.getSwitcherType();
-        wallPage++;
+        var $newPost = $('.newpost');
+        var $wallLoader = Elements.getWallLoader();
+        t.wallPage++;
         articlesLoading = true;
 
-        Elements.getWallLoader().show();
+        $wallLoader.show();
+        $newPost.hide();
 
         var requestData = {
             sortType: Elements.getSortType(),
-            sourceFeedIds: sourceFeedIds,
-            page: wallPage,
+            page: t.wallPage,
             type: sourceType,
             targetFeedId: targetFeedId
         };
 
-        if (sourceType == 'authors') {
-            $('.newpost').show();
-
-            requestData.userGroupId = Elements.getUserGroupId();
-            switch (switcherType) {
-                case 'approved':
-                    requestData.articleStatus = 2;
-                    break;
-                case 'deferred':
-                    requestData.articleStatus = 1;
-                    break;
-                case 'all':
-                    requestData.mode = 'all';
-                    break;
-                case 'my':
-                    requestData.mode = 'my';
-                    break;
-                default:
-                    requestData.articleStatus = 1;
-            }
-        } else if (sourceType == 'ads' && sourceFeedIds.length == 1) {
-            $('.newpost').show();
-        } else {
-            $('.newpost').hide();
+        switch (sourceType) {
+            case App.FEED_TYPE_AUTHORS:
+                requestData.userGroupId = Elements.getUserGroupId();
+                $newPost.show();
+                switch (switcherType) {
+                    case 'approved':
+                        requestData.articleStatus = App.ARTICLE_STATUS_APPROVED;
+                        break;
+                    case 'deferred':
+                        requestData.articleStatus = App.ARTICLE_STATUS_REVIEWING;
+                        break;
+                }
+                break;
+            case App.FEED_TYPE_ALBUMS:
+                requestData.sourceFeedIds = Elements.leftdd();
+                switch (switcherType) {
+                    case 'approved':
+                        requestData.articleStatus = App.ARTICLE_STATUS_APPROVED;
+                        break;
+                    case 'deferred':
+                        requestData.articleStatus = App.ARTICLE_STATUS_REVIEWING;
+                        break;
+                }
+                break;
+            case App.FEED_TYPE_MY:
+                requestData.articleStatus = Elements.getArticleStatus();
+                requestData.mode = App.FEED_TYPE_MY;
+                break;
+            case App.FEED_TYPE_ADS:
+                requestData.sourceFeedIds = Elements.leftdd();
+                requestData.from = 0;
+                requestData.to = 100;
+                if (requestData.sourceFeedIds.length == 1) {
+                    $newPost.show();
+                }
+                break;
+            case App.FEED_TYPE_TOPFACE:
+            case App.FEED_TYPE_SOURCE:
+                    requestData.sourceFeedIds = Elements.leftdd();
+                    var $slider = $('#slider-range');
+                    requestData.from = $slider.slider('values', 0);
+                    requestData.to = $slider.slider('values', 1);
+                break;
+            default:
+                break;
         }
 
-        if (sourceType == 'my') {
-            requestData.articleStatus = Elements.getArticleStatus();
-            requestData.mode = 'my';
-        } else if (sourceType == 'ads') {
-            requestData.from = 0;
-            requestData.to = 100;
-        } else {
-            var $slider = $("#slider-range");
-            requestData.from = $slider.slider("values", 0);
-            requestData.to = $slider.slider("values", 1);
+        if (filterAuthorId) {
+            requestData.mode = 'posted';
+            requestData.authorId = filterAuthorId;
         }
 
         if (!clean) {
             requestData.articlesOnly = 1;
         }
 
-        //clean and load left column
-        $.ajax({
-            url: controlsRoot + 'articles-list/',
-            dataType: "html",
-            data: requestData
-        }).always(function() {
-            Elements.getWallLoader().hide();
+        Control.fire('get_articles', requestData).always(function() {
             if (clean) {
                 t.$wall.empty();
             }
-        }).done(function(data) {
-            if (!data) {
+            $wallLoader.hide();
+            articlesLoading = false;
+        }).success(function(html) {
+            if (!html) {
                 $(window).data('disable-load-more', true);
                 $('.wall-title span.count').text('нет записей');
             } else {
                 var tmpEl = document.createElement('div');
-                var $block = $(tmpEl).html(data);
+                var $block = $(tmpEl).html(html);
                 t.$wall.append($block);
                 Elements.initDraggable($block);
                 Elements.initDroppable($('#right-panel'));
@@ -487,7 +528,9 @@ var LeftPanelWidget = Event.extend({
                     $(window).data('disable-load-more', true);
                 }
             }
-            articlesLoading = false;
+            t.trigger('loadArticles', html);
+        }).error(function() {
+            t.trigger('loadArticles', false);
         });
     },
 
@@ -1096,13 +1139,72 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $window = $(window);
         $window.scroll(function() {
-            if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
-                t.loadArticles(false);
-            }
+            clearTimeout(t.wallScrollTimeoutAutoload);
+            t.wallScrollTimeoutAutoload = setTimeout(function() {
+                if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
+                    t.loadArticles(false);
+                }
+            }, 200);
         });
     },
 
-    initLeftPanelTabs: function() {
+    // Скрытие постов, которые сейчас не видны в ленте
+    initWallAutohide: function() {
+        var t = this;
+
+        if (t.wallAutohideInited) {
+            return;
+        }
+        t.wallAutohideInited = true;
+        t.wallPostsPositionsTop = null;
+
+        var $window = $(window);
+        $window.scroll(onScroll);
+        t.$wall.addClass('autohide-enabled');
+
+        function onScroll() {
+            clearTimeout(t.wallScrollTimeoutAutohide);
+            t.wallScrollTimeoutAutohide = setTimeout(function() {
+                var wallPostsPositionsTop = t.wallPostsPositionsTop || t.getWallPostsPositionsTop();
+                var scrollTop = $window.scrollTop();
+                var focusedElements = [];
+                for (var i in wallPostsPositionsTop) {
+                    if (!wallPostsPositionsTop.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    i = +i;
+                    var positionTop = wallPostsPositionsTop[i];
+                    var positionTopNext = wallPostsPositionsTop[i + 1];
+                    if ((positionTopNext ? positionTopNext.top >= scrollTop : true) && positionTop.top <= scrollTop + $window.height()) {
+                        focusedElements.push({id: positionTop.id, top: positionTop.top});
+                    }
+                }
+
+                t.$wall.find('.post.show-images').removeClass('show-images');
+                for (var i in focusedElements) {
+                    if (!focusedElements.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    t.$wall.find('.post[data-id="' + focusedElements[i].id + '"]').addClass('show-images');
+                }
+            }, 500);
+        }
+    },
+
+    getWallPostsPositionsTop: function() {
+        var t = this;
+        var $wall = t.$wall;
+        var positionsTop = [];
+        $wall.find('.post').each(function() {
+            positionsTop.push({
+                id: $(this).data('id'),
+                top: $(this).offset().top
+            });
+        });
+        return positionsTop;
+    },
+
+    initTabs: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
 
@@ -1112,17 +1214,17 @@ var LeftPanelWidget = Event.extend({
                 return;
             }
 
-            $leftPanel.find(".type-selector .sourceType").removeClass('active');
+            $leftPanel.find('.type-selector .sourceType').removeClass('active');
             $(this).addClass('active');
 
-            if ($(this).data('type') == 'authors-list') {
+            if ($(this).data('type') == App.FEED_TYPE_AUTHORS_LIST) {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
                 t.updateAuthorListPage();
             } else {
                 $('body').removeClass('editor-mode');
                 $(window).data('disable-load-more', false);
-                Events.fire('rightcolumn_dropdown_change');
+                app.updateRightPanelDropdown();
             }
         });
 
@@ -1135,8 +1237,6 @@ var LeftPanelWidget = Event.extend({
             var $tab = $(this);
             $leftPanel.find('.authors-tabs .tab').removeClass('selected');
             $tab.addClass('selected');
-
-            wallPage = 0;
             t.loadArticles(true);
         });
 
@@ -1358,22 +1458,245 @@ var LeftPanelWidget = Event.extend({
     initModeration: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
+
         $leftPanel.delegate('.moderation .button.approve', 'click', function() {
             var $post = $(this).closest('.post');
             var postId = $post.data('id');
-            Events.fire('leftcolumn_approve_post', postId, function() {
-                $post.slideUp(200);
-            });
+            t.acceptArticle(postId);
         });
 
         $leftPanel.delegate('.moderation .button.reject', 'click', function() {
             var $post = $(this).closest('.post');
-            var postId = $post.data('id');
             var $newComment = $post.find('.new-comment');
-            var $moderation = $post.find('.moderation');
-            $moderation.hide();
-            $newComment.show();
-            $newComment.find('textarea').focus();
+            if (!$newComment.length) {
+                var postId = $post.data('id');
+                t.declineArticle(postId);
+            } else {
+                var $moderation = $post.find('.moderation');
+                $moderation.hide();
+                $newComment.show();
+                $newComment.find('.button.send').text('Отклонить');
+                $newComment.find('textarea').focus();
+            }
         });
+
+        $leftPanel.delegate('.post > .comments .new-comment .send', 'click', function() {
+            var $post = $(this).closest('.post');
+            var $moderation = $post.find('.moderation');
+            var postId = $post.data('id');
+            if ($moderation.length && !$moderation.data('checked')) {
+                $moderation.data('checked', true);
+                t.declineArticle(postId);
+            }
+        });
+
+        $leftPanel.delegate('.new-comment', 'close', function() {
+            var $newComment = $(this);
+            var $post = $newComment.closest('.post');
+            var $moderation = $post.find('.moderation');
+            if ($moderation.length && !$moderation.data('checked')) {
+                $moderation.show();
+                $newComment.hide();
+            }
+        });
+    },
+
+    /**
+     * Одобряет запись и скрывает её
+     * @param articleId
+     * @return Deferred|bool
+     */
+    acceptArticle: function(articleId) {
+        var $post = this.$leftPanel.find('.post[data-id="' + articleId + '"]');
+        if (!$post.length) {
+            return false;
+        }
+
+        return Control.fire('accept_article', {articleId: articleId}, function() {
+            $post.slideUp(200, function() {
+                $(this).remove();
+            });
+        });
+    },
+
+    /**
+     * Отклоняет запись и скрывает её
+     * @param articleId
+     * @return Deferred|bool
+     */
+    declineArticle: function(articleId) {
+        var $post = this.$leftPanel.find('.post[data-id="' + articleId + '"]');
+        if (!$post.length) {
+            return false;
+        }
+
+        return Control.fire('decline_article', {articleId: articleId}, function() {
+            $post.slideUp(200, function() {
+                $(this).remove();
+            });
+        });
+    },
+
+    /**
+     * Инициализация фильтра ленты по пользователю
+     * @task 13477 Лента пользователя
+     */
+    initUserFilter: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
+        $leftPanel.delegate('.post.author .name', 'click', function() {
+            var userId = $(this).closest('.post').data('author-id');
+            t.userFilter(userId);
+        });
+    },
+
+    /**
+     * Фильтрация ленты по пользователю
+     * @task 13477 Лента пользователя
+     */
+    userFilter: function(userId) {
+        var t = this;
+        t.filterAuthorId = userId;
+        t.$leftPanel.find('.header .tab.selected').removeClass('selected');
+        t.loadArticles(true);
+    },
+
+    dropdownChangeLeftPanel: function(data) {
+        var t = this;
+        var $wallSwitcher = $('#wall-switcher');
+        var $multiSelect = $('#source-select');
+        var $leftPanel = t.$leftPanel;
+        var $leftPanelTabs = $leftPanel.find('.type-selector');
+        var $userGroupTabs = $('.user-groups-tabs');
+        var targetFeedId = Elements.rightdd();
+        var sourceType = Elements.leftType();
+        var sourceTypes = data.accessibleSourceTypes;
+
+        if (sourceType != App.FEED_TYPE_SOURCE) {
+            $('#slider-text').hide();
+            $('#slider-cont').hide();
+            $('#filter-list').hide();
+        } else {
+            $('#slider-text').show();
+            $('#slider-cont').show();
+            $('#filter-list').show();
+        }
+
+        if (data.showSourceList) {
+            $multiSelect.multiselect('getButton').removeClass('hidden');
+        } else {
+            $multiSelect.multiselect('getButton').addClass('hidden');
+        }
+
+        // фильтры по типу постов
+        if (data.showArticleStatusFilter) {
+            $leftPanel.find('.authors-tabs .tab').removeClass('selected');
+            $leftPanel.find('.authors-tabs .tab:first').addClass('selected');
+            $leftPanel.find('.authors-tabs').show();
+        } else {
+            $leftPanel.find('.authors-tabs').hide();
+        }
+
+        // группы юзеров
+        $wallSwitcher.hide();
+
+        if (sourceType == 'authors') {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                var showSwitcherType;
+
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+
+            var userGroups = data.showUserGroups;
+            $userGroupTabs.empty();
+            $userGroupTabs.removeClass('hidden');
+            $userGroupTabs.append('<div class="tab selected">Все новости</div>');
+            if (userGroups) {
+                for (var i in userGroups) {
+                    var userGroupModel = new UserGroupModel();
+                    userGroupModel.id(userGroups[i]['id']);
+                    userGroupModel.name(userGroups[i]['name']);
+                    userGroupCollection.add(userGroupModel.id(), userGroupModel);
+                    $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
+                }
+            }
+        } else {
+            $userGroupTabs.addClass('hidden');
+        }
+
+        if (sourceType == App.FEED_TYPE_ALBUMS) {
+            if (data.authorsFilters && (data.authorsFilters.all_my_filter || data.authorsFilters.article_status_filter)) {
+                if (data.authorsFilters.all_my_filter) {
+                    showSwitcherType = 'all';
+                } else {
+                    showSwitcherType = 'deferred';
+                }
+
+                $wallSwitcher.show();
+                $wallSwitcher.find('a').hide();
+                $wallSwitcher.find('a[data-type="' + showSwitcherType + '"]').show();
+            }
+
+            $leftPanel.addClass('albums');
+            t.enableKeyboardDecision();
+        } else {
+            $leftPanel.removeClass('albums');
+            t.disableKeyboardDecision();
+        }
+
+        $leftPanelTabs.children('.sourceType').each(function(i, item) {
+            item = $(item);
+            if ($.inArray(item.data('type'), sourceTypes) == -1) {
+                item.hide();
+            } else {
+                item.show();
+            }
+        });
+
+        $.cookie('sourceTypes' + targetFeedId, sourceType);
+        articlesLoading = true;
+        t.updateSlider(targetFeedId, sourceType);
+        t.setMultiSelectData(data.sourceFeeds, targetFeedId);
+        articlesLoading = false;
+        t.loadArticles(true);
+    },
+
+    /**
+     * Включение горячих клавиш для одобрения
+     * и отклонения фоток в альбомах
+     * @task 13636
+     */
+    enableKeyboardDecision: function() {
+        var t = this;
+        $(window).on('keydown.keyboardDecision', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (String.fromCharCode(e.which).toLowerCase()) {
+                    case 'd':
+                        t.declineArticle(t.$leftPanel.find('.post:first').data('id'));
+                        e.preventDefault();
+                        break;
+                    case 'a':
+                        t.acceptArticle(t.$leftPanel.find('.post:first').data('id'));
+                        e.preventDefault();
+                        break;
+                }
+            }
+        });
+    },
+
+    /**
+     * Оключение горячих клавиш для одобрения
+     * и отклонения фоток в альбомах
+     * @task 13636
+     */
+    disableKeyboardDecision: function() {
+        $(window).off('keydown.keyboardDecision');
     }
 });

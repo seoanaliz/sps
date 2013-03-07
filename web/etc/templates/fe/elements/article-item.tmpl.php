@@ -4,14 +4,10 @@
 /** @var $sourceFeed SourceFeed|null */
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
-/** @var $canEditPost boolean */
 /** @var $sourceFeedType String */
-/**
- * @var $forceDisabledPublishing bool|null -  принудительно отключить редактирование
- */
 
 if (!empty($article)) {
-    $forceDisabledPublishing = isset($forceDisabledPublishing) && $forceDisabledPublishing;
+    $canEditPost = true;
     $extLinkLoader = false;
     $isPostMovable = false;
     $isPostRelocatable = true;
@@ -24,27 +20,51 @@ if (!empty($article)) {
     if ($sourceFeedType == SourceFeedUtility::Ads) {
         $isPostRelocatable = false;
     }
-    if ($isWebUserEditor && !$forceDisabledPublishing) {
-        if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
-            $isPostMovable = true;
+
+    if ($isWebUserEditor) {
+        switch ($sourceFeedType) {
+            case SourceFeedUtility::Ads:
+            case SourceFeedUtility::Source:
+            case SourceFeedUtility::Topface:
+                $isPostMovable = true;
+                break;
+            case SourceFeedUtility::Authors:
+            case SourceFeedUtility::Albums:
+                if ($article->articleStatus == Article::STATUS_APPROVED && is_null($article->queuedAt)) {
+                    $isPostMovable = true;
+                }
+                break;
         }
-        if (!empty($sourceFeed)) {
-            $isPostMovable = true;
-        }
+    }
+
+    $canEditPost = true;
+    if (!$isWebUserEditor) {
+        $canEditPost = $Article->articleStatus != Article::STATUS_APPROVED;
+    }
+    if (!empty($sourceFeed) && $sourceFeed->type == SourceFeedUtility::Albums) {
+        $canEditPost = false;
     }
 ?>
 <div
     class="post bb
     <?= $isPostMovable ? 'movable' : '' ?>
     <?= $canEditPost ? 'editable' : '' ?>
+    <?= !empty($author) ? 'author' : '' ?>
     <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
+    <? if (!empty($author)) { ?>
+        data-author-id="{$author->authorId}"
+    <? } ?>
     data-id="{$article->articleId}">
     <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
-            <div class="userpic"><img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" /></div>
+            <div class="userpic">
+                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
+            </div>
         </div>
-        <div class="name d-hide"><?=$sourceInfo[$article->sourceFeedId]['name']?></div>
+        <div class="name d-hide">
+            <?=$sourceInfo[$article->sourceFeedId]['name']?>
+        </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
             <div class="userpic"><img src="{$author->avatar}" alt="" /></div>
@@ -57,10 +77,10 @@ if (!empty($article)) {
     <div class="bottom d-hide">
         <div class="l">
             <span class="timestamp">{$article->createdAt->defaultFormat()}</span>
-            <? if ($canEditPost): ?>|
+            <? if ($canEditPost) { ?>|
                 <a class="edit">Редактировать</a> |
                 <a class="clear-text">Очистить текст</a>
-            <? endif; ?>
+            <? } ?>
         </div>
         <div class="r">
             <? if (!empty($articleRecord->link)) { ?>
@@ -97,45 +117,45 @@ if (!empty($article)) {
                 <? } ?>
             </span>
             <? if ($article->rate > 0) { ?>
-                <span class="likes spr"></span><span class="likes-count">
+                <span class="likes spr"></span>
+                <span class="likes-count">
                     <?= ($article->rate > 100) ? 'TOP' : $article->rate ?>
                 </span>
             <? } ?>
         </div>
     </div>
-    <? if ($canEditPost): ?>
+    <? if ($canEditPost) { ?>
         <div class="delete spr"></div>
-    <? endif; ?>
+    <? } ?>
     <div class="clear"></div>
 
-    <? if (!empty($article->authorId )) { ?>
-    <div class="comments">
-        <div class="list">
-            {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+    <? if (!empty($article->authorId)) { ?>
+        <div class="comments">
+            <div class="list">
+                {increal:tmpl://app/elements/wall-comments-list.tmpl.php}
+            </div>
+            <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
+                <div class="photo">
+                    <img src="{$__Editor->avatar}" alt="" />
+                </div>
+                <div class="textarea-wrap">
+                    <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
+                </div>
+                <div class="actions">
+                    <button class="button send">Отправить</button>
+                    <span class="text">Ctrl+Enter</span>
+                </div>
+            </div>
         </div>
-        <div class="new-comment" style="<? if ($showApproveBlock) { ?>display: none<? } ?>">
-            <div class="photo">
-                <img src="{$__Editor->avatar}" alt="" />
-            </div>
-            <div class="textarea-wrap">
-                <textarea rows="" cols="" placeholder="Ваш текст..."></textarea>
-            </div>
-            <div class="actions">
-                <button class="button send">Отправить</button>
-                <span class="text">Ctrl+Enter</span>
-            </div>
-        </div>
-
-    </div>
     <? } ?>
-    <? if ($showApproveBlock): ?>
-    <div class="moderation">
-        <div class="actions">
-            <button class="button approve">Одобрить</button>
-            <button class="button white reject">Отклонить</button>
+    <? if ($showApproveBlock) { ?>
+        <div class="moderation">
+            <div class="actions">
+                <button class="button approve">Одобрить</button>
+                <button class="button white reject">Отклонить</button>
+            </div>
         </div>
-    </div>
-    <? endif; ?>
+    <? } ?>
     <div class="clear"></div>
 </div>
 <? } ?>

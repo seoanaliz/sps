@@ -41,7 +41,7 @@ var RightPanelWidget = Event.extend({
 
                 // проставление типа источника
                 cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $('.left-panel .type-selector a[data-type="' + cookieData + '"]');
+                sourceType = $leftPanel.find('.type-selector a[data-type="' + cookieData + '"]');
                 if (sourceType.length == 0) {
                     sourceType = $leftPanel.find('.type-selector a[data-type="source"]');
                 }
@@ -57,7 +57,7 @@ var RightPanelWidget = Event.extend({
                 $rightPanel.find('.type-selector a').removeClass('active');
                 targetType.addClass('active');
 
-                Events.fire('rightcolumn_dropdown_change');
+                t.updateDropdown();
             },
             oncreate: function() {
                 $(this).find('.default').removeClass('default');
@@ -140,7 +140,7 @@ var RightPanelWidget = Event.extend({
         $rightPanel.addClass('expanded');
         $rightPanel.find('.images-ready').imageComposition();
         $rightPanelBackground.show();
-        $('body').width($('body').width()).css('overflow-y', 'hidden');
+        $('html').width($('html').width()).css('overflow-y', 'hidden');
     },
 
     compact: function() {
@@ -149,7 +149,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanel.removeClass('expanded');
         $rightPanelBackground.hide();
-        $('body').width('auto').css('overflow-y', 'scroll');
+        $('html').width('auto').css('overflow-y', 'scroll');
     },
 
     initVkAvatar: function() {
@@ -190,5 +190,57 @@ var RightPanelWidget = Event.extend({
 
     loadQueue: function() {
         this.getQueueWidget().load();
+    },
+
+    updateDropdown: function() {
+        var t = this;
+
+        Control.fire('get_source_list', {
+            targetFeedId: Elements.rightdd(),
+            type: Elements.leftType()
+        }).success(function(data) {
+            t.dropdownChangeRightPanel(data);
+            t.trigger('updateDropdown', data);
+        }).error(function() {
+            t.trigger('updateDropdown', false);
+        });
+    },
+
+    dropdownChangeRightPanel: function(data) {
+        // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+        var $sourceTypeLink = $('#sourceType-' + data.type);
+        if (!$sourceTypeLink.hasClass('active')) {
+            $('.sourceType.active').removeClass('active');
+            $sourceTypeLink.addClass('active');
+        }
+
+        var t = this;
+        var sourceType = Elements.leftType();
+        var gridTypes = data.accessibleGridTypes;
+        var showCount = 0;
+
+        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(i, item){
+            item = $(item);
+            if ($.inArray(item.data('type'), gridTypes) == -1){
+                item.hide();
+            } else {
+                showCount++;
+                item.show();
+            }
+        });
+        if (showCount > 2) {
+            $('.grid_type.all').show();
+        } else {
+            $('.grid_type.all').hide();
+        }
+
+        var addCellButton = $('.queue-footer > a.add-button');
+        if (data.canAddPlanCell) {
+            addCellButton.show();
+        } else {
+            addCellButton.hide();
+        }
+
+        t.loadQueue();
     }
 });

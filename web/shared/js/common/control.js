@@ -53,7 +53,7 @@ var Control = {
         });
         return {
             success: function(callback) {
-                jQueryObj.success(function(data) {
+                return jQueryObj.success(function(data) {
                     if (typeof callback != 'function') {
                         return;
                     }
@@ -70,10 +70,14 @@ var Control = {
                 return this.success;
             },
             error: function(callback) {
-                jQueryObj.error(function(data) {
+                return jQueryObj.error(function(data) {
                     callback(data);
                 });
-                return this.error;
+            },
+            always: function(callback) {
+                return jQueryObj.always(function(data) {
+                    callback(data);
+                });
             }
         }
     }
