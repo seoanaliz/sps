@@ -1,4 +1,5 @@
 #!/bin/sh
+
 echo "[PERM] Changing Directory Permissions"
 echo -e "\t $1 to 644, dirs to 755"
 chmod -f -R 664 $1
@@ -18,6 +19,8 @@ rm $1cache/*
 rm $1cache/compiled.eaze
 rm $1/eaze.php
 mv $1/eaze.production.php $1/eaze.php
+
+~/bin/rnginx
 
 echo -e "Done!"
 date
