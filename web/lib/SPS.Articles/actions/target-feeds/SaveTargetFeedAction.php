@@ -20,8 +20,8 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         parent::$factory = new TargetFeedFactory();
     }
 
-        public function Execute() {
-            $result = parent::Execute();
+    public function Execute() {
+        $result = parent::Execute();
 
         if ($this->objectId) {
             $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
