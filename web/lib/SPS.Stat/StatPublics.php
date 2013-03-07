@@ -664,8 +664,9 @@
         }
 
         //проверяет изменения в пабликах(название и ава)
-        public static function update_public_info( $publics, $conn )
+        public static function update_public_info( $publics, $conn, $base_publics = null)
         {
+            $base_publics = array_flip( $base_publics );
             $public_chunks = array_chunk( $publics, 500 );
 
             foreach( $public_chunks as $ids ) {
@@ -675,8 +676,13 @@
                 foreach( $res as $public ) {
                     if( !isset($public->gid) || !isset($public->photo) || !isset($public->name) || !isset($public->type))
                         continue;
-                    //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
-                    $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
+                    if( !$base_publics || isset(  $base_publics[$public->gid] )) {
+                        //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
+                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name';
+                    } else {
+                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","page","sh_in_main")
+                                                               VALUES ( @public_id, @photo, @name, true, true)';
+                    }
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name',   $public->name );
