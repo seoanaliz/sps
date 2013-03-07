@@ -311,7 +311,7 @@ var QueueWidget = Event.extend({
         var $textarea = $slot.find('textarea');
         var text = $.trim($textarea.val());
         var imageUploader = $slot.data('imageUploader');
-        var files = imageUploader && imageUploader.getFiles();
+        var files = imageUploader && imageUploader.getPhotos();
         if (text || files) {
             $slot.addClass('locked');
             Events.fire('post', text, files, '', null, function(data) {
