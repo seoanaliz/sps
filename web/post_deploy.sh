@@ -22,8 +22,8 @@ mv $1/eaze.production.php $1/eaze.php
 rm -rf /tmp/sps.beta.cache /tmp/sps.cache
 mkdir -p /tmp/sps.beta.cache /tmp/sps.cache
 
-chmod -R a+r,g+w /tmp/sps.beta.cache /tmp/sps.cache
-chgrp -R www /tmp/sps.beta.cache /tmp/sps.cache
+sudo chmod -R a+r,g+w /tmp/sps.beta.cache /tmp/sps.cache
+sudo chgrp -R www /tmp/sps.beta.cache /tmp/sps.cache
 
 ln -s /tmp/sps.beta.cache /home/sps/www/beta/cache
 ln -s /tmp/sps.cache /home/sps/www/current/cache
