@@ -17,7 +17,7 @@
             , 'SCRIPT_NAME'     => '/eaze.php'
             , 'PHP_SELF'        => '/eaze.php'
             , 'DOCUMENT_URI'    => '/eaze.php'
-            , 'DOCUMENT_ROOT'   => dirname( __FILE__ )
+            , 'DOCUMENT_ROOT'   => dirname( __FILE__ ) . '/www/current/'
         );
 
         if ( !empty( $queryString ) ) {
