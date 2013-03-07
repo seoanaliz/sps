@@ -2,6 +2,10 @@
 <sites>
     <site name="sps">
         <pages>
+            <page uri="([^?]+)" boot="">
+                <template>tmpl://fe/503.tmpl.php</template>
+            </page>
+
             <pageGroup name="fe" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
                 <page uri="/">
                     <actions>SPS.Site.GetIndexPage</actions>
