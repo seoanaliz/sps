@@ -250,6 +250,7 @@
         {
             list( $owner_id, $post_id ) = explode( '_', $full_post_id );
             if( $post_id) {
+                $owner_id = trim($owner_id, '-');
                 $params = array(
                     'owner_id'      =>  '-' . $owner_id,
                     'post_id'       =>  $post_id,
