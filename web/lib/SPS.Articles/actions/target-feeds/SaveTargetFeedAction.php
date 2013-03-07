@@ -20,8 +20,8 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         parent::$factory = new TargetFeedFactory();
     }
 
-        public function Execute() {
-            $result = parent::Execute();
+    public function Execute() {
+        $result = parent::Execute();
 
         if ($this->objectId) {
             $UserFeeds = UserFeedFactory::GetForTargetFeed($this->objectId);
@@ -47,7 +47,8 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             UserFeed::ROLE_OWNER => 'Владелец',
             UserFeed::ROLE_EDITOR => 'Редактор',
             UserFeed::ROLE_AUTHOR => 'Автор',
-        ) );
+        ));
+        return $result;
     }
 
     /**
@@ -188,9 +189,9 @@ class SaveTargetFeedAction extends BaseSaveAction  {
      */
     protected function add( $object ) {
         ConnectionFactory::BeginTransaction();
-
         $result = parent::$factory->Add( $object );
-        $objectId = parent::$factory->GetCurrentId();
+
+        $this->objectId = $objectId = parent::$factory->GetCurrentId();
 
         if ($result && !empty($object->grids)) {
             foreach ($object->grids as $grid) {
