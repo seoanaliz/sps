@@ -9,6 +9,44 @@ class WrTopics extends wrapper
 {
     private $ids;
     private $conn;
+    public static $toface_beauty = array(
+        25678227,
+        38000449,
+        35807278,
+        38000423,
+        38000513,
+        38000540,
+        42351996,
+        41946825,
+        42352011,
+        42352024,
+        42494921,
+        42352077,
+        42352062,
+        42494824,
+        42494714,
+        41946847,
+        42495064,
+        42352154,
+        42352138,
+        42494794,
+        41946872,
+        42495143,
+        42495239,
+        42494936,
+        41946945,
+        42495024,
+        41946887,
+        41946921,
+        42495048,
+        42494987,
+        41946866,
+        42494848,
+        42352086,
+        42352120,
+        42494766,
+        49903343
+    );
 
     public function Execute()
     {
@@ -20,11 +58,9 @@ class WrTopics extends wrapper
             $this->double_check_quantity();
             die('Не сейчас');
         }
-        $this->get_id_arr();
-//
-//        $this->find_admins();
-//        die();
-        StatPublics::update_public_info( $this->ids, $this->conn );
+        $base_publics = $this->get_id_arr();
+
+        StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );
         $this->update_quantity();
         $this->double_check_quantity();
         $this->update_visitors();
@@ -44,7 +80,9 @@ class WrTopics extends wrapper
             $res[] = $ds->getInteger( 'vk_id' );
         }
 
-        $this->ids = $res;
+
+        $this->ids =  array_merge( $res, self::$toface_beauty );
+        return $res;
 
     }
 
