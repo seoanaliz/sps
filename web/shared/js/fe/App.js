@@ -74,7 +74,7 @@ var App = (function() {
             var element = $element[0];
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
-                var $attachment = $($listElement.find('> .attachment')[id]);
+                var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
                 $attachment.data({
                     filename: response.filename,
                     image: response.image
@@ -89,7 +89,7 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, filename) {
-                var $attachment = $('<div class="attachment qq-upload-success">' +
+                var $attachment = $('<div class="attachment attachment-handmade">' +
                 '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('filename', filename);

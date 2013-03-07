@@ -1040,7 +1040,7 @@ var LeftPanelWidget = Event.extend({
                     var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                     var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
-                    var imageUploader = window.imageUploader = app.imageUploader({
+                    var imageUploader = app.imageUploader({
                         $element: $uploadBtn,
                         $listElement: $attachments
                     });
