@@ -16,8 +16,6 @@
             , 'REQUEST_URI'     => $url
             , 'SCRIPT_NAME'     => '/eaze.php'
             , 'PHP_SELF'        => '/eaze.php'
-            , 'DOCUMENT_URI'    => '/eaze.php'
-            , 'DOCUMENT_ROOT'   => dirname( __FILE__ ) . '/www/current/'
         );
 
         if ( !empty( $queryString ) ) {
@@ -30,6 +28,7 @@
             $_SERVER[$k] = $v;
         }
 
+        chdir(dirname(__FILE__));
         include 'eaze.php';
     } else {
         die ( 'Usage: ' . basename( $_SERVER['PHP_SELF'] ) . " host url \n" );
