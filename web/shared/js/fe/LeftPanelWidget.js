@@ -1040,9 +1040,9 @@ var LeftPanelWidget = Event.extend({
                     var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                     var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
-                    var imageUploader = app.imageUploader({
+                    var imageUploader = window.imageUploader = app.imageUploader({
                         $element: $uploadBtn,
-                        $listElement: $attachments,
+                        $listElement: $attachments
                     });
 
                     var onSave = function() {
@@ -1111,7 +1111,7 @@ var LeftPanelWidget = Event.extend({
     initWallAutoload: function() {
         var t = this;
         var $window = $(window);
-        $window.scroll(function() {
+        window.scroll(function() {
             clearTimeout(t.wallScrollTimeoutAutoload);
             t.wallScrollTimeoutAutoload = setTimeout(function() {
                 if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {

@@ -89,7 +89,7 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, filename) {
-                var $attachment = $('<div class="attachment">' +
+                var $attachment = $('<div class="attachment qq-upload-success">' +
                 '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('filename', filename);
