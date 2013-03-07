@@ -1036,8 +1036,8 @@ var LeftPanelWidget = Event.extend({
                     var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
                     var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
                     var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
-                    var $saveBtn = $('<div/>', {class: 'save button l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
-                    var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
+                    var $saveBtn = $('<button/>', {class: 'save button', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                    var $cancelBtn = $('<button/>', {class: 'cancel button', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                     var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
                     var imageUploader = app.imageUploader({
