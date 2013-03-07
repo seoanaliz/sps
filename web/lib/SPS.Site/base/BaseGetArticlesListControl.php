@@ -520,6 +520,5 @@ abstract class BaseGetArticlesListControl extends BaseControl
         Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articlesOnly'));
         Response::setInteger('authorId', $this->getAuthor()->authorId);
-        Response::setBoolean('forceDisabledPublishing', $this->getSourceFeedType() == 'my');
     }
 }

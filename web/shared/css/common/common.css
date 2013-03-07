@@ -17,7 +17,8 @@
 .ui-state-active a,.ui-state-active a:link,.ui-state-active a:visited{text-decoration:none;}
 .ui-widget:active{outline:none;}
 html,body,input,textarea{margin:0;font-family:arial, verdana, Lucida Sans, serif;font-size:12px;}
-html,body{padding:0;width:100%;height:100%;}
+body{display:inline-block;}
+html,body{padding:0;margin:0;width:100%;height:100%;}
 textarea{resize:none;}
 input[type="text"],textarea{padding:4px;border:1px solid #C4CDE0;background-color:#fff;}
 input:focus,textarea:focus,[contenteditable]:focus{outline:none;}

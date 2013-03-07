@@ -18,7 +18,6 @@
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : null;
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
-            $canEditPost    = $isWebUserEditor || $article->articleStatus != Article::STATUS_APPROVED;
             ?>{increal:tmpl://fe/elements/article-item.tmpl.php}<?
         }
     }

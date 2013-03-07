@@ -514,10 +514,11 @@ function getURLParameter(name, search) {
 // Попап
 var Box = (function() {
     var $body;
+    var $html;
     var $layout;
     var boxesCollection = {};
     var boxesHistory = [];
-    var bodyOverflow;
+    var htmlOverflow;
 
     return function(options) {
         if (typeof options != 'object') {
@@ -543,6 +544,7 @@ var Box = (function() {
 
         if (!$layout) {
             $body = $('body');
+            $html = $('html');
             $layout = $(tmpl(BOX_LAYOUT)).click(function(e) {
                 if (e.target == e.currentTarget) {
                     if (boxesHistory[boxesHistory.length-1]) {
@@ -597,9 +599,8 @@ var Box = (function() {
                     boxesHistory[boxesHistory.length-1].$box.hide();
                 }
             } else {
-                bodyOverflow = $body.css('overflow-y');
-                $body.width($body.width());
-                $body.css('overflow-y', 'hidden');
+                htmlOverflow = $html.css('overflow-y');
+                $html.width($body.width()).css('overflow-y', 'hidden');
                 $layout.show();
             }
 
@@ -620,8 +621,7 @@ var Box = (function() {
                     boxesHistory[boxesHistory.length-1].$box.show();
                 }
             } else {
-                $body.css('overflow-y', bodyOverflow);
-                $body.width('auto');
+                $html.css('overflow-y', htmlOverflow).width('auto');
                 $layout.hide();
             }
 

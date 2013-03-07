@@ -1,9 +1,14 @@
 var App = (function() {
     var App = Event.extend({
         init: function() {
-            this.getLeftPanelWidget();
-            this.getRightPanelWidget();
-            this.initGoToTop();
+            var t = this;
+            t.getLeftPanelWidget();
+            t.getRightPanelWidget();
+            t.initGoToTop();
+
+            t.getRightPanelWidget().on('updateDropdown', function(data) {
+                t.getLeftPanelWidget().dropdownChangeLeftPanel(data);
+            });
         },
 
         // Кнопка "наверх"
@@ -46,16 +51,8 @@ var App = (function() {
             this.getLeftPanelWidget().loadArticles(clean);
         },
 
-        updateMultiSelect: function() {
-            this.getLeftPanelWidget().updateMultiSelect();
-        },
-
-        setMultiSelectData: function(sourceFeeds, targetFeedId) {
-            this.getLeftPanelWidget().setMultiSelectData(sourceFeeds, targetFeedId);
-        },
-
-        onRightPanelDropdownChange: function(data) {
-            this.getRightPanelWidget().dropdownChange(data);
+        updateRightPanelDropdown: function() {
+            this.getRightPanelWidget().updateDropdown();
         },
 
         loadQueue: function() {
@@ -116,6 +113,14 @@ var App = (function() {
     App.ARTICLE_STATUS_REVIEWING = 1;
     App.ARTICLE_STATUS_APPROVED = 2;
     App.ARTICLE_STATUS_REJECTED = 3;
+
+    App.FEED_TYPE_MY = 'my';
+    App.FEED_TYPE_ADS = 'ads';
+    App.FEED_TYPE_SOURCE = 'source';
+    App.FEED_TYPE_ALBUMS = 'albums';
+    App.FEED_TYPE_AUTHORS = 'authors';
+    App.FEED_TYPE_TOPFACE = 'topface';
+    App.FEED_TYPE_AUTHORS_LIST = 'authors-list';
 
     return App;
 })();
