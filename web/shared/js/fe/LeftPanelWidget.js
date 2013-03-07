@@ -710,7 +710,6 @@ var LeftPanelWidget = Event.extend({
                     t.post();
                 });
 
-
                 this.closeImagePopup($popup);
                 this.crop();
                 this.upload();
@@ -735,21 +734,9 @@ var LeftPanelWidget = Event.extend({
                 });
             },
             upload: function() {
-                var t = this;
-                try {
-                    new qq.FileUploader({
-                        debug: true,
-                        element: $('#attach-image-file')[0],
-                        action: root + 'int/controls/image-upload/',
-                        template: ' <div class="qq-uploader">' +
-                        '<ul class="qq-upload-list"></ul>' +
-                            //'<a href="#" class="button qq-upload-button">Загрузить картинку</a>' +
-                        '</div>',
-                        onComplete: function(id, fileName, responseJSON) {
-                            popupNotice('Не реализовано');
-                        }
-                    });
-                } catch (e) {}
+                app.imageUploader({
+                    $element: $('#attach-image-file')
+                });
             },
             showPreview: function (coords,t) {
                 var rx = $('.previewLayout').width() / coords.w;
