@@ -21,6 +21,7 @@ rm $1/eaze.php
 mv $1/eaze.production.php $1/eaze.php
 
 ~/bin/rnginx
+crontab $1/crontab/crontab
 
 echo -e "Done!"
 date
