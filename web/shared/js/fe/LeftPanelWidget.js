@@ -1040,7 +1040,7 @@ var LeftPanelWidget = Event.extend({
                     var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                     var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
-                    var imageUploader = window.imageUploader = app.imageUploader({
+                    var imageUploader = app.imageUploader({
                         $element: $uploadBtn,
                         $listElement: $attachments,
                     });
@@ -1048,7 +1048,7 @@ var LeftPanelWidget = Event.extend({
                     var onSave = function() {
                         var text = $text.val();
                         var link = $links.find('a').attr('href');
-                        var photos = imageUploader.getFiles();
+                        var photos = imageUploader.getPhotos();
                         if (!($.trim(text) || link || photos.length)) {
                             return $text.focus();
                         } else {
