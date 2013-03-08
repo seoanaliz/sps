@@ -129,7 +129,6 @@
                 </settings>
             </host>
             <host name="production">
-                <hostname>sps.verumnets.ru</hostname>
                 <hostname>socialboard.ru</hostname>
                 <hostname>im.socialboard.ru</hostname>
                 <settings>
@@ -141,7 +140,7 @@
                             <param name="authSecret">7kajXDE67HpjKrRs9Sy2</param>
                         </vkapi>
                         <mediaServer class="MediaServerManager">
-                            <param name="host">media.sps.verumnets.ru:8081</param>
+                            <param name="host">media.socialboard.ru</param>
                             <param name="mainLocation">/</param>
                             <param name="tempLocation">/temp/</param>
                             <param name="uploadPort">8001</param>
@@ -161,12 +160,14 @@
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
+                            <port>54320</port>
                         </database>
                         <database driver="PgSql" name="tst">
                             <name>tst</name>
                             <user>sps</user>
                             <password></password>
                             <encoding>UTF8</encoding>
+                            <port>54320</port>
                         </database>
                     </databases>
                 </settings>

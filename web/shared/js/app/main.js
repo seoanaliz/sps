@@ -71,7 +71,7 @@ var App = (function() {
             })();
 
             (function() {
-                var $window = $('body');
+                var $window = $('#main');
                 var lastHeight = 0;
                 setInterval(function() {
                     if ($window.height() != lastHeight) {
@@ -463,7 +463,7 @@ var App = (function() {
         },
 
         refreshSize: function() {
-            VK.callMethod('resizeWindow', false, $('body').height());
+            VK.callMethod('resizeWindow', false, $('#main').outerHeight());
         }
     });
 
