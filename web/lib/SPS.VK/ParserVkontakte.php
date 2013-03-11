@@ -148,7 +148,7 @@
         //              группы или посетителей(от последних отсеивается)
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
-        public function get_posts( $page_number )
+        public function  get_posts( $page_number )
         {
             sleep(rand( 1,12 ));
             $offset = $page_number * self::PAGE_SIZE;
@@ -203,13 +203,22 @@
 
                         switch( $attachment->type ) {
                             case 'photo':
+
+                                if ( isset( $attachment->photo->src_xxbig )) {
+                                    $url = $attachment->photo->src_xxbig;
+                                }elseif (isset( $attachment->photo->src_xbig )) {
+                                    $url = $attachment->photo->src_xbig;
+                                }elseif (isset( $attachment->photo->src_big )) {
+                                    $url = $attachment->photo->src_big;
+                                }else {
+                                    $url = $attachment->photo->src;
+                                }
+
                                  $photo[] =
                                      array(
                                          'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
                                          'desc' =>  '',
-                                         'url'  =>  isset( $attachment->photo->src_big ) ?
-                                                                    $attachment->photo->src_big :
-                                                                    $attachment->photo->src,
+                                         'url'  => $url,
                                      );
                                  break;
                             case 'graffiti':
@@ -443,7 +452,9 @@ return $a;
             $text = html_entity_decode($text);
             $text = strip_tags( $text );
             $text = preg_replace('/#[^\s]+/', '',$text);
+//            echo $text, '<br>';
             return trim($text);
+
         }
 
         //$post_ids  = массив idпаблика_idпоста
@@ -530,7 +541,7 @@ return $a;
                    $res = array_pop($res);
                    return $res->size;
                } else {
-                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id );
                }
             }
         }
