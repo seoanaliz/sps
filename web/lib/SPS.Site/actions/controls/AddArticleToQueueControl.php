@@ -29,6 +29,12 @@ class AddArticleToQueueControl extends BaseControl
             return false;
         }
 
+        if ( $timestamp >  DateTimeWrapper::Now()->modify('-3 minute')->getTimestamp()) {
+            $result['message'] = 'Too late';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
         if (!empty($queueId)) {
             //просто перемещаем элемент очереди
             ArticleUtility::ChangeQueueDates($queueId, $timestamp);
