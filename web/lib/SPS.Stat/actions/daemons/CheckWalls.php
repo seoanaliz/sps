@@ -344,12 +344,6 @@ class CheckWalls
     private function get_publics_for_mentions()
     {
         return array(
-            34468364,
-            32348256,
-            48356824,
-            43064547,
-            19069441,
-            33258470
         );
     }
 
@@ -364,7 +358,6 @@ class CheckWalls
             if ($this->cookie ) break;
             sleep(3);
         }
-        print_r($this->cookie);
         foreach( $publics_for_men_search as $public_id ) {
             echo 'mentions of ' . $public_id . '<br>';
 
