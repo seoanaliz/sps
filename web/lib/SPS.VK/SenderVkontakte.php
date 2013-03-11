@@ -128,7 +128,6 @@
             }
 
             sleep(2);
-//            $check_id = $this->delivery_check( count( $attachments ) , $check_id );
 
             if ( !$check_id )
                 throw new exception( "can't find post: vk.com/public" . $this->vk_group_id );
@@ -481,11 +480,12 @@
             sleep( 1 );
 
             //"закрепляем" фотку
-            $url2 = self::METH .$method_save_photo;
-            $params = array(    'gid'           =>  $this->vk_group_id,
+            $params = array(
+                'gid'           =>  $this->vk_group_id,
                 'server'        =>  $content->server,
                 'hash'          =>  $content->hash,
-                $photo_list     =>  $content->$photo_list,
+                'photo'         =>  $content->$photo_list,
+                'photos_list'   =>  $content->$photo_list,
                 'access_token'  =>  $this->vk_access_token,
                 'aid'           =>  $aid,
                 'caption'       =>  $caption
