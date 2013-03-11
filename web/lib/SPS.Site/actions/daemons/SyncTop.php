@@ -83,7 +83,7 @@
             }
 
             /**
-             * Обходим посты и созраняем их в бд, попутно сливая фотки
+             * Обходим посты и сохраняем их в бд, попутно сливая фотки
              */
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8('top-' . $post['id']);
@@ -99,6 +99,7 @@
                 $article->importedAt    = DateTimeWrapper::Now();
                 $article->isCleaned     = false;
                 $article->statusId      = 1;
+                $article->articleStatus  = Article::STATUS_APPROVED;
 
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = !empty($post['text']) ? $post['text'] : '';
