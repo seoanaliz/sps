@@ -171,7 +171,8 @@ class getEntries {
                                             'abs_vis_grow',
                                             'rel_vis_grow'
             );
-            $resul = $this->get_our_publics_state( $time_from, $time_to );
+
+            $resul = $this->get_our_publics_state( $time_from, $time_to, $groupId );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'visitors';
             $a = $this->compare( $sortBy, $sortReverse );
             usort( $resul, $a );
@@ -223,9 +224,10 @@ class getEntries {
     }
 
     //возвращает данные о наших пабликах
-    private function get_our_publics_state( $time_start, $time_stop )
+    private function get_our_publics_state( $time_start, $time_stop, $groupId )
     {
-        $publics = StatPublics::get_our_publics_list();
+        $selector = $groupId == 110 ? 2: 1;
+        $publics = StatPublics::get_our_publics_list($selector);
         $res = array();
         $ret = array();
 
