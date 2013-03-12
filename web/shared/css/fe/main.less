@@ -527,26 +527,28 @@ i {font-style: italic;}
     width: 370px;
     z-index: 1;
 
-    .queue-footer {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
-        border: 1px solid #fff;
-        border-top-color: #C4CDE0;
-        .border-radius(0 0 3px 3px);
-    }
-
     .items {
         overflow-y: scroll;
         overflow-x: hidden;
         position: absolute;
-        top: 146px;
-        bottom: 31px;
+        top: 120px;
+        bottom: 0px;
         width: 100%;
+        .border-radius(0 0 2px 2px);
+
+        .queue-title {
+            z-index: 2;
+            margin-bottom: -26px;
+            height: 26px;
+            width: 342px;
+
+            &.fixed {
+                z-index: 3;
+                top: 131px;
+                position: fixed;
+                .box-shadow(0 1px 1px rgba(0,0,0, 0.2));
+            }
+        }
 
         .slot {
             background: #fff;
@@ -813,7 +815,6 @@ i {font-style: italic;}
         left: -10px;
         .box-shadow(inset -2px 0 1px rgba(0,0,0, 0.1));
         .border-radius(3px 0 0 3px);
-        .transition(0.2s all);
         .opacity(0);
 
         .arrow {

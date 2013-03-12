@@ -1,6 +1,19 @@
 var QueueWidget = Event.extend({
     init: function() {
         this.$queue = $('#queue');
+        this.initAutoload();
+    },
+
+    /**
+     * Загрузка ленты очереди
+     * @return Deferred
+     */
+    loadPage: function() {
+        return Control.fire('get_queue', {
+            targetFeedId: Elements.rightdd(),
+            timestamp: Elements.calendar(),
+            type: Elements.rightType()
+        })
     },
 
     /**
@@ -17,19 +30,13 @@ var QueueWidget = Event.extend({
 
         $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
 
-        var type = Elements.rightType();
-
-        if (type == 'all') {
+        if (Elements.rightType() == 'all') {
             $('.queue-footer').hide();
         } else {
             $('.queue-footer').show();
         }
 
-        return Control.fire('get_queue', {
-            targetFeedId: Elements.rightdd(),
-            timestamp: Elements.calendar(),
-            type: type
-        }).success(function(data) {
+        return t.loadPage().success(function(data) {
             if (data) {
                 var tmpEl = document.createElement('div');
                 var $block = $(tmpEl).html(data);
@@ -324,6 +331,112 @@ var QueueWidget = Event.extend({
             });
         } else {
             $textarea.focus();
+        }
+    },
+
+    /**
+     * Бесконечный скроллинг в ленте отправки
+     * @task 13271
+     */
+    initAutoload: function() {
+        var t = this;
+        t.$queue.scroll(function() {
+            var scrollTop = t.$queue.scrollTop();
+            if (scrollTop <= 0) {
+                t.showNextTopPage();
+            } else if (scrollTop >= t.$queue[0].scrollHeight - t.$queue.outerHeight()) {
+                t.showNextBottomPage();
+            }
+        });
+    },
+
+    getPageData: function(id) {
+        var t = this;
+
+        if (t.getCachedPageData(id)) {
+            return t.getCachedPageData(id);
+        } else {
+            return t.loadPage().success(function(data) {
+                t.setCachedPageData(id, data);
+            });
+        }
+    },
+
+    setCachedPageData: function(id, data) {
+        this.getCachedPages()[id] = data;
+    },
+
+    getCachedPageData: function(id) {
+        return this.getCachedPages()[id];
+    },
+
+    getCachedPages: function() {
+        return this._chachedPages || (this._chachedPages = {});
+    },
+
+    setFirstPageId: function(id) {
+        this._firstPageId = id;
+    },
+
+    getFirstPageId: function() {
+        return this._firstPageId || (this._firstPageId = 0);
+    },
+
+    setLastPageId: function(id) {
+        this._lastPageId = id;
+    },
+
+    getLastPageId: function() {
+        return this._lastPageId || (this._lastPageId = 0);
+    },
+
+    appendPageData: function(id, pageData, isTop) {
+        var t = this;
+
+        if (isTop) {
+            t.$queue.prepend(pageData);
+            t.$queue.find('.queue-title').removeClass('fixed');
+            t.$queue.find('.queue-title:first').addClass('fixed');
+        } else {
+            t.$queue.find('.queue-title').removeClass('fixed');
+            t.$queue.find('.queue-title:last').addClass('fixed');
+            t.$queue.append(pageData);
+        }
+    },
+
+    showNextTopPage: function() {
+        var t = this;
+        var pageData = t.getPageData(t.getFirstPageId());
+
+        if (typeof pageData.success == 'function') {
+            Elements.getWallLoader().show();
+            pageData.success(function() {
+                Elements.getWallLoader().hide();
+                t.showNextTopPage();
+            });
+        } else {
+            var oldScrollHeight = t.$queue[0].scrollHeight;
+            t.setFirstPageId(t.getFirstPageId() - 1);
+            t.setCachedPageData(t.getFirstPageId() - 1, t.getPageData(t.getFirstPageId() - 1));
+            t.appendPageData(t.getFirstPageId(), pageData, true);
+            t.$queue.scrollTop(t.$queue[0].scrollHeight - oldScrollHeight);
+        }
+    },
+
+    showNextBottomPage: function() {
+        var t = this;
+        var pageData = t.getPageData(t.getLastPageId());
+
+        if (typeof pageData.success == 'function') {
+            Elements.getWallLoader().show();
+            pageData.success(function() {
+                Elements.getWallLoader().hide();
+                t.showNextBottomPage();
+            });
+        } else {
+            t.setLastPageId(t.getLastPageId() + 1);
+            t.setCachedPageData(t.getLastPageId() + 1, t.getPageData(t.getLastPageId() + 1));
+            t.appendPageData(t.getLastPageId(), pageData, false);
         }
     }
 });

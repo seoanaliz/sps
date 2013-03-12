@@ -1,3 +1,4 @@
+<div class="queue-title"><?=rand(1, 30)?> марта 2013</div>
 <?
 /** @var $canEditQueue bool */
 /** @var $grid array */
