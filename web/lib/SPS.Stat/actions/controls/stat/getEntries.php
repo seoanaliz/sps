@@ -114,7 +114,7 @@ class getEntries {
                             quantity > @min_quantity '
                             . $page .
                           ' AND quantity < @max_quantity
-                            AND quantity > 10000'.
+                            AND quantity > 100'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy .
@@ -356,7 +356,7 @@ class getEntries {
 
     private function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 50000' ;
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 100' ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
         $ds = $cmd->Execute();
         $ds->Next();
