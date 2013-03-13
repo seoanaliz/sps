@@ -6,7 +6,7 @@ var QueueWidget = Event.extend({
 
     /**
      * Загрузка ленты очереди
-     * @return Deferred
+     * @return Control.Deferred
      */
     loadPage: function(id) {
         return Control.fire('get_queue', {
@@ -18,7 +18,7 @@ var QueueWidget = Event.extend({
 
     /**
      * Обновление ленты очереди
-     * @return Deferred|bool
+     * @return Control.Deferred|bool
      */
     update: function() {
         var t = this;
@@ -368,10 +368,19 @@ var QueueWidget = Event.extend({
         });
     },
 
+    /**
+     * Возвращает все страницы в ленте очереди
+     * @returns jQuery
+     */
     getPages: function() {
         return this._$pages || (this._$pages = this.$queue.find('.queue-page'));
     },
 
+    /**
+     * Возвращает данные страницы
+     * @param id
+     * @return Control.Deferred|string
+     */
     getPageData: function(id) {
         var t = this;
 
@@ -410,10 +419,18 @@ var QueueWidget = Event.extend({
         }
     },
 
+    /**
+     * Возвращает id текущей страницы
+     * @return number
+     */
     getCurrentPageId: function() {
         return this.getCurrentPage().data('id') || 0;
     },
 
+    /**
+     * Возвращает id последней верхней страницы
+     * @return number
+     */
     getFirstPageId: function() {
         return this._firstPageId || +(this._firstPageId = this.getPages().first().data('id') || 0);
     },
@@ -425,6 +442,10 @@ var QueueWidget = Event.extend({
         }
     },
 
+    /**
+     * Возвращает id последней нижней страницы
+     * @return number
+     */
     getLastPageId: function() {
         return this._lastPageId || +(this._lastPageId = this.getPages().last().data('id') || 0);
     },
@@ -436,10 +457,17 @@ var QueueWidget = Event.extend({
         }
     },
 
+    /**
+     * Загрузка страницы в кэш
+     * @param id
+     */
     preloadPage: function(id) {
         this.getPageData(id);
     },
 
+    /**
+     * Очистить кэш и всю хуйню
+     */
     clearCache: function() {
         this._chachedPages = null;
         this._firstPageId = null;
@@ -449,6 +477,12 @@ var QueueWidget = Event.extend({
         this._defaultTime = null;
     },
 
+    /**
+     * Добавить страницу в DOM
+     * @param id
+     * @param pageData
+     * @param isTop
+     */
     appendPageData: function(id, pageData, isTop) {
         var t = this;
         var $page = $(pageData);
@@ -472,11 +506,14 @@ var QueueWidget = Event.extend({
         t._$pages = null;
     },
 
+    /**
+     * Показать следующую страницу сверху
+     */
     showNextTopPage: function() {
         var t = this;
         var pageData = t.getPageData(t.getFirstPageId() - 1);
 
-        if (pageData && typeof pageData.success == 'function') {
+        if (Control.isDeferred(pageData)) {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();
@@ -491,11 +528,14 @@ var QueueWidget = Event.extend({
         }
     },
 
+    /**
+     * Показать следующую страницу снизу
+     */
     showNextBottomPage: function() {
         var t = this;
         var pageData = t.getPageData(t.getLastPageId() + 1);
 
-        if (pageData && typeof pageData.success == 'function') {
+        if (Control.isDeferred(pageData)) {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();
