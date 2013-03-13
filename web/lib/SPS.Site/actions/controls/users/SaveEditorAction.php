@@ -107,18 +107,25 @@
                if( !isset($UserFeeds[$old_role->targetFeedId]) && $old_role->role != UserFeed::ROLE_ADMINISTRATOR )
                    $UserFeeds[$old_role->targetFeedId] = $old_role;
             }
+
             if ($UserFeeds) {
                 UserFeedFactory::AddRange($UserFeeds);
             }
-            $this->setForeignLists();
+            $this->setTargetFeedsList();
         }
-        protected function setForeignLists() {
-            parent::setForeignLists();
 
-            //выбираем паблики, где юзер админит
-            $this->old_userFeeds =  UserFeedFactory::GetForVkId( $this->currentObject->vkId );
-            foreach( $this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR] as $userFeed ) {
-               $targetFeedsIds[$userFeed->targetFeedId] = $userFeed->targetFeedId;
+        protected function beforeSave() {
+            $this->setTargetFeedsList();
+        }
+
+        protected function setTargetFeedsList()
+        {
+            if( isset( $this->currentObject->vkId )) {
+                //выбираем паблики, где юзер админит
+                $this->old_userFeeds =  UserFeedFactory::GetForVkId( $this->currentObject->vkId );
+                foreach( $this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR] as $userFeed ) {
+                    $targetFeedsIds[$userFeed->targetFeedId] = $userFeed->targetFeedId;
+                }
             }
             Response::setArray( 'targetFeedsIds', $targetFeedsIds );
         }
