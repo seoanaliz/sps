@@ -38,32 +38,20 @@ var QueueWidget = Event.extend({
 
         return t.loadPage(t.getCurrentPageId()).success(function(data) {
             if (data) {
-                var tmpEl = document.createElement('div');
-                var $block = $(tmpEl).html(data);
-                t.$queue.show().html($block);
-                Elements.initDraggable($block);
+                var $page = $(data);
+                t.$queue.html($page);
+                Elements.initDraggable($page);
                 Elements.initDroppable($('#right-panel'));
-                Elements.initImages($block);
-                Elements.initLinks($block);
-                $block.find('.post.blocked').draggable('disable');
+                Elements.initImages($page);
+                Elements.initLinks($page);
+                $page.find('.post.blocked').draggable('disable');
             } else {
                 t.$queue.empty();
             }
 
-//            t.renderSize();
             t.clearCache();
             t.$queue.data('cancelEvent', true).scrollTop(0);
         });
-    },
-
-    renderSize: function() {
-        var size = this.$queue.find('.post').length;
-        $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
-    },
-
-    renderSizeForPage: function($page) {
-        var size = $page.find('.post').length;
-        $page.find('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
     },
 
     initQueue: function() {
@@ -476,7 +464,11 @@ var QueueWidget = Event.extend({
         }
 
         $page.data('id', id);
-//        t.renderSizeForPage($page);
+        Elements.initDraggable($page);
+        Elements.initDroppable($('#right-panel'));
+        Elements.initImages($page);
+        Elements.initLinks($page);
+        $page.find('.post.blocked').draggable('disable');
         t._$pages = null;
     },
 
