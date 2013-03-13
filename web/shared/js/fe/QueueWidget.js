@@ -20,9 +20,10 @@ var QueueWidget = Event.extend({
      * Обновление ленты очереди
      * @return Control.Deferred|bool
      */
-    update: function() {
+    update: function(id) {
         var t = this;
         var targetFeedId = Elements.rightdd();
+        var pageId = id || t.getCurrentPageId();
 
         if (!targetFeedId) {
             return false;
@@ -36,7 +37,7 @@ var QueueWidget = Event.extend({
             $('.queue-footer').show();
         }
 
-        return t.loadPage(t.getCurrentPageId()).success(function(data) {
+        return t.loadPage(pageId).success(function(data) {
             if (data) {
                 var $page = $(data);
                 t.$queue.html($page);
@@ -162,7 +163,7 @@ var QueueWidget = Event.extend({
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
                     if (state) {
-                        t.updateQueue();
+                        t.update();
                     }
                 });
             }
@@ -247,14 +248,19 @@ var QueueWidget = Event.extend({
             e.preventDefault();
         });
 
-        $('.queue-footer .add-button').click(function() {
-            $queue.scrollTo(0);
+        t.initSlotCreate();
+        t.initInlineCreate();
+    },
+
+    initSlotCreate: function() {
+        var t = this;
+
+        t.$queue.delegate('.add-button', 'click', function() {
             var $newPost = $(QUEUE_SLOT_ADD);
-            $newPost.prependTo($queue).animate({height: 110}, 200);
+            var $page = $(this).closest('.queue-page');
+            $newPost.prependTo($page).animate({height: 110}, 200);
             $newPost.find('.time').click();
         });
-
-        t.initInlineCreate();
     },
 
     /**
