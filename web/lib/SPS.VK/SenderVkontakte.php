@@ -419,7 +419,8 @@
         {
             if ( !file_exists( $path ))
                 throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
-
+            if ( filesize( $path) / 1024 < 5)
+                throw new exception( " File damaged : $path for vk.com/public" . $this->vk_group_id);
             $aid = '';
             switch ( $destination ) {
                 case 'wall':
@@ -473,9 +474,8 @@
             //заливка фото
             $content = $this->qurl_request( $upload_url, array('file1' => '@' . $path ) );
             $content = json_decode( $content );
-
             if ( empty( $content->$photo_list )) {
-                throw new exception(" Error uploading photo. Response : $content  in post to vk.com/public" . $this->vk_group_id );
+                throw new exception(" Error uploading photo. Response : $content in post to vk.com/public" . $this->vk_group_id );
             }
             sleep( 1 );
 

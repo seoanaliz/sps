@@ -10,8 +10,7 @@
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
-         25678227
-        ,26776509
+         26776509
         ,43503789
         ,346191
         ,33704958
@@ -24,6 +23,45 @@
         ,25817269
         );
 
+        public static $topface_beauty = array(
+            25678227,
+            38000449,
+            35807278,
+            38000423,
+            38000513,
+            38000540,
+            42351996,
+            41946825,
+            42352011,
+            42352024,
+            42494921,
+            42352077,
+            42352062,
+            42494824,
+            42494714,
+            41946847,
+            42495064,
+            42352154,
+            42352138,
+            42494794,
+            41946872,
+            42495143,
+            42495239,
+            42494936,
+            41946945,
+            42495024,
+            41946887,
+            41946921,
+            42495048,
+            42494987,
+            41946866,
+            42494848,
+            42352086,
+            42352120,
+            42494766,
+            49903343
+        );
+
         public static function get_id_by_shortname( $shortname )
         {
             $params = array( 'gids'  => $shortname );
@@ -31,7 +69,7 @@
             return $res[0]->gid;
         }
 
-        public static function get_our_publics_list()
+        public static function get_our_publics_list( $selector = 0 )
         {
             $publics = TargetFeedFactory::Get();
 
@@ -39,7 +77,10 @@
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
-
+                // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
+                if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
+                    ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
+                    continue;
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;

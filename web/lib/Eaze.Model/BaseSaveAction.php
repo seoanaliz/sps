@@ -313,5 +313,6 @@
             $selectedTab = Request::getInteger( "selectedTab" );
             Response::setInteger( "selectedTab", (is_null( $selectedTab ) ? 0 : $selectedTab ) );
         }
+
     }
 ?>
