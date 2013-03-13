@@ -123,6 +123,7 @@ class GetArticlesQueueListControl extends BaseControl {
 
         Response::setArray('articleRecords', $articleRecords);
         Response::setArray('articlesQueue', $articlesQueues);
+        Response::setObject('queueDate', $queueDate);
 
         if ($isHistory) {
             Page::$TemplatePath = 'tmpl://fe/elements/articles-queue-history.tmpl.php';

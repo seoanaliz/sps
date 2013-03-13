@@ -8,10 +8,10 @@ var QueueWidget = Event.extend({
      * Загрузка ленты очереди
      * @return Deferred
      */
-    loadPage: function() {
+    loadPage: function(id) {
         return Control.fire('get_queue', {
             targetFeedId: Elements.rightdd(),
-            timestamp: Elements.calendar(),
+            timestamp: (this.getDefaultTime() - id * TIME.DAY) / 1000,
             type: Elements.rightType()
         })
     },
@@ -36,7 +36,7 @@ var QueueWidget = Event.extend({
             $('.queue-footer').show();
         }
 
-        return t.loadPage().success(function(data) {
+        return t.loadPage(t.getCurrentPageId()).success(function(data) {
             if (data) {
                 var tmpEl = document.createElement('div');
                 var $block = $(tmpEl).html(data);
@@ -49,13 +49,21 @@ var QueueWidget = Event.extend({
             } else {
                 t.$queue.empty();
             }
-            t.renderSize();
+
+//            t.renderSize();
+            t.clearCache();
+            t.$queue.data('cancelEvent', true).scrollTop(0);
         });
     },
 
     renderSize: function() {
         var size = this.$queue.find('.post').length;
         $('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
+    },
+
+    renderSizeForPage: function($page) {
+        var size = $page.find('.post').length;
+        $page.find('.queue-title').text((size == 0 ? 'ничего не' : size) + ' ' + Lang.declOfNum( size, ['запланирована', 'запланировано', 'запланировано'] ));
     },
 
     initQueue: function() {
@@ -340,75 +348,143 @@ var QueueWidget = Event.extend({
      */
     initAutoload: function() {
         var t = this;
+
         t.$queue.scroll(function() {
+            if (t.$queue.data('cancelEvent')) {
+                t.$queue.data('cancelEvent', false);
+                return;
+            }
+
             var scrollTop = t.$queue.scrollTop();
+            var queueHeight = t.$queue.height();
+            var $pages = t.getPages();
+
             if (scrollTop <= 0) {
                 t.showNextTopPage();
-            } else if (scrollTop >= t.$queue[0].scrollHeight - t.$queue.outerHeight()) {
+            } else if (scrollTop + queueHeight >= t.$queue[0].scrollHeight) {
                 t.showNextBottomPage();
             }
+
+            $pages.each(function() {
+                var $page = $(this);
+                if ($page.position().top + $page.outerHeight() >= 0) {
+                    t.setCurrentPage($page);
+                    return false;
+                }
+            });
         });
+
+        t.on('changeCurrentPage', function(pageId, $page) {
+            t.getPages().find('.queue-title').removeClass('fixed');
+            $page.find('.queue-title').addClass('fixed');
+        });
+    },
+
+    getPages: function() {
+        return this._$pages || (this._$pages = this.$queue.find('.queue-page'));
     },
 
     getPageData: function(id) {
         var t = this;
 
-        if (t.getCachedPageData(id)) {
+        if (t.getCachedPageData(id) !== undefined) {
             return t.getCachedPageData(id);
         } else {
-            return t.loadPage().success(function(data) {
+            return t.loadPage(id).success(function(data) {
                 t.setCachedPageData(id, data);
             });
         }
     },
 
-    setCachedPageData: function(id, data) {
-        this.getCachedPages()[id] = data;
+    getDefaultTime: function() {
+        return this._defaultTime || (this._defaultTime = Elements.calendar() * 1000);
     },
 
     getCachedPageData: function(id) {
-        return this.getCachedPages()[id];
+        return this._chachedPages ? this._chachedPages[id] : undefined;
     },
 
-    getCachedPages: function() {
-        return this._chachedPages || (this._chachedPages = {});
+    setCachedPageData: function(id, data) {
+        if (!this._chachedPages) {
+            this._chachedPages = {};
+        }
+        this._chachedPages[id] = data;
     },
 
-    setFirstPageId: function(id) {
-        this._firstPageId = id;
+    getCurrentPage: function() {
+        return this._$currentPage || (this._$currentPage = this.getPages().first());
+    },
+
+    setCurrentPage: function($page) {
+        if (!this._$currentPage || $page[0] != this._$currentPage[0]) {
+            this._$currentPage = $page;
+            this.trigger('changeCurrentPage', this.getCurrentPageId(), $page);
+        }
+    },
+
+    getCurrentPageId: function() {
+        return this.getCurrentPage().data('id') || 0;
     },
 
     getFirstPageId: function() {
-        return this._firstPageId || (this._firstPageId = 0);
+        return this._firstPageId || +(this._firstPageId = this.getPages().first().data('id') || 0);
     },
 
-    setLastPageId: function(id) {
-        this._lastPageId = id;
+    setFirstPageId: function(id) {
+        if (id != this._firstPageId) {
+            this._firstPageId = id;
+            this.trigger('changeFirstPageId', id);
+        }
     },
 
     getLastPageId: function() {
-        return this._lastPageId || (this._lastPageId = 0);
+        return this._lastPageId || +(this._lastPageId = this.getPages().last().data('id') || 0);
+    },
+
+    setLastPageId: function(id) {
+        if (id != this._lastPageId) {
+            this._lastPageId = id;
+            this.trigger('changeLastPageId', id);
+        }
+    },
+
+    preloadPage: function(id) {
+        this.getPageData(id);
+    },
+
+    clearCache: function() {
+        this._chachedPages = null;
+        this._firstPageId = null;
+        this._lastPageId = null;
+        this._$currentPage = null;
+        this._$pages = null;
+        this._defaultTime = null;
     },
 
     appendPageData: function(id, pageData, isTop) {
         var t = this;
+        var $page = $(pageData);
+
+        if (!$page.hasClass('queue-page')) {
+            return;
+        }
 
         if (isTop) {
-            t.$queue.prepend(pageData);
-            t.$queue.find('.queue-title').removeClass('fixed');
-            t.$queue.find('.queue-title:first').addClass('fixed');
+            t.$queue.prepend($page);
         } else {
-            t.$queue.find('.queue-title').removeClass('fixed');
-            t.$queue.find('.queue-title:last').addClass('fixed');
-            t.$queue.append(pageData);
+            t.$queue.append($page);
         }
+
+        $page.data('id', id);
+//        t.renderSizeForPage($page);
+        t._$pages = null;
     },
 
     showNextTopPage: function() {
         var t = this;
-        var pageData = t.getPageData(t.getFirstPageId());
+        var pageData = t.getPageData(t.getFirstPageId() - 1);
 
-        if (typeof pageData.success == 'function') {
+        if (pageData && typeof pageData.success == 'function') {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();
@@ -417,7 +493,7 @@ var QueueWidget = Event.extend({
         } else {
             var oldScrollHeight = t.$queue[0].scrollHeight;
             t.setFirstPageId(t.getFirstPageId() - 1);
-            t.setCachedPageData(t.getFirstPageId() - 1, t.getPageData(t.getFirstPageId() - 1));
+            t.preloadPage(t.getFirstPageId() - 1);
             t.appendPageData(t.getFirstPageId(), pageData, true);
             t.$queue.scrollTop(t.$queue[0].scrollHeight - oldScrollHeight);
         }
@@ -425,9 +501,9 @@ var QueueWidget = Event.extend({
 
     showNextBottomPage: function() {
         var t = this;
-        var pageData = t.getPageData(t.getLastPageId());
+        var pageData = t.getPageData(t.getLastPageId() + 1);
 
-        if (typeof pageData.success == 'function') {
+        if (pageData && typeof pageData.success == 'function') {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();
@@ -435,7 +511,7 @@ var QueueWidget = Event.extend({
             });
         } else {
             t.setLastPageId(t.getLastPageId() + 1);
-            t.setCachedPageData(t.getLastPageId() + 1, t.getPageData(t.getLastPageId() + 1));
+            t.preloadPage(t.getLastPageId() + 1);
             t.appendPageData(t.getLastPageId(), pageData, false);
         }
     }

@@ -84,17 +84,13 @@ var RightPanelWidget = Event.extend({
     initCalendar: function() {
         var t = this;
         var $calendar = t.$calendar;
-        $calendar
-            .datepicker()
-            .keydown(function(e){
-                if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
-                    e.preventDefault();
-                }
-            })
-            .change(function(){
-                $(this).parent().find('.caption').toggleClass('default', !$(this).val().length);
-                t.updateQueue();
-            });
+        $calendar.datepicker().keydown(function(e){
+            if (!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
+                e.preventDefault();
+            }
+        }).change(function() {
+            t.updateQueue();
+        });
 
         $('.calendar .tip, #calendar-fix').click(function(){
             $calendar.focus();
@@ -103,17 +99,44 @@ var RightPanelWidget = Event.extend({
         // Приведение вида календаря из 22.12.2012 в 22 декабря
         var d = $calendar.val().split('.');
         var date = [d[1], d[0], d[2]].join('/');
-        $calendar.datepicker('setDate', new Date(date)).trigger('change');
+        t.setTime(date);
 
         // Кнопки вперед-назад в календаре
         $('.calendar .prev').click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
+            t.setNextDay(true);
         });
+
         $('.calendar .next').click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
+            t.setPrevDay(true);
         });
+    },
+
+    setTime: function(time, isTrigger) {
+        var $calendar = this.$calendar;
+        $calendar.datepicker('setDate', new Date(time));
+        $calendar.parent().find('.caption').toggleClass('default', !$calendar.val().length);
+
+        if (isTrigger) {
+            $calendar.trigger('change');
+        }
+    },
+
+    getTime: function() {
+        var $calendar = this.$calendar;
+        return $calendar.datepicker('getDate').getTime();
+    },
+
+    offsetTime: function(time, isTrigger) {
+        var currentTime = this.getTime();
+        this.setTime(currentTime + time, isTrigger);
+    },
+
+    setNextDay: function(isTrigger) {
+        this.offsetTime(TIME.DAY, isTrigger);
+    },
+
+    setPrevDay: function(isTrigger) {
+        this.offsetTime(-TIME.DAY, isTrigger);
     },
 
     initExpander: function() {
@@ -185,7 +208,11 @@ var RightPanelWidget = Event.extend({
     },
 
     initQueue: function() {
-        this.getQueueWidget().initQueue();
+        var t = this;
+        t.getQueueWidget().initQueue();
+        t.getQueueWidget().on('changeCurrentPage', function(pageId) {
+            t.setTime(t.getQueueWidget().getDefaultTime() - (TIME.DAY * pageId));
+        });
     },
 
     updateQueue: function() {

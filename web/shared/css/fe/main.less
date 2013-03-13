@@ -536,17 +536,23 @@ i {font-style: italic;}
         width: 100%;
         .border-radius(0 0 2px 2px);
 
-        .queue-title {
-            z-index: 2;
-            margin-bottom: -26px;
-            height: 26px;
-            width: 342px;
+        .queue-page {
+            position: relative;
+            padding-top: 26px;
 
-            &.fixed {
+            .queue-title {
+                position: absolute;
+                top: 0;
                 z-index: 3;
-                top: 131px;
-                position: fixed;
-                .box-shadow(0 1px 1px rgba(0,0,0, 0.2));
+                height: 26px;
+                width: 342px;
+
+                &.fixed {
+                    z-index: 2;
+                    top: 131px;
+                    position: fixed;
+                    .box-shadow(0 1px 1px rgba(0,0,0, 0.2));
+                }
             }
         }
 
@@ -853,6 +859,12 @@ i {font-style: italic;}
         width: 600px;
         .box-shadow(0 0 30px 5px rgba(0,0,0, 0.1));
 
+        .queue-page {
+            .queue-title {
+                width: 572px;
+            }
+        }
+
         .right-panel-expander {
             display: none;
         }
@@ -860,6 +872,7 @@ i {font-style: italic;}
         .post {
             display: none;
         }
+
         .expanded-post {
             display: block;
         }
