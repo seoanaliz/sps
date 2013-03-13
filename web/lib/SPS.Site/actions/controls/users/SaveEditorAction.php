@@ -120,6 +120,7 @@
 
         protected function setTargetFeedsList()
         {
+            $targetFeedsIds = array();
             if( isset( $this->currentObject->vkId )) {
                 //выбираем паблики, где юзер админит
                 $this->old_userFeeds =  UserFeedFactory::GetForVkId( $this->currentObject->vkId );
