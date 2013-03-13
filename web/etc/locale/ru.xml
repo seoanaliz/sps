@@ -215,9 +215,9 @@
         <editTitle><![CDATA[Редактирование автора]]></editTitle>
       </author>
       <editor>
-        <list><![CDATA[Список админов]]></list>
-        <addTitle><![CDATA[Добавление админа]]></addTitle>
-        <editTitle><![CDATA[Редактирование админа]]></editTitle>
+        <list><![CDATA[Список редакторов]]></list>
+        <addTitle><![CDATA[Добавление редактора]]></addTitle>
+        <editTitle><![CDATA[Редактирование редактора]]></editTitle>
       </editor>
     </screens>
     <vfs>
@@ -258,7 +258,7 @@
       <articlesQueue><![CDATA[Очередь]]></articlesQueue>
       <publishers><![CDATA[Издатели]]></publishers>
       <authors><![CDATA[Авторы]]></authors>
-      <editors><![CDATA[Админы]]></editors>
+      <editors><![CDATA[Редакторы]]></editors>
     </menu>
     <metaDetail>
       <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
@@ -419,13 +419,12 @@
       <statusId><![CDATA[Статус]]></statusId>
     </author>
     <editor>
-      <deleteString><![CDATA[Вы действительно хотите удалить админа?]]></deleteString>
-      <header><![CDATA[админы]]></header>
+      <deleteString><![CDATA[Вы действительно хотите удалить редактора?]]></deleteString>
+      <header><![CDATA[редакторы]]></header>
       <vkId><![CDATA[Vk Id]]></vkId>
       <firstName><![CDATA[Имя]]></firstName>
       <lastName><![CDATA[Фамилия]]></lastName>
       <avatar><![CDATA[Аватар]]></avatar>
-      <targetFeeds><![CDATA[Ленты отправки]]></targetFeeds>
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
     </editor>
@@ -525,9 +524,9 @@
     <editor>
       <single><![CDATA[редактор]]></single>
       <plural><![CDATA[редакторы]]></plural>
-      <pluralGenitive><![CDATA[админов]]></pluralGenitive>
-      <singleGenitive><![CDATA[админа]]></singleGenitive>
-      <singleAccusative><![CDATA[админа]]></singleAccusative>
+      <pluralGenitive><![CDATA[редакторов]]></pluralGenitive>
+      <singleGenitive><![CDATA[редактора]]></singleGenitive>
+      <singleAccusative><![CDATA[редактора]]></singleAccusative>
     </editor>
   </objects>
 </language>

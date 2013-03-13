@@ -21,10 +21,6 @@
             <label>{lang:vt.editor.vkId}</label>
             <?= FormHelper::FormInput( 'vkId', $object->vkId, 'vkId', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="targetFeeds" class="row">
-            <label>{lang:vt.editor.targetFeeds}</label>
-            <?= FormHelper::FormSelectMultiple( 'targetFeedIds[]', $targetFeeds, 'targetFeedId', 'title', $targetFeedsIds, 'targetFeedsIds', null, null, array('style' => 'height: 200px;') ) ?>
-        </div>
         <div data-row="statusId" class="row required">
             <label>{lang:vt.editor.statusId}</label>
             <?= FormHelper::FormSelect( $prefix . '[statusId]', StatusUtility::$Common[$__currentLang], "", "", $object->statusId, null, null, false ); ?>
