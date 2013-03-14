@@ -211,7 +211,7 @@ var RightPanelWidget = Event.extend({
         var t = this;
         t.getQueueWidget().initQueue();
         t.getQueueWidget().on('changeCurrentPage', function(pageId) {
-            t.setTime(t.getQueueWidget().getDefaultTime() - (TIME.DAY * pageId));
+            t.setTime(t.getQueueWidget().getDefaultTime() - (TIME.DAY * pageId), false);
         });
     },
 

@@ -124,7 +124,6 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(true);
-                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);

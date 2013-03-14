@@ -51,6 +51,7 @@ var QueueWidget = Event.extend({
             }
 
             t.clearCache();
+            t.trigger('changeCurrentPage', pageId, $page);
             t.$queue.data('cancelEvent', true).scrollTop(0);
         });
     },
@@ -162,9 +163,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
-                    if (state) {
-                        t.update();
-                    }
+                    t.update($input.closest('.queue-page').data('id'));
                 });
             }
         });
@@ -214,13 +213,13 @@ var QueueWidget = Event.extend({
                         if ($post.hasClass('new')) {
                             // Добавление ячейки
                             Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
-                                if (state) {}
+                                t.update($post.closest('.queue-page').data('id'));
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
                                 Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
-                                    if (state) {}
+                                    t.update($post.closest('.queue-page').data('id'));
                                 });
                             }
                         }
