@@ -160,7 +160,7 @@ var QueueWidget = Event.extend({
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
                     if (state) {
-                        t.loadQueue();
+                        t.load();
                     }
                 });
             }
