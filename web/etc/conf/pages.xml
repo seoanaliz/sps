@@ -588,6 +588,9 @@
                 <page uri="daemons://token-checker/">
                     <actions>SPS.Stat.TokenChecker</actions>
                 </page>
+                <page uri="daemons://PublicsParser/">
+                    <actions>SPS.Stat.PublicsParser</actions>
+                </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
                  </page>
