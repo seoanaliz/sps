@@ -8,7 +8,7 @@
 <div class="queue-page">
     <? if (!empty($queueDate)) { ?>
         <div class="queue-title">
-            <?= TextRender::FullDateString($queueDate) ?>
+            <?= DateTimeHelper::GetRelativeDateString($queueDate, false) ?>
             <a class="add-button r">Добавить ячейку</a>
         </div>
     <? } ?>
