@@ -101,8 +101,7 @@ var Eventlist = {
             data: {
                 id: post_id
             },
-            success: function(data) {
-                app.updateQueue();
+            success: function() {
                 if (typeof callback == 'function') {
                     callback(true);
                 }
@@ -144,10 +143,9 @@ var Eventlist = {
                 timestamp: Elements.calendar(),
                 queueId: qid
             },
-            success: function (data) {
-                if(data.success) {
+            success: function(data) {
+                if (data.success) {
                     callback(true);
-                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -189,7 +187,6 @@ var Eventlist = {
             success: function (data) {
                 if(data.success) {
                     callback(1, data.id);
-                    app.updateQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);

@@ -215,9 +215,11 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    updateQueue: function() {
-        this.getQueueWidget().clearCache();
-        this.getQueueWidget().update();
+    updateQueue: function(pageId) {
+        if (pageId === undefined) {
+            this.getQueueWidget().clearCache();
+        }
+        this.getQueueWidget().update(pageId);
     },
 
     updateDropdown: function() {

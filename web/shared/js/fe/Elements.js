@@ -71,17 +71,14 @@ var Elements = {
                 activeClass: 'ui-state-active',
                 hoverClass: 'ui-state-hover',
                 drop: function(e, ui) {
-                    var $target = $(this),
+                    var $slot = $(this),
+                        $page = $slot.closest('.queue-page'),
                         $post = $(ui.draggable).closest('.post');
 
-                    if ($target.hasClass('empty')) {
-                        Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
-                            if (state) {
-                                if ($post.hasClass('relocatable')) {
-                                    $target.html($post);
-                                }
-                                $target.addClass('image-compositing');
-                            }
+                    if ($slot.hasClass('empty')) {
+                        Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
+                            var queuePageId = app.getRightPanelWidget().getQueueWidget().getPageIdByPage($page);
+                            app.updateQueue(queuePageId);
                         });
                     }
                 }

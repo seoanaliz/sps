@@ -63,9 +63,13 @@ var QueueWidget = Event.extend({
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
-            var $post = $(this).closest('.post'),
-            pid = $post.data('id');
-            Events.fire('rightcolumn_deletepost', pid);
+            var $post = $(this).closest('.post');
+            var $page = $post.closest('.queue-page');
+            var pid = $post.data('id');
+
+            Events.fire('rightcolumn_deletepost', pid, function() {
+                t.update(t.getPageIdByPage($page));
+            });
         });
 
         // Смена даты
@@ -100,6 +104,7 @@ var QueueWidget = Event.extend({
             }
 
             var $post = $input.closest('.slot');
+            var $page = $post.closest('.queue-page');
             var $time = $post.find('.time');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
@@ -113,7 +118,9 @@ var QueueWidget = Event.extend({
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
-                        if (state) {}
+                        if (state) {
+                            t.update(t.getPageIdByPage($page));
+                        }
                     });
                 }
             } else if (!time) {
@@ -155,6 +162,7 @@ var QueueWidget = Event.extend({
             }
 
             var $post = $input.closest('.slot');
+            var $page = $post.closest('.queue-page');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
 
@@ -164,7 +172,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
-                    t.update(t.getPageIdByPage($input.closest('.queue-page')));
+                    t.update(t.getPageIdByPage($page));
                 });
             }
         });
@@ -176,6 +184,7 @@ var QueueWidget = Event.extend({
             if (!$header.data('datepicker')) {
                 var $datepicker = $('<input type="text" />');
                 var $slot = $target.closest('.slot');
+                var $page = $slot.closest('.queue-page');
                 var $time = $slot.find('.time');
                 var gridLineId = $slot.data('grid-id');
                 var startDate = $slot.data('start-date');
@@ -214,13 +223,13 @@ var QueueWidget = Event.extend({
                         if ($slot.hasClass('new')) {
                             // Добавление ячейки
                             Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                t.update(t.getPageIdByPage($slot.closest('.queue-page')));
+                                t.update(t.getPageIdByPage($page));
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
                                 Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                    t.update(t.getPageIdByPage($slot.closest('.queue-page')));
+                                    t.update(t.getPageIdByPage($page));
                                 });
                             }
                         }
@@ -331,13 +340,16 @@ var QueueWidget = Event.extend({
         var text = $.trim($textarea.val());
         var imageUploader = $slot.data('imageUploader');
         var files = imageUploader && imageUploader.getPhotos();
+        var $page = $slot.closest('.queue-page');
+
         if (text || files) {
             $slot.addClass('locked');
             Events.fire('post', text, files, '', null, function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
+
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.update();
+                        t.update(t.getPageIdByPage($page));
                     });
                 }
             });
