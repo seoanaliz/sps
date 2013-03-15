@@ -113,7 +113,7 @@ var QueueWidget = Event.extend({
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
-                    $post.animate({height: 0}, 200, function() {
+                    $post.transition({height: 0}, 200, function() {
                         $(this).remove();
                     });
                 }
@@ -287,7 +287,7 @@ var QueueWidget = Event.extend({
         $('.queue-footer .add-button').click(function() {
             $queue.scrollTo(0);
             var $newPost = $(QUEUE_SLOT_ADD);
-            $newPost.prependTo($queue).animate({height: 110}, 200);
+            $newPost.prependTo($queue).transition({height: 110}, 200);
             $newPost.find('.time').click();
         });
     },
