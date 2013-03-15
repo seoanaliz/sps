@@ -686,7 +686,7 @@
         public static function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
-            $sql = 'SELECT vk_id, name, ava, quantity, page
+            $sql = 'SELECT vk_id, name, ava, quantity, is_page
                     FROM ' . TABLE_STAT_PUBLICS . '
                     WHERE vk_id IN (' . $public_ids . ')';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -698,7 +698,7 @@
                     'name'      =>   $ds->GetString ( 'name' ),
                     'ava'       =>   $ds->GetString ( 'ava' ),
                     'quantity'  =>   $ds->GetInteger( 'quantity' ),
-                    'page'      =>   $ds->GetBoolean( 'page')
+                    'page'      =>   $ds->GetBoolean( 'is_page')
                 );
             }
             return $res;
@@ -721,7 +721,7 @@
                         //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
                         $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name';
                     } else {
-                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","page","sh_in_main")
+                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","is_page","sh_in_main")
                                                                VALUES ( @public_id, @photo, @name, true, true)';
                     }
                     $cmd = new SqlCommand( $sql, $conn );
@@ -792,7 +792,7 @@
             //поиск id паблика
             $int_search = (int) $search_string;
 
-            $sql = 'SELECT vk_id,ava, name,quantity,page
+            $sql = 'SELECT vk_id,ava, name,quantity,is_page
                     FROM ' . TABLE_STAT_PUBLICS .
                    ' WHERE
                         ( name ILIKE @search_string

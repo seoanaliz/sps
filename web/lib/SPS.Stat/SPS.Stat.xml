@@ -26,6 +26,9 @@
         <action name="TokenChecker">
             <path>daemons/TokenChecker</path>
         </action>
+        <action name="PublicsParser">
+            <path>daemons/PublicsParser</path>
+        </action>
 
     </group>
 
