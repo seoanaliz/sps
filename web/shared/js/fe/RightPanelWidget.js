@@ -216,6 +216,7 @@ var RightPanelWidget = Event.extend({
     },
 
     updateQueue: function(pageId) {
+        this.getQueueWidget().clearCache();
         this.getQueueWidget().update(pageId);
     },
 
