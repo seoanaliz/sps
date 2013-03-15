@@ -43,6 +43,9 @@
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
                     <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                 </vkapi>
+                <textRender class="TextRender">
+                    <param name="active">true</param>
+                </textRender>
 			</modules>
 			<databases>
 				<database driver="PgSql">
