@@ -5,7 +5,9 @@
 
 <div class="queue-page">
     <? if (!empty($queueDate)) { ?>
-        <?= TextRender::FullDateString($queueDate) ?>
+        <div class="queue-title">
+            <?= TextRender::FullDateString($queueDate) ?>
+        </div>
     <? } ?>
     <? if (!empty($articlesQueue)) { ?>
         <? foreach ($articlesQueue as $articleQueueItem) {

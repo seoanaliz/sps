@@ -55,8 +55,8 @@ var App = (function() {
             this.getRightPanelWidget().updateDropdown();
         },
 
-        updateQueue: function() {
-            this.getRightPanelWidget().updateQueue();
+        updateQueue: function(pageId) {
+            this.getRightPanelWidget().updateQueue(pageId);
         },
 
         imageUploader: function(options) {

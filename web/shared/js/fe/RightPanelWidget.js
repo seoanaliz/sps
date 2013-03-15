@@ -19,7 +19,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanel = t.$rightPanel;
 
         $('#right-drop-down').dropdown({
-            data: rightPanelData,
+            data: window.rightPanelData,
             type: 'radio',
             addClass: 'right',
             onchange: function(item) {
@@ -211,12 +211,12 @@ var RightPanelWidget = Event.extend({
         var t = this;
         t.getQueueWidget().initQueue();
         t.getQueueWidget().on('changeCurrentPage', function(pageId) {
-            t.setTime(t.getQueueWidget().getDefaultTime() - (TIME.DAY * pageId), false);
+            t.setTime(t.getQueueWidget().getDefaultTime() - pageId * TIME.DAY, false);
         });
     },
 
-    updateQueue: function() {
-        this.getQueueWidget().update();
+    updateQueue: function(pageId) {
+        this.getQueueWidget().update(pageId);
     },
 
     updateDropdown: function() {

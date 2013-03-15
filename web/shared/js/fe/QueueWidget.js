@@ -1,7 +1,8 @@
 var QueueWidget = Event.extend({
     init: function() {
-        this.$queue = $('#queue');
-        this.initAutoload();
+        var t = this;
+        t.$queue = $('#queue');
+        t.initAutoload();
     },
 
     /**
@@ -9,9 +10,10 @@ var QueueWidget = Event.extend({
      * @return Control.Deferred
      */
     loadPage: function(id) {
+        var t = this;
         return Control.fire('get_queue', {
             targetFeedId: Elements.rightdd(),
-            timestamp: (this.getDefaultTime() - id * TIME.DAY) / 1000,
+            timestamp: (t.getDefaultTime() - id * TIME.DAY) / 1000,
             type: Elements.rightType()
         })
     },
@@ -50,8 +52,8 @@ var QueueWidget = Event.extend({
                 t.$queue.empty();
             }
 
-            t.clearCache();
             t.trigger('changeCurrentPage', pageId, $page);
+            t.clearCache();
             t.$queue.data('cancelEvent', true).scrollTop(0);
         });
     },
