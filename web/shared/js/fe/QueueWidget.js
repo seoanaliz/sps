@@ -10,10 +10,9 @@ var QueueWidget = Event.extend({
      * @return Control.Deferred
      */
     loadPage: function(id) {
-        var t = this;
         return Control.fire('get_queue', {
             targetFeedId: Elements.rightdd(),
-            timestamp: (t.getDefaultTime() - id * TIME.DAY) / 1000,
+            timestamp: intval(this.getTimeByPageId(id) / 1000),
             type: Elements.rightType()
         })
     },
@@ -165,7 +164,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
-                    t.update($input.closest('.queue-page').data('id'));
+                    t.update(t.getPageIdByPage($input.closest('.queue-page')));
                 });
             }
         });
@@ -176,13 +175,13 @@ var QueueWidget = Event.extend({
 
             if (!$header.data('datepicker')) {
                 var $datepicker = $('<input type="text" />');
-                var $post = $target.closest('.slot');
-                var $time = $post.find('.time');
-                var gridLineId = $post.data('grid-id');
-                var startDate = $post.data('start-date');
-                var endDate = $post.data('end-date');
-                var defStartDate = $post.data('start-date');
-                var defEndDate = $post.data('end-date');
+                var $slot = $target.closest('.slot');
+                var $time = $slot.find('.time');
+                var gridLineId = $slot.data('grid-id');
+                var startDate = $slot.data('start-date');
+                var endDate = $slot.data('end-date');
+                var defStartDate = $slot.data('start-date');
+                var defEndDate = $slot.data('end-date');
                 var time = $time.text();
 
                 $header.data('datepicker', $datepicker);
@@ -199,10 +198,10 @@ var QueueWidget = Event.extend({
                         picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
                     }),
                     onSelect: function(dates) {
-                        $post.data('start-date', $.datepick.formatDate(dates[0]));
-                        $post.data('end-date', $.datepick.formatDate(dates[1]));
-                        startDate = $post.data('start-date');
-                        endDate = $post.data('end-date');
+                        $slot.data('start-date', $.datepick.formatDate(dates[0]));
+                        $slot.data('end-date', $.datepick.formatDate(dates[1]));
+                        startDate = $slot.data('start-date');
+                        endDate = $slot.data('end-date');
                     },
                     onShow: function() {
                         $header.find('span.datepicker').addClass('active');
@@ -212,16 +211,16 @@ var QueueWidget = Event.extend({
                         time = $time.text();
                         $header.find('span.datepicker').removeClass('active');
                         $queue.css('overflow', 'auto');
-                        if ($post.hasClass('new')) {
+                        if ($slot.hasClass('new')) {
                             // Добавление ячейки
-                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state){
-                                t.update($post.closest('.queue-page').data('id'));
+                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
+                                t.update(t.getPageIdByPage($slot.closest('.queue-page')));
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
-                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function(state) {
-                                    t.update($post.closest('.queue-page').data('id'));
+                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
+                                    t.update(t.getPageIdByPage($slot.closest('.queue-page')));
                                 });
                             }
                         }
@@ -257,10 +256,13 @@ var QueueWidget = Event.extend({
         var t = this;
 
         t.$queue.delegate('.add-button', 'click', function() {
-            var $newPost = $(QUEUE_SLOT_ADD);
+            var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
-            $newPost.prependTo($page).animate({height: 110}, 200);
-            $newPost.find('.time').click();
+            var dateString = $.datepick.formatDate(new Date(t.getTimeByPageId(t.getPageIdByPage($page))));
+            $newSlot.prependTo($page).animate({height: 110}, 200);
+            $newSlot.find('.time').click();
+            $newSlot.data('start-date', dateString);
+            $newSlot.data('end-date', dateString);
         });
     },
 
@@ -404,6 +406,18 @@ var QueueWidget = Event.extend({
         return this._defaultTime || (this._defaultTime = Elements.calendar() * 1000);
     },
 
+    getTimeByPageId: function(pageId) {
+        return this.getDefaultTime() - pageId * TIME.DAY;
+    },
+
+    getCurrentTime: function() {
+        return this.getTimeByPageId(this.getCurrentPageId());
+    },
+
+    getPageIdByPage: function($page) {
+        return intval($page.data('id'));
+    },
+
     getCachedPageData: function(id) {
         return this._chachedPages ? this._chachedPages[id] : undefined;
     },
@@ -431,7 +445,7 @@ var QueueWidget = Event.extend({
      * @return number
      */
     getCurrentPageId: function() {
-        return this.getCurrentPage().data('id') || 0;
+        return this.getPageIdByPage(this.getCurrentPage());
     },
 
     /**
@@ -439,7 +453,7 @@ var QueueWidget = Event.extend({
      * @return number
      */
     getFirstPageId: function() {
-        return this._firstPageId || +(this._firstPageId = this.getPages().first().data('id') || 0);
+        return this._firstPageId || +(this._firstPageId = this.getPageIdByPage(this.getPages().first()));
     },
 
     setFirstPageId: function(id) {
@@ -454,7 +468,7 @@ var QueueWidget = Event.extend({
      * @return number
      */
     getLastPageId: function() {
-        return this._lastPageId || +(this._lastPageId = this.getPages().last().data('id') || 0);
+        return this._lastPageId || +(this._lastPageId = this.getPageIdByPage(this.getPages().last()));
     },
 
     setLastPageId: function(id) {
