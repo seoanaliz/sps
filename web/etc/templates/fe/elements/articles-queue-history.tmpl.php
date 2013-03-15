@@ -1,11 +1,22 @@
 <?
-    /** @var $articlesQueue ArticleQueue[] */
+/** @var $articlesQueue ArticleQueue[] */
+/** @var $queueDate DateTimeWrapper */
+?>
 
-    foreach ($articlesQueue as $articleQueueItem) {
-        $articleQueueId = $articleQueueItem->articleQueueId;
-        $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
-        if (empty($articleRecord)) continue;
-        ?>
+<div class="queue-page">
+    <? if (!empty($queueDate)) { ?>
+        <div class="queue-title">
+            <?= TextRender::FullDateString($queueDate) ?>
+        </div>
+    <? } ?>
+    <? if (!empty($articlesQueue)) { ?>
+        <? foreach ($articlesQueue as $articleQueueItem) {
+            $articleQueueId = $articleQueueItem->articleQueueId;
+            $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
+            if (empty($articleRecord)) {
+                continue;
+            }
+            ?>
             <div class="slot locked">
                 <div class="slot-header">
                     <span>&nbsp;<?= !empty($articleQueueItem->sentAt) ? $articleQueueItem->sentAt->defaultTimeFormat() : $articleQueueItem->startDate->modify('+30 seconds')->defaultTimeFormat() ?></span>
@@ -18,6 +29,8 @@
                     </div>
                 </div>
             </div>
-        <?
-    }
-?>
+        <? } ?>
+    <? } else { ?>
+        <div class="empty-queue">Пусто</div>
+    <? } ?>
+</div>

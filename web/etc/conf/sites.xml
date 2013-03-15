@@ -32,6 +32,8 @@
 				    <param name="default">ru</param>
 				    <param name="allowChange">false</param>
 					<param name="htmlEncoding">utf-8</param>
+                    <param name="locale">ru_RU.UTF-8</param>
+                    <param name="number">C</param>
     			</localization>
     			<mailFactory class="MailFactory">
 				    <param name="senderName">Administrator</param>

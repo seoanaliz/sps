@@ -22,7 +22,7 @@
          * @return string
          */
         public static function FullDateString( $date ) {
-            return strftime( "%e %B %Y", $date->format( "U" ) );
+            return strftime( "%#d %B %Y", $date->format( "U" ) );
         }
 
         /**
@@ -30,7 +30,7 @@
          * @return string
          */
         public static function ShortDateString( $date ) {
-            return strftime( "%e %B", $date->format( "U" ) );
+            return strftime( "%#d %B", $date->format( "U" ) );
         }
     }
 ?>
