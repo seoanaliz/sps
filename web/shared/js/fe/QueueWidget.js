@@ -364,7 +364,7 @@ var QueueWidget = Event.extend({
 
             $pages.each(function() {
                 var $page = $(this);
-                if ($page.position().top + $page.outerHeight() >= 0) {
+                if ($page.position().top + $page.outerHeight() > 0) {
                     t.setCurrentPage($page);
                     return false;
                 }
