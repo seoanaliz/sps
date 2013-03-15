@@ -5,7 +5,7 @@
 
 <div class="queue-page">
     <? if (!empty($queueDate)) { ?>
-        <div class="queue-title">{$queueDate->defaultDateFormat()}</div>
+        <?= TextRender::FullDateString($queueDate) ?>
     <? } ?>
     <? if (!empty($articlesQueue)) { ?>
         <? foreach ($articlesQueue as $articleQueueItem) {
