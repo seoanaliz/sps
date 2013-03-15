@@ -25,18 +25,10 @@ var QueueWidget = Event.extend({
     update: function(id) {
         var t = this;
         var targetFeedId = Elements.rightdd();
-        var pageId = id || t.getCurrentPageId();
+        var pageId = id || 0;
 
         if (!targetFeedId) {
             return false;
-        }
-
-        $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
-
-        if (Elements.rightType() == 'all') {
-            $('.queue-footer').hide();
-        } else {
-            $('.queue-footer').show();
         }
 
         return t.loadPage(pageId).success(function(data) {
@@ -52,9 +44,17 @@ var QueueWidget = Event.extend({
                 t.$queue.empty();
             }
 
+            $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
             t.trigger('changeCurrentPage', pageId, $page);
-            t.clearCache();
             t.$queue.data('cancelEvent', true).scrollTop(0);
+
+            if (Elements.rightType() == 'all') {
+                $('.queue-title.add-button').hide();
+            } else {
+                $('.queue-title.add-button').show();
+            }
+
+            t.clearCache();
         });
     },
 
