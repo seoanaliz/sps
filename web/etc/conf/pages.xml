@@ -721,6 +721,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="mobile" boot="">
+                <page uri="mobile://">
+                    <template>tmpl://mobile/index.tmpl.php</template>
+                </page>
+            </pageGroup>
+
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">
                 <actions>SPS.Site.GetForceStaticPage</actions>
                 <template>tmpl://fe/template.tmpl.php</template>
