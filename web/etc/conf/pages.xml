@@ -722,7 +722,7 @@
             </pageGroup>
 
             <pageGroup name="mobile" boot="">
-                <page uri="mobile://">
+                <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
                 </page>
             </pageGroup>

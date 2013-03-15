@@ -1,0 +1,100 @@
+.inline-block {
+  display: inline-block;
+}
+html {
+  background-color: #f1f1f1;
+}
+.block-wrapper-2,
+.block-wrapper-3 {
+  font-size: 0;
+}
+.block-wrapper-2  > .block,
+.block-wrapper-3  > .block {
+  font-size: 12px;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  vertical-align: top;
+  width: 100%;
+  display: inline-block;
+}
+.block-wrapper-2  > .block.right,
+.block-wrapper-3  > .block.right {
+  text-align: right;
+}
+.block-wrapper-2  > .block {
+  width: 50%;
+}
+.block-wrapper-3  > .block {
+  width: 33%;
+}
+.big-button {
+  border: 1px solid #5d94d4;
+  padding: 20px 40px;
+  text-align: center;
+  cursor: pointer;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 24px;
+  margin: 20px 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #6ea7e6;
+  background-image: -webkit-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -moz-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -ms-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -o-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: linear-gradient(top, #6ea7e6, #5f99e0);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+#main {
+  font-family: helvetica, arial, tahoma, sans-serif !important;
+}
+#header {
+  padding: 15px;
+  background-color: #fff;
+}
+#footer {
+  color: #777;
+  background-color: #f1f1f1;
+  padding: 20px;
+}
+#main-content {
+  background-color: #f1f1f1;
+}
+#description {
+  background-color: #fff;
+  padding-top: 50px;
+  color: #777;
+}
+#description .reason {
+  text-align: center;
+  padding: 50px 0;
+}
+#description .reason .icon {
+  width: 70px;
+  height: 70px;
+  margin: 20px;
+  background-color: #f1f1f1;
+}
+#description .reason .title {
+  font-size: 30px;
+}
+#description .reason .description {
+  line-height: 2em;
+  font-size: 14px;
+}
+.inner-content {
+  width: 1000px;
+  margin: 0 auto;
+}
+#mobiles {
+  width: 400px;
+  height: 550px;
+  background-color: #ccc;
+  margin: 50px;
+  margin-bottom: -50px;
+}
