@@ -34,6 +34,7 @@
     background-image: -ms-linear-gradient(top,@top-color,@bottom-color);
     background-image: -o-linear-gradient(top,@top-color,@bottom-color);
     background-image: linear-gradient(top,@top-color,@bottom-color);
+    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr="@top-color~", EndColorStr="@bottom-color~")";
 }
 .border-radius(@params) {
     -webkit-border-radius: @params;
