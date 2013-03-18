@@ -138,6 +138,10 @@ html, body {
     height: 100%;
 }
 
+button {
+    *overflow: visible;
+}
+
 textarea {
     resize: none;
 }
@@ -265,21 +269,20 @@ input {
 
     .tag {
         background-color: @bg_hover;
-        display: inline-block;
         padding: 2px 4px;
         margin-top: 3px;
         margin-left: 3px;
         position: relative;
         font-size: 0.9em;
         vertical-align: top;
+        .inline-block;
 
-        &>.text {
-            display: inline-block;
+        &>.text,
+        &>.delete {
             vertical-align: middle;
+            .inline-block;
         }
         &>.delete {
-            display: inline-block;
-            vertical-align: middle;
             width: 1em;
             height: 1em;
             cursor: pointer;
@@ -291,7 +294,6 @@ input {
 /* Buttons */
 .button {
     position: relative;
-    display: inline-block;
     font-size: 11px;
     padding: 0.4em 1.3em;
     margin: 0;
@@ -302,8 +304,9 @@ input {
     color: #fff;
     border: 0.1em solid #4E6F93;
     border-top-color: #517295;
-    box-shadow: 0 0.1em 0.1em rgba(255,255,255, 0.2) inset;
-    text-shadow: 0 0.1em 0 #45688E;
+    .inline-block;
+    .box-shadow(inset 0 0.1em 0.1em rgba(255,255,255, 0.2));
+    .text-shadow(0 0.1em 0 #45688E);
     .border-radius(0.2em);
     .background-gradient(#6A8DB2, #50769E);
     .user-select(none);
@@ -315,38 +318,37 @@ input {
     }
     &.load,
     &:active {
-        box-shadow: none;
         background: #5E80A5;
+        .box-shadow(none);
     }
 
     &.white {
         color: #444;
         border-color: #B3B3B3;
-        box-shadow: 0 0.1em .1em rgba(255,255,255,1) inset;
-        text-shadow: 0 0.1em 0 #fff;
+        .box-shadow(inset 0 0.1em .1em rgba(255,255,255,1));
+        .text-shadow(0 0.1em 0 #fff);
         .background-gradient(#fafafa, #d4d4d4);
 
         &:focus,
         &:hover {
             text-decoration: none;
-
             .background-gradient(#fff, #e5e5e5);
         }
 
         &.load,
         &:active {
-            box-shadow: none;
             background: #dcdcdc;
-            text-shadow: 0 0.1em 0 #eee;
+            .box-shadow(none);
+            .text-shadow(0 0.1em 0 #eee);
         }
     }
 
     &.cancel {
         color: @color_link;
         border-color: transparent;
-        box-shadow: none;
-        text-shadow: none;
         background: none;
+        .box-shadow(none);
+        .text-shadow(none);
 
         &:hover {
             background: @bg_hover;
@@ -381,14 +383,13 @@ input {
         font-weight: bold;
         padding: 0.46em 1em;
         cursor: pointer;
-        display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
         font-size: 11px;
         line-height: 1.2;
-
+        .inline-block;
         .border-radius(0.3em);
 
         &>.counter {
@@ -437,10 +438,10 @@ input {
 .icon {
     width: 1em;
     height: 1em;
-    display: inline-block;
     background-position: center;
     background-repeat: no-repeat;
 
+    .inline-block;
     .user-select(none);
     .transition(.2s opacity);
 
@@ -528,66 +529,66 @@ input {
     height: 100%;
     overflow: auto;
     overflow-y: scroll;
+}
 
-    .box-wrap {
-        background: #fff;
-        box-shadow: 0 2px 10px rgba(0,0,0,.3);
-        margin: 80px auto;
-        width: 400px;
-        overflow: hidden;
+.box-wrap {
+    background: #fff;
+    margin: 80px auto;
+    width: 400px;
+    overflow: hidden;
+    .box-shadow(0 2px 10px rgba(0,0,0, 0.3));
 
-        &>.title {
-            padding: 8px 10px 8px 10px;
-            background: #597DA3;
-            color: #fff;
-            border: 1px solid #43658A;
-            box-shadow: 0 1px 0 #648CB7 inset;
-            font-size: 1.18em;
-            font-weight: bold;
-            position: relative;
+    &>.title {
+        padding: 8px 10px 8px 10px;
+        background: #597DA3;
+        color: #fff;
+        border: 1px solid #43658A;
+        font-size: 1.18em;
+        font-weight: bold;
+        position: relative;
+        .box-shadow(inset 0 1px 0 #648CB7);
 
-            &>.close {
-                width: 18px;
-                height: 18px;
-                background: url('../../images/common/delete-white.png') center no-repeat;
-                cursor: pointer;
-                position: absolute;
-                top: 50%;
-                right: 10px;
-                margin-top: -9px;
-                .opacity(0.5);
-                .transition(0.2s opacity);
+        &>.close {
+            width: 18px;
+            height: 18px;
+            background: url('../../images/common/delete-white.png') center no-repeat;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            margin-top: -9px;
+            .opacity(0.5);
+            .transition(0.2s opacity);
 
-                &:hover {
-                    opacity: 1;
-                }
+            &:hover {
+                opacity: 1;
             }
         }
+    }
 
-        &>.body {
-            border-left: 1px solid #999;
-            border-right: 1px solid #999;
-            padding: 14px;
+    &>.body {
+        border-left: 1px solid #999;
+        border-right: 1px solid #999;
+        padding: 14px;
 
-            &>.box-loading {
-                min-height: 200px;
-                background: #fff url(../../images/common/progress.gif) no-repeat center;
-            }
+        &>.box-loading {
+            min-height: 200px;
+            background: #fff url(../../images/common/progress.gif) no-repeat center;
         }
+    }
 
-        &>.actions-wrap {
-            border: 1px solid #999;
-            border-top: 0;
+    &>.actions-wrap {
+        border: 1px solid #999;
+        border-top: 0;
 
-            &>.actions {
-                padding: 10px;
-                text-align: right;
-                border-top: 1px solid #DAE1E8;
-                background-color: #F2F2F2;
+        &>.actions {
+            padding: 10px;
+            text-align: right;
+            border-top: 1px solid #DAE1E8;
+            background-color: #F2F2F2;
 
-                .action + .action {
-                    margin-left: 10px;
-                }
+            .action + .action {
+                margin-left: 10px;
             }
         }
     }

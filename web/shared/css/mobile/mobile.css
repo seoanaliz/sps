@@ -12,18 +12,15 @@ span {
   zoom: 1;
   *display: inline;
 }
-button {
-  *overflow: visible;
-}
 .box-layout {
   background-color: rgba(0, 0, 0, 0.5);
 }
-.box-layout .box-wrap {
+.box-wrap {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.box-layout .box-wrap  > .title {
+.box-wrap  > .title {
   padding: 15px;
   border: 0;
   font-size: 22px;
@@ -41,15 +38,32 @@ button {
   background-image: linear-gradient(top, #659ad5, #578dd0);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= #659ad5 , EndColorStr= #578dd0 );
 }
-.box-layout .box-wrap  > .body {
+.box-wrap  > .body {
   border: 0;
 }
-.box-layout .box-wrap  > .actions-wrap {
+.box-wrap  > .actions-wrap {
   border: 0;
 }
-.box-layout .box-wrap  > .actions-wrap .actions {
+.box-wrap  > .actions-wrap .actions {
   padding: 20px;
   text-align: center;
+}
+.box-groups  > .title {
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+}
+.box-groups  > .body {
+  overflow: auto;
+  max-height: 550px;
+}
+.box-groups  > .actions-wrap {
+  -webkit-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+}
+.box-groups  > .actions-wrap .actions {
+  border-top: 1px solid #fff;
 }
 .block-wrapper-2,
 .block-wrapper-3 {

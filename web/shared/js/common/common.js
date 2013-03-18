@@ -537,6 +537,7 @@ var Box = (function() {
             closeBtn: true,
             buttons: [],
             width: 400,
+            additionalClass: '',
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
@@ -588,10 +589,13 @@ var Box = (function() {
         box.setButtons = setButtons;
         box.refreshTop = refreshTop;
         box.visible = false;
+        box.addClass = addClass;
+        box.removeClass = removeClass;
 
         box.setTitle(params.title);
         box.setHTML(params.html);
         box.setButtons(params.buttons);
+        box.addClass(params.additionalClass);
 
         function show() {
             if (boxesHistory.length) {
@@ -669,6 +673,12 @@ var Box = (function() {
                 });
             }
             return box;
+        }
+        function addClass(cssClass) {
+            $box.addClass(cssClass);
+        }
+        function removeClass(cssClass) {
+            $box.removeClass(cssClass);
         }
         function refreshTop() {
             var top = ($(window).height() / 3) - ($box.height() / 2);

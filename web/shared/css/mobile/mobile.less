@@ -9,36 +9,51 @@ span {
     .inline-block;
 }
 
-button {
-    *overflow: visible;
-}
-
 .box-layout {
     background-color: rgba(0,0,0, 0.5);
+}
 
-    .box-wrap {
-        .border-radius(3px);
+.box-wrap {
+    .border-radius(3px);
 
-        & > .title {
-            padding: 15px;
-            border: 0;
-            font-size: 22px;
-            .border-radius(2px 2px 0 0);
-            .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
-            .background-gradient(#659ad5, #578dd0);
+    & > .title {
+        padding: 15px;
+        border: 0;
+        font-size: 22px;
+        .border-radius(2px 2px 0 0);
+        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
+        .background-gradient(#659ad5, #578dd0);
+    }
+
+    & > .body {
+        border: 0;
+    }
+
+    & > .actions-wrap {
+        border: 0;
+
+        .actions {
+            padding: 20px;
+            text-align: center;
         }
+    }
+}
 
-        & > .body {
-            border: 0;
-        }
+.box-groups {
+    & > .title {
+        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3)");
+    }
 
-        & > .actions-wrap {
-            border: 0;
-            
-            .actions {
-                padding: 20px;
-                text-align: center;
-            }
+    & > .body {
+        overflow: auto;
+        max-height: 550px;
+    }
+
+    & > .actions-wrap {
+        .box-shadow(0 -1px 5px rgba(0,0,0, 0.3));
+
+        .actions {
+            border-top: 1px solid #fff;
         }
     }
 }

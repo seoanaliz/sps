@@ -27,6 +27,7 @@ App = Event.extend({
             t.popup = new Box({
                 title: 'Выберите сообщенства',
                 html: html,
+                additionalClass: 'box-groups',
                 buttons: [
                     {label: 'Отправить заявку'}
                 ]
