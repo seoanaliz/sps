@@ -10,6 +10,7 @@ App = Event.extend({
     initPopup: function() {
         var t = this;
 
+        t.checkVKAuth();
         $('#create-app').on('click', function() {
             t.showPopup();
         });
@@ -17,18 +18,21 @@ App = Event.extend({
 
     showPopup: function() {
         var t = this;
-
         var html = '';
-        for (var i = 0; i < 100; i++) {
-            html += '<div class="group-row">' +
-            '<div class="image"><img src="http://vk.com/images/camera_b.gif" /></div>' +
-            '<div class="title">' + Math.random() + '</div>' +
-            '</div>';
-        }
+
+        $.each(t.groups, function() {
+            var group = this;
+            if (group.gid) {
+                html += '<div class="group-row">' +
+                '<div class="image"><img src="' + group.photo + '" /></div>' +
+                '<div class="title">' + group.name + '</div>' +
+                '</div>';
+            }
+        });
 
         if (!t.popup) {
             t.popup = new Box({
-                title: 'Выберите сообщенства',
+                title: 'Выберите сообщества',
                 html: html,
                 additionalClass: 'box-groups',
                 buttons: [
@@ -55,19 +59,22 @@ App = Event.extend({
     },
 
     checkVKAuth: function() {
+        var t = this;
+        var code =
+        'return {' +
+        'me: API.users.get({uids: API.getVariable({key: 1280}), fields: "photo"})[0],' +
+        'groups: API.groups.get({extended: 1, filter: "admin"})' +
+        '};';
+
         VK.init({
             apiId: window.vkAppId,
             nameTransportPath: '/xd_receiver.htm'
         });
 
-        var code =
-        'return {' +
-        'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-        '};';
-
         VK.Api.call('execute', {code: code}, function(data) {
             var response = data && data.response;
             if (response) {
+                t.groups = response.groups;
                 console.log(response);
             }
         });

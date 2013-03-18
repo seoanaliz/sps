@@ -66,11 +66,20 @@ span {
 .box-groups  > .actions-wrap .actions {
   border-top: 1px solid #fff;
 }
+.box-groups .group-row + .group-row {
+  border-top: 1px solid #e5edf7;
+}
 .box-groups .group-row {
   padding: 7px;
   cursor: pointer;
-  border-bottom: 1px solid #e5edf7;
   white-space: nowrap;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }
 .box-groups .group-row  > div {
   vertical-align: middle;
