@@ -84,15 +84,15 @@ var App = (function() {
             var getPhotos = function() {
                 var photos = [];
                 $listElement.find('> .attachment').each(function(){
-                    photos.push({ filename: $(this).data('filename') });
+                    photos.push($(this).data('data'));
                 });
                 return photos;
             };
-            var addPhoto = function(image, filename) {
+            var addPhoto = function(image, data) {
                 var $attachment = $('<div class="attachment attachment-handmade">' +
                 '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
                 '</div>');
-                $attachment.data('filename', filename);
+                $attachment.data('data', data);
                 $listElement.append($attachment);
             };
 
