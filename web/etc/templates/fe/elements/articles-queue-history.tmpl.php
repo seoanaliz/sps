@@ -6,7 +6,7 @@
 <div class="queue-page">
     <? if (!empty($queueDate)) { ?>
         <div class="queue-title">
-            <?= TextRender::FullDateString($queueDate) ?>
+            <?= DateTimeHelper::GetRelativeDateString($queueDate, false) ?>
         </div>
     <? } ?>
     <? if (!empty($articlesQueue)) { ?>
