@@ -185,12 +185,18 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="AuthorControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://getAuthors/">
                     <actions>SPS.Stat.getAuthors</actions>
                 </page>
                 <page uri="controls://getPublics/">
                     <actions>SPS.Stat.getPublics</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://saveNewUser/">
+                    <actions>SPS.Stat.saveNewUser</actions>
                 </page>
             </pageGroup>
 
