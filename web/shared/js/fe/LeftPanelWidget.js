@@ -1098,7 +1098,7 @@ var LeftPanelWidget = Event.extend({
     initWallAutoload: function() {
         var t = this;
         var $window = $(window);
-        window.scroll(function() {
+        $window.scroll(function() {
             clearTimeout(t.wallScrollTimeoutAutoload);
             t.wallScrollTimeoutAutoload = setTimeout(function() {
                 if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
