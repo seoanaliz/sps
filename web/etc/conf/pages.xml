@@ -52,6 +52,9 @@
                 <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
+                <page uri="controls://article-queue-item-save/">
+                    <actions>SPS.Site.SaveQueueItemControl</actions>
+                </page>
                 <page uri="controls://article-add-to-queue/">
                     <actions>SPS.Site.AddArticleToQueueControl</actions>
                 </page>

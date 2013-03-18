@@ -172,6 +172,33 @@ var Eventlist = {
             }
         });
     },
+    rightcolumn_post_edit: function(text, photos, link, dataQueueId, callback){
+        var $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedId;
+        if ($sourceFeedIds.length != 1) {
+            $sourceFeedId = null;
+        } else {
+            $sourceFeedId = $sourceFeedIds[0];
+        }
+
+        $.ajax({
+            url: controlsRoot + 'article-queue-item-save/',
+            type: 'POST',
+            dataType : "json",
+            data: {
+                articleQueueId: dataQueueId,
+                text: text,
+                photos: photos,
+                link: link,
+                sourceFeedId: $sourceFeedId,
+                targetFeedId: Elements.rightdd(),
+                userGroupId: Elements.getUserGroupId()
+            },
+            success: function(data) {
+                callback(data);
+            }
+        });
+    },
 
     post_moved: function(post_id, slot_id, queueId, callback){
         $.ajax({
