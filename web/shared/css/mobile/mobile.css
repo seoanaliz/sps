@@ -66,6 +66,16 @@ span {
 .box-groups  > .actions-wrap .actions {
   border-top: 1px solid #fff;
 }
+.box-groups  > .actions-wrap .actions .button {
+  display: block;
+  width: 100%;
+}
+.box-groups .groups-empty {
+  color: #777;
+  text-align: center;
+  padding: 100px 0;
+  font-size: 16px;
+}
 .box-groups .group-row + .group-row {
   border-top: 1px solid #e5edf7;
 }
@@ -165,7 +175,7 @@ span {
   height: 20px;
 }
 .button {
-  font-size: 22px;
+  font-size: 20px;
   padding: 15px 30px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;

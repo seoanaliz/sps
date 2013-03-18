@@ -681,7 +681,7 @@ var Box = (function() {
             $box.removeClass(cssClass);
         }
         function refreshTop() {
-            var top = ($(window).height() / 3) - ($box.height() / 2);
+            var top = ($(window).height() / 2.5) - ($box.height() / 2);
             $box.css({
                 marginTop: top < 20 ? 20 : top
             });

@@ -20,7 +20,7 @@ App = Event.extend({
         var t = this;
         var html = '';
 
-        $.each(t.groups, function() {
+        $.each(t.getVKGroups(), function() {
             var group = this;
             if (group.gid) {
                 html += '<div class="group-row">' +
@@ -29,6 +29,10 @@ App = Event.extend({
                 '</div>';
             }
         });
+
+        if (!html) {
+            html = '<div class="groups-empty">У вас нет администрируемых групп :(</div>';
+        }
 
         if (!t.popup) {
             t.popup = new Box({
@@ -81,6 +85,6 @@ App = Event.extend({
     },
 
     getVKGroups: function() {
-
+        return this.groups || [];
     }
 });
