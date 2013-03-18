@@ -76,6 +76,7 @@ span {
     color: #fff;
     font-size: 24px;
     margin: 20px 0;
+    overflow: visible;
     .text-shadow(0 1px 2px rgba(0,0,0, 0.3));
     .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3)");
     .background-gradient(#6ea7e6, #5f99e0);
@@ -86,6 +87,10 @@ span {
         color: #f9f9f9;
         padding: 21px 40px 19px;
         background: #5f99e0;
+    }
+
+    &:focus {
+        outline: none;
     }
 }
 
