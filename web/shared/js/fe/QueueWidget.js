@@ -25,6 +25,7 @@ var QueueWidget = Event.extend({
         var t = this;
         var targetFeedId = Elements.rightdd();
         var pageId = id || 0;
+        var isPageChanged = t.getCurrentPageId() != pageId;
 
         if (!targetFeedId) {
             return false;
@@ -45,7 +46,10 @@ var QueueWidget = Event.extend({
 
             $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
             t.trigger('changeCurrentPage', pageId, $page);
-            t.$queue.data('cancelEvent', true).scrollTop(0);
+
+            if (isPageChanged) {
+                t.$queue.data('cancelEvent', true).scrollTop(0);
+            }
 
             if (Elements.rightType() == 'all') {
                 $('.queue-title.add-button').hide();
