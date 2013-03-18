@@ -77,6 +77,9 @@ var Elements = {
 
                     if ($slot.hasClass('empty')) {
                         Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
+                            if ($post.hasClass('relocatable')) {
+                                $slot.html($post);
+                            }
                             var queuePageId = app.getRightPanelWidget().getQueueWidget().getPageIdByPage($page);
                             app.updateQueue(queuePageId);
                         });

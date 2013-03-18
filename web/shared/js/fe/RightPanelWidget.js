@@ -103,11 +103,11 @@ var RightPanelWidget = Event.extend({
 
         // Кнопки вперед-назад в календаре
         $('.calendar .prev').click(function(){
-            t.setNextDay(true);
+            t.setPrevDay(true);
         });
 
         $('.calendar .next').click(function(){
-            t.setPrevDay(true);
+            t.setNextDay(true);
         });
     },
 
