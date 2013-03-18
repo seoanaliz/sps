@@ -4,6 +4,10 @@
 html {
   background-color: #f1f1f1;
 }
+span {
+  vertical-align: middle;
+  display: inline-block;
+}
 .block-wrapper-2,
 .block-wrapper-3 {
   font-size: 0;
@@ -28,18 +32,41 @@ html {
 .block-wrapper-3  > .block {
   width: 33%;
 }
+.big-title {
+  font-size: 42px;
+  color: #fff;
+  -webkit-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  -moz-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.big-button-description {
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  -webkit-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  -moz-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+.big-button-description .icon-vk {
+  background: center no-repeat url("../../images/mobile/vk.png");
+  font-size: 0;
+  width: 30px;
+  height: 20px;
+}
 .big-button {
   border: 1px solid #5d94d4;
   padding: 20px 40px;
   text-align: center;
   cursor: pointer;
   color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   font-size: 24px;
   margin: 20px 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
   background-color: #6ea7e6;
   background-image: -webkit-linear-gradient(top, #6ea7e6, #5f99e0);
   background-image: -moz-linear-gradient(top, #6ea7e6, #5f99e0);
@@ -49,9 +76,25 @@ html {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.big-button:active {
+  color: #f9f9f9;
+  padding: 21px 40px 19px;
+  background: #5f99e0;
 }
 #main {
   font-family: helvetica, arial, tahoma, sans-serif !important;
+}
+#logo {
+  font-weight: bold;
+  color: #2b587a;
 }
 #header {
   padding: 15px;
@@ -63,29 +106,43 @@ html {
   padding: 20px;
 }
 #main-content {
-  background-color: #f1f1f1;
+  background: #9d7b76 url('../../images/mobile/main-content.jpg') center;
+  height: 530px;
+}
+#main-content .big-title {
+  margin-top: 150px;
 }
 #description {
   background-color: #fff;
   padding-top: 50px;
-  color: #777;
+  color: #666;
 }
 #description .reason {
   text-align: center;
-  padding: 50px 0;
+  padding: 50px;
 }
 #description .reason .icon {
-  width: 70px;
+  width: 80px;
   height: 70px;
   margin: 20px;
-  background-color: #f1f1f1;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#description .reason .icon.check {
+  background-image: url("../../images/mobile/check.png");
+}
+#description .reason .icon.heart {
+  background-image: url("../../images/mobile/heart.png");
+}
+#description .reason .icon.megaphone {
+  background-image: url("../../images/mobile/megaphone.png");
 }
 #description .reason .title {
   font-size: 30px;
 }
 #description .reason .description {
   line-height: 2em;
-  font-size: 14px;
+  font-size: 16px;
 }
 .inner-content {
   width: 1000px;
@@ -93,8 +150,7 @@ html {
 }
 #mobiles {
   width: 400px;
-  height: 550px;
-  background-color: #ccc;
-  margin: 50px;
-  margin-bottom: -50px;
+  height: 565px;
+  margin: 45px;
+  background: url("../../images/mobile/mobiles.png") center no-repeat;
 }

@@ -2,22 +2,28 @@
 <div id="main" class="main">
     <div id="header">
         <div class="inner-content block-wrapper-2">
-            <div class="block">Logo</div>
-            <div class="block right">Widget</div>
+            <div class="block">
+                <div id="logo">
+                    SocialBoard
+                </div>
+            </div>
+            <div class="block right">
+                Widget
+            </div>
         </div>
     </div>
     <div id="main-content">
         <div class="inner-content block-wrapper-2">
             <div class="block">
-                <div class="block">
-                    Ваше сообщество в App Store и Google Play
+                <div class="big-title">
+                    Ваше сообщество в App&nbsp;Store и Google&nbsp;Play
                 </div>
-                <div class="block">
+                <span>
                     <button class="big-button">Создать приложение</button>
-                </div>
-                <div class="block">
-                    Необходима авторизация VK
-                </div>
+                    <div class="big-button-description">
+                        Необходима авторизация <span class="icon-vk">VK</span>
+                    </div>
+                </span>
             </div>
             <div class="block">
                 <div id="mobiles"></div>
@@ -28,23 +34,23 @@
         <div class="inner-content block-wrapper-3">
             <div class="block">
                 <div class="reason">
-                    <div class="icon"></div>
-                    <div class="title">Simple</div>
-                    <div class="description">ssssssssss</div>
+                    <div class="icon check"></div>
+                    <div class="title">Просто</div>
+                    <div class="description">Вам не придётся сталкиваться со сложным процессом разработки</div>
                 </div>
             </div>
             <div class="block">
                 <div class="reason">
-                    <div class="icon"></div>
-                    <div class="title">Simple</div>
-                    <div class="description">ssssssssss</div>
+                    <div class="icon heart"></div>
+                    <div class="title">Бесплатно</div>
+                    <div class="description">Использование платформы Public app абсолютно бесплатно</div>
                 </div>
             </div>
             <div class="block">
                 <div class="reason">
-                    <div class="icon"></div>
-                    <div class="title">Simple</div>
-                    <div class="description">ssssssssss</div>
+                    <div class="icon megaphone"></div>
+                    <div class="title">Эффективно</div>
+                    <div class="description">Проверенные механизмы монетизации позволят вам получать прибыль</div>
                 </div>
             </div>
         </div>
