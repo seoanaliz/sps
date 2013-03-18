@@ -22,6 +22,14 @@ span {
         width: 100%;
         .inline-block;
 
+        &.left {
+            text-align: left;
+        }
+
+        &.center {
+            text-align: center;
+        }
+
         &.right {
             text-align: right;
         }
@@ -117,7 +125,9 @@ span {
 
     .reason {
         text-align: center;
-        padding: 50px;
+        padding: 50px 0;
+        width: 250px;
+        .inline-block;
 
         .icon {
             width: 80px;
@@ -145,19 +155,20 @@ span {
 
         .description {
             line-height: 2em;
-            font-size: 16px;
+            font-size: 17px;
         }
     }
 }
 
 .inner-content {
-    width: 1000px;
+    width: 950px;
     margin: 0 auto;
 }
 
 #mobiles {
     width: 400px;
     height: 565px;
-    margin: 45px;
+    margin: 45px 0;
     background: url("../../images/mobile/mobiles.png") center no-repeat;
+    .inline-block;
 }

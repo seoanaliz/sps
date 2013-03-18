@@ -25,28 +25,28 @@
                     </div>
                 </span>
             </div>
-            <div class="block">
+            <div class="block right">
                 <div id="mobiles"></div>
             </div>
         </div>
     </div>
     <div id="description">
         <div class="inner-content block-wrapper-3">
-            <div class="block">
+            <div class="block left">
                 <div class="reason">
                     <div class="icon check"></div>
                     <div class="title">Просто</div>
                     <div class="description">Вам не придётся сталкиваться со сложным процессом разработки</div>
                 </div>
             </div>
-            <div class="block">
+            <div class="block center">
                 <div class="reason">
                     <div class="icon heart"></div>
                     <div class="title">Бесплатно</div>
                     <div class="description">Использование платформы Public app абсолютно бесплатно</div>
                 </div>
             </div>
-            <div class="block">
+            <div class="block right">
                 <div class="reason">
                     <div class="icon megaphone"></div>
                     <div class="title">Эффективно</div>

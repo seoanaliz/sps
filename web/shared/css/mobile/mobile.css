@@ -22,6 +22,14 @@ span {
   width: 100%;
   display: inline-block;
 }
+.block-wrapper-2  > .block.left,
+.block-wrapper-3  > .block.left {
+  text-align: left;
+}
+.block-wrapper-2  > .block.center,
+.block-wrapper-3  > .block.center {
+  text-align: center;
+}
 .block-wrapper-2  > .block.right,
 .block-wrapper-3  > .block.right {
   text-align: right;
@@ -119,7 +127,9 @@ span {
 }
 #description .reason {
   text-align: center;
-  padding: 50px;
+  padding: 50px 0;
+  width: 250px;
+  display: inline-block;
 }
 #description .reason .icon {
   width: 80px;
@@ -142,15 +152,16 @@ span {
 }
 #description .reason .description {
   line-height: 2em;
-  font-size: 16px;
+  font-size: 17px;
 }
 .inner-content {
-  width: 1000px;
+  width: 950px;
   margin: 0 auto;
 }
 #mobiles {
   width: 400px;
   height: 565px;
-  margin: 45px;
+  margin: 45px 0;
   background: url("../../images/mobile/mobiles.png") center no-repeat;
+  display: inline-block;
 }
