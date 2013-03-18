@@ -20,7 +20,10 @@ App = Event.extend({
 
         var html = '';
         for (var i = 0; i < 100; i++) {
-            html += 'Text' + Math.random() + '<br>';
+            html += '<div class="group-row">' +
+            '<div class="image"><img src="http://vk.com/images/camera_b.gif" /></div>' +
+            '<div class="title">' + Math.random() + '</div>' +
+            '</div>';
         }
 
         if (!t.popup) {
@@ -31,6 +34,10 @@ App = Event.extend({
                 buttons: [
                     {label: 'Отправить заявку'}
                 ]
+            });
+
+            t.popup.$box.delegate('.group-row', 'mousedown', function() {
+                $(this).toggleClass('selected');
             });
         }
 

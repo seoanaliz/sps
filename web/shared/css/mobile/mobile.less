@@ -47,6 +47,7 @@ span {
     & > .body {
         overflow: auto;
         max-height: 550px;
+        padding: 7px;
     }
 
     & > .actions-wrap {
@@ -54,6 +55,46 @@ span {
 
         .actions {
             border-top: 1px solid #fff;
+        }
+    }
+
+    .group-row {
+        padding: 7px;
+        cursor: pointer;
+        border-bottom: 1px solid #e5edf7;
+        white-space: nowrap;
+        .user-select(none);
+
+        & > div {
+            vertical-align: middle;
+            .inline-block;
+        }
+
+        .image {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+
+            img {
+                max-width: 100%;
+            }
+        }
+
+        .title {
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 16px;
+            max-width: 80%;
+        }
+
+        &:hover {
+            background-color: #e5edf7;
+        }
+
+        &.selected {
+            background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
         }
     }
 }
