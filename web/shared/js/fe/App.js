@@ -55,21 +55,46 @@ var App = (function() {
             this.getRightPanelWidget().updateDropdown();
         },
 
-        loadQueue: function() {
-            this.getRightPanelWidget().loadQueue();
+        updateQueue: function(pageId) {
+            this.getRightPanelWidget().updateQueue(pageId);
         },
 
         imageUploader: function(options) {
-            if (!(options.$element instanceof jQuery)) {
+            var $element = options.$element;
+            var $listElement = options.$listElement;
+
+            if (!($element instanceof jQuery)) {
                 throw new TypeError('$element must be instance of jQuery');
             }
 
-            if (!(options.$listElement instanceof jQuery)) {
+            if (!($listElement instanceof jQuery)) {
                 throw new TypeError('$listElement must be instance of jQuery');
             }
 
-            var element = options.$element[0];
-            var listElement = options.$listElement[0];
+            var element = $element[0];
+            var listElement = $listElement ? $listElement[0] : undefined;
+            var onComplete = function(id, fileName, response) {
+                var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
+                $attachment.data({
+                    filename: response.filename,
+                    image: response.image
+                });
+                $attachment.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
+            };
+            var getPhotos = function() {
+                var photos = [];
+                $listElement.find('> .attachment').each(function(){
+                    photos.push({ filename: $(this).data('filename') });
+                });
+                return photos;
+            };
+            var addPhoto = function(image, filename) {
+                var $attachment = $('<div class="attachment attachment-handmade">' +
+                '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
+                '</div>');
+                $attachment.data('filename', filename);
+                $listElement.append($attachment);
+            };
 
             new qq.FileUploader($.extend({
                 element: element,
@@ -86,25 +111,19 @@ var App = (function() {
                 '<a class="qq-upload-cancel">Отмена</a>' +
                 '<span class="qq-upload-failed-text">Ошибка</span>' +
                 '</div>',
-                onComplete: function(id, fileName, response) {
-                    var $attachmentNode = $(options.$listElement.find('> .attachment')[id]);
-                    $attachmentNode.data('filename', response.filename);
-                    $attachmentNode.data('image', response.image);
-                    $attachmentNode.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
-                }
+                onComplete: onComplete
             }, options));
 
-            options.$listElement.delegate('.delete-attach', 'click', function() {
+            $listElement.delegate('.delete-attach', 'click', function() {
                 $(this).closest('.attachment').remove();
             });
 
             return {
-                getFiles: function() {
-                    var photos = [];
-                    options.$listElement.find('> .attachment').each(function(){
-                        photos.push({ filename: $(this).data('filename') });
-                    });
-                    return photos;
+                getPhotos: function() {
+                    return getPhotos.apply(this, arguments);
+                },
+                addPhoto: function(photoURL, filename) {
+                    return addPhoto.apply(this, arguments);
                 }
             }
         }

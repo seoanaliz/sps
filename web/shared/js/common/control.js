@@ -67,7 +67,6 @@ var Control = {
                         callback(data);
                     }
                 });
-                return this.success;
             },
             error: function(callback) {
                 return jQueryObj.error(function(data) {
@@ -80,5 +79,10 @@ var Control = {
                 });
             }
         }
+    },
+
+    // @todo: сделать нормальный конструктор
+    isDeferred: function(obj) {
+        return obj && obj.success && obj.error;
     }
 };

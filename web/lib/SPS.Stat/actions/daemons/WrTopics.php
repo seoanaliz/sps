@@ -162,8 +162,7 @@ class WrTopics extends wrapper
                 diff_abs_week   =   @diff_abs_week,
                 diff_rel_week   =   @diff_rel_week,
                 diff_abs_month  =   @diff_abs_month,
-                diff_rel_month  =   @diff_rel_month,
-                updated_at      =   current_date
+                diff_rel_month  =   @diff_rel_month
             WHERE
                 vk_id = @publ_id';
 

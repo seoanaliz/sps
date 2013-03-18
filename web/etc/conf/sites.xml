@@ -33,6 +33,8 @@
 				    <param name="default">ru</param>
 				    <param name="allowChange">false</param>
 					<param name="htmlEncoding">utf-8</param>
+                    <param name="LC_ALL">ru_RU.UTF-8</param>
+                    <param name="LC_NUMERIC">C</param>
     			</localization>
     			<mailFactory class="MailFactory">
 				    <param name="senderName">Administrator</param>
@@ -44,6 +46,9 @@
                     <param name="password">q2L3DWlLse0Wtah6nMTR</param>
                     <param name="authSecret">X1zsnZdfoL1ywzRODpEg</param>
                 </vkapi>
+                <textRender class="TextRender">
+                    <param name="active">true</param>
+                </textRender>
 			</modules>
 			<databases>
 				<database driver="PgSql">

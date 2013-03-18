@@ -527,26 +527,41 @@ i {font-style: italic;}
     width: 370px;
     z-index: 1;
 
-    .queue-footer {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
-        border: 1px solid #fff;
-        border-top-color: #C4CDE0;
-        .border-radius(0 0 3px 3px);
-    }
-
     .items {
         overflow-y: scroll;
         overflow-x: hidden;
         position: absolute;
-        top: 146px;
-        bottom: 31px;
+        top: 120px;
+        bottom: 0px;
         width: 100%;
+        .border-radius(0 0 2px 2px);
+
+        .queue-page {
+            position: relative;
+            padding-top: 26px;
+
+            .queue-title {
+                position: absolute;
+                top: 0;
+                z-index: 3;
+                height: 26px;
+                width: 342px;
+
+                &.fixed {
+                    z-index: 2;
+                    top: 131px;
+                    position: fixed;
+                    .box-shadow(0 1px 1px rgba(0,0,0, 0.2));
+                }
+            }
+
+            .empty-queue {
+                color: #999;
+                padding: 50px;
+                text-align: center;
+                font-size: 14px;
+            }
+        }
 
         .slot {
             background: #fff;
@@ -813,7 +828,6 @@ i {font-style: italic;}
         left: -10px;
         .box-shadow(inset -2px 0 1px rgba(0,0,0, 0.1));
         .border-radius(3px 0 0 3px);
-        .transition(0.2s all);
         .opacity(0);
 
         .arrow {
@@ -852,6 +866,12 @@ i {font-style: italic;}
         width: 600px;
         .box-shadow(0 0 30px 5px rgba(0,0,0, 0.1));
 
+        .queue-page {
+            .queue-title {
+                width: 572px;
+            }
+        }
+
         .right-panel-expander {
             display: none;
         }
@@ -859,6 +879,7 @@ i {font-style: italic;}
         .post {
             display: none;
         }
+
         .expanded-post {
             display: block;
         }
@@ -1384,11 +1405,8 @@ i {font-style: italic;}
             border: none;
         }
 
-        a {
+        .button + .button {
             margin-left: 10px;
-            line-height: 30px;
-            height: 30px;
-            cursor: pointer;
         }
     }
 

@@ -710,7 +710,6 @@ var LeftPanelWidget = Event.extend({
                     t.post();
                 });
 
-
                 this.closeImagePopup($popup);
                 this.crop();
                 this.upload();
@@ -735,21 +734,9 @@ var LeftPanelWidget = Event.extend({
                 });
             },
             upload: function() {
-                var t = this;
-                try {
-                    new qq.FileUploader({
-                        debug: true,
-                        element: $('#attach-image-file')[0],
-                        action: root + 'int/controls/image-upload/',
-                        template: ' <div class="qq-uploader">' +
-                        '<ul class="qq-upload-list"></ul>' +
-                            //'<a href="#" class="button qq-upload-button">Загрузить картинку</a>' +
-                        '</div>',
-                        onComplete: function(id, fileName, responseJSON) {
-                            popupNotice('Не реализовано');
-                        }
-                    });
-                } catch (e) {}
+                app.imageUploader({
+                    $element: $('#attach-image-file')
+                });
             },
             showPreview: function (coords,t) {
                 var rx = $('.previewLayout').width() / coords.w;
@@ -882,8 +869,7 @@ var LeftPanelWidget = Event.extend({
                         if (input.setSelectionRange) {
                             input.focus();
                             input.setSelectionRange(selectionStart, selectionEnd);
-                        }
-                        else if (input.createTextRange) {
+                        } else if (input.createTextRange) {
                             var range = input.createTextRange();
                             range.collapse(true);
                             range.moveEnd('character', selectionEnd);
@@ -1004,7 +990,7 @@ var LeftPanelWidget = Event.extend({
                                 });
                             }
                             if (data.description) {
-                                el.find('div.link-description-text p')
+                                el.find('.link-description-text p')
                                 .text(data.description)
                                 .click(function() {
                                     var $description = $(this);
@@ -1019,18 +1005,6 @@ var LeftPanelWidget = Event.extend({
                                 });
                             }
                         });
-                    }
-                    function addPhoto(path, filename, url, el) {
-                        var $photo = $('<span/>', {class: 'attachment'})
-                        .append('<img src="' + path + '" alt="" />')
-                        .append($('<div />', {class: 'delete-attach', title: 'Удалить'})
-                        .click(function() {
-                            $photo.remove();
-                        })
-                        )
-                        .append($('<input />', {type: 'hidden', name: 'filename', value: filename, "class" : 'filename'}))
-                        .append($('<input />', {type: 'hidden', name: 'url', value: url, "class" : 'url'}))
-                        .appendTo(el);
                     }
 
                     var cache = {
@@ -1049,33 +1023,19 @@ var LeftPanelWidget = Event.extend({
                     var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
                     var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
                     var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
-                    var $saveBtn = $('<div/>', {class: 'save button l', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
-                    var $cancelBtn = $('<a/>', {class: 'cancel l', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
+                    var $saveBtn = $('<button/>', {class: 'save button', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                    var $cancelBtn = $('<button/>', {class: 'cancel button', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
                     var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
 
-                    var uploader = new qq.FileUploader({
-                        debug: true,
-                        element: $uploadBtn.get(0),
-                        action: root + 'int/controls/image-upload/',
-                        template: '<div class="qq-uploader">' +
-                        '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-                        '<div class="qq-upload-button">Прикрепить</div>' +
-                        '<ul class="qq-upload-list"></ul>' +
-                        '</div>',
-                        onComplete: function(id, fileName, res) {
-                            addPhoto(res.image, res.filename, res.url, $photos);
-                        }
+                    var imageUploader = app.imageUploader({
+                        $element: $uploadBtn,
+                        $listElement: $attachments
                     });
+
                     var onSave = function() {
                         var text = $text.val();
                         var link = $links.find('a').attr('href');
-                        var photos = [];
-                        $photos.children().each(function() {
-                            var photo = {};
-                            photo.filename = $(this).find('.filename').val();
-                            photo.url = $(this).find('.url').val();
-                            photos.push(photo);
-                        });
+                        var photos = imageUploader.getPhotos();
                         if (!($.trim(text) || link || photos.length)) {
                             return $text.focus();
                         } else {
@@ -1126,7 +1086,7 @@ var LeftPanelWidget = Event.extend({
                     if (data.photos) {
                         var photos = eval(data.photos);
                         $(photos).each(function() {
-                            addPhoto(this.path, this.filename, this.url, $photos);
+                            imageUploader.addPhoto(this.path, this.filename);
                         });
                     }
                 }
