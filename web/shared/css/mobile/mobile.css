@@ -15,6 +15,42 @@ span {
 button {
   *overflow: visible;
 }
+.box-layout {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.box-layout .box-wrap {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.box-layout .box-wrap  > .title {
+  padding: 15px;
+  border: 0;
+  font-size: 22px;
+  -webkit-border-radius: 2px 2px 0 0;
+  -moz-border-radius: 2px 2px 0 0;
+  border-radius: 2px 2px 0 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  background-color: #659ad5;
+  background-image: -webkit-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -moz-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -ms-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -o-linear-gradient(top, #659ad5, #578dd0);
+  background-image: linear-gradient(top, #659ad5, #578dd0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= #659ad5 , EndColorStr= #578dd0 );
+}
+.box-layout .box-wrap  > .body {
+  border: 0;
+}
+.box-layout .box-wrap  > .actions-wrap {
+  border: 0;
+}
+.box-layout .box-wrap  > .actions-wrap .actions {
+  padding: 20px;
+  text-align: center;
+}
 .block-wrapper-2,
 .block-wrapper-3 {
   font-size: 0;
@@ -70,20 +106,18 @@ button {
   width: 30px;
   height: 20px;
 }
-.big-button {
-  border: 1px solid #5d94d4;
-  padding: 20px 40px;
-  text-align: center;
-  cursor: pointer;
+.button {
+  font-size: 22px;
+  padding: 15px 30px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+.button,
+.button:hover,
+.button:active {
   color: #fff;
-  font-size: 24px;
-  margin: 20px 0;
-  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
-  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
-  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  border: 1px solid #5d94d4;
   background-color: #6ea7e6;
   background-image: -webkit-linear-gradient(top, #6ea7e6, #5f99e0);
   background-image: -moz-linear-gradient(top, #6ea7e6, #5f99e0);
@@ -91,26 +125,39 @@ button {
   background-image: -o-linear-gradient(top, #6ea7e6, #5f99e0);
   background-image: linear-gradient(top, #6ea7e6, #5f99e0);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= #6ea7e6 , EndColorStr= #5f99e0 );
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -webkit-text-shadow: none;
+  -moz-text-shadow: none;
+  text-shadow: none;
 }
-.big-button:active {
-  color: #f9f9f9;
-  padding: 21px 40px 19px;
+.button:active {
+  padding-top: 16px;
+  padding-bottom: 14px;
   background: #5f99e0;
 }
-.big-button:focus {
-  outline: none;
+.big-button {
+  padding: 20px 40px;
+  font-size: 24px;
+  margin: 20px 0;
 }
-#main {
+.big-button,
+.big-button:hover,
+.big-button:active {
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.big-button:active {
+  padding-top: 21px;
+  padding-bottom: 19px;
+}
+#main,
+#main * {
   font-family: helvetica, arial, tahoma, sans-serif !important;
 }
 #logo {

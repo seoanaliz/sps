@@ -19,7 +19,7 @@
                     Ваше сообщество в App&nbsp;Store и Google&nbsp;Play
                 </div>
                 <span>
-                    <button class="big-button">Создать приложение</button>
+                    <button id="create-app" class="button big-button">Создать приложение</button>
                     <div class="big-button-description">
                         Необходима авторизация <span class="icon-vk">VK</span>
                     </div>

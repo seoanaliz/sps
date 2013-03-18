@@ -41,6 +41,9 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
+    'js://common/class.js',
+    'js://common/event.js',
+    'js://common/control.js',
     'js://mobile/mobile.js',
 );
 
@@ -67,6 +70,5 @@ if(!empty($jsFilesAdds)) {
     <link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
-    <?= JsHelper::Flush(); ?>
 </head>
 <body>

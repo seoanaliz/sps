@@ -302,16 +302,15 @@ input {
     color: #fff;
     border: 0.1em solid #4E6F93;
     border-top-color: #517295;
-    box-shadow: 0 0.1em .1em rgba(255,255,255,.2) inset;
+    box-shadow: 0 0.1em 0.1em rgba(255,255,255, 0.2) inset;
     text-shadow: 0 0.1em 0 #45688E;
-
     .border-radius(0.2em);
     .background-gradient(#6A8DB2, #50769E);
+    .user-select(none);
 
     &:focus,
     &:hover {
         text-decoration: none;
-
         .background-gradient(#789ABF, #5980A9);
     }
     &.load,
@@ -325,7 +324,6 @@ input {
         border-color: #B3B3B3;
         box-shadow: 0 0.1em .1em rgba(255,255,255,1) inset;
         text-shadow: 0 0.1em 0 #fff;
-
         .background-gradient(#fafafa, #d4d4d4);
 
         &:focus,
@@ -339,7 +337,7 @@ input {
         &:active {
             box-shadow: none;
             background: #dcdcdc;
-            text-shadow: 0 .1em 0 #eee;
+            text-shadow: 0 0.1em 0 #eee;
         }
     }
 
@@ -546,15 +544,18 @@ input {
             box-shadow: 0 1px 0 #648CB7 inset;
             font-size: 1.18em;
             font-weight: bold;
+            position: relative;
 
             &>.close {
-                float: right;
                 width: 18px;
                 height: 18px;
                 background: url('../../images/common/delete-white.png') center no-repeat;
-                opacity: .5;
                 cursor: pointer;
-
+                position: absolute;
+                top: 50%;
+                right: 10px;
+                margin-top: -9px;
+                .opacity(0.5);
                 .transition(0.2s opacity);
 
                 &:hover {

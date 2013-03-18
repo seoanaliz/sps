@@ -13,6 +13,36 @@ button {
     *overflow: visible;
 }
 
+.box-layout {
+    background-color: rgba(0,0,0, 0.5);
+
+    .box-wrap {
+        .border-radius(3px);
+
+        & > .title {
+            padding: 15px;
+            border: 0;
+            font-size: 22px;
+            .border-radius(2px 2px 0 0);
+            .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
+            .background-gradient(#659ad5, #578dd0);
+        }
+
+        & > .body {
+            border: 0;
+        }
+
+        & > .actions-wrap {
+            border: 0;
+            
+            .actions {
+                padding: 20px;
+                text-align: center;
+            }
+        }
+    }
+}
+
 .block-wrapper-2,
 .block-wrapper-3 {
     font-size: 0;
@@ -72,33 +102,46 @@ button {
     }
 }
 
-.big-button {
-    border: 1px solid #5d94d4;
-    padding: 20px 40px;
-    text-align: center;
-    cursor: pointer;
-    color: #fff;
-    font-size: 24px;
-    margin: 20px 0;
-    .text-shadow(0 1px 2px rgba(0,0,0, 0.3));
-    .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3)");
-    .background-gradient(#6ea7e6, #5f99e0);
+.button {
+    font-size: 22px;
+    padding: 15px 30px;
     .border-radius(2px);
-    .user-select(none);
 
-    &:active {
-        color: #f9f9f9;
-        padding: 21px 40px 19px;
-        background: #5f99e0;
+    &, &:hover, &:active {
+        color: #fff;
+        border: 1px solid #5d94d4;
+        .background-gradient(#6ea7e6, #5f99e0);
+        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.5));
+        .text-shadow(none);
     }
 
-    &:focus {
-        outline: none;
+    &:active {
+        padding-top: 16px;
+        padding-bottom: 14px;
+        background: #5f99e0;
+    }
+}
+
+.big-button {
+    padding: 20px 40px;
+    font-size: 24px;
+    margin: 20px 0;
+
+    &, &:hover, &:active {
+        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3)");
+        .text-shadow(0 1px 2px rgba(0,0,0, 0.3));
+    }
+
+    &:active {
+        padding-top: 21px;
+        padding-bottom: 19px;
     }
 }
 
 #main {
-    font-family: helvetica, arial, tahoma, sans-serif !important;
+    &, * {
+        font-family: helvetica, arial, tahoma, sans-serif !important;
+    }
 }
 
 #logo {
