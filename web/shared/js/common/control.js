@@ -1,5 +1,5 @@
 /**
- * @description Основной класс для вызова серверных методов
+ * @description Основной объект для вызова серверных методов
  */
 var Control = {
     root: '',
@@ -32,31 +32,14 @@ var Control = {
                 params[paramKey] = data[paramKey];
             }
         }
-        var jQueryObj = $.ajax({
+        var deferred = new (t.getDeferred());
+
+        $.ajax({
             url: root + controlName + '/',
             dataType: dataType,
             data: $.extend(controlDefaultParams, params),
             success: function(data) {
                 if (typeof callback != 'function') {
-                    return;
-                }
-                if (typeof t.commonResponse == 'function') {
-                    data = t.commonResponse(data);
-                }
-                if (typeof control.response == 'function') {
-                    data = control.response(data);
-                }
-                if (typeof callback == 'function') {
-                    callback(data);
-                }
-            }
-        });
-        return {
-            success: function(callback) {
-                return jQueryObj.success(function(data) {
-                    if (typeof callback != 'function') {
-                        return;
-                    }
                     if (typeof t.commonResponse == 'function') {
                         data = t.commonResponse(data);
                     }
@@ -66,23 +49,26 @@ var Control = {
                     if (typeof callback == 'function') {
                         callback(data);
                     }
-                });
+                }
+                deferred.fireSuccess(data);
             },
-            error: function(callback) {
-                return jQueryObj.error(function(data) {
-                    callback(data);
-                });
-            },
-            always: function(callback) {
-                return jQueryObj.always(function(data) {
-                    callback(data);
-                });
+            error: function() {
+                deferred.fireError();
             }
-        }
+        });
+
+        return deferred;
     },
 
-    // @todo: сделать нормальный конструктор
     isDeferred: function(obj) {
-        return obj && obj.success && obj.error;
+        return obj instanceof this.getDeferred();
+    },
+
+    getDeferred: function() {
+        if (!window.Deferred) {
+            throw new Error('Deferred class is not exist!');
+        }
+
+        return Deferred;
     }
 };

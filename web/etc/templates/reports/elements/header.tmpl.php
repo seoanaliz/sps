@@ -48,6 +48,7 @@ $jsFiles = array(
     'js://common/event.js',
     'js://common/model.js',
     'js://common/widget.js',
+    'js://common/deferred.js',
     'js://common/control.js',
     'js://common/collection.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',

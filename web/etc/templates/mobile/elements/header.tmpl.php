@@ -43,6 +43,7 @@ $jsFiles = array(
     'js://common/common.js',
     'js://common/class.js',
     'js://common/event.js',
+    'js://common/deferred.js',
     'js://common/control.js',
     'js://mobile/mobile.js',
 );
