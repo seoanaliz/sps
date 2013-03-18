@@ -75,10 +75,7 @@ var App = (function() {
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
                 var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
-                $attachment.data({
-                    filename: response.filename,
-                    image: response.image
-                });
+                $attachment.data('data', response);
                 $attachment.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
             };
             var getPhotos = function() {
