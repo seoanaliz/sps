@@ -49,6 +49,7 @@ class PublicsParser
                     $entry->quantity = $public->members_count;
                     $entry->short_name =  $public->screen_name;
                     $entry->is_page    =  $public->type == 'page' ? true : false;
+                    $entry->sh_in_main =  true;
                     $new_entries[] = $entry;
                 }
             }
