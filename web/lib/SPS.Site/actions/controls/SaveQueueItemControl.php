@@ -88,20 +88,6 @@ class SaveQueueItemControl extends BaseControl
         echo ObjectHelper::ToJSON($result);
     }
 
-    private function add($article, $articleRecord)
-    {
-        ConnectionFactory::BeginTransaction();
-
-        $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
-        if ($result) {
-            $articleRecord->articleId = $article->articleId;
-            $result = ArticleRecordFactory::Add($articleRecord);
-        }
-
-        ConnectionFactory::CommitTransaction($result);
-        return $result;
-    }
-
     private function update($id, $articleRecord)
     {
 
