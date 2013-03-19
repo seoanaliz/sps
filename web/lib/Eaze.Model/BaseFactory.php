@@ -657,7 +657,7 @@
             } else {
                 $expires = empty( $mapping['cache'] ) ? self::$DefaultCacheTime : $mapping['cache'];
             }
-
+            
 
             self::ProcessSearchParameters( $searchArray, $mapping, $options, $cmd );
 
@@ -750,7 +750,7 @@
 
             foreach ( $tree as $field => $value ) {
                 $factoryName = null;
-
+                
                 if ( false === is_array( $value ) ) {
                     if ( !empty( $mapping['fields'][$field] ) ) {
                         $type        = $mapping['fields'][$field]['type'];
@@ -762,7 +762,7 @@
                             $result->$field = $ds->GetValue( $prefix . $field, $type );
                         }
                     }
-                } else if ( !empty( $mapping['fields'][$field . 'Id'] ) ) {
+                } else if ( !empty( $mapping['fields'][$field . 'Id'] ) ) { 
                     $factoryName = $mapping['fields'][$field . 'Id']['foreignKey'] . 'Factory';
                 } else if ( !empty( $mapping['fields'][$field . '_id'] ) ) {
                     $factoryName = $mapping['fields'][$field . '_id']['foreignKey'] . 'Factory';
@@ -771,7 +771,7 @@
                 if ( $factoryName !== null ) {
                     $result->$field = self::GetObject( $ds, self::GetMapping( $factoryName ), $value, $prefix . $field . '.'  );
                 }
-
+                
             }
 
             return $result;
@@ -834,7 +834,7 @@
             }
         }
 
-
+        
         /**
          * Get Foreign Lists
          * @param array $options          options array
@@ -877,7 +877,7 @@
             } else {
                 $expires = empty( $mapping["cache"] ) ? self::$DefaultCacheTime : $mapping["cache"];
             }
-
+            
             self::ProcessSearchParameters( $searchArray, $mapping, $options, $cmd );
 
             if ( self::CanPages( $mapping ) ) {

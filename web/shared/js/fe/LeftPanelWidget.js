@@ -1086,7 +1086,7 @@ var LeftPanelWidget = Event.extend({
                     if (data.photos) {
                         var photos = eval(data.photos);
                         $(photos).each(function() {
-                            imageUploader.addPhoto(this.path, this.filename);
+                            imageUploader.addPhoto(this.path, this);
                         });
                     }
                 }
