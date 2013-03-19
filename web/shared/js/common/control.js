@@ -32,7 +32,7 @@ var Control = {
                 params[paramKey] = data[paramKey];
             }
         }
-        var deferred = new (t.getDeferred());
+        var deferred = new Deferred;
 
         $.ajax({
             url: root + controlName + '/',
@@ -58,17 +58,5 @@ var Control = {
         });
 
         return deferred;
-    },
-
-    isDeferred: function(obj) {
-        return obj instanceof this.getDeferred();
-    },
-
-    getDeferred: function() {
-        if (!window.Deferred) {
-            throw new Error('Deferred class is not exist!');
-        }
-
-        return Deferred;
     }
 };
