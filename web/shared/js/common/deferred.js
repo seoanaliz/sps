@@ -151,25 +151,44 @@ var Deferred = Class.extend({
         }
     },
 
-    // Shortcuts
+    /**
+     * @returns {Deferred}
+     */
     success: function() {
-        return this.addCallback.apply(this, arguments);
+        this.addCallback.apply(this, arguments);
+        return this;
     },
 
+    /**
+     * @returns {Deferred}
+     */
     error: function() {
-        return this.addErrback.apply(this, arguments);
+        this.addErrback.apply(this, arguments);
+        return this;
     },
 
+    /**
+     * @returns {Deferred}
+     */
     always: function() {
-        return this.addBoth.apply(this, arguments);
+        this.addBoth.apply(this, arguments);
+        return this;
     },
 
+    /**
+     * @returns {Deferred}
+     */
     fireSuccess: function() {
-        return this.callback.apply(this, arguments);
+        this.callback.apply(this, arguments);
+        return this;
     },
 
+    /**
+     * @returns {Deferred}
+     */
     fireError: function() {
-        return this.errback.apply(this, arguments);
+        this.errback.apply(this, arguments);
+        return this;
     }
 });
 
