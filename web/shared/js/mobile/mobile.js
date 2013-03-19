@@ -160,31 +160,6 @@ App = Event.extend({
         'groups: API.groups.get({extended: 1, filter: "admin"})' +
         '};';
 
-        return t.callVK('execute', {code: code});
-    },
-
-    /**
-     * ...
-     * @param method
-     * @param params
-     * @returns {Deferred}
-     */
-    callVK: function(method, params) {
-        var deferred = new Deferred();
-
-        $.ajax({
-            dataType: 'jsonp',
-            url: 'https://api.vk.com/method/' + method,
-            data: $.extend({access_token: $.cookie('accessToken')}, params)
-        }).always(function(data) {
-            if (data && data.response) {
-                deferred.fireSuccess(data.response);
-            } else {
-                $.cookie('accessToken', '');
-                deferred.fireError(data);
-            }
-        });
-
-        return deferred;
+        return Control.callVK('execute', {code: code});
     }
 });

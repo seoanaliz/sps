@@ -6,16 +6,30 @@ var Control = {
     dataType: 'json',
     controlMap: {},
 
-    call: function() {
-        this.fire.apply(this, arguments);
+    /**
+     * Шорткат для Control.fire
+     * @param {string} method
+     * @param {object=} params
+     * @param {function=} callback
+     * @returns {Deferred}
+     */
+    call: function(method, params, callback) {
+        return this.fire.apply(this, arguments);
     },
 
-    fire: function(key, data, callback) {
+    /**
+     * ...
+     * @param {string} method
+     * @param {object=} data
+     * @param {function=} callback
+     * @returns {Deferred}
+     */
+    fire: function(method, data, callback) {
         var t = this;
         var params = $.extend({}, t.commonParams, t.defaultParams);
-        var control = t.controlMap[key] || {};
+        var control = t.controlMap[method] || {};
         var dataType = control.dataType || t.dataType;
-        var controlName = control.name || key;
+        var controlName = control.name || method;
         var controlDefaultParams = control.defaultParams || {};
         var root = control.root || t.root;
         for (var paramKey in data) {
@@ -46,9 +60,8 @@ var Control = {
                     if (typeof control.response == 'function') {
                         data = control.response(data);
                     }
-                    if (typeof callback == 'function') {
-                        callback(data);
-                    }
+                } else {
+                    callback(data);
                 }
                 deferred.fireSuccess(data);
             },
@@ -56,6 +69,39 @@ var Control = {
                 deferred.fireError();
             }
         });
+
+        return deferred;
+    },
+
+    /**
+     * ...
+     * @param {string} method
+     * @param {object=} params
+     * @param {function=} callback
+     * @returns {Deferred}
+     */
+    callVK: function(method, params, callback) {
+        var deferred = new Deferred();
+
+        if (!$.cookie('accessToken')) {
+            deferred.fireError('accessToken is not exist!');
+        } else {
+            $.ajax({
+                dataType: 'jsonp',
+                url: 'https://api.vk.com/method/' + method,
+                data: $.extend({access_token: $.cookie('accessToken')}, params)
+            }).always(function(data) {
+                if (data && data.response) {
+                    if (typeof callback == 'function') {
+                        callback(data);
+                    }
+                    deferred.fireSuccess(data.response);
+                } else {
+                    $.cookie('accessToken', '');
+                    deferred.fireError(data);
+                }
+            });
+        }
 
         return deferred;
     }
