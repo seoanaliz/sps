@@ -84,6 +84,16 @@
             </action>
         </group>
 
+        <group name="NewUsers">
+            <action name="saveNewUser">
+                <path>controls/newUsers/AddNewUserControl</path>
+            </action>
+            <action name="getNewUsers">
+                <path>controls/newUsers/GetNewUserControl</path>
+            </action>
+
+        </group>
+
         <group name="Groups">
             <action name="shareGroup">
                 <path>controls/groups/shareGroup</path>
