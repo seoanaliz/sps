@@ -198,6 +198,9 @@
                 <page uri="controls://saveNewUser/">
                     <actions>SPS.Stat.saveNewUser</actions>
                 </page>
+                <page uri="controls://getNewUsers/">
+                    <actions>SPS.Stat.getNewUsers</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="MessControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">

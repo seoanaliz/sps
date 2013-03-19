@@ -2,7 +2,7 @@
     Package::Load( 'SPS.Stat' );
 
     /**
-     * addnNewUserControl Action
+     * addNewUserControl Action
      * @package    SPS
      * @subpackage Stat
      */
