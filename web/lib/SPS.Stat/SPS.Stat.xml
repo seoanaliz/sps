@@ -86,10 +86,10 @@
 
         <group name="NewUsers">
             <action name="saveNewUser">
-                <path>controls/newUsers/addNewUserControl</path>
+                <path>controls/newUsers/AddNewUserControl</path>
             </action>
             <action name="getNewUsers">
-                <path>controls/newUsers/getNewUserControl</path>
+                <path>controls/newUsers/GetNewUserControl</path>
             </action>
 
         </group>

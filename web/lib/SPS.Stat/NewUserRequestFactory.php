@@ -1,8 +1,5 @@
 <?php
 
-
-Package::Load( 'tst.' );
-
 /**
  * NewUserRequest Factory
  *
@@ -24,25 +21,25 @@ class NewUserRequestFactory implements IFactory {
     , 'fields'    => array(
             'newUserRequestId' => array(
                 'name'          => 'newUserRequestId'
-            , 'type'        => TYPE_INTEGER
-            , 'key'         => true
+                , 'type'        => TYPE_INTEGER
+                , 'key'         => true
             )
         ,'vkId' => array(
                 'name'          => 'vkId'
-            , 'type'        => TYPE_STRING
+                , 'type'        => TYPE_STRING
             )
         ,'email' => array(
                 'name'          => 'email'
-            , 'type'        => TYPE_STRING
+                , 'type'        => TYPE_STRING
             )
         ,'publicIds' => array(
                 'name'          => 'publicIds'
-            , 'type'        => TYPE_ARRAY
-            , 'complexType' => 'int[]'
+                , 'type'        => TYPE_ARRAY
+                , 'complexType' => 'int[]'
             )
         ,'statusId' => array(
                 'name'          => 'statusId'
-            , 'type'        => TYPE_INTEGER
+                , 'type'        => TYPE_INTEGER
             )
         ,'createdAt' => array(
                 'name'          => 'createdAt'
@@ -52,13 +49,13 @@ class NewUserRequestFactory implements IFactory {
     , 'search'    => array(
             'page' => array(
                 'name'         => 'page'
-            , 'type'       => TYPE_INTEGER
-            , 'default'    => 0
+                , 'type'       => TYPE_INTEGER
+                , 'default'    => 0
             )
         ,'pageSize' => array(
                 'name'         => 'pageSize'
-            , 'type'       => TYPE_INTEGER
-            , 'default'    => 25
+                , 'type'       => TYPE_INTEGER
+                , 'default'    => 25
             ))
     );
 
