@@ -97,7 +97,6 @@ var Control = {
                     }
                     deferred.fireSuccess(data.response);
                 } else {
-                    $.cookie('accessToken', '');
                     deferred.fireError(data);
                 }
             });

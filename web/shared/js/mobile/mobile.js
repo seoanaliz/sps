@@ -8,6 +8,11 @@ App = Event.extend({
         this.initPopup();
     },
 
+    /**
+     * После авторизации в ВК, нас переадресовыват
+     * на нашу же страничку в попапе. Если мы
+     * сейчас в попапе, то должны его закрыть
+     */
     checkIsChildWindow: function() {
         if (window.parent && location.hash) {
             var accessToken = (location.hash.split('&')[0] || '').split('=')[1];
@@ -18,14 +23,24 @@ App = Event.extend({
         }
     },
 
+    /**
+     * Инициализация попапа со списком групп
+     */
     initPopup: function() {
         var t = this;
+        var $createApp = $('#create-app');
+
+        if (t.isAlreadySent()) {
+            $createApp.html('Ваша заявка рассматривается').addClass('disabled');
+            $('.big-button-description').hide();
+            return;
+        }
 
         if (t.isLoginVK()) {
             t.updatePopup();
         }
 
-        $('#create-app').on('click', function() {
+        $createApp.on('click', function() {
             if (t.isLoginVK()) {
                 if (!t.popup) {
                     t.updatePopup().success(function() {
@@ -41,7 +56,7 @@ App = Event.extend({
     },
 
     /**
-     * ...
+     * Получить группы и перерисовать попап с группами
      * @returns {Deferred}
      */
     updatePopup: function() {
@@ -95,6 +110,9 @@ App = Event.extend({
         return deferred;
     },
 
+    /**
+     * Показать попап с группами
+     */
     showPopup: function() {
         var t = this;
         if (!t.popup) {
@@ -103,6 +121,9 @@ App = Event.extend({
         t.popup.show();
     },
 
+    /**
+     * Скрыть попап с группами
+     */
     hidePopup: function() {
         var t = this;
         if (!t.popup) {
@@ -111,6 +132,9 @@ App = Event.extend({
         t.popup.hide();
     },
 
+    /**
+     * Отправить группы на сервер
+     */
     sendGroups: function() {
         var t = this;
         if (!t.popup) {
@@ -125,19 +149,41 @@ App = Event.extend({
             groups.push($(this).data('id'));
         });
 
-        if (groups.length && email) {
-            t.popup.hide();
+        if (!groups.length) {
+            return;
         }
+
+        if (!email) {
+            $email.focus();
+            return;
+        }
+
+        t.popup.hide();
+        $.cookie('alreadySent', 1);
+        location.reload();
     },
 
     /**
+     * Уже отправил заявку
+     * @returns {boolean}
+     */
+    isAlreadySent: function() {
+        return !!$.cookie('alreadySent');
+    },
+
+    /**
+     * Залогинен в ВК с помощью нашего приложения
      * @returns {boolean}
      */
     isLoginVK: function() {
         return !!$.cookie('accessToken');
     },
 
+    /**
+     * Открывает попап для логина в ВК
+     */
     loginVK: function() {
+        $.cookie('accessToken', '');
         var appId = window.vkAppId;
         var scope = 'offline,stats,groups';
         var loginUrl = 'https://oauth.vk.com/authorize' +
