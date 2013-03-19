@@ -321,7 +321,7 @@ function getURLParameter(name, search) {
                     var src = $(this).attr('src');
                     var img = new Image();
                     img.onload = function() {
-                        imagesSizes.push([img.width, img.height]);
+                        imagesSizes[i] = [img.width, img.height];
                         if (imagesSizes.length >= imagesNum) {
                             onLoadImages();
                         }
