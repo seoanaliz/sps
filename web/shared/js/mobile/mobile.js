@@ -175,6 +175,8 @@ App = Event.extend({
                 t.showErrorBox(data && data.message);
                 console.log(data);
             }
+        }).error(function() {
+            t.showErrorBox();
         });
     },
 
