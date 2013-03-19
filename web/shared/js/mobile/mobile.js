@@ -166,11 +166,26 @@ App = Event.extend({
             publicIds: groups.join(',')
         }).always(function() {
             t.popup.$box.find('.button').removeClass('disabled');
-        }).success(function() {
-            t.popup.hide();
-            $.cookie('alreadySent', 1);
-            location.reload();
+        }).success(function(data) {
+            if (data && data.success) {
+                t.popup.hide();
+                $.cookie('alreadySent', 1);
+                location.reload();
+            } else {
+                t.showErrorBox(data && data.message);
+                console.log(data);
+            }
         });
+    },
+
+    showErrorBox: function(text) {
+        var t = this;
+        if (!t.errorPopup) {
+            t.errorPopup = new Box({
+                title: 'Ошибка'
+            });
+        }
+        t.errorPopup.setHTML(text || 'Произошла ошибка. Пожалуйста, попробуйте еще раз чуть позже').show();
     },
 
     /**
