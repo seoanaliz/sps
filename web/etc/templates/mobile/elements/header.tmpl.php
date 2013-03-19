@@ -40,6 +40,7 @@ $cssFiles = array(
 
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
+    'js://ext/jquery.plugins/jquery.cookie.js',
     'js://common/common.js',
     'js://common/class.js',
     'js://common/event.js',

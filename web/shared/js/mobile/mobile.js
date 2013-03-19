@@ -4,39 +4,38 @@ $(document).ready(function() {
 
 App = Event.extend({
     init: function() {
-        VK.init({
-            apiId: window.vkAppId,
-            nameTransportPath: '/xd_receiver.htm'
-        });
-
-        this.isAuthorizedInVK = null;
+        this.checkIsChildWindow();
         this.initPopup();
+    },
+
+    checkIsChildWindow: function() {
+        if (window.parent && location.hash) {
+            var accessToken = (location.hash.split('&')[0] || '').split('=')[1];
+            if (accessToken) {
+                $.cookie('accessToken', accessToken);
+            }
+            window.close();
+        }
     },
 
     initPopup: function() {
         var t = this;
 
-        t.checkVKAuth().success(function() {
-            t.isAuthorizedInVK = true;
-            t.updatePopup().success(function() {
-                t.showPopup();
-            });
-        });
+        if (t.isLoginVK()) {
+            t.updatePopup();
+        }
 
         $('#create-app').on('click', function() {
-            if (t.isAuthorizedInVK) {
-                t.showPopup();
-            } else {
-                t.loginVK();
-
-                VK.Observer.subscribe('auth.login', function() {
-                    VK.Observer.unsubscribe('auth.login');
-
-                    t.isAuthorizedInVK = true;
+            if (t.isLoginVK()) {
+                if (!t.popup) {
                     t.updatePopup().success(function() {
                         t.showPopup();
                     });
-                });
+                } else {
+                    t.showPopup();
+                }
+            } else {
+                t.loginVK();
             }
         });
     },
@@ -127,37 +126,27 @@ App = Event.extend({
         });
 
         if (groups.length && email) {
-            console.log(groups, email);
             t.popup.hide();
         }
     },
 
     /**
-     * ...
-     * @returns {Deferred}
+     * @returns {boolean}
      */
-    checkVKAuth: function() {
-        var deferred = new Deferred();
-        VK.Auth.getLoginStatus(function(data) {
-            if (data.session) {
-                deferred.fireSuccess();
-            } else {
-                deferred.fireError();
-            }
-        });
-        return deferred;
+    isLoginVK: function() {
+        return !!$.cookie('accessToken');
     },
 
-    /**
-     * ...
-     * @returns {Deferred}
-     */
     loginVK: function() {
-        var deferred = new Deferred();
-        VK.Auth.login(function() {
-            deferred.fireSuccess();
-        });
-        return deferred;
+        var appId = window.vkAppId;
+        var scope = 'offline,stats,groups';
+        var loginUrl = 'https://oauth.vk.com/authorize' +
+        '?client_id=' + appId +
+        '&scope=' + scope +
+        '&redirect_uri=' + location.href +
+        '&display=popup' +
+        '&response_type=token';
+        windowOpen(loginUrl);
     },
 
     /**
@@ -165,16 +154,33 @@ App = Event.extend({
      * @returns {Deferred}
      */
     getVKGroups: function() {
-        var deferred = new Deferred();
+        var t = this;
         var code =
         'return {' +
         'groups: API.groups.get({extended: 1, filter: "admin"})' +
         '};';
 
-        VK.Api.call('execute', {code: code}, function(data) {
+        return t.callVK('execute', {code: code});
+    },
+
+    /**
+     * ...
+     * @param method
+     * @param params
+     * @returns {Deferred}
+     */
+    callVK: function(method, params) {
+        var deferred = new Deferred();
+
+        $.ajax({
+            dataType: 'jsonp',
+            url: 'https://api.vk.com/method/' + method,
+            data: $.extend({access_token: $.cookie('accessToken')}, params)
+        }).always(function(data) {
             if (data && data.response) {
                 deferred.fireSuccess(data.response);
             } else {
+                $.cookie('accessToken', '');
                 deferred.fireError(data);
             }
         });

@@ -111,6 +111,31 @@ function getURLParameter(name, search) {
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
 }
 
+function windowOpen(url, windowName) {
+    var screenX = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
+    var screenY = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
+    var outerWidth = $(window).width();
+    var width = 400;
+    var height = 200;
+    var top = parseInt(screenY + 280);
+    var left = parseInt(screenX + ((outerWidth - width) / 2));
+    var params = {
+        top: top,
+        left: left,
+        width: width,
+        height: height,
+        menubar: 'no',
+        toolbar: 'no',
+        resizable: 'no',
+        scrollbars: 'no',
+        directories: 'no',
+        location: 'yes',
+        status: 'no'
+    };
+    var windowFeatures = $.param(params).split('&').join(',');
+    return window.open(url, windowName, windowFeatures);
+}
+
 // Выделение текста в инпутах
 (function($) {
     $.fn.selectRange = function(start, end) {
