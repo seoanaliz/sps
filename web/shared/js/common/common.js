@@ -320,15 +320,21 @@ function getURLParameter(name, search) {
                 (function loadImage(i) {
                     var img = new Image();
                     var src = $($images[i]).attr('src');
+                    var isLastImage = false;
+
+                    if (i == imagesNum - 1) {
+                        isLastImage = true;
+                    } else {
+                        loadImage(i + 1);
+                    }
 
                     img.onload = function() {
                         imagesSizes.push([img.width, img.height]);
-                        if (i == imagesNum - 1) {
-                            return onLoadImages();
-                        } else {
-                            loadImage(i + 1);
+                        if (isLastImage) {
+                            onLoadImages();
                         }
                     };
+
                     img.src = src;
                 })(0);
 
