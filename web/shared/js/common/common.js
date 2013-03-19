@@ -317,26 +317,17 @@ function getURLParameter(name, search) {
                 $wrap.data(DATA_KEY, true);
                 $wrap.addClass(CLASS_LOADING);
 
-                (function loadImage(i) {
+                $images.each(function(i) {
+                    var src = $(this).attr('src');
                     var img = new Image();
-                    var src = $($images[i]).attr('src');
-                    var isLastImage = false;
-
-                    if (i == imagesNum - 1) {
-                        isLastImage = true;
-                    } else {
-                        loadImage(i + 1);
-                    }
-
                     img.onload = function() {
                         imagesSizes.push([img.width, img.height]);
-                        if (isLastImage) {
+                        if (imagesSizes.length >= imagesNum) {
                             onLoadImages();
                         }
                     };
-
                     img.src = src;
-                })(0);
+                });
 
                 function onLoadImages() {
                     if ((imagesNum - 1) % imagesPerColumn == 1) {
