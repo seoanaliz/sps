@@ -145,7 +145,21 @@ button {
 textarea {
     resize: none;
 }
+
 input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
 textarea {
     padding: 4px;
     border: 1px solid #C4CDE0;
@@ -195,6 +209,29 @@ input {
     }
     &[disabled] {
         background-color: #f7f7f7;
+    }
+}
+
+.input-wrap,
+.textarea-wrap {
+    margin-right: 10px;
+
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"],
+    textarea {
+        width: 100%;
     }
 }
 

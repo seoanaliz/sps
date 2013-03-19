@@ -22,7 +22,7 @@ body{display:inline-block;}
 html,body{padding:0;margin:0;width:100%;height:100%;}
 button{*overflow:visible;}
 textarea{resize:none;}
-input[type="text"],textarea{padding:4px;border:1px solid #C4CDE0;background-color:#fff;}
+input[type="text"],input[type="password"],input[type="datetime"],input[type="datetime-local"],input[type="date"],input[type="month"],input[type="time"],input[type="week"],input[type="number"],input[type="email"],input[type="url"],input[type="search"],input[type="tel"],input[type="color"],textarea{padding:4px;border:1px solid #C4CDE0;background-color:#fff;}
 input:focus,textarea:focus,[contenteditable]:focus{outline:none;}
 table,tr,td,th{margin:0;padding:0;border-spacing:0;text-align:left;}
 a{color:#2B587A;text-decoration:none;cursor:pointer;}a:focus,a:hover{outline:none;text-decoration:underline;}
@@ -31,6 +31,7 @@ input[type="checkbox"]:hover:after{background-position:0 -28px;}
 input[type="checkbox"]:checked:hover:after{background-position:0 -42px;}
 input[type="checkbox"]:checked:after{background-position:0 -14px;}
 input[disabled]{background-color:#f7f7f7;}
+.input-wrap,.textarea-wrap{margin-right:10px;}.input-wrap input[type="text"],.textarea-wrap input[type="text"],.input-wrap input[type="password"],.textarea-wrap input[type="password"],.input-wrap input[type="datetime"],.textarea-wrap input[type="datetime"],.input-wrap input[type="datetime-local"],.textarea-wrap input[type="datetime-local"],.input-wrap input[type="date"],.textarea-wrap input[type="date"],.input-wrap input[type="month"],.textarea-wrap input[type="month"],.input-wrap input[type="time"],.textarea-wrap input[type="time"],.input-wrap input[type="week"],.textarea-wrap input[type="week"],.input-wrap input[type="number"],.textarea-wrap input[type="number"],.input-wrap input[type="email"],.textarea-wrap input[type="email"],.input-wrap input[type="url"],.textarea-wrap input[type="url"],.input-wrap input[type="search"],.textarea-wrap input[type="search"],.input-wrap input[type="tel"],.textarea-wrap input[type="tel"],.input-wrap input[type="color"],.textarea-wrap input[type="color"],.input-wrap textarea,.textarea-wrap textarea{width:100%;}
 .ui-dropdown-menu{position:absolute;display:none;background-color:#fff;max-height:300px;border:1px solid #C4CDE0;margin-top:-1px;z-index:99;overflow-y:auto;}.ui-dropdown-menu .ui-dropdown-menu-empty{color:#777;padding:.5em 1em;background-color:#f7f7f7;}
 .ui-dropdown-menu .ui-dropdown-menu-item{padding:.5em 1em;cursor:pointer;color:#2b587a;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;line-height:150%;}.ui-dropdown-menu .ui-dropdown-menu-item.hover{background-color:#e1e7ed;}
 .ui-dropdown-menu .ui-dropdown-menu-item.active{color:#fff;background-color:#587da1;}
