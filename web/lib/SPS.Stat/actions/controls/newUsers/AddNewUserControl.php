@@ -30,10 +30,10 @@
                 $result['message'] = 'Wrong data';
                 die( ObjectHelper::ToJSON($result));
             }
-            if ( !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $result['message'] = 'Wrong email';
-                die( ObjectHelper::ToJSON($result));
-            }
+//            if ( !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+//                $result['message'] = 'Wrong email';
+//                die( ObjectHelper::ToJSON($result));
+//            }
             $newUser = NewUserRequestFactory::GetOne( array('vkId' => $this->vkId));
             if( $newUser ) {
                 $old_publics = is_array( $newUser->publicIds ) ? $newUser->publicIds: array();
