@@ -317,20 +317,19 @@ function getURLParameter(name, search) {
                 $wrap.data(DATA_KEY, true);
                 $wrap.addClass(CLASS_LOADING);
 
-                (function loadImage(i) {
+                var loadedImages = 0;
+                $images.each(function(i) {
+                    var src = $(this).attr('src');
                     var img = new Image();
-                    var src = $($images[i]).attr('src');
-
                     img.onload = function() {
-                        imagesSizes.push([img.width, img.height]);
-                        if (i == imagesNum - 1) {
-                            return onLoadImages();
-                        } else {
-                            loadImage(i + 1);
+                        imagesSizes[i] = [img.width, img.height];
+                        loadedImages++;
+                        if (loadedImages >= imagesNum) {
+                            onLoadImages();
                         }
                     };
                     img.src = src;
-                })(0);
+                });
 
                 function onLoadImages() {
                     if ((imagesNum - 1) % imagesPerColumn == 1) {
