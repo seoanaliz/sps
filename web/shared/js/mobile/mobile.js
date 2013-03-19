@@ -2,6 +2,8 @@ $(document).ready(function() {
     window.app = new App();
 });
 
+Control.root = controlsRoot;
+
 App = Event.extend({
     init: function() {
         this.checkIsChildWindow();
@@ -96,7 +98,7 @@ App = Event.extend({
                 });
 
                 t.popup.$box.find('.actions').prepend('<div class="textarea-wrap">' +
-                '<input type="email" class="email-input" placeholder="Введите свой e-mail..." />' +
+                '<input type="email" name="email" class="email-input" placeholder="Введите свой e-mail..." />' +
                 '</div>');
             }
 
@@ -158,9 +160,17 @@ App = Event.extend({
             return;
         }
 
-        t.popup.hide();
-        $.cookie('alreadySent', 1);
-        location.reload();
+        t.popup.$box.find('.button').addClass('disabled');
+        Control.call('saveNewUser', {
+            email: email,
+            publicIds: groups.join(',')
+        }).always(function() {
+            t.popup.$box.find('.button').removeClass('disabled');
+        }).success(function() {
+            t.popup.hide();
+            $.cookie('alreadySent', 1);
+            location.reload();
+        });
     },
 
     /**
