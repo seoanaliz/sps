@@ -317,12 +317,14 @@ function getURLParameter(name, search) {
                 $wrap.data(DATA_KEY, true);
                 $wrap.addClass(CLASS_LOADING);
 
+                var loadedImages = 0;
                 $images.each(function(i) {
                     var src = $(this).attr('src');
                     var img = new Image();
                     img.onload = function() {
                         imagesSizes[i] = [img.width, img.height];
-                        if (imagesSizes.length >= imagesNum) {
+                        loadedImages++;
+                        if (loadedImages >= imagesNum) {
                             onLoadImages();
                         }
                     };
