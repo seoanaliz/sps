@@ -6,24 +6,31 @@
 #*/2     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
 #*/1     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
 
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
-*/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
+1-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
 
 
 0     1       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-top/ > /dev/null
