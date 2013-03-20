@@ -34,6 +34,7 @@ $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.css',
         'css://st/main.css',
+        'css://mobile/admin.css',
     ),
     AssetHelper::IE7 => array(),
 );
@@ -85,14 +86,6 @@ if (!empty($jsFilesAdds)) {
     <div class="content">
         <div class="table" id="table">
             <!--  ROWS  -->
-            <div class="header">
-                <div class="row">
-                    <div class="column column3">Имя</div>
-                    <div class="column column7">Паблики</div>
-                    <div class="column column2">Решение</div>
-                </div>
-            </div>
-            <div class="body"></div>
         </div>
         <div id="load-more-table">Показать больше</div>
     </div>

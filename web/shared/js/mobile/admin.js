@@ -22,6 +22,8 @@ var MobileTable = Class.extend({
         $('#rejected').mousedown(function() {
             t.showRejectedRequests();
         });
+
+        $('#table').html(tmpl(TABLE));
     },
 
     /**
@@ -58,7 +60,7 @@ var MobileTable = Class.extend({
             });
 
             var code = 'return {' +
-            'users: API.users.get({uids: "' + userIds.join(',') +  '"}), ' +
+            'users: API.users.get({uids: "' + userIds.join(',') +  '", fields: "photo"}), ' +
             'groups: API.groups.getById({gids: "' + groupIds.join(',') + '"})' +
             '};';
 
@@ -67,6 +69,7 @@ var MobileTable = Class.extend({
             }).success(function(data) {
                 $.each(data.users, function(i, vkUser) {
                     var user = users[vkUser.uid];
+                    user.photo = vkUser.photo;
                     user.name = vkUser.first_name + ' ' + vkUser.last_name;
                     user.groups = [];
 
@@ -143,21 +146,72 @@ MobileTable.STATUS_REVIEWING = 1;
 MobileTable.STATUS_APPROVED = 4;
 MobileTable.STATUS_REJECTED = 5;
 
+TABLE =
+'<div class="header">' +
+    '<div class="row">' +
+        '<div class="column column3">' +
+            '<div class="cell">Имя</div>' +
+        '</div>' +
+        '<div class="column column5">' +
+            '<div class="cell">Паблики</div>' +
+        '</div>' +
+        '<div class="column column3">' +
+            '<div class="cell">E-mail</div>' +
+        '</div>' +
+        '<div class="column column1">' +
+            '<div class="cell">Решение</div>' +
+        '</div>' +
+    '</div>' +
+'</div>' +
+'<div class="body"></div>';
+
 TABLE_BODY =
-'<? each(TABLE_ROW, items); ?>';
+'<? if (count(items)) { ?>' +
+    '<? each(TABLE_ROW, items); ?>' +
+'<? } else { ?>' +
+    '<div class="empty">Пусто</div>' +
+'<? } ?>';
 
 TABLE_ROW =
 '<div class="row">' +
     '<div class="column column3">' +
-        '<?=name?>' +
+        '<div class="cell">' +
+            '<div class="photo">' +
+                '<img src="<?=photo?>" />' +
+            '</div>' +
+            '<div class="name">' +
+                '<a href="http://vk.com/id<?=vkId?>" target="_blank"><?=name?></a>' +
+            '</div>' +
+        '</div>' +
     '</div>' +
-    '<div class="column column7">' +
-        '<? each(GROUP, groups); ?>' +
+    '<div class="column column5">' +
+        '<div class="cell"><? each(GROUP, groups); ?></div>' +
     '</div>' +
-    '<div class="column column2">' +
-        'Да Нет' +
+    '<div class="column column3">' +
+        '<div class="cell"><?=email?></div>' +
+    '</div>' +
+    '<div class="column column1">' +
+        '<div class="cell decision">' +
+            '<? if (statusId == MobileTable.STATUS_REVIEWING) { ?>' +
+                '<button class="button">' +
+                    '<span class="approve"></span>' +
+                '</button> ' +
+                '<button class="button">' +
+                    '<span class="reject"></span>' +
+                '</button>' +
+            '<? } else { ?>' +
+                '--' +
+            '<? } ?>' +
+        '</div>' +
     '</div>' +
 '</div>';
 
 GROUP =
-'<?=name?><br/>';
+'<div class="group">' +
+    '<div class="photo">' +
+        '<img src="<?=photo?>" />' +
+    '</div>' +
+    '<div class="name">' +
+        '<a href="http://vk.com/public<?=id?>" target="_blank"><?=name?></a>' +
+    '</div>' +
+'</div>';

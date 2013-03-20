@@ -13,17 +13,18 @@ table,tr,td{vertical-align:top;}
 .table>.body>.row>.column6,.table>.header>.row>.column6{width:50%;}
 .table>.body>.row>.column5,.table>.header>.row>.column5{width:41.6%;}
 .table>.body>.row>.column4,.table>.header>.row>.column4{width:33.3%;}
-.table>.body>.row>.column3,.table>.header>.row>.column3{width:20%;}
+.table>.body>.row>.column3,.table>.header>.row>.column3{width:25%;}
 .table>.body>.row>.column2,.table>.header>.row>.column2{width:16.6%;}
 .table>.body>.row>.column1,.table>.header>.row>.column1{width:8.3%;}
-.table>.body>.row>.column,.table>.header>.row>.column{font-size:12px;padding:10px;margin-right:-20px;vertical-align:top;display:inline-block;zoom:1;*display:inline;}.table>.body>.row>.column.left,.table>.header>.row>.column.left{text-align:left;}
+.table>.body>.row>.column,.table>.header>.row>.column{font-size:12px;vertical-align:top;display:inline-block;zoom:1;*display:inline;}.table>.body>.row>.column>.cell,.table>.header>.row>.column>.cell{padding:10px;}
+.table>.body>.row>.column.left,.table>.header>.row>.column.left{text-align:left;}
 .table>.body>.row>.column.center,.table>.header>.row>.column.center{text-align:center;}
 .table>.body>.row>.column.right,.table>.header>.row>.column.right{text-align:right;}
 .table>.body>.row>.column.top,.table>.header>.row>.column.top{vertical-align:top;}
 .table>.body>.row>.column.middle,.table>.header>.row>.column.middle{vertical-align:middle;}
 .table>.body>.row>.column.bottom,.table>.header>.row>.column.bottom{vertical-align:bottom;}
+.table>.body>.empty,.table>.header>.empty{padding:100px 0;text-align:center;color:#777;font-size:14px;}
 .table>.header{color:#2b587a;background-color:#DEE5EB;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}.table>.header>.row>.column{font-weight:bold;}
-.table>.empty{padding:100px 0;text-align:center;color:#777;}
 #main{width:1070px;margin:10px auto;border:1px solid #C4CDE0;border-radius:3px;background-color:white;position:relative;z-index:1;}#main>.header{background:#f1f1f1;border:1px solid #fff;border-radius:2px;border-bottom:1px solid #D8DFEA;}
 #main .right-column{background-color:#f7f7f7;border-left:1px solid #D8DFEA;}
 #main .right-column>div{width:169px;padding-bottom:10px;}#main .right-column>div>.interval-wrapper{display:none;}
