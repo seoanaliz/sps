@@ -49,8 +49,11 @@
         public static function BuildDates($object, $timestamp) {
             $object->startDate = new DateTimeWrapper(date('r', $timestamp));
             $object->endDate = new DateTimeWrapper(date('r', $timestamp));
-
-            $object->startDate->modify('-30 seconds');
+            if( $object->startDate->format('H') > 22 ) {
+                $object->startDate->modify('+5 seconds');
+            } else {
+                $object->startDate->modify('-30 seconds');
+            }
             $object->endDate->modify('+9 minutes');
         }
     }
