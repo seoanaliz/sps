@@ -20,7 +20,7 @@
             $limit  = Request::GetInteger('limit');
             if( !$status )
                 $status = 1;
-            $search = array('status' => $status);
+            $search = array('statusId' => $status);
             if( $limit ) {
                 $search[BaseFactoryPrepare::Page] = floor( $offset/$limit );
                 $search[BaseFactoryPrepare::PageSize] = $limit;

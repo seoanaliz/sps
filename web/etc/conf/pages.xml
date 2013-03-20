@@ -194,7 +194,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams">
                 <page uri="controls://saveNewUser/">
                     <actions>SPS.Stat.saveNewUser</actions>
                 </page>
