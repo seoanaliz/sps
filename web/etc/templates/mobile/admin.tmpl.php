@@ -65,17 +65,12 @@ if (!empty($jsFilesAdds)) {
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=<?= LocaleLoader::$HtmlEncoding ?>" />
-    <script type="text/javascript">
-        var controlsRoot = '{web:controls://}';
-        var vkAppId = <?= AuthVkontakte::$AppId ?>;
-    </script>
     <title><?=$__pageTitle?></title>
     <meta name="keywords" content="{form:$__metaKeywords}" />
     <link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>
 <div id="global-loader"></div>
@@ -102,5 +97,14 @@ if (!empty($jsFilesAdds)) {
     </div>
 </div>
 <div id="go-to-top">Наверх</div>
+<script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+<script type="text/javascript">
+    var controlsRoot = '{web:controls://}';
+    var vkAppId = <?= AuthVkontakte::$AppId ?>;
+    VK.init({
+        apiId: window.vkAppId,
+        nameTransportPath: '/xd_receiver.htm'
+    });
+</script>
 </body>
 </html>
