@@ -134,6 +134,7 @@ var Deferred = Class.extend({
                 }
             } catch (err) {
                 console.log('Deferred callback error!');
+                console.dir(err);
                 fired = 1;
                 if (!(err instanceof Error)) {
                     err = new Error(err);
