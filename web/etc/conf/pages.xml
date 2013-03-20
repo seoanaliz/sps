@@ -740,6 +740,9 @@
                 <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
                 </page>
+                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                    <template>tmpl://mobile/admin.tmpl.php</template>
+                </page>
             </pageGroup>
 
             <page uri="([^?]+)" boot="SPS.Site.GetSiteParams">

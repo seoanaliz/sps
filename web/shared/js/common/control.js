@@ -93,7 +93,7 @@ var Control = {
             }).always(function(data) {
                 if (data && data.response) {
                     if (typeof callback == 'function') {
-                        callback(data);
+                        callback(data.response);
                     }
                     deferred.fireSuccess(data.response);
                 } else {
