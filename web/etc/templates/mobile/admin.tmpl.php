@@ -87,8 +87,9 @@ if (!empty($jsFilesAdds)) {
             <!--  ROWS  -->
             <div class="header">
                 <div class="row">
-                    <div class="column column4">Имя</div>
-                    <div class="column column6">Паблики</div>
+                    <div class="column column3">Имя</div>
+                    <div class="column column7">Паблики</div>
+                    <div class="column column2">Решение</div>
                 </div>
             </div>
             <div class="body"></div>

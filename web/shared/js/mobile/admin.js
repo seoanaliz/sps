@@ -148,11 +148,14 @@ TABLE_BODY =
 
 TABLE_ROW =
 '<div class="row">' +
-    '<div class="column column4">' +
+    '<div class="column column3">' +
         '<?=name?>' +
     '</div>' +
-    '<div class="column column6">' +
+    '<div class="column column7">' +
         '<? each(GROUP, groups); ?>' +
+    '</div>' +
+    '<div class="column column2">' +
+        'Да Нет' +
     '</div>' +
 '</div>';
 
