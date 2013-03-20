@@ -3,7 +3,7 @@ html{overflow-y:scroll;}
 label{display:block;cursor:pointer;}
 label>*{vertical-align:middle;}
 table,tr,td{vertical-align:top;}
-.table>.body,.table>.header{font-size:0;}.table>.body.row+.row,.table>.header.row+.row{border-top:1px solid #dae1e8;}
+.table>.body,.table>.header{font-size:0;}.table>.body>.row+.row,.table>.header>.row+.row{border-top:1px solid #dae1e8;}
 .table>.body>.row>.column12,.table>.header>.row>.column12{width:100%;}
 .table>.body>.row>.column11,.table>.header>.row>.column11{width:91.6%;}
 .table>.body>.row>.column10,.table>.header>.row>.column10{width:83.3%;}
