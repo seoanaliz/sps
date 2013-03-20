@@ -18,7 +18,6 @@ var Control = {
     },
 
     /**
-     * ...
      * @param {string} method
      * @param {object=} data
      * @param {function=} callback
@@ -74,13 +73,12 @@ var Control = {
     },
 
     /**
-     * ...
      * @param {string} method
      * @param {object=} params
      * @param {function=} callback
      * @returns {Deferred}
      */
-    callVK: function(method, params, callback) {
+    callVKByOAuth: function(method, params, callback) {
         var deferred = new Deferred();
 
         if (!$.cookie('accessToken')) {
@@ -91,6 +89,33 @@ var Control = {
                 url: 'https://api.vk.com/method/' + method,
                 data: $.extend({access_token: $.cookie('accessToken')}, params)
             }).always(function(data) {
+                if (data && data.response) {
+                    if (typeof callback == 'function') {
+                        callback(data.response);
+                    }
+                    deferred.fireSuccess(data.response);
+                } else {
+                    deferred.fireError(data);
+                }
+            });
+        }
+
+        return deferred;
+    },
+
+    /**
+     * @param {string} method
+     * @param {object=} params
+     * @param {function=} callback
+     * @returns {Deferred}
+     */
+    callVKByOpenAPI: function(method, params, callback) {
+        var deferred = new Deferred();
+
+        if (!window.VK) {
+            deferred.fireError('VK is not exist!');
+        } else {
+            VK.Api.call(method, params, function(data) {
                 if (data && data.response) {
                     if (typeof callback == 'function') {
                         callback(data.response);

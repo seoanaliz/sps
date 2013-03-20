@@ -62,7 +62,7 @@ var MobileTable = Class.extend({
             'groups: API.groups.getById({gids: "' + groupIds.join(',') + '"})' +
             '};';
 
-            Control.callVK('execute', {
+            Control.callVKByOpenAPI('execute', {
                 code: code
             }).success(function(data) {
                 $.each(data.users, function(i, vkUser) {

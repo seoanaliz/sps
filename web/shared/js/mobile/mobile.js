@@ -6,23 +6,12 @@ Control.root = controlsRoot;
 
 App = Event.extend({
     init: function() {
-        this.checkIsChildWindow();
-        this.initPopup();
-    },
+        VK.init({
+            apiId: window.vkAppId,
+            nameTransportPath: '/xd_receiver.htm'
+        });
 
-    /**
-     * После авторизации в ВК, нас переадресовыват
-     * на нашу же страничку в попапе. Если мы
-     * сейчас в попапе, то должны его закрыть
-     */
-    checkIsChildWindow: function() {
-        if (window.parent && location.hash) {
-            var accessToken = (location.hash.split('&')[0] || '').split('=')[1];
-            if (accessToken) {
-                $.cookie('accessToken', accessToken);
-            }
-            window.close();
-        }
+        this.initPopup();
     },
 
     /**
@@ -38,12 +27,12 @@ App = Event.extend({
             return;
         }
 
-        if (t.isLoginVK()) {
+        t.checkVKAuth().success(function() {
             t.updatePopup();
-        }
+        });
 
         $createApp.on('click', function() {
-            if (t.isLoginVK()) {
+            t.checkVKAuth().success(function() {
                 if (!t.popup) {
                     t.updatePopup().success(function() {
                         t.showPopup();
@@ -51,9 +40,18 @@ App = Event.extend({
                 } else {
                     t.showPopup();
                 }
-            } else {
+            }).error(function() {
                 t.loginVK();
-            }
+
+                VK.Observer.subscribe('auth.login', function() {
+                    VK.Observer.unsubscribe('auth.login');
+
+                    t.isAuthorizedInVK = true;
+                    t.updatePopup().success(function() {
+                        t.showPopup();
+                    });
+                });
+            });
         });
     },
 
@@ -180,6 +178,9 @@ App = Event.extend({
         });
     },
 
+    /**
+     * @param {string} text
+     */
     showErrorBox: function(text) {
         var t = this;
         if (!t.errorPopup) {
@@ -200,26 +201,30 @@ App = Event.extend({
 
     /**
      * Залогинен в ВК с помощью нашего приложения
-     * @returns {boolean}
+     * @returns {Deferred}
      */
-    isLoginVK: function() {
-        return !!$.cookie('accessToken');
+    checkVKAuth: function() {
+        var deferred = new Deferred();
+        VK.Auth.getLoginStatus(function(data) {
+            if (data.session) {
+                deferred.fireSuccess();
+            } else {
+                deferred.fireError();
+            }
+        });
+        return deferred;
     },
 
     /**
      * Открывает попап для логина в ВК
+     * @returns {Deferred}
      */
     loginVK: function() {
-        $.cookie('accessToken', '');
-        var appId = window.vkAppId;
-        var scope = 'offline,stats,groups';
-        var loginUrl = 'https://oauth.vk.com/authorize' +
-        '?client_id=' + appId +
-        '&scope=' + scope +
-        '&redirect_uri=' + location.href +
-        '&display=popup' +
-        '&response_type=token';
-        windowOpen(loginUrl);
+        var deferred = new Deferred();
+        VK.Auth.login(function() {
+            deferred.fireSuccess();
+        });
+        return deferred;
     },
 
     /**
@@ -233,6 +238,6 @@ App = Event.extend({
         'groups: API.groups.get({extended: 1, filter: "admin"})' +
         '};';
 
-        return Control.callVK('execute', {code: code});
+        return Control.callVKByOpenAPI('execute', {code: code});
     }
 });
