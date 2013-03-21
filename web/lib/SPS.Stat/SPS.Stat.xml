@@ -91,6 +91,9 @@
             <action name="getNewUsers">
                 <path>controls/newUsers/GetNewUserControl</path>
             </action>
+            <action name="approveNewUser">
+                <path>controls/newUsers/ApproveNewUserControl</path>
+            </action>
 
         </group>
 
