@@ -9,11 +9,7 @@ span {
     .inline-block;
 }
 
-.box-layout {
-    background-color: rgba(0,0,0, 0.5);
-}
-
-.box-wrap {
+.box-wrap > .box {
     .border-radius(3px);
 
     & > .title {
@@ -39,7 +35,7 @@ span {
     }
 }
 
-.box-groups {
+.box.box-groups {
     & > .title {
         .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3)");
     }
