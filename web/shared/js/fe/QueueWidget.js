@@ -7,7 +7,7 @@ var QueueWidget = Event.extend({
 
     /**
      * Загрузка ленты очереди
-     * @return Control.Deferred
+     * @return Deferred
      */
     loadPage: function(id) {
         return Control.fire('get_queue', {
@@ -19,7 +19,7 @@ var QueueWidget = Event.extend({
 
     /**
      * Обновление ленты очереди
-     * @return Control.Deferred|bool
+     * @return Deferred|bool
      */
     update: function(id) {
         var t = this;
@@ -411,7 +411,7 @@ var QueueWidget = Event.extend({
     /**
      * Возвращает данные страницы
      * @param id
-     * @return Control.Deferred|string
+     * @return Deferred|string
      */
     getPageData: function(id) {
         var t = this;
@@ -557,7 +557,7 @@ var QueueWidget = Event.extend({
         var t = this;
         var pageData = t.getPageData(t.getFirstPageId() - 1);
 
-        if (Control.isDeferred(pageData)) {
+        if (pageData instanceof Deferred) {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();
@@ -579,7 +579,7 @@ var QueueWidget = Event.extend({
         var t = this;
         var pageData = t.getPageData(t.getLastPageId() + 1);
 
-        if (Control.isDeferred(pageData)) {
+        if (pageData instanceof Deferred) {
             Elements.getWallLoader().show();
             pageData.success(function() {
                 Elements.getWallLoader().hide();

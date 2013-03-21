@@ -2,29 +2,7 @@ $(document).ready(function() {
     var newWindow;
 
     $('#loginBtn').click(function() {
-        var screenX = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
-        var screenY = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
-        var outerWidth = $(window).width();
-        var outerHeight = $(window).height();
-        var width = 400;
-        var height = 200;
-        var top = parseInt(screenY + 280);
-        var left = parseInt(screenX + ((outerWidth - width) / 2));
-        var params = {
-            top: top,
-            left: left,
-            width: width,
-            height: height,
-            menubar: 'no',
-            toolbar: 'no',
-            resizable: 'no',
-            scrollbars: 'no',
-            directories: 'no',
-            location: 'yes',
-            status: 'no'
-        };
-        var paramsStr = $.param(params).split('&').join(',');
-        newWindow = window.open($(this).attr('href'), 'VK', paramsStr);
+        newWindow = windowOpen($(this).attr('href'));
         $('#accessToken').fadeIn(200);
 
         var $windowHint = $('.window-hint');

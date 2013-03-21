@@ -55,6 +55,7 @@
         'js://common/event.js',
         'js://common/model.js',
         'js://common/collection.js',
+        'js://common/deferred.js',
         'js://common/control.js',
         'js://fe/jquery-ui-1.8.18.custom.min.js',
         'js://ext/jquery.plugins/jquery.cookie.js',

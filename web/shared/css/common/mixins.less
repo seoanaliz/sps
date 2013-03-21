@@ -34,6 +34,7 @@
     background-image: -ms-linear-gradient(top,@top-color,@bottom-color);
     background-image: -o-linear-gradient(top,@top-color,@bottom-color);
     background-image: linear-gradient(top,@top-color,@bottom-color);
+    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr="@top-color~", EndColorStr="@bottom-color~")";
 }
 .border-radius(@params) {
     -webkit-border-radius: @params;
@@ -50,8 +51,18 @@
     -moz-box-shadow: @params;
     box-shadow: @params;
 }
+.text-shadow(@params) {
+    -webkit-text-shadow: @params;
+    -moz-text-shadow: @params;
+    text-shadow: @params;
+}
 .pointer-events(@params) {
     -webkit-pointer-events: @params;
     -moz-pointer-events: @params;
     pointer-events: @params;
+}
+.inline-block {
+    display: inline-block;
+    zoom: 1;
+    *display: inline;
 }
