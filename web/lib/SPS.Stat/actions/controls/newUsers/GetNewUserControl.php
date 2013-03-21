@@ -18,7 +18,7 @@
             $status = Request::GetInteger('status');
             $offset = Request::GetInteger('offset');
             $limit  = Request::GetInteger('limit');
-            $sort_reverse  = Request::GetInteger('sortReverce') ?  'ASC' : 'DESC';
+            $sort_reverse  = Request::GetInteger('sortReverse') ?  'ASC' : 'DESC';
             $options = array();
             $options = array(BaseFactory::OrderBy => array(array( 'name' => 'createdAt', 'sort' => $sort_reverse )));
             if( !$status )
