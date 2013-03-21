@@ -27,14 +27,18 @@ var MobileTable = Class.extend({
 
         $('#table').delegate('.cell.decision .button', 'click', function() {
             var $button = $(this);
-            var groupId = $button.closest('.row').data('group-id');
+            var $row = $button.closest('.row');
+            var groupId = $row.data('group-id');
 
             if ($button.find('.approve').length) {
                 t.approveGroup(groupId);
             }
+
             if ($button.find('.reject').length) {
                 t.rejectGroup(groupId);
             }
+
+            $row.css({'opacity': 0.5, height: $row.height()}).find('.button').remove();
         });
     },
 
@@ -43,15 +47,24 @@ var MobileTable = Class.extend({
      */
     decide: function(groupId, decision) {
         var deferred = new Deferred();
+        var act = '';
 
         switch (decision) {
             case MobileTable.DICISION_APPROVE:
-                console.log(groupId, 'approve');
+                act = 'approve';
                 break;
             case MobileTable.DICISION_REJECT:
-                console.log(groupId, 'reject');
+                act = 'reject';
                 break;
         }
+
+        Control.call('approveNewUser', {
+            act: act,
+            newUserReqId: groupId
+        }).error(function(error) {
+            new Box({title: 'Ошибка', html: 'Произошла ошибка принятия решения'}).show();
+            console.error(error);
+        });
 
         return deferred;
     },

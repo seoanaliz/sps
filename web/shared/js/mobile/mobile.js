@@ -179,7 +179,7 @@ App = Event.extend({
     },
 
     /**
-     * @param {string} text
+     * @param {string=} text
      */
     showErrorBox: function(text) {
         var t = this;
