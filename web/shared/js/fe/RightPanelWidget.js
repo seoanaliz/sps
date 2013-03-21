@@ -210,8 +210,8 @@ var RightPanelWidget = Event.extend({
     initQueue: function() {
         var t = this;
         t.getQueueWidget().initQueue();
-        t.getQueueWidget().on('changeCurrentPage', function(pageId) {
-            t.setTime(t.getQueueWidget().getTimeByPageId(pageId), false);
+        t.getQueueWidget().on('changeCurrentPage', function($page) {
+            t.setTime(t.getQueueWidget().getPageTimestamp($page) * 1000, false);
         });
     },
 
