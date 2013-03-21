@@ -143,6 +143,16 @@
                     'name'         => 'externalLikes',
                     'type'          => TYPE_BOOLEAN,
                     'searchType' => SEARCHTYPE_NULL
+                )
+                , 'startDateFrom' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATE
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                , 'startDateTo' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATE
+                    , 'searchType' => SEARCHTYPE_LE
                 ))
         );
         

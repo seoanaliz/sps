@@ -49,6 +49,10 @@
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/articles-queue-list.tmpl.php</template>
                 </page>
+                <page uri="controls://articles-queue-timeline/">
+                    <actions>SPS.Site.GetArticlesQueueTimelineControl</actions>
+                    <template>tmpl://fe/elements/articles-queue-timeline.tmpl.php</template>
+                </page>
                 <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
