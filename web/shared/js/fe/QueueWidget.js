@@ -22,6 +22,7 @@ var QueueWidget = Event.extend({
 
     /**
      * Обновление ленты очереди
+     * @param {number} timestamp
      * @returns {Deferred|boolean}
      */
     update: function(timestamp) {
@@ -178,7 +179,7 @@ var QueueWidget = Event.extend({
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
+                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
                     t.update(t.getPageTimestamp($page));
                 });
             }
@@ -247,7 +248,7 @@ var QueueWidget = Event.extend({
         });
 
         // Показать полностью в правом меню
-        $queue.delegate('.toggle-text', 'click', function(e) {
+        $queue.delegate('.toggle-text', 'click', function() {
             $(this).parent().toggleClass('collapsed');
         });
 
@@ -432,18 +433,32 @@ var QueueWidget = Event.extend({
         return deferred;
     },
 
+    /**
+     * @returns {Deferred}
+     */
     getNextTopPageData: function() {
         return this.getPageData(this.getFirstPageTimestamp() + (TIME.DAY / 1000), true);
     },
 
+    /**
+     * @returns {Deferred}
+     */
     getNextBottomPageData: function() {
         return this.getPageData(this.getLastPageTimestamp() - (TIME.DAY / 1000), false);
     },
 
+    /**
+     * @param {number} timestamp
+     * @returns {*}
+     */
     getCachedPageData: function(timestamp) {
         return this._chachedPages ? this._chachedPages[timestamp] : undefined;
     },
 
+    /**
+     * @param {number} timestamp
+     * @param {*} data
+     */
     setCachedPageData: function(timestamp, data) {
         if (!this._chachedPages) {
             this._chachedPages = {};
@@ -458,6 +473,9 @@ var QueueWidget = Event.extend({
         return this._$currentPage || (this._$currentPage = this.getPages().first());
     },
 
+    /**
+     * @param {jQuery} $page
+     */
     setCurrentPage: function($page) {
         if (!this._$currentPage || $page[0] != this._$currentPage[0]) {
             this._$currentPage = $page;
