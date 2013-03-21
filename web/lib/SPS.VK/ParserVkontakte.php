@@ -203,16 +203,7 @@
 
                         switch( $attachment->type ) {
                             case 'photo':
-
-                                if ( isset( $attachment->photo->src_xxbig )) {
-                                    $url = $attachment->photo->src_xxbig;
-                                }elseif (isset( $attachment->photo->src_xbig )) {
-                                    $url = $attachment->photo->src_xbig;
-                                }elseif (isset( $attachment->photo->src_big )) {
-                                    $url = $attachment->photo->src_big;
-                                }else {
-                                    $url = $attachment->photo->src;
-                                }
+                                $url = self::get_biggest_picture( $attachment );
 
                                  $photo[] =
                                      array(
@@ -257,6 +248,25 @@
                 );
             }
             return $result_posts_array;
+        }
+
+        public static function get_biggest_picture( $data )
+        {
+
+            if( isset($data->photo))
+                $data = $data->photo;
+            if ( isset( $data->src_xxxbig )) {
+                $url = $data->src_xxxbig;
+            } elseif ( isset( $data->src_xxbig )) {
+                $url = $data->src_xxbig;
+            }elseif (isset( $data->src_xbig )) {
+                $url = $data->src_xbig;
+            }elseif (isset( $data->src_big )) {
+                $url = $data->src_big;
+            }else {
+                $url = $data->src;
+            }
+            return $url;
         }
 
         private function get_average( array &$a )

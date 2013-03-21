@@ -129,7 +129,7 @@
                 $photo[] = array(
                     'id'   =>  $post->owner_id . '_' . $post->pid,
                     'desc' =>  '',
-                    'url'  =>  isset( $post->src_big ) ? $post->src_big : $post->src
+                    'url'  =>  ParserVkontakte::get_biggest_picture($post)
                 );
 
                 $result_posts_array[] = array( 'id' => $id,    'likes'  => $likes, 'likes_tr'=> $likes_tr,
