@@ -137,9 +137,9 @@ var MobileTable = Class.extend({
 
                     for (var publicId in user.publicIds) {
                         user.groups.push({
-                            id: data.groups[publicId].gid,
-                            photo: data.groups[publicId].photo,
-                            name: data.groups[publicId].name
+                            id: groups[publicId].gid,
+                            photo: groups[publicId].photo,
+                            name: groups[publicId].name
                         });
                     }
                 });
