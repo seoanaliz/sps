@@ -34,7 +34,7 @@ var QueueWidget = Event.extend({
             return false;
         }
 
-        return t.loadPages(t.getLastPageTimestamp()).success(function(data) {
+        return t.loadPages(Elements.calendar()).success(function(data) {
             if (data) {
                 var $page = $(data);
                 t.$queue.html($page);
@@ -493,7 +493,7 @@ var QueueWidget = Event.extend({
      * @returns {number}
      */
     getPageTimestamp: function($page) {
-        return intval($page.data('timestamp')) || Elements.calendar();
+        return intval($page.data('timestamp'));
     },
 
     /**
