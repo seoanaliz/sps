@@ -135,7 +135,8 @@
             $iterator = new DateTimeWrapper($this->date);
             $this->startDate = new DateTimeWrapper($this->date);
 
-            while (count($this->grid) < self::TARGET_ITEMS_COUNT) {
+            $loadedCount = 0;
+            while ($loadedCount < self::TARGET_ITEMS_COUNT) {
                 /**
                  * Подгружаем сетку на конкретный день
                  */
@@ -143,6 +144,7 @@
 
                 $timestamp = $iterator->format('U');
 
+                $loadedCount += empty($grid) ? 1 : count($grid);
                 if ($this->direction == 'down') {
                     //если листаем вниз - добавляем полученные данные в конец результата
                     $this->grid = $this->grid + array($timestamp => $grid);
