@@ -28,12 +28,38 @@ if (!window.localStorage) {
 
 if (!window.console) {
     window.console = {
-        log: function(params) {},
-        dir: function(params) {},
-        group: function(groupName) {},
-        groupCollapsed: function(groupName) {},
-        groupEnd: function(groupName) {},
-        error: function(params) {}
+        /**
+         @param {...*} message
+         */
+        info: function(message) {},
+        /**
+         @param {...*} message
+         */
+        warn: function(message) {},
+        /**
+         @param {...*} message
+         */
+        error: function(message) {},
+        /**
+         @param {...*} message
+         */
+        log: function(message) {},
+        /**
+         @param {...*} message
+         */
+        dir: function(message) {},
+        group: function() {},
+        groupCollapsed: function() {},
+        groupEnd: function() {},
+        trace: function() {},
+        /**
+         @param {string} timerName
+         */
+        time: function(timerName) {},
+        /**
+         @param {string} timerName
+         */
+        timeEnd: function(timerName) {}
     };
 }
 
