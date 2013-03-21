@@ -80,8 +80,8 @@ var Elements = {
                             if ($post.hasClass('relocatable')) {
                                 $slot.html($post);
                             }
-                            var queuePageId = app.getRightPanelWidget().getQueueWidget().getPageIdByPage($page);
-                            app.updateQueue(queuePageId);
+                            var queuePageTimestamp = app.getRightPanelWidget().getQueueWidget().getPageTimestamp($page);
+                            app.updateQueue(queuePageTimestamp);
                         });
                     }
                 }

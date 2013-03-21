@@ -215,11 +215,11 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    updateQueue: function(pageId) {
-        if (pageId === undefined) {
+    updateQueue: function(timestamp) {
+        if (timestamp === undefined) {
             this.getQueueWidget().clearCache();
         }
-        this.getQueueWidget().update(pageId);
+        this.getQueueWidget().update(timestamp);
     },
 
     updateDropdown: function() {

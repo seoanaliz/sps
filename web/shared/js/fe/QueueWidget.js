@@ -499,15 +499,6 @@ var QueueWidget = Event.extend({
 
     /**
      * @param $page
-     * @deprecated
-     * @returns {number}
-     */
-    getPageIdByPage: function($page) {
-        return this.getPageTimestamp($page);
-    },
-
-    /**
-     * @param $page
      * @returns {number}
      */
     getPageTimestamp: function($page) {
