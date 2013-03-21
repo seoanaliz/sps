@@ -10,9 +10,11 @@ var QueueWidget = Event.extend({
      * @return Deferred
      */
     loadPage: function(id) {
+        var isUp = (id > 0);
         return Control.fire('get_queue', {
+            direction: isUp ? 'up' : 'down',
+            timestamp: (isUp ? this.getFirstPageTimestamp() : this.getLastPageTimestamp()) + ((isUp ? TIME.DAY : -TIME.DAY) / 1000),
             targetFeedId: Elements.rightdd(),
-            timestamp: intval(this.getTimeByPageId(id) / 1000),
             type: Elements.rightType()
         })
     },
@@ -492,6 +494,28 @@ var QueueWidget = Event.extend({
      */
     getLastPageId: function() {
         return this._lastPageId || +(this._lastPageId = this.getPageIdByPage(this.getPages().last()));
+    },
+
+    /**
+     * @returns {number}
+     */
+    getFirstPageTimestamp: function() {
+        return this.getPageTimestamp(this.getPages().first());
+    },
+
+    /**
+     * @returns {number}
+     */
+    getLastPageTimestamp: function() {
+        return this.getPageTimestamp(this.getPages().last());
+    },
+
+    /**
+     * @param $page
+     * @returns {number}
+     */
+    getPageTimestamp: function($page) {
+        return intval($page.data('timestamp'));
     },
 
     setLastPageId: function(id) {

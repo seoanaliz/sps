@@ -56,7 +56,7 @@ Control = $.extend(Control, {
             }
         },
         get_queue: {
-            name: 'articles-queue-list'
+            name: 'articles-queue-timeline'
         }
     }
 });
