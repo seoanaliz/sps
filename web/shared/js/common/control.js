@@ -52,14 +52,13 @@ var Control = {
             dataType: dataType,
             data: $.extend(controlDefaultParams, params),
             success: function(data) {
-                if (typeof callback != 'function') {
-                    if (typeof t.commonResponse == 'function') {
-                        data = t.commonResponse(data);
-                    }
-                    if (typeof control.response == 'function') {
-                        data = control.response(data);
-                    }
-                } else {
+                if (typeof t.commonResponse == 'function') {
+                    data = t.commonResponse(data);
+                }
+                if (typeof control.response == 'function') {
+                    data = control.response(data);
+                }
+                if (typeof callback == 'function') {
                     callback(data);
                 }
                 deferred.fireSuccess(data);
