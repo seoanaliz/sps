@@ -24,6 +24,50 @@ var MobileTable = Class.extend({
         });
 
         $('#table').html(tmpl(TABLE));
+
+        $('#table').delegate('.cell.decision .button', 'click', function() {
+            var $button = $(this);
+            var groupId = $button.closest('.row').data('group-id');
+
+            if ($button.find('.approve').length) {
+                t.approveGroup(groupId);
+            }
+            if ($button.find('.reject').length) {
+                t.rejectGroup(groupId);
+            }
+        });
+    },
+
+    /**
+     * @returns {Deferred}
+     */
+    decide: function(groupId, decision) {
+        var deferred = new Deferred();
+
+        switch (decision) {
+            case MobileTable.DICISION_APPROVE:
+                console.log(groupId, 'approve');
+                break;
+            case MobileTable.DICISION_REJECT:
+                console.log(groupId, 'reject');
+                break;
+        }
+
+        return deferred;
+    },
+
+    /**
+     * @returns {Deferred}
+     */
+    approveGroup: function(groupId) {
+        return this.decide(groupId, MobileTable.DICISION_APPROVE);
+    },
+
+    /**
+     * @returns {Deferred}
+     */
+    rejectGroup: function(groupId) {
+        return this.decide(groupId, MobileTable.DICISION_REJECT);
     },
 
     /**
@@ -145,6 +189,8 @@ var MobileTable = Class.extend({
 MobileTable.STATUS_REVIEWING = 1;
 MobileTable.STATUS_APPROVED = 4;
 MobileTable.STATUS_REJECTED = 5;
+MobileTable.DICISION_REJECT = 1;
+MobileTable.DICISION_APPROVE = 2;
 
 TABLE =
 '<div class="header">' +
@@ -173,7 +219,7 @@ TABLE_BODY =
 '<? } ?>';
 
 TABLE_ROW =
-'<div class="row">' +
+'<div class="row" data-group-id="<?=newUserRequestId?>">' +
     '<div class="column column3">' +
         '<div class="cell">' +
             '<div class="photo">' +
