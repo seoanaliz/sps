@@ -5,7 +5,7 @@
 /** @var $queueDate DateTimeWrapper */
 ?>
 
-<div class="queue-page">
+<div class="queue-page" data-timestamp="<?= $queueDate->format('U') ?>">
     <? if (!empty($queueDate)) { ?>
         <div class="queue-title">
             <?= DateTimeHelper::GetRelativeDateString($queueDate, false) ?>
