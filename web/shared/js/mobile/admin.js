@@ -124,6 +124,11 @@ var MobileTable = Class.extend({
             Control.callVKByOpenAPI('execute', {
                 code: code
             }).success(function(data) {
+                var groups = {};
+                $.each(data.groups, function(i, vkGroup) {
+                    groups[vkGroup.gid] = vkGroup;
+                });
+
                 $.each(data.users, function(i, vkUser) {
                     var user = users[vkUser.uid];
                     user.photo = vkUser.photo;
