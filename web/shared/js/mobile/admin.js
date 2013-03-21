@@ -135,13 +135,13 @@ var MobileTable = Class.extend({
                     user.name = vkUser.first_name + ' ' + vkUser.last_name;
                     user.groups = [];
 
-                    for (var publicId in user.publicIds) {
+                    $.each(user.publicIds, function(i, publicId) {
                         user.groups.push({
                             id: groups[publicId].gid,
                             photo: groups[publicId].photo,
                             name: groups[publicId].name
                         });
-                    }
+                    });
                 });
                 deferred.fireSuccess(users);
             }).error(function() {
