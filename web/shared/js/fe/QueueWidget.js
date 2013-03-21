@@ -28,14 +28,14 @@ var QueueWidget = Event.extend({
     update: function(timestamp) {
         var t = this;
         var targetFeedId = Elements.rightdd();
-        timestamp = timestamp || 0;
+        timestamp = timestamp || Elements.calendar();
         var isPageChanged = t.getPageTimestamp(t.getCurrentPage()) != timestamp;
 
         if (!targetFeedId) {
             return false;
         }
 
-        return t.loadPages(Elements.calendar()).success(function(data) {
+        return t.loadPages(timestamp).success(function(data) {
             if (data) {
                 var $page = $(data);
                 t.$queue.html($page);
