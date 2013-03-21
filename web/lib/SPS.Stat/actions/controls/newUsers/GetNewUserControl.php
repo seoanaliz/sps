@@ -18,6 +18,9 @@
             $status = Request::GetInteger('status');
             $offset = Request::GetInteger('offset');
             $limit  = Request::GetInteger('limit');
+            $sort_reverse  = Request::GetInteger('sortReverse') ?  'ASC' : 'DESC';
+            $options = array();
+            $options = array(BaseFactory::OrderBy => array(array( 'name' => 'createdAt', 'sort' => $sort_reverse )));
             if( !$status )
                 $status = 1;
             $search = array('statusId' => $status);
@@ -25,7 +28,7 @@
                 $search[BaseFactoryPrepare::Page] = floor( $offset/$limit );
                 $search[BaseFactoryPrepare::PageSize] = $limit;
             }
-            $newUsers = NewUserRequestFactory::Get( $search );
+            $newUsers = NewUserRequestFactory::Get( $search, $options );
             $response = array();
             foreach( $newUsers as $newUser ) {
                 $newUser = (array)$newUser;
