@@ -40,10 +40,13 @@ class GetArticlesQueueListControl extends BaseControl {
 
         if(!empty($targetFeedId) && !empty($targetFeed)) {
             //вытаскиваем всю очередь на этот день на этот паблик
+            $startDate = new DateTimeWrapper($date);
+            $startDate->modify('-30 seconds');
+
             $articlesQueues = ArticleQueueFactory::Get(
                 array(
                     'targetFeedId' => $targetFeedId,
-                    'startDateAsDate' => $date,
+                    'startDateFrom' => $startDate,
                     'type' => ($type == GridLineUtility::TYPE_ALL) ? null : $type,
                 )
                 , array(

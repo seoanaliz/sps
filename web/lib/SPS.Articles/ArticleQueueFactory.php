@@ -146,12 +146,12 @@
                 )
                 , 'startDateFrom' => array(
                     'name'         => 'startDate'
-                    , 'type'       => TYPE_DATE
+                    , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_GE
                 )
                 , 'startDateTo' => array(
                     'name'         => 'startDate'
-                    , 'type'       => TYPE_DATE
+                    , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
                 ))
         );

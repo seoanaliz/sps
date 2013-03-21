@@ -168,6 +168,8 @@
          * Подставляем данные в ячейки
          */
         private function setArticles() {
+            ($this->direction == 'up') ? $this->startDate->modify('-30 seconds') : $this->endDate->modify('-30 seconds');
+
             //вытаскиваем очередь на полученную сетку
             $this->articleQueues = ArticleQueueFactory::Get(
                 array(
