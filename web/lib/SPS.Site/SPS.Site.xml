@@ -112,6 +112,9 @@
             <action name="PostDeletePlanControl">
                 <path>controls/PostDeletePlanControl</path>
             </action>
+            <action name="GetArticlesQueueTimelineControl">
+                <path>controls/GetArticlesQueueTimelineControl</path>
+            </action>
         </group>
 
         <group name="Grid">

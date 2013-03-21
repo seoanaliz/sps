@@ -49,6 +49,10 @@
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/articles-queue-list.tmpl.php</template>
                 </page>
+                <page uri="controls://articles-queue-timeline/">
+                    <actions>SPS.Site.GetArticlesQueueTimelineControl</actions>
+                    <template>tmpl://fe/elements/articles-queue-timeline.tmpl.php</template>
+                </page>
                 <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
@@ -739,6 +743,15 @@
             <pageGroup name="reports" boot="">
                 <page uri="reports://topface-user-posts/">
                     <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="mobile" boot="">
+                <page uri="/mobile/?">
+                    <template>tmpl://mobile/index.tmpl.php</template>
+                </page>
+                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
+                    <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
 

@@ -6,7 +6,7 @@ Control = $.extend(Control, {
     },
 
     commonResponse: function(data) {
-        return data.response;
+        return data ? data.response : [];
     },
 
     controlMap: {

@@ -1,0 +1,49 @@
+@import "../common/mixins.less";
+
+.photo,
+.name {
+    vertical-align: middle;
+    .inline-block;
+}
+
+.photo {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.group + .group {
+    margin-top: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.decision {
+    .button + .button {
+        margin-top: 10px;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .approve, .reject {
+        width: 12px;
+        height: 12px;
+        background: center no-repeat;
+        .inline-block;
+    }
+
+    .approve {
+        background-image: url("../../images/common/select-white.png");
+    }
+
+    .reject {
+        background-image: url("../../images/common/delete-white.png");
+    }
+}
