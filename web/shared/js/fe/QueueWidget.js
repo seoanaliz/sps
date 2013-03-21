@@ -398,7 +398,7 @@ var QueueWidget = Event.extend({
 
         t.on('changeCurrentPage', function(pageId, $page) {
             t.getPages().find('.queue-title').removeClass('fixed');
-            $page.find('.queue-title').addClass('fixed');
+            $page.find('.queue-title').first().addClass('fixed');
         });
     },
 
@@ -515,7 +515,7 @@ var QueueWidget = Event.extend({
      * @returns {number}
      */
     getPageTimestamp: function($page) {
-        return intval($page.data('timestamp'));
+        return intval($page.data('timestamp')) || (this.getDefaultTime() / 1000);
     },
 
     setLastPageId: function(id) {
