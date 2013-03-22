@@ -11,6 +11,7 @@ class PublicsParser
 
     const LIMIT = 10000;
     const REQUESTS_PER_LAUNCH = 20;
+    const PUBICS_PER_REQUEST  = 300;
     const PAUSE = 2;
     private $current_public;
 
@@ -26,8 +27,8 @@ class PublicsParser
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $ms = microtime(1);
             $params = array(
-                'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + 499 )),
-                'fields'    =>  members_count
+                'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + self::PUBICS_PER_REQUEST )),
+                'fields'    =>  'members_count'
             );
             $res = VkHelper::api_request( 'groups.getById', $params );
             if( !$res)
@@ -58,7 +59,7 @@ class PublicsParser
             }
             echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),'<br>';
             sleep( self::PAUSE );
-            $this->current_public += 499;
+            $this->current_public += self::PUBICS_PER_REQUEST;
             $this->set_state($this->current_public);
         }
     }
