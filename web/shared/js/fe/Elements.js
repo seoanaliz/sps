@@ -67,6 +67,10 @@ var Elements = {
                 Elements.initDroppable($(this));
             });
         } else {
+            if ($elem.data('droppable_inited')) {
+                return;
+            }
+            $elem.data('droppable_inited', true);
             $elem.droppable({
                 activeClass: 'ui-state-active',
                 hoverClass: 'ui-state-hover',
