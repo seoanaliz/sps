@@ -43,10 +43,14 @@ class GetArticlesQueueListControl extends BaseControl {
             $startDate = new DateTimeWrapper($date);
             $startDate->modify('-30 seconds');
 
+            $endDate = new DateTimeWrapper($date);
+            $endDate->modify('+1 day -31 seconds');
+
             $articlesQueues = ArticleQueueFactory::Get(
                 array(
                     'targetFeedId' => $targetFeedId,
                     'startDateFrom' => $startDate,
+                    'startDateTo' => $endDate,
                     'type' => ($type == GridLineUtility::TYPE_ALL) ? null : $type,
                 )
                 , array(
