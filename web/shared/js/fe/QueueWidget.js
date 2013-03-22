@@ -275,10 +275,13 @@ var QueueWidget = Event.extend({
             var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
             var dateString = $.datepick.formatDate(new Date(t.getPageTimestamp($page) * 1000));
-            $newSlot.prependTo($page).animate({height: 110}, 200);
-            $newSlot.find('.time').click();
+            $newSlot.prependTo($page).transition({height: 110}, 200);
+            if ($page.position().top < 0) {
+                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top);
+            }
             $newSlot.data('start-date', dateString);
             $newSlot.data('end-date', dateString);
+            $newSlot.find('.time').click();
         });
     },
 
