@@ -71,8 +71,13 @@ var Elements = {
                 activeClass: 'ui-state-active',
                 hoverClass: 'ui-state-hover',
                 drop: function(e, ui) {
-                    var $slot = $(this),
-                        $page = $slot.closest('.queue-page'),
+                    var $slot = $(this);
+
+                    if (!$slot.hasClass('.slot')) {
+                        return;
+                    }
+
+                    var $page = $slot.closest('.queue-page'),
                         $post = $(ui.draggable).closest('.post');
 
                     Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
