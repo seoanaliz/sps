@@ -27,7 +27,7 @@ class PublicsParser
             $ms = microtime(1);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + 499 )),
-                'fields'    =>  members_count
+                'fields'    =>  'members_count'
             );
             $res = VkHelper::api_request( 'groups.getById', $params );
             if( !$res)
