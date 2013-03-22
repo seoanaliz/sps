@@ -43,6 +43,10 @@ var Elements = {
             });
         } else if ($elem.is('.movable:not(.blocked)')) {
             islog && console.log($elem.find('> .content'));
+            if ($elem.data('draggable_inited')) {
+                return;
+            }
+            $elem.data('draggable_inited', true);
             $elem.find('> .content').draggable({
                 revert: 'invalid',
                 appendTo: 'body',
@@ -61,12 +65,12 @@ var Elements = {
         }
     },
     initDroppable: function($elem) {
-        var $block = $elem.find('.slot.empty:not(.locked)');
+        var $block = $elem.find('.slot');
         if ($block.length) {
             $block.each(function() {
                 Elements.initDroppable($(this));
             });
-        } else {
+        } else if ($elem.is('.empty:not(.locked)')) {
             if ($elem.data('droppable_inited')) {
                 return;
             }
