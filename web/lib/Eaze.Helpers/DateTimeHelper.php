@@ -206,7 +206,7 @@
 
             /** Check Month */
             if ( $date->format("Y") == date( "Y" ) ) {
-                return strftime( "%e %B", $date->format( "U" ) );
+                return $date->format('j') . ' ' . LocaleLoader::Translate('months.month' . $date->format('n'));
             }
 
             /** Check Year */
