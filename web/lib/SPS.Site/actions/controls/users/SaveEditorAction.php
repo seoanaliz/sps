@@ -84,6 +84,9 @@
             parent::afterAction($result);
 
             $targetFeedIds = Request::getArray('targetFeedIds');
+            if( !$targetFeedIds)
+                $targetFeedIds = array();
+
             //стираем все роли юзера
             if (is_numeric( $this->currentObject->vkId) &&  $this->currentObject->vkId) {
                 UserFeedFactory::DeleteForVkId( $this->currentObject->vkId );
@@ -124,8 +127,10 @@
             if( isset( $this->currentObject->vkId )) {
                 //выбираем паблики, где юзер админит
                 $this->old_userFeeds =  UserFeedFactory::GetForVkId( $this->currentObject->vkId );
-                foreach( $this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR] as $userFeed ) {
-                    $targetFeedsIds[$userFeed->targetFeedId] = $userFeed->targetFeedId;
+                if(isset($this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR])) {
+                    foreach( $this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR] as $userFeed ) {
+                        $targetFeedsIds[$userFeed->targetFeedId] = $userFeed->targetFeedId;
+                    }
                 }
             }
             Response::setArray( 'targetFeedsIds', $targetFeedsIds );
