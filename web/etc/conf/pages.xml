@@ -207,7 +207,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
                 <page uri="controls://approveNewUser/">
                     <actions>SPS.Stat.approveNewUser</actions>
                 </page>
@@ -750,7 +750,7 @@
                 <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
                 </page>
-                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
+                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
                     <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
