@@ -3,22 +3,22 @@
 /** @var $grid array */
 /** @var $articlesQueue array */
 /** @var $queueDate DateTimeWrapper */
+$now = new DateTimeWrapper(date('d.m.Y'));
 ?>
 
-<div class="queue-page">
+<div class="queue-page" data-timestamp="<?= $queueDate->format('U') ?>">
     <? if (!empty($queueDate)) { ?>
         <div class="queue-title">
             <?= DateTimeHelper::GetRelativeDateString($queueDate, false) ?>
-            <a class="add-button r">Добавить ячейку</a>
+            <? if ($queueDate >= $now && $canEditQueue) { ?>
+                <a class="add-button r">Добавить ячейку</a>
+            <? } ?>
         </div>
     <? } ?>
     <? if (!empty($grid)) { ?>
         <? foreach ($grid as $gridItem) {
             $id = $gridItem['dateTime']->format('U');
             $isEmptyItem = empty($gridItem['queue']);
-            if ($isEmptyItem && !$canEditQueue) {
-                continue;
-            }
             ?>
             <div class="slot
                 <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : '' ?>

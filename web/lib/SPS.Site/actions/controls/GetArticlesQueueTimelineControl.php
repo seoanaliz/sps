@@ -102,7 +102,7 @@
              */
             Response::setArray('articleRecords', $this->articleRecords);
             Response::setArray('articlesQueue', $this->articleQueues);
-            Response::setArray('grid', $this->grid);
+            Response::setArray('gridData', $this->grid);
         }
 
         /**
@@ -135,28 +135,25 @@
             $iterator = new DateTimeWrapper($this->date);
             $this->startDate = new DateTimeWrapper($this->date);
 
-            while (count($this->grid) < self::TARGET_ITEMS_COUNT) {
+            $loadedCount = 0;
+            while ($loadedCount < self::TARGET_ITEMS_COUNT) {
                 /**
                  * Подгружаем сетку на конкретный день
                  */
                 $grid = GridLineUtility::GetGrid($this->targetFeed->targetFeedId, $iterator->DefaultDateFormat(), $this->type);
-                if (empty($grid)) {
-                    $grid = array(
-                        array(
-                            'emptyDateTime' => clone($iterator),
-                        )
-                    );
-                }
 
+                $timestamp = $iterator->format('U');
+
+                $loadedCount += empty($grid) ? 1 : count($grid);
                 if ($this->direction == 'down') {
                     //если листаем вниз - добавляем полученные данные в конец результата
-                    $this->grid = array_merge($this->grid, $grid);
+                    $this->grid = $this->grid + array($timestamp => $grid);
 
                     $iterator->modify('-1 day');
                 } else {
                     //если листаем вверх - добавляем полученные данные перед результатом
-                    $this->grid = array_merge($grid, $this->grid);
-                    
+                    $this->grid = array($timestamp => $grid) + $this->grid;
+
                     $iterator->modify('+1 day');
                 }
             }
@@ -168,7 +165,13 @@
          * Подставляем данные в ячейки
          */
         private function setArticles() {
-            ($this->direction == 'up') ? $this->startDate->modify('-30 seconds') : $this->endDate->modify('-30 seconds');
+            if ($this->direction == 'up') {
+                $this->startDate->modify('-30 seconds');
+                $this->endDate->modify('+1 day -31 seconds');
+            } else {
+                $this->startDate->modify('+1 day -31 seconds');
+                $this->endDate->modify('-30 seconds');
+            }
 
             //вытаскиваем очередь на полученную сетку
             $this->articleQueues = ArticleQueueFactory::Get(
@@ -256,19 +259,23 @@
             $now = DateTimeWrapper::Now();
             foreach($this->articleQueues as $articlesQueueItem) {
                 //ищем место в grid для текущей $articlesQueueItem
-                $place = null;
-                foreach ($this->grid as $key => $gridItem) {
-                    if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
-                        if (empty($gridItem['queue'])) {
-                            $place = $key;
+                $targetKey = null;
+                $targetTimestamp = null;
+                foreach ($this->grid as $timestamp => $gridData) {
+                    foreach ($gridData as $key => $gridItem) {
+                        if ($gridItem['dateTime'] >= $articlesQueueItem->startDate && $gridItem['dateTime'] <= $articlesQueueItem->endDate) {
+                            if (empty($gridItem['queue'])) {
+                                $targetTimestamp = $timestamp;
+                                $targetKey = $key;
+                            }
                         }
                     }
                 }
 
-                if ($place !== null) {
-                    $this->grid[$place]['queue'] = $articlesQueueItem;
-                    $this->grid[$place]['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
-                    $this->grid[$place]['failed'] = ($articlesQueueItem->statusId != StatusUtility::Finished && $articlesQueueItem->endDate <= $now);
+                if ($targetKey !== null) {
+                    $this->grid[$targetTimestamp][$targetKey]['queue'] = $articlesQueueItem;
+                    $this->grid[$targetTimestamp][$targetKey]['blocked'] = ($articlesQueueItem->statusId != 1 || $articlesQueueItem->endDate <= $now);
+                    $this->grid[$targetTimestamp][$targetKey]['failed'] = ($articlesQueueItem->statusId != StatusUtility::Finished && $articlesQueueItem->endDate <= $now);
                 }
             }
         }

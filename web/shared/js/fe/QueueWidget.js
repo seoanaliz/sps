@@ -7,31 +7,35 @@ var QueueWidget = Event.extend({
 
     /**
      * Загрузка ленты очереди
-     * @return Deferred
+     * @param {number=} timestamp
+     * @param {boolean=} isUp
+     * @returns {Deferred}
      */
-    loadPage: function(id) {
+    loadPages: function(timestamp, isUp) {
         return Control.fire('get_queue', {
+            direction: isUp ? 'up' : 'down',
+            timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
-            timestamp: intval(this.getTimeByPageId(id) / 1000),
             type: Elements.rightType()
         })
     },
 
     /**
      * Обновление ленты очереди
-     * @return Deferred|bool
+     * @param {number} timestamp
+     * @returns {Deferred|boolean}
      */
-    update: function(id) {
+    update: function(timestamp) {
         var t = this;
         var targetFeedId = Elements.rightdd();
-        var pageId = id || 0;
-        var isPageChanged = t.getCurrentPageId() != pageId;
+        timestamp = timestamp || Elements.calendar();
+        var isPageChanged = t.getPageTimestamp(t.getCurrentPage()) != timestamp;
 
         if (!targetFeedId) {
             return false;
         }
 
-        return t.loadPage(pageId).success(function(data) {
+        return t.loadPages(timestamp).success(function(data) {
             if (data) {
                 var $page = $(data);
                 t.$queue.html($page);
@@ -45,7 +49,7 @@ var QueueWidget = Event.extend({
             }
 
             $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
-            t.trigger('changeCurrentPage', pageId, $page);
+            t.trigger('changeCurrentPage', $page);
 
             if (isPageChanged) {
                 t.$queue.data('cancelEvent', true).scrollTop(0);
@@ -72,7 +76,7 @@ var QueueWidget = Event.extend({
             var pid = $post.data('id');
 
             Events.fire('rightcolumn_deletepost', pid, function() {
-                t.update(t.getPageIdByPage($page));
+                t.update(t.getPageTimestamp($page));
             });
         });
 
@@ -123,7 +127,7 @@ var QueueWidget = Event.extend({
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {
-                            t.update(t.getPageIdByPage($page));
+                            t.update(t.getPageTimestamp($page));
                         }
                     });
                 }
@@ -175,8 +179,8 @@ var QueueWidget = Event.extend({
             $input.blur().hide().val(time);
 
             if (time) {
-                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function(state) {
-                    t.update(t.getPageIdByPage($page));
+                Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
+                    t.update(t.getPageTimestamp($page));
                 });
             }
         });
@@ -227,13 +231,13 @@ var QueueWidget = Event.extend({
                         if ($slot.hasClass('new')) {
                             // Добавление ячейки
                             Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                t.update(t.getPageIdByPage($page));
+                                t.update(t.getPageTimestamp($page));
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
                                 Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                    t.update(t.getPageIdByPage($page));
+                                    t.update(t.getPageTimestamp($page));
                                 });
                             }
                         }
@@ -244,7 +248,7 @@ var QueueWidget = Event.extend({
         });
 
         // Показать полностью в правом меню
-        $queue.delegate('.toggle-text', 'click', function(e) {
+        $queue.delegate('.toggle-text', 'click', function() {
             $(this).parent().toggleClass('collapsed');
         });
 
@@ -267,15 +271,17 @@ var QueueWidget = Event.extend({
 
     initSlotCreate: function() {
         var t = this;
-
         t.$queue.delegate('.add-button', 'click', function() {
             var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
-            var dateString = $.datepick.formatDate(new Date(t.getTimeByPageId(t.getPageIdByPage($page))));
-            $newSlot.prependTo($page).animate({height: 110}, 200);
-            $newSlot.find('.time').click();
+            var dateString = $.datepick.formatDate(new Date(t.getPageTimestamp($page) * 1000));
+            $newSlot.prependTo($page).transition({height: 110}, 200);
+            if ($page.position().top < 0) {
+                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top);
+            }
             $newSlot.data('start-date', dateString);
             $newSlot.data('end-date', dateString);
+            $newSlot.find('.time').click();
         });
     },
 
@@ -353,7 +359,7 @@ var QueueWidget = Event.extend({
                     var postId = data.articleId;
 
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.update(t.getPageIdByPage($page));
+                        t.update(t.getPageTimestamp($page));
                     });
                 }
             });
@@ -394,15 +400,15 @@ var QueueWidget = Event.extend({
             });
         });
 
-        t.on('changeCurrentPage', function(pageId, $page) {
+        t.on('changeCurrentPage', function($page) {
             t.getPages().find('.queue-title').removeClass('fixed');
-            $page.find('.queue-title').addClass('fixed');
+            $page.find('.queue-title').first().addClass('fixed');
         });
     },
 
     /**
      * Возвращает все страницы в ленте очереди
-     * @returns jQuery
+     * @returns {jQuery}
      */
     getPages: function() {
         return this._$pages || (this._$pages = this.$queue.find('.queue-page'));
@@ -410,103 +416,110 @@ var QueueWidget = Event.extend({
 
     /**
      * Возвращает данные страницы
-     * @param id
-     * @return Deferred|string
+     * @param {number} timestamp
+     * @param {boolean=false} isUp
+     * @returns {Deferred}
      */
-    getPageData: function(id) {
+    getPageData: function(timestamp, isUp) {
         var t = this;
+        var deferred = new Deferred();
 
-        if (t.getCachedPageData(id) !== undefined) {
-            return t.getCachedPageData(id);
+        if (t.getCachedPageData(timestamp) !== undefined) {
+            deferred.fireSuccess(t.getCachedPageData(timestamp));
         } else {
-            return t.loadPage(id).success(function(data) {
-                t.setCachedPageData(id, data);
+            return t.loadPages(timestamp, isUp).success(function(data) {
+                t.setCachedPageData(timestamp, data);
+                deferred.fireSuccess(data);
             });
         }
+
+        return deferred;
     },
 
-    getDefaultTime: function() {
-        return this._defaultTime || (this._defaultTime = Elements.calendar() * 1000);
+    /**
+     * @returns {Deferred}
+     */
+    getNextTopPageData: function() {
+        return this.getPageData(this.getFirstPageTimestamp() + (TIME.DAY / 1000), true);
     },
 
-    getTimeByPageId: function(pageId) {
-        return this.getDefaultTime() - pageId * TIME.DAY;
+    /**
+     * @returns {Deferred}
+     */
+    getNextBottomPageData: function() {
+        return this.getPageData(this.getLastPageTimestamp() - (TIME.DAY / 1000), false);
     },
 
-    getCurrentTime: function() {
-        return this.getTimeByPageId(this.getCurrentPageId());
+    /**
+     * @param {number} timestamp
+     * @returns {*}
+     */
+    getCachedPageData: function(timestamp) {
+        return this._chachedPages ? this._chachedPages[timestamp] : undefined;
     },
 
-    getPageIdByPage: function($page) {
-        return intval($page.data('id'));
-    },
-
-    getCachedPageData: function(id) {
-        return this._chachedPages ? this._chachedPages[id] : undefined;
-    },
-
-    setCachedPageData: function(id, data) {
+    /**
+     * @param {number} timestamp
+     * @param {*} data
+     */
+    setCachedPageData: function(timestamp, data) {
         if (!this._chachedPages) {
             this._chachedPages = {};
         }
-        this._chachedPages[id] = data;
+        this._chachedPages[timestamp] = data;
     },
 
+    /**
+     * @returns {jQuery}
+     */
     getCurrentPage: function() {
         return this._$currentPage || (this._$currentPage = this.getPages().first());
     },
 
+    /**
+     * @param {jQuery} $page
+     */
     setCurrentPage: function($page) {
         if (!this._$currentPage || $page[0] != this._$currentPage[0]) {
             this._$currentPage = $page;
-            this.trigger('changeCurrentPage', this.getCurrentPageId(), $page);
+            this.trigger('changeCurrentPage', $page);
         }
     },
 
     /**
-     * Возвращает id текущей страницы
-     * @return number
+     * @returns {number}
      */
-    getCurrentPageId: function() {
-        return this.getPageIdByPage(this.getCurrentPage());
+    getFirstPageTimestamp: function() {
+        return this.getPageTimestamp(this.getPages().first());
     },
 
     /**
-     * Возвращает id последней верхней страницы
-     * @return number
+     * @returns {number}
      */
-    getFirstPageId: function() {
-        return this._firstPageId || +(this._firstPageId = this.getPageIdByPage(this.getPages().first()));
-    },
-
-    setFirstPageId: function(id) {
-        if (id != this._firstPageId) {
-            this._firstPageId = id;
-            this.trigger('changeFirstPageId', id);
-        }
+    getLastPageTimestamp: function() {
+        return this.getPageTimestamp(this.getPages().last());
     },
 
     /**
-     * Возвращает id последней нижней страницы
-     * @return number
+     * @param $page
+     * @returns {number}
      */
-    getLastPageId: function() {
-        return this._lastPageId || +(this._lastPageId = this.getPageIdByPage(this.getPages().last()));
-    },
-
-    setLastPageId: function(id) {
-        if (id != this._lastPageId) {
-            this._lastPageId = id;
-            this.trigger('changeLastPageId', id);
-        }
+    getPageTimestamp: function($page) {
+        return intval($page.data('timestamp'));
     },
 
     /**
      * Загрузка страницы в кэш
-     * @param id
      */
-    preloadPage: function(id) {
-        this.getPageData(id);
+    preloadNextTopPage: function() {
+        this.getNextTopPageData();
+    },
+
+    /**
+     * Загрузка страницы в кэш
+     */
+    preloadNextBottomPage: function() {
+        this.getNextBottomPageData();
     },
 
     /**
@@ -514,20 +527,16 @@ var QueueWidget = Event.extend({
      */
     clearCache: function() {
         this._chachedPages = null;
-        this._firstPageId = null;
-        this._lastPageId = null;
         this._$currentPage = null;
         this._$pages = null;
-        this._defaultTime = null;
     },
 
     /**
      * Добавить страницу в DOM
-     * @param id
-     * @param pageData
-     * @param isTop
+     * @param {string} pageData
+     * @param {boolean} isTop
      */
-    appendPageData: function(id, pageData, isTop) {
+    appendPageData: function(pageData, isTop) {
         var t = this;
         var $page = $(pageData);
 
@@ -541,7 +550,6 @@ var QueueWidget = Event.extend({
             t.$queue.append($page);
         }
 
-        $page.data('id', id);
         Elements.initDraggable($page);
         Elements.initDroppable($('#right-panel'));
         Elements.initImages($page);
@@ -555,21 +563,16 @@ var QueueWidget = Event.extend({
      */
     showNextTopPage: function() {
         var t = this;
-        var pageData = t.getPageData(t.getFirstPageId() - 1);
 
-        if (pageData instanceof Deferred) {
-            Elements.getWallLoader().show();
-            pageData.success(function() {
-                Elements.getWallLoader().hide();
-                t.showNextTopPage();
-            });
-        } else {
+        Elements.getWallLoader().show();
+        t.getNextTopPageData().always(function() {
+            Elements.getWallLoader().hide();
+        }).success(function(pageData) {
             var oldScrollHeight = t.$queue[0].scrollHeight;
-            t.setFirstPageId(t.getFirstPageId() - 1);
-            t.preloadPage(t.getFirstPageId() - 1);
-            t.appendPageData(t.getFirstPageId(), pageData, true);
+            t.appendPageData(pageData, true);
+            t.preloadNextTopPage();
             t.$queue.scrollTop(t.$queue[0].scrollHeight - oldScrollHeight);
-        }
+        });
     },
 
     /**
@@ -577,18 +580,13 @@ var QueueWidget = Event.extend({
      */
     showNextBottomPage: function() {
         var t = this;
-        var pageData = t.getPageData(t.getLastPageId() + 1);
 
-        if (pageData instanceof Deferred) {
-            Elements.getWallLoader().show();
-            pageData.success(function() {
-                Elements.getWallLoader().hide();
-                t.showNextBottomPage();
-            });
-        } else {
-            t.setLastPageId(t.getLastPageId() + 1);
-            t.preloadPage(t.getLastPageId() + 1);
-            t.appendPageData(t.getLastPageId(), pageData, false);
-        }
+        Elements.getWallLoader().show();
+        t.getNextBottomPageData().always(function() {
+            Elements.getWallLoader().hide();
+        }).success(function(pageData) {
+            t.appendPageData(pageData, false);
+            t.preloadNextBottomPage();
+        });
     }
 });
