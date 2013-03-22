@@ -65,39 +65,29 @@ var Elements = {
         }
     },
     initDroppable: function($elem) {
-        var $block = $elem.find('.slot');
-        if ($block.length) {
-            $block.each(function() {
-                Elements.initDroppable($(this));
-            });
-        } else if ($elem.is('.empty:not(.locked)')) {
-            if ($elem.data('droppable_inited')) {
-                return;
-            }
-            $elem.data('droppable_inited', true);
-            $elem.droppable({
-                activeClass: 'ui-state-active',
-                hoverClass: 'ui-state-hover',
-                drop: function(e, ui) {
-                    var $slot = $(this);
+        var $slots = $elem.find('.slot.empty:not(.locked)');
+        $slots.droppable({
+            activeClass: 'ui-state-active',
+            hoverClass: 'ui-state-hover',
+            drop: function(e, ui) {
+                var $slot = $(this);
 
-                    if (!$slot.hasClass('.slot')) {
-                        return;
-                    }
-
-                    var $page = $slot.closest('.queue-page'),
-                        $post = $(ui.draggable).closest('.post');
-
-                    Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
-                        if ($post.hasClass('relocatable')) {
-                            $slot.html($post);
-                        }
-                        var queuePageTimestamp = app.getRightPanelWidget().getQueueWidget().getPageTimestamp($page);
-                        app.updateQueue(queuePageTimestamp);
-                    });
+                if (!$slot.hasClass('.slot')) {
+                    return;
                 }
-            });
-        }
+
+                var $page = $slot.closest('.queue-page'),
+                    $post = $(ui.draggable).closest('.post');
+
+                Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
+                    if ($post.hasClass('relocatable')) {
+                        $slot.html($post);
+                    }
+                    var queuePageTimestamp = app.getRightPanelWidget().getQueueWidget().getPageTimestamp($page);
+                    app.updateQueue(queuePageTimestamp);
+                });
+            }
+        });
     },
     initLinks: function($block) {
         $block.find('img.ajax-loader').each(function(){
