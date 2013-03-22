@@ -3,13 +3,16 @@
 /** @var $grid array */
 /** @var $articlesQueue array */
 /** @var $queueDate DateTimeWrapper */
+$now = new DateTimeWrapper(date('d.m.Y'));
 ?>
 
 <div class="queue-page" data-timestamp="<?= $queueDate->format('U') ?>">
     <? if (!empty($queueDate)) { ?>
         <div class="queue-title">
             <?= DateTimeHelper::GetRelativeDateString($queueDate, false) ?>
-            <a class="add-button r">Добавить ячейку</a>
+            <? if ($queueDate >= $now) { ?>
+                <a class="add-button r">Добавить ячейку</a>
+            <? } ?>
         </div>
     <? } ?>
     <? if (!empty($grid)) { ?>
