@@ -61,7 +61,7 @@ var Elements = {
         }
     },
     initDroppable: function($elem) {
-        var $block = $elem.find('.slot');
+        var $block = $elem.find('.slot.empty:not(.locked)');
         if ($block.length) {
             $block.each(function() {
                 Elements.initDroppable($(this));
@@ -75,15 +75,13 @@ var Elements = {
                         $page = $slot.closest('.queue-page'),
                         $post = $(ui.draggable).closest('.post');
 
-                    if ($slot.hasClass('empty')) {
-                        Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
-                            if ($post.hasClass('relocatable')) {
-                                $slot.html($post);
-                            }
-                            var queuePageId = app.getRightPanelWidget().getQueueWidget().getPageIdByPage($page);
-                            app.updateQueue(queuePageId);
-                        });
-                    }
+                    Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
+                        if ($post.hasClass('relocatable')) {
+                            $slot.html($post);
+                        }
+                        var queuePageTimestamp = app.getRightPanelWidget().getQueueWidget().getPageTimestamp($page);
+                        app.updateQueue(queuePageTimestamp);
+                    });
                 }
             });
         }

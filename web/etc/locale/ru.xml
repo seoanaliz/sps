@@ -1,5 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language name="ru">
+    <months>
+        <month1><![CDATA[января]]></month1>
+        <month2><![CDATA[февраля]]></month2>
+        <month3><![CDATA[марта]]></month3>
+        <month4><![CDATA[апреля]]></month4>
+        <month5><![CDATA[мая]]></month5>
+        <month6><![CDATA[июня]]></month6>
+        <month7><![CDATA[июля]]></month7>
+        <month8><![CDATA[августа]]></month8>
+        <month9><![CDATA[сентября]]></month9>
+        <month10><![CDATA[октября]]></month10>
+        <month11><![CDATA[ноября]]></month11>
+        <month12><![CDATA[декабря]]></month12>
+    </months>
   <fe>
     <common>
       <records>
