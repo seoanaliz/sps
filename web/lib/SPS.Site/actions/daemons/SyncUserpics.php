@@ -24,12 +24,10 @@
                 , ArrayHelper::GetObjectsFieldValues( $targets, array( 'externalId' ) )
             );
 
-            foreach ($externalIds as $externalId) {
-                if (in_array($externalId, SourceFeedUtility::$Tops)) continue;
-                SourceFeedUtility::SaveRemoteImage($externalId);
-                sleep(1);
-            }
+            $externalIdsClean = array_diff($externalIds, SourceFeedUtility::$Tops );
+            SourceFeedUtility::SaveRemoteImage($externalIdsClean);
         }
+
     }
 
 ?>
