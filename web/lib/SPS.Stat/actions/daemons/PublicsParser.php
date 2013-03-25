@@ -11,7 +11,7 @@ class PublicsParser
 
     const LIMIT = 10000;
     const REQUESTS_PER_LAUNCH = 20;
-    const PUBICS_PER_REQUEST  = 300;
+    const PUBICS_PER_REQUEST  = 100;
     const PAUSE = 2;
     private $current_public;
 
