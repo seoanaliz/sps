@@ -158,7 +158,7 @@
                 }
             }
 
-            $this->endDate = clone($iterator);
+            $this->endDate = new DateTimeWrapper($iterator->DefaultDateFormat());
         }
 
         /**
