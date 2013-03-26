@@ -23,46 +23,54 @@ var QueueWidget = Event.extend({
     /**
      * Обновление ленты очереди
      * @param {number} timestamp
-     * @returns {Deferred|boolean}
+     * @returns {Deferred}
      */
     update: function(timestamp) {
         var t = this;
         var targetFeedId = Elements.rightdd();
         timestamp = timestamp || Elements.calendar();
         var isPageChanged = t.getPageTimestamp(t.getCurrentPage()) != timestamp;
+        var deferred = new Deferred();
 
         if (!targetFeedId) {
-            return false;
+            setTimeout(function() {
+                deferred.fireError('targetFeedId does not exist!');
+            }, 0);
+        } else {
+            t.loadPages(timestamp).success(function(data) {
+                if (data) {
+                    var $page = $(data);
+                    t.$queue.html($page);
+                    Elements.initDraggable($page);
+                    Elements.initDroppable($('#right-panel'));
+                    Elements.initImages($page);
+                    Elements.initLinks($page);
+                    $page.find('.post.blocked').draggable('disable');
+                } else {
+                    t.$queue.empty();
+                }
+
+                $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
+                t.trigger('changeCurrentPage', $page);
+
+                if (isPageChanged) {
+                    t.$queue.data('cancelEvent', true).scrollTop(0);
+                }
+
+                if (Elements.rightType() == 'all') {
+                    $('.queue-title.add-button').hide();
+                } else {
+                    $('.queue-title.add-button').show();
+                }
+
+                t.clearCache();
+                deferred.fireSuccess(data);
+            }).error(function(error) {
+                deferred.fireError(error);
+            });
         }
 
-        return t.loadPages(timestamp).success(function(data) {
-            if (data) {
-                var $page = $(data);
-                t.$queue.html($page);
-                Elements.initDraggable($page);
-                Elements.initDroppable($('#right-panel'));
-                Elements.initImages($page);
-                Elements.initLinks($page);
-                $page.find('.post.blocked').draggable('disable');
-            } else {
-                t.$queue.empty();
-            }
-
-            $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
-            t.trigger('changeCurrentPage', $page);
-
-            if (isPageChanged) {
-                t.$queue.data('cancelEvent', true).scrollTop(0);
-            }
-
-            if (Elements.rightType() == 'all') {
-                $('.queue-title.add-button').hide();
-            } else {
-                $('.queue-title.add-button').show();
-            }
-
-            t.clearCache();
-        });
+        return deferred;
     },
 
     initQueue: function() {
@@ -76,7 +84,7 @@ var QueueWidget = Event.extend({
             var pid = $post.data('id');
 
             Events.fire('rightcolumn_deletepost', pid, function() {
-                t.update(t.getPageTimestamp($page));
+                t.updatePage($page);
             });
         });
 
@@ -127,7 +135,7 @@ var QueueWidget = Event.extend({
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
                         if (state) {
-                            t.update(t.getPageTimestamp($page));
+                            t.updatePage($page);
                         }
                     });
                 }
@@ -180,7 +188,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
-                    t.update(t.getPageTimestamp($page));
+                    t.updatePage($page);
                 });
             }
         });
@@ -231,13 +239,13 @@ var QueueWidget = Event.extend({
                         if ($slot.hasClass('new')) {
                             // Добавление ячейки
                             Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                t.update(t.getPageTimestamp($page));
+                                t.updatePage($page);
                             });
                         } else {
                             // Редактироваиние ячейки
                             if (defStartDate != startDate || defEndDate != endDate) {
                                 Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                    t.update(t.getPageTimestamp($page));
+                                    t.updatePage($page);
                                 });
                             }
                         }
@@ -359,7 +367,7 @@ var QueueWidget = Event.extend({
                     var postId = data.articleId;
 
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.update(t.getPageTimestamp($page));
+                        t.updatePage($page);
                     });
                 }
             });
@@ -588,5 +596,25 @@ var QueueWidget = Event.extend({
             t.appendPageData(pageData, false);
             t.preloadNextBottomPage();
         });
+    },
+
+    /**
+     * Обновляет страницу в очереди
+     * @param {jQuery} $page
+     * @returns {Deferred}
+     */
+    updatePage: function($page) {
+        var t = this;
+        var deferred = new Deferred();
+        var pageScroll = -$page.position().top;
+
+        t.update(t.getPageTimestamp($page)).success(function() {
+            t.$queue.scrollTop(pageScroll);
+            deferred.fireSuccess();
+        }).error(function() {
+            deferred.fireError();
+        });
+
+        return deferred;
     }
 });
