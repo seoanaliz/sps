@@ -223,6 +223,10 @@ var RightPanelWidget = Event.extend({
         this.getQueueWidget().update(timestamp);
     },
 
+    updateQueuePage: function($page) {
+        return this.getQueueWidget().updatePage($page);
+    },
+
     updateDropdown: function() {
         var t = this;
 

@@ -48,15 +48,19 @@ var App = (function() {
         },
 
         loadArticles: function(clean) {
-            this.getLeftPanelWidget().loadArticles(clean);
+            return this.getLeftPanelWidget().loadArticles(clean);
         },
 
         updateRightPanelDropdown: function() {
-            this.getRightPanelWidget().updateDropdown();
+            return this.getRightPanelWidget().updateDropdown();
         },
 
         updateQueue: function(timestamp) {
-            this.getRightPanelWidget().updateQueue(timestamp);
+            return this.getRightPanelWidget().updateQueue(timestamp);
+        },
+
+        updateQueuePage: function($page) {
+            return this.getRightPanelWidget().updateQueuePage($page);
         },
 
         imageUploader: function(options) {

@@ -64,9 +64,9 @@ var QueueWidget = Event.extend({
                 }
 
                 t.clearCache();
-                t.fireSuccess(data);
+                deferred.fireSuccess(data);
             }).error(function(error) {
-                t.fireError(error);
+                deferred.fireError(error);
             });
         }
 
