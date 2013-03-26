@@ -128,7 +128,7 @@ var RightPanelWidget = Event.extend({
 
     offsetTime: function(time, isTrigger) {
         var currentTime = this.getTime();
-        this.setDate(currentTime + time, isTrigger);
+        this.setDate(new Date(currentTime + time), isTrigger);
     },
 
     setNextDay: function(isTrigger) {
