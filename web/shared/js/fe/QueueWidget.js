@@ -2,7 +2,7 @@ var QueueWidget = Event.extend({
     init: function() {
         var t = this;
         t.$queue = $('#queue');
-        //t.initAutoload();
+        t.initAutoload();
     },
 
     /**
