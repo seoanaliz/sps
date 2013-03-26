@@ -99,7 +99,7 @@ var RightPanelWidget = Event.extend({
         // Приведение вида календаря из 22.12.2012 в 22 декабря
         var d = $calendar.val().split('.');
         var date = [d[1], d[0], d[2]].join('/');
-        t.setTime(date);
+        t.setDate(new Date(date));
 
         // Кнопки вперед-назад в календаре
         $('.calendar .prev').click(function(){
@@ -111,9 +111,9 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    setTime: function(time, isTrigger) {
+    setDate: function(date, isTrigger) {
         var $calendar = this.$calendar;
-        $calendar.datepicker('setDate', new Date(time));
+        $calendar.datepicker('setDate', date);
         $calendar.parent().find('.caption').toggleClass('default', !$calendar.val().length);
 
         if (isTrigger) {
@@ -128,7 +128,7 @@ var RightPanelWidget = Event.extend({
 
     offsetTime: function(time, isTrigger) {
         var currentTime = this.getTime();
-        this.setTime(currentTime + time, isTrigger);
+        this.setDate(currentTime + time, isTrigger);
     },
 
     setNextDay: function(isTrigger) {
@@ -211,7 +211,8 @@ var RightPanelWidget = Event.extend({
         var t = this;
         t.getQueueWidget().initQueue();
         t.getQueueWidget().on('changeCurrentPage', function($page) {
-            t.setTime(t.getQueueWidget().getPageTimestamp($page) * 1000, false);
+            var date = new Date(t.getQueueWidget().getPageTimestamp($page) * 1000);
+            t.setDate(new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + 14400000), false);
         });
     },
 
