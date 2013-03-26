@@ -135,9 +135,7 @@ class ParserTop
             $response = $this->tf_api_wrap('top', $request_params);
             foreach($response->users as $entry){
 
-                if ( $entry->liked < 95 )
-                    continue;
-                if ($entry->age > 35 || $entry->age < 18)
+                if ( $entry->liked < 95 || $entry->age > 35 || $entry->age < 18)
                     continue;
                 $uids[] = $entry->uid;
                 $res[] = array(
