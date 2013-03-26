@@ -170,19 +170,19 @@
             $res = VkHelper::api_request( 'wall.get', $params );
             sleep(self::PAUSE);
             unset( $res[0] );
-            $posts = $this->post_conv( $res );
+            $posts = self::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
 
 
             return $posts;
         }
 
-        private function post_conv( $posts, $trig_inc = false )
+        public static function post_conv( $posts, $trig_inc = false )
         {
             $result_posts_array = array();
 
             foreach( $posts as $post ) {
-                $id         =   $this->page_id . '_' . $post->id;
+                $id         =   $post->to_id . '_' . $post->id;
                 $likes      =   $post->likes->count;
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
@@ -414,39 +414,39 @@
         private function get_page($page = '')
         {
 
-    if ($page == '')
-    $page = $this->page_adr;
-    if (self::TESTING) echo '<br>get page url = ' . $page;
-    $hnd = curl_init($page);
-        //            curl_setopt($hnd , CURLOPT_HEADER, 1);
-    curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
-    $a = curl_exec($hnd);
-    if (curl_errno($hnd))
-    throw new Exception('curl error : ' . curl_error($hnd) . ' trying
-                    to get ' . $page);
-    if (!$a)  throw new Exception("can't download page " . $page);
-    file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
-        //проверка на доступность
-    if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
-    substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-    throw new Exception('access denied to http://vk.com/public' . $page);
+            if ($page == '')
+            $page = $this->page_adr;
+            if (self::TESTING) echo '<br>get page url = ' . $page;
+            $hnd = curl_init($page);
+                //            curl_setopt($hnd , CURLOPT_HEADER, 1);
+            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+            $a = curl_exec($hnd);
+            if (curl_errno($hnd))
+            throw new Exception('curl error : ' . curl_error($hnd) . ' trying
+                            to get ' . $page);
+            if (!$a)  throw new Exception("can't download page " . $page);
+            file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
+                //проверка на доступность
+            if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
+            substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
+            throw new Exception('access denied to http://vk.com/public' . $page);
 
-    if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
-    (substr_count($a, '404 Not Found') == 0) &&
-    (substr_count($a, 'общество не найден') == 0))  ;
-    else
-    {
-    throw new Exception('page not found : ' . $page);
-    }
-if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
-    (substr_count($a, 'Страница заблокирована') == 0))  ;
-else
-{
-    throw new Exception('page is blocked: ' . $page);
-}
-return $a;
-}
+            if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
+            (substr_count($a, '404 Not Found') == 0) &&
+            (substr_count($a, 'общество не найден') == 0))  ;
+            else
+            {
+            throw new Exception('page not found : ' . $page);
+            }
+            if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
+                (substr_count($a, 'Страница заблокирована') == 0))  ;
+            else
+            {
+                throw new Exception('page is blocked: ' . $page);
+            }
+            return $a;
+        }
 
         public static  function remove_tags($text)
         {
@@ -567,5 +567,15 @@ return $a;
                 }
             }
             return $res;
+        }
+
+        public static function get_posts_by_vk_id( $ids )
+        {
+            if( is_array( $ids ))
+                $ids = implode( ',', $ids );
+            $ids = str_replace( 'wall', '', $ids );
+            $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
+            $posts = self::post_conv( $res );
+            return $posts;
         }
 }
