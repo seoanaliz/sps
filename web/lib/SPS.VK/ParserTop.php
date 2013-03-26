@@ -3,7 +3,7 @@
 class ParserTop
 {
     const TOKEN = '7f31f1fe06f3ad988556b38775c15c0a75cf6590aae74f7fe8d965a35c523d00a4c892e8df9c3b3c6ee22';
-    const API_URL = 'api.topface.ru';
+    const API_URL = 'api.topface.ru/?v=2';
     const TESTING = false;
     public $counter = 0;
     private $ssid = ''; //id текущей сессии
@@ -83,7 +83,7 @@ class ParserTop
             echo 'враппер, ' . $service . '<br>';
         }
         $request = array(   'service'   =>  $service,
-            'data'      =>  $request_params
+                            'data'      =>  $request_params
         );
         if ($this->ssid)
             $request['ssid'] = $this->ssid;
@@ -133,49 +133,27 @@ class ParserTop
             );
 
             $response = $this->tf_api_wrap('top', $request_params);
-            foreach($response->top as &$entry){
-                if ( $entry->liked < 95 )
+            foreach($response->users as $entry){
+
+                if ( $entry->liked < 95 || $entry->age > 35 || $entry->age < 18)
                     continue;
                 $uids[] = $entry->uid;
                 $res[] = array(
-                    'id'      =>  $entry->uid,
-                    'link'    =>  'http://topface.com/vklike/' . $entry->uid. '/',
+                    'id'      =>  $entry->id,
+                    'link'    =>  'http://topface.com/vklike/' . $entry->id. '/',
                     'likes'   =>  $entry->liked,
                     'photo'   =>  array(
                         '0' => array(
-                            'url' => $entry->photo
+                            'url' => $entry->photo->links->original
                         )
-                    )
+                    ),
+                    'text'    =>  $entry->first_name . ', ' . $entry->age
                 );
             }
 
             sleep(0.1);
         }
 
-        $request_params = array(
-            'uids'      =>  $uids,
-            'fields'    =>  array('first_name', 'age')
-        );
-
-        $response = $this->tf_api_wrap('profiles', $request_params);
-        $i = 0;
-        foreach($response->profiles as $entry) {
-            while (1) {
-                if ($entry->age > 35 || $entry->age < 18) break;
-                if ($res[$i]['id'] == $entry->uid) {
-                    $res[$i]['text'] = $entry->first_name . ', ' . $entry->age;
-                    $i++;
-                    break;
-                } else {
-                    unset($res[$i]);
-                    $i++;
-                    if ($i > 10000) {
-                        throw new exception('Error in ' . __CLASS__ . '::' . __FUNCTION__ .
-                            'something really goes wrong with arrays of top and extra data');
-                    }
-                }
-            }
-        }
 
         if (self::TESTING) {
             echo 'count uids = ' . count($uids) . '<br>';

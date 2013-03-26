@@ -52,18 +52,18 @@ class WrTopics extends wrapper
     {
         $this->conn = ConnectionFactory::Get( 'tst' );
 
-        set_time_limit(14000);
 
+        set_time_limit(14000);
         if (! $this->check_time()) {
             $this->double_check_quantity();
             die('Не сейчас');
         }
         $base_publics = $this->get_id_arr();
-
+        $this->update_visitors();
         StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );
         $this->update_quantity();
         $this->double_check_quantity();
-        $this->update_visitors();
+
         echo "end_time = " . date( 'H:i' ) . '<br>';
     }
 
@@ -118,7 +118,6 @@ class WrTopics extends wrapper
 
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->SetInteger( '@publ_id',  $publ_id );
-
         $ds = $cmd->Execute();
         $quan_arr = array();
 
@@ -220,6 +219,7 @@ class WrTopics extends wrapper
                         $count = isset( $entry->count ) ? $entry->count : 0;
                         $key = str_replace( 'a', '', $key );
                         $this->update_point( $key, $count );
+
                         if ( !$count )
                             continue;
                         $this->set_public_grow( $key, $count, $timeTo );
@@ -282,33 +282,32 @@ class WrTopics extends wrapper
             StatPublics::get_views_visitors_from_vk( $public_id, $time_start, $time_start );
         }
 
-        $sql = 'UPDATE stat_publics_50k as a
-                SET visitors=(
-                        SELECT b.visitors
-                        FROM stat_publics_50k_points as b
-                        WHERE a.vk_id=b.id
-                        ORDER BY time DESC
-                        LIMIT 1
-                )';
+        $sql = 'UPDATE stat_publics_50k as publics
+                SET visitors_month=points.visitors_sum, viewers_month=points.viewers_sum
+                FROM
+                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                          WHERE time > now()-interval \'1 month\' AND time < now() group by id )
+                                as points
+                WHERE publics.vk_id=points.id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
-        $sql = 'UPDATE stat_publics_50k as a
-                SET visitors_month=(
-                        SELECT sum(b.visitors)
-                        FROM stat_publics_50k_points as b
-                        WHERE a.vk_id=b.id AND b.time> now()-interval \'1 month\' AND b.time < now()
-                )';
+        $sql = 'UPDATE stat_publics_50k as publics
+                SET visitors_month=points.visitors_sum, viewers_month=points.viewers_sum
+                FROM
+                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                          WHERE time > now()-interval \'1 week\' AND time < now() group by id )
+                                as points
+                WHERE publics.vk_id=points.id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
         $sql = 'UPDATE stat_publics_50k as a
                 SET visitors_week=(
                         SELECT sum(b.visitors)
                         FROM stat_publics_50k_points as b
-                        WHERE a.vk_id=b.id AND b.time> now()-interval \'1 week\' AND b.time < now()
+                        WHERE a.vk_id=b.id AND  b.time = now() - interval\'1 day\'
                 )';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
-
     }
 
     //поиск админов пабликов
@@ -329,7 +328,7 @@ class WrTopics extends wrapper
             $k = explode( '<div class="image">' ,$k );
             unset( $k[0] );
 
-            if ( empty( $k ) )
+            if ( empty( $k ))
                 continue;
             $this->delete_admins( $id );
 
