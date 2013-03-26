@@ -48,29 +48,32 @@ class getEntries {
         $group  = StatGroups::get_group( $groupId );
         //1 тип статистики
         if ( empty( $group) || $group['type'] != 2 ) {
-            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
+            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search', 'viewers' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
             if ( $period == 7 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' )
+                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers' )
                     $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
                 $diff_vis = 'diff_vis_week';
                 $visitors = 'visitors_week';
+                $viewers  = 'viewers_week';
             } else if( $period == 30 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' )
+                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers')
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
                 $diff_vis = 'diff_vis_month';
                 $visitors = 'visitors_month';
+                $viewers  = 'viewers_month';
             } else {
                 $diff_rel = 'diff_rel';
                 $diff_abs = 'diff_abs';
                 $diff_vis = 'diff_vis';
                 $visitors = 'visitors';
+                $viewers  = 'viewers';
             }
 
             $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
@@ -78,8 +81,8 @@ class getEntries {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
                 $sql = 'SELECT
-                    publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
-                    publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.quantity, gprel.main_admin,
+                    publ.vk_id, publ.ava, publ.name,  publ.' . $diff_abs . ',
+                    publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.' . $viewers .',  publ.quantity, gprel.main_admin,
                     publ.in_search,publ.active
                 FROM
                         ' . TABLE_STAT_PUBLICS . ' as publ,
@@ -107,7 +110,7 @@ class getEntries {
                 $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
                 $sql = 'SELECT
-                            vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ', quantity,in_search,active
+                            vk_id, ava, name, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ',' . $viewers . ', quantity,in_search,active
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
@@ -146,12 +149,12 @@ class getEntries {
                                 'quantity'  =>  $row['quantity'],
                                 'name'      =>  $row['name'],
                                 'ava'       =>  $row['ava'],
-                                'price'     =>  $row['price'],
                                 'group_id'  =>  $groups,
                                 'admins'    =>  $admins,
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
                                 'visitors'  =>  $row[$visitors],
+                                'viewers'   =>  $row[$viewers],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
                                 'active'    =>  $row['active']== 't' ? true : false
                 );
