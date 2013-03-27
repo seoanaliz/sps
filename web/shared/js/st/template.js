@@ -28,7 +28,7 @@ var TABLE_HEADER =
     '<div class="item followers">' +
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
-    '<div class="item visitors">' +
+    '<div class="item audience">' +
         'охват<span class="icon arrow">' +
     '</div>' +
     '<div class="item visitors">' +
@@ -54,7 +54,7 @@ var TABLE_ROW =
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
     '<div class="column public-followers"><?=publicFollowers?></div>' +
-    '<div class="column public-followers"><?=publicFollowers?></div>' +
+    '<div class="column public-audience"><?=publicAudience?></div>' +
     '<div class="column public-visitors">' +
         '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
             '<?=publicVisitors ? publicVisitors : "-"?>' +
