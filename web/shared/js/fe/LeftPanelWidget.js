@@ -569,7 +569,6 @@ var LeftPanelWidget = Event.extend({
         }).keyup();
 
         function parseUrl(txt) {
-            debugger;
             // если ссылку уже приаттачили
             if (foundLink) {
                 return;
@@ -657,8 +656,9 @@ var LeftPanelWidget = Event.extend({
                         text: 'обновить',
                         'css': {'display': 'none'}
                     }).click(function() {
+                        var link = foundLink;
                         deleteLink();
-                        parseUrl(foundLink);
+                        parseUrl(link);
                     });
 
                     $span.append($deleteLink);
