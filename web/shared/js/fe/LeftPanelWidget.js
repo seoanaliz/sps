@@ -570,6 +570,11 @@ var LeftPanelWidget = Event.extend({
                 return;
             }
 
+            // если репост уже приаттачили
+            if (foundPostId) {
+                return;
+            }
+
             var matches = txt.match(pattern);
 
             if (!matches) {
