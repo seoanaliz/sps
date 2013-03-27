@@ -46,7 +46,7 @@ var QUEUE_SLOT_ADD =
 var ATTACHMENT_PREVIEW_REPOST =
 '<div class="link-info">' +
     '<div class="link-description">' +
-        '<div class="post_describe_image" title="Редактировать картинку" style="background-image: url(http://cs410520.vk.me/v410520923/84ad/mZzhvh4yGsI.jpg);"></div>' +
+        '<div class="post_describe_image" style="background-image: url(http://cs410520.vk.me/v410520923/84ad/mZzhvh4yGsI.jpg);"></div>' +
         '<div class="post_describe_layout">' +
             '<div class="post_describe_header">' +
                 '<a href="http://tasks.verumnets.ru/issues/14514" target="_blank" title="Редактировать заголовок">' +
@@ -59,12 +59,7 @@ var ATTACHMENT_PREVIEW_REPOST =
                 '<textarea id="post_description"></textarea>' +
             '</p>' +
         '</div>' +
-    '</div>' +
-    '<div class="link-status">' +
-        '<span>' +
-            'Ссылка: <a href="http://tasks.verumnets.ru/issues/14514" target="_blank">tasks.verumnets.ru</a>' +
-            '<a class="delete-link">удалить</a>' +
-        '</span>' +
+        '<a class="delete-link">удалить</a>' +
     '</div>' +
 '</div>';
 
@@ -77,7 +72,7 @@ var ATTACHMENT_PREVIEW_LINK =
         '<div class="post_describe_layout">' +
             '<? if (isset("title")) { ?>' +
                 '<div class="post_describe_header">' +
-                    '<a href="http://tasks.verumnets.ru/issues/14514" target="_blank" title="Редактировать заголовок">' +
+                    '<a href="<?=link?>" target="_blank" title="Редактировать заголовок">' +
                         '<span><?=title?></span>' +
                     '</a>' +
                     '<input type="text" id="post_header">' +
@@ -93,7 +88,7 @@ var ATTACHMENT_PREVIEW_LINK =
     '</div>' +
     '<div class="link-status">' +
         '<span>' +
-            'Ссылка: <a href="http://tasks.verumnets.ru/issues/14514" target="_blank">tasks.verumnets.ru</a>' +
+            'Ссылка: <a href="<?=link?>" target="_blank"><?=text?></a>' +
             '<a class="delete-link">удалить</a>' +
         '</span>' +
     '</div>' +

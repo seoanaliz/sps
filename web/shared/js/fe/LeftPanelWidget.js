@@ -595,7 +595,9 @@ var LeftPanelWidget = Event.extend({
                     var $attachment = $(tmpl(ATTACHMENT_PREVIEW_LINK, {
                         image: result.img,
                         title: result.title,
-                        description: result.description
+                        description: result.description,
+                        text: foundDomain,
+                        link: foundLink
                     }));
 
                     $form.append($attachment);
@@ -1659,5 +1661,6 @@ var LeftPanelWidget = Event.extend({
         console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359'));
         console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
         console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
+        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall3967881_12359'));
     }
 });
