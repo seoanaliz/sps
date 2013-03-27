@@ -13,6 +13,7 @@ var LeftPanelWidget = Event.extend({
         this.initWall();
         this.initWallFilter();
         this.initAddPost();
+        this.initEditPost();
         this.initWallAutoload();
         this.initTabs();
         this.initModeration();
@@ -536,15 +537,14 @@ var LeftPanelWidget = Event.extend({
 
     initAddPost: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
-        var $form = $(".newpost"),
-        $input = $("textarea", $form),
-        $tip = $(".tip", $form);
+        var $form = $('.newpost'),
+        $input = $('textarea', $form),
+        $tip = $('.tip', $form);
 
         var $linkInfo = $('.link-info', $form),
         $linkDescription = $('.link-description', $linkInfo),
         $linkStatus = $('.link-status', $linkInfo),
-        foundLink, foundDomain;
+        foundLink, foundDomain, foundPostId;
 
         $tip.click(function() {
             $input.focus();
@@ -553,8 +553,8 @@ var LeftPanelWidget = Event.extend({
             e.stopPropagation();
         });
         $input.focus(function(){
-            $form.removeClass("collapsed");
-            $(window).bind("click", stop);
+            $form.removeClass('collapsed');
+            $(window).bind('click', stop);
         });
         $input.bind('paste', function() {
             setTimeout(function() {
@@ -568,73 +568,109 @@ var LeftPanelWidget = Event.extend({
             }
         }).keyup();
 
-        var parseUrl = function(txt){
+        function parseUrl(txt) {
+            // если ссылку уже приаттачили
+            if (foundLink) {
+                return;
+            }
+
+            // если репост уже приаттачили
+            if (foundPostId) {
+                return;
+            }
+
             var matches = txt.match(pattern);
 
+            if (!matches) {
+                return;
+            }
+
+            // если приаттачили репост
+            if (foundPostId = t.getPostIdByURL(matches[0])) {
+                console.log('PostId: ' + foundPostId);
+            }
             // если приаттачили ссылку
-            if (matches && matches[0] && matches[1] && !foundLink) {
+            else if (matches[0] && matches[1]) {
                 foundLink   = matches[0];
                 foundDomain = matches[2];
 
                 Events.fire('post_describe_link', foundLink, function(result) {
-                    if (result) {
-                        $linkDescription.empty();
-                        $linkStatus.empty();
-
-                        var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
-                        $linkDescription.append($descriptionLayout);
-
-                        // отрисовываем ссылку
-                        if (result.img) {
-                            var $imgBlock = $('<div></div>',{'class':'post_describe_image','title':'Редактировать картинку'}).css({
-                                'background-image' : 'url('+result.img+')'
-                            });
-
-                            $linkDescription.prepend($imgBlock);
-                        }
-                        if (result.title) {
-                            var $a = $('<a />', {
-                                href: foundLink,
-                                target: '_blank',
-                                html: '<span>'+result.title+'</span>',
-                                title:'Редактировать заголовок'
-                            });
-                            var $h = $('<div></div>',{'class':'post_describe_header'});
-                            $h.append($a);
-                            $descriptionLayout.append($h);
-                        }
-                        if (result.description) {
-                            var $p = $('<p />', {
-                                html: '<span>'+result.description+'</span>',
-                                title:'Редактировать описание'
-                            });
-                            $descriptionLayout.append($p);
-                        }
-
-                        editPostDescribeLink.load($h,$p,$imgBlock,result.imgOriginal);
-
-                        var $span = $('<span />', { text: 'Ссылка: ' });
-                        $span.append($('<a />', { href: foundLink, target: '_blank', text: foundDomain }));
-
-                        var $deleteLink = $('<a />', { 'class': 'delete-link', text: 'удалить' }).click(function() {
-                            // убираем аттач ссылки
-                            deleteLink();
-                        });
-                        var $reloadLink = $('<a />', { 'class': 'reload-link', text: 'обновить', 'css' : {'display': 'none'} }).click(function() {
-                            link = foundLink;
-                            deleteLink();
-                            parseUrl(link);
-                        });
-                        $span.append($deleteLink);
-                        $span.append($reloadLink);
-
-                        $linkStatus.html($span);
-
-                        $linkInfo.show();
+                    if (!result) {
+                        return;
                     }
+
+                    $linkDescription.empty();
+                    $linkStatus.empty();
+
+                    var $descriptionLayout = $('<div></div>',{'class':'post_describe_layout'});
+                    $linkDescription.append($descriptionLayout);
+
+                    // отрисовываем ссылку
+                    if (result.img) {
+                        var $imgBlock = $('<div></div>', {
+                            'class': 'post_describe_image',
+                            'title': 'Редактировать картинку'
+                        }).css({
+                            'background-image': 'url(' + result.img + ')'
+                        });
+
+                        $linkDescription.prepend($imgBlock);
+                    }
+                    if (result.title) {
+                        var $a = $('<a />', {
+                            href: foundLink,
+                            target: '_blank',
+                            html: '<span>' + result.title + '</span>',
+                            title: 'Редактировать заголовок'
+                        });
+                        var $h = $('<div></div>', {
+                            'class': 'post_describe_header'
+                        });
+                        $h.append($a);
+                        $descriptionLayout.append($h);
+                    }
+                    if (result.description) {
+                        var $p = $('<p />', {
+                            html: '<span>' + result.description + '</span>',
+                            title: 'Редактировать описание'
+                        });
+                        $descriptionLayout.append($p);
+                    }
+
+                    editPostDescribeLink.load($h, $p, $imgBlock, result.imgOriginal);
+
+                    var $span = $('<span />', {
+                        text: 'Ссылка: '
+                    });
+                    $span.append($('<a />', {
+                        href: foundLink,
+                        target: '_blank',
+                        text: foundDomain
+                    }));
+
+                    var $deleteLink = $('<a />', {
+                        'class': 'delete-link',
+                        text: 'удалить'
+                    }).click(function() {
+                        // убираем аттач ссылки
+                        deleteLink();
+                    });
+                    var $reloadLink = $('<a />', {
+                        'class': 'reload-link',
+                        text: 'обновить',
+                        'css': {'display': 'none'}
+                    }).click(function() {
+                        deleteLink();
+                        parseUrl(foundLink);
+                    });
+
+                    $span.append($deleteLink);
+                    $span.append($reloadLink);
+                    $linkStatus.html($span);
+                    $linkInfo.show();
                 });
             }
-        };
+        }
 
         // Редактирование ссылки
         var editPostDescribeLink = {
@@ -775,19 +811,17 @@ var LeftPanelWidget = Event.extend({
 
                 $('.editImagePopup .close').click();
 
-                Events.fire('post_link_data', data, function(state){
-
-                });
+                Events.fire('post_link_data', data);
             }
         };
 
-        var clearForm = function(){
-            $input.data("id", 0).val('');
+        function clearForm() {
+            $input.data('id', 0).val('');
             $('.qq-upload-list').html('');
             deleteLink();
-        };
+        }
 
-        var stop = function(){
+        function stop() {
             $(window).unbind('click', stop);
 
             if (!$input.val().length && !$('.qq-upload-list li').length && !$linkInfo.is(':visible')) {
@@ -795,17 +829,18 @@ var LeftPanelWidget = Event.extend({
                 $form.addClass('collapsed');
                 deleteLink();
             }
-        };
+        }
 
-        var deleteLink = function(){
+        function deleteLink() {
             $linkDescription.empty();
             $linkStatus.empty();
             $linkInfo.hide();
             foundLink = false;
             foundDomain = false;
-        };
+            foundPostId = false;
+        }
 
-        $form.delegate('.save', 'click', function(e){
+        $form.delegate('.save', 'click', function() {
             var link = $linkStatus.find('a').attr('href');
             var photos = [];
             var text = $.trim($input.val());
@@ -828,16 +863,18 @@ var LeftPanelWidget = Event.extend({
                 });
             }
         });
+
         $form.delegate('.cancel', 'click' ,function(e){
             clearForm();
             $input.val('').blur();
             $form.addClass('collapsed');
             e.preventDefault();
         });
-        $form.delegate('.image-attach', 'click' ,function(e){
-            $input.focus();
-            $('.newpost .qq-upload-button').trigger('focus');
-        });
+    },
+
+    initEditPost: function() {
+        var t = this;
+        var $leftPanel = t.$leftPanel;
 
         // Быстрое редактирование поста в левой колонке
         $leftPanel.delegate('.post.editable .content .shortcut', 'click', function() {
@@ -1658,5 +1695,21 @@ var LeftPanelWidget = Event.extend({
      */
     disableKeyboardDecision: function() {
         $(window).off('keydown.keyboardDecision');
+    },
+
+    /**
+     * @param {string} url
+     * @returns {string|null}
+     */
+    getPostIdByURL: function(url) {
+        var match = url.match(/wall-(\d+_\d+)/im);
+        return match && match[1] ? match[1] : null;
+    },
+
+    getPostIdByURL_test: function() {
+        var t = this;
+        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359'));
+        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
+        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
     }
 });

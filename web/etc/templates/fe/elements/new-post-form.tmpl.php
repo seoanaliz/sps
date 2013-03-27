@@ -1,7 +1,6 @@
 <div class="newpost collapsed bb">
     <div class="textarea-wrap">
         <textarea placeholder="Есть чем поделиться?"></textarea>
-        <div class="image-attach"></div>
     </div>
     <div id="attach-file" class="buttons attach-file">
         <div class="save button l">Отправить</div>
