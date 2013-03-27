@@ -31,9 +31,6 @@ class SaveArticleControl extends BaseControl
         $result = array(
             'success' => false
         );
-        $id = $this->add_repost_article('wall-27421965_2942');
-        print_r($id);
-        die();
         $id = Request::getInteger('articleId');
         $text = trim(Request::getString('text'));
         $link = trim(Request::getString('link'));
