@@ -5,7 +5,7 @@ var LIST =
     '<div class="actions">' +
         '<a href="javascript:;" class="share">Поделиться</a> |' +
         '<a href="javascript:;" class="edit">Редактировать</a> |' +
-        '<a href="javascript:;" class="delete">Удалить</a>' +
+        '<a class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';
 
@@ -28,11 +28,8 @@ var TABLE_HEADER =
     '<div class="item followers">' +
         'подписчики<span class="icon arrow"></span>' +
     '</div>' +
-    '<div class="item is-active">' +
-        'бан<span class="icon arrow">' +
-    '</div>' +
-    '<div class="item in-search">' +
-        'в поиске<span class="icon arrow">' +
+    '<div class="item visitors">' +
+        'охват<span class="icon arrow">' +
     '</div>' +
     '<div class="item visitors">' +
         'посетители<span class="icon arrow">' +
@@ -40,8 +37,8 @@ var TABLE_HEADER =
     '<div class="item growth">' +
         'прирост<span class="icon arrow"></span>' +
     '</div>' +
-    '<div class="item contacts">' +
-        'контакты' +
+    '<div class="item in-search">' +
+        'в поиске<span class="icon arrow">' +
     '</div>' +
 '</div>';
 
@@ -57,8 +54,7 @@ var TABLE_ROW =
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
     '<div class="column public-followers"><?=publicFollowers?></div>' +
-    '<div class="column public-is-active"><span class="<?=publicIsActive ? "true" : "false"?>">●</span></div>' +
-    '<div class="column public-in-search"><span class="<?=publicInSearch ? "true" : "false"?>">●</span></div>' +
+    '<div class="column public-followers"><?=publicFollowers?></div>' +
     '<div class="column public-visitors">' +
         '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
             '<?=publicVisitors ? publicVisitors : "-"?>' +
@@ -68,11 +64,6 @@ var TABLE_ROW =
         '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
             '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
         '</span>' +
-    '</div>' +
-    '<div class="column public-contacts">' +
-        '<? if (isset("users") && users.length) { ?>' +
-            '<?=tmpl(CONTACT, users[0])?>' +
-        '<? } ?>' +
     '</div>' +
     '<div class="column public-actions">' +
         '<span class="action add-to-list">' +
@@ -85,6 +76,7 @@ var TABLE_ROW =
             '<span class="icon plus"></span>' +
         '</span>' +
     '</div>' +
+    '<div class="column public-in-search"><span class="<?=publicInSearch ? "true" : "false"?>">●</span></div>' +
 '</div>';
 
 var OUR_TABLE =
@@ -104,7 +96,6 @@ var OUR_TABLE_HEADER =
     '<div class="item authors-likes" title="авторские лайки">авт. лайки<span class="icon arrow"></div>' +
     '<div class="item authors-reposts" title="авторские репосты">авт. репосты<span class="icon arrow"></div>' +
     '<div class="item growth-visitors" title="прирост посетителей">рост посетит.<span class="icon arrow"></div>' +
-//    '<div class="item sb-posts" title="SB посты">SB посты<span class="icon arrow"></div>' +
     '<div class="item sb-likes" title="SB лайки">SB лайки<span class="icon arrow"></div>' +
 '</div>';
 
@@ -129,7 +120,6 @@ var OUR_TABLE_ROW =
             '<?=publicGrowthVisitors?> <small><?=publicGrowthVisitorsRelative?>%</small>' +
         '</span>' +
     '</div>' +
-//    '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
     '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
 '</div>';
 
