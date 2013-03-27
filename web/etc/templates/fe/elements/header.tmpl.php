@@ -29,13 +29,20 @@
      * Default page title
      */
     $__pageTitle = !empty( $__pageTitle ) ? $__pageTitle : $__sitePageTitle;
+
+    $lessFiles = array(
+        AssetHelper::AnyBrowser => array(
+            'css://common/common.less',
+        )
+        , AssetHelper::IE7 => array()
+    );
 	
     $cssFiles = array(
         AssetHelper::AnyBrowser => array(
             'js://fe/file-uploader/fileuploader.css',
             'css://fe/jquery.multiselect.css',
             'css://fe/jquery-ui.css',
-            'css://common/common.css',
+            //'css://common/common.css',
             'css://fe/main.css',
             'css://fe/custom.css',
             'css://fe/jquery.datepick.css',
@@ -84,8 +91,14 @@
         'js://fe/main.js',
     );
 
+    LessHelper::Init( true );
     CssHelper::Init( true );
     JsHelper::Init( true );
+
+    LessHelper::PushGroups( $lessFiles );
+    if( !empty( $lessFilesAdds ) ) {
+        LessHelper::PushGroups( $lessFilesAdds );
+    }
 
     CssHelper::PushGroups( $cssFiles );
     if( !empty( $cssFilesAdds ) ) {
@@ -121,6 +134,7 @@
     <? } ?>
 	<link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
+    <?= LessHelper::Flush(); ?>
     <?= CssHelper::Flush(); ?>
 </head>
 <body>

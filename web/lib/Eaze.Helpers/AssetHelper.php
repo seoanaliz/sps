@@ -121,7 +121,7 @@
                 , self::Line => '<style type="text/css">%s</style>'
             )
             , self::LESS => array(
-                'src'        => '<link rel="stylesheet/less" type="text/css" href="%s">'
+                'src'        => '<link rel="stylesheet" type="text/css" href="%s" />'
             )
         );
 

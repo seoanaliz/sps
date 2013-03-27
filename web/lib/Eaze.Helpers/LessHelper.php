@@ -40,6 +40,13 @@
          * @param string $mode browser mode
          */
         public static function PushFile( $file, $mode = self::AnyBrowser ) {
+            $lessPath = Site::GetRealPath($file);
+            $file     = str_replace('.less', '.css', $file);
+            $cssPath  = Site::GetRealPath($file);
+
+            $less = new lessc();
+            $less->checkedCompile($lessPath, $cssPath);
+
             parent::addFile( self::$type, $file, $mode );
         }
 
