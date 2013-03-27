@@ -46,7 +46,7 @@ var QUEUE_SLOT_ADD =
 var ATTACHMENT_PREVIEW_REPOST =
 '<div class="link-info">' +
     '<div class="link-description">' +
-        '<div class="post_describe_image" style="background-image: url(http://cs410520.vk.me/v410520923/84ad/mZzhvh4yGsI.jpg);"></div>' +
+        '<div class="post_describe_image" style="background: no-repeat url(http://cs410520.vk.me/v410520923/84ad/mZzhvh4yGsI.jpg);"></div>' +
         '<div class="post_describe_layout">' +
             '<div class="post_describe_header">' +
                 '<a href="http://tasks.verumnets.ru/issues/14514" target="_blank" title="Редактировать заголовок">' +
@@ -67,7 +67,7 @@ var ATTACHMENT_PREVIEW_LINK =
 '<div class="link-info">' +
     '<div class="link-description">' +
         '<? if (isset("image")) { ?>' +
-            '<div class="post_describe_image" title="Редактировать картинку" style="background-image: url(<?=image?>);"></div>' +
+            '<div class="post_describe_image" title="Редактировать картинку" style="background: no-repeat center url(<?=image?>);"></div>' +
         '<? } ?>' +
         '<div class="post_describe_layout">' +
             '<? if (isset("title")) { ?>' +

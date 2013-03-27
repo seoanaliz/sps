@@ -539,6 +539,7 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $form = $('.newpost');
         var $input = $('textarea', $form);
+        var $attachments = $form.find('.attachments');
 
         var foundLink, foundDomain, foundPostId;
 
@@ -583,7 +584,7 @@ var LeftPanelWidget = Event.extend({
 
             // если приаттачили репост
             if (foundPostId = t.getPostIdByURL(matches[0])) {
-                $form.append($(tmpl(ATTACHMENT_PREVIEW_REPOST, {
+                $attachments.append($(tmpl(ATTACHMENT_PREVIEW_REPOST, {
                     postId: foundPostId
                 })));
             }
@@ -605,13 +606,12 @@ var LeftPanelWidget = Event.extend({
                         link: foundLink
                     }));
 
-                    $form.append($attachment);
+                    $attachments.append($attachment);
 
                     editPostDescribeLink.load(
                         $attachment.find('.post_describe_header'),
                         $attachment.find('p'),
-                        $attachment.find('.post_describe_image'),
-                        result.imgOriginal
+                        $attachment.find('.post_describe_image')
                     );
                 });
             }
@@ -619,16 +619,21 @@ var LeftPanelWidget = Event.extend({
 
         // Редактирование ссылки
         var editPostDescribeLink = {
-            load: function($header, $description, $image, imageSrc) {
+            load: function($header, $description, $image) {
                 this.header = $header;
                 this.description = $description;
                 this.image = $image;
-                this.imageSrc = imageSrc;
                 this.renderEditor();
             },
             renderEditor: function() {
-                var $editField = $('<input />',{type:'text',id:'post_header'});
-                var $editArea = $('<textarea />',{id: 'post_description'});
+                var $editField = $('<input />', {
+                    type: 'text',
+                    id: 'post_header'
+                });
+                var $editArea = $('<textarea />', {
+                    id: 'post_description'
+                });
+
                 if (this.header) {
                     this.header.append($editField.val(this.header.text()));
                 }
@@ -652,84 +657,6 @@ var LeftPanelWidget = Event.extend({
                         return false;
                     });
                 }
-                if (this.image) {
-                    this.image.click(function() {
-                        t.editImage();
-                        return false;
-                    });
-                }
-            },
-            editImage: function() {
-                this.renderEditImagePopup();
-            },
-            renderEditImagePopup: function() {
-                var $popup = $('<div></div>',{
-                    'class': 'editImagePopup',
-                    'html': '<h2>Редактировать изображение</h2>'+
-                    '<table><tr><td><img src="'+this.imageSrc+'" id="originalImage" /></td>'+
-                    '<td><div class="previewContainer">'+
-                    '<div class="previewLayout"><img id="preview" src="'+this.imageSrc+'" /></div>'+
-                    '<div class="button save">Сохранить</div>'+
-                    '<div id="attach-image-file" class="buttons attach-file">'+
-                    '</div>'+
-                    '</div></td></tr></table><b class="close"></b>'
-                }),
-                t = this;
-                $('body').append($popup);
-                $('<div class="substrate"></div>').appendTo('body');
-                $('#originalImage').load(function(){
-                    $popup.css({
-                        left: $('body').width()/2 - $popup.width()/2,
-                        top: $('.link-info').position().top
-                    });
-                    $('.substrate').css({
-                        height: $(document).height()
-                    });
-                });
-
-                $popup.find('.save').click(function() {
-                    t.post();
-                });
-
-                this.closeImagePopup($popup);
-                this.crop();
-                this.upload();
-            },
-            closeImagePopup: function($popup) {
-                $('.substrate,.editImagePopup .close').click(function() {
-                    $('.substrate').remove();
-                    $popup.remove();
-                });
-            },
-            crop: function() {
-                var t = this;
-                this.originalImage = $('#originalImage');
-                this.originalImage.load(function (){
-                    t.Jcrop = $.Jcrop($(this), {
-                        onChange: t.showPreview,
-                        onSelect: t.showPreview,
-                        aspectRatio : 2.06,
-                        minSize: [130,63],
-                        setSelect: [0,0,130,63]
-                    });
-                });
-            },
-            upload: function() {
-                app.imageUploader({
-                    $element: $('#attach-image-file')
-                });
-            },
-            showPreview: function (coords,t) {
-                var rx = $('.previewLayout').width() / coords.w;
-                var ry = $('.previewLayout').height() / coords.h;
-
-                $('#preview').css({
-                    width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
-                    height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
-                    marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-                    marginTop: '-' + Math.round(ry * coords.y) + 'px'
-                });
-                editPostDescribeLink.coords = coords;
             },
             edit: function($elem) {
                 var t = this;
@@ -777,7 +704,7 @@ var LeftPanelWidget = Event.extend({
             }
         }
 
-        function deleteLink(el) {
+        function deleteLink() {
             var $linkInfo = $form.find('.link-info');
             $linkInfo.remove();
             foundLink = false;
@@ -786,19 +713,21 @@ var LeftPanelWidget = Event.extend({
         }
 
         $form.delegate('.delete-link', 'click', function() {
-            deleteLink(this);
+            deleteLink();
         });
 
         $form.delegate('.reload-link', 'click', function() {
             var link = foundLink;
-            deleteLink(this);
+            deleteLink();
             parseUrl(link);
         });
 
         $form.delegate('.save', 'click', function() {
+            var $linkStatus = $form.find('.link-status');
             var link = $linkStatus.find('a').attr('href');
             var photos = [];
             var text = $.trim($input.val());
+
             $('.newpost .qq-upload-success').each(function(){
                 var photo = {};
                 photo.filename = $(this).find('input:hidden').val();
