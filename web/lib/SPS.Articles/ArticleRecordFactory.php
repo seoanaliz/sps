@@ -101,6 +101,14 @@
                     'name'          => 'articleQueueId'
                     , 'type'        => TYPE_INTEGER
                     , 'foreignKey'  => 'ArticleQueue'
+                )
+                ,'repostArticleRecordId' => array(
+                    'name'          => 'repostArticleRecordId'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'repostExternalId' => array(
+                    'name'          => 'repostExternalId'
+                    , 'type'        => TYPE_STRING
                 ))
             , 'lists'     => array()
             , 'search'    => array(
