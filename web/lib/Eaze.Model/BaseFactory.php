@@ -354,7 +354,6 @@
             if ( !empty( $mapping["search"] ) ) {
                 $source = array_merge_recursive( $source, $mapping["search"] );
             }
-
             // process array
             foreach ( $source as $field => $data ) {
                 switch ($data["type"]) {
@@ -383,7 +382,7 @@
                             }
 
                             // integer hack
-                            if ( ( $data["type"] === TYPE_INTEGER ||  $data["type"] === TYPE_FLOAT ) && ( empty( $searchArray[$field] ) ) ) {
+                            if ( ( $data["type"] === TYPE_INTEGER ||  $data["type"] === TYPE_FLOAT ) && ( empty( $searchArray[$field] ) && (  $searchArray[$field] !== 0 ) ) ) {
                                 $resultSearch[$field] = null;
                             }
 
@@ -408,7 +407,6 @@
                 		break;
                 }
             }
-
             // Pages Hack for GetAction
             if ( !isset( $resultSearch[BaseFactoryPrepare::PageSize] ) ) {
                 $resultSearch[BaseFactoryPrepare::PageSize] = BaseFactoryPrepare::PageSizeCount;
@@ -417,7 +415,6 @@
             if ( !isset( $resultSearch[BaseFactoryPrepare::Page] ) ) {
                 $resultSearch[BaseFactoryPrepare::Page] = 0;
             }
-
             return $resultSearch;
         }
 
@@ -476,7 +473,7 @@
          *
          * @param array  $objects
          * @param array  $mapping
-         * @param array  $options
+         * @param array|null  $options
          * @param string $connectionName
          * @return result
          */
@@ -921,7 +918,6 @@
                     }
                 }
             }
-
 
 
 

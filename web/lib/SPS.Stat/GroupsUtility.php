@@ -60,14 +60,14 @@
             GroupFactory::UpdateRange( $groups );
         }
 
-        //возвращает дефолтню группу для этого типа групп. Нет - создаст
+        //возвращает дефолтную группу для этого типа групп. Нет - создаст
         public static function get_default_group( $user_id, $groupe_sourse ) {
 
             $default_group = GroupFactory::Get( array( '_created_by' => $user_id, 'source' => $groupe_sourse, 'type' => 2 ));
             if( empty( $default_group )) {
                 $default_group = new Group;
                 $default_group->created_by  =   $user_id;
-                $default_group->name        =   self::DEFAULT_GROUPE_NAME;
+                $default_group->name        =   'default_group';
                 $default_group->source      =   $groupe_sourse;
                 $default_group->status      =   1;
                 $default_group->type        =   2;
@@ -81,6 +81,18 @@
             return $default_group;
         }
 
+        public static function get_all_user_groups( $user_id, $groupe_sourse )
+        {
+            $search = array( '_users_ids_in_array' => array( $user_id ), 'source'=> $groupe_sourse );
+            $groups = GroupFactory::Get( $search );
+            $result = array();
+
+            foreach( $groups as $group ) {
+                $result[] = $group->group_id;
+            }
+            return $result;
+        }
+
         //проверяет уникальность предлагаемого имени группы для данного типа групп данного пользователя
         public static function check_name( $user_id, $group_source, $group_name )
         {
@@ -91,23 +103,15 @@
         }
 
         //удаляет группу - точнее, все упоминания группы. она сама меняет статус
-        public static function delete_group( Group $group, Group $default_group )
+        public static function delete_group( Group $group )
         {
-            //todo определение типа группы (бартер, мессагер...)
-            //ищем все привязанные к групе записи, удаляем отметку этой группы
-//            $entries = BarterEventFactory::Get( array( '_groups_ids' => array( $group->group_id )), array(), 'tst');
-//            foreach( $entries as $entry ) {
-//                $key = array_search( $group->group_id, $entry->groups_ids );
-//                if ( $key === false || $key === null )
-//                    continue;
-//                unset( $entry->groups_ids[ $key ]);
-//                //если отметок о группах не осталось, ставим дефолтную
-//                if ( count($entry->groups_ids == 0))
-//                    $entry->groups_ids = array( $default_group->group_id );
-//            }
-//            BarterEventFactory::UpdateRange( $entries, null, 'tst');
-//
-//            $group->users_ids   =   array(0);
+            //удаляем эвенты группы
+            $object = new BarterEvent();
+            $object->status = 7;
+            $search = array( '_groups_ids' => array( $group->group_id ));
+            BarterEventFactory::UpdateByMask( $object, array( 'status'), $search );
+
+            $group->users_ids   =   array(0);
             $group->status      =   7;
             GroupFactory::Update( $group );
 
@@ -121,24 +125,47 @@
                 $groups = array( $groups );
             $res = array();
             $i = 1;
+
             foreach( $groups as $group ) {
-                $field = ( $group->created_by == $user_id ) ? 'user_lists' : 'shared_lists';
-                $field = ( $group->created_by == $user_id && $group->type == 2 ) ? 'default_list' : $field;
-                $res[$field][] = array(
-                    'group_id'  =>  $group->group_id,
-                    'type'      =>  $group->type,
-                    'name'      =>  ( $field == 'default_list' ) ? 'Не в списке' : $group->name,
-                    'place'     =>  ( $field == 'default_list' ) ? 0 : $i++
+                if( $group->created_by != $user_id ) {
+                    $user_shared_groups[$group->created_by][] = $group->group_id;
+                } else {
+
+                    $tmp = array(
+                        'group_id'  =>  $group->group_id,
+                        'type'      =>  $group->type,
+                        'name'      =>  $group->type == 2 ? 'Мой первый список' : $group->name,
+                        'place'     =>  $group->type == 2 ? 0 : $i++
+                    );
+                    if( $group->type == 2 ) {
+                        if( !is_array( $res['user_lists']))
+                            $res['user_lists'] = array();
+                        array_unshift( $res['user_lists'], $tmp );
+                    } else {
+                        $res['user_lists'][] = $tmp;
+                    }
+                }
+            }
+
+            $users_list = array_keys( $user_shared_groups);
+            $users_info = StatUsers::get_vk_user_info( $users_list );
+            foreach( $user_shared_groups as $sharer_id => $sharer_groups ) {
+                $res['shared_lists'][] = array(
+                    'group_id'  =>  implode( ',', $sharer_groups ),
+                    'type'      =>  1,
+                    'name'      =>  $users_info[$sharer_id]['name'],
+                    'place'     =>  $i++
                 );
             }
-            if( !isset( $res['user_lists'] )) $res['user_lists'] = array();
+
+            if( !isset( $res['user_lists'] ))   $res['user_lists'] = array();
             if( !isset( $res['shared_lists'] )) $res['shared_lists'] = array();
-            if( !isset( $res['default_list'] )) $res['default_list'] = array( GroupsUtility::get_default_group( $user_id, $group_source ));
+            if( !isset( $res['default_list'] )) $res['default_list'] = array();
             return $res;
         }
 
         //проверяет, является ли юзер автором группы
-        public static function is_author( $group_id, $user_id)
+        public static function is_author( $group_id, $user_id )
         {
             $group = GroupFactory::GetOne( array( 'group_id' => $group_id, 'created_by'=> $user_id ));
             if ( $group )
@@ -157,8 +184,8 @@
         public static function share_groups( $groups, $rec_ids )
         {
             foreach( $groups as $group ) {
-                if ( $group->type == 2 )
-                    continue;
+//                if ( $group->type == 2 )
+//                    continue;
                 $group->users_ids = array_unique( array_merge( $group->users_ids, $rec_ids ));
             }
         }

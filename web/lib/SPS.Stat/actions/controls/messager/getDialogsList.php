@@ -84,6 +84,8 @@ class getDialogsList
 
         //навешиваем юзеров на диалоги
         $users_array = StatUsers::get_vk_user_info( $user_ids, $user_id );
+        if(  empty( $users_array ))
+            die( ERR_NO_ACC_TOK );
         foreach( $dialogs_array as &$dialog ) {
             $dialog->uid = $users_array[ $dialog->uid ];
         }

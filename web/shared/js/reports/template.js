@@ -1,31 +1,75 @@
-/*
-{"response":[
-    {
-        "published_at":null,
-        "ad_public":{
-            "id":123,
-            "ava":"https://vk.com/images/community_50.gif",
-            "name":"ЭРОТИКА НА ГРАНИ ПОРНО. СЕКС ЗНАКОМСТВА.",
-            "link":"http://vk.com/public123"
-        },
-        "posted_at":null,
-        "deleted_at":null,
-        "overlaps":null,
-        "subscribers":0,
-        "visitors":0
-    }
-]}
-*/
 var REPORTS = {
     MAIN:
     '<div id="header" class="header"></div>' +
-    '<div id="list-header" class="list-head clear-fix"></div>' +
-    '<div id="results"></div>',
+    '<table><tbody>' +
+        '<tr>' +
+            '<td id="left-column" class="left-column">' +
+                '<div class="content">' +
+                    '<div id="list-header" class="list-head clear-fix"></div>' +
+                    '<div id="results"></div>' +
+                '</div>' +
+            '</td>' +
+            '<td id="right-column" class="right-column">' +
+                '<div id="filter">' +
+                    '<div class="title">Фильтр</div>' +
+                    '<div class="form">' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="all" checked="checked">' +
+                            '<span>Все</span>' +
+                        '</label>' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="complete">' +
+                            '<span>Успешные</span>' +
+                        '</label>' +
+                        '<label>' +
+                            '<input name="filter" type="radio" value="false">' +
+                            '<span>Неудачные</span>' +
+                        '</label>' +
+                    '</div>' +
+                '</div>' +
+                '<div id="group-list" class="filter"></div>' +
+            '</td>' +
+        '</tr>' +
+    '</tbody></table>',
+
+    BOX_SHARE:
+    '<div class="box-share">' +
+        '<div class="title">Выберите списки</div>' +
+        '<input type="text" class="lists"></textarea>' +
+        '<div class="title">Выберите друзей</div>' +
+        '<input type="text" class="users"></textarea>' +
+    '</div>',
+
+    GROUP_LIST_ITEM:
+    '<div data-id="<?=id?>" class="item"><?=name?></div>',
+
+    GROUP_LIST:
+    '<? if (count(defaultLists) && (!count(userLists) || count(userLists) > 1)) { ?>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, defaultLists); ?>' +
+        '</div>' +
+    '<? } ?>' +
+    '<div class="title">Мои списки</div>' +
+    '<div class="list">' +
+        '<? each(REPORTS.GROUP_LIST_ITEM, userLists); ?>' +
+        '<input type="text" placeholder="Введите название списка..." /> ' +
+        '<div class="item"><u>Создать список</u></div>' +
+    '</div>' +
+    '<? if (count(sharedLists)) { ?>' +
+        '<div class="title">Общие списки</div>' +
+        '<div class="list">' +
+            '<? each(REPORTS.GROUP_LIST_ITEM, sharedLists); ?>' +
+        '</div>' +
+    '<? } ?>',
 
     HEADER:
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
+        '<div class="actions">' +
+            '<a id="share-list" class="share">Поделиться списком</a> |' +
+            '<a id="delete-list" class="share">Удалить</a>' +
+        '</div>' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
@@ -51,12 +95,13 @@ var REPORTS = {
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.MONITOR.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-id="<?=report_id?>" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
+        '<div class="row" data-id="report_id" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -90,20 +135,21 @@ var REPORTS = {
         '<div class="item public our-public">Кого рекламируем<span class="icon arrow"></div>' +
         '<div class="item public partner">Где размещаем<span class="icon arrow"></div>' +
         '<div class="item time post-time">Время поста<span class="icon arrow"></div>' +
-        '<div class="item time delete-time">Удалён через<span class="icon arrow"></div>' +
-        '<div class="item time overlap-time">Перекрыт через<span class="icon arrow"></div>' +
+        '<div class="item time delete-time">Удалён<span class="icon arrow"></div>' +
+        '<div class="item time overlap-time">Перекрыт<span class="icon arrow"></div>' +
         '<div class="item visitors">Посетителей<span class="icon arrow"></div>' +
         '<div class="item subscribers">Подписчиков<span class="icon arrow"></div>',
 
         LIST:
         '<? if (isset("items") && items.length) { ?>' +
             '<? each(REPORTS.RESULT.ITEM, items); ?>' +
+            '<div class="loading" id="load-more-table">Показать больше</div>' +
         '<? } else { ?>' +
-            'Empty' +
+            '<div class="empty-result">Пусто</div>' +
         '<? } ?>',
 
         ITEM:
-        '<div class="row" data-id="<?=report_id?>" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
+        '<div class="row" data-our-public-id="<?=ad_public.id?>" data-public-id="<?=published_at.id?>">' +
             '<? if (isset("ad_public") && ad_public) { ?>' +
                 '<div class="column public" title="Наш паблик">' +
                     '<div class="photo">' +
@@ -129,7 +175,6 @@ var REPORTS = {
             '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
             '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
-            '<div class="column action" title="Удалить"><div class="icon delete"></div></div>' +
         '</div>'
     }
 };

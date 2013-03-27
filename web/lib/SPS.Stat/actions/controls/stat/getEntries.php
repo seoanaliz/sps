@@ -1,12 +1,12 @@
 <?php
-//Package::Load( 'SPS.Stat' );
-//Package::Load( 'SPS.Site' );
+Package::Load( 'SPS.Stat' );
+Package::Load( 'SPS.Site' );
 /**
  * addPrice Action
  * @package    SPS
  * @subpackage Stat
  */
-
+new stat_tables();
 set_time_limit(10);
 class getEntries {
 
@@ -45,75 +45,82 @@ class getEntries {
         $limit          =   $limit  ?  $limit : 25;
         $search         =   mb_strlen( $search ) > 5 ? mb_substr( $search, 0, mb_strlen( $search ) - 2 ) : $search;
 
-        $group  = StatGroups::get_group($groupId);
+        $group  = StatGroups::get_group( $groupId );
+        //1 тип статистики
         if ( empty( $group) || $group['type'] != 2 ) {
-            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
+            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search', 'viewers' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
             if ( $period == 7 ) {
-                if ( $sortBy == 'diff_abs' )
+                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers' )
                     $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
                 $diff_vis = 'diff_vis_week';
+                $visitors = 'visitors_week';
+                $viewers  = 'viewers_week';
             } else if( $period == 30 ) {
-                if ( $sortBy == 'diff_abs' )
+                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers')
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
-                $diff_vis = 'diff_vis_week';
+                $diff_vis = 'diff_vis_month';
+                $visitors = 'visitors_month';
+                $viewers  = 'viewers_month';
             } else {
                 $diff_rel = 'diff_rel';
                 $diff_abs = 'diff_abs';
                 $diff_vis = 'diff_vis';
+                $visitors = 'visitors';
+                $viewers  = 'viewers';
             }
-            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
 
+            $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
             if ( isset( $groupId ) ) {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
-             $sql = 'SELECT
-                        publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
-                        publ.' . $diff_rel . ', publ.visitors,  publ.quantity, gprel.main_admin,
-                        publ.in_search,publ.active
-                    FROM
-                            ' . TABLE_STAT_PUBLICS . ' as publ,
-                            ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
-                    WHERE
-                          publ.vk_id=gprel.public_id '
-                          . $page .
-                         ' AND gprel.group_id=@group_id
-                          AND publ.quantity >= @min_quantity
-                          AND publ.quantity <= @max_quantity
-                          AND publ.quantity >= 50000
-                          ' . $search . '
-                    ORDER BY '
-                        . $sortBy . #$sortReverse .
-                  ' OFFSET '
-                        . $offset .
-                  ' LIMIT '
-                        . $limit;
+                $sql = 'SELECT
+                    publ.vk_id, publ.ava, publ.name,  publ.' . $diff_abs . ',
+                    publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.' . $viewers .',  publ.quantity, gprel.main_admin,
+                    publ.in_search,publ.active
+                FROM
+                        ' . TABLE_STAT_PUBLICS . ' as publ,
+                        ' . TABLE_STAT_GROUP_PUBLIC_REL . ' as gprel
+                WHERE
+                      publ.vk_id=gprel.public_id '
+                      . $page .
+                     ' AND gprel.group_id=@group_id
+                      AND publ.quantity >= @min_quantity
+                      AND publ.quantity <= @max_quantity
+                      AND closed is false
+                      ' . $search . '
+                ORDER BY '
+                    . $sortBy .
+              ' OFFSET '
+                    . $offset .
+              ' LIMIT '
+                    . $limit;
 
-                    $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                    $cmd->SetInteger('@group_id', $groupId);
-                    $cmd->SetInteger('@user_id',  $userId);
-
+                $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+                $cmd->SetInteger('@group_id', $groupId);
+                $cmd->SetInteger('@user_id',  $userId);
+            //                    echo $cmd->GetQuery() . '<br>';
             } else {
                 $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
                 $sql = 'SELECT
-                            vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ',visitors, quantity,in_search,active
+                            vk_id, ava, name, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ',' . $viewers . ', quantity,in_search,active
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
                             quantity > @min_quantity '
                             . $page .
                           ' AND quantity < @max_quantity
-                            AND quantity > 50000'.
+                            AND quantity > 100'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
-                            . $sortBy . #$sortReverse .
+                            . $sortBy .
                       ' OFFSET '
                             . $offset .
                       ' LIMIT '
@@ -121,6 +128,8 @@ class getEntries {
                 $cmd = new SqlCommand( $sql, $this->conn );
 
                 $cmd->SetString('@sortBy', $sortBy);
+//                echo $cmd->GetQuery() . '<br>';
+
             }
             $cmd->SetInteger('@min_quantity', $quant_min);
             $cmd->SetInteger('@max_quantity', $quant_max);
@@ -130,7 +139,6 @@ class getEntries {
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
                 $admins = array();
-//                if ( isset( $row[ 'main_admins' ]))
                 $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
@@ -141,17 +149,18 @@ class getEntries {
                                 'quantity'  =>  $row['quantity'],
                                 'name'      =>  $row['name'],
                                 'ava'       =>  $row['ava'],
-                                'price'     =>  $row['price'],
                                 'group_id'  =>  $groups,
                                 'admins'    =>  $admins,
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
-                                'visitors'  =>  $row['visitors'],
+                                'visitors'  =>  $row[$visitors],
+                                'viewers'   =>  $row[$viewers],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
                                 'active'    =>  $row['active']== 't' ? true : false
                 );
             }
         }
+        //2 тип, наши паблики. Сортировка силами php
         else {
             $allowed_sort_values = array(   'views',
                                             'overall_posts',
@@ -165,7 +174,8 @@ class getEntries {
                                             'abs_vis_grow',
                                             'rel_vis_grow'
             );
-            $resul = $this->get_our_publics_state( $time_from, $time_to );
+
+            $resul = $this->get_our_publics_state( $time_from, $time_to, $groupId );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'visitors';
             $a = $this->compare( $sortBy, $sortReverse );
             usort( $resul, $a );
@@ -217,11 +227,13 @@ class getEntries {
     }
 
     //возвращает данные о наших пабликах
-    private function get_our_publics_state( $time_start, $time_stop )
+    private function get_our_publics_state( $time_start, $time_stop, $groupId )
     {
-        $publics = StatPublics::get_our_publics_list();
+        $selector = $groupId == 110 ? 2: 1;
+        $publics = StatPublics::get_our_publics_list($selector);
         $res = array();
         $ret = array();
+
         foreach( $publics as $public ) {
             $res['ava'] = $this->get_ava($public['id']);
             $res['id']  = $public['id'];
@@ -248,6 +260,11 @@ class getEntries {
             $res['auth_reposts_eff']= $non_authors_posts['reposts'] ?
                 (round( $authors_posts['reposts'] / $non_authors_posts['reposts'], 4 ) * 100 ) : 0;
 
+            //прирост подписчиков относительно предыдущего периода
+            $sub_now = StatPublics::get_avg_subs_growth( $public['sb_id'], $time_start, $time_stop );
+            $sub_pre = StatPublics::get_avg_subs_growth( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
+
+            //прирост посетителей относительно предыдущего периода
             $vis_now = StatPublics::get_average_visitors( $public['sb_id'], $time_start, $time_stop );
             $vis_prev_period = StatPublics::get_average_visitors( $public['sb_id'], ( 2 * $time_start - $time_stop ), $time_start );
             if ( $vis_now && $vis_prev_period ) {
@@ -303,7 +320,7 @@ class getEntries {
         $cmd->SetInteger( '@publ_id',  $publ );
         $ds = $cmd->Execute();
         $structure  = BaseFactory::getObjectTree( $ds->Columns );
-        while ( $ds->next() ) {
+        while ( $ds->next()) {
             $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
             if ( $vk_id == $sadmin ) {
                 if ( isset( $resul[0] ) )
@@ -344,7 +361,7 @@ class getEntries {
 
     private function get_min_max()
     {
-        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 50000' ;
+        $sql = 'SELECT MIN(quantity), MAX(quantity)  FROM ' . TABLE_STAT_PUBLICS . ' WHERE quantity > 100' ;
         $cmd = new SqlCommand($sql, ConnectionFactory::Get('tst'));
         $ds = $cmd->Execute();
         $ds->Next();

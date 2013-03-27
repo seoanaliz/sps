@@ -8,6 +8,7 @@
         private $page_short_name;
         private $count;
 
+        const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
         const PAGE_SIZE = 20;
@@ -147,9 +148,9 @@
         //              группы или посетителей(от последних отсеивается)
         //$trig_inc - нужно ли собирать внутренний текст с фото
         //
-
-        public function get_posts( $page_number )
+        public function  get_posts( $page_number )
         {
+            sleep(rand( 1,12 ));
             $offset = $page_number * self::PAGE_SIZE;
 
             if (!isset($this->count))
@@ -167,6 +168,7 @@
             );
 
             $res = VkHelper::api_request( 'wall.get', $params );
+            sleep(self::PAUSE);
             unset( $res[0] );
             $posts = $this->post_conv( $res );
             $posts = $this->kill_attritions( $posts );
@@ -185,7 +187,7 @@
                 $likes_tr   =   $likes;
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
-                $text       =   $this->remove_tags( $post->text);
+                $text       =   self::remove_tags( $post->text);
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -201,13 +203,13 @@
 
                         switch( $attachment->type ) {
                             case 'photo':
+                                $url = self::get_biggest_picture( $attachment );
+
                                  $photo[] =
                                      array(
                                          'id'   =>  $attachment->photo->owner_id . '_' . $attachment->photo->pid,
                                          'desc' =>  '',
-                                         'url'  =>  isset( $attachment->photo->src_big ) ?
-                                                                    $attachment->photo->src_big :
-                                                                    $attachment->photo->src,
+                                         'url'  => $url,
                                      );
                                  break;
                             case 'graffiti':
@@ -248,6 +250,25 @@
             return $result_posts_array;
         }
 
+        public static function get_biggest_picture( $data )
+        {
+
+            if( isset($data->photo))
+                $data = $data->photo;
+            if ( isset( $data->src_xxxbig )) {
+                $url = $data->src_xxxbig;
+            } elseif ( isset( $data->src_xxbig )) {
+                $url = $data->src_xxbig;
+            }elseif (isset( $data->src_xbig )) {
+                $url = $data->src_xbig;
+            }elseif (isset( $data->src_big )) {
+                $url = $data->src_big;
+            }else {
+                $url = $data->src;
+            }
+            return $url;
+        }
+
         private function get_average( array &$a )
         {
             $q = count( $a );
@@ -265,10 +286,10 @@
                         $sum_reposts += $post['retweet'] / $post['likes_tr'];
                 }
             }
-            //            echo 'cymma = ' . $sum . 'and q = ' . $q . '<br>';
             return ( array(
-                'avg_likes' => $sum_likes / $q,
-                'avg_retweet' => $sum_reposts / $q
+                'avg_likes'   =>  $q ? $sum_likes / $q   : 0,
+                'avg_retweet' =>  $q ? $sum_reposts / $q : 0
+
             ));
         }
 
@@ -371,12 +392,16 @@
                              'count'    =>  1,
                              'filter'   => 'owner' );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            sleep( self::PAUSE );
             if ( isset( $res->error )) {
                 if ( $res->error->error_code == 15 )
                     throw new Exception('access denied to http://vk.com/public ' . $this->page_id );
                 else
                     throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $params ));
-            }
+            } elseif ( !isset( $res[0]))
+                throw new Exception('Error on getting vk.com/public' . $this->page_id .' wall posts count. Response: '
+                    . ObjectHelper::ToJSON( $res ) . ' on params ' . json_encode( $params ));
+
             $this->count = $res[0];
             return (int) $res[0];
         }
@@ -389,41 +414,41 @@
         private function get_page($page = '')
         {
 
-            if ($page == '')
-                $page = $this->page_adr;
-            if (self::TESTING) echo '<br>get page url = ' . $page;
-            $hnd = curl_init($page);
-            //            curl_setopt($hnd , CURLOPT_HEADER, 1);
-            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
-            $a = curl_exec($hnd);
-            if (curl_errno($hnd))
-                throw new Exception('curl error : ' . curl_error($hnd) . ' trying
+    if ($page == '')
+    $page = $this->page_adr;
+    if (self::TESTING) echo '<br>get page url = ' . $page;
+    $hnd = curl_init($page);
+        //            curl_setopt($hnd , CURLOPT_HEADER, 1);
+    curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+    $a = curl_exec($hnd);
+    if (curl_errno($hnd))
+    throw new Exception('curl error : ' . curl_error($hnd) . ' trying
                     to get ' . $page);
-            if (!$a)  throw new Exception("can't download page " . $page);
-            file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
-            //проверка на доступность
-            if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
-                substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-                throw new Exception('access denied to http://vk.com/public' . $page);
+    if (!$a)  throw new Exception("can't download page " . $page);
+    file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
+        //проверка на доступность
+    if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
+    substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
+    throw new Exception('access denied to http://vk.com/public' . $page);
 
-            if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
-                (substr_count($a, '404 Not Found') == 0) &&
-                (substr_count($a, 'общество не найден') == 0))  ;
-            else
-            {
-                throw new Exception('page not found : ' . $page);
-            }
-            if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
-                (substr_count($a, 'Страница заблокирована') == 0))  ;
-            else
-            {
-                throw new Exception('page is blocked: ' . $page);
-            }
-            return $a;
-        }
+    if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
+    (substr_count($a, '404 Not Found') == 0) &&
+    (substr_count($a, 'общество не найден') == 0))  ;
+    else
+    {
+    throw new Exception('page not found : ' . $page);
+    }
+if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
+    (substr_count($a, 'Страница заблокирована') == 0))  ;
+else
+{
+    throw new Exception('page is blocked: ' . $page);
+}
+return $a;
+}
 
-        private function remove_tags($text)
+        public static  function remove_tags($text)
         {
             $text = str_replace( '<br>',    "\r\n", $text );
             $text = str_replace( '&#189;',  "½",    $text );
@@ -437,25 +462,23 @@
             $text = html_entity_decode($text);
             $text = strip_tags( $text );
             $text = preg_replace('/#[^\s]+/', '',$text);
+//            echo $text, '<br>';
             return trim($text);
+
         }
 
         //$post_ids  = массив idпаблика_idпоста
         //ограничение - 90 постов
-        public static function get_post_likes( $post_ids )
+        public static function get_post_likes( $post_ids, $access_token = '')
         {
             $post_ids = implode( ',', $post_ids );
             $params = array(
                 'posts'   =>   $post_ids
             );
-
-            $res = VkHelper::api_request( 'wall.getById', $params, 0 );
-
-            if ( !empty( $res->error )) {
-
-                throw new Exception('wall.getById::'.$res->error->error_msg);
-            }
-
+            if ( $access_token )
+                $params['access_token'] = $access_token;
+            $res = VkHelper::api_request( 'wall.getById', $params );
+            sleep( self::PAUSE );
             $result = array();
             foreach( $res as $post ) {
                 $result[ $post->to_id . '_' . $post->id ] = array(
@@ -477,6 +500,7 @@
             if (is_numeric($offset))    $params['offset'] = $offset;
 
             $res = VkHelper::api_request( 'photos.get', $params );
+            sleep( self::PAUSE );
             if ($res) {
                 $query_line = array();
 
@@ -495,7 +519,7 @@
                     'extended' => 1,
                 );
                 $res = VkHelper::api_request('photos.getById', $params);
-
+                sleep(self::PAUSE);
                 $posts = VkAlbums::post_conv($res);
                 $posts = $this->kill_attritions($posts, self::ALBUM_MIN_LIKES_LIMIT);
                 return $posts;
@@ -519,7 +543,7 @@
             );
 
             $res = VkHelper::api_request('photos.getAlbums', $params);
-
+            sleep(self::PAUSE);
             if (!empty($res->error)) {
                 throw new Exception('wall.getById::' . $res->error->error_msg);
             } else {
@@ -527,8 +551,21 @@
                    $res = array_pop($res);
                    return $res->size;
                } else {
-                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id);
+                   throw new Exception('Cann`t get album info '.$public_id.'_'.$album_id );
                }
             }
+        }
+
+        public function get_public_albums( $public_id )
+        {
+            $res = array();
+            $response = VkHelper::api_request('photos.getAlbums', array( 'gid' => $public_id ), 0 );
+            if( !isset( $response->error )) {
+                sleep( self::PAUSE );
+                foreach( $response as $album ) {
+                    $res[$album->aid] = array('title' => $album->title );
+                }
+            }
+            return $res;
         }
 }

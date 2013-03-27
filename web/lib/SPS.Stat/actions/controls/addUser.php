@@ -18,10 +18,10 @@
         public function Execute() {
             error_reporting( 0 );
 
-            $user_id    =   Request::getInteger( 'userId' );
+            $user_id    =   AuthVkontakte::IsAuth();
             $rank       =   Request::getInteger( 'rank' );
             $comments   =   Request::getString ( 'uComments' );
-
+            $type       =   Request::getString ( 'type' );
             $rank = $rank ? $rank : 0;
 
             $comments = $comments ? $comments : NULL;
@@ -30,10 +30,13 @@
 
             $user = StatUsers::is_our_user( $user_id );
             if ( $user ) {
-                $user['at'] = StatUsers::get_access_token( $user_id ) ? 1 : 0;
-                if ( $user['at']) {
-//                    MesDialogs::check_friend_requests( $user_id );
-                    MesDialogs::check_new_messages( array( $user_id ), 30 );
+                if ( !$type ) {
+                    $user['at'] = StatUsers::get_access_token( $user_id ) ? 1 : 0;
+                    if ( $user['at']) {
+    //                    MesDialogs::check_friend_requests( $user_id );
+                       if ( !MesDialogs::check_new_messages( array( $user_id ), 30 ))
+                           die( ERR_NO_ACC_TOK );
+                    }
                 }
                 die(  ObjectHelper::ToJSON( array( 'response' => $user )));
             }

@@ -8,7 +8,6 @@
  */
 class CheckPosts
 {
-    const time_shift = 0;
     private $now;
 
     public function Execute()
@@ -19,8 +18,7 @@ class CheckPosts
 
         $this->search_for_posts( $barters_for_search );
 
-        $this->update_population( $barters_for_search );
-        print_r( $barters_for_search );
+        StatPublics::update_population( $barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -28,17 +26,16 @@ class CheckPosts
     {
         $chunks = array_chunk( $barter_events_array, 25 );
         foreach( $chunks as $chunk ) {
-            $res = StatPublics::get_publics_walls( $chunk );
+            $res = StatPublics::get_publics_walls( $chunk, 'barter' );
             $barter = reset( $chunk );
-            $overposts = '';
+
             foreach( $res as $wall ) {
+                $overposts = '';
                 unset($wall[0]);
                 $trig = false;
 
                 foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
-                        print_r( $barter);
-                        print_r(StatBarter::TIME_INTERVAL + $barter->detected_at->format('U'));
                         if( time() >= StatBarter::TIME_INTERVAL + $barter->detected_at->format('U')) {
                             $barter->status = 4;
                             $barter->deletedAt = $this->now;
@@ -50,7 +47,7 @@ class CheckPosts
                         $barter->deleted_at = $this->now;
                         break;
                     } else {
-                        if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + self::time_shift )))> 0  )
+                        if( $barter->stop_search_at->compareTo( new DateTimeWrapper(date('Y-m-d H:i:s', $post->date + StatPublics::time_shift )))> 0  )
                             $overposts .= $post->date . ',';
                     }
                 }
@@ -70,7 +67,7 @@ class CheckPosts
     public function check_post_existence( $barter_event )
     {
         $res = VkHelper::api_request( 'wall.getById', array(
-            'posts' => '-' . $barter_event->barter_public . '_' . $barter_event->post_id ), 0 );
+            'posts' => '-' . $barter_event->barter_public . '_' . $barter_event->post_id ), 0, 'barter' );
         //todo ошибки
         if ( empty( $res )) {
             $barter_event->status = 5;
@@ -79,24 +76,23 @@ class CheckPosts
         return true;
     }
 
-    public function update_population( $barter_events_array )
+    public function get_public_members_count( $public_id )
     {
-        foreach( $barter_events_array as $barter_event ) {
-            if ( $barter_event->status != 3 ) {
-                $time = time() + self::time_shift;
+        $count = 0;
+        for ( $i = 0; $i < 3; $i++ ) {
+            $params = array(
+                'gid'       =>  $public_id,
+                'fields'    =>  'members_count'
+            );
 
-                $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
-                if( !$res ) {
-                    sleep(1);
-                    $time -= 44600;
-                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time );
-                }
-
-                $barter_event->end_visitors = $res['visitors'];
-                $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0 );
-                $barter_event->end_subscribers = $res->count;
-                sleep(0.3);
+            $res = VkHelper::api_request( 'groups.getById', $params, 0, 'barter' );
+            if ( isset( $count->error)) {
+                sleep(0.6);
+                continue;
             }
+            $count = $res[0]->members_count;
+            break;
         }
+        return $count;
     }
 }

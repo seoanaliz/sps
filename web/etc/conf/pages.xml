@@ -31,37 +31,44 @@
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
-                <page uri="controls://arcticles-list/">
+                <page uri="controls://articles-list/">
                     <actions>SPS.Site.GetArticlesListControl</actions>
-                    <template>tmpl://fe/elements/arcticles-list.tmpl.php</template>
+                    <template>tmpl://fe/elements/articles-list.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-item/">
+                <page uri="controls://article-item/">
                     <actions>SPS.Site.GetArticleItemControl</actions>
-                    <template>tmpl://fe/elements/arcticle-item.tmpl.php</template>
+                    <template>tmpl://fe/elements/article-item.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-delete/">
+                <page uri="controls://article-delete/">
                     <actions>SPS.Site.DeleteArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-clear-text/">
+                <page uri="controls://article-clear-text/">
                     <actions>SPS.Site.ClearArticleTextControl</actions>
                 </page>
-                <page uri="controls://arcticles-queue-list/">
+                <page uri="controls://articles-queue-list/">
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
-                    <template>tmpl://fe/elements/arcticles-queue-list.tmpl.php</template>
+                    <template>tmpl://fe/elements/articles-queue-list.tmpl.php</template>
                 </page>
-                <page uri="controls://arcticle-queue-delete/">
+                <page uri="controls://articles-queue-timeline/">
+                    <actions>SPS.Site.GetArticlesQueueTimelineControl</actions>
+                    <template>tmpl://fe/elements/articles-queue-timeline.tmpl.php</template>
+                </page>
+                <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
-                <page uri="controls://arcticle-add-to-queue/">
+                <page uri="controls://article-queue-item-save/">
+                    <actions>SPS.Site.SaveQueueItemControl</actions>
+                </page>
+                <page uri="controls://article-add-to-queue/">
                     <actions>SPS.Site.AddArticleToQueueControl</actions>
                 </page>
-                <page uri="controls://arcticle-save/">
+                <page uri="controls://article-save/">
                     <actions>SPS.Site.SaveArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-get/">
+                <page uri="controls://article-get/">
                     <actions>SPS.Site.GetArticleControl</actions>
                 </page>
-                <page uri="controls://arcticle-restore/">
+                <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
                 <page uri="controls://parse-url/">
@@ -98,6 +105,24 @@
                 <page uri="controls://plan-post-delete/">
                     <actions>SPS.Site.PostDeletePlanControl</actions>
                 </page>
+                <page uri="controls://article-approved/">
+                    <actions>SPS.Site.ApproveArticleControl</actions>
+                </page>
+                <page uri="controls://article-reject/">
+                    <actions>SPS.Site.RejectArticleControl</actions>
+                </page>
+
+
+                <page uri="controls://add-user-group/">
+                    <actions>SPS.Site.AddUserGroup</actions>
+                </page>
+                <page uri="controls://add-user-to-group/">
+                    <actions>SPS.Site.AddUserToUserGroup</actions>
+                </page>
+                <page uri="controls://remove-user-from-group/">
+                    <actions>SPS.Site.RemoveUserFromUserGroup</actions>
+                </page>
+
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
@@ -164,12 +189,27 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="AuthorControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://getAuthors/">
                     <actions>SPS.Stat.getAuthors</actions>
                 </page>
                 <page uri="controls://getPublics/">
                     <actions>SPS.Stat.getPublics</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://saveNewUser/">
+                    <actions>SPS.Stat.saveNewUser</actions>
+                </page>
+                <page uri="controls://getNewUsers/">
+                    <actions>SPS.Stat.getNewUsers</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
+                <page uri="controls://approveNewUser/">
+                    <actions>SPS.Stat.approveNewUser</actions>
                 </page>
             </pageGroup>
 
@@ -245,6 +285,10 @@
                 <page uri="vt://">
                     <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetAuditEventList, SPS.Common.SetAuditMenu</actions>
                     <template>tmpl://vt/audit/index.tmpl.php</template>
+                </page>
+                <page uri="vt://stats/">
+                    <actions>SPS.Common.GetSystemStats</actions>
+                    <template>tmpl://vt/stats.tmpl.php</template>
                 </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
@@ -476,7 +520,7 @@
                             <template>tmpl://vt/authors/add.tmpl.php</template>
                         </page>
                         <page uri="vt://authors/delete/([0-9]+)">
-                            <actions>SPS.App.DeleteAuthor</actions>
+                            <actions>SPS.Site.DeleteAuthor</actions>
                         </page>
                         <page uri="vt://authors/edit/([0-9]+)">
                             <actions>SPS.Site.SaveAuthor</actions>
@@ -484,7 +528,6 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
-				
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
@@ -497,6 +540,16 @@
                         <actions>SPS.Common.DeleteDaemonLock</actions>
                     </page>
                 </pageGroup>
+
+                <pageGroup name="scripts">
+                    <page uri="vt://scripts/UserMigrate">
+                        <actions>SPS.Common.UserMigrateAction</actions>
+                    </page>
+                    <page uri="vt://scripts/articlesStatusSet">
+                        <actions>SPS.Common.ArticlesStatusSetAction</actions>
+                    </page>
+                </pageGroup>
+
                 <pageGroup name="vfs">
                     <page uri="vt://vfs(/mce|/|/fldr|/sfldr)([0-9]*)">
                         <actions>Base.VFS.InitBrowseScreen</actions>
@@ -527,6 +580,9 @@
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>
                 </page>
+                <page uri="daemons://delete-photo/">
+                    <actions>SPS.Site.DeletePhoto</actions>
+                </page>
                 <page uri="daemons://sync-albums/">
                     <actions>SPS.Site.SyncAlbums</actions>
                 </page>
@@ -551,14 +607,11 @@
                 <page uri="daemons://MesCheckUpdates/">
                     <actions>SPS.Stat.MesCheckUpdates</actions>
                 </page>
-                <page uri="daemons://MessageSender/">
-                    <actions>SPS.Stat.MessageSender</actions>
+                <page uri="daemons://token-checker/">
+                    <actions>SPS.Stat.TokenChecker</actions>
                 </page>
-                <page uri="daemons://AlbumUpdate/">
-                    <actions>SPS.Stat.AlbumUpdate</actions>
-                </page>
-                <page uri="daemons://OurAdminsStat/">
-                    <actions>SPS.Stat.OurAdminsStat</actions>
+                <page uri="daemons://PublicsParser/">
+                    <actions>SPS.Stat.PublicsParser</actions>
                 </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
@@ -594,9 +647,12 @@
                 <page uri="appControls://article-save/">
                     <actions>SPS.Site.SaveArticleAppControl</actions>
                 </page>
-                <page uri="appControls://articles-list/">
+                <page uri="appControls://articles-list/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuthSilent">
                     <actions>SPS.Site.GetArticlesAppListControl</actions>
                     <template>tmpl://app/elements/wall-posts-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://user-groups/">
+                    <actions>SPS.Site.GetUserGroups</actions>
                 </page>
                 <page uri="appControls://article-delete/">
                     <actions>SPS.Site.DeleteArticleAppControl</actions>
@@ -607,22 +663,41 @@
                 <page uri="appControls://article-mark/">
                     <actions>SPS.Site.MarkArticleAppControl</actions>
                 </page>
-                <page uri="appControls://(editor/)?comment-save/">
+
+                <page uri="appControls://comment-save/">
                     <actions>SPS.Site.SaveCommentAppControl</actions>
                     <template>tmpl://app/elements/wall-comment.tmpl.php</template>
                 </page>
-                <page uri="appControls://(editor/)?comments-load/">
+                <page uri="appControls://comments-load/">
                     <actions>SPS.Site.LoadCommentsAppControl</actions>
                     <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
                 </page>
-                <page uri="appControls://(editor/)?comment-delete/">
+                <page uri="appControls://comment-delete/">
                     <actions>SPS.Site.DeleteCommentAppControl</actions>
                 </page>
-                <page uri="appControls://(editor/)?comment-restore/">
+                <page uri="appControls://comment-restore/">
                     <actions>SPS.Site.RestoreCommentAppControl</actions>
                 </page>
+
                 <page uri="appControls://comment-mark/">
                     <actions>SPS.Site.MarkCommentAppControl</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="siteControls" boot="SPS.Site.GetSiteParams">
+                <page uri="appControls://editor/comment-save/">
+                    <actions>SPS.Site.SaveCommentAppControl</actions>
+                    <template>tmpl://app/elements/wall-comment.tmpl.php</template>
+                </page>
+                <page uri="appControls://editor/comments-load/">
+                    <actions>SPS.Site.LoadCommentsAppControl</actions>
+                    <template>tmpl://app/elements/wall-comments-list.tmpl.php</template>
+                </page>
+                <page uri="appControls://editor/comment-delete/">
+                    <actions>SPS.Site.DeleteCommentAppControl</actions>
+                </page>
+                <page uri="appControls://editor/comment-restore/">
+                    <actions>SPS.Site.RestoreCommentAppControl</actions>
                 </page>
             </pageGroup>
 
@@ -668,6 +743,15 @@
             <pageGroup name="reports" boot="">
                 <page uri="reports://topface-user-posts/">
                     <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="mobile" boot="">
+                <page uri="/mobile/?">
+                    <template>tmpl://mobile/index.tmpl.php</template>
+                </page>
+                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
+                    <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
 

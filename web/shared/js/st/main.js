@@ -50,7 +50,6 @@ function initVK(data) {
     if (data.response) {
         var r = data.response;
         cur.dataUser = r.me;
-
         Events.fire('get_user', cur.dataUser.uid, function() {
             Filter.init(function() {
                 List.init(function() {

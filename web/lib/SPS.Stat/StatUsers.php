@@ -1,9 +1,8 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
-
-
+    Package::Load( 'SPS.Stat' );
+    new stat_tables();
     class StatUsers
     {
 
@@ -27,12 +26,14 @@
         {
             if ( is_array( $ids ) )
                 $ids    =   implode (',', $ids);
-            if ( !trim( $ids ))
+            $ids = trim( $ids );
+            if ( !$ids )
                 return array();
+
             if( $user_id )
                 $acc_tok = StatUsers::get_access_token( $user_id );
             $users  =   array();
-            $params = array(
+            $params =   array(
                 'uids'   =>  $ids,
                 'fields' =>  'photo,online',
             );
@@ -40,10 +41,14 @@
                 $params['access_token'] =   $acc_tok;
 
             $result = VkHelper::api_request( 'users.get', $params, 0 );
-            if ( isset( $result->error ))
-                die( ERR_NO_ACC_TOK );
+            if ( isset( $result->error ));
+//                die( ERR_NO_ACC_TOK );
+
             foreach( $result as $user )
             {
+                if( !isset ( $user->uid ))
+                    continue;
+
                 $users[ $user->uid ] = array(
                                     'userId'    =>  $user->uid,
                                     'ava'       =>  $user->photo,
@@ -51,7 +56,6 @@
                                     'online'    =>  $user->online,
                                 );
             }
-
             return $users;
         }
 
@@ -72,7 +76,6 @@
             $cmd->SetString ( '@name',        $users['name'] );
             $cmd->SetString ( '@ava',         $users['ava'] );
             $cmd->SetString ( '@comments',    $users['comments'] );
-            echo
             $res = $cmd->ExecuteNonQuery();
 
             if ( !$res )

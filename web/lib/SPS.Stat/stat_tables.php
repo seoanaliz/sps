@@ -1,14 +1,12 @@
 <?php
-/*    Package::Load( 'SPS.Articles' );
-    Package::Load( 'SPS.Site' );*/
 
 
 ###constants
 
-define('ADMIN_RANK', 2);
+    define('ADMIN_RANK', 2);
 
-define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'parameters missing '    )));
-define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
+    define( 'ERR_MISSING_PARAMS', ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'parameters missing '    )));
+    define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'user is not authorized' )));
 
 ###tables
 
@@ -47,4 +45,7 @@ define( 'ERR_NO_ACC_TOK'    , ObjectHelper::ToJSON( array( 'response' => false, 
 //альбомы
     define( 'TABLE_ALBUMS', 'albums' );//данные об альбомах
     define( 'TABLE_ALBUM_POINTS', 'albums_points' );//ежедневные(?) снапшоты альбомов
+class stat_tables {
+
+}
 ?>

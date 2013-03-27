@@ -98,6 +98,10 @@
                 ,'deleteAt' => array(
                     'name'          => 'deleteAt'
                     , 'type'        => TYPE_DATETIME
+                )
+                ,'collectLikes' => array(
+                    'name'          => 'collectLikes'
+                , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -139,6 +143,16 @@
                     'name'         => 'externalLikes',
                     'type'          => TYPE_BOOLEAN,
                     'searchType' => SEARCHTYPE_NULL
+                )
+                , 'startDateFrom' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                , 'startDateTo' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_LE
                 ))
         );
         

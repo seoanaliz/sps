@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <actions>
+    <action name="GetSystemStats" />
+
     <group name="siteparam">
         <action name="GetSiteParamList">
             <path>site-params/GetSiteParamListAction</path>
@@ -49,6 +51,14 @@
                     <param name="action">'delete'</param>
                 </request>
             </parameters>
+        </action>
+    </group>
+    <group name="scripts">
+        <action name="UserMigrateAction">
+            <path>scripts/UserMigrateAction</path>
+        </action>
+        <action name="ArticlesStatusSetAction">
+            <path>scripts/ArticlesStatusSetAction</path>
         </action>
     </group>
     <group name="staticpage">

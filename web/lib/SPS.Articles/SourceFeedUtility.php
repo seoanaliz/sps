@@ -21,6 +21,10 @@
 
         const Albums = 'albums';
 
+        const AuthorsList = 'authors-list';
+
+        const My = 'my';
+
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
@@ -28,9 +32,11 @@
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
+            self::My => 'Мои публикации',
             self::Authors => 'Авторские',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',
+            self::AuthorsList => '+',
         );
 
         public static function IsTopFeed($sourceFeed) {
@@ -67,22 +73,24 @@
             return $sourceInfo;
         }
 
-        public static function SaveRemoteImage($externalId) {
-            $path = 'temp://userpic-' . $externalId . '.jpg';
-            $filePath = Site::GetRealPath($path);
-            try {
-                $parser = new ParserVkontakte();
-                $info = $parser->get_info(ParserVkontakte::VK_URL . '/public' . $externalId);
-
-                if (!empty($info['avatara'])) {
-                    $avatarPath = $info['avatara'];
-                    $content = file_get_contents($avatarPath);
-                    if (!empty($content)) {
-                        file_put_contents($filePath, $content);
-                        Logger::Debug($avatarPath . ' -> ' . Site::GetWebPath($path));
+        public static function SaveRemoteImage($externalIds) {
+            if( !is_array( $externalIds))
+                $externalIds = array($externalIds);
+            $externalIdsChunks = array_chunk( $externalIds, 300 );
+            foreach( $externalIdsChunks as $chunk ) {
+                try {
+                    $feedsVkInfo = StatPublics::get_publics_info( $chunk );
+                    foreach( $feedsVkInfo as $feedInfo ) {
+                        $path = 'temp://userpic-' . $feedInfo['id'] . '.jpg';
+                        $filePath = Site::GetRealPath($path);
+                        $content = file_get_contents($feedInfo['ava']);
+                        if (!empty($content)) {
+                            file_put_contents($filePath, $content);
+                            Logger::Debug($feedInfo['ava'] . ' -> ' . Site::GetWebPath($path));
+                        }
                     }
-                }
-            } catch (Exception $Ex) {}
+                } catch (Exception $Ex) {}
+            }
         }
 
         public static function GetAll() {

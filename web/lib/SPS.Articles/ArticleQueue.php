@@ -1,69 +1,78 @@
 <?php
-    /**
-     * WTF MFD EG 1.6 [t:trunk]
-     * Copyright (c) The 1ADW. All rights reserved.
-     */
+/**
+ * WTF MFD EG 1.6 [t:trunk]
+ * Copyright (c) The 1ADW. All rights reserved.
+ */
 
-    /**
-     * ArticleQueue
-     *
-     * @package SPS
-     * @subpackage Articles
-     */
-    class ArticleQueue {
+/**
+ * ArticleQueue
+ *
+ * @package SPS
+ * @subpackage Articles
+ */
+class ArticleQueue {
 
-        /** @var int */
-        public $articleQueueId;
+    /** @var int */
+    public $articleQueueId;
 
-        /** @var DateTimeWrapper */
-        public $startDate;
+    /** @var DateTimeWrapper */
+    public $startDate;
 
-        /** @var DateTimeWrapper */
-        public $endDate;
+    /** @var DateTimeWrapper */
+    public $endDate;
 
-        /** @var DateTimeWrapper */
-        public $createdAt;
+    /** @var DateTimeWrapper */
+    public $createdAt;
 
-        /** @var DateTimeWrapper */
-        public $sentAt;
+    /** @var DateTimeWrapper */
+    public $sentAt;
 
-        /** @var string */
-        public $type;
+    /** @var string */
+    public $type;
 
-        /** @var string */
-        public $author;
+    /** @var string */
+    public $author;
 
-        /** @var string */
-        public $externalId;
+    /** @var string */
+    public $externalId;
 
-        /** @var int */
-        public $externalLikes;
+    /** @var int */
+    public $externalLikes;
 
-        /** @var int */
-        public $externalRetweets;
+    /** @var int */
+    public $externalRetweets;
 
-        /** @var int */
-        public $articleId;
+    /** @var int */
+    public $articleId;
 
-        /** @var Article */
-        public $article;
+    /** @var Article */
+    public $article;
 
-        /** @var int */
-        public $targetFeedId;
+    /** @var Author */
+    public $articleAuthor;
 
-        /** @var TargetFeed */
-        public $targetFeed;
+    /** @var Author */
+    public $articleQueueCreator;
 
-        /** @var int */
-        public $statusId;
+    /** @var int */
+    public $targetFeedId;
 
-        /** @var Status */
-        public $status;
+    /** @var TargetFeed */
+    public $targetFeed;
 
-        /** @var DateTimeWrapper */
-        public $deleteAt;
+    /** @var int */
+    public $statusId;
 
-        /** @var boolean */
-        public $isDeleted;
-    }
+    /** @var Status */
+    public $status;
+
+    /** @var DateTimeWrapper */
+    public $deleteAt;
+
+    /** @var boolean */
+    public $isDeleted;
+
+    /** @var boolean */
+    public $collectLikes;
+}
 ?>

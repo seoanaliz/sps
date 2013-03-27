@@ -1,10 +1,16 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
+    new stat_tables();
+
 
     class StatGroups
     {
+
+        const GROUP_ORDINARY = 0;
+        const GROUP_DEFAULT  = 2;
+        const GROUP_GLOBAL   = 3;
+
         public static function is_general( $groupId )
         {
             $group = self::get_group( $groupId );
@@ -23,10 +29,10 @@
             $ds->Next();
             return array (
                 'groupId'   =>  $ds->getInteger( 'group_id' ),
-                'general'   => $ds->getInteger( 'general'),
+                'general'   =>  $ds->getInteger( 'general'),
                 'name'      =>  $ds->getValue( 'name' ),
                 'comments'  =>  $ds->getValue( 'comments' ),
-                'type'  =>  $ds->getInteger( 'type' ),
+                'type'      =>  $ds->getInteger( 'type' ),
             );
 
         }
@@ -39,23 +45,23 @@
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
                         ' . TABLE_STAT_GROUPS . ' as c
                     WHERE
-                        a.user_id = b.user_id
+                        ( a.user_id = b.user_id OR type = ' . self::GROUP_GLOBAL . ' )
                         AND c.group_id = b.group_id
                         AND a.user_id = @user_id';
 
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
             $cmd->SetInteger( '@user_id', $userId );
-            $ds = $cmd->Execute();
+            $ds  = $cmd->Execute();
             $res = array();
 
-            while( $ds->Next() ) {
+            while( $ds->Next()) {
                 $res[] = array(
                     'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
                     'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
                     'name'      =>  $ds->getValue( 'name' ),
                     'comments'  =>  $ds->getValue( 'comments' ),
                     'fave'      =>  $ds->GetBoolean( 'fave' ),
-                    'group_type'=>  $ds->GetInteger( 'type'),
+                    'group_type'=>  $ds->GetInteger( 'type' ),
                 );
             }
 
@@ -96,6 +102,9 @@
 		
             $i = 0;
             foreach( $groupIds as $gr_id ) {
+                $group = self::get_group( $gr_id );
+                if ( $group['type'] == self::GROUP_GLOBAL )
+                    continue;
                 foreach ( $userIds as $id ) {
 
                     $query = 'INSERT INTO ' . TABLE_STAT_GROUP_USER_REL . '(user_id,group_id)
@@ -105,7 +114,6 @@
                     $cmd->SetInteger('@user_id', $id);
 		      if ($cmd->ExecuteNonQuery())
                         $i++;
-
                 }
             }
 
@@ -113,11 +121,13 @@
                 return true;
             else
                 return false;
-
         }
 
         public static function extricate_group( $group_id, $user_id )
         {
+            $group = self::get_group( $group_id );
+            if ( $group['type'] == self::GROUP_GLOBAL )
+                return true;
             $sql = 'DELETE FROM
                             ' . TABLE_STAT_GROUP_USER_REL . '
                          WHERE
@@ -133,18 +143,24 @@
             return false;
         }
 
-        public static function implement_entry( $groupId, $publicId, $user_id = 0 )
+        public static function implement_entry( $group_id, $publicId, $user_id = 0 )
         {
+            $group = self::get_group( $group_id );
+            if ( $group['type'] == self::GROUP_GLOBAL )
+                return true;
             $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(public_id,group_id)
                        VALUES (@public_id,@group_id)';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@group_id', $groupId);
+            $cmd->SetInteger('@group_id', $group_id);
             $cmd->SetInteger('@public_id', $publicId);
             $cmd->Execute();
         }
 
         public static function extricate_entry( $group_id, $entry_id, $user_id = 0 )
         {
+            $group = self::get_group( $group_id );
+            if ( $group['type'] == self::GROUP_GLOBAL )
+                return true;
             $query =  'DELETE FROM '
                 . TABLE_STAT_GROUP_PUBLIC_REL . '
                            WHERE
@@ -156,10 +172,13 @@
             $cmd->Execute();
         }
 
-        public static function setGroup( $ava, $groupName, $comments, $groupId = false )
+        public static function setGroup( $ava, $groupName, $comments, $group_id = false )
         {
             //update
-            if ( $groupId ) {
+            if ( $group_id ) {
+                $group = self::get_group( $group_id );
+                if ( $group['type'] == self::GROUP_GLOBAL )
+                    return true;
                 $sql = 'UPDATE
                             ' . TABLE_STAT_GROUPS .
                     ' SET
@@ -167,12 +186,12 @@
                           WHERE group_id=@group_id';
 
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-                $cmd->SetInteger('@group_id',   $groupId);
+                $cmd->SetInteger('@group_id',   $group_id);
                 $cmd->SetString('@name',        $groupName);
                 $cmd->SetString('@comments',    $comments);
                 $cmd->SetString('@ava',         $ava);
                 $cmd->Execute();
-                return $groupId;
+                return $group_id;
             //create new
             } elseif( $groupName ) {
                 $sql = 'INSERT INTO
@@ -189,12 +208,12 @@
 
                 $ds = $cmd->Execute();
                 $ds->next();
-                $groupId = $ds->getValue('group_id', TYPE_INTEGER);
-                if ( !$groupId || $groupId== NULL) {
+                $group_id = $ds->getValue('group_id', TYPE_INTEGER);
+                if ( !$group_id ) {
                     return false;
                 }
 
-                return $groupId;
+                return $group_id;
             }
         }
 
@@ -234,11 +253,13 @@
                 return false;
 
             return true;
-
         }
 
         public static function delete_group( $group_id )
         {
+            $group = self::get_group( $group_id );
+            if ( $group['type'] == self::GROUP_GLOBAL )
+                return true;
             $sql = 'DELETE FROM
                             ' . TABLE_STAT_GROUP_USER_REL . '
                          WHERE
@@ -277,7 +298,6 @@
             }
             return $res;
         }
-
 
     }
 ?>

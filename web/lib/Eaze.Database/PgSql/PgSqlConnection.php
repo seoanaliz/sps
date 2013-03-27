@@ -107,7 +107,6 @@
          */
         public function GetConnectionString() {
             $connectionString = sprintf( 'host=%s port=%s dbname=%s user=%s password=%s', $this->host, $this->port, $this->dbname, $this->user, $this->password );
-
             return $connectionString;
         }
 
@@ -231,9 +230,13 @@
             $connectionString = $this->getConnectionString();
 
             if ( !empty( $this->isPersistent ) ) {
-                $this->connection = pg_pconnect( $connectionString );
+                $this->connection = @pg_pconnect( $connectionString );
             } else {
-                $this->connection = pg_connect( $connectionString );
+                $this->connection = @pg_connect( $connectionString );
+            }
+
+            if (!is_resource( $this->connection )) {
+                Response::HttpStatusCode( '503', 'Service Unavailable' );
             }
 
             if ( !empty( $this->charset ) ) {

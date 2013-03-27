@@ -1,5 +1,8 @@
 <?php
+if (!defined('DEFAULT_TIMEZONE')){
     define( 'DEFAULT_TIMEZONE', date_default_timezone_get() );
+}
+
 
     /**
      * DateTimeWrapper
@@ -125,7 +128,7 @@
         /**
          * Returns d.m.Y H:i
          * @param string $format
-         * @return void
+         * @return string
          */
         public function Default24hFormat( $format = 'd.m.Y H:i' ) {
             return $this->format( $format );
@@ -135,7 +138,7 @@
         /**
          * Returns G:i
          * @param string $format
-         * @return void
+         * @return string
          */
         public function DefaultTimeFormat( $format = 'G:i' ) {
             return $this->format( $format );
@@ -145,7 +148,7 @@
         /**
          * Returns d.m.Y
          * @param string $format
-         * @return void
+         * @return string
          */
         public function DefaultDateFormat( $format = 'd.m.Y' ) {
             return $this->format( $format );

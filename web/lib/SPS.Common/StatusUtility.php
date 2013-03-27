@@ -4,8 +4,9 @@
      *
      */
     class StatusUtility {
-
-        const Queued = 4;
+        const Enabled = 1;
+        const Deleted = 3;
+        const Queued  = 4;
         const Finished = 5;
 
         /**

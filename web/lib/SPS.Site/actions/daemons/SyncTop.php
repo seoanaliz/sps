@@ -1,5 +1,6 @@
 <?php
     Package::Load( 'SPS.Site' );
+    Package::Load( 'SPS.VK' );
 
     /**
      * SyncTop Action
@@ -28,7 +29,7 @@
                 return;
             }
 
-            $parser = new tf_parcer();
+            $parser = new ParserTop();
 
             $tries  = 3;
             $i      = 0;
@@ -82,7 +83,7 @@
             }
 
             /**
-             * Обходим посты и созраняем их в бд, попутно сливая фотки
+             * Обходим посты и сохраняем их в бд, попутно сливая фотки
              */
             foreach ($posts as $post) {
                 $externalId = TextHelper::ToUTF8('top-' . $post['id']);
@@ -98,9 +99,10 @@
                 $article->importedAt    = DateTimeWrapper::Now();
                 $article->isCleaned     = false;
                 $article->statusId      = 1;
+                $article->articleStatus  = Article::STATUS_APPROVED;
 
                 $articleRecord = new ArticleRecord();
-                $articleRecord->content = $post['text'];
+                $articleRecord->content = !empty($post['text']) ? $post['text'] : '';
                 $articleRecord->link    = $post['link'];
                 $articleRecord->likes   = Convert::ToInteger($post['likes']);
                 $articleRecord->photos  = array();
@@ -123,10 +125,10 @@
                 $conn = ConnectionFactory::Get();
                 $conn->begin();
 
-                $result = ArticleFactory::Add($article);
+                $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
 
                 if ( $result ) {
-                    $articleRecord->articleId = ArticleFactory::GetCurrentId();
+                    $articleRecord->articleId = $article->articleId;
                     $result = ArticleRecordFactory::Add( $articleRecord );
                 }
 

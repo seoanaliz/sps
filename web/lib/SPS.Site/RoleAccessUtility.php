@@ -8,10 +8,11 @@ class RoleAccessUtility
 {
     protected static $FeedRulesByRole = array();
     protected static $FeedRulesByFeed = array();
+    public static $TopFaceFeeds = array(22);
 
     private static $isLoaded = false;
 
-    public function __construct($vkId = null) {
+    public function __construct($vkId) {
         if (!self::$isLoaded) {
             $this->loadRules($vkId);
         }
@@ -21,10 +22,7 @@ class RoleAccessUtility
      * Загружает права пользователя
      * @param null $vkId
      */
-    private function loadRules($vkId = null) {
-        if (is_null($vkId)){
-            $vkId = AuthVkontakte::IsAuth();
-        }
+    private function loadRules($vkId) {
         if ($vkId) {
             $UserFeeds = UserFeedFactory::Get(array('vkId' => (int)$vkId));
             self::$FeedRulesByRole = array();
@@ -72,6 +70,7 @@ class RoleAccessUtility
         return $targetFeedIds;
     }
 
+
     /**
      * @param $targetFeedId - ид ленты
      * @param $sourceType - тип ресурса
@@ -93,12 +92,12 @@ class RoleAccessUtility
                 break;
 
                 case SourceFeedUtility::Topface:
-                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR)) && in_array($targetFeedId, self::$TopFaceFeeds);
                 break;
 
-                //case SourceFeedUtility::AuthorsList:
-                //    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
-                //break;
+                case SourceFeedUtility::AuthorsList:
+                    return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
+                break;
             }
             return true;
         }
@@ -155,9 +154,7 @@ class RoleAccessUtility
     public function canAddPlanCell($targetFeedId) {
         if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
                 return !in_array(self::$FeedRulesByFeed[$targetFeedId], array(UserFeed::ROLE_AUTHOR));
-            return true;
         }
-        #return false;
         return true;
     }
 

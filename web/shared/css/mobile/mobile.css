@@ -1,0 +1,324 @@
+.inline-block {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+html {
+  background-color: #f1f1f1;
+}
+span {
+  vertical-align: middle;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.box-wrap > .box {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.box-wrap > .box  > .title {
+  padding: 15px;
+  border: 0;
+  font-size: 22px;
+  -webkit-border-radius: 2px 2px 0 0;
+  -moz-border-radius: 2px 2px 0 0;
+  border-radius: 2px 2px 0 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  background-color: #659ad5;
+  background-image: -webkit-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -moz-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -ms-linear-gradient(top, #659ad5, #578dd0);
+  background-image: -o-linear-gradient(top, #659ad5, #578dd0);
+  background-image: linear-gradient(top, #659ad5, #578dd0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= #659ad5 , EndColorStr= #578dd0 );
+}
+.box-wrap > .box  > .body {
+  border: 0;
+}
+.box-wrap > .box  > .actions-wrap {
+  border: 0;
+}
+.box-wrap > .box  > .actions-wrap .actions {
+  padding: 20px;
+  text-align: center;
+}
+.box.box-groups  > .title {
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+}
+.box.box-groups  > .body {
+  overflow: auto;
+  max-height: 550px;
+  padding: 7px;
+}
+.box.box-groups  > .actions-wrap {
+  -webkit-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3);
+}
+.box.box-groups  > .actions-wrap .actions {
+  border-top: 1px solid #fff;
+}
+.box.box-groups  > .actions-wrap .actions .button {
+  display: block;
+  width: 100%;
+}
+.box.box-groups .groups-empty {
+  color: #777;
+  text-align: center;
+  padding: 100px 0;
+  font-size: 16px;
+}
+.box.box-groups .group-row + .group-row {
+  border-top: 1px solid #e5edf7;
+}
+.box.box-groups .group-row {
+  padding: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.box.box-groups .group-row  > div {
+  vertical-align: middle;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.box.box-groups .group-row .image {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+}
+.box.box-groups .group-row .image img {
+  max-width: 100%;
+}
+.box.box-groups .group-row .title {
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  max-width: 80%;
+}
+.box.box-groups .group-row:hover {
+  background-color: #e5edf7;
+}
+.box.box-groups .group-row.selected {
+  background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
+}
+.box.box-groups .textarea-wrap {
+  margin-right: 20px;
+}
+.box.box-groups .email-input {
+  padding: 6px 9px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  border-color: #c7c7c7;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.box.box-groups .email-input:focus {
+  background-color: #fff;
+}
+.block-wrapper-2,
+.block-wrapper-3 {
+  font-size: 0;
+}
+.block-wrapper-2  > .block,
+.block-wrapper-3  > .block {
+  font-size: 12px;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  vertical-align: top;
+  width: 100%;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.block-wrapper-2  > .block.left,
+.block-wrapper-3  > .block.left {
+  text-align: left;
+}
+.block-wrapper-2  > .block.center,
+.block-wrapper-3  > .block.center {
+  text-align: center;
+}
+.block-wrapper-2  > .block.right,
+.block-wrapper-3  > .block.right {
+  text-align: right;
+}
+.block-wrapper-2  > .block {
+  width: 50%;
+}
+.block-wrapper-3  > .block {
+  width: 33%;
+}
+.big-title {
+  font-size: 42px;
+  color: #fff;
+  -webkit-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  -moz-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.big-button-description {
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  -webkit-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  -moz-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+.big-button-description .icon-vk {
+  background: center no-repeat url("../../images/mobile/vk.png");
+  font-size: 0;
+  width: 30px;
+  height: 20px;
+}
+.button {
+  font-size: 20px;
+  padding: 15px 30px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+.button,
+.button:hover,
+.button:active {
+  color: #fff;
+  border: 1px solid #5d94d4;
+  background-color: #6ea7e6;
+  background-image: -webkit-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -moz-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -ms-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: -o-linear-gradient(top, #6ea7e6, #5f99e0);
+  background-image: linear-gradient(top, #6ea7e6, #5f99e0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= #6ea7e6 , EndColorStr= #5f99e0 );
+  -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  -webkit-text-shadow: none;
+  -moz-text-shadow: none;
+  text-shadow: none;
+}
+.button:active {
+  padding-top: 16px;
+  padding-bottom: 14px;
+  background: #5f99e0;
+}
+.button.disabled {
+  cursor: default;
+  -webkit-pointer-events: none;
+  -moz-pointer-events: none;
+  pointer-events: none;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=(70));
+  filter: alpha(opacity = (70));
+  opacity: 0.7;
+}
+.big-button {
+  padding: 20px 40px;
+  font-size: 24px;
+  margin: 20px 0;
+}
+.big-button,
+.big-button:hover,
+.big-button:active {
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3);
+  -webkit-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  -moz-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.big-button:active {
+  padding-top: 21px;
+  padding-bottom: 19px;
+}
+#main,
+#main * {
+  font-family: helvetica, arial, tahoma, sans-serif !important;
+}
+#logo {
+  font-weight: bold;
+  color: #2b587a;
+}
+#header {
+  padding: 15px;
+  background-color: #fff;
+}
+#footer {
+  color: #777;
+  background-color: #f1f1f1;
+  padding: 20px;
+}
+#main-content {
+  background: #9d7b76 url('../../images/mobile/main-content.jpg') center;
+  height: 530px;
+}
+#main-content .big-title {
+  margin-top: 150px;
+}
+#description {
+  background-color: #fff;
+  padding-top: 50px;
+  color: #666;
+}
+#description .reason {
+  text-align: center;
+  padding: 50px 0;
+  width: 250px;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+#description .reason .icon {
+  width: 80px;
+  height: 70px;
+  margin: 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#description .reason .icon.check {
+  background-image: url("../../images/mobile/check.png");
+}
+#description .reason .icon.heart {
+  background-image: url("../../images/mobile/heart.png");
+}
+#description .reason .icon.megaphone {
+  background-image: url("../../images/mobile/megaphone.png");
+}
+#description .reason .title {
+  font-size: 30px;
+}
+#description .reason .description {
+  line-height: 2em;
+  font-size: 17px;
+}
+.inner-content {
+  width: 950px;
+  margin: 0 auto;
+}
+#mobiles {
+  width: 400px;
+  height: 565px;
+  margin: 45px 0;
+  background: url("../../images/mobile/mobiles.png") center no-repeat;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}

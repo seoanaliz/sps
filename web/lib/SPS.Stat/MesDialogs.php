@@ -1,7 +1,7 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
+    new stat_tables();
 
 
     class MesDialogs
@@ -30,12 +30,13 @@
         }
 
         //получает все диалоги, $max_offset - ограничение
-        public static function get_all_dialogs( $user_id, $max_offset = '' )
+        public static function get_all_dialogs( $user_id, $max_offset = 0 )
         {
             $max_offset = $max_offset ? $max_offset : 9000000;
             $access_token = StatUsers::get_access_token( $user_id );
             $offset = 0;
             $dialog_array = array();
+
             while(1) {
                 $code   = '';
                 $return = "return{";
@@ -50,8 +51,10 @@
                 $code .= trim( $return, ',' ) . "};";
                 $res = VkHelper::api_request( 'execute',  array( 'code'  =>  $code, 'access_token' => $access_token ), 0 );
                 //todo logs
-                if ( isset( $res->error ))
+                if ( isset( $res->error )) {
                     return false;
+                }
+
 
                 foreach ( $res as $stak ) {
                     unset( $stak[0] );
@@ -138,9 +141,10 @@
             $cmd->SetInteger( '@rec_id',  $rec_id  );
             $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
-            if ( $ds->Next() );
+            $id = false;
+            if ( $ds->Next())
                 $id =  $ds->GetValue( 'id', TYPE_INTEGER ) ;
-            return $id ? $id : false;
+            return $id;
         }
 
         //возвращает id второго участника диалога
@@ -319,7 +323,7 @@
 
         private static function get_long_poll_server( $token )
         {
-            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 1 );
+            $res = VkHelper::api_request( 'messages.getLongPollServer', array('access_token' => $token), 0 );
             if ( isset( $res->error ) )
                 return false;
             return (array)$res;
@@ -361,6 +365,7 @@
             $cmd->SetInt( '@rec_id' , $rec_id  );
             $cmd->SetInt( '@time'   , $time );
             $cmd->SetInt( '@state'  , MesDialogs::calculate_state( $read, $in ));
+//            echo $cmd->GetQuery() . '<br>';
             $cmd->Execute();
         }
 
@@ -404,6 +409,7 @@
                 $cmd->SetInt( '@dialog_id', $dialog );
                 $cmd->SetInt( '@state', $state );
                 $cmd->SetInt( '@now',   $now );
+//                echo $cmd->GetQuery() . '<br>';
                 $cmd->Execute();
             }
         }
@@ -694,10 +700,20 @@
             $cmd->Execute();
         }
 
+        //
         public static function check_new_messages( $im_users, $count = 0 )
         {
+            if ( !is_array( $im_users ))
+                $im_users = array( $im_users );
+
             foreach( $im_users as $user ) {
                 $dialogs = MesDialogs::get_all_dialogs( $user, $count );
+                if ( $dialogs == 'no access_token' )
+                    return false;
+//                if ( $user == 13049517) {
+//                    file_put_contents( '1.txt', json_encode($dialogs) );
+//                    die();
+//                }
                 $default_group = MesGroups::get_unlist_dialogs_group( $user);
                 if ( !$dialogs )
                     continue;
@@ -739,6 +755,7 @@
                     MesGroups::update_highlighted_list( $group_ids, $user, $act, $dialog_id );
                 }
             }
+            return true;
         }
 
         public static function save_last_line( $dialog_id, $text, $out, $mid, $read )
@@ -756,6 +773,7 @@
             $cmd->Execute();
         }
 
+        // для быстрой подгрузки старые заипси диалогов(последее сообщение) сохраняются у нас, выдаются без обращений к контакту
         public static function get_dialogs_from_db( $user_id, $res_ids )
         {
             $res_ids = implode( ',', $res_ids );
@@ -783,6 +801,25 @@
                     'mid'           =>  $ds->GetInteger('mid'),
                     'title'         =>  $ds->GetString( 'text'),
                     'body'          =>  $ds->GetString( 'text')
+                );
+            }
+            return $res;
+        }
+
+        public function get_dialogs_list_from_db( $user_id ) {
+            $sql = 'SELECT
+                        id, rec_id
+                    FROM '
+                        . TABLE_MES_DIALOGS . '
+                    WHERE user_id=@user_id
+            ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds = $cmd->Execute();
+            $res = array();
+            while( $ds->Next()) {
+                $res[$ds->GetInteger('id')] = array(
+                    $ds->GetInteger('rec_id')
                 );
             }
             return $res;

@@ -29,6 +29,11 @@
     </action>
     <action name="VKCheckAppAuth">
         <path>VKCheckAppAuth</path>
+        <parameters>
+            <request>
+                <param name="isVkApp">true</param>
+            </request>
+        </parameters>
         <redirects>
             <redirect name="empty" path="/app/landing/" />
         </redirects>
@@ -38,6 +43,7 @@
         <parameters>
             <request>
                 <param name="silent">true</param>
+                <param name="isVkApp">true</param>
             </request>
         </parameters>
     </action>

@@ -8,17 +8,8 @@
         <action name="WrTopics">
             <path>daemons/WrTopics</path>
         </action>
-        <action name="OurAdminsStat">
-            <path>daemons/OurAdminsStat</path>
-        </action>
         <action name="MesCheckUpdates">
             <path>daemons/MesCheckUpdates</path>
-        </action>
-        <action name="MessageSender">
-            <path>daemons/MessageSender</path>
-        </action>
-        <action name="AlbumUpdate">
-            <path>daemons/AlbumUpdate</path>
         </action>
         <action name="PublicsGrowFixer">
             <path>daemons/PublicsGrowFixer</path>
@@ -31,6 +22,12 @@
         </action>
         <action name="CheckPosts">
             <path>daemons/CheckPosts</path>
+        </action>
+        <action name="TokenChecker">
+            <path>daemons/TokenChecker</path>
+        </action>
+        <action name="PublicsParser">
+            <path>daemons/PublicsParser</path>
         </action>
 
     </group>
@@ -85,6 +82,19 @@
             <action name="getPublics">
                 <path>controls/authors/getPublics</path>
             </action>
+        </group>
+
+        <group name="NewUsers">
+            <action name="saveNewUser">
+                <path>controls/newUsers/AddNewUserControl</path>
+            </action>
+            <action name="getNewUsers">
+                <path>controls/newUsers/GetNewUserControl</path>
+            </action>
+            <action name="approveNewUser">
+                <path>controls/newUsers/ApproveNewUserControl</path>
+            </action>
+
         </group>
 
         <group name="Groups">

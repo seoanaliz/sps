@@ -12,14 +12,20 @@ class GetPublicGrowthAction
      * Constructor
      */
     public function execute() {
-        $this->get_publics_growth();
+        $creator_id     =   Request::getInteger( 'id' ) ? Request::getInteger( 'id' ) : '';
+        $this->get_publics_growth( $creator_id );
 //       print_r( $this->get_average_barters( '2012-11-30' ));
     }
 
-    protected function get_publics_growth()
+    protected function get_publics_growth( $creator_id )
     {
-        $sql = 'SELECT * FROM stat_our_auditory ORDER BY point_date ';
+        $type = 'all_publics';
+        if ( $creator_id ) {
+            $type = "vld_publics";
+        }
+        $sql = 'SELECT * FROM stat_our_auditory  WHERE type = @type ORDER BY point_date ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetString( '@type', $type );
         $ds  = $cmd->Execute();
         $res = array();
 //        echo '>>>>>>>>>>>>>>>>>' . microtime(1) . '<br>';
@@ -50,7 +56,7 @@ class GetPublicGrowthAction
                 $data['change_unq'] = '-';
                 $data['change_unuqunq'] = '-';
             }
-            $barter = $this->get_average_barters( $date );
+            $barter = $this->get_average_barters( $date, $creator_id );
             $data['barters_vis']  = $barter['total_vis'];
             $data['barters_subs'] = $barter['total_sub'];
             $data['barters']      = $barter['total_count'] . '(' . $barter['rel_count']. ')';
@@ -59,23 +65,27 @@ class GetPublicGrowthAction
         Response::setArray( 'stat_summary' , array_reverse( $res ));
     }
 
-    private function get_average_barters( $date )
+    private function get_average_barters( $date, $creator_id = '' )
     {
+
+        $search_line =  $creator_id ? ' AND  creator_id = @creator_id ' : '';
+
         $sql = 'SELECT
                     *
-                    FROM
-                        barter_events
-                    WHERE
-                        posted_at::date = date @date
-                        AND status in (4,5,6)
-                        AND post_id IS NOT NULL
-                        AND start_visitors IS NOT NULL
-                        AND end_visitors IS NOT NULL
-                    ORDER BY detected_at
+                FROM
+                    barter_events
+                WHERE
+                    posted_at::date = date @date
+                    AND status in (4,6)
+                    AND post_id IS NOT NULL
+                    AND start_visitors IS NOT NULL
+                    AND end_visitors IS NOT NULL
+                    ' . $search_line . '
+                ORDER BY detected_at
                     ';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
         $cmd->SetString( '@date', $date );
-//        echo $cmd->GetQuery();
+        $cmd->SetString( '@creator_id', $creator_id );
         $ds  = $cmd->Execute();
         $vis  = 0;
         $subs = 0;
@@ -88,6 +98,9 @@ class GetPublicGrowthAction
             $end_visitors   = $ds->GetInteger( 'end_visitors' );
             $start_subscribers = $ds->GetInteger( 'start_subscribers' );
             $end_subscribers   = $ds->GetInteger( 'end_subscribers' );
+            if ( !$start_subscribers || !$end_subscribers )
+                continue;
+
             $a = $ds->GetDateTime( 'detected_at');
             if ( $a )
                 $a = $a->getTimestamp();

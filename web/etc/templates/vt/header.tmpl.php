@@ -82,6 +82,11 @@
                     , "link" => "/"
                 )
                 , array(
+                    "title"  => "Приложение для авторов"
+                    , "link" => "http://vk.com/app" . AuthVkontakte::$AuthorAppId
+                    , "target" => "_blank"
+                )
+                , array(
                     "title"    => "vt.menu.toSiteNew"
                     , "link"   => "/"
                     , "target" => "_blank"

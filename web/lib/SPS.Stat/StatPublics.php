@@ -1,11 +1,66 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-//    Package::Load( 'SPS.Stat' );
+    new stat_tables();
 
     class StatPublics
     {
+
+        const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
+        //массив пабликов, которые не надо включать в сбор/отбражение данных
+        public static $exception_publics_array = array(
+         26776509
+        ,43503789
+        ,346191
+        ,33704958
+        ,38000521
+        ,1792796
+        ,27421965
+        ,34010064
+        ,25749497
+        ,35807078
+        ,25817269
+        );
+
+        public static $topface_beauty = array(
+            25678227,
+            38000449,
+            35807278,
+            38000423,
+            38000513,
+            38000540,
+            42351996,
+            41946825,
+            42352011,
+            42352024,
+            42494921,
+            42352077,
+            42352062,
+            42494824,
+            42494714,
+            41946847,
+            42495064,
+            42352154,
+            42352138,
+            42494794,
+            41946872,
+            42495143,
+            42495239,
+            42494936,
+            41946945,
+            42495024,
+            41946887,
+            41946921,
+            42495048,
+            42494987,
+            41946866,
+            42494848,
+            42352086,
+            42352120,
+            42494766,
+            49903343
+        );
 
         public static function get_id_by_shortname( $shortname )
         {
@@ -14,42 +69,32 @@
             return $res[0]->gid;
         }
 
-        public static function get_our_publics_list()
+        public static function get_our_publics_list( $selector = 0 )
         {
             $publics = TargetFeedFactory::Get();
 
             $res = array();
             foreach ( $publics as $public ) {
-                if( $public->type != 'vk'             ||
-                    $public->externalId ==  25678227  ||
-                    $public->externalId ==  26776509  ||
-                    $public->externalId ==  43503789  ||
-                    $public->externalId ==  346191  ||
-                    $public->externalId ==  33704958  ||
-                    $public->externalId ==  38000521  ||
-                    $public->externalId ==  1792796  ||
-                    $public->externalId ==  27421965  ||
-                    $public->externalId ==  34010064  ||
-                    $public->externalId ==  25749497  ||
-//                    $public->externalId ==  38000555  ||
-                    $public->externalId ==  35807078  ||
-                    $public->externalId ==  25817269 )
+                if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
-
+                // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
+                if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
+                    ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
+                    continue;
                 $a['id']    = $public->externalId;
                 $a['title'] = $public->title;
                 $a['sb_id'] = $public->targetFeedId;
-                $res[] = $a;
+                $res[$public->externalId] = $a;
             }
             return $res;
         }
 
-        public static function get_publics_info( $public_ids )
+        public static function get_publics_info( $public_ids, $app = '' )
         {
             if( is_array( $public_ids ))
                 $public_ids = implode( ',', $public_ids );
             $result = array();
-            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0 );
+            $res = VkHelper::api_request( 'groups.getById', array( 'gids' => $public_ids ), 0, $app );
             if( isset( $res->error ))
                 return false;
             $result = array();
@@ -563,12 +608,12 @@
 
         }
 
-        //возвращает стены до 25 пабликов
-        public static function get_publics_walls( $barter_events_array )
+        //РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚РµРЅС‹ РґРѕ 25 РїР°Р±Р»РёРєРѕРІ
+        public static function get_publics_walls( $barter_events_array, $app = '' )
         {
             $code = '';
             $return = "return{";
-            //запрашиваем стены пабликов по 25 пабликов, 15 постов
+            //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 15 РїРѕСЃС‚РѕРІ
             $i = 0;
             foreach( $barter_events_array as $public ) {
                 $id = trim( $public->barter_public );
@@ -577,12 +622,11 @@
                 $i++;
             }
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
-                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
             return $res;
         }
 
-        public static function get_public_walls_mk2( $walls_array )
+        public static function get_public_walls_mk2( $walls_array, $app = '' )
         {
             $walls = array();
             $walls_array = array_unique( $walls_array );
@@ -590,7 +634,7 @@
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
-                //запрашиваем стены пабликов по 25 пабликов, 10 постов
+                //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 10 РїРѕСЃС‚РѕРІ
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
@@ -599,7 +643,7 @@
                     $i++;
                 }
                 $code .= trim( $return, ',' ) . "};";
-                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+                $res   = VkHelper::api_request( 'execute', array( 'code' => $code ), 0, $app );
                 if( isset( $res->error ))
                     continue;
                 foreach( $res as $id => $content ) {
@@ -610,7 +654,7 @@
             return $walls;
         }
 
-        public static function get_visitors_from_vk( $public_id, $time_from, $time_to )
+        public static function get_visitors_from_vk( $public_id, $time_from, $time_to, $app = '' )
         {
 //            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
 //            if ( !empty( $public )) {
@@ -624,12 +668,15 @@
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-//            if ( isset( $publisher->publisher->vk_token ))
-//                $params['access_token']  =  $publisher->publisher->vk_token;
-
-            $res = VkHelper::api_request( 'stats.get', $params, 0 );
-            if ( !empty ( $res->error ))
+            for( $i = 0; $i < 3; $i++ ) {
+                sleep(0.6);
+                $res = VkHelper::api_request( 'stats.get', $params, 0, $app );
+                if ( empty ( $res->error ) && !empty( $res ))
+                    break;
+            }
+            if ( !empty ( $res->error ) || empty( $res ))
                 return false;
+
             return array(
                 'visitors'  =>  $res[0]->visitors,
                 'viewers'   =>  $res[0]->views
@@ -639,7 +686,7 @@
         public static function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
-            $sql = 'SELECT vk_id, name, ava, quantity, page
+            $sql = 'SELECT vk_id, name, ava, quantity, is_page
                     FROM ' . TABLE_STAT_PUBLICS . '
                     WHERE vk_id IN (' . $public_ids . ')';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -651,15 +698,16 @@
                     'name'      =>   $ds->GetString ( 'name' ),
                     'ava'       =>   $ds->GetString ( 'ava' ),
                     'quantity'  =>   $ds->GetInteger( 'quantity' ),
-                    'page'      =>   $ds->GetBoolean( 'page')
+                    'page'      =>   $ds->GetBoolean( 'is_page')
                 );
             }
             return $res;
         }
 
         //проверяет изменения в пабликах(название и ава)
-        public static function update_public_info( $publics, $conn )
+        public static function update_public_info( $publics, $conn, $base_publics = null)
         {
+            $base_publics = array_flip( $base_publics );
             $public_chunks = array_chunk( $publics, 500 );
 
             foreach( $public_chunks as $ids ) {
@@ -667,29 +715,19 @@
                 $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
                 sleep(0.3);
                 foreach( $res as $public ) {
-                    //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
-                    $sql = '
-                    DROP FUNCTION IF EXISTS update_public_info( id integer, p_name varchar , ava varchar, page boolean);
-                    CREATE FUNCTION update_public_info( id integer, p_name varchar, ava varchar, page boolean) RETURNS varchar AS $$
-                    DECLARE
-                        curr_name CHARACTER VARYING := \'_\';
-                    BEGIN
-                        SELECT name INTO curr_name FROM stat_publics_50k WHERE vk_id=$1;
-                        IF( curr_name=p_name )
-                        THEN
-                            curr_name := \'\';
-                        ELSE
-                            INSERT INTO stat_public_audit(public_id,name,changed_at,act) VALUES ($1,curr_name,CURRENT_TIMESTAMP,\'name\');
-                        END IF;
-                        UPDATE stat_publics_50k SET name = $2, ava=$3, page=$4 WHERE vk_id=$1;
-                        RETURN curr_name;
-                    END
-                    $$ lANGUAGE plpgsql;
-                    SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;';
+                    if( !isset($public->gid) || !isset($public->photo) || !isset($public->name) || !isset($public->type))
+                        continue;
+                    if( !$base_publics || isset(  $base_publics[$public->gid] )) {
+                        //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
+                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name';
+                    } else {
+                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","is_page","sh_in_main")
+                                                               VALUES ( @public_id, @photo, @name, true, true)';
+                    }
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
-                    $cmd->SetString(  '@name', $public->name );
-                    $cmd->SetString(  '@photo', $public->photo);
+                    $cmd->SetString(  '@name',   $public->name );
+                    $cmd->SetString(  '@photo',  $public->photo);
                     $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
                     $cmd->Execute();
                 }
@@ -701,24 +739,7 @@
         //записывает изменения в
         public static function set_state( $public_id, $parameter, $state, $conn )
         {
-            $sql =
-                "DROP FUNCTION IF EXISTS set_state( id integer, column_name varchar , new_value boolean );
-                CREATE FUNCTION set_state( id integer, column_name varchar , state boolean ) RETURNS boolean AS $$
-                DECLARE
-                old_value boolean    := 0;
-                curr_state boolean := false;
-                BEGIN
-                    execute 'SELECT '|| column_name ||' FROM stat_publics_50k WHERE vk_id='||$1 INTO old_value;
-                    IF $3=old_value THEN
-                        return false;
-                    ELSE
-                        execute 'INSERT INTO stat_public_audit( public_id, '||$2||', changed_at,act) VALUES ( '||$1||','||$3||',CURRENT_TIMESTAMP, '''||$2||''' )';
-                        execute 'UPDATE stat_publics_50k SET '||$2||' = '||$3||' WHERE  vk_id='||$1;
-                        return true;
-                    END IF;
-                END
-                $$ LANGUAGE plpgsql;
-                SELECT set_state( @public_id, @name, @state) AS cnanged;";
+            $sql = "SELECT set_state( @public_id, @name, @state) AS cnanged;";
                 $cmd = new SqlCommand( $sql, $conn );
                 $cmd->SetInteger( '@public_id', $public_id );
                 $cmd->SetString(  '@name',      $parameter );
@@ -771,13 +792,13 @@
             //поиск id паблика
             $int_search = (int) $search_string;
 
-            $sql = 'SELECT vk_id,ava, name,quantity,page
+            $sql = 'SELECT vk_id,ava, name,quantity,is_page
                     FROM ' . TABLE_STAT_PUBLICS .
                    ' WHERE
                         ( name ILIKE @search_string
                         OR vk_id = @int_search )
                         AND active IS TRUE
-                        AND quantity > 50000
+                        AND quantity > 10000
                     ORDER BY quantity DESC
                    ';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -791,10 +812,48 @@
                     'quantity'  =>  $ds->GetInteger('quantity'),
                     'name'      =>  $ds->GetString('name'),
                     'ava'       =>  $ds->GetString('ava'),
-                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'groupe',
+                    'type'      =>  $ds->GetBoolean( 'page') == 't' ? 'page' : 'group',
                 );
             }
             return $res;
         }
+
+        public static  function update_population( $barter_events_array, $point = 'end' )
+        {
+            $subscribers =  $point . '_subscribers';
+            $visitors    =  $point . '_visitors';
+
+            foreach( $barter_events_array as $barter_event ) {
+                /** @var $barter_event BarterEvent */
+                if ( $barter_event->status != 3 || $point = 'start' ) {
+                    $time = time() + self::time_shift;
+
+                    $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );
+                    if( !$res ) {
+                        sleep(1);
+                        $time -= 44600;
+                        $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time, 'barter' );
+                    }
+                    $barter_event->$visitors = $res['visitors'];
+
+                    $count = 0;
+                    for ( $i = 0; $i < 3; $i++ ) {
+
+                        $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
+                        if( !isset( $res->count )) {
+                            sleep( 1 );
+                            continue;
+                        }
+                        $count = $res->count;
+                        break;
+                    }
+//                if( !$count ) {
+//                    $count = $this->get_public_members_count( $barter_event->target_public );
+//                }
+                    $barter_event->$subscribers = $count;
+                }
+            }
+        }
+
     }
 ?>

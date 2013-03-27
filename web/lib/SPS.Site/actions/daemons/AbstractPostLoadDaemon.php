@@ -40,7 +40,8 @@ abstract class AbstractPostLoadDaemon {
         $__mapping = ArticleFactory::$mapping;
         ArticleFactory::$mapping['view'] = 'articles';
         $originalObjects = ArticleFactory::Get(
-            array('_externalId' => $externalIds)
+
+            array('_externalId' => !empty($externalIds) ? $externalIds : array(-1 => -1))
             , array(
                 BaseFactory::WithColumns => '"articleId", "externalId"'
                 , BaseFactory::WithoutPages => true
@@ -70,6 +71,9 @@ abstract class AbstractPostLoadDaemon {
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 1;
+            // демон загружает уже одобренные посты. ха
+            $article->articleStatus = ( $source->type == SourceFeedUtility::Albums ) ?
+                Article::STATUS_REVIEW : Article::STATUS_APPROVED;
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $post['text'];
@@ -146,10 +150,10 @@ abstract class AbstractPostLoadDaemon {
         $conn = ConnectionFactory::Get();
         $conn->begin();
 
-        $result = ArticleFactory::Add($article);
+        $result = ArticleFactory::Add($article, array(BaseFactory::WithReturningKeys => true));
 
         if ($result) {
-            $articleRecord->articleId = ArticleFactory::GetCurrentId();
+            $articleRecord->articleId = $article->articleId;
             $result = ArticleRecordFactory::Add($articleRecord);
         }
 
@@ -171,34 +175,11 @@ abstract class AbstractPostLoadDaemon {
         $result = array();
 
         foreach ($data as $photo) {
-            //чтобы не блочили за частый слив фоточек
-            sleep(1);
-
-            //moving photo to local temp
-            $tmpName = Site::GetRealPath('temp://') . md5($photo['url']) . '.jpg';
-            $content = file_get_contents($photo['url']);
-
-            if (!$content) {
-                throw new Exception('failed to get content of photo ' . $photo['url']);
-            }
-
-            file_put_contents($tmpName, $content);
-            $file = array(
-                'tmp_name' => $tmpName,
-                'name' => $tmpName,
+            $result[] = array(
+                'filename' => '',
+                'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                'url' => $photo['url'],
             );
-            $fileUploadResult = MediaUtility::SaveTempFile($file, 'Article', 'photos');
-
-            if (!empty($fileUploadResult['filename'])) {
-                MediaUtility::MoveObjectFilesFromTemp('Article', 'photos', array($fileUploadResult['filename']));
-                unlink($tmpName);
-
-                $result[] = array(
-                    'filename' => $fileUploadResult['filename'],
-                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
-                    'url' => $photo['url'],
-                );
-            }
         }
 
         return $result;

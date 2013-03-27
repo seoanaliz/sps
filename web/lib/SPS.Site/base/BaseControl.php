@@ -14,7 +14,12 @@ abstract class BaseControl {
      *
      */
     public function __construct(){
-        $this->vkId = AuthVkontakte::IsAuth();
+        // force app
+        if (Request::getParameter('isVkApp')) {
+            $this->vkId = Session::getInteger('authorId');
+        } else {
+            $this->vkId = AuthVkontakte::IsAuth();
+        }
     }
 
     /**
@@ -28,6 +33,9 @@ abstract class BaseControl {
     protected function getAuthor(){
         if ($this->currentAuthor === false) {
             $this->currentAuthor = AuthorFactory::GetOne(array('vkId' => $this->vkId));
+            if (!$this->currentAuthor){
+                throw new Exception('Cant find author in BaseControl:getAuthor for vkid=' . $this->vkId);
+            }
         }
         return $this->currentAuthor;
     }

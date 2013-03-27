@@ -9,26 +9,52 @@
         define ( 'ACC_TOK_WRK', '0b8c8e800086894200868942b100a9af1a000860093b1dc50eb180b9b836874e8ec5f99' );
         define ( 'VK_API_URL' , 'https://api.vk.com/method/' );
 
+
         class AccessTokenIsDead extends Exception{}
 
-        class VkHelper {
+        class   VkHelper {
 
             /**
-             *wrap for VkAPI
-             *
-             * @static
-             * @return array
+             *id аппа статистки
              */
+            const APP_ID_STATISTICS = 2642172;
 
-            const TESTING = false;
-            public static function api_request( $method, $request_params, $throw_exc_on_errors = 1 )
+            /**
+             *id аппа обмена
+             */
+            const APP_ID_BARTER = 3391730;
+            const PAUSE   = 0.5;
+            public static  $serv_bots = array(
+                array(
+                    'login'     =>  '79531648056',
+                    'pass'      =>  'SdfW3@4R4$'
+                ),
+                array(
+                    'login'     =>  '79531648839',
+                    'pass'      =>  'Kjhy&^d^9h'
+                ),
+                array(
+                    'login'     =>  '79531647915',
+                    'pass'      =>  'JHh97)&%lui'
+                ),
+
+            );
+
+
+            public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
+                $app_id = $app == 'barter' ? self::APP_ID_BARTER : self::APP_ID_STATISTICS;
                 if ( !isset( $request_params['access_token'] ))
-                    $request_params['access_token']  =  self::get_service_access_token();
+                    $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
-
-                $res = json_decode( VkHelper::qurl_request( $url, $request_params ) );
-                if(!$res)
+                $a = VkHelper::qurl_request( $url, $request_params );
+                if ( $method == 'stats.get')
+                {
+                    $start = strpos( $a, ',"sex"');
+                    $a = substr_replace( $a, '}]}', $start );
+                }
+                $res = json_decode(  $a );
+                if( !$res )
                     return array();
                 if ( isset( $res->error ) )
                     if ( $throw_exc_on_errors ) {
@@ -51,7 +77,7 @@
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                curl_setopt($ch, CURLOPT_TIMEOUT , 5 );
+                curl_setopt($ch, CURLOPT_TIMEOUT , 180 );
 
                 if (is_array( $headers )) { // если заданы какие-то заголовки для браузера
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -71,7 +97,7 @@
                 } else return false;
 
                 $result = curl_exec($ch);
-                if (curl_errno($ch)){
+                if (curl_errno($ch)) {
                     echo "<br>error in curl: ". curl_error($ch) ."<br>";
                     return 'error in curl: '. curl_error($ch);
                 }
@@ -146,7 +172,7 @@
                 }
             }
 
-            public static function get_service_access_token()
+            public static function get_service_access_token( $app_id = self::APP_ID_STATISTICS )
             {
                 $connect =  ConnectionFactory::Get( 'tst' );
                 $count = 0;
@@ -156,14 +182,15 @@
                     $sql = 'SELECT access_token
                             FROM serv_access_tokens
                             WHERE active IS TRUE
+                            AND app_id = @app_id
                             ORDER BY random()
                             LIMIT 1';
                     $cmd = new SqlCommand( $sql, $connect );
+                    $cmd->SetInt( '@app_id', $app_id );
                     $ds  = $cmd->Execute();
                     $ds->Next();
                     $at  = $ds->GetString( 'access_token' );
                     if ( !$at ) {
-                        wrapper::mailer( 'закончились сервисные токены!');
                         throw new Exception ('закончились сервисные токены!');
                     }
                     if ( self::check_at( $at ))
@@ -186,7 +213,7 @@
             public static function check_at( $access_token )
             {
                 $res = self::get_vk_time( $access_token );
-                sleep(0.2);
+                sleep( self::PAUSE );
                 if ( isset( $res->error )) {
                     //self::deactivate_at( $access_token );
                     return false;
@@ -203,6 +230,45 @@
                 $cmd->SetInteger( '@user_id ',      $user_id );
                 $cmd->SetInteger( '@app_id',        $app_id );
                 $cmd->Execute();
+            }
+
+            public static function connect( $link, $cookie=null, $post=null ) {
+                $ch = curl_init();
+
+                curl_setopt( $ch, CURLOPT_URL, $link );
+                curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+                curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
+                curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
+                curl_setopt($ch, CURLOPT_USERAGENT,
+                    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');
+                if( $cookie !== null )
+                    curl_setopt( $ch, CURLOPT_COOKIE, $cookie );
+                if( $post !== null )
+                {
+                    curl_setopt( $ch, CURLOPT_POST, 1 );
+                    curl_setopt( $ch, CURLOPT_POSTFIELDS, $post );
+                }
+                $res = curl_exec( $ch );
+                curl_close( $ch );
+                return $res;
+            }
+
+            public static function vk_authorize( $login = null, $pass = null )
+            {
+                if( !$login) {
+                    shuffle( self::$serv_bots);
+                    $login = self::$serv_bots[0]['login'];
+                    $pass  = self::$serv_bots[0]['pass'];
+                }
+                $res = self::connect("http://login.vk.com/?act=login&email=$login&pass=$pass");
+                if( !preg_match("/hash=([a-z0-9]{1,32})/", $res, $hash )) {
+                    return false;
+                }
+                $res = self::connect("http://vk.com/login.php?act=slogin&hash=" . $hash[1] );
+                if( preg_match( "/remixsid=(.*?);/", $res, $sid ))
+                    return "remixchk=5; remixsid=$sid[1]";
+                return false;
             }
         }
     ?>

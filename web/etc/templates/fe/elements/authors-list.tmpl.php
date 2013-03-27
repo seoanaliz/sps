@@ -1,5 +1,9 @@
 <?
-    /** @var $authors Author[] */
+    /**
+     * @var $authors Author[]
+     * @var $authorGroups Author[]
+     * @var $userGroups UserGroup[]
+     */
 ?>
 <div class="authors-list">
     <div class="authors-types tab-bar">
@@ -15,7 +19,7 @@
     <? if (!empty($authors)) { ?>
     <div class="list">
         <? foreach ($authors as $author) { ?>
-            <div class="author" data-id="{$author->vkId}">
+            <div class="author" data-id="{$author->vkId}" data-group-ids="<?=implode(',', $authorGroups[$author->vkId])?>">
                 <div class="photo">
                     <img src="{$author->avatar}" alt="" />
                 </div>
@@ -23,11 +27,25 @@
                     <div class="name">
                         <a target="_blank" href="http://vk.com/id{$author->vkId}">{$author->FullName()}</a>
                     </div>
-                    <!-- div class="description">User description</div -->
                 </div>
-                <div class="delete"></div>
+                <div class="action add-to-list"></div>
+                <div class="action delete"></div>
             </div>
         <? } ?>
     </div>
     <? } ?>
 </div>
+
+ <script style="text/javascript">
+     userGroupCollection.clear();
+     <? foreach ($userGroups as $UserGroup) {
+        /** @var $UserGroup UserGroup */
+         ?>
+        var newUserGroupModel = new UserGroupModel();
+        newUserGroupModel.name('<?=$UserGroup->name?>');
+        newUserGroupModel.id(<?=$UserGroup->userGroupId?>);
+        userGroupCollection.add(<?=$UserGroup->userGroupId?>, newUserGroupModel);
+         <?
+        }
+    ?>
+ </script>
