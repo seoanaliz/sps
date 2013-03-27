@@ -544,7 +544,7 @@ var LeftPanelWidget = Event.extend({
         var $linkInfo = $('.link-info', $form),
         $linkDescription = $('.link-description', $linkInfo),
         $linkStatus = $('.link-status', $linkInfo),
-        foundLink, foundDomain, foundPostId;
+        foundLink, foundDomain;
 
         $tip.click(function() {
             $input.focus();
@@ -569,13 +569,9 @@ var LeftPanelWidget = Event.extend({
         }).keyup();
 
         function parseUrl(txt) {
+            debugger;
             // если ссылку уже приаттачили
             if (foundLink) {
-                return;
-            }
-
-            // если репост уже приаттачили
-            if (foundPostId) {
                 return;
             }
 
@@ -586,11 +582,12 @@ var LeftPanelWidget = Event.extend({
             }
 
             // если приаттачили репост
-            if (foundPostId = t.getPostIdByURL(matches[0])) {
-                console.log('PostId: ' + foundPostId);
+            if (t.getPostIdByURL(matches[0])) {
+                console.log('PostId!');
             }
+
             // если приаттачили ссылку
-            else if (matches[0] && matches[1]) {
+            if (matches[0] && matches[1]) {
                 foundLink   = matches[0];
                 foundDomain = matches[2];
 
@@ -837,7 +834,6 @@ var LeftPanelWidget = Event.extend({
             $linkInfo.hide();
             foundLink = false;
             foundDomain = false;
-            foundPostId = false;
         }
 
         $form.delegate('.save', 'click', function() {
