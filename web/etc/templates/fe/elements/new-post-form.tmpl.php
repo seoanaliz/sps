@@ -7,10 +7,6 @@
         <a class="cancel l">Отменить</a>
         <!-- Штука для загрузки файла -->
     </div>
-    <div class="link-info" style="display: none;">
-        <div class="link-description"><!-- --></div>
-        <div class="link-status"><!-- --></div>
-    </div>
     <div class="clear"></div>
 </div>
 <script type="text/javascript">
