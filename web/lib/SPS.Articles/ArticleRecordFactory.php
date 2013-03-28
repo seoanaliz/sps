@@ -117,11 +117,18 @@
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 )
+                ,'_articleRecordId' => array(
+                    'name'         => 'articleRecordId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
                 ,'_articleQueueId' => array(
                     'name'         => 'articleQueueId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
-                ))
+                ),
+
+            )
         );
         
         /** @return array */
