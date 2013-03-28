@@ -33,6 +33,7 @@ class SaveArticleControl extends BaseControl
         );
         $id = Request::getInteger('articleId');
         $text = trim(Request::getString('text'));
+
         $link = trim(Request::getString('link'));
         $repostExternalId = trim(Request::getString('repostExternalId'));
         $photos = Request::getArray('photos');
@@ -97,7 +98,7 @@ class SaveArticleControl extends BaseControl
         $articleRecord->likes = 0;
         $articleRecord->photos = !empty($photos) ? $photos : array();
         $articleRecord->link = $link;
-        if( !empty($repostExternalId )) {
+        if( !empty( $repostExternalId )) {
             $articleRecord->repostArticleRecordId = $this->add_repost_article( $repostExternalId );
             if( $articleRecord->repostArticleRecordId ) {
                 $articleRecord->repostExternalId = $repostExternalId;
@@ -153,7 +154,8 @@ class SaveArticleControl extends BaseControl
     {
         $articleRecordId = null;
         try {
-            $post = reset(  ParserVkontakte::get_posts_by_vk_id( $repostExternalId ));
+            $posts =  ParserVkontakte::get_posts_by_vk_id( $repostExternalId );
+            $post = $posts[0];
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $post['text'];
             $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
@@ -166,7 +168,6 @@ class SaveArticleControl extends BaseControl
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
             $articleRecord->rate = 0;
-            print_r($articleRecord);
 
             foreach ($post['photo'] as $photo) {
                 $photos[] = array(
@@ -179,17 +180,15 @@ class SaveArticleControl extends BaseControl
             $conn = ConnectionFactory::Get();
             $conn->begin();
 
-            ArticleRecordFactory::Add($articleRecord, array(BaseFactory::WithReturningKeys => true));
-
+            ArticleRecordFactory::Add( $articleRecord, array(BaseFactory::WithReturningKeys => true));
             if ($articleRecord->articleRecordId) {
                 $conn->commit();
             } else {
                 $conn->rollback();
-            };
-        }catch (Exception $e) {}
+            }
+        } catch (Exception $e) {}
 
         return $articleRecord->articleRecordId;
     }
 }
-
 ?>
