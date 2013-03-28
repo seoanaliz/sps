@@ -1,8 +1,13 @@
 <?
 /** @var $canEditQueue bool */
 /** @var $grid array */
-/** @var $articlesQueue array */
+/** @var $articlesQueue ArticleQueue[] */
 /** @var $queueDate DateTimeWrapper */
+/** @var $queueDate DateTimeWrapper */
+/** @var $queueDate DateTimeWrapper */
+/** @var $articleRecords ArticleRecord[] */
+/** @var $repostArticleRecords ArticleRecord[] */
+
 $now = new DateTimeWrapper(date('d.m.Y'));
 ?>
 
@@ -48,6 +53,9 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                     <?
                     $articleQueueId = $gridItem['queue']->articleQueueId;
                     $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
+                    echo 'tut<br>';
+                    print_r($repostArticleRecords);
+                    echo 'tut<br>';
                     $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
                     $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
                     ?>

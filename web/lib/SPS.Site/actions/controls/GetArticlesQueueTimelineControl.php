@@ -64,6 +64,10 @@
          * @var ArticleRecord[]
          */
         public $articleRecords;
+   /**
+         * @var ArticleRecord[]
+         */
+        public $repostArticleRecords;
 
         /**
          * Entry Point
@@ -100,6 +104,7 @@
             /**
              * response
              */
+            Response::setArray('repostArticleRecords', $this->repostArticleRecords);
             Response::setArray('articleRecords', $this->articleRecords);
             Response::setArray('articlesQueue', $this->articleQueues);
             Response::setArray('gridData', $this->grid);
@@ -251,7 +256,16 @@
             );
             if (!empty($this->articleRecords)) {
                 $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleQueueId', false);
+                $repostArticleRecordsIds = array_filter( ArrayHelper::GetObjectsFieldValues($this->articleRecords, array('repostArticleRecordId')));
+                if (!empty($repostArticleRecordsIds)) {
+                    $repostRecords = ArticleRecordFactory::Get(
+                        array('_articleRecordId' => array_unique($repostArticleRecordsIds))
+                    );
+                    $this->repostArticleRecords = BaseFactoryPrepare::Collapse($repostRecords, 'articleRecordId', false);
+                }
             }
+
+
 
             /**
              * Распихиваем элементы в grid
