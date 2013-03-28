@@ -144,7 +144,7 @@ class SaveArticleControl extends BaseControl
     {
         ConnectionFactory::BeginTransaction();
 
-        $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link'), array('articleId' => $id));
+        $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link', 'repostArticleRecordId','repostExternalId'), array('articleId' => $id));
 
         ConnectionFactory::CommitTransaction($result);
         return $result;
