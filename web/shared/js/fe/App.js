@@ -105,7 +105,7 @@ var App = (function() {
                 '<div class="qq-upload-drop-area">+</div>' +
                 '<a class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
-                fileTemplate: '<div class="attachment">' +
+                fileTemplate: '<div class="attachment photo">' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
                 '<span class="qq-upload-size"></span>' +
