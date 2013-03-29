@@ -49,7 +49,6 @@ $jsFiles = array(
 );
 
 CssHelper::Init(false);
-LessHelper::Init(false);
 JsHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);

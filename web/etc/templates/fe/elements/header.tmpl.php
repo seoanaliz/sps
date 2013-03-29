@@ -35,7 +35,7 @@
             'js://fe/file-uploader/fileuploader.css',
             'css://fe/jquery.multiselect.css',
             'css://fe/jquery-ui.css',
-            'css://common/common.css',
+            'css://common/common.less',
             'css://fe/main.css',
             'css://fe/custom.css',
             'css://fe/jquery.datepick.css',
