@@ -115,7 +115,6 @@ var App = (function() {
                 fileTemplate: '<div class="attachment photo">' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
-                '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel">Отмена</a>' +
                 '<span class="qq-upload-failed-text">Ошибка</span>' +
                 '</div>',
