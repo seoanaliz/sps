@@ -1549,12 +1549,12 @@ i {
   box-shadow: 0 1px 1px rgba(0,0,0,0.4);
 }
 .attachments .attachment.photo .delete-attachment {
+  margin: 0;
   position: absolute;
   top: 0;
   right: 0;
   width: 10px;
   height: 10px;
-  margin: 0;
   background: #fff url(../../images/fe/controls.png) no-repeat -44px -2px;
   border: 3px solid #fff;
   cursor: pointer;
@@ -1563,13 +1563,16 @@ i {
   border-radius: 2px;
   opacity: 0.8;
 }
+.attachments .attachment.post {
+  margin-top: 7px;
+}
 .attachments .attachment.post .delete-attachment {
+  margin: 0;
   position: absolute;
   top: 0;
   right: 0;
   width: 10px;
   height: 10px;
-  margin: 0;
   background: #000 url(../../images/fe/controls.png) no-repeat -44px -2px;
   border: 3px solid #000;
   cursor: pointer;
@@ -1577,7 +1580,7 @@ i {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
-  opacity: 0.8;
+  opacity: 0.3;
 }
 body.editor-mode .authors-list {
   display: block;
