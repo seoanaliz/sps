@@ -748,11 +748,17 @@ var LeftPanelWidget = Event.extend({
                 return $input.focus();
             } else {
                 $form.addClass('spinner');
-                Events.fire('post', text, photos, link, $input.data('id'), function() {
-                    clearForm();
-                    stop();
+                $input.blur();
+
+                t.savePost({
+                    text: text,
+                    photos: photos,
+                    link: link
+                }).always(function() {
                     $form.removeClass('spinner');
-                    $input.blur();
+                    stop();
+                }).success(function() {
+                    clearForm();
                     t.loadArticles(true);
                 });
             }
@@ -970,7 +976,12 @@ var LeftPanelWidget = Event.extend({
                         if (!($.trim(text) || link || photos.length)) {
                             return $text.focus();
                         } else {
-                            Events.fire('post', text, photos, link, postId, function(data) {
+                            t.savePost({
+                                text: text,
+                                photos: photos,
+                                link: link,
+                                articleId: postId
+                            }).success(function() {
                                 t.reloadArticle(data.id);
                             });
                         }
@@ -1606,5 +1617,25 @@ var LeftPanelWidget = Event.extend({
         console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
         console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
         console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall3967881_12359'));
+    },
+
+    /**
+     * @param {object} params
+     * @returns {Deferred}
+     */
+    savePost: function(params) {
+        var $sourceFeedIds = Elements.leftdd();
+        var sourceFeedId;
+        if ($sourceFeedIds.length != 1) {
+            sourceFeedId = null;
+        } else {
+            sourceFeedId = $sourceFeedIds[0];
+        }
+
+        return Control.fire('post', $.extend({
+            sourceFeedId: sourceFeedId,
+            targetFeedId: Elements.rightdd(),
+            userGroupId: Elements.getUserGroupId()
+        }, params));
     }
 });
