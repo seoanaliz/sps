@@ -1551,6 +1551,11 @@ i {
   border-radius: 2px;
   opacity: 0.3;
 }
+.attachments .qq-upload-size,
+.attachments .qq-upload-spinner,
+.attachments .qq-upload-cancel {
+  display: none !important;
+}
 body.editor-mode .authors-list {
   display: block;
 }
