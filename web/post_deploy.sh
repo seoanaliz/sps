@@ -11,6 +11,9 @@ chmod -f -R 777 $1/cache/
 echo -e "\t $1/shared/files/ to 777"
 chmod -f -R 777 $1/shared/files/
 
+echo -e "\t $1/shared/css/ to 777"
+chmod -f -R 777 $1/shared/css/
+
 echo -e "\t $1/shared/temp/ to 777"
 chmod -f -R 777 $1/shared/temp/
 

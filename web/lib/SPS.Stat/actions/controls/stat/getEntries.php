@@ -53,7 +53,7 @@ class getEntries {
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
             if ( $period == 7 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers' )
+                if ( $sortBy == 'diff_abs' || $sortBy == 'visitors' || $sortBy == 'viewers' )
                     $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
@@ -61,7 +61,7 @@ class getEntries {
                 $visitors = 'visitors_week';
                 $viewers  = 'viewers_week';
             } else if( $period == 30 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' || $sortBy = 'viewers')
+                if ( $sortBy == 'diff_abs' || $sortBy == 'visitors' || $sortBy == 'viewers')
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
