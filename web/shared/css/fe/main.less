@@ -27,58 +27,9 @@ i {font-style: italic;}
     font-weight: bold;
     .user-select(none);
 }
-.default {color:#888;}
 
-.newpost {
-    .link-info {
-        .link-description {
-            overflow: hidden;
-            margin-top: 15px;
-            padding: 10px;
-            background: #fff;
-            border: #c0cad4 solid 1px;
-
-            img {
-                float: left;
-                margin-right: 10px;
-            }
-            a {
-                margin: 0;
-            }
-            a + p {
-                margin-top: 5px;
-            }
-        }
-        .link-description img ~ a,
-        .link-description img ~ p {
-            width: 450px;
-        }
-        .link-status {
-            margin: 10px 0 0 10px;
-        }
-        .link-status span {
-            position: relative;
-        }
-        .link-status .delete-link {
-            position: absolute;
-            top: 2px;
-            right: -12px;
-            width: 10px;
-            height: 10px;
-            margin: 0;
-            background: url(../../images/fe/controls.png) no-repeat -44px -2px;
-            text-indent: -9999px;
-        }
-    }
-}
-
-.collapsed .attach-file {
-    display: none;
-}
-
-.attach-file {
-    display: block;
-    height: 20px;
+.default {
+    color: #888;
 }
 
 .qq-upload-list {
@@ -104,7 +55,7 @@ i {font-style: italic;}
         display: block;
         height: 75px;
     }
-    li .delete-attach {
+    li .delete-attachment {
         position: absolute;
         top: 0;
         right: 0;
@@ -929,47 +880,6 @@ i {font-style: italic;}
 
 .spinner {opacity: 0.3;}
 
-.newpost {
-    position: relative;
-
-    .input {
-        min-height: 17px;
-        max-height: 200px;
-        border: #f2cb7e solid 2px;
-    }
-
-    .tip {
-        display: none;
-        position: absolute;
-        top: 24px;
-        left: 25px;
-        color: #888;
-    }
-
-    a {
-        margin-top: 5px; background: none;
-    }
-
-    .cancel {
-        margin-left: 10px;
-    }
-
-    &.collapsed {
-        .input {
-            border: none;
-        }
-        .tip {
-            display: block;
-        }
-        .button {
-            display: none;
-        }
-        a {
-            display: none;
-        }
-    }
-}
-
 .post-image {
     overflow-x: hidden;
     overflow-y: hidden;
@@ -987,34 +897,6 @@ i {font-style: italic;}
     }
 }
 
-.newpost {
-    .link-info {
-        .post_describe_image {
-            background-position: 50% 50%;
-            width: 130px;
-            height: 63px;
-            float: left;
-            margin: 0 10px 0 0;
-        }
-        .post_describe_layout {
-            overflow: hidden;
-        }
-        .post_describe_layout p {
-            cursor: pointer;
-        }
-        .post_describe_layout a span:hover,
-        .post_describe_layout p span:hover {
-            background: yellow;
-        }
-        .post_describe_layout input[type="text"],
-        .post_describe_layout textarea {
-            border: 1px solid #C0CAD4;
-            width: 95%;
-            font: inherit;
-            display: none;
-        }
-    }
-}
 .editImagePopup {
     position: absolute;
     top:0;
@@ -1179,12 +1061,6 @@ i {font-style: italic;}
     resize: none;
     line-height: 160%;
 }
-.newpost textarea {
-    width: 536px;
-    height: 30px;
-    padding-right: 30px;
-    line-height: 100%;
-}
 .textarea-wrap {
     position: relative;
 
@@ -1325,6 +1201,102 @@ i {font-style: italic;}
     &:hover {
         background: @bg_hover;
         color: @color_blue;
+    }
+}
+
+.newpost {
+    position: relative;
+
+    .textarea-wrap {
+        margin-right: 22px;
+    }
+
+    textarea {
+        height: 1em;
+        line-height: 100%;
+    }
+
+    .buttons {
+        margin-top: 10px;
+    }
+
+    .link-info {
+        .post_describe_image {
+            background-position: 50% 50%;
+            width: 130px;
+            height: 63px;
+            float: left;
+            margin: 0 10px 0 0;
+        }
+        .post_describe_layout {
+            overflow: hidden;
+        }
+        .post_describe_layout p {
+            cursor: pointer;
+        }
+        .post_describe_layout a span:hover,
+        .post_describe_layout p span:hover {
+            background: yellow;
+        }
+        .post_describe_layout input[type="text"],
+        .post_describe_layout textarea {
+            border: 1px solid #C0CAD4;
+            width: 95%;
+            font: inherit;
+            display: none;
+        }
+
+        .link-description {
+            overflow: hidden;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff;
+            border: #c0cad4 solid 1px;
+
+            img {
+                float: left;
+                margin-right: 10px;
+            }
+            a {
+                margin: 0;
+            }
+            a + p {
+                margin-top: 5px;
+            }
+        }
+        .link-description img ~ a,
+        .link-description img ~ p {
+            width: 450px;
+        }
+        .link-status {
+            margin: 10px 0 0 10px;
+
+            span {
+                position: relative;
+            }
+
+            .delete-attachment {
+                position: absolute;
+                top: 2px;
+                right: -12px;
+                width: 10px;
+                height: 10px;
+                margin: 0;
+                background: url(../../images/fe/controls.png) no-repeat -44px -2px;
+                text-indent: -9999px;
+            }
+        }
+    }
+
+    .cancel {
+        margin-left: 5px;
+    }
+
+    &.collapsed {
+        .attachments,
+        .buttons {
+            display: none;
+        }
     }
 }
 
@@ -1515,10 +1487,7 @@ i {font-style: italic;}
                 display: none;
             }
             &>.textarea-wrap {
-                padding-right: 12px;
-
                 textarea {
-                    width: 100%;
                     height: 17px;
                 }
             }
@@ -1642,30 +1611,52 @@ i {font-style: italic;}
 
 .attachments {
     .attachment {
-        margin-top: 5px;
         position: relative;
-        display: inline-block;
-        margin: 7px 7px 0 0;
 
-        img {
-            border-radius: 3px;
-            width: 60px;
-            height: 60px;
-            .box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+        &.photo {
+            margin-top: 5px;
+            display: inline-block;
+            margin: 7px 7px 0 0;
+
+            img {
+                border-radius: 3px;
+                width: 60px;
+                height: 60px;
+                .box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+            }
+
+            .delete-attachment {
+                margin: 0;
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 10px;
+                height: 10px;
+                background: #fff url(../../images/fe/controls.png) no-repeat -44px -2px;
+                border: 3px solid #fff;
+                cursor: pointer;
+                .border-radius(2px);
+                .opacity(0.8);
+            }
         }
 
-        .delete-attach {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            margin: 0;
-            background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
-            cursor: pointer;
-            border: 3px solid white;
-            .border-radius(2px);
-            .opacity(0.8);
+        &.post {
+            margin-top: 7px;
+
+            .delete-attachment {
+                margin: 0;
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 10px;
+                height: 10px;
+                background: #000 url(../../images/fe/controls.png) no-repeat -44px -2px;
+                border: 3px solid #000;
+                cursor: pointer;
+                text-indent: -9999px;
+                .border-radius(2px);
+                .opacity(0.3);
+            }
         }
     }
 }
