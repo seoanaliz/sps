@@ -533,8 +533,13 @@ var LeftPanelWidget = Event.extend({
     initAddPost: function() {
         var t = this;
         var $form = $('.newpost');
-        var $input = $('textarea', $form);
+        var $input = $form.find('textarea');
+        var $uploadBtn = $form.find('.image-uploader');
         var $attachments = $form.find('.attachments');
+        var imageUploader = app.imageUploader({
+            $element: $uploadBtn,
+            $listElement: $attachments
+        });
 
         var foundLink, foundDomain, foundPostId;
 
@@ -735,15 +740,9 @@ var LeftPanelWidget = Event.extend({
         $form.delegate('.save', 'click', function() {
             var $linkStatus = $form.find('.link-status');
             var link = $linkStatus.find('a').attr('href');
-            var photos = [];
+            var photos = imageUploader.getPhotos();
             var text = $.trim($input.val());
 
-            $('.newpost .qq-upload-success').each(function(){
-                var photo = {};
-                photo.filename = $(this).find('input:hidden').val();
-                photo.title = $(this).find('textarea').val();
-                photos.push(photo);
-            });
             if (!text && !photos.length && !link) {
                 return $input.focus();
             } else {

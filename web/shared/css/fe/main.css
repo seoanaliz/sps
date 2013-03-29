@@ -53,6 +53,9 @@ i {
 .default {
   color: #888;
 }
+.newpost .buttons {
+  margin-top: 7px;
+}
 .newpost .link-info .link-description {
   overflow: hidden;
   margin-top: 15px;
@@ -89,13 +92,6 @@ i {
   margin: 0;
   background: url(../../images/fe/controls.png) no-repeat -44px -2px;
   text-indent: -9999px;
-}
-.collapsed .attach-file {
-  display: none;
-}
-.attach-file {
-  display: block;
-  height: 20px;
 }
 .qq-upload-list {
   overflow: hidden;
@@ -897,40 +893,6 @@ i {
 .spinner {
   opacity: 0.3;
 }
-.newpost {
-  position: relative;
-}
-.newpost .input {
-  min-height: 17px;
-  max-height: 200px;
-  border: #f2cb7e solid 2px;
-}
-.newpost .tip {
-  display: none;
-  position: absolute;
-  top: 24px;
-  left: 25px;
-  color: #888;
-}
-.newpost a {
-  margin-top: 5px;
-  background: none;
-}
-.newpost .cancel {
-  margin-left: 10px;
-}
-.newpost.collapsed .input {
-  border: none;
-}
-.newpost.collapsed .tip {
-  display: block;
-}
-.newpost.collapsed .button {
-  display: none;
-}
-.newpost.collapsed a {
-  display: none;
-}
 .post-image {
   overflow-x: hidden;
   overflow-y: hidden;
@@ -944,6 +906,9 @@ i {
 }
 .post-image .else {
   max-width: 150px;
+}
+.newpost {
+  position: relative;
 }
 .newpost .link-info .post_describe_image {
   background-position: 50% 50%;
@@ -967,6 +932,13 @@ i {
   border: 1px solid #C0CAD4;
   width: 95%;
   font: inherit;
+  display: none;
+}
+.newpost .cancel {
+  margin-left: 5px;
+}
+.newpost.collapsed .attachments,
+.newpost.collapsed .buttons {
   display: none;
 }
 .editImagePopup {

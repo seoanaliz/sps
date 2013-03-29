@@ -74,7 +74,6 @@
         'js://fe/jquery.maskedinput-1.3.js',
         'js://fe/jquery.multiselect.min.js',
         'js://fe/edit-post.js',
-        'js://fe/files.js',
         'js://fe/LeftPanelWidget.js',
         'js://fe/RightPanelWidget.js',
         'js://fe/QueueWidget.js',

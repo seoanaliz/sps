@@ -27,9 +27,16 @@ i {font-style: italic;}
     font-weight: bold;
     .user-select(none);
 }
-.default {color:#888;}
+
+.default {
+    color: #888;
+}
 
 .newpost {
+    .buttons {
+        margin-top: 7px;
+    }
+
     .link-info {
         .link-description {
             overflow: hidden;
@@ -72,15 +79,6 @@ i {font-style: italic;}
             }
         }
     }
-}
-
-.collapsed .attach-file {
-    display: none;
-}
-
-.attach-file {
-    display: block;
-    height: 20px;
 }
 
 .qq-upload-list {
@@ -931,47 +929,6 @@ i {font-style: italic;}
 
 .spinner {opacity: 0.3;}
 
-.newpost {
-    position: relative;
-
-    .input {
-        min-height: 17px;
-        max-height: 200px;
-        border: #f2cb7e solid 2px;
-    }
-
-    .tip {
-        display: none;
-        position: absolute;
-        top: 24px;
-        left: 25px;
-        color: #888;
-    }
-
-    a {
-        margin-top: 5px; background: none;
-    }
-
-    .cancel {
-        margin-left: 10px;
-    }
-
-    &.collapsed {
-        .input {
-            border: none;
-        }
-        .tip {
-            display: block;
-        }
-        .button {
-            display: none;
-        }
-        a {
-            display: none;
-        }
-    }
-}
-
 .post-image {
     overflow-x: hidden;
     overflow-y: hidden;
@@ -990,6 +947,8 @@ i {font-style: italic;}
 }
 
 .newpost {
+    position: relative;
+
     .link-info {
         .post_describe_image {
             background-position: 50% 50%;
@@ -1016,7 +975,19 @@ i {font-style: italic;}
             display: none;
         }
     }
+
+    .cancel {
+        margin-left: 5px;
+    }
+
+    &.collapsed {
+        .attachments,
+        .buttons {
+            display: none;
+        }
+    }
 }
+
 .editImagePopup {
     position: absolute;
     top:0;

@@ -120,6 +120,9 @@ var App = (function() {
             });
 
             return {
+                /**
+                 * @returns {Array}
+                 */
                 getPhotos: function() {
                     return getPhotos.apply(this, arguments);
                 },

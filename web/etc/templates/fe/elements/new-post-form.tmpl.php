@@ -3,10 +3,8 @@
         <textarea placeholder="Есть чем поделиться?"></textarea>
     </div>
     <div class="attachments"></div>
-    <div id="attach-file" class="buttons attach-file">
-        <div class="save button l">Отправить</div>
-        <a class="cancel l">Отменить</a>
-        <!-- Штука для загрузки файла -->
+    <div class="buttons">
+        <button class="button save">Отправить</button>
+        <button class="button cancel">Отменить</button>
     </div>
-    <div class="clear"></div>
 </div>
