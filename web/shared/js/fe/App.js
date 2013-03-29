@@ -84,7 +84,7 @@ var App = (function() {
             var element = $element[0];
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
-                var $file = $listElement.find('> .attachment .qq-upload-file').first();
+                var $file = $listElement.find('> .attachment .qq-upload-file');
                 var $attachment = $file.closest('.attachment');
                 $attachment.data('data', response);
                 $attachment.html('<img src="' + response.image + '" /><div class="delete-attachment" title="Удалить"></div>');
@@ -115,6 +115,7 @@ var App = (function() {
                 fileTemplate: '<div class="attachment photo">' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
+                '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel">Отмена</a>' +
                 '<span class="qq-upload-failed-text">Ошибка</span>' +
                 '</div>',
