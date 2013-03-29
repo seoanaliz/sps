@@ -106,6 +106,7 @@ var Eventlist = {
         */
         var clearSortBy = {
             followers: 'quantity',
+            viewers: 'viewers',
             contacts: '',
             growth: 'diff_abs',
             isActive: 'active',
