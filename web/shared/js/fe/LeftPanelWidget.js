@@ -752,8 +752,9 @@ var LeftPanelWidget = Event.extend({
 
                 t.savePost({
                     text: text,
+                    link: link,
                     photos: photos,
-                    link: link
+                    repostExternalId: foundPostId
                 }).always(function() {
                     $form.removeClass('spinner');
                     stop();
@@ -980,7 +981,8 @@ var LeftPanelWidget = Event.extend({
                                 text: text,
                                 photos: photos,
                                 link: link,
-                                articleId: postId
+                                articleId: postId,
+                                repostExternalId: 1
                             }).success(function() {
                                 t.reloadArticle(data.id);
                             });
@@ -1620,7 +1622,7 @@ var LeftPanelWidget = Event.extend({
     },
 
     /**
-     * @param {object} params
+     * @param {{text: string, link: string, photos: Array, articleId: (number=), repostExternalId: number}} params
      * @returns {Deferred}
      */
     savePost: function(params) {
@@ -1632,10 +1634,15 @@ var LeftPanelWidget = Event.extend({
             sourceFeedId = $sourceFeedIds[0];
         }
 
-        return Control.fire('post', $.extend({
+        return Control.fire('post', {
+            text: params.text,
+            link: params.link,
+            photos: params.photos,
+            articleId: params.articleId,
+            repostExternalId: params.repostExternalId,
             sourceFeedId: sourceFeedId,
             targetFeedId: Elements.rightdd(),
             userGroupId: Elements.getUserGroupId()
-        }, params));
+        });
     }
 });

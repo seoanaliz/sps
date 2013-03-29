@@ -27,10 +27,16 @@ var App = (function() {
             });
         },
 
+        /**
+         * @returns {LeftPanelWidget}
+         */
         getLeftPanelWidget: function() {
             return this.leftPanelWidget || (this.leftPanelWidget = new LeftPanelWidget());
         },
 
+        /**
+         * @returns {RightPanelWidget}
+         */
         getRightPanelWidget: function() {
             return this.rightPanelWidget || (this.rightPanelWidget = new RightPanelWidget());
         },
@@ -131,6 +137,14 @@ var App = (function() {
                     return addPhoto.apply(this, arguments);
                 }
             }
+        },
+
+        /**
+         * @param {{text: string, link: string, photos: Array, articleId: (number=), repostExternalId: number}} params
+         * @returns {Deferred}
+         */
+        savePost: function(params) {
+            return this.getLeftPanelWidget().savePost(params);
         }
     });
 
