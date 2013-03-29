@@ -1,6 +1,6 @@
 var App = (function() {
     var App = Event.extend({
-        init: function() {
+        run: function() {
             var t = this;
             t.getLeftPanelWidget();
             t.getRightPanelWidget();

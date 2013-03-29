@@ -6,5 +6,6 @@
     <div class="buttons">
         <button class="button save">Отправить</button>
         <button class="button cancel">Отменить</button>
+        <a class="image-uploader r">Прикрепить</a>
     </div>
 </div>

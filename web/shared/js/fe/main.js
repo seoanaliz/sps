@@ -139,4 +139,5 @@ function popupNotice( message ) {
 
 $(document).ready(function() {
     window.app = new App();
+    app.run();
 });
