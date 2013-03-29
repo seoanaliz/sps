@@ -36,7 +36,7 @@
             'css://fe/jquery.multiselect.css',
             'css://fe/jquery-ui.css',
             'css://common/common.less',
-            'css://fe/main.css',
+            'css://fe/main.less',
             'css://fe/custom.css',
             'css://fe/jquery.datepick.css',
             'js://ext/fancybox2/jquery.fancybox.css',

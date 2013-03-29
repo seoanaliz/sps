@@ -80,7 +80,7 @@ var App = (function() {
             var onComplete = function(id, fileName, response) {
                 var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
                 $attachment.data('data', response);
-                $attachment.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
+                $attachment.html('<img src="' + response.image + '" /><div class="delete-attachment" title="Удалить"></div>');
             };
             var getPhotos = function() {
                 var photos = [];
@@ -90,8 +90,8 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, data) {
-                var $attachment = $('<div class="attachment attachment-handmade">' +
-                '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
+                var $attachment = $('<div class="attachment photo attachment-handmade">' +
+                '<img src="' + image + '" /><div class="delete-attachment" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('data', data);
                 $listElement.append($attachment);
@@ -115,7 +115,7 @@ var App = (function() {
                 onComplete: onComplete
             }, options));
 
-            $listElement.delegate('.delete-attach', 'click', function() {
+            $listElement.delegate('.delete-attachment', 'click', function() {
                 $(this).closest('.attachment').remove();
             });
 

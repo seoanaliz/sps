@@ -401,21 +401,16 @@ var LeftPanelWidget = Event.extend({
     },
 
     reloadArticle: function(id) {
-        $.ajax({
-            url: controlsRoot + 'article-item/',
-            dataType: "html",
-            data: {
-                id: id,
-                targetFeedId: Elements.rightdd()
-            },
-            success: function(data) {
-                var $elem = $('.post[data-id=' + id + ']');
-                var $newElem = $(data);
-                $elem.replaceWith($newElem);
-                Elements.initDraggable($newElem);
-                Elements.initImages($newElem);
-                Elements.initLinks($newElem);
-            }
+        Control.fire('article-item', {
+            id: id,
+            targetFeedId: Elements.rightdd()
+        }).success(function(data) {
+            var $elem = $('.post[data-id=' + id + ']');
+            var $newElem = $(data);
+            $elem.replaceWith($newElem);
+            Elements.initDraggable($newElem);
+            Elements.initImages($newElem);
+            Elements.initLinks($newElem);
         });
     },
 
@@ -584,9 +579,30 @@ var LeftPanelWidget = Event.extend({
 
             // если приаттачили репост
             if (foundPostId = t.getPostIdByURL(matches[0])) {
-                $attachments.append($(tmpl(ATTACHMENT_PREVIEW_REPOST, {
-                    postId: foundPostId
-                })));
+                var code =
+                'var p=API.wall.getById({posts:"' + foundPostId + '"})[0];' +
+                'var owner=(p.to_id>0)?API.users.get({uids:p.to_id,fields:"photo,screen_name"})[0]:API.groups.getById({gid:-p.to_id})[0];' +
+                'return {owner:owner,post:p};';
+                Control.callVKByOpenAPI('execute', {
+                    code: code
+                }).success(function(data) {
+                    var post = data.post;
+                    var owner = data.owner;
+                    if (owner.first_name) {
+                        owner.name = owner.first_name + ' ' + owner.last_name;
+                    }
+                    var $post = $(tmpl(ATTACHMENT_PREVIEW_REPOST, {
+                        postId: post.id,
+                        text: post.text,
+                        date: post.date,
+                        attachments: post.attachments,
+                        owner: owner
+                    }));
+                    $attachments.append($post);
+                }).error(function(error) {
+                    foundPostId = false;
+                    new Box({title: 'Ошибка', html: error.message}).show();
+                });
             }
             // если приаттачили ссылку
             else if (matches[0] && matches[1]) {
@@ -705,21 +721,15 @@ var LeftPanelWidget = Event.extend({
         }
 
         function deleteLink() {
-            var $linkInfo = $form.find('.link-info');
+            var $linkInfo = $form.find('.attachment');
             $linkInfo.remove();
             foundLink = false;
             foundDomain = false;
             foundPostId = false;
         }
 
-        $form.delegate('.delete-link', 'click', function() {
+        $form.delegate('.delete-attachment', 'click', function() {
             deleteLink();
-        });
-
-        $form.delegate('.reload-link', 'click', function() {
-            var link = foundLink;
-            deleteLink();
-            parseUrl(link);
         });
 
         $form.delegate('.save', 'click', function() {

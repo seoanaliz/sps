@@ -121,7 +121,7 @@ var Control = {
                     }
                     deferred.fireSuccess(data.response);
                 } else {
-                    deferred.fireError(data);
+                    deferred.fireError(data.error.error_msg);
                 }
             });
         }

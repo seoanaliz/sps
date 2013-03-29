@@ -55,19 +55,21 @@ i {font-style: italic;}
         }
         .link-status {
             margin: 10px 0 0 10px;
-        }
-        .link-status span {
-            position: relative;
-        }
-        .link-status .delete-link {
-            position: absolute;
-            top: 2px;
-            right: -12px;
-            width: 10px;
-            height: 10px;
-            margin: 0;
-            background: url(../../images/fe/controls.png) no-repeat -44px -2px;
-            text-indent: -9999px;
+
+            span {
+                position: relative;
+            }
+
+            .delete-attachment {
+                position: absolute;
+                top: 2px;
+                right: -12px;
+                width: 10px;
+                height: 10px;
+                margin: 0;
+                background: url(../../images/fe/controls.png) no-repeat -44px -2px;
+                text-indent: -9999px;
+            }
         }
     }
 }
@@ -104,7 +106,7 @@ i {font-style: italic;}
         display: block;
         height: 75px;
     }
-    li .delete-attach {
+    li .delete-attachment {
         position: absolute;
         top: 0;
         right: 0;
@@ -1642,30 +1644,48 @@ i {font-style: italic;}
 
 .attachments {
     .attachment {
-        margin-top: 5px;
         position: relative;
-        display: inline-block;
-        margin: 7px 7px 0 0;
 
-        img {
-            border-radius: 3px;
-            width: 60px;
-            height: 60px;
-            .box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+        &.photo {
+            margin-top: 5px;
+            display: inline-block;
+            margin: 7px 7px 0 0;
+
+            img {
+                border-radius: 3px;
+                width: 60px;
+                height: 60px;
+                .box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+            }
+
+            .delete-attachment {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 10px;
+                height: 10px;
+                background: #fff url(../../images/fe/controls.png) no-repeat -44px -2px;
+                border: 3px solid #fff;
+                cursor: pointer;
+                .border-radius(2px);
+                .opacity(0.8);
+            }
         }
 
-        .delete-attach {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            margin: 0;
-            background: white url(../../images/fe/controls.png) no-repeat -44px -2px;
-            cursor: pointer;
-            border: 3px solid white;
-            .border-radius(2px);
-            .opacity(0.8);
+        &.post {
+            .delete-attachment {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 10px;
+                height: 10px;
+                background: #000 url(../../images/fe/controls.png) no-repeat -44px -2px;
+                border: 3px solid #000;
+                cursor: pointer;
+                text-indent: -9999px;
+                .border-radius(2px);
+                .opacity(0.3);
+            }
         }
     }
 }
