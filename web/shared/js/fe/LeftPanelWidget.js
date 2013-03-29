@@ -985,7 +985,7 @@ var LeftPanelWidget = Event.extend({
                                 photos: photos,
                                 link: link,
                                 articleId: postId,
-                                repostExternalId: 1
+                                repostExternalId: $post.data('repost-id')
                             }).success(function() {
                                 t.reloadArticle(data.id);
                             });

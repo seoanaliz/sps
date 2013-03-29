@@ -53,6 +53,7 @@ if (!empty($article)) {
     <?= !empty($author) ? 'author' : '' ?>
     <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
+    data-repost-id="<? //@todo сюда надо вставить vk id поста ?>"
     <? if (!empty($author)) { ?>
         data-author-id="{$author->authorId}"
     <? } ?>
@@ -84,6 +85,9 @@ if (!empty($article)) {
             <? } ?>
         </div>
         <div class="r">
+            <? if (!empty($repostArticleRecord) && $repostArticleRecord != 'nulll' /* wtf? */) { ?>
+                <span class="hash-span" title="Пост с репостом">Репост</span>
+            <? } ?>
             <? if (!empty($articleRecord->link)) { ?>
                 <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
             <? } ?>
