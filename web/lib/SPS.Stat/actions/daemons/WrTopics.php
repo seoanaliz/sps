@@ -292,7 +292,7 @@ class WrTopics extends wrapper
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
         $sql = 'UPDATE stat_publics_50k as publics
-                SET visitors_month=points.visitors_sum, viewers_month=points.viewers_sum
+                SET visitors_week=points.visitors_sum, viewers_week=points.viewers_sum
                 FROM
                         ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'1 week\' AND time < now() group by id )
@@ -300,14 +300,16 @@ class WrTopics extends wrapper
                 WHERE publics.vk_id=points.id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
-        $sql = 'UPDATE stat_publics_50k as a
-                SET visitors_week=(
-                        SELECT sum(b.visitors)
-                        FROM stat_publics_50k_points as b
-                        WHERE a.vk_id=b.id AND  b.time = now() - interval\'1 day\'
-                )';
+        $sql = 'UPDATE stat_publics_50k as publics
+                SET visitors=points.visitors_sum, viewers=points.viewers_sum
+                FROM
+                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                          WHERE time > now()-interval \'2 day\' AND time < now() group by id )
+                                as points
+                WHERE publics.vk_id=points.id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
+
     }
 
     //поиск админов пабликов
