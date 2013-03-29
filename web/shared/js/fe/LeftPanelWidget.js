@@ -710,8 +710,7 @@ var LeftPanelWidget = Event.extend({
 
         function clearForm() {
             $input.data('id', 0).val('');
-            $('.qq-upload-list').html('');
-            deleteLink();
+            $('.attachments').empty();
         }
 
         function stop() {
@@ -721,20 +720,22 @@ var LeftPanelWidget = Event.extend({
             if (!$input.val().length && !$('.qq-upload-list li').length && !$linkInfo.is(':visible')) {
                 $input.data('id', 0);
                 $form.addClass('collapsed');
-                deleteLink();
             }
         }
 
-        function deleteLink() {
-            var $linkInfo = $form.find('.attachment');
-            $linkInfo.remove();
-            foundLink = false;
-            foundDomain = false;
-            foundPostId = false;
-        }
-
         $form.delegate('.delete-attachment', 'click', function() {
-            $(this).closest('.attachment').remove();
+            var $attachment = $(this).closest('.attachment');
+
+            if ($attachment.hasClass('post')) {
+                foundPostId = false;
+            }
+
+            if ($attachment.hasClass('link-info')) {
+                foundDomain = false;
+                foundLink = false;
+            }
+
+            $attachment.remove();
         });
 
         $form.delegate('.save', 'click', function() {
