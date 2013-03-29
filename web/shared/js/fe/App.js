@@ -101,7 +101,7 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, data) {
-                var $attachment = $('<div class="attachment photo">' +
+                var $attachment = $('<div class="attachment photo upload-compile">' +
                 '<img src="' + image + '" /><div class="delete-attachment" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('data', data);
