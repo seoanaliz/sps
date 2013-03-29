@@ -747,7 +747,7 @@ var LeftPanelWidget = Event.extend({
             var photos = imageUploader.getPhotos();
             var text = $.trim($input.val());
 
-            if (!text && !photos.length && !link) {
+            if (!text && !photos.length && !link && !foundPostId) {
                 return $input.focus();
             } else {
                 $form.addClass('spinner');
@@ -977,7 +977,8 @@ var LeftPanelWidget = Event.extend({
                         var text = $text.val();
                         var link = $links.find('a').attr('href');
                         var photos = imageUploader.getPhotos();
-                        if (!($.trim(text) || link || photos.length)) {
+                        var repostId = $post.data('repost-id');
+                        if (!($.trim(text) || link || photos.length || repostId)) {
                             return $text.focus();
                         } else {
                             t.savePost({
@@ -985,7 +986,7 @@ var LeftPanelWidget = Event.extend({
                                 photos: photos,
                                 link: link,
                                 articleId: postId,
-                                repostExternalId: $post.data('repost-id')
+                                repostExternalId: repostId
                             }).success(function() {
                                 t.reloadArticle(data.id);
                             });
