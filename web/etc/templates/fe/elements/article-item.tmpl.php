@@ -86,6 +86,7 @@ if (!empty($article)) {
         </div>
         <div class="r">
             <? if (!empty($repostArticleRecord) && $repostArticleRecord != 'nulll' /* wtf? */) { ?>
+                <? //@todo ссылка на пост ?>
                 <span class="hash-span" title="Пост с репостом">Репост</span>
             <? } ?>
             <? if (!empty($articleRecord->link)) { ?>
