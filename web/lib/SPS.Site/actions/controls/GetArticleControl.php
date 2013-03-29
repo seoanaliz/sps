@@ -42,7 +42,8 @@
                 'id' => $articleId,
                 'text' => nl2br($articleRecord->content),
                 'photos' => ObjectHelper::ToJSON($photos),
-                'link' => $articleRecord->link
+                'link' => $articleRecord->link,
+                'repostExternalId' => $articleRecord->repostExternalId,
             );
 
             echo ObjectHelper::ToJSON($result);

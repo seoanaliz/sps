@@ -1,8 +1,13 @@
 <?
 /** @var $canEditQueue bool */
 /** @var $grid array */
-/** @var $articlesQueue array */
+/** @var $articlesQueue ArticleQueue[] */
 /** @var $queueDate DateTimeWrapper */
+/** @var $queueDate DateTimeWrapper */
+/** @var $queueDate DateTimeWrapper */
+/** @var $articleRecords ArticleRecord[] */
+/** @var $repostArticleRecords ArticleRecord[] */
+
 $now = new DateTimeWrapper(date('d.m.Y'));
 ?>
 

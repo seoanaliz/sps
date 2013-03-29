@@ -2,11 +2,13 @@
     $articlesCount = empty($articlesCount) ? 0 : $articlesCount;
     /** @var $articles Article[] */
     /** @var $articleRecords ArticleRecord[] */
+    /** @var $repostArticleRecords ArticleRecord[] */
     /** @var $sourceFeeds SourceFeed[] */
     /** @var $authors Author[] */
     /** @var $reviewArticleCount int */
     /** @var $showArticlesOnly bool */
     /** @var $isWebUserEditor bool */
+
 ?>
 <? if (!$isWebUserEditor && $reviewArticleCount && !$showArticlesOnly): ?>
     <div class="show-all-postponed">Показать <?=$reviewArticleCount?> <?=LocaleLoader::Translate('fe.common.records.declension' . TextHelper::GetDeclension($reviewArticleCount))?> в очереди</div>
@@ -16,8 +18,11 @@
     if (!empty($articles)) {
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
+            $repostArticleRecord = ( !empty($articleRecord->repostArticleRecordId) && isset(  $repostArticleRecords[$articleRecord->repostArticleRecordId] ))
+                ? $repostArticleRecords[$articleRecord->repostArticleRecordId] : nulll;
             $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : null;
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
+
             ?>{increal:tmpl://fe/elements/article-item.tmpl.php}<?
         }
     }

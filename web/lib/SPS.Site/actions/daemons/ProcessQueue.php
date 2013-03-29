@@ -122,6 +122,7 @@ sql;
                 'video_id' => array(),
                 'link' => $link,
                 'header' => '',
+                'repost_post' => $articleRecord->repostExternalId
             );
 
             if (!empty($articleRecord->photos)) {
@@ -142,7 +143,11 @@ sql;
             $sender = new SenderVkontakte($post_data);
 
             try {
-                $articleQueue->externalId = $sender->send_post();
+                if ( !$post_data['repost_post'] ) {
+                    $articleQueue->externalId = $sender->send_post();
+                } else {
+                    $articleQueue->externalId = $sender->repost();
+                }
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
 

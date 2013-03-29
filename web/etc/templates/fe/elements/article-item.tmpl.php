@@ -5,6 +5,7 @@
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
 /** @var $sourceFeedType String */
+/** $var $repostArticleRecord ArticleRecord */
 
 if (!empty($article)) {
     $canEditPost = true;
