@@ -833,6 +833,7 @@ var Table = (function() {
 
         var sortFields = {
             followers: '.followers',
+            viewers: '.audience',
             growth: '.growth',
             isActive: '.is-active',
             inSearch: '.in-search',
