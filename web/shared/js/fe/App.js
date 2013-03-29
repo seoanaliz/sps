@@ -84,9 +84,9 @@ var App = (function() {
             var element = $element[0];
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
-                var $file = $listElement.find('> .attachment .qq-upload-file-loading');
-                var $attachment = $file.closest('.attachment');
+                var $attachment = $listElement.find('> .attachment:not(.upload-compile)').first();
                 $attachment.data('data', response);
+                $attachment.addClass('upload-compile');
                 $attachment.html('<img src="' + response.image + '" />' +
                 '<span class="qq-upload-size"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
@@ -117,7 +117,6 @@ var App = (function() {
                 '<a class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
                 fileTemplate: '<div class="attachment photo">' +
-                '<span class="qq-upload-file-loading"></span>' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
                 '<span class="qq-upload-size"></span>' +
