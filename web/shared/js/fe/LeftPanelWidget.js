@@ -711,6 +711,9 @@ var LeftPanelWidget = Event.extend({
         function clearForm() {
             $input.data('id', 0).val('');
             $('.attachments').empty();
+            foundPostId = false;
+            foundDomain = false;
+            foundLink = false;
         }
 
         function stop() {
