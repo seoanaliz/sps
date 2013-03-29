@@ -78,7 +78,8 @@ var App = (function() {
             var element = $element[0];
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
-                var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
+                var $file = $listElement.find('> .attachment .qq-upload-file');
+                var $attachment = $file.closest('.attachment');
                 $attachment.data('data', response);
                 $attachment.html('<img src="' + response.image + '" /><div class="delete-attachment" title="Удалить"></div>');
             };
@@ -90,7 +91,7 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, data) {
-                var $attachment = $('<div class="attachment photo attachment-handmade">' +
+                var $attachment = $('<div class="attachment photo">' +
                 '<img src="' + image + '" /><div class="delete-attachment" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('data', data);

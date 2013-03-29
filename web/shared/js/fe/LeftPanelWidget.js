@@ -734,7 +734,7 @@ var LeftPanelWidget = Event.extend({
         }
 
         $form.delegate('.delete-attachment', 'click', function() {
-            deleteLink();
+            $(this).closest('.attachment').remove();
         });
 
         $form.delegate('.save', 'click', function() {
