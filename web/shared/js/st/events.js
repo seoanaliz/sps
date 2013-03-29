@@ -171,7 +171,7 @@ var Eventlist = {
                             publicIsActive: !!publicItem.active,
                             publicInSearch: !!publicItem.in_search,
                             publicVisitors: publicItem.visitors,
-                            publicAudience: publicItem.quantity,
+                            publicAudience: publicItem.viewers,
                             lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                             users: users
                         });
