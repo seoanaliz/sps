@@ -541,7 +541,7 @@ var LeftPanelWidget = Event.extend({
             $listElement: $attachments
         });
 
-        var foundLink, foundDomain, foundPostId;
+        var foundLink, foundDomain, repostId;
 
         $form.click(function(e) {
             e.stopPropagation();
@@ -572,7 +572,7 @@ var LeftPanelWidget = Event.extend({
             }
 
             // если репост уже приаттачили
-            if (foundPostId) {
+            if (repostId) {
                 return;
             }
 
@@ -583,9 +583,9 @@ var LeftPanelWidget = Event.extend({
             }
 
             // если приаттачили репост
-            if (foundPostId = t.getPostIdByURL(matches[0])) {
+            if (repostId = t.getPostIdByURL(matches[0])) {
                 var code =
-                'var p=API.wall.getById({posts:"' + foundPostId + '"})[0];' +
+                'var p=API.wall.getById({posts:"' + repostId + '"})[0];' +
                 'var owner=(p.to_id>0)?API.users.get({uids:p.to_id,fields:"photo,screen_name"})[0]:API.groups.getById({gid:-p.to_id})[0];' +
                 'return {owner:owner,post:p};';
                 Control.callVKByOpenAPI('execute', {
@@ -605,7 +605,7 @@ var LeftPanelWidget = Event.extend({
                     }));
                     $attachments.append($post);
                 }).error(function(error) {
-                    foundPostId = false;
+                    repostId = false;
                     new Box({title: 'Ошибка', html: error.message}).show();
                 });
             }
@@ -711,7 +711,7 @@ var LeftPanelWidget = Event.extend({
         function clearForm() {
             $input.data('id', 0).val('');
             $('.attachments').empty();
-            foundPostId = false;
+            repostId = false;
             foundDomain = false;
             foundLink = false;
         }
@@ -730,7 +730,7 @@ var LeftPanelWidget = Event.extend({
             var $attachment = $(this).closest('.attachment');
 
             if ($attachment.hasClass('post')) {
-                foundPostId = false;
+                repostId = false;
             }
 
             if ($attachment.hasClass('link-info')) {
@@ -747,7 +747,7 @@ var LeftPanelWidget = Event.extend({
             var photos = imageUploader.getPhotos();
             var text = $.trim($input.val());
 
-            if (!text && !photos.length && !link && !foundPostId) {
+            if (!($.trim(text) || link || photos.length || repostId)) {
                 return $input.focus();
             } else {
                 $form.addClass('spinner');
@@ -757,7 +757,7 @@ var LeftPanelWidget = Event.extend({
                     text: text,
                     link: link,
                     photos: photos,
-                    repostExternalId: foundPostId
+                    repostExternalId: repostId
                 }).always(function() {
                     $form.removeClass('spinner');
                     stop();
