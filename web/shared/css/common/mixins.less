@@ -34,7 +34,6 @@
     background-image: -ms-linear-gradient(top,@top-color,@bottom-color);
     background-image: -o-linear-gradient(top,@top-color,@bottom-color);
     background-image: linear-gradient(top,@top-color,@bottom-color);
-    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorStr="@top-color~", EndColorStr="@bottom-color~")";
 }
 .border-radius(@params) {
     -webkit-border-radius: @params;
@@ -42,8 +41,6 @@
     border-radius: @params;
 }
 .opacity(@opacity) {
-    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`;
-    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
     opacity: @opacity;
 }
 .box-shadow(@params) {
