@@ -32,55 +32,6 @@ i {font-style: italic;}
     color: #888;
 }
 
-.newpost {
-    .buttons {
-        margin-top: 10px;
-    }
-
-    .link-info {
-        .link-description {
-            overflow: hidden;
-            margin-top: 15px;
-            padding: 10px;
-            background: #fff;
-            border: #c0cad4 solid 1px;
-
-            img {
-                float: left;
-                margin-right: 10px;
-            }
-            a {
-                margin: 0;
-            }
-            a + p {
-                margin-top: 5px;
-            }
-        }
-        .link-description img ~ a,
-        .link-description img ~ p {
-            width: 450px;
-        }
-        .link-status {
-            margin: 10px 0 0 10px;
-
-            span {
-                position: relative;
-            }
-
-            .delete-attachment {
-                position: absolute;
-                top: 2px;
-                right: -12px;
-                width: 10px;
-                height: 10px;
-                margin: 0;
-                background: url(../../images/fe/controls.png) no-repeat -44px -2px;
-                text-indent: -9999px;
-            }
-        }
-    }
-}
-
 .qq-upload-list {
     overflow: hidden;
     margin: 0;
@@ -946,48 +897,6 @@ i {font-style: italic;}
     }
 }
 
-.newpost {
-    position: relative;
-
-    .link-info {
-        .post_describe_image {
-            background-position: 50% 50%;
-            width: 130px;
-            height: 63px;
-            float: left;
-            margin: 0 10px 0 0;
-        }
-        .post_describe_layout {
-            overflow: hidden;
-        }
-        .post_describe_layout p {
-            cursor: pointer;
-        }
-        .post_describe_layout a span:hover,
-        .post_describe_layout p span:hover {
-            background: yellow;
-        }
-        .post_describe_layout input[type="text"],
-        .post_describe_layout textarea {
-            border: 1px solid #C0CAD4;
-            width: 95%;
-            font: inherit;
-            display: none;
-        }
-    }
-
-    .cancel {
-        margin-left: 5px;
-    }
-
-    &.collapsed {
-        .attachments,
-        .buttons {
-            display: none;
-        }
-    }
-}
-
 .editImagePopup {
     position: absolute;
     top:0;
@@ -1152,12 +1061,6 @@ i {font-style: italic;}
     resize: none;
     line-height: 160%;
 }
-.newpost textarea {
-    width: 536px;
-    height: 30px;
-    padding-right: 30px;
-    line-height: 100%;
-}
 .textarea-wrap {
     position: relative;
 
@@ -1298,6 +1201,102 @@ i {font-style: italic;}
     &:hover {
         background: @bg_hover;
         color: @color_blue;
+    }
+}
+
+.newpost {
+    position: relative;
+
+    .textarea-wrap {
+        margin-right: 22px;
+    }
+
+    textarea {
+        height: 1em;
+        line-height: 100%;
+    }
+
+    .buttons {
+        margin-top: 10px;
+    }
+
+    .link-info {
+        .post_describe_image {
+            background-position: 50% 50%;
+            width: 130px;
+            height: 63px;
+            float: left;
+            margin: 0 10px 0 0;
+        }
+        .post_describe_layout {
+            overflow: hidden;
+        }
+        .post_describe_layout p {
+            cursor: pointer;
+        }
+        .post_describe_layout a span:hover,
+        .post_describe_layout p span:hover {
+            background: yellow;
+        }
+        .post_describe_layout input[type="text"],
+        .post_describe_layout textarea {
+            border: 1px solid #C0CAD4;
+            width: 95%;
+            font: inherit;
+            display: none;
+        }
+
+        .link-description {
+            overflow: hidden;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff;
+            border: #c0cad4 solid 1px;
+
+            img {
+                float: left;
+                margin-right: 10px;
+            }
+            a {
+                margin: 0;
+            }
+            a + p {
+                margin-top: 5px;
+            }
+        }
+        .link-description img ~ a,
+        .link-description img ~ p {
+            width: 450px;
+        }
+        .link-status {
+            margin: 10px 0 0 10px;
+
+            span {
+                position: relative;
+            }
+
+            .delete-attachment {
+                position: absolute;
+                top: 2px;
+                right: -12px;
+                width: 10px;
+                height: 10px;
+                margin: 0;
+                background: url(../../images/fe/controls.png) no-repeat -44px -2px;
+                text-indent: -9999px;
+            }
+        }
+    }
+
+    .cancel {
+        margin-left: 5px;
+    }
+
+    &.collapsed {
+        .attachments,
+        .buttons {
+            display: none;
+        }
     }
 }
 

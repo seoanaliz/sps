@@ -53,46 +53,6 @@ i {
 .default {
   color: #888;
 }
-.newpost .buttons {
-  margin-top: 10px;
-}
-.newpost .link-info .link-description {
-  overflow: hidden;
-  margin-top: 15px;
-  padding: 10px;
-  background: #fff;
-  border: #c0cad4 solid 1px;
-}
-.newpost .link-info .link-description img {
-  float: left;
-  margin-right: 10px;
-}
-.newpost .link-info .link-description a {
-  margin: 0;
-}
-.newpost .link-info .link-description a + p {
-  margin-top: 5px;
-}
-.newpost .link-info .link-description img ~ a,
-.newpost .link-info .link-description img ~ p {
-  width: 450px;
-}
-.newpost .link-info .link-status {
-  margin: 10px 0 0 10px;
-}
-.newpost .link-info .link-status span {
-  position: relative;
-}
-.newpost .link-info .link-status .delete-attachment {
-  position: absolute;
-  top: 2px;
-  right: -12px;
-  width: 10px;
-  height: 10px;
-  margin: 0;
-  background: url(../../images/fe/controls.png) no-repeat -44px -2px;
-  text-indent: -9999px;
-}
 .qq-upload-list {
   overflow: hidden;
   margin: 0;
@@ -907,40 +867,6 @@ i {
 .post-image .else {
   max-width: 150px;
 }
-.newpost {
-  position: relative;
-}
-.newpost .link-info .post_describe_image {
-  background-position: 50% 50%;
-  width: 130px;
-  height: 63px;
-  float: left;
-  margin: 0 10px 0 0;
-}
-.newpost .link-info .post_describe_layout {
-  overflow: hidden;
-}
-.newpost .link-info .post_describe_layout p {
-  cursor: pointer;
-}
-.newpost .link-info .post_describe_layout a span:hover,
-.newpost .link-info .post_describe_layout p span:hover {
-  background: yellow;
-}
-.newpost .link-info .post_describe_layout input[type="text"],
-.newpost .link-info .post_describe_layout textarea {
-  border: 1px solid #C0CAD4;
-  width: 95%;
-  font: inherit;
-  display: none;
-}
-.newpost .cancel {
-  margin-left: 5px;
-}
-.newpost.collapsed .attachments,
-.newpost.collapsed .buttons {
-  display: none;
-}
 .editImagePopup {
   position: absolute;
   top: 0;
@@ -1092,12 +1018,6 @@ i {
   resize: none;
   line-height: 160%;
 }
-.newpost textarea {
-  width: 536px;
-  height: 30px;
-  padding-right: 30px;
-  line-height: 100%;
-}
 .textarea-wrap {
   position: relative;
 }
@@ -1238,6 +1158,87 @@ i {
 .show-all-postponed:hover {
   background: #E1E7ED;
   color: #5E82A8;
+}
+.newpost {
+  position: relative;
+}
+.newpost .textarea-wrap {
+  margin-right: 22px;
+}
+.newpost textarea {
+  height: 1em;
+  line-height: 100%;
+}
+.newpost .buttons {
+  margin-top: 10px;
+}
+.newpost .link-info .post_describe_image {
+  background-position: 50% 50%;
+  width: 130px;
+  height: 63px;
+  float: left;
+  margin: 0 10px 0 0;
+}
+.newpost .link-info .post_describe_layout {
+  overflow: hidden;
+}
+.newpost .link-info .post_describe_layout p {
+  cursor: pointer;
+}
+.newpost .link-info .post_describe_layout a span:hover,
+.newpost .link-info .post_describe_layout p span:hover {
+  background: yellow;
+}
+.newpost .link-info .post_describe_layout input[type="text"],
+.newpost .link-info .post_describe_layout textarea {
+  border: 1px solid #C0CAD4;
+  width: 95%;
+  font: inherit;
+  display: none;
+}
+.newpost .link-info .link-description {
+  overflow: hidden;
+  margin-top: 15px;
+  padding: 10px;
+  background: #fff;
+  border: #c0cad4 solid 1px;
+}
+.newpost .link-info .link-description img {
+  float: left;
+  margin-right: 10px;
+}
+.newpost .link-info .link-description a {
+  margin: 0;
+}
+.newpost .link-info .link-description a + p {
+  margin-top: 5px;
+}
+.newpost .link-info .link-description img ~ a,
+.newpost .link-info .link-description img ~ p {
+  width: 450px;
+}
+.newpost .link-info .link-status {
+  margin: 10px 0 0 10px;
+}
+.newpost .link-info .link-status span {
+  position: relative;
+}
+.newpost .link-info .link-status .delete-attachment {
+  position: absolute;
+  top: 2px;
+  right: -12px;
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  background: url(../../images/fe/controls.png) no-repeat -44px -2px;
+  text-indent: -9999px;
+}
+.newpost .cancel {
+  margin-left: 5px;
+}
+.newpost.collapsed .attachments,
+.newpost.collapsed .buttons {
+  display: none;
 }
 .post {
   background: #fff;
