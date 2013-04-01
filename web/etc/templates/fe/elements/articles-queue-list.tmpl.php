@@ -54,6 +54,12 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                     $articleQueueId = $gridItem['queue']->articleQueueId;
                     $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
                     $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
+                    $is_repost = false;
+                    if( $articleRecord->repostArticleRecordId && isset( $repostArticleRecords[$articleRecord->repostArticleRecordId])) {
+                        $repostOrigin = $articleRecord->repostExternalId;
+                        $articleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
+                        $is_repost = true;
+                    }
                     $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
                     ?>
                     <? if ($canEditQueue) { ?>
