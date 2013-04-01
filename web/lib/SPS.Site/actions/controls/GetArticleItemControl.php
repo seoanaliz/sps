@@ -66,6 +66,7 @@ class GetArticleItemControl extends BaseControl
         }
 
         $sourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
+        if( !$sourceFeed ) $sourceFeed = new SourceFeed();
         if (!empty($Article->authorId)) {
             $author = AuthorFactory::GetById($Article->authorId);
             Response::setParameter('author', $author);

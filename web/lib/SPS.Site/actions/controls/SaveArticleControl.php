@@ -152,12 +152,12 @@ class SaveArticleControl extends BaseControl
 
     private function add_repost_article( $repostExternalId )
     {
-        $articleRecordId = null;
+
+        $articleRecord = new ArticleRecord();
         try {
             $posts =  ParserVkontakte::get_posts_by_vk_id( $repostExternalId );
             $post = $posts[0];
-            $articleRecord = new ArticleRecord();
-            $articleRecord->content = $post['text'];
+            $articleRecord->content = $post['text']? $post['text'] : '';
             $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
             $articleRecord->link = Convert::ToString($post['link']);
             $articleRecord->retweet = Convert::ToArray($post['retweet']);
@@ -186,7 +186,9 @@ class SaveArticleControl extends BaseControl
             } else {
                 $conn->rollback();
             }
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+//            print_r($e->getMessage());
+        }
 
         return $articleRecord->articleRecordId;
     }
