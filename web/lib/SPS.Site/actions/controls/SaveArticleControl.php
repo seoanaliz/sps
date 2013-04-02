@@ -61,7 +61,7 @@ class SaveArticleControl extends BaseControl
             $link = null;
         }
 
-        if (empty($text) && empty($photos) && empty($link)) {
+        if (empty($text) && empty($photos) && empty($link) && empty($repostExternalId)) {
             $result['message'] = 'emptyArticle';
             echo ObjectHelper::ToJSON($result);
             return false;
@@ -94,7 +94,7 @@ class SaveArticleControl extends BaseControl
         }
 
         $articleRecord = new ArticleRecord();
-        $articleRecord->content = $text;
+        $articleRecord->content = $text ? $text : '';
         $articleRecord->likes = 0;
         $articleRecord->photos = !empty($photos) ? $photos : array();
         $articleRecord->link = $link;
