@@ -12,6 +12,9 @@ Package::Load( 'SPS.Stat' );
 
 class PublicsGrowFixer
 {
+    const PAUSE = 3;
+    const REQUESTS_PER_QUERY = 20;
+
     private $conn;
     private $time;
     private $vld_publics = array(
@@ -42,21 +45,24 @@ class PublicsGrowFixer
             die('not now!');
 
         $publics = StatPublics::get_our_publics_list();
+        echo 'всего должно быть записей: ', count($publics), '<br>';
+        $publ_do_it_couter = 0;
         foreach( $publics as $public ) {
             if ( !$this->check_entry_exsists( $public['id'] ))
                 echo 'не нашел паблик ' . $public['id'] . '<br>';
             echo '<br>паблик ' . $public['id'] . '<br>';
-            for( $i = 0; $i < 3; $i++) {
+            for( $try = 0; $try < 3; $try++) {
                 $this->create_public_entry( $public['id']);
                 if( !$this->get_public_members( $public['id'] )) {
                     echo '<br>try again <br>';
-                    $this->clear_public_entry( $public['id']);
+                    $this->clear_public_entry( $public['id'] );
                     continue;
                 }
+                $publ_do_it_couter ++;
                 break;
             }
-
         }
+//        echo '<br>alarm!!<br>Всего: ', $publ_do_it_couter, ' ( а должно было ', count($publics),' )<br> <br> ';
         $this->set_sum_entry();
         $this->save_point();
 
@@ -71,7 +77,7 @@ class PublicsGrowFixer
         $code = '';
         $return = "return{";
         while( 1 ) {
-            if ( $i == 25 ) {
+            if ( $i == self::REQUESTS_PER_QUERY ) {
                 $code .= trim( $return, ',' ) . "};";
                 $res = VkHelper::api_request( 'execute', array( 'code' =>  $code ), 0 );
                 if ( empty( $res )) {
@@ -94,7 +100,7 @@ class PublicsGrowFixer
                         break(2);
                     }
                 }
-                sleep(0.3);
+                sleep( self::PAUSE );
                 $i = 0;
                 $return = "return{";
                 $code = '';
@@ -104,7 +110,6 @@ class PublicsGrowFixer
             $i++;
             $offset += 1000;
         }
-        print_r( $public_id);
         $count = $this->get_users_count( $public_id );
         echo '<br>';
         print_r( array( $count, $quantity ));
@@ -201,7 +206,7 @@ class PublicsGrowFixer
             $cmd = new SqlCommand( $sql, $this->conn );
             $cmd->SetInteger( '@public_id', $public_id );
             $cmd->SetString ( '@type',      $type );
-            echo $cmd->GetQuery() .'<br>';
+            echo $cmd->GetQuery() . '<br>';
             $cmd->Execute();
         }
     }
