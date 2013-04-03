@@ -47,7 +47,7 @@ class PublicsParser
                     $entry->vk_id = $public->gid;
                     $entry->ava   = $public->photo;
                     $entry->name  = $public->name;
-                    $entry->closed =  $public->closed;
+                    $entry->closed =  $public->is_closed;
                     $entry->quantity = $public->members_count;
                     $entry->short_name =  $public->screen_name;
                     $entry->is_page    =  $public->type == 'page' ? true : false;

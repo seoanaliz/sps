@@ -571,11 +571,13 @@
 
         public static function get_posts_by_vk_id( $ids )
         {
+            $replace_array = array( 'wall', 'post' );
             if( is_array( $ids ))
                 $ids = implode( ',', $ids );
-            $ids = str_replace( 'wall', '', $ids );
+
+            $ids = str_replace( $replace_array, '', $ids );
             $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
             $posts = self::post_conv( $res );
             return $posts;
         }
-}
+    }

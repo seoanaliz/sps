@@ -402,6 +402,8 @@
       <video><![CDATA[Видео]]></video>
       <music><![CDATA[Музыка]]></music>
       <textLinks><![CDATA[Ссылки в тексте]]></textLinks>
+      <repostArticleRecordId><![CDATA[id статьи репоста]]></repostArticleRecordId>
+      <repostExternalId><![CDATA[внешний id репоста]]></repostExternalId>
     </articleRecord>
     <publisher>
       <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>

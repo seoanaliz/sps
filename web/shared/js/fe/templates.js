@@ -42,3 +42,52 @@ var QUEUE_SLOT_ADD =
         '<span class="datepicker"></span>' +
     '</div>' +
 '</div>';
+
+var ATTACHMENT_PREVIEW_REPOST =
+'<div class="attachment post">' +
+    '<div class="l d-hide">' +
+        '<div class="userpic">' +
+            '<img src="<?=owner.photo?>" />' +
+        '</div>' +
+    '</div>' +
+    '<div class="name">' +
+        '<a href="http://vk.com/<?=owner.screen_name?>" target="_blank">' +
+            '<?=owner.name?>' +
+        '</a>' +
+    '</div>' +
+    '<div class="content">' +
+        '<?=text?>' +
+    '</div>' +
+    '<a class="delete-attachment">удалить</a>' +
+'</div>';
+
+var ATTACHMENT_PREVIEW_LINK =
+'<div class="attachment link-info">' +
+    '<div class="link-description">' +
+        '<? if (isset("image")) { ?>' +
+            '<div class="post_describe_image" title="Редактировать картинку" style="background: no-repeat center url(<?=image?>);"></div>' +
+        '<? } ?>' +
+        '<div class="post_describe_layout">' +
+            '<? if (isset("title")) { ?>' +
+                '<div class="post_describe_header">' +
+                    '<a href="<?=link?>" target="_blank" title="Редактировать заголовок">' +
+                        '<span><?=title?></span>' +
+                    '</a>' +
+                    '<input type="text" id="post_header">' +
+                '</div>' +
+            '<? } ?>' +
+            '<? if (isset("description")) { ?>' +
+                '<p title="Редактировать описание">' +
+                    '<span><?=description?></span>' +
+                    '<textarea id="post_description"></textarea>' +
+                '</p>' +
+            '<? } ?>' +
+        '</div>' +
+    '</div>' +
+    '<div class="link-status">' +
+        '<span>' +
+            'Ссылка: <a href="<?=link?>" target="_blank"><?=text?></a>' +
+            '<a class="delete-attachment">удалить</a>' +
+        '</span>' +
+    '</div>' +
+'</div>';

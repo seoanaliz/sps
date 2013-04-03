@@ -25,6 +25,7 @@
         private $header;                        //заголовок ссылки
         private $audio_id = array();            //заголовок ссылки
         private $video_id = array();            //заголовок ссылки
+        private $repost_post;
 
         const METH          =   'https://api.vk.com/method/';
         const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
@@ -47,10 +48,11 @@
                 $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
                 $this->link             =   $post_data['link'];
                 $this->header           =   $post_data['header'];
+                $this->repost_post      =   $post_data['repost_post'];
             }
         }
 
-        private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
+        private function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '' )
         {
             if (empty($url)) {
                 return false;
@@ -133,6 +135,20 @@
                 throw new exception( "can't find post: vk.com/public" . $this->vk_group_id );
             else
                 return '-' . $this->vk_group_id . '_' . $check_id;
+        }
+
+        public function repost()
+        {
+            $params = array(
+                'object'    =>  'wall' . $this->repost_post,
+                'message'   =>  '',
+                'gid'       =>  $this->vk_group_id,
+                'access_token' => $this->vk_access_token
+            );
+            $res = VkHelper::api_request( 'wall.repost', $params );
+            if ( isset( $res->success) && $res->success && isset( $res->post_id ))
+                return  '-' . $this->vk_group_id . '_' . $res->post_id;
+
         }
 
         public function text_corrector( $text )

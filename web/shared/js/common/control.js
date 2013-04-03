@@ -3,6 +3,7 @@
  */
 var Control = {
     root: '',
+    type: 'get',
     dataType: 'json',
     controlMap: {},
 
@@ -28,6 +29,7 @@ var Control = {
         var params = $.extend({}, t.commonParams, t.defaultParams);
         var control = t.controlMap[method] || {};
         var dataType = control.dataType || t.dataType;
+        var type = control.type || t.type;
         var controlName = control.name || method;
         var controlDefaultParams = control.defaultParams || {};
         var root = control.root || t.root;
@@ -51,6 +53,7 @@ var Control = {
             url: root + controlName + '/',
             dataType: dataType,
             data: $.extend(controlDefaultParams, params),
+            type: type,
             success: function(data) {
                 if (typeof t.commonResponse == 'function') {
                     data = t.commonResponse(data);
@@ -121,7 +124,7 @@ var Control = {
                     }
                     deferred.fireSuccess(data.response);
                 } else {
-                    deferred.fireError(data);
+                    deferred.fireError(data.error.error_msg);
                 }
             });
         }

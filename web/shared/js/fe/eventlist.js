@@ -1,5 +1,6 @@
 Control = $.extend(Control, {
     root: controlsRoot,
+    type: 'GET',
     dataType: 'html',
 
     controlMap: {
@@ -57,6 +58,11 @@ Control = $.extend(Control, {
         },
         get_queue: {
             name: 'articles-queue-timeline'
+        },
+        post: {
+            name: 'article-save',
+            dataType: 'json',
+            type: 'POST'
         }
     }
 });
@@ -255,34 +261,6 @@ var Eventlist = {
         });
     },
 
-    post: function(text, photos, link, id, callback){
-        var $sourceFeedIds = Elements.leftdd();
-        var $sourceFeedId;
-        if ($sourceFeedIds.length != 1) {
-            $sourceFeedId = null;
-        } else {
-            $sourceFeedId = $sourceFeedIds[0];
-        }
-
-        $.ajax({
-            url: controlsRoot + 'article-save/',
-            type: 'POST',
-            dataType : "json",
-            data: {
-                articleId: id,
-                text: text,
-                photos: photos,
-                link: link,
-                sourceFeedId: $sourceFeedId,
-                targetFeedId: Elements.rightdd(),
-                userGroupId: Elements.getUserGroupId()
-            },
-            success: function(data) {
-                callback(data);
-            }
-        });
-    },
-
     post_link_data: function(data, callback) {
         $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
         $.ajax({
@@ -295,10 +273,11 @@ var Eventlist = {
             success: function (data) {
                 if (data) {
                     $('.reload-link').click();
-                    callback(data);
                 } else {
                     popupError('Ошибка сохренения информации о ссылке');
-                    callback(false);
+                }
+                if (typeof callback == 'function') {
+                    callback(data);
                 }
             }
         });
