@@ -94,8 +94,10 @@ if (!empty($article)) {
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if ($article->externalId != -1) { ?>
-                    <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
+                <? if ($article->externalId != -1) {
+                $externalId = trim($article->externalId, '-');
+                ?>
+                    <a href="{$articleLinkPrefix}{$externalId}" target="_blank">Оригинал</a>
                 <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {
