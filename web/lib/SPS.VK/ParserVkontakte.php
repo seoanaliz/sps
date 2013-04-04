@@ -259,7 +259,7 @@
             $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
-            $article->statusId = 1;
+            $article->statusId = 3;
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
             $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
