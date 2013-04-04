@@ -293,15 +293,16 @@
             $articleQueue->collectLikes = true;
             $articleQueue->sentAt = $article->sentAt;
             $articleQueue->externalId = $article->externalId;
-            $articleQueue->startDate = new DateTimeWrapper($article->sentAt->DefaultDateFormat());
+            $articleQueue->startDate = new DateTimeWrapper($article->sentAt->Default24hFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate = new DateTimeWrapper($article->sentAt->DefaultDateFormat());
+            $articleQueue->endDate = new DateTimeWrapper($article->sentAt->Default24hFormat());
             $articleQueue->endDate->modify( '+5 minutes');
             $articleQueue->targetFeedId = $article->targetFeedId;
             $articleQueue->statusId = StatusUtility::Finished;
             $articleQueue->createdAt = $article->createdAt;
             $articleQueue->isDeleted = false;
             $articleQueue->type = 'content'; //неспортивно
+
             return $articleQueue;
         }
 
