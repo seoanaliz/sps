@@ -1,6 +1,6 @@
 var App = (function() {
     var App = Event.extend({
-        init: function() {
+        run: function() {
             var t = this;
             t.getLeftPanelWidget();
             t.getRightPanelWidget();
@@ -27,10 +27,16 @@ var App = (function() {
             });
         },
 
+        /**
+         * @returns {LeftPanelWidget}
+         */
         getLeftPanelWidget: function() {
             return this.leftPanelWidget || (this.leftPanelWidget = new LeftPanelWidget());
         },
 
+        /**
+         * @returns {RightPanelWidget}
+         */
         getRightPanelWidget: function() {
             return this.rightPanelWidget || (this.rightPanelWidget = new RightPanelWidget());
         },
@@ -78,9 +84,14 @@ var App = (function() {
             var element = $element[0];
             var listElement = $listElement ? $listElement[0] : undefined;
             var onComplete = function(id, fileName, response) {
-                var $attachment = $($listElement.find('> .attachment:not(.attachment-handmade)')[id]);
+                var $attachment = $listElement.find('> .attachment:not(.upload-compile)').first();
                 $attachment.data('data', response);
-                $attachment.html('<img src="' + response.image + '" /><div class="delete-attach" title="Удалить"></div>');
+                $attachment.addClass('upload-compile');
+                $attachment.html('<img src="' + response.image + '" />' +
+                '<span class="qq-upload-size"></span>' +
+                '<span class="qq-upload-spinner"></span>' +
+                '<span class="qq-upload-cancel"></span>' +
+                '<div class="delete-attachment" title="Удалить"></div>');
             };
             var getPhotos = function() {
                 var photos = [];
@@ -90,8 +101,8 @@ var App = (function() {
                 return photos;
             };
             var addPhoto = function(image, data) {
-                var $attachment = $('<div class="attachment attachment-handmade">' +
-                '<img src="' + image + '" /><div class="delete-attach" title="Удалить"></div>' +
+                var $attachment = $('<div class="attachment photo upload-compile">' +
+                '<img src="' + image + '" /><div class="delete-attachment" title="Удалить"></div>' +
                 '</div>');
                 $attachment.data('data', data);
                 $listElement.append($attachment);
@@ -105,7 +116,7 @@ var App = (function() {
                 '<div class="qq-upload-drop-area">+</div>' +
                 '<a class="qq-upload-button">Прикрепить</a>' +
                 '</div>',
-                fileTemplate: '<div class="attachment">' +
+                fileTemplate: '<div class="attachment photo">' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
                 '<span class="qq-upload-size"></span>' +
@@ -115,11 +126,14 @@ var App = (function() {
                 onComplete: onComplete
             }, options));
 
-            $listElement.delegate('.delete-attach', 'click', function() {
+            $listElement.delegate('.delete-attachment', 'click', function() {
                 $(this).closest('.attachment').remove();
             });
 
             return {
+                /**
+                 * @returns {Array}
+                 */
                 getPhotos: function() {
                     return getPhotos.apply(this, arguments);
                 },
@@ -127,6 +141,14 @@ var App = (function() {
                     return addPhoto.apply(this, arguments);
                 }
             }
+        },
+
+        /**
+         * @param {{text: string, link: string, photos: Array, articleId: (number=), repostExternalId: number}} params
+         * @returns {Deferred}
+         */
+        savePost: function(params) {
+            return this.getLeftPanelWidget().savePost(params);
         }
     });
 

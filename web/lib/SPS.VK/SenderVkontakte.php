@@ -140,9 +140,10 @@
         public function repost()
         {
             $params = array(
-                'object'    =>  $this->repost_post,
-                'message'   =>  $this->post_text,
-                'gid'       =>  $this->vk_group_id
+                'object'    =>  'wall' . $this->repost_post,
+                'message'   =>  '',
+                'gid'       =>  $this->vk_group_id,
+                'access_token' => $this->vk_access_token
             );
             $res = VkHelper::api_request( 'wall.repost', $params );
             if ( isset( $res->success) && $res->success && isset( $res->post_id ))

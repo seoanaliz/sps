@@ -1,5 +1,5 @@
 var articlesLoading = false;
-var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
+var pattern = /\b(https?|ftp):\/\/([\-A-Z0-9.]+)(\/[\-A-Z0-9+&@#\/%=~_|!:,.;]*)?(\?[-A-Z0-9+&@#\/%=~_|!:,.;]*)?/im;
 var easydateParams = {
     date_parse: function(date) {
         if (!date) return;
@@ -139,4 +139,5 @@ function popupNotice( message ) {
 
 $(document).ready(function() {
     window.app = new App();
+    app.run();
 });

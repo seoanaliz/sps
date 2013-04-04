@@ -20,8 +20,8 @@ class getReportList
         $status         =   Request::getInteger( 'status' );
         $sort_by        =   strtolower( Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
-        $target_public  =   0;#Request::getString ( 'targetPublicId' );
-        $barter_public  =   0;#Request::getString ( 'barterPublicId' );
+        $target_public  =   Request::getString ( 'targetPublicId' );
+        $barter_public  =   Request::getString ( 'barterPublicId' );
         $group_id       =   Request::getInteger( 'groupId');
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;

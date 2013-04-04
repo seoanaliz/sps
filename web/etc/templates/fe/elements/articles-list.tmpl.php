@@ -19,7 +19,7 @@
         foreach($articles as $article) {
             $articleRecord  = !empty($articleRecords[$article->articleId]) ? $articleRecords[$article->articleId] : new ArticleRecord();
             $repostArticleRecord = ( !empty($articleRecord->repostArticleRecordId) && isset(  $repostArticleRecords[$articleRecord->repostArticleRecordId] ))
-                ? $repostArticleRecords[$articleRecord->repostArticleRecordId] : nulll;
+                ? $repostArticleRecords[$articleRecord->repostArticleRecordId] : null;
             $sourceFeed     = !empty($sourceFeeds[$article->sourceFeedId]) ? $sourceFeeds[$article->sourceFeedId] : null;
             $author         = !empty($authors[$article->authorId]) ? $authors[$article->authorId] : null;
 
