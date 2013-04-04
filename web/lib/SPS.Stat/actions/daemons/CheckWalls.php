@@ -6,19 +6,23 @@
  * Time: 21:06
  * To change this template use File | Settings | File Templates.
  */
-
+//монструозина
+//изначально нужна была только для отслеживания бартеров. Основная фича
+// парс большого количества стен(особенно наших пабликов) . появился до функционал(отслеживание всех
+//исходящих ссылей, отслеживание упоминаний.
+//теперь здесь же будут мониторится посты, созданные не через sb и туда вноситься
 class CheckWalls
 {
-
     private $posts_in_progress;
     private $cookie = null;
+    private $existing_external_ids;
 
     const url_mentions = 'http://vk.com/feed?section=mentions&obj=';
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
     const MONITORING_TYPE_WALL = 'wall';
     const MONITORING_TYPE_MENTIONS = 'mentions';
     const MONITORING_TYPE_NOT_SB_POSTS = 'not_sb';
-
+    //v
     private  $monitoring_array = array(
         43005314,
         42933269,
@@ -37,6 +41,7 @@ class CheckWalls
         set_time_limit( 0 );
 
         $this->get_mentions();
+        $this->get_existing_external_ids();
         $this->posts_in_progress = $this->get_posts_under_observation();
         if ( date('H') == 1 && date('i') < 15 ) {
             //установка новых автомониторов
@@ -52,6 +57,7 @@ class CheckWalls
 
     }
 
+    //
     public function kill_overtimed()
     {
         //ищем просроченные
@@ -79,16 +85,18 @@ class CheckWalls
         $our_publics = StatPublics::get_our_publics_list();
         $our_publics_ids = array_keys( $our_publics);
 
-        foreach( $publics as $barter_event )
+        //массив id пабликов для мониторинга бартеров
+        foreach( $publics as $barter_event ) {
             $ids_array[] = $barter_event->barter_public;
-        //левая тема для записи последнего поста паблика, нужна для отлова левых постов
+        }
+        //добавляем стены пабликов для отслеживания внешних ссылок
         $ids_array = array_merge( $ids_array, $this->monitoring_array, $our_publics_ids);
         $ids_array = array_unique( $ids_array );
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
             $post = $walls[ $public_id ][1];
-            $this->save_post( $public_id, $post->id, $post->text);
+            $this->save_post( $public_id, $post->id, $post->text );
         }
 
         //сохраняем активность наших пабликов
@@ -97,10 +105,10 @@ class CheckWalls
                 continue;
             $post = $walls[ $public_id ][1];
             $link = $this->find_memlink( $post->text );
+            $this->save_post( $public_id, $post->id, $post->text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
 
-            //не сохраняем текст для опубликованных чз sb постов
-            $text =  ( $this->check_if_via_sb( $public_id, $post->id ) && $link ) ? 'with bare hands' : $post->text;
-            $this->save_post( $public_id, $post->id, $text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
+            //заносим отсутствующие в sb посты в sb
+            $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
         }
 
         //перебор мониторов, поиск постов на соответств. стенах
@@ -326,7 +334,8 @@ class CheckWalls
         if( !$link ) {
             $link = $this->find_memlink( $text );
         }
-        if( $link && $type == self::MONITORING_TYPE_WALL )  return false;
+        if( $link && $type == self::MONITORING_TYPE_WALL )
+            return false;
 
         if( !$this->check_if_post_registered( $public_id, $post_id )) {
             $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, @link, @type, @mentioned_public)';
@@ -343,8 +352,7 @@ class CheckWalls
 
     private function get_publics_for_mentions()
     {
-        return array(
-        );
+        return array();
     }
 
     //собирает упоминания пабликов
@@ -365,7 +373,6 @@ class CheckWalls
             $this->parse_mentions_page( $page, $public_id );
         }
     }
-
 
     private function parse_mentions_page( $page, $public_id )
     {
@@ -409,9 +416,87 @@ class CheckWalls
         }
     }
 
-    public function check_if_via_sb( $public_id, $post_id)
+    public function get_existing_external_ids()
     {
-        $check = ArticleQueueFactory::Get( array( 'externalId' => '-' . $public_id . '_' . $post_id ));
-        return !empty( $check );
+        $result = array();
+        //выбираем внешние id отправленных чз sb(или уже спаренных) постов
+        $sql = <<<sql
+            SELECT "externalId"
+            FROM   "articleQueues"
+            WHERE
+                   "sentAt" IS NOT NULL
+               AND "sentAt" > now() - interval '15 minute'
+               AND "externalId" IS NOT NULL
+sql;
+
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get());
+        $ds = $cmd->Execute();
+        while( $ds->Next()) {
+            $result[$ds->GetValue('externalId')] = 1;
+        }
+
+        $this->existing_external_ids = $result;
     }
+
+    //сохраняем посты(сделанные не через sb), заносим их в очередь как отправленные
+    public function add_posts_to_sb_queue( $posts, $targeetFeedId, $check_time = true )
+    {
+        $check_date = new DateTimeWrapper( date('r', time() - 600 ));
+        $posts_c = ParserVkontakte::post_conv( $posts );
+        foreach( $posts_c as $post ) {
+            $postDate = new DateTimeWrapper( date('r', $post['time'] ));
+            //если пост уже спарсен или был опубликовн больше 10 минут назад - пропускаем
+            if ( ($check_time && $postDate <= $check_date ) || isset( $this->existing_external_ids[$post['id']] )) {
+                continue;
+            }
+            $article = ParserVkontakte::get_article_from_post( $post, $targeetFeedId );
+            $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
+
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+            $result = ArticleFactory::Add( $article, array(BaseFactory::WithReturningKeys => true));
+            if ($result) {
+                $articleRecord->articleId = $article->articleId;
+                $articleRecord->articleQueueId = $this->insert_into_queue( $article );;
+                $result = ArticleRecordFactory::Add( $articleRecord );
+            }
+            if(  $result && $articleRecord->articleQueueId ) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+        }
+    }
+
+    /**
+     * рзмещаем сатью в очереди с пометкой "отправлено"
+     * @param article Article
+     * @return int | boolean
+     */
+    public function insert_into_queue( $article )
+    {
+        $articleQueue = ParserVkontakte::get_articleQueue_from_article( $article );
+        $result = ArticleQueueFactory::Add( $articleQueue, array( BaseFactory::WithReturningKeys => true ));
+        if (!$result )
+            return false;
+        $date = $article->sentAt->format('d.m.Y');
+        $grid_line = new GridLine();
+        $grid_line->startDate = $date;
+        $grid_line->endDate = $date;
+        $grid_line->targetFeedId = $article->targetFeedId;
+        $grid_line->time = $article->sentAt->format('H:i:s');
+        $grid_line->type = GridLineUtility::TYPE_CONTENT;
+        $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
+        if (!$result )
+            return false;
+        $grid_line_item = new GridLineItem();
+        $grid_line_item->gridLineId = $grid_line->gridLineId;
+        $grid_line_item->date = $article->sentAt;
+        $result = GridLineItemFactory::Add( $grid_line_item );
+
+        return $result ? $articleQueue->articleQueueId : false;
+    }
+
+
+
 }

@@ -177,7 +177,8 @@
             return $posts;
         }
 
-        public static function post_conv( $posts, $trig_inc = false )
+        //
+        public static function post_conv( $posts )
         {
             $result_posts_array = array();
 
@@ -188,6 +189,7 @@
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
                 $text       =   self::remove_tags( $post->text);
+                $source     =   $post->post_source->type;
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -198,9 +200,7 @@
                 $text_links = array();
 
                 if ( isset( $post->attachments )) {
-                    foreach( $post->attachments as $attachment )
-                    {
-
+                    foreach( $post->attachments as $attachment ) {
                         switch( $attachment->type ) {
                             case 'photo':
                                 $url = self::get_biggest_picture( $attachment );
@@ -244,10 +244,79 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links
+                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'source'=>$source
                 );
+
             }
             return $result_posts_array;
+        }
+        /** @return Article */
+        public static function get_article_from_post( $post, $target_feed_id )
+        {
+            $article = new Article();
+            $article->externalId = $post['id'];
+            $article->targetFeedId = $target_feed_id;
+            $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->importedAt = DateTimeWrapper::Now();
+            $article->isCleaned = false;
+            $article->statusId = 1;
+            $article->articleStatus = Article::STATUS_APPROVED;
+            $article->rate = 0;
+            $article->sourceFeedId = -2;
+            return $article;
+        }
+
+        /** @return ArticleRecord */
+        public static function get_articleRecord_from_post( $post )
+        {
+            $articleRecord = new ArticleRecord();
+            $articleRecord->content = $post['text'] ? $post['text'] :"";
+            $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
+            $articleRecord->link = Convert::ToString($post['link']);
+            $articleRecord->retweet = Convert::ToArray($post['retweet']);
+            $articleRecord->text_links = Convert::ToArray($post['text_links']);
+            $articleRecord->video = Convert::ToArray($post['video']);
+            $articleRecord->music = Convert::ToArray($post['music']);
+            $articleRecord->poll = Convert::ToString($post['poll']);
+            $articleRecord->map = Convert::ToString($post['map']);
+            $articleRecord->doc = Convert::ToString($post['doc']);
+            $articleRecord->rate = 0;
+            $articleRecord->photos = self::savePostPhotos($post['photo']);
+            return $articleRecord;
+        }
+
+        /** @return ArticleQueue */
+        public static function get_articleQueue_from_article( Article $article )
+        {
+            $articleQueue = new ArticleQueue();
+            $articleQueue->articleId = $article->articleId;
+            $articleQueue->collectLikes = true;
+            $articleQueue->sentAt = $article->sentAt;
+            $articleQueue->externalId = $article->externalId;
+            $articleQueue->startDate =  clone( $article->sentAt );
+            $articleQueue->startDate->modify( '-5 minutes');
+            $articleQueue->endDate =  clone( $article->sentAt );
+            $articleQueue->endDate->modify( '+5 minutes');
+            $articleQueue->targetFeedId = $article->targetFeedId;
+            $articleQueue->statusId = StatusUtility::Finished;
+            $articleQueue->createdAt = $article->createdAt;
+            $articleQueue->isDeleted = false;
+            $articleQueue->type = 'content'; //неспортивно
+            return $articleQueue;
+        }
+
+        public static function savePostPhotos($data) {
+            $result = array();
+
+            foreach ($data as $photo) {
+                $result[] = array(
+                    'filename' => '',
+                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                    'url' => $photo['url'],
+                );
+            }
+
+            return $result;
         }
 
         public static function get_biggest_picture( $data )
