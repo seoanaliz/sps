@@ -293,9 +293,9 @@
             $articleQueue->collectLikes = true;
             $articleQueue->sentAt = $article->sentAt;
             $articleQueue->externalId = $article->externalId;
-            $articleQueue->startDate =  clone( $article->sentAt );
+            $articleQueue->startDate = new DateTimeWrapper($article->sentAt->DefaultDateFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate =  clone( $article->sentAt );
+            $articleQueue->endDate = new DateTimeWrapper($article->sentAt->DefaultDateFormat());
             $articleQueue->endDate->modify( '+5 minutes');
             $articleQueue->targetFeedId = $article->targetFeedId;
             $articleQueue->statusId = StatusUtility::Finished;
