@@ -262,7 +262,7 @@
             $article->statusId = 1;
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
-            $article->sourceFeedId = -2;
+            $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
             return $article;
         }
 
