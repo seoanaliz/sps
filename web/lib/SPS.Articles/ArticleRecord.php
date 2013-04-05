@@ -72,5 +72,8 @@
         /** @var string */
         public $repostExternalId;
 
+        /** @var string */
+        public $createdVia;
+
     }
 ?>

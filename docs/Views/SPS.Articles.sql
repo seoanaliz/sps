@@ -93,6 +93,7 @@ SELECT "public"."articleRecords"."articleRecordId"
 	, "public"."articleRecords"."articleQueueId"
     , "public"."articleRecords"."repostArticleRecordId"
     , "public"."articleRecords"."repostExternalId"
+    , "public"."articleRecords"."createdVia"
  FROM "public"."articleRecords";
 
 CREATE OR REPLACE VIEW "getPublishers" AS

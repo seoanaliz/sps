@@ -404,6 +404,7 @@
       <textLinks><![CDATA[Ссылки в тексте]]></textLinks>
       <repostArticleRecordId><![CDATA[id статьи репоста]]></repostArticleRecordId>
       <repostExternalId><![CDATA[внешний id репоста]]></repostExternalId>
+      <createdVia><![CDATA[пост создан через ]]></createdVia>
     </articleRecord>
     <publisher>
       <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>

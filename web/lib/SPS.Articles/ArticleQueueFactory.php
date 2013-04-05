@@ -76,7 +76,6 @@
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Article'
                 )
                 ,'targetFeedId' => array(

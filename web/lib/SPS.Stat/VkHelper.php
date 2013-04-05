@@ -14,6 +14,7 @@
 
         class   VkHelper {
 
+
             /**
              *id аппа статистки
              */
@@ -40,11 +41,14 @@
 
             );
 
+            public static  $open_methods = array(
+                'wall.get' => true,
+            );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
                 $app_id = $app == 'barter' ? self::APP_ID_BARTER : self::APP_ID_STATISTICS;
-                if ( !isset( $request_params['access_token'] ))
+                if ( !isset( $request_params['access_token']) && !isset( self::$open_methods[ $method ]))
                     $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
                 $a = VkHelper::qurl_request( $url, $request_params );
@@ -62,9 +66,9 @@
                             throw new AccessTokenIsDead();
                         else
                             throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
-                    }
-                    else
+                    } else {
                         return $res;
+                    }
                 return $res->response;
             }
 
