@@ -21,8 +21,10 @@
             }
 
             $urlData = parse_url($url);
+            if( $urlData['host'] == 'vk.com' || $urlData['host'] == 'vkontakte.ru') {
+                return $result;
+            }
             $baseUrl = $urlData['scheme'] . '://' . $urlData['host'];
-
             $document = phpQuery::newDocument($html);
 
             $title = $document->find( "meta[property='og:title']" )->attr('content');
