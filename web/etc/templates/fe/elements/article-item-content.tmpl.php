@@ -14,7 +14,7 @@ $contentPart1 = !empty($contentPart1) ? $contentPart1 : ''
 <? if (!empty($articleRecord->link)) { ?>
     <div class="link-info-content">
         <div class="link-description-content">
-            <img src="{web:images://fe/ajax-loader.gif}" alt="" class="<?= isset($extLinkLoader) ? 'ajax-loader-ext' : 'ajax-loader' ?>" rel="{form:$articleRecord->link}" />
+            <img src="{web:images://fe/ajax-loader.gif}" alt="" class="<?= !empty($extLinkLoader) ? 'ajax-loader-ext' : 'ajax-loader' ?>" rel="{form:$articleRecord->link}" />
         </div>
     </div>
 <? } ?>
