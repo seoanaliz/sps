@@ -1,0 +1,1 @@
+ALTER TABLE "articleQueues" ALTER "articleId" DROP  NOT NULL;

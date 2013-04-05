@@ -449,17 +449,17 @@ sql;
             if ( ($check_time && $postDate <= $check_date ) || isset( $this->existing_external_ids[$post['id']] )) {
                 continue;
             }
-            $article = ParserVkontakte::get_article_from_post( $post, $targeetFeedId );
+//            $article = ParserVkontakte::get_article_from_post( $post, $targeetFeedId );
             $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
 
             $conn = ConnectionFactory::Get();
             $conn->begin();
-            $result = ArticleFactory::Add( $article, array(BaseFactory::WithReturningKeys => true));
-            if ($result) {
-                $articleRecord->articleId = $article->articleId;
-                $articleRecord->articleQueueId = $this->insert_into_queue( $article );;
-                $result = ArticleRecordFactory::Add( $articleRecord );
-            }
+            $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
+            ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
+            $articleRecord->articleQueueId = $articleQueue->articleQueueId;
+            $this->make_grids( $targeetFeedId, $postDate );
+            $result = ArticleRecordFactory::Add( $articleRecord );
+
             if(  $result && $articleRecord->articleQueueId ) {
                 $conn->commit();
             } else {
@@ -468,35 +468,25 @@ sql;
         }
     }
 
-    /**
-     * рзмещаем сатью в очереди с пометкой "отправлено"
-     * @param article Article
-     * @return int | boolean
-     */
-    public function insert_into_queue( $article )
+    public function make_grids( $target_feed_id, $sent_at )
     {
-        $articleQueue = ParserVkontakte::get_articleQueue_from_article( $article );
-        $result = ArticleQueueFactory::Add( $articleQueue, array( BaseFactory::WithReturningKeys => true ));
-        if (!$result )
-            return false;
-        $date = $article->sentAt->format('d.m.Y');
+        $date = $sent_at->format('d.m.Y');
         $grid_line = new GridLine();
         $grid_line->startDate = $date;
         $grid_line->endDate = $date;
-        $grid_line->targetFeedId = $article->targetFeedId;
-        $grid_line->time = $article->sentAt->format('H:i:s');
+        $grid_line->targetFeedId = $target_feed_id;
+        $grid_line->time = $sent_at->format('H:i:s');
         $grid_line->type = GridLineUtility::TYPE_CONTENT;
         $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
+
         if (!$result )
             return false;
+
         $grid_line_item = new GridLineItem();
         $grid_line_item->gridLineId = $grid_line->gridLineId;
-        $grid_line_item->date = $article->sentAt;
-        $result = GridLineItemFactory::Add( $grid_line_item );
+        $grid_line_item->date = $sent_at;
 
-        return $result ? $articleQueue->articleQueueId : false;
+        return GridLineItemFactory::Add( $grid_line_item );
     }
-
-
 
 }

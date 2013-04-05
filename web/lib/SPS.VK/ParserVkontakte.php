@@ -244,7 +244,7 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'source'=>$source
+                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source
                 );
 
             }
@@ -280,29 +280,30 @@
             $articleRecord->poll = Convert::ToString($post['poll']);
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
+            $articleRecord->createdVia = Convert::ToString($post['createdVia']);
             $articleRecord->rate = 0;
             $articleRecord->photos = self::savePostPhotos($post['photo']);
             return $articleRecord;
         }
 
         /** @return ArticleQueue */
-        public static function get_articleQueue_from_article( Article $article )
+        public static function get_articleQueue_from_article( $post ,$sent_at, $target_feed_id )
         {
             $articleQueue = new ArticleQueue();
-            $articleQueue->articleId = $article->articleId;
             $articleQueue->collectLikes = true;
-            $articleQueue->sentAt = $article->sentAt;
-            $articleQueue->externalId = $article->externalId;
-            $articleQueue->startDate = new DateTimeWrapper($article->sentAt->Default24hFormat());
+            $articleQueue->sentAt = $sent_at;
+            $articleQueue->externalId = $post['id'];
+            $articleQueue->externalLikes = (int)$post['likes_tr'];
+            $articleQueue->externalRetweets = (int)$post['retweet'];
+            $articleQueue->startDate = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate = new DateTimeWrapper($article->sentAt->Default24hFormat());
+            $articleQueue->endDate = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->endDate->modify( '+5 minutes');
-            $articleQueue->targetFeedId = $article->targetFeedId;
+            $articleQueue->targetFeedId = $target_feed_id;
             $articleQueue->statusId = StatusUtility::Finished;
-            $articleQueue->createdAt = $article->createdAt;
+            $articleQueue->createdAt = $sent_at;
             $articleQueue->isDeleted = false;
             $articleQueue->type = 'content'; //неспортивно
-
             return $articleQueue;
         }
 
