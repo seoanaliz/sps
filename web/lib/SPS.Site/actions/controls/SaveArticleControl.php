@@ -152,8 +152,6 @@ class SaveArticleControl extends BaseControl
 
     private function add_repost_article( $repostExternalId )
     {
-        print_r($repostExternalId);
-        die();
         $articleRecord = new ArticleRecord();
         try {
             $posts =  ParserVkontakte::get_posts_by_vk_id( $repostExternalId );

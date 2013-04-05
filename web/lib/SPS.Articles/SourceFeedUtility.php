@@ -28,10 +28,6 @@
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
-        /**
-         * посты не из socialbord'а
-         */
-        const FakeSourceNotSbPosts = -3;
 
         public static $Types = array(
             self::Source => 'Источники',
