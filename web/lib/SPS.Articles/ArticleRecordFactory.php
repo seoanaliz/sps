@@ -109,6 +109,9 @@
                 ,'repostExternalId' => array(
                     'name'          => 'repostExternalId'
                     , 'type'        => TYPE_STRING
+                ),'createdVia' => array(
+                    'name'          => 'createdVia'
+                    , 'type'        => TYPE_STRING
                 ))
             , 'lists'     => array()
             , 'search'    => array(

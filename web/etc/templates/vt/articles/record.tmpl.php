@@ -55,7 +55,11 @@
 </div>
 <div data-row="repostExternalId" class="row">
     <label>{lang:vt.articleRecord.repostExternalId}</label>
-    <?= FormHelper::FormInput( $prefixRecord . '[repostExternalId]', ObjectHelper::ToJSON($articleRecord->repostExternalId), 'repostExternalId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+    <?= FormHelper::FormInput( $prefixRecord . '[repostExternalId]', $articleRecord->repostExternalId, 'repostExternalId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+</div>
+<div data-row="createdVia" class="row">
+    <label>{lang:vt.articleRecord.createdVia}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[createdVia]', $articleRecord->createdVia, 'createdVia', null, array( 'size' => 20, 'style' => 'width: 200px;' ) ); ?>
 </div>
 
 <div data-row="files" class="row">
