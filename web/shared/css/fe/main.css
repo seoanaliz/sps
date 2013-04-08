@@ -1244,6 +1244,7 @@ i {
   background: #fff;
   position: relative;
   padding: 10px;
+  padding-left: 50px;
   line-height: 160%;
   -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
   -moz-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
@@ -1256,21 +1257,17 @@ i {
   -o-user-select: none;
   user-select: none;
 }
-.post .name,
-.post .content,
-.post .comments,
-.post .moderation,
-.post .bottom {
-  margin-left: 40px;
-}
 .post .userpic {
-  float: left;
+  top: 10px;
+  left: 10px;
+  position: absolute;
   width: 30px;
   height: 30px;
   overflow: hidden;
+  text-align: center;
 }
 .post .userpic img {
-  width: 30px;
+  max-width: 100%;
 }
 .post .likes-count {
   color: #45688E;

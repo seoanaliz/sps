@@ -1304,26 +1304,22 @@ i {font-style: italic;}
     background: #fff;
     position: relative;
     padding: 10px;
+    padding-left: 50px;
     line-height: 160%;
     .box-shadow(0px 1px 4px 0px rgba(0, 0, 0, 0.1));
     .user-select(none);
 
-    .name,
-    .content,
-    .comments,
-    .moderation,
-    .bottom {
-        margin-left: 40px;
-    }
-
     .userpic {
-        float: left;
+        top: 10px;
+        left: 10px;
+        position: absolute;
         width: 30px;
         height: 30px;
         overflow: hidden;
+        text-align: center;
 
         img {
-            width: 30px;
+            max-width: 100%;
         }
     }
 
