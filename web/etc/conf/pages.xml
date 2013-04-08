@@ -723,7 +723,7 @@
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-                <page uri="stat://reports/" boot="">
+                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>

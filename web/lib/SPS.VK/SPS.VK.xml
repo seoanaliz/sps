@@ -12,7 +12,7 @@
     <action name="VKCheckAuth">
         <path>VKCheckAuth</path>
         <redirects>
-            <redirect name="login" path="/login/" />
+            <redirect name="login" path="/login/?{redirect}" />
         </redirects>
     </action>
     <action name="VKCheckAuthEditor">
@@ -23,7 +23,7 @@
             </request>
         </parameters>
         <redirects>
-            <redirect name="login" path="/login/" />
+            <redirect name="login" path="/login/?{redirect}" />
             <redirect name="empty" path="/landing/" />
         </redirects>
     </action>
