@@ -58,7 +58,19 @@ var ATTACHMENT_PREVIEW_REPOST =
     '<div class="content">' +
         '<?=text?>' +
     '</div>' +
+    '<? if (isset("attachments")) { ?>' +
+        '<? if (attachments.photos && attachments.photos.length) { ?>' +
+            '<div class="images-ready">' +
+                '<? each(ATTACHMENT_PHOTO, attachments.photos); ?>' +
+            '</div>' +
+        '<? } ?>' +
+    '<? } ?>' +
     '<a class="delete-attachment">удалить</a>' +
+'</div>';
+
+var ATTACHMENT_PHOTO =
+'<div class="post-image">' +
+    '<img src="<?=photo.src_big?>" />' +
 '</div>';
 
 var ATTACHMENT_PREVIEW_LINK =
