@@ -89,7 +89,10 @@ sql;
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
                     } catch (ChangeSenderException $Ex) {
-                        //ниче не делаем
+                            $err = $Ex->getMessage();
+                            Logger::Warning($err);
+            
+                            AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
                     }
                 }
             }
