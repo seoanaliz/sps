@@ -746,6 +746,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="mobileSettings" boot="">
+                <page uri="/settings/29905631/(android|ios:?)/settings.php">
+                    <actions>SPS.Mobile.GetSettings</actions>
+                </page>
+            </pageGroup>
+
             <pageGroup name="mobile" boot="">
                 <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
