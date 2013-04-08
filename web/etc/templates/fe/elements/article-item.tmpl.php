@@ -14,6 +14,7 @@ if (!empty($article)) {
     $isPostRelocatable = true;
     $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
     $repostOrigin = false;
+    $originalId = false;
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
@@ -47,9 +48,11 @@ if (!empty($article)) {
         $canEditPost = false;
     }
 
-    if( isset( $repostArticleRecord) && $repostArticleRecord ) {
-        $repostOrigin = trim( $articleRecord->repostExternalId, '-' );
+    if (isset($repostArticleRecord) && $repostArticleRecord) {
+        $originalId = trim($articleRecord->repostExternalId, '-');
         $articleRecord = $repostArticleRecord;
+    } elseif ($article->externalId != -1) {
+        $originalId = trim($article->externalId, '-');
     }
 ?>
 <div
@@ -92,7 +95,6 @@ if (!empty($article)) {
         </div>
         <div class="r">
             <? if (!empty($repostArticleRecord)) { ?>
-                <?//@todo ссылка на пост ?>
                 <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
             <? } ?>
             <? if (!empty($articleRecord->link)) { ?>
@@ -105,12 +107,8 @@ if (!empty($article)) {
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if ($article->externalId != -1) {
-                        $original_id = trim( $article->externalId, '-');
-                ?>
-                    <a href="{$articleLinkPrefix}{$original_id}" target="_blank">Оригинал</a>
-                <?} elseif ( $repostOrigin ) { ?>
-                <a href="{$articleLinkPrefix}{$repostOrigin}" target="_blank">Оригинал</a>
+                <? if ($originalId) { ?>
+                    <a href="{$articleLinkPrefix}{$originalId}" target="_blank">Оригинал</a>
                 <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {
@@ -127,8 +125,7 @@ if (!empty($article)) {
                                 $sign = 'Ожидает рассмотрения';
                                 break;
                         }
-                    }
-                    ?>
+                    } ?>
                     {$sign}
                 <? } ?>
             </span>
