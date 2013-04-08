@@ -3,45 +3,61 @@ var LIST =
     '<div class="tab selected" data-id="null">Популярные</div>' +
     '<? each(LIST_ITEM, items); ?>' +
     '<div class="actions">' +
-        '<a href="javascript:;" class="share">Поделиться</a> |' +
-        '<a href="javascript:;" class="edit">Редактировать</a> |' +
-        '<a href="javascript:;" class="delete">Удалить</a>' +
+        '<a class="share">Поделиться</a> |' +
+        '<a class="edit">Редактировать</a> |' +
+        '<a class="delete">Удалить</a>' +
     '</div> ' +
 '</div>';
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
-    '<span class="tab"data-id="<?=itemId?>"><?=itemTitle?></span>' +
+    '<span class="tab" data-id="<?=itemId?>"><?=itemTitle?></span>' +
 '<? } ?>';
 
 var TABLE =
-'<?=tmpl(TABLE_HEADER)?>' +
-'<div class="list-body">' +
+'<div class="header list-head">' +
+    '<?=tmpl(TABLE_HEADER)?>' +
+'</div>' +
+'<div class="body list-body">' +
     '<?=tmpl(TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var TABLE_HEADER =
-'<div class="list-head clear-fix">' +
-    '<div class="item publics">' +
-        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
+'<div class="row">' +
+    '<div class="column column3 publics">' +
+        '<div class="cell">' +
+            '<div class="input-wrap">' +
+               '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
+            '</div>' +
+        '</div>' +
     '</div>' +
-    '<div class="item followers">' +
-        'подписчики<span class="icon arrow"></span>' +
+    '<div class="column column2 followers">' +
+        '<div class="cell">' +
+            'подписчики<span class="icon arrow"></span>' +
+        '</div>' +
     '</div>' +
-    '<div class="item is-active">' +
-        'бан<span class="icon arrow">' +
+    '<div class="column column1 audience">' +
+        '<div class="cell">' +
+            'охват<span class="icon arrow">' +
+        '</div>' +
     '</div>' +
-    '<div class="item in-search">' +
-        'в поиске<span class="icon arrow">' +
+    '<div class="column column2 visitors">' +
+        '<div class="cell">' +
+            'посетители<span class="icon arrow">' +
+        '</div>' +
     '</div>' +
-    '<div class="item visitors">' +
-        'посетители<span class="icon arrow">' +
+    '<div class="column column2 growth">' +
+        '<div class="cell">' +
+            'прирост<span class="icon arrow"></span>' +
+        '</div>' +
     '</div>' +
-    '<div class="item growth">' +
-        'прирост<span class="icon arrow"></span>' +
+    '<div class="column column1 in-search">' +
+        '<div class="cell">' +
+            'в поиске<span class="icon arrow">' +
+        '</div>' +
     '</div>' +
-    '<div class="item contacts">' +
-        'контакты' +
+    '<div class="column column1" title="Действия">' +
+        '<div class="cell"></div>' +
     '</div>' +
 '</div>';
 
@@ -49,88 +65,161 @@ var TABLE_BODY =
 '<? each(TABLE_ROW, rows); ?>';
 
 var TABLE_ROW =
-'<div class="public clear-fix" data-id="<?=publicId?>">' +
-    '<div class="column public-info clear-fix" data-id="<?=publicId?>">' +
-        '<div class="photo">' +
-            '<img src="<?=publicImg?>" alt="" />' +
+'<div class="public row" data-id="<?=publicId?>">' +
+    '<div class="column column3 public-info" data-id="<?=publicId?>">' +
+        '<div class="cell">' +
+            '<div class="photo">' +
+                '<img src="<?=publicImg?>" alt="" />' +
+            '</div>' +
+            '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
         '</div>' +
-        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
-    '<div class="column public-followers"><?=publicFollowers?></div>' +
-    '<div class="column public-is-active"><span class="<?=publicIsActive ? "true" : "false"?>">●</span></div>' +
-    '<div class="column public-in-search"><span class="<?=publicInSearch ? "true" : "false"?>">●</span></div>' +
-    '<div class="column public-visitors">' +
-        '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
-            '<?=publicVisitors ? publicVisitors : "-"?>' +
-        '</a>' +
+    '<div class="column column2">' +
+        '<div class="cell">' +
+            '<?=publicFollowers ? publicFollowers : "-"?>' +
+        '</div>' +
     '</div>' +
-    '<div class="column public-growth">' +
-        '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
-            '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
-        '</span>' +
+    '<div class="column column1">' +
+        '<div class="cell">' +
+            '<?=publicAudience ? publicAudience : "-"?>' +
+        '</div>' +
     '</div>' +
-    '<div class="column public-contacts">' +
-        '<? if (isset("users") && users.length) { ?>' +
-            '<?=tmpl(CONTACT, users[0])?>' +
-        '<? } ?>' +
+    '<div class="column column2">' +
+        '<div class="cell">' +
+            '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
+                '<?=publicVisitors ? publicVisitors : "-"?>' +
+            '</a>' +
+        '</div>' +
     '</div>' +
-    '<div class="column public-actions">' +
-        '<span class="action add-to-list">' +
-            '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
-        '</span>' +
-        '<span class="action delete-public">' +
-            '<span class="icon delete"></span>' +
-        '</span>' +
-        '<span class="action restore-public">' +
-            '<span class="icon plus"></span>' +
-        '</span>' +
+    '<div class="column column2">' +
+        '<div class="cell">' +
+            '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
+                '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
+            '</span>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1">' +
+        '<div class="cell">' +
+            '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1 public-actions">' +
+        '<div class="cell">' +
+            '<span class="action add-to-list">' +
+                '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
+            '</span>' +
+            '<span class="action delete-public">' +
+                '<span class="icon delete"></span>' +
+            '</span>' +
+            '<span class="action restore-public">' +
+                '<span class="icon plus"></span>' +
+            '</span>' +
+        '</div>' +
     '</div>' +
 '</div>';
 
 var OUR_TABLE =
-'<?=tmpl(OUR_TABLE_HEADER)?>' +
-'<div class="list-body">' +
+'<div class="header list-head">' +
+    '<?=tmpl(OUR_TABLE_HEADER)?>' +
+'</div>' +
+'<div class="body list-body">' +
     '<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
 var OUR_TABLE_HEADER =
-'<div class="list-head clear-fix">' +
-    '<div class="item publics">' +
-        '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
+'<div class="row">' +
+    '<div class="column column2 publics">' +
+        '<div class="cell">' +
+            '<div class="input-wrap">' +
+               '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
+            '</div>' +
+        '</div>' +
     '</div>' +
-    '<div class="item posts" title="всего постов">посты<span class="icon arrow"></div>' +
-    '<div class="item posts-per-day" title="постов в день">постов в день<span class="icon arrow"></div>' +
-    '<div class="item authors-posts" title="авторские посты">авт. посты<span class="icon arrow"></div>' +
-    '<div class="item authors-likes" title="авторские лайки">авт. лайки<span class="icon arrow"></div>' +
-    '<div class="item authors-reposts" title="авторские репосты">авт. репосты<span class="icon arrow"></div>' +
-    '<div class="item growth-visitors" title="прирост посетителей">рост посетит.<span class="icon arrow"></div>' +
-//    '<div class="item sb-posts" title="SB посты">SB посты<span class="icon arrow"></div>' +
-    '<div class="item sb-likes" title="SB лайки">SB лайки<span class="icon arrow"></div>' +
+    '<div class="column column1 posts" title="всего постов">' +
+        '<div class="cell">' +
+            'посты<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 posts-per-day" title="постов в день">' +
+        '<div class="cell">' +
+            'постов в день<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 authors-posts" title="авторские посты">' +
+        '<div class="cell">' +
+            'авт. посты<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 authors-likes" title="авторские лайки">' +
+        '<div class="cell">' +
+            'авт. лайки<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 authors-reposts" title="авторские репосты">' +
+        '<div class="cell">' +
+            'авт. репосты<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 growth-visitors" title="прирост посетителей">' +
+        '<div class="cell">' +
+            'рост посетит.<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5 sb-likes" title="SB лайки">' +
+        '<div class="cell">' +
+            'SB лайки<span class="icon arrow">' +
+        '</div>' +
+    '</div>' +
 '</div>';
 
 var OUR_TABLE_BODY =
 '<? each(OUR_TABLE_ROW, rows); ?>';
 
 var OUR_TABLE_ROW =
-'<div class="public clear-fix" data-id="<?=publicId?>">' +
-    '<div class="column public-info clear-fix" data-id="<?=publicId?>">' +
+'<div class="public row" data-id="<?=publicId?>">' +
+    '<div class="column column2 public-info" data-id="<?=publicId?>">' +
         '<div class="photo">' +
             '<img src="<?=publicImg?>" alt="" />' +
         '</div>' +
         '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
     '</div>' +
-    '<div class="column public-posts"><?=publicPosts ? publicPosts : "-"?></div>' +
-    '<div class="column public-posts-per-day"><?=publicPostsPerDay ? publicPostsPerDay : "-"?></div>' +
-    '<div class="column public-authors-posts"><?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?></div>' +
-    '<div class="column public-authors-likes"><?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?></div>' +
-    '<div class="column public-authors-reposts"><?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?></div>' +
-    '<div class="column public-growth-visitors">' +
-        '<span class="<?=publicGrowthVisitors > 0 ? "plus" : "minus"?>">' +
-            '<?=publicGrowthVisitors?> <small><?=publicGrowthVisitorsRelative?>%</small>' +
-        '</span>' +
+    '<div class="column column1 ">' +
+        '<div class="cell">' +
+            '<?=publicPosts ? publicPosts : "-"?>' +
+        '</div>' +
     '</div>' +
-//    '<div class="column public-sb-posts"><?=publicSbPosts ? publicSbPosts : "-"?></div>' +
-    '<div class="column public-sb-likes"><?=publicSbLikes ? publicSbLikes : "-"?></div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<?=publicPostsPerDay ? publicPostsPerDay : "-"?>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<span class="<?=publicGrowthVisitors > 0 ? "plus" : "minus"?>">' +
+                '<?=publicGrowthVisitors?> <small><?=publicGrowthVisitorsRelative?>%</small>' +
+            '</span>' +
+        '</div>' +
+    '</div>' +
+    '<div class="column column1-5">' +
+        '<div class="cell">' +
+            '<?=publicSbLikes ? publicSbLikes : "-"?>' +
+        '</div>' +
+    '</div>' +
 '</div>';
 
 var CONTACT =
