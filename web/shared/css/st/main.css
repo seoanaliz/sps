@@ -18,6 +18,12 @@ tr,
 td {
   vertical-align: top;
 }
+.table>.body>.row>.column {
+  vertical-align: top;
+}
+.table>.header>.row>.column {
+  vertical-align: middle;
+}
 .table>.body,
 .table>.header {
   font-size: 0;
@@ -74,10 +80,13 @@ td {
 .table>.header>.row>.column1 {
   width: 8.3%;
 }
+.table>.body>.row>.column1-5,
+.table>.header>.row>.column1-5 {
+  width: 12.5%;
+}
 .table>.body>.row>.column,
 .table>.header>.row>.column {
   font-size: 12px;
-  vertical-align: top;
   display: inline-block;
   zoom: 1;
   *display: inline;
@@ -118,7 +127,7 @@ td {
   font-size: 14px;
 }
 .table>.header {
-  color: #000;
+  color: #2B587A;
   background-color: #DEE5EB;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -245,8 +254,8 @@ td {
   background-color: #E1E7ED;
 }
 #main .right-column > div>.list>.item:hover .icon {
-  opacity: .5;
   display: block;
+  opacity: 0.5;
 }
 #main .right-column > div>.list>.item .icon {
   position: absolute;
@@ -284,43 +293,33 @@ td {
   -o-user-select: none;
   user-select: none;
 }
-#main .left-column > .content .list-head .item {
-  float: left;
-  text-align: center;
-  font-weight: bold;
-  padding: 6px 0;
-  line-height: 27px;
+#main .left-column > .content .list-head .column {
   cursor: pointer;
-  white-space: nowrap;
+  text-align: center;
 }
-#main .left-column > .content .list-head .item .icon {
+#main .left-column > .content .list-head .column .icon {
   opacity: 0;
   margin-right: -1.5em;
   background-position: center .5em;
 }
-#main .left-column > .content .list-head .item .filter {
-  padding: 5px;
-  width: 200px;
-  margin-left: 10px;
-}
-#main .left-column > .content .list-head .item .filter.loading {
+#main .left-column > .content .list-head .column .filter.loading {
   background-image: url('../../images/common/upload.gif');
   background-repeat: no-repeat;
   background-position: 95%;
 }
-#main .left-column > .content .list-head .item:hover .icon {
-  opacity: .5;
+#main .left-column > .content .list-head .column:hover .icon {
+  opacity: 0.5;
 }
-#main .left-column > .content .list-head .item.active .icon {
+#main .left-column > .content .list-head .column.active .icon {
   opacity: 1;
 }
-#main .left-column > .content .list-head .item.reverse .icon {
+#main .left-column > .content .list-head .column.reverse .icon {
   background-image: url('../../images/common/arrow-top.png');
 }
-#main .left-column > .content .list-head .item.contacts {
+#main .left-column > .content .list-head .column.contacts {
   cursor: default;
 }
-#main .left-column > .content .list-head .item.publics {
+#main .left-column > .content .list-head .column.publics {
   text-align: left;
   cursor: default;
 }
@@ -346,10 +345,16 @@ td {
   background-color: #edf1f5;
 }
 #main .left-column > .content .list-body .column {
-  float: left;
-  height: 100%;
   white-space: nowrap;
   overflow: hidden;
+  vertical-align: middle;
+  text-align: center;
+}
+#main .left-column > .content .list-body .column .cell {
+  padding: 0;
+}
+#main .left-column > .content .list-body .column.public-info {
+  text-align: left;
 }
 #main .left-column > .content .list-body .column.public-info a,
 #main .left-column > .content .list-body .column.public-info .photo {
@@ -369,44 +374,39 @@ td {
 #main .left-column > .content .list-body .column.public-info .photo img {
   max-width: 100%;
 }
-#main .left-column > .content .list-body .column.public-actions {
-  width: 5%;
-  float: right;
-  text-align: center;
-}
-#main .left-column > .content .list-body .column.public-actions>.action {
+#main .left-column > .content .list-body .column.public-actions .action {
   cursor: pointer;
   display: inline-block;
   padding: 4px;
   margin: 8px 0;
 }
-#main .left-column > .content .list-body .column.public-actions>.action.delete-public {
+#main .left-column > .content .list-body .column.public-actions .action .icon.plus {
+  opacity: 0.3;
+}
+#main .left-column > .content .list-body .column.public-actions .action.delete-public {
   display: none;
 }
-#main .left-column > .content .list-body .column.public-actions>.action.restore-public {
+#main .left-column > .content .list-body .column.public-actions .action.restore-public {
   display: none;
 }
-#main .left-column > .content .list-body .column.public-actions>.action .icon.plus {
-  opacity: .3;
-}
-#main .left-column > .content .list-body .column.public-actions>.action.selected .icon,
-#main .left-column > .content .list-body .column.public-actions>.action.active .icon,
-#main .left-column > .content .list-body .column.public-actions>.action:hover .icon {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon,
+#main .left-column > .content .list-body .column.public-actions .action.active .icon,
+#main .left-column > .content .list-body .column.public-actions .action:hover .icon {
   opacity: 1;
 }
-#main .left-column > .content .list-body .column.public-actions>.action.selected {
+#main .left-column > .content .list-body .column.public-actions .action.selected {
   background-color: #597DA3;
 }
-#main .left-column > .content .list-body .column.public-actions>.action.selected .icon.arrow {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon.arrow {
   background-image: url('../../images/common/select-white.png');
 }
-#main .left-column > .content .list-body .column.public-actions>.action.selected .icon.plus {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon.plus {
   background-image: url('../../images/common/add-white.png');
 }
-#main .left-column > .content .list-body .column.public-actions>.action.selected .icon.select {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon.select {
   background-image: url('../../images/common/select-white.png');
 }
-#main .left-column > .content .list-body .column.public-actions>.action.selected .icon.delete {
+#main .left-column > .content .list-body .column.public-actions .action.selected .icon.delete {
   background-image: url('../../images/common/delete.png');
 }
 #main .left-column > .content .list-body.edit-mode .public {
@@ -418,10 +418,10 @@ td {
   overflow: hidden;
   margin: 8px 10px;
 }
-#main .left-column > .content .list-body.edit-mode .public-actions>.action.add-to-list {
+#main .left-column > .content .list-body.edit-mode .public-actions .action.add-to-list {
   display: none;
 }
-#main .left-column > .content .list-body.edit-mode .public-actions>.action.delete-public {
+#main .left-column > .content .list-body.edit-mode .public-actions .action.delete-public {
   display: block;
 }
 #main .left-column > .content .list-body.edit-mode .public-contacts {
@@ -442,131 +442,18 @@ td {
 #main .left-column > .content .list-body.edit-mode .public.not-editable {
   display: block;
 }
-#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions>.action.delete-public {
+#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions .action.delete-public {
   display: none;
 }
-#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions>.action.restore-public {
+#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions .action.restore-public {
   display: block;
 }
-#main .left-column > .content .table.no-list-id .public-actions>.action .icon {
-  opacity: .3;
+#main .left-column > .content .table.no-list-id .public-actions .action .icon {
+  opacity: 0.3;
 }
-#main .left-column > .content .table.no-list-id .public-actions>.action:hover .icon,
-#main .left-column > .content .table.no-list-id .public-actions>.action.selected .icon {
+#main .left-column > .content .table.no-list-id .public-actions .action:hover .icon,
+#main .left-column > .content .table.no-list-id .public-actions .action.selected .icon {
   opacity: 1;
-}
-#main .left-column > .content .list-head .followers,
-#main .left-column > .content .list-head .audience,
-#main .left-column > .content .list-head .is-active,
-#main .left-column > .content .list-head .in-search,
-#main .left-column > .content .list-head .visitors,
-#main .left-column > .content .list-head .growth,
-#main .left-column > .content .public-followers,
-#main .left-column > .content .public-audience,
-#main .left-column > .content .public-is-active,
-#main .left-column > .content .public-in-search,
-#main .left-column > .content .public-visitors,
-#main .left-column > .content .public-growth {
-  width: 11%;
-  text-align: center;
-}
-#main .left-column > .content .list-head .posts,
-#main .left-column > .content .list-head .posts-per-day,
-#main .left-column > .content .list-head .views,
-#main .left-column > .content .list-head .authors-posts,
-#main .left-column > .content .list-head .authors-likes,
-#main .left-column > .content .list-head .authors-reposts,
-#main .left-column > .content .list-head .sb-posts,
-#main .left-column > .content .list-head .sb-likes,
-#main .left-column > .content .list-head .growth-views,
-#main .left-column > .content .list-head .growth-visitors,
-#main .left-column > .content .public-posts,
-#main .left-column > .content .public-posts-per-day,
-#main .left-column > .content .public-views,
-#main .left-column > .content .public-authors-posts,
-#main .left-column > .content .public-authors-likes,
-#main .left-column > .content .public-authors-reposts,
-#main .left-column > .content .public-sb-posts,
-#main .left-column > .content .public-sb-likes,
-#main .left-column > .content .public-growth-views,
-#main .left-column > .content .public-growth-visitors {
-  width: 10%;
-  text-align: center;
-}
-#main .left-column > .content .list-head .contacts,
-#main .left-column > .content .public-contacts {
-  width: 20%;
-  overflow: visible !important;
-}
-#main .left-column > .content .list-head .publics,
-#main .left-column > .content .public-info {
-  width: 30%;
-}
-#main .left-column > .content .list-head .is-active,
-#main .left-column > .content .list-head .in-search,
-#main .left-column > .content .public-is-active,
-#main .left-column > .content .public-in-search {
-  width: 6%;
-}
-.contact {
-  position: relative;
-  font-weight: normal;
-}
-.contact:hover {
-  outline: 1px solid #C4CDE0;
-  background-color: #fff;
-}
-.contact.selected {
-  outline: 1px solid #597DA3;
-  background-color: #fff;
-}
-.contact>.photo {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  bottom: 0;
-  overflow: hidden;
-  width: 32px;
-  height: 32px;
-}
-.contact>.photo img {
-  width: 100%;
-}
-.contact>.content {
-  line-height: 16px;
-  margin-left: 0;
-  padding: 3px 20px 3px 40px;
-  position: relative;
-  cursor: pointer;
-  max-width: 10em;
-  min-height: 32px;
-}
-.contact>.content .icon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0 2px;
-  height: auto;
-  opacity: .3;
-}
-.contact>.content:hover .icon,
-.contact>.content.selected .icon {
-  opacity: 1;
-  background-color: #EDF1F5;
-}
-.contact>.content>.name {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.contact>.content>.description {
-  color: #808080;
-  font-size: 90%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 150px;
 }
 #global-loader {
   position: fixed;

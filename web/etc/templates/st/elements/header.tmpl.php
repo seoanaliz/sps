@@ -4,7 +4,7 @@ if (!isset($__activeElement)) $__activeElement = NULL;
 /**
  * Manual set meta or reset of meta
  */
-$__sitePageTitle    = 'Stat';
+$__sitePageTitle    = 'Рейтинг сообществ';
 $__pageTitle        = !empty($__pageTitle) ? $__pageTitle : '';
 $__metaDescription  = !empty($__metaDescription) ? $__metaDescription : '';
 $__metaKeywords     = !empty($__metaKeywords) ? $__metaKeywords : '';

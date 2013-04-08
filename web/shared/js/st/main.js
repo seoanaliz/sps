@@ -792,16 +792,6 @@ var Table = (function() {
     }
 
     function _initEvents() {
-        $container.delegate('.contact', 'click', function(e) {
-            var $el = $(this);
-            var $public = $el.closest('.public');
-            var publicId = $public.data('id');
-            var publicData;
-            for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
-            }
-            _createDropdownContact(e, publicData);
-        });
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
@@ -850,9 +840,9 @@ var Table = (function() {
         };
 
         $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
-            $container.delegate(sortFieldSelector, 'click', function(e) {
+            $container.delegate(sortFieldSelector, 'click', function() {
                 var $target = $(this);
-                $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+                $target.closest('.list-head').find('.column').not($target).removeClass('reverse active');
                 if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                     $target.addClass('reverse');
                     sort(sortFieldKey, true);
@@ -891,60 +881,6 @@ var Table = (function() {
                 }
             });
         })();
-    }
-
-    function _createDropdownContact(e, publicData) {
-        var $el = $(e.currentTarget);
-        var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
-        var $public = $el.closest('.public');
-        var publicId = $public.data('id');
-        var users = publicData.users;
-
-        e.stopPropagation();
-
-        if (!$el.hasClass('selected')) {
-            $el.addClass('selected');
-            if (!$dropdown) {
-                $dropdown = $(tmpl(CONTACT_DROPDOWN, {users: users})).appendTo('body');
-
-                $dropdown.delegate('.item', 'mousedown', function(e) {
-                    if ($(e.target).is('a')) return false;
-                    var $item = $(this);
-                    $dropdown.find('.item.selected').removeClass('selected');
-                    $item.addClass('selected');
-                    onChange($item);
-                });
-                $(document).mousedown(function() {
-                    if ($dropdown.is(':hidden')) return;
-                    $dropdown.hide();
-                    $el.removeClass('selected');
-                });
-
-                function onChange($item) {
-                    var userId = $item.data('user-id');
-                    var $contact = $el.closest('.contact');
-                    var user;
-                    for (var i in users) {
-                        if (users[i].userId == userId) { user = users[i]; break; }
-                    }
-                    $contact.css('opacity', .5);
-                    Events.fire('change_user', userId, currentListId, publicId, function(data) {
-                        if (!data) return;
-                        $contact
-                            .html(tmpl(CONTACT, user))
-                            .animate({opacity: 1}, 100)
-                        ;
-                    });
-                }
-                $el.data('dropdown', $dropdown);
-            }
-            $dropdown.show().css({
-                top: offset.top + $el.outerHeight(),
-                left: offset.left - 1,
-                width: $el.outerWidth()
-            });
-        }
     }
 
     function _createDropdownList(e, publicData) {
@@ -1007,7 +943,7 @@ var Table = (function() {
                     });
 
                     function onSave(text) {
-                        Events.fire('add_list', text, function(data) {
+                        Events.fire('add_list', text, function() {
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
