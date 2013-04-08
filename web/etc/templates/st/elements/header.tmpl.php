@@ -32,7 +32,7 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
-        'css://common/common.css',
+        'css://common/common.less',
         'css://st/main.less',
         'css://fe/jquery-ui.css',
         'css://fe/custom.css',
