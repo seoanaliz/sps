@@ -154,8 +154,8 @@
         public function text_corrector( $text )
         {
             $text = strip_tags( $text );
-    //            $text = htmlspecialchars( $text );
-            $text = str_replace( '@', ' @', $text );
+            //cURL пытается найти файл по любой строке, начинающейся с @
+            preg_replace( '/^@/', '^ @', $text );
             return $text;
         }
 
