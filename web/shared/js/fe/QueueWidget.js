@@ -79,7 +79,8 @@ var QueueWidget = Event.extend({
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
-            var $post = $(this).closest('.post');
+            var $slot = $(this).closest('.slot');
+            var $post = $slot.find('.post');
             var $page = $post.closest('.queue-page');
             var pid = $post.data('id');
 

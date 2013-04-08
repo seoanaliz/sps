@@ -79,9 +79,6 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                         <div class="content">
                             {increal:tmpl://fe/elements/articles-queue-item-content.tmpl.php}
                         </div>
-                        <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
-                            <div class="delete"></div>
-                        <? } ?>
                     </div>
 
                     <?
@@ -115,6 +112,9 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                             {increal:tmpl://fe/elements/article-item-content.tmpl.php}
                         </div>
                     </div>
+                    <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
+                        <div class="delete"></div>
+                    <? } ?>
                 <? } ?>
             </div>
         <? } ?>
