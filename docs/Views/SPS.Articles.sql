@@ -91,8 +91,11 @@ SELECT "public"."articleRecords"."articleRecordId"
 	, "public"."articleRecords"."topfaceData"
 	, "public"."articleRecords"."articleId"
 	, "public"."articleRecords"."articleQueueId"
+    , "public"."articleRecords"."repostArticleRecordId"
+    , "public"."articleRecords"."repostExternalId"
+    , "public"."articleRecords"."createdVia"
  FROM "public"."articleRecords";
- 
+
 CREATE OR REPLACE VIEW "getPublishers" AS
 SELECT "public"."publishers"."publisherId"
 	, "public"."publishers"."name"

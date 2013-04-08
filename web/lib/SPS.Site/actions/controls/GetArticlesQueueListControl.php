@@ -27,6 +27,7 @@ class GetArticlesQueueListControl extends BaseControl {
         $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
         $articleRecords = array();
+        $repostArticleRecords = array();
         $articlesQueues  = array();
         $authors = array();
 
@@ -124,10 +125,20 @@ class GetArticlesQueueListControl extends BaseControl {
                 );
                 if (!empty($articleRecords)) {
                     $articleRecords = BaseFactoryPrepare::Collapse($articleRecords, 'articleQueueId', false);
+
+                    $repostArticleRecordsIds =   array_filter( ArrayHelper::GetObjectsFieldValues($articleRecords, array('repostArticleRecordId')));
+                    if (!empty($repostArticleRecordsIds)) {
+                        $repostRecords = ArticleRecordFactory::Get(
+                            array('_articleRecordId' => array_unique($repostArticleRecordsIds)),
+                            array(BaseFactory::WithoutPages => true)
+                        );
+                        $repostArticleRecords = BaseFactoryPrepare::Collapse($repostRecords, 'articleRecordId', false);
+                    }
                 }
             }
         }
 
+        Response::setArray('repostArticleRecords', $repostArticleRecords);
         Response::setArray('articleRecords', $articleRecords);
         Response::setArray('articlesQueue', $articlesQueues);
         Response::setObject('queueDate', $queueDate);

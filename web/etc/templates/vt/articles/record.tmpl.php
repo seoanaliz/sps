@@ -49,6 +49,18 @@
     <label>{lang:vt.articleRecord.textLinks}</label>
     <?= FormHelper::FormInput( $prefixRecord . '[text_links]', ObjectHelper::ToJSON($articleRecord->text_links), 'text_links', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
 </div>
+<div data-row="repostArticleRecordId" class="row">
+    <label>{lang:vt.articleRecord.repostArticleRecordId}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[repostArticleRecordId]', ObjectHelper::ToJSON($articleRecord->repostArticleRecordId), 'repostArticleRecordId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+</div>
+<div data-row="repostExternalId" class="row">
+    <label>{lang:vt.articleRecord.repostExternalId}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[repostExternalId]', $articleRecord->repostExternalId, 'repostExternalId', null, array( 'size' => 80, 'style' => 'width: 200px;' ) ); ?>
+</div>
+<div data-row="createdVia" class="row">
+    <label>{lang:vt.articleRecord.createdVia}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[createdVia]', $articleRecord->createdVia, 'createdVia', null, array( 'size' => 20, 'style' => 'width: 200px;' ) ); ?>
+</div>
 
 <div data-row="files" class="row">
     <label>{lang:vt.articleRecord.photos}</label>

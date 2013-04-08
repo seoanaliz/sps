@@ -88,6 +88,7 @@ abstract class AbstractPostLoadDaemon {
             $articleRecord->poll = Convert::ToString($post['poll']);
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
+            $articleRecord->createdVia = Convert::ToString($post['createdVia']);
 
             //rate
             $articleRecord->rate = 0;

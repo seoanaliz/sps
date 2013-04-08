@@ -48,6 +48,11 @@ abstract class BaseGetArticlesListControl extends BaseControl
     protected $articleRecords = array();
 
     /**
+     * @var ArticleRecord[]
+     */
+    protected $repostArticleRecords = array();
+
+    /**
      * @var TargetFeed[]
      */
     protected $targetFeeds = array();
@@ -478,6 +483,15 @@ abstract class BaseGetArticlesListControl extends BaseControl
                 $this->articleRecords = BaseFactoryPrepare::Collapse($this->articleRecords, 'articleId', false);
             }
 
+            // получаем репосты
+            $repostArticleRecordsIds = array_filter( ArrayHelper::GetObjectsFieldValues($this->articleRecords, array('repostArticleRecordId')));
+            if (!empty($repostArticleRecordsIds)) {
+                $repostRecords = ArticleRecordFactory::Get(
+                    array('_articleRecordId' => array_unique($repostArticleRecordsIds))
+                );
+                $this->repostArticleRecords = BaseFactoryPrepare::Collapse($repostRecords, 'articleRecordId', false);
+            }
+
             // получаем авторов
             $authorIds = ArrayHelper::GetObjectsFieldValues($this->articles, array('authorId'));
             if (!empty($authorIds)) {
@@ -500,6 +514,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         $this->sourceFeeds = SourceFeedFactory::Get(array('_sourceFeedId' => $this->getSourceFeedIds()));
         Response::setArray('articles', $this->articles);
         Response::setArray('articleRecords', $this->articleRecords);
+        Response::setArray('repostArticleRecords', $this->repostArticleRecords);
         Response::setInteger('articlesCount', $this->articlesCount);
         Response::setBoolean('hasMore', $this->hasMore);
         Response::setArray('authors', $this->authors);
@@ -511,7 +526,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
             $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
             $isWebUserEditor = !is_null($role) && $role != UserFeed::ROLE_AUTHOR;
         }
-
         Response::setString('articleLinkPrefix', $this->articleLinkPrefix);
         Response::setString('sourceFeedType', $this->getSourceFeedType());
         Response::setArray('sourceFeeds', $this->sourceFeeds);
@@ -520,5 +534,6 @@ abstract class BaseGetArticlesListControl extends BaseControl
         Response::setInteger('reviewArticleCount', $this->reviewArticleCount);
         Response::setBoolean('showArticlesOnly', (bool)Request::getBoolean('articlesOnly'));
         Response::setInteger('authorId', $this->getAuthor()->authorId);
+
     }
 }

@@ -10,17 +10,18 @@
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
-         26776509
-        ,43503789
-        ,346191
-        ,33704958
-        ,38000521
-        ,1792796
-        ,27421965
-        ,34010064
-        ,25749497
-        ,35807078
-        ,25817269
+             26776509
+            ,43503789
+            ,346191
+            ,33704958
+            ,38000521
+            ,1792796
+            ,27421965
+            ,34010064
+            ,25749497
+            ,35807078
+            ,25817269
+            ,31554488
         );
 
         public static $topface_beauty = array(
@@ -634,11 +635,10 @@
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
-                //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 10 РїРѕСЃС‚РѕРІ
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
-                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count":10 });';
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6 });';
                     $return .=  "\"id$id\":id$id,";
                     $i++;
                 }

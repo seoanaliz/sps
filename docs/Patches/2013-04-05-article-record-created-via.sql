@@ -1,0 +1,1 @@
+ALTER TABLE "public"."articleRecords" ADD COLUMN "createdVia" character varying;

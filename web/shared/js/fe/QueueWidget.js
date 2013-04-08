@@ -357,15 +357,17 @@ var QueueWidget = Event.extend({
         var $textarea = $slot.find('textarea');
         var text = $.trim($textarea.val());
         var imageUploader = $slot.data('imageUploader');
-        var files = imageUploader && imageUploader.getPhotos();
+        var photos = imageUploader && imageUploader.getPhotos();
         var $page = $slot.closest('.queue-page');
 
-        if (text || files) {
+        if (text || photos) {
             $slot.addClass('locked');
-            Events.fire('post', text, files, '', null, function(data) {
+            app.savePost({
+                text: text,
+                photos: photos
+            }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-
                     Events.fire('post_moved', postId, $slot.data('id'), null, function() {
                         t.updatePage($page);
                     });
