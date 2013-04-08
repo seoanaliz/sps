@@ -89,12 +89,14 @@ sql;
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
                     } catch (ChangeSenderException $Ex) {
-                            $err = $Ex->getMessage();
-                            Logger::Warning($err);
-            
-                            AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
                     }
                 }
+                
+                $err = 'Failed to post, persumably publishers are banned, public id = ' . $targetFeed->externalId;
+                Logger::Warning($err);
+
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
+                  
             }
         }
 
