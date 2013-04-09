@@ -16,7 +16,7 @@
             $response['response'] = array(
                 'min_version'       => '1.0.0',
                 'max_version'       => '2345662354',
-                'about_app_url'     => 'http://socialboard.com/',
+                'about_app_url'     => 'http://socialboard.ru/mobile/about',
                 'wall_post_message' => '',
             );
 
