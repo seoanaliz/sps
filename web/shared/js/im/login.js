@@ -2,11 +2,19 @@ $(document).ready(function() {
     var newWindow;
 
     $('#loginBtn').click(function() {
-        newWindow = windowOpen($(this).attr('href'));
+        newWindow = windowOpen($(this).data('url'));
         $('#accessToken').fadeIn(200);
 
+        var screenX = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
+        var screenY = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
+        var outerWidth = $(window).width();
+        var width = 400;
+        var top = parseInt(screenY + 280);
+        var left = parseInt(screenX + ((outerWidth - width) / 2));
         var $windowHint = $('.window-hint');
-        if (!$windowHint.length) $windowHint = $('<div>').addClass('window-hint');
+        if (!$windowHint.length) {
+            $windowHint = $('<div>').addClass('window-hint');
+        }
         $windowHint.show().html('Где-то здесь должно быть окно. Нажмите Разрешить, если вы не устанавливали наше приложение, а затем скопируйте всё содержимое адресной строки этого окна.').css({
             top: top,
             left: left - 160,
@@ -54,8 +62,12 @@ $(document).ready(function() {
 });
 
 function onSuccess(token) {
-    $.cookie('token', token, {path: '/', expires: 30});
-    Events.fire('add_user', token, function() {
+    Control.call('add_user', {
+        access_token: token
+    }).success(function() {
         window.location = '/' + decodeURIComponent(location.search.substr(1));
+    }).error(function(error) {
+        new Box({title: 'Ошибка', html: 'Произошла ошибка при сохранении токена'}).show();
+        throw error;
     });
 }

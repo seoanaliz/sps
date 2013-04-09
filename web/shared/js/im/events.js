@@ -162,11 +162,6 @@ var Events = {
 };
 
 var EventList = {
-    add_user: function(token, callback) {
-        simpleAjax('saveAt', {access_token: token}, function() {
-            callback(true);
-        })
-    },
     get_viewer: function(callback) {
         simpleAjax('addUser', function(rawUser) {
             callback((rawUser && rawUser.at) ? Cleaner.user(rawUser) : false);
