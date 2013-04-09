@@ -524,7 +524,8 @@
                 return false;
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
+
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach, $day->day, $connect );
             }
             sleep(0.3);
         }
@@ -561,7 +562,7 @@
             return 0;
         }
 
-        public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
+        public static function save_view_visitor( $public_id, $views, $visitors, $reach, $date, $connect )
         {
             $sql = 'select * from
                 stat_publics_50k_points
@@ -578,7 +579,8 @@
                         stat_publics_50k_points
                     SET
                         visitors=@visitors,
-                        views   =@views
+                        views   =@views,
+                        reach   =@reach
                     WHERE
                         id=@public_id
                         AND time=@date';
@@ -586,6 +588,7 @@
                 $cmd->SetInteger( '@public_id', $public_id );
                 $cmd->SetInteger( '@visitors',  $visitors );
                 $cmd->SetInteger( '@views',     $views );
+                $cmd->SetInteger( '@reach',     $reach );
                 $cmd->SetString ( '@date',      $date );
 
                 $cmd->Execute();
@@ -597,12 +600,14 @@
                            @date,
                            0,
                            @visitors,
-                           @views
+                           @views,
+                           @reach
                     )';
                 $cmd = new SqlCommand( $sql, $connect );
                 $cmd->SetInteger( '@public_id', $public_id );
                 $cmd->SetInteger( '@visitors',  $visitors );
                 $cmd->SetInteger( '@views',     $views );
+                $cmd->SetInteger( '@reach',     $reach );
                 $cmd->SetString ( '@date',      $date );
                 $cmd->Execute();
             }
