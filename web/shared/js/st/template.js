@@ -81,7 +81,9 @@ var TABLE_ROW =
     '</div>' +
     '<div class="column column1">' +
         '<div class="cell">' +
-            '<?=publicAudience ? publicAudience : "-"?>' +
+            '<a href="http://vk.com/stats?act=reach&gid=<?=publicId?>" target="_blank">' +
+                '<?=publicAudience ? publicAudience : "-"?>' +
+            '</a>' +
         '</div>' +
     '</div>' +
     '<div class="column column2">' +
