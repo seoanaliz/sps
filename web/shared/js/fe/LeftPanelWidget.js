@@ -615,6 +615,7 @@ var LeftPanelWidget = Event.extend({
                     }));
 
                     $attachments.append($post);
+                    $uploadBtn.hide();
 
                     if (photos.length) {
                         $post.find('.images-ready').imageComposition();
@@ -729,6 +730,7 @@ var LeftPanelWidget = Event.extend({
             repostId = false;
             foundDomain = false;
             foundLink = false;
+            $uploadBtn.show();
         }
 
         function stop() {
@@ -746,6 +748,7 @@ var LeftPanelWidget = Event.extend({
 
             if ($attachment.hasClass('post')) {
                 repostId = false;
+                $uploadBtn.show();
             }
 
             if ($attachment.hasClass('link-info')) {
