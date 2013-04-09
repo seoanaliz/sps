@@ -416,6 +416,15 @@ td {
 #main .left-column > .content .list-body .column.public-actions .action.selected .icon.delete {
   background-image: url('../../images/common/delete.png');
 }
+#main .left-column > .content .list-body .column .stat-link-icon {
+  padding: 4px;
+}
+#main .left-column > .content .list-body .column .stat-link-icon .icon {
+  opacity: 0.5;
+}
+#main .left-column > .content .list-body .column .stat-link-icon:hover .icon {
+  opacity: 1;
+}
 #main .left-column > .content .list-body.edit-mode .public {
   padding: 0;
 }

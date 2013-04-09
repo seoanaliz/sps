@@ -81,14 +81,14 @@ var TABLE_ROW =
     '</div>' +
     '<div class="column column1">' +
         '<div class="cell">' +
-            '<a href="http://vk.com/stats?act=reach&gid=<?=publicId?>" target="_blank">' +
+            '<a class="stat-link-icon" href="http://vk.com/stats?act=reach&gid=<?=publicId?>" target="_blank">' +
                 '<?=publicAudience ? publicAudience : "<div class=\'icon locked\'></div>"?>' +
             '</a>' +
         '</div>' +
     '</div>' +
     '<div class="column column2">' +
         '<div class="cell">' +
-            '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
+            '<a class="stat-link-icon" href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
                 '<?=publicVisitors ? publicVisitors : "<div class=\'icon locked\'></div>"?>' +
             '</a>' +
         '</div>' +
