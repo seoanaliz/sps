@@ -155,6 +155,9 @@ class SaveArticleControl extends BaseControl
         $articleRecord = new ArticleRecord();
         try {
             $posts =  ParserVkontakte::get_posts_by_vk_id( $repostExternalId );
+            if( !isset( $posts[0])){
+                throw new Exception( "failed to load post");
+            }
             $post = $posts[0];
             $articleRecord->content = $post['text']? $post['text'] : '';
             $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
@@ -186,7 +189,7 @@ class SaveArticleControl extends BaseControl
                 $conn->rollback();
             }
         } catch (Exception $e) {
-//            print_r($e->getMessage());
+            die( ObjectHelper::ToJSON(array('success'=>false, 'message'=>$e->getMessage())));
         }
 
         return $articleRecord->articleRecordId;

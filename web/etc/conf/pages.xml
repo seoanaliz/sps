@@ -723,7 +723,7 @@
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-                <page uri="stat://reports/" boot="">
+                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>
@@ -743,6 +743,12 @@
             <pageGroup name="reports" boot="">
                 <page uri="reports://topface-user-posts/">
                     <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="mobileSettings" boot="">
+                <page uri="/settings/29905631/(android|ios:?)/settings.php">
+                    <actions>SPS.Mobile.GetSettings</actions>
                 </page>
             </pageGroup>
 

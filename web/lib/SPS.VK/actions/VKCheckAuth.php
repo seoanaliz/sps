@@ -11,6 +11,7 @@
 
         public function Execute() {
             $checkEditor = Request::getBoolean( 'checkEditor' );
+            Response::SetString('redirect', ltrim(Request::getRequestUri(), '/'));
 
             $vk_auth = AuthVkontakte::IsAuth($checkEditor);
             if ($vk_auth === false) {
