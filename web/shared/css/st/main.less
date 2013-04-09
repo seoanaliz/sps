@@ -365,10 +365,12 @@ table, tr, td {
                             display: none;
                         }
 
-                        &.selected .icon,
-                        &.active .icon,
-                        &:hover .icon {
-                            .opacity(1);
+                        &.selected,
+                        &.active,
+                        &:hover {
+                            .icon {
+                                .opacity(1);
+                            }
                         }
 
                         &.selected {
@@ -388,6 +390,20 @@ table, tr, td {
                                     background-image: url('../../images/common/delete.png');
                                 }
                             }
+                        }
+                    }
+                }
+
+                .stat-link-icon {
+                    padding: 4px;
+
+                    .icon {
+                        .opacity(0.5);
+                    }
+
+                    &:hover {
+                        .icon {
+                            .opacity(1);
                         }
                     }
                 }
