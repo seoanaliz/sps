@@ -166,13 +166,13 @@ var Eventlist = {
                             publicId: publicItem.id,
                             publicImg: publicItem.ava,
                             publicName: publicItem.name,
-                            publicFollowers: numberWithSeparator(publicItem.quantity),
-                            publicGrowthNum: numberWithSeparator(publicItem.diff_abs),
-                            publicGrowthPer: numberWithSeparator(publicItem.diff_rel),
+                            publicFollowers: publicItem.quantity,
+                            publicGrowthNum: publicItem.diff_abs,
+                            publicGrowthPer: publicItem.diff_rel,
                             publicIsActive: !!publicItem.active,
                             publicInSearch: !!publicItem.in_search,
-                            publicVisitors: numberWithSeparator(publicItem.visitors),
-                            publicAudience: numberWithSeparator(publicItem.viewers),
+                            publicVisitors: publicItem.visitors,
+                            publicAudience: publicItem.viewers,
                             lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                             users: users
                         });
