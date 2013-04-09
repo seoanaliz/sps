@@ -86,8 +86,8 @@ if(!empty($jsFilesAdds)) {
     <? if (!empty($__params[SiteParamHelper::GoogleMeta])) { ?>
         <meta name='google-site-verification' content='<?= $__params[SiteParamHelper::GoogleMeta]->value ?>' />
     <? } ?>
-    <link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
-    <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
+    <link rel="icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
+    <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
     <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
