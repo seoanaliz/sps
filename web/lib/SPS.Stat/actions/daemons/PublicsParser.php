@@ -26,8 +26,9 @@ class PublicsParser
         echo 'Начианаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $ms = microtime(1);
+            $take_counter = rand(50, self::PUBICS_PER_REQUEST);
             $params = array(
-                'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + self::PUBICS_PER_REQUEST )),
+                'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
             );
             $res = VkHelper::api_request( 'groups.getById', $params );
@@ -60,7 +61,7 @@ class PublicsParser
             }
             echo 'добавил: ', count($new_entries),'<br>', round(microtime(1) - $ms, 2),'<br>';
 
-            $this->current_public += self::PUBICS_PER_REQUEST;
+            $this->current_public += $take_counter;
             $this->set_state($this->current_public);
         }
     }
