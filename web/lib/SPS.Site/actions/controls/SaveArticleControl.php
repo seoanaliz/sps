@@ -98,7 +98,7 @@ class SaveArticleControl extends BaseControl
         $articleRecord->likes = 0;
         $articleRecord->photos = !empty($photos) ? $photos : array();
         $articleRecord->link = $link;
-        if( $repostExternalId ) {
+        if( $repostExternalId && $repostExternalId != 'null' ) {
             $articleRecord->repostArticleRecordId = $this->add_repost_article( $repostExternalId );
             if( $articleRecord->repostArticleRecordId ) {
                 $articleRecord->repostExternalId = $repostExternalId;
