@@ -71,7 +71,7 @@ class SaveArticleControl extends BaseControl
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = $article->createdAt;
-        $article->sourceFeedId = SourceFeedUtility::FakeSourceRepost;
+        $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
         $article->targetFeedId = $targetFeedId;
         $article->externalId = -1;
         $article->rate = 0;
