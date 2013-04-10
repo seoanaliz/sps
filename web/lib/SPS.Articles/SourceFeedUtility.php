@@ -38,7 +38,7 @@
             self::Authors => 'Авторские',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',
-            self::Source => 'Источники репоста',
+            self::Repost => 'Источники репоста',
             self::AuthorsList => '+',
         );
 
