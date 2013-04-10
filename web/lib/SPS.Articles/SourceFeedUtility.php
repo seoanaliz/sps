@@ -25,11 +25,11 @@
 
         const My = 'my';
 
-        const Repost = 'repost';
-
         const FakeSourceAuthors = -1;
 
         const FakeSourceTopface = -2;
+
+        const FakeSourceRepost  = -3;
 
         public static $Types = array(
             self::Source => 'Источники',
@@ -38,7 +38,6 @@
             self::Authors => 'Авторские',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',
-            self::Repost => 'Источники репоста',
             self::AuthorsList => '+',
         );
 
@@ -115,6 +114,7 @@
                 array(
                     self::FakeSourceAuthors => $sourceFeedAuthors,
                     self::FakeSourceTopface => $sourceFeedTopface,
+                    self::FakeSourceRepost  => $sourceFeedTopface,
                 ) + $sourceFeeds;
             return $sourceFeeds;
         }

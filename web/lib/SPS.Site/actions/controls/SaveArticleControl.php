@@ -71,7 +71,7 @@ class SaveArticleControl extends BaseControl
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = $article->createdAt;
-        $article->sourceFeedId = -1;
+        $article->sourceFeedId = SourceFeedUtility::FakeSourceRepost;
         $article->targetFeedId = $targetFeedId;
         $article->externalId = -1;
         $article->rate = 0;
@@ -81,7 +81,6 @@ class SaveArticleControl extends BaseControl
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
         $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
-
         if ($sourceFeedId) {
             $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
             if ($SourceFeed) {
@@ -102,26 +101,6 @@ class SaveArticleControl extends BaseControl
             $articleRecord->repostArticleRecordId = $this->add_repost_article( $repostExternalId );
             if( $articleRecord->repostArticleRecordId ) {
                 $articleRecord->repostExternalId = $repostExternalId;
-                $post_extenal_id = explode('_', trim( $repostExternalId, '-'));
-                if( !isset($post_extenal_id[0]) || !$post_extenal_id[0] ) {
-                    $result['message'] = 'Wrong post id';
-                    return $result;
-                }
-
-                $source = SourceFeedFactory::GetOne( array( 'externalId' => $post_extenal_id[0]));
-
-                if( !$source ) {
-                    $source = new SourceFeed();
-                    $source->externalId = $post_extenal_id[0];
-                    $source->statusId = StatusUtility::Enabled;
-                    $source->targetFeedIds = $targetFeedId;
-                    $source->type  = SourceFeedUtility::Repost;
-                    $source->title = 'public' . $post_extenal_id[0];
-                    $source->useFullExport = false;
-                    SourceFeedUtility::SaveSourceInfo( $source );
-                    SourceFeedFactory::Add( $source, array( BaseFactory::WithReturningKeys => true ));
-                }
-                $article->sourceFeedId = $source->sourceFeedId;
             }
         }
         if (!empty($id)) {
@@ -190,7 +169,12 @@ class SaveArticleControl extends BaseControl
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
             $articleRecord->rate = 0;
-
+            $public_id = explode( '_', trim( $post['id'], '-'));
+            $info = StatPublics::get_publics_info( $public_id[0]);
+            $info = current( $info );
+            $articleRecord->repostPublicImage = $info['ava'];
+            $articleRecord->repostPublicTitle = $info['name'];
+            $photos = array();
             foreach ($post['photo'] as $photo) {
                 $photos[] = array(
                     'filename' => '',
@@ -214,7 +198,5 @@ class SaveArticleControl extends BaseControl
 
         return $articleRecord->articleRecordId;
     }
-
-
 }
 ?>
