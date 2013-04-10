@@ -113,7 +113,7 @@ class SaveArticleControl extends BaseControl
                 if( !$source ) {
                     $source = new SourceFeed();
                     $source->externalId = $post_extenal_id[0];
-                    $source->statusId = StatusUtility::Finished;
+                    $source->statusId = StatusUtility::Enabled;
                     $source->targetFeedIds = $targetFeedId;
                     $source->type  = SourceFeedUtility::Repost;
                     $source->title = 'public' . $post_extenal_id[0];
