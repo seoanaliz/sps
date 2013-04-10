@@ -15,6 +15,8 @@ if (!empty($article)) {
     $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
     $repostOrigin = false;
     $originalId = false;
+    $source_img = '';
+    $source_title = '';
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
@@ -54,7 +56,7 @@ if (!empty($article)) {
         $articleRecord = $repostArticleRecord;
         $source_img = $articleRecord->repostPublicImage;
         $source_title = $articleRecord->repostPublicTitle;
-    } elseif ($article->externalId != -1) {
+    } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
         $originalId = trim($article->externalId, '-');
         $source_img = $sourceInfo[$article->sourceFeedId]['img'];
         $source_title = $sourceInfo[$article->sourceFeedId]['name'];
@@ -72,7 +74,7 @@ if (!empty($article)) {
         data-author-id="{$author->authorId}"
     <? } ?>
     data-id="{$article->articleId}">
-    <? if (!empty($sourceInfo[$article->sourceFeedId]) || $repostOrigin ) { ?>
+    <? if (!empty($sourceInfo[$article->sourceFeedId]) || $repostOrigin) { ?>
         <div class="l d-hide">
             <div class="userpic">
                 <img src="<?=$source_img?>" alt="" />
