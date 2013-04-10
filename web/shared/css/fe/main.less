@@ -1314,6 +1314,31 @@ i {font-style: italic;}
     }
 }
 
+.repost {
+    .repost-title {
+        & > div {
+            vertical-align: middle;
+            .inline-block;
+
+            & + & {
+                margin-left: 1em;
+            }
+        }
+
+        .repost-image {
+            text-align: center;
+            width: 25px;
+            height: 25px;
+            overflow: hidden;
+            background-color: #f1f1f1;
+
+            img {
+                max-width: 100%;
+            }
+        }
+    }
+}
+
 .post {
     background: #fff;
     position: relative;

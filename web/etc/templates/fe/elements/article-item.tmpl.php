@@ -13,10 +13,8 @@ if (!empty($article)) {
     $isPostMovable = false;
     $isPostRelocatable = true;
     $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
-    $repostOrigin = false;
+    $isRepost = false;
     $originalId = false;
-    $source_img = '';
-    $source_title = '';
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
@@ -51,15 +49,10 @@ if (!empty($article)) {
     }
 
     if (isset($repostArticleRecord) && $repostArticleRecord) {
-        $repostOrigin = true;
+        $isRepost = true;
         $originalId = trim($articleRecord->repostExternalId, '-');
-        $articleRecord = $repostArticleRecord;
-        $source_img = $articleRecord->repostPublicImage;
-        $source_title = $articleRecord->repostPublicTitle;
     } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
         $originalId = trim($article->externalId, '-');
-        $source_img = $sourceInfo[$article->sourceFeedId]['img'];
-        $source_title = $sourceInfo[$article->sourceFeedId]['name'];
     }
 ?>
 <div
@@ -74,14 +67,14 @@ if (!empty($article)) {
         data-author-id="{$author->authorId}"
     <? } ?>
     data-id="{$article->articleId}">
-    <? if (!empty($sourceInfo[$article->sourceFeedId]) || $repostOrigin) { ?>
+    <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic">
-                <img src="<?=$source_img?>" alt="" />
+                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
             </div>
         </div>
         <div class="name d-hide">
-            <?=$source_title?>
+            <?=$sourceInfo[$article->sourceFeedId]['name']?>
         </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
@@ -91,6 +84,9 @@ if (!empty($article)) {
     <? } ?>
     <div class="content">
         {increal:tmpl://fe/elements/article-item-content.tmpl.php}
+        <? if ($isRepost) { ?>
+            {increal:tmpl://fe/elements/article-item-content-repost.tmpl.php}
+        <? } ?>
     </div>
     <div class="bottom d-hide">
         <div class="l">
@@ -101,7 +97,7 @@ if (!empty($article)) {
             <? } ?>
         </div>
         <div class="r">
-            <? if (!empty($repostArticleRecord)) { ?>
+            <? if ($isRepost) { ?>
                 <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
             <? } ?>
             <? if (!empty($articleRecord->link)) { ?>
