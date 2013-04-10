@@ -524,6 +524,9 @@ input[disabled] {
 .icon.edit {
   background-image: url('../../images/common/edit.png');
 }
+.icon.locked {
+  background-image: url('../../images/common/locked.png');
+}
 .placeholder {
   color: #999;
   -webkit-touch-callout: none;

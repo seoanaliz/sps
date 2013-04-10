@@ -7,6 +7,8 @@ set_time_limit(13600);
 new stat_tables();
 class WrTopics extends wrapper
 {
+    const STAT_QUANTITY_LIMIT = 30000;
+
     private $ids;
     private $conn;
     public static $toface_beauty = array(
@@ -58,7 +60,7 @@ class WrTopics extends wrapper
             $this->double_check_quantity();
             die('Не сейчас');
         }
-        $base_publics = $this->get_id_arr();
+        $base_publics = $this->get_id_arr( self::STAT_QUANTITY_LIMIT );
         $this->update_visitors();
         StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );
         $this->update_quantity();
@@ -67,13 +69,14 @@ class WrTopics extends wrapper
         echo "end_time = " . date( 'H:i' ) . '<br>';
     }
 
-    public function get_id_arr()
+    public function get_id_arr( $limit )
     {
         $sql = "select vk_id
                 FROM " . TABLE_STAT_PUBLICS . "
-                WHERE quantity > 10000
+                WHERE quantity > @limit
                 ORDER BY vk_id";
         $cmd = new SqlCommand( $sql, $this->conn );
+        $cmd->SetInteger( '@limit',  $limit );
         $ds = $cmd->Execute();
         $res = array();
         while ( $ds->Next() ) {
@@ -285,7 +288,7 @@ class WrTopics extends wrapper
         $sql = 'UPDATE stat_publics_50k as publics
                 SET visitors_month=points.visitors_sum, viewers_month=points.viewers_sum
                 FROM
-                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                        ( SELECT  sum(visitors) as visitors_sum, sum(reach) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'1 month\' AND time < now() group by id )
                                 as points
                 WHERE publics.vk_id=points.id';
@@ -294,7 +297,7 @@ class WrTopics extends wrapper
         $sql = 'UPDATE stat_publics_50k as publics
                 SET visitors_week=points.visitors_sum, viewers_week=points.viewers_sum
                 FROM
-                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                        ( SELECT  sum(visitors) as visitors_sum, sum(reach) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'1 week\' AND time < now() group by id )
                                 as points
                 WHERE publics.vk_id=points.id';
@@ -303,7 +306,7 @@ class WrTopics extends wrapper
         $sql = 'UPDATE stat_publics_50k as publics
                 SET visitors=points.visitors_sum, viewers=points.viewers_sum
                 FROM
-                        ( SELECT  sum(visitors) as visitors_sum, sum(views) as viewers_sum,id FROM stat_publics_50k_points
+                        ( SELECT  sum(visitors) as visitors_sum, sum(reach) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'2 day\' AND time < now() group by id )
                                 as points
                 WHERE publics.vk_id=points.id';

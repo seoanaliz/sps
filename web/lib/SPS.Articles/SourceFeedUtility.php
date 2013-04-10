@@ -29,6 +29,8 @@
 
         const FakeSourceTopface = -2;
 
+        const FakeSourceRepost  = -3;
+
         public static $Types = array(
             self::Source => 'Источники',
             self::Ads => 'Реклама',
@@ -81,17 +83,22 @@
                 try {
                     $feedsVkInfo = StatPublics::get_publics_info( $chunk );
                     foreach( $feedsVkInfo as $feedInfo ) {
-                        $path = 'temp://userpic-' . $feedInfo['id'] . '.jpg';
-                        $filePath = Site::GetRealPath($path);
-                        $content = file_get_contents($feedInfo['ava']);
-                        if (!empty($content)) {
-                            file_put_contents($filePath, $content);
-                            Logger::Debug($feedInfo['ava'] . ' -> ' . Site::GetWebPath($path));
-                        }
+                        self::DownloadImage( $feedInfo['id'], $feedInfo['ava'] );
                     }
                 } catch (Exception $Ex) {}
             }
         }
+
+        public static function DownloadImage( $sourceExternalId, $imgUrl ) {
+            $path = 'temp://userpic-' . $sourceExternalId. '.jpg';
+            $filePath = Site::GetRealPath($path);
+            $content = file_get_contents( $imgUrl );
+            if (!empty($content)) {
+                file_put_contents($filePath, $content);
+                Logger::Debug( $imgUrl  . ' -> ' . Site::GetWebPath($path));
+            }
+        }
+
 
         public static function GetAll() {
             $sourceFeeds = SourceFeedFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
@@ -107,8 +114,19 @@
                 array(
                     self::FakeSourceAuthors => $sourceFeedAuthors,
                     self::FakeSourceTopface => $sourceFeedTopface,
+                    self::FakeSourceRepost  => $sourceFeedTopface,
                 ) + $sourceFeeds;
             return $sourceFeeds;
+        }
+
+        public static function SaveSourceInfo( SourceFeed $source) {
+            if( !$source->externalId)
+                return false;
+
+            $info = reset( StatPublics::get_publics_info( $source->externalId ));
+            $source->title = $info['name'];
+            self::DownloadImage( $source->externalId, $info['ava'] );
+
         }
     }
 ?>

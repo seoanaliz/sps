@@ -38,7 +38,7 @@ class getEntries {
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
-        $page           =   $page ? ' AND publ.page=true ' : ' ';
+        $page           =   ' AND publ.is_page=true ';
         $quant_max      =   $quant_max ? $quant_max : 100000000;
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;

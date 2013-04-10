@@ -76,25 +76,28 @@ var TABLE_ROW =
     '</div>' +
     '<div class="column column2">' +
         '<div class="cell">' +
-            '<?=publicFollowers ? publicFollowers : "-"?>' +
+            '<?=publicFollowers ? numberWithSeparator(publicFollowers) : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1">' +
         '<div class="cell">' +
-            '<?=publicAudience ? publicAudience : "-"?>' +
+            '<a class="stat-link-icon" href="http://vk.com/stats?act=reach&gid=<?=publicId?>" target="_blank">' +
+                '<?=publicAudience ? numberWithSeparator(publicAudience) : "<div class=\'icon locked\'></div>"?>' +
+            '</a>' +
         '</div>' +
     '</div>' +
     '<div class="column column2">' +
         '<div class="cell">' +
-            '<a href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
-                '<?=publicVisitors ? publicVisitors : "-"?>' +
+            '<a class="stat-link-icon" href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
+                '<?=publicVisitors ? numberWithSeparator(publicVisitors) : "<div class=\'icon locked\'></div>"?>' +
             '</a>' +
         '</div>' +
     '</div>' +
     '<div class="column column2">' +
         '<div class="cell">' +
             '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
-                '<?=publicGrowthNum?> <small><?=publicGrowthPer?>%</small>' +
+                '<?=numberWithSeparator(publicGrowthNum)?> ' +
+                '<small><?=numberWithSeparator(publicGrowthPer)?>%</small>' +
             '</span>' +
         '</div>' +
     '</div>' +
@@ -185,39 +188,39 @@ var OUR_TABLE_ROW =
     '</div>' +
     '<div class="column column1 ">' +
         '<div class="cell">' +
-            '<?=publicPosts ? publicPosts : "-"?>' +
+            '<?=publicPosts ? numberWithSeparator(publicPosts) : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<?=publicPostsPerDay ? publicPostsPerDay : "-"?>' +
+            '<?=publicPostsPerDay ? numberWithSeparator(publicPostsPerDay) : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<?=publicAuthorsPosts ? publicAuthorsPosts + "%" : "-"?>' +
+            '<?=publicAuthorsPosts ? numberWithSeparator(publicAuthorsPosts) + "%" : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<?=publicAuthorsLikes ? publicAuthorsLikes + "%" : "-"?>' +
+            '<?=publicAuthorsLikes ? numberWithSeparator(publicAuthorsLikes) + "%" : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<?=publicAuthorsReposts ? publicAuthorsReposts + "%" : "-"?>' +
+            '<?=publicAuthorsReposts ? numberWithSeparator(publicAuthorsReposts) + "%" : "-"?>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
             '<span class="<?=publicGrowthVisitors > 0 ? "plus" : "minus"?>">' +
-                '<?=publicGrowthVisitors?> <small><?=publicGrowthVisitorsRelative?>%</small>' +
+                '<?=publicGrowthVisitors?> <small><?=numberWithSeparator(publicGrowthVisitorsRelative)?>%</small>' +
             '</span>' +
         '</div>' +
     '</div>' +
     '<div class="column column1-5">' +
         '<div class="cell">' +
-            '<?=publicSbLikes ? publicSbLikes : "-"?>' +
+            '<?=publicSbLikes ? numberWithSeparator(publicSbLikes) : "-"?>' +
         '</div>' +
     '</div>' +
 '</div>';

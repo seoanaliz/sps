@@ -42,7 +42,7 @@ class VkPublic {
     public $diff_rel_month;
 
     /** @var bool */
-    public $page;
+    public $is_page;
 
     /** @var int */
     public $visitors;

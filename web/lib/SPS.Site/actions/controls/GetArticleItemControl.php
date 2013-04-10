@@ -40,7 +40,7 @@ class GetArticleItemControl extends BaseControl
 
         // определяем роль
         if ($Article->sourceFeedId && !in_array($Article->sourceFeedId, array(SourceFeedUtility::FakeSourceAuthors,
-            SourceFeedUtility::FakeSourceTopface))){
+            SourceFeedUtility::FakeSourceTopface, SourceFeedUtility::FakeSourceRepost))){
             // если у поста есть источник, то проверяем, привязана ли он к ленте и по ленте определяем роль
             $SourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
             if ($SourceFeed){

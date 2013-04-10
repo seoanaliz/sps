@@ -155,7 +155,8 @@
         {
             $text = strip_tags( $text );
             //cURL пытается найти файл по любой строке, начинающейся с @
-            preg_replace( '/^@/', '^ @', $text );
+//            preg_replace( '/^@/', '^ @', $text );
+           $text = str_replace('@', ' @', $text);
             return $text;
         }
 
