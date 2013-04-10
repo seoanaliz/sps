@@ -1244,14 +1244,25 @@ i {
 .newpost.collapsed .buttons {
   display: none;
 }
+.repost .repost-title {
+  margin-top: 5px;
+}
 .repost .repost-title > div {
   vertical-align: middle;
   display: inline-block;
   zoom: 1;
   *display: inline;
 }
-.repost .repost-title > div + .repost .repost-title > div {
-  margin-left: 1em;
+.repost .repost-title > div + div {
+  margin-left: 6px;
+}
+.repost .repost-title .repost-link a {
+  padding-left: 12px;
+  font-weight: bold;
+  background: url('../../images/common/repost.gif') 0 center no-repeat;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
 }
 .repost .repost-title .repost-image {
   text-align: center;

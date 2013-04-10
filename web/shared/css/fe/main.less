@@ -1316,12 +1316,23 @@ i {font-style: italic;}
 
 .repost {
     .repost-title {
+        margin-top: 5px;
+
         & > div {
             vertical-align: middle;
             .inline-block;
 
-            & + & {
-                margin-left: 1em;
+            & + div {
+                margin-left: 6px;
+            }
+        }
+
+        .repost-link {
+            a {
+                padding-left: 12px;
+                font-weight: bold;
+                background: url('../../images/common/repost.gif') 0 center no-repeat;
+                .inline-block;
             }
         }
 
