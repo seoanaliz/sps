@@ -524,8 +524,7 @@
                 return false;
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-
-                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach, $day->day, $connect );
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach_subscribers, $day->day, $connect );
             }
             sleep(0.3);
         }
