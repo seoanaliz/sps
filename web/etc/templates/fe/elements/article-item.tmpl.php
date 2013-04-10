@@ -47,9 +47,15 @@ if (!empty($article)) {
         $canEditPost = false;
     }
 
+
     if( isset( $repostArticleRecord) && $repostArticleRecord ) {
         $repostOrigin = trim( $articleRecord->repostExternalId, '-' );
         $articleRecord = $repostArticleRecord;
+        $source_img = $articleRecord->repostPublicImage;
+        $source_title = $articleRecord->repostPublicTitle;
+    } elseif(!empty( $sourceInfo[$article->sourceFeedId] )) {
+        $source_img = $sourceInfo[$article->sourceFeedId]['img'];
+        $source_title = $sourceInfo[$article->sourceFeedId]['name'];
     }
 ?>
 <div
@@ -64,14 +70,14 @@ if (!empty($article)) {
         data-author-id="{$author->authorId}"
     <? } ?>
     data-id="{$article->articleId}">
-    <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
+    <? if (!empty($sourceInfo[$article->sourceFeedId]) || $repostOrigin ) { ?>
         <div class="l d-hide">
             <div class="userpic">
-                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
+                <img src="<?=$source_img?>" alt="" />
             </div>
         </div>
         <div class="name d-hide">
-            <?=$sourceInfo[$article->sourceFeedId]['name']?>
+            <?=$source_title?>
         </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
