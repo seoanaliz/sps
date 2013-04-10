@@ -102,6 +102,26 @@ class SaveArticleControl extends BaseControl
             $articleRecord->repostArticleRecordId = $this->add_repost_article( $repostExternalId );
             if( $articleRecord->repostArticleRecordId ) {
                 $articleRecord->repostExternalId = $repostExternalId;
+                $post_extenal_id = explode('_', trim( $repostExternalId, '-'));
+                if( !isset($post_extenal_id[0]) || !$post_extenal_id[0] ) {
+                    $result['message'] = 'Wrong post id';
+                    return $result;
+                }
+
+                $source = SourceFeedFactory::GetOne( array( 'externalId' => $post_extenal_id[0]));
+
+                if( !$source ) {
+                    $source = new SourceFeed();
+                    $source->externalId = $post_extenal_id[0];
+                    $source->statusId = StatusUtility::Finished;
+                    $source->targetFeedIds = $targetFeedId;
+                    $source->type  = SourceFeedUtility::Repost;
+                    $source->title = 'public' . $post_extenal_id[0];
+                    $source->useFullExport = false;
+                    SourceFeedUtility::SaveSourceInfo( $source );
+                    SourceFeedFactory::Add( $source, array( BaseFactory::WithReturningKeys => true ));
+                }
+                $article->sourceFeedId = $source->sourceFeedId;
             }
         }
         if (!empty($id)) {
@@ -194,5 +214,7 @@ class SaveArticleControl extends BaseControl
 
         return $articleRecord->articleRecordId;
     }
+
+
 }
 ?>
