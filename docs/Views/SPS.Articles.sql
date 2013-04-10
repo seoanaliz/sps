@@ -94,6 +94,8 @@ SELECT "public"."articleRecords"."articleRecordId"
     , "public"."articleRecords"."repostArticleRecordId"
     , "public"."articleRecords"."repostExternalId"
     , "public"."articleRecords"."createdVia"
+    , "public"."articleRecords"."repostPublicImage"
+    , "public"."articleRecords"."repostPublicTitle"
  FROM "public"."articleRecords";
 
 CREATE OR REPLACE VIEW "getPublishers" AS

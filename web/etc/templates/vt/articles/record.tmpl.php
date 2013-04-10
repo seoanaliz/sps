@@ -61,6 +61,14 @@
     <label>{lang:vt.articleRecord.createdVia}</label>
     <?= FormHelper::FormInput( $prefixRecord . '[createdVia]', $articleRecord->createdVia, 'createdVia', null, array( 'size' => 20, 'style' => 'width: 200px;' ) ); ?>
 </div>
+<div data-row="repostPublicImage" class="row">
+    <label>{lang:vt.articleRecord.repostPublicImage}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[repostPublicImage]', $articleRecord->repostPublicImage, 'repostPublicImage', null, array( 'size' => 200, 'style' => 'width: 200px;' ) ); ?>
+</div>
+<div data-row="repostPublicTitle" class="row">
+    <label>{lang:vt.articleRecord.repostPublicTitle}</label>
+    <?= FormHelper::FormInput( $prefixRecord . '[repostPublicTitle]', $articleRecord->repostPublicTitle, 'repostPublicTitle', null, array( 'size' => 200, 'style' => 'width: 200px;' ) ); ?>
+</div>
 
 <div data-row="files" class="row">
     <label>{lang:vt.articleRecord.photos}</label>
