@@ -56,10 +56,10 @@ class WrTopics extends wrapper
 
 
         set_time_limit(14000);
-//        if (! $this->check_time()) {
-//            $this->double_check_quantity();
-//            die('Не сейчас');
-//        }
+        if (! $this->check_time()) {
+            $this->double_check_quantity();
+            die('Не сейчас');
+        }
         $base_publics = $this->get_id_arr( self::STAT_QUANTITY_LIMIT );
         $this->update_visitors();
         StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );

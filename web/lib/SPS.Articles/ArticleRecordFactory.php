@@ -112,6 +112,12 @@
                 ),'createdVia' => array(
                     'name'          => 'createdVia'
                     , 'type'        => TYPE_STRING
+                ),'repostPublicImage' => array(
+                    'name'          => 'repostPublicImage'
+                    , 'type'        => TYPE_STRING
+                ),'repostPublicTitle' => array(
+                    'name'          => 'repostPublicTitle'
+                    , 'type'        => TYPE_STRING
                 ))
             , 'lists'     => array()
             , 'search'    => array(

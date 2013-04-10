@@ -405,6 +405,8 @@
       <repostArticleRecordId><![CDATA[id статьи репоста]]></repostArticleRecordId>
       <repostExternalId><![CDATA[внешний id репоста]]></repostExternalId>
       <createdVia><![CDATA[пост создан через ]]></createdVia>
+      <repostPublicImage><![CDATA[ава паблика ]]></repostPublicImage>
+      <repostPublicTitle><![CDATA[ название паблика ]]></repostPublicTitle>
     </articleRecord>
     <publisher>
       <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>

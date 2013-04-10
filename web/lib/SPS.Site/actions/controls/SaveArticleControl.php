@@ -71,7 +71,7 @@ class SaveArticleControl extends BaseControl
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = $article->createdAt;
-        $article->sourceFeedId = -1;
+        $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
         $article->targetFeedId = $targetFeedId;
         $article->externalId = -1;
         $article->rate = 0;
@@ -81,7 +81,6 @@ class SaveArticleControl extends BaseControl
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
         $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
-
         if ($sourceFeedId) {
             $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
             if ($SourceFeed) {
@@ -170,7 +169,12 @@ class SaveArticleControl extends BaseControl
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
             $articleRecord->rate = 0;
-
+            $public_id = explode( '_', trim( $post['id'], '-'));
+            $info = StatPublics::get_publics_info( $public_id[0]);
+            $info = current( $info );
+            $articleRecord->repostPublicImage = $info['ava'];
+            $articleRecord->repostPublicTitle = $info['name'];
+            $photos = array();
             foreach ($post['photo'] as $photo) {
                 $photos[] = array(
                     'filename' => '',
