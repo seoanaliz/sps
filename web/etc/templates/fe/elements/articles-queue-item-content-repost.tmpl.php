@@ -1,11 +1,12 @@
 <?
 /** @var $articleRecord ArticleRecord */
 /** @var $repostArticleRecord ArticleRecord */
-/** @var $sourceVkId */
-/** @var $sourceVkURL */
+/** @var $originalId */
 
 $content = nl2br(HtmlHelper::RenderToForm($repostArticleRecord->content));
 $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
+$sourceVkId = current(explode('_', $originalId));
+$sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . trim($sourceVkId, '-');
 ?>
 <div class="repost">
     <div class="repost-title">

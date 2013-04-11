@@ -57,14 +57,10 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                     $isRepost = false;
 
                     if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
-                        $repostArticleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
-                        $originalId = $articleRecord->repostExternalId;
                         $isRepost = true;
-                    } else {
-                        $originalId = $article->externalId;
+                        $originalId = $articleRecord->repostExternalId;
+                        $repostArticleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
                     }
-                    $sourceVkId = current(explode('_', $originalId));
-                    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . trim($sourceVkId, '-');
                     $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
                     ?>
                     <? if ($canEditQueue) { ?>

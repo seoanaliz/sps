@@ -1,12 +1,13 @@
 <?php
 /** @var $articleRecord ArticleRecord */
 /** @var $repostArticleRecord ArticleRecord */
-/** @var $sourceVkId */
-/** @var $sourceVkURL */
+/** @var $originalId */
 
 $contentPart1 = mb_substr($repostArticleRecord->content, 0, 300);
 $contentPart2 = mb_substr($repostArticleRecord->content, 300);
 $contentPart1 = !empty($contentPart1) ? $contentPart1 : '';
+$sourceVkId = current(explode('_', $originalId));
+$sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . trim($sourceVkId, '-');
 ?>
 <div class="repost">
     <div class="repost-title">
