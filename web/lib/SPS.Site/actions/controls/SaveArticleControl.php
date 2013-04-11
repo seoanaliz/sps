@@ -170,7 +170,11 @@ class SaveArticleControl extends BaseControl
             $articleRecord->doc = Convert::ToString($post['doc']);
             $articleRecord->rate = 0;
             $public_id = explode( '_', trim( $post['id'], '-'));
-            $info = StatPublics::get_publics_info( $public_id[0]);
+            for( $try = 0; $try < 3; $try ++) {
+                $info = StatPublics::get_publics_info( $public_id[0]);
+                if ( $info ) break;
+                sleep( 0.3 );
+            }
             $info = current( $info );
             $articleRecord->repostPublicImage = $info['ava'];
             $articleRecord->repostPublicTitle = $info['name'];

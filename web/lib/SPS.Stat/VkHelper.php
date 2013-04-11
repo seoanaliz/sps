@@ -42,7 +42,10 @@
             );
 
             public static  $open_methods = array(
-                'wall.get' => true,
+                'wall.get'          => true,
+                'groups.getById'    => true,
+                'wall.getById'      => true,
+
             );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
@@ -52,11 +55,10 @@
                     $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
                 $a = VkHelper::qurl_request( $url, $request_params );
-                if ( $method == 'stats.get')
-                {
-                    $start = strpos( $a, ',"sex"');
-                    $a = substr_replace( $a, '}]}', $start );
-                }
+//                if ( $method == 'stats.get') {
+//                    $start = strpos( $a, ',"sex"');
+//                    $a = substr_replace( $a, '}]}', $start );
+//                }
                 $res = json_decode(  $a );
                 if( !$res )
                     return array();

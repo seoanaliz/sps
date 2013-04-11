@@ -189,7 +189,7 @@
                 $retweet    =   $post->reposts->count;
                 $time       =   $post->date;
                 $text       =   self::remove_tags( $post->text);
-                $source     =   $post->post_source->type;
+                $source     =   isset( $post->post_source->type) ? $post->post_source->type : null;
                 $maps = '';
                 $doc  = '';
                 $link = '';
