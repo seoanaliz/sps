@@ -212,9 +212,7 @@ class WrTopics extends wrapper
         $cmd->SetFloat( '@diff_rel',           $diff_rel );
         $cmd->SetFloat( '@diff_abs',           $diff_abs );
         $cmd->SetBoolean( '@sh_in_main',       $show_in_main );
-        echo $cmd->GetQuery();
         $cmd->Execute();
-        die();
 
     }
 
