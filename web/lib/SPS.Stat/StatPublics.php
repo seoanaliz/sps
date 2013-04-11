@@ -8,6 +8,12 @@
 
         const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
+
+        const WARNING_DATA_NOT_ACCURATE = 1;
+        const WARNING_DATA_FROM_YESTERDAY = 2;
+        const WARNING_DATA_ACCURATE = 3;
+
+
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
              26776509
@@ -412,6 +418,7 @@
                 'count'      =>  round( $ds->GetFloat( 'count' )),
             );
             return $res;
+
         }
 
         public static function get_average_visitors( $sb_id, $time_from, $time_to )
@@ -524,7 +531,7 @@
                 return false;
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach_subscribers, $day->day, $connect );
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach, $day->day, $connect );
             }
             sleep(0.3);
         }
@@ -583,14 +590,6 @@
                     WHERE
                         id=@public_id
                         AND time=@date';
-                $cmd = new SqlCommand( $sql, $connect );
-                $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetInteger( '@visitors',  $visitors );
-                $cmd->SetInteger( '@views',     $views );
-                $cmd->SetInteger( '@reach',     $reach );
-                $cmd->SetString ( '@date',      $date );
-
-                $cmd->Execute();
             } else {
                 $sql = 'INSERT INTO
                         stat_publics_50k_points
@@ -602,14 +601,15 @@
                            @views,
                            @reach
                     )';
-                $cmd = new SqlCommand( $sql, $connect );
-                $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetInteger( '@visitors',  $visitors );
-                $cmd->SetInteger( '@views',     $views );
-                $cmd->SetInteger( '@reach',     $reach );
-                $cmd->SetString ( '@date',      $date );
-                $cmd->Execute();
+
             }
+            $cmd = new SqlCommand( $sql, $connect );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetInteger( '@visitors',  $visitors );
+            $cmd->SetInteger( '@views',     $views );
+            $cmd->SetInteger( '@reach',     $reach );
+            $cmd->SetString ( '@date',      $date );
+            $cmd->Execute();
 
         }
 
@@ -713,7 +713,6 @@
         {
             $base_publics = array_flip( $base_publics );
             $public_chunks = array_chunk( $publics, 500 );
-
             foreach( $public_chunks as $ids ) {
                 $line = implode( ',', $ids );
                 $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
@@ -859,5 +858,15 @@
             }
         }
 
+        public static function get_last_stat_demon_time()
+        {
+            $sql = 'SELECT MAX("createdAt") FROM ' . TABLE_STAT_PUBLICS_POINTS;
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $ds = $cmd->Execute();
+            echo $cmd->GetQuery();
+            $ds->Next();
+            return $ds->Next() ? $ds->GetDateTime( 'max' ) : DateTimeWrapper::Now() ;
+        }
     }
 ?>
