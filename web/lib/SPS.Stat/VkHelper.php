@@ -204,6 +204,19 @@
                 }
             }
 
+            public static function get_all_service_tokens()
+            {
+                $connect =  ConnectionFactory::Get( 'tst' );
+                $sql = 'SELECT access_token,user_id  FROM serv_access_tokens';
+                $cmd = new SqlCommand( $sql, $connect );
+                $ds  = $cmd->Execute();
+                $result = array();
+                while( $ds->Next()) {
+                    $result[$ds->GetInteger('user_id')] = $ds->GetValue('access_token');
+                }
+                return $result;
+            }
+
             public static function deactivate_at( $access_token )
             {
                 if ( !$access_token )
