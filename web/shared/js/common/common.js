@@ -131,6 +131,15 @@ function strval(value) {
     return value + '';
 }
 
+/**
+ * @param num
+ * @param {string} [separator=" "]
+ * @returns {string}
+ */
+function numberWithSeparator(num, separator) {
+    return typeof num == 'string' ? num.replace(/\B(?=(\d{3})+(?!\d))/g, separator || ' ') : num;
+}
+
 // Парсинг URL
 function getURLParameter(name, search) {
     search = search || location.search;
