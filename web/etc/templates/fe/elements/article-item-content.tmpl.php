@@ -1,7 +1,6 @@
 <?
-/**
- * @var $articleRecord ArticleRecord
- */
+/** @var $articleRecord ArticleRecord */
+
 $contentPart1 = mb_substr($articleRecord->content, 0, 300);
 $contentPart2 = mb_substr($articleRecord->content, 300);
 $contentPart1 = !empty($contentPart1) ? $contentPart1 : '';

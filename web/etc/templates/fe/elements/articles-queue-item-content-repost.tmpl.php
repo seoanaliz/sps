@@ -1,0 +1,42 @@
+<?
+/** @var $repostArticleRecord ArticleRecord */
+
+$content = nl2br(HtmlHelper::RenderToForm($repostArticleRecord->content));
+$collapsed = (strlen($content) > 50) ? 'collapsed' : false;
+?>
+<div class="repost">
+    <div class="repost-title">
+        <div class="repost-image">
+            <a href="#" target="_blank"><img src="{$repostArticleRecord->repostPublicImage}" /></a>
+        </div>
+        <div class="repost-link">
+            <a href="#" target="_blank">{$repostArticleRecord->repostPublicTitle}</a>
+        </div>
+    </div>
+    <div class="text {$collapsed}">
+        {$content}
+        <? if ($collapsed) { ?>
+            <span class="toggle-text"></span>
+        <? } ?>
+    </div>
+<? if (!empty($repostArticleRecord->link)) { ?>
+    <div class="link-info-content">
+        <div class="link-description-content">
+            <img src="{web:images://fe/ajax-loader.gif}" alt="" class="ajax-loader" rel="{form:$repostArticleRecord->link}" />
+        </div>
+    </div>
+<? } ?>
+<? if (!empty($repostArticleRecord->photos)) { ?>
+    <div class="images">
+        <? $i = 0; ?>
+        <? foreach($repostArticleRecord->photos as $photoItem) {
+            $i++;
+            $size = 'original';
+            ?>
+            <div class="img">
+                <img src="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
+            </div>
+        <? } ?>
+    </div>
+<? } ?>
+</div>

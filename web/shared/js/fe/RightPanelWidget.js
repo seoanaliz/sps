@@ -161,7 +161,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanel = t.$rightPanel;
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanel.addClass('expanded');
-        $rightPanel.find('.images-ready').imageComposition();
+        $rightPanel.find('.images').imageComposition();
         $rightPanelBackground.show();
         $('html').width($('html').width()).css('overflow-y', 'hidden');
     },

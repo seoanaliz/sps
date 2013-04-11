@@ -7,6 +7,6 @@
 <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
 <span class="hash-span" title="Пост с хештэгом">#hash</span>
 <? } ?>
-<? if ( isset( $is_repost) && $is_repost ) { ?>
+<? if (isset($isRepost) && $isRepost) { ?>
 <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
 <? } ?>
