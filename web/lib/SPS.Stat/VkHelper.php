@@ -59,8 +59,6 @@
 //                    $start = strpos( $a, ',"sex"');
 //                    $a = substr_replace( $a, '}]}', $start );
 //                }
-                print_r($method);
-                print_r($request_params);
                 $res = json_decode(  $a );
                 if( !$res )
                     return array();
