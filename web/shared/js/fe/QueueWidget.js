@@ -45,6 +45,7 @@ var QueueWidget = Event.extend({
                     Elements.initDroppable($('#right-panel'));
                     Elements.initImages($page);
                     Elements.initLinks($page);
+                    $page.find('.post .images').imageComposition();
                     $page.find('.post.blocked').draggable('disable');
                 } else {
                     t.$queue.empty();

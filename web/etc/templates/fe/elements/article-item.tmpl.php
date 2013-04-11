@@ -50,12 +50,12 @@ if (!empty($article)) {
 
     if (isset($repostArticleRecord) && $repostArticleRecord) {
         $isRepost = true;
-        $originalId = trim($articleRecord->repostExternalId, '-');
+        $originalId = $articleRecord->repostExternalId;
     } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
-        $originalId = trim($article->externalId, '-');
+        $originalId = $article->externalId;
     }
     $sourceVkId = current(explode('_', $originalId));
-    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . $sourceVkId;
+    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . trim($sourceVkId, '-');
 ?>
 <div
     class="post bb
@@ -113,7 +113,7 @@ if (!empty($article)) {
             <? } ?>
             <span class="original">
                 <? if ($originalId) { ?>
-                    <a href="{$articleLinkPrefix}{$originalId}" target="_blank">Оригинал</a>
+                    <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
                 <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {

@@ -58,13 +58,13 @@ $now = new DateTimeWrapper(date('d.m.Y'));
 
                     if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
                         $repostArticleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
-                        $originalId = trim($articleRecord->repostExternalId, '-');
+                        $originalId = $articleRecord->repostExternalId;
                         $isRepost = true;
                     } else {
-                        $originalId = trim($article->externalId, '-');
+                        $originalId = $article->externalId;
                     }
                     $sourceVkId = current(explode('_', $originalId));
-                    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . $sourceVkId;
+                    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . trim($sourceVkId, '-');
                     $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
                     ?>
                     <? if ($canEditQueue) { ?>
