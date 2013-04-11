@@ -720,18 +720,20 @@
                 foreach( $res as $public ) {
                     if( !isset($public->gid) || !isset($public->photo) || !isset($public->name) || !isset($public->type))
                         continue;
-                    if( !$base_publics || isset(  $base_publics[$public->gid] )) {
+                    if( !$base_publics || isset(  $base_publics[$public->gid] ) || in_array( $public->gid, WrTopics::$toface_beauty )) {
                         //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
-                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name';
+                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;
+                                UPDATE '. TABLE_STAT_PUBLICS . ' set closed = @closed WHERE vk_id = @public_id';
                     } else {
-                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","is_page","sh_in_main")
-                                                               VALUES ( @public_id, @photo, @name, true, true)';
+                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","is_page","sh_in_main","closed")
+                                                               VALUES ( @public_id, @photo, @name, true, true, @closed)';
                     }
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name',   $public->name );
                     $cmd->SetString(  '@photo',  $public->photo);
                     $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
+                    $cmd->SetBoolean( '@closed', (boolean)$public->is_closed);
                     $cmd->Execute();
                 }
             }
