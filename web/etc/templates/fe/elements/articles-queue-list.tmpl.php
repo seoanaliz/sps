@@ -54,11 +54,12 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                     $articleQueueId = $gridItem['queue']->articleQueueId;
                     $articleRecord = !empty($articleRecords[$articleQueueId]) ? $articleRecords[$articleQueueId] : new ArticleRecord();
                     $articleQueue = !empty($articlesQueue[$articleQueueId]) ? $articlesQueue[$articleQueueId] : new ArticleQueue();
-                    $is_repost = false;
-                    if( $articleRecord->repostArticleRecordId && isset( $repostArticleRecords[$articleRecord->repostArticleRecordId])) {
-                        $repostOrigin = $articleRecord->repostExternalId;
-                        $articleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
-                        $is_repost = true;
+                    $isRepost = false;
+
+                    if ($articleRecord->repostArticleRecordId && isset($repostArticleRecords[$articleRecord->repostArticleRecordId])) {
+                        $isRepost = true;
+                        $originalId = $articleRecord->repostExternalId;
+                        $repostArticleRecord = $repostArticleRecords[$articleRecord->repostArticleRecordId];
                     }
                     $deleteAt = !empty($articleQueue->deleteAt) ? $articleQueue->deleteAt->modify('+1 minute')->defaultTimeFormat() : null;
                     ?>
@@ -78,10 +79,10 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                          data-queue-id="{$articleQueueId}">
                         <div class="content">
                             {increal:tmpl://fe/elements/articles-queue-item-content.tmpl.php}
+                            <? if ($isRepost) { ?>
+                                {increal:tmpl://fe/elements/articles-queue-item-content-repost.tmpl.php}
+                            <? } ?>
                         </div>
-                        <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
-                            <div class="delete"></div>
-                        <? } ?>
                     </div>
 
                     <?
@@ -113,8 +114,14 @@ $now = new DateTimeWrapper(date('d.m.Y'));
                                 </div>
                             <? } ?>
                             {increal:tmpl://fe/elements/article-item-content.tmpl.php}
+                            <? if ($isRepost) { ?>
+                                {increal:tmpl://fe/elements/articles-queue-item-content-repost.tmpl.php}
+                            <? } ?>
                         </div>
                     </div>
+                    <? if (empty($gridItem['blocked']) && $canEditQueue) { ?>
+                        <div class="delete"></div>
+                    <? } ?>
                 <? } ?>
             </div>
         <? } ?>

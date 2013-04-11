@@ -13,7 +13,8 @@ if (!empty($article)) {
     $isPostMovable = false;
     $isPostRelocatable = true;
     $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
-    $repostOrigin = false;
+    $isRepost = false;
+    $originalId = false;
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
@@ -47,15 +48,11 @@ if (!empty($article)) {
         $canEditPost = false;
     }
 
-
-    if( isset( $repostArticleRecord) && $repostArticleRecord ) {
-        $repostOrigin = trim( $articleRecord->repostExternalId, '-' );
-        $articleRecord = $repostArticleRecord;
-        $source_img = $articleRecord->repostPublicImage;
-        $source_title = $articleRecord->repostPublicTitle;
-    } elseif(!empty( $sourceInfo[$article->sourceFeedId] )) {
-        $source_img = $sourceInfo[$article->sourceFeedId]['img'];
-        $source_title = $sourceInfo[$article->sourceFeedId]['name'];
+    if (isset($repostArticleRecord) && $repostArticleRecord) {
+        $isRepost = true;
+        $originalId = $articleRecord->repostExternalId;
+    } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
+        $originalId = $article->externalId;
     }
 ?>
 <div
@@ -70,14 +67,14 @@ if (!empty($article)) {
         data-author-id="{$author->authorId}"
     <? } ?>
     data-id="{$article->articleId}">
-    <? if (!empty($sourceInfo[$article->sourceFeedId]) || $repostOrigin ) { ?>
+    <? if (!empty($sourceInfo[$article->sourceFeedId])) { ?>
         <div class="l d-hide">
             <div class="userpic">
-                <img src="<?=$source_img?>" alt="" />
+                <img src="<?=$sourceInfo[$article->sourceFeedId]['img']?>" alt="" />
             </div>
         </div>
         <div class="name d-hide">
-            <?=$source_title?>
+            <?=$sourceInfo[$article->sourceFeedId]['name']?>
         </div>
     <? } else if (!empty($author)) { ?>
         <div class="l d-hide">
@@ -87,6 +84,9 @@ if (!empty($article)) {
     <? } ?>
     <div class="content">
         {increal:tmpl://fe/elements/article-item-content.tmpl.php}
+        <? if ($isRepost) { ?>
+            {increal:tmpl://fe/elements/article-item-content-repost.tmpl.php}
+        <? } ?>
     </div>
     <div class="bottom d-hide">
         <div class="l">
@@ -97,8 +97,7 @@ if (!empty($article)) {
             <? } ?>
         </div>
         <div class="r">
-            <? if (!empty($repostArticleRecord)) { ?>
-                <?//@todo ссылка на пост ?>
+            <? if ($isRepost) { ?>
                 <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
             <? } ?>
             <? if (!empty($articleRecord->link)) { ?>
@@ -111,12 +110,8 @@ if (!empty($article)) {
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if ($article->externalId != -1) {
-                        $original_id = trim( $article->externalId, '-');
-                ?>
-                    <a href="{$articleLinkPrefix}{$original_id}" target="_blank">Оригинал</a>
-                <?} elseif ( $repostOrigin ) { ?>
-                <a href="{$articleLinkPrefix}{$repostOrigin}" target="_blank">Оригинал</a>
+                <? if ($originalId) { ?>
+                    <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
                 <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {
@@ -133,8 +128,7 @@ if (!empty($article)) {
                                 $sign = 'Ожидает рассмотрения';
                                 break;
                         }
-                    }
-                    ?>
+                    } ?>
                     {$sign}
                 <? } ?>
             </span>

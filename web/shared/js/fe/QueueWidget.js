@@ -45,6 +45,7 @@ var QueueWidget = Event.extend({
                     Elements.initDroppable($('#right-panel'));
                     Elements.initImages($page);
                     Elements.initLinks($page);
+                    $page.find('.post .images').imageComposition();
                     $page.find('.post.blocked').draggable('disable');
                 } else {
                     t.$queue.empty();
@@ -79,7 +80,8 @@ var QueueWidget = Event.extend({
 
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
-            var $post = $(this).closest('.post');
+            var $slot = $(this).closest('.slot');
+            var $post = $slot.find('.post');
             var $page = $post.closest('.queue-page');
             var pid = $post.data('id');
 

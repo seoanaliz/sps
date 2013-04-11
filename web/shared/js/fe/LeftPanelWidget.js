@@ -593,17 +593,33 @@ var LeftPanelWidget = Event.extend({
                 }).success(function(data) {
                     var post = data.post;
                     var owner = data.owner;
+                    var photos = [];
                     if (owner.first_name) {
                         owner.name = owner.first_name + ' ' + owner.last_name;
                     }
+
+                    for (var i in post.attachments) {
+                        if (post.attachments[i].type == 'photo') {
+                            photos.push(post.attachments[i]);
+                        }
+                    }
+
                     var $post = $(tmpl(ATTACHMENT_PREVIEW_REPOST, {
                         postId: post.id,
                         text: post.text,
                         date: post.date,
-                        attachments: post.attachments,
+                        attachments: {
+                            photos: photos
+                        },
                         owner: owner
                     }));
+
                     $attachments.append($post);
+                    $uploadBtn.hide();
+
+                    if (photos.length) {
+                        $post.find('.images-ready').imageComposition();
+                    }
                 }).error(function(error) {
                     repostId = false;
                     new Box({title: 'Ошибка', html: error.message}).show();
@@ -714,6 +730,7 @@ var LeftPanelWidget = Event.extend({
             repostId = false;
             foundDomain = false;
             foundLink = false;
+            $uploadBtn.show();
         }
 
         function stop() {
@@ -731,6 +748,7 @@ var LeftPanelWidget = Event.extend({
 
             if ($attachment.hasClass('post')) {
                 repostId = false;
+                $uploadBtn.show();
             }
 
             if ($attachment.hasClass('link-info')) {

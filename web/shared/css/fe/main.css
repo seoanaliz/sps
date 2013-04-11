@@ -526,6 +526,9 @@ i {
   border-bottom: 1px solid #ddd;
   min-height: 114px;
 }
+.right-panel .items .slot .delete {
+  opacity: 0;
+}
 .right-panel .items .slot .slot-header {
   font-size: 11px;
   color: #888;
@@ -543,9 +546,9 @@ i {
   width: 13px;
   background: url('../../images/fe/datepicker-dis.png') center no-repeat;
   cursor: pointer;
-  opacity: 0;
   margin-top: 2px;
   margin-left: 4px;
+  opacity: 0;
   -webkit-transition: 0.2s all;
   -moz-transition: 0.2s all;
   -o-transition: 0.2s all;
@@ -634,6 +637,9 @@ i {
 .right-panel .items .slot.edit .editing-post {
   display: block;
 }
+.right-panel .items .slot:hover .delete {
+  opacity: 0.5;
+}
 .right-panel .expanded-post {
   display: none;
   padding: 30px 10px 10px;
@@ -649,6 +655,10 @@ i {
 }
 .right-panel .expanded-post .content {
   margin-left: 40px;
+}
+.right-panel .expanded-post .images {
+  width: 100%;
+  height: 400px;
 }
 .right-panel .editing-post {
   display: none;
@@ -926,11 +936,10 @@ i {
   left: 0;
   top: 0;
   background: #000;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
   z-index: 99;
   width: 100%;
   height: 100%;
+  opacity: 0.5;
 }
 .jcrop-holder {
   text-align: left;
@@ -987,12 +996,12 @@ i {
   font-weight: bold;
   cursor: pointer;
   display: none;
-  opacity: .3;
   background: none;
+  opacity: 0.3;
 }
 #go-to-top:hover {
   background: #ddd;
-  opacity: .7;
+  opacity: 0.7;
 }
 #wall-load {
   background-image: url('../../images/common/upload.gif');
@@ -1051,7 +1060,7 @@ i {
   box-shadow: 0px 20px 60px rgba(0,0,0,0.3);
 }
 .dragged.moving img {
-  opacity: .1;
+  opacity: 0.1;
 }
 .popup-bg {
   position: fixed;
@@ -1060,8 +1069,7 @@ i {
   width: 100%;
   height: 100%;
   background-color: #000;
-  opacity: .5;
-  filter: alpha(opacity=50);
+  opacity: 0.5;
 }
 .popup-image-edit {
   position: fixed;
@@ -1240,10 +1248,41 @@ i {
 .newpost.collapsed .buttons {
   display: none;
 }
+.repost .repost-title {
+  margin-top: 5px;
+}
+.repost .repost-title > div {
+  vertical-align: middle;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.repost .repost-title > div + div {
+  margin-left: 6px;
+}
+.repost .repost-title .repost-link a {
+  padding-left: 12px;
+  font-weight: bold;
+  background: url('../../images/common/repost.gif') 0 center no-repeat;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.repost .repost-title .repost-image {
+  text-align: center;
+  width: 25px;
+  height: 25px;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+.repost .repost-title .repost-image img {
+  max-width: 100%;
+}
 .post {
   background: #fff;
   position: relative;
   padding: 10px;
+  padding-left: 50px;
   line-height: 160%;
   -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
   -moz-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
@@ -1256,21 +1295,17 @@ i {
   -o-user-select: none;
   user-select: none;
 }
-.post .name,
-.post .content,
-.post .comments,
-.post .moderation,
-.post .bottom {
-  margin-left: 40px;
-}
 .post .userpic {
-  float: left;
+  top: 10px;
+  left: 10px;
+  position: absolute;
   width: 30px;
   height: 30px;
   overflow: hidden;
+  text-align: center;
 }
 .post .userpic img {
-  width: 30px;
+  max-width: 100%;
 }
 .post .likes-count {
   color: #45688E;
@@ -1293,10 +1328,10 @@ i {
   color: #999;
 }
 .post .bottom .original a {
-  opacity: .5;
+  opacity: 0.5;
 }
 .post .bottom .original a:hover {
-  opacity: .99;
+  opacity: 1;
 }
 .post .bottom .attach-icon + .original {
   margin-left: 5px;
@@ -1327,8 +1362,8 @@ i {
 .post .link-description-text > a[contenteditable=true],
 .post .link-description-text > p[contenteditable=true] {
   padding: 0 2px;
-  opacity: 1;
   cursor: text;
+  opacity: 1;
 }
 .post>.comments {
   margin-top: 10px;
@@ -1461,7 +1496,7 @@ i {
   opacity: 0.3;
 }
 .post.moving {
-  opacity: .6;
+  opacity: 0.6;
   -webkit-box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
   -moz-box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
   box-shadow: 0 0 8px rgba(0,0,0,0.2) inset;
@@ -1473,7 +1508,7 @@ i {
   color: #999;
 }
 .post.removed img {
-  opacity: .6;
+  opacity: 0.6;
 }
 .post.deleted-post {
   color: #767875;
