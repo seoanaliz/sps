@@ -42,7 +42,10 @@
             );
 
             public static  $open_methods = array(
-                'wall.get' => true,
+                'wall.get'          => true,
+                'groups.getById'    => true,
+                'wall.getById'      => true,
+
             );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
@@ -56,6 +59,8 @@
 //                    $start = strpos( $a, ',"sex"');
 //                    $a = substr_replace( $a, '}]}', $start );
 //                }
+                print_r($method);
+                print_r($request_params);
                 $res = json_decode(  $a );
                 if( !$res )
                     return array();
