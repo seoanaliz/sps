@@ -54,6 +54,8 @@ if (!empty($article)) {
     } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
         $originalId = trim($article->externalId, '-');
     }
+    $sourceVkId = current(explode('_', $originalId));
+    $sourceVkURL = 'http://vk.com/' . ($sourceVkId > 0 ? 'id' : 'public') . $sourceVkId;
 ?>
 <div
     class="post bb

@@ -1,5 +1,8 @@
 <?
+/** @var $articleRecord ArticleRecord */
 /** @var $repostArticleRecord ArticleRecord */
+/** @var $sourceVkId */
+/** @var $sourceVkURL */
 
 $content = nl2br(HtmlHelper::RenderToForm($repostArticleRecord->content));
 $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
@@ -7,10 +10,10 @@ $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
 <div class="repost">
     <div class="repost-title">
         <div class="repost-image">
-            <a href="#" target="_blank"><img src="{$repostArticleRecord->repostPublicImage}" /></a>
+            <a href="{$sourceVkURL}" target="_blank"><img src="{$repostArticleRecord->repostPublicImage}" /></a>
         </div>
         <div class="repost-link">
-            <a href="#" target="_blank">{$repostArticleRecord->repostPublicTitle}</a>
+            <a href="{$sourceVkURL}" target="_blank">{$repostArticleRecord->repostPublicTitle}</a>
         </div>
     </div>
     <div class="text {$collapsed}">
@@ -28,11 +31,7 @@ $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
 <? } ?>
 <? if (!empty($repostArticleRecord->photos)) { ?>
     <div class="images">
-        <? $i = 0; ?>
-        <? foreach($repostArticleRecord->photos as $photoItem) {
-            $i++;
-            $size = 'original';
-            ?>
+        <? foreach($repostArticleRecord->photos as $photoItem) { ?>
             <div class="img">
                 <img src="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
             </div>

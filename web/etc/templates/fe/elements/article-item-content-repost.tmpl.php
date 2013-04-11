@@ -1,5 +1,8 @@
 <?php
+/** @var $articleRecord ArticleRecord */
 /** @var $repostArticleRecord ArticleRecord */
+/** @var $sourceVkId */
+/** @var $sourceVkURL */
 
 $contentPart1 = mb_substr($repostArticleRecord->content, 0, 300);
 $contentPart2 = mb_substr($repostArticleRecord->content, 300);
@@ -8,10 +11,10 @@ $contentPart1 = !empty($contentPart1) ? $contentPart1 : '';
 <div class="repost">
     <div class="repost-title">
         <div class="repost-image">
-            <a href="#" target="_blank"><img src="{$repostArticleRecord->repostPublicImage}" /></a>
+            <a href="{$sourceVkURL}" target="_blank"><img src="{$repostArticleRecord->repostPublicImage}" /></a>
         </div>
         <div class="repost-link">
-            <a href="#" target="_blank">{$repostArticleRecord->repostPublicTitle}</a>
+            <a href="{$sourceVkURL}" target="_blank">{$repostArticleRecord->repostPublicTitle}</a>
         </div>
     </div>
     <div class="shortcut"><?= nl2br(HtmlHelper::RenderToForm($contentPart1)) ?></div>

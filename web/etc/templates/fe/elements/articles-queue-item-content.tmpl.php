@@ -19,11 +19,7 @@ $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
 <? } ?>
 <? if (!empty($articleRecord->photos)) { ?>
     <div class="images">
-        <? $i = 0; ?>
-        <? foreach($articleRecord->photos as $photoItem) {
-            $i++;
-            $size = 'original';
-            ?>
+        <? foreach($articleRecord->photos as $photoItem) { ?>
             <div class="img">
                 <img src="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
             </div>
