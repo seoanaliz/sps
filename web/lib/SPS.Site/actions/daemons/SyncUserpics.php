@@ -22,16 +22,23 @@
 
         public function get_feeds_userpics()
         {
-            $sources = SourceFeedFactory::Get(array('type' => SourceFeedUtility::Source), array(BaseFactory::WithColumns => '"externalId"'));
-            $targets = TargetFeedFactory::Get(array('type' => TargetFeedUtility::VK), array(BaseFactory::WithColumns => '"externalId"'));
 
-            $externalIds = array_merge(
-                ArrayHelper::GetObjectsFieldValues( $sources, array( 'externalId' ))
-                , ArrayHelper::GetObjectsFieldValues( $targets, array( 'externalId' ))
-            );
-
-            $externalIdsClean = array_diff($externalIds, SourceFeedUtility::$Tops );
-            SourceFeedUtility::SaveRemoteImage($externalIdsClean);
+            $page = 0;
+            $pageSize = 100;
+            while( $feeds = $this->get_feeds($page++, $pageSize, new SourceFeedFactory(), SourceFeedUtility::Source )) {
+                SourceFeedUtility::UpdateFeedInfo( $feeds );
+                if( $feeds ) {
+                    SourceFeedFactory::UpdateRange( $feeds );
+                }
+            }
+//
+            $page = 0;
+            while( $feeds = $this->get_feeds($page++, $pageSize, new TargetFeedFactory(), TargetFeedUtility::VK )) {
+                SourceFeedUtility::UpdateFeedInfo( $feeds );
+                if( $feeds ) {
+                    TargetFeedFactory::UpdateRange( $feeds );
+                }
+            }
         }
 
         public function get_users_userpics()
@@ -63,6 +70,25 @@
 
             AuthorFactory::UpdateRange( $authors );
             EditorFactory::UpdateRange( $editors );
+        }
+
+        public function get_feeds( $page, $pageSize, $factory, $type )
+        {
+            $mapping    = BaseFactory::GetMapping( get_class( $factory ) );
+            $sql = 'SELECT * FROM "' . $mapping['view'] . '" WHERE "type" = @type OFFSET @offset LIMIT @limit;';
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
+            $cmd->SetInteger( '@offset', $page * $pageSize );
+            $cmd->SetInteger( '@limit',  $pageSize );
+            $cmd->SetString ( '@type',  $type );
+            $ds = $cmd->Execute();
+
+            $structure  = BaseFactory::getObjectTree( $ds->Columns );
+            $result = array();
+            while ( $ds->Next()) {
+                $result[$ds->GetValue('externalId')] = BaseFactory::GetObject($ds, $mapping, $structure);
+            }
+            return $result;
         }
     }
 ?>
