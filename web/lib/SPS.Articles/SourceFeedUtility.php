@@ -75,7 +75,7 @@
             return $sourceInfo;
         }
 
-        public static function SaveRemoteImage($externalIds) {
+        public static function SaveRemoteImage( $externalIds ) {
             if( !is_array( $externalIds))
                 $externalIds = array($externalIds);
             $externalIdsChunks = array_chunk( $externalIds, 300 );
@@ -84,6 +84,19 @@
                     $feedsVkInfo = StatPublics::get_publics_info( $chunk );
                     foreach( $feedsVkInfo as $feedInfo ) {
                         self::DownloadImage( $feedInfo['id'], $feedInfo['ava'] );
+                    }
+                } catch (Exception $Ex) {}
+            }
+        }
+
+        public static function UpdateFeedInfo( $feeds ) {
+            if( $feeds ) {
+                $ids = array_keys( $feeds );
+                try {
+                    $feedsVkInfo = StatPublics::get_publics_info( $ids );
+                    foreach( $feedsVkInfo as $feedInfo ) {
+                        self::DownloadImage( $feedInfo['id'], $feedInfo['ava'] );
+                        $feeds[$feedInfo['id']]->title = $feedInfo['name'];
                     }
                 } catch (Exception $Ex) {}
             }

@@ -57,7 +57,6 @@ class getEntries {
                     $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
-                $diff_vis = 'diff_vis_week';
                 $visitors = 'visitors_week';
                 $viewers  = 'viewers_week';
             } else if( $period == 30 ) {
@@ -65,13 +64,11 @@ class getEntries {
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
-                $diff_vis = 'diff_vis_month';
                 $visitors = 'visitors_month';
                 $viewers  = 'viewers_month';
             } else {
                 $diff_rel = 'diff_rel';
                 $diff_abs = 'diff_abs';
-                $diff_vis = 'diff_vis';
                 $visitors = 'visitors';
                 $viewers  = 'viewers';
             }
@@ -91,8 +88,7 @@ class getEntries {
                       publ.vk_id=gprel.public_id '
                       . $page .
                      ' AND gprel.group_id=@group_id
-                      AND publ.quantity >= @min_quantity
-                      AND publ.quantity <= @max_quantity
+                      AND publ.quantity BEETWEEN @min_quantity AND @max_quantity
                       AND closed is false
                       ' . $search . '
                 ORDER BY '
@@ -114,10 +110,9 @@ class getEntries {
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
-                            quantity > @min_quantity '
+                            quantity BETWEEN @min_quantity AND @max_quantity '
                             . $page .
-                          ' AND quantity < @max_quantity
-                            AND quantity > 100'.
+                          ' AND quantity > 100'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy .
