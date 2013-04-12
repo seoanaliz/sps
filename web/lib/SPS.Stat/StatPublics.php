@@ -531,7 +531,8 @@
                 return false;
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->reach_subscribers, $day->day, $connect );
+                $subs = isset($day->reach_subscribers) ? $day->reach_subscribers : 0;
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $subs, $day->day, $connect );
             }
             sleep(0.3);
         }
