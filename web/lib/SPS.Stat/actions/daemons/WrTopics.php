@@ -68,7 +68,7 @@ class WrTopics extends wrapper
 
 
         StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );
-        $this->update_quantity();
+//        $this->update_quantity();
         //проверка на разницу по времени
         $standard_parse_time = DateTimeWrapper::Now();
         $standard_parse_time->setTime(3,0,0);
@@ -330,7 +330,7 @@ class WrTopics extends wrapper
         $sql = 'UPDATE stat_publics_50k as publics
                 SET visitors_month=points.visitors_sum, viewers_month=points.viewers_sum
                 FROM
-                        ( SELECT  sum(visitors) as visitors_sum, sum(reach) as viewers_sum,id FROM stat_publics_50k_points
+                        ( SELECT  avg(visitors) as visitors_sum, avg(reach) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'1 month\' AND time < now() group by id )
                                 as points
                 WHERE publics.vk_id=points.id';
@@ -339,7 +339,7 @@ class WrTopics extends wrapper
         $sql = 'UPDATE stat_publics_50k as publics
                 SET visitors_week=points.visitors_sum, viewers_week=points.viewers_sum
                 FROM
-                        ( SELECT  sum(visitors) as visitors_sum, sum(reach) as viewers_sum,id FROM stat_publics_50k_points
+                        ( SELECT  avg(visitors) as visitors_sum, avg(reach) as viewers_sum,id FROM stat_publics_50k_points
                           WHERE time > now()-interval \'1 week\' AND time < now() group by id )
                                 as points
                 WHERE publics.vk_id=points.id';
@@ -354,6 +354,7 @@ class WrTopics extends wrapper
                 WHERE publics.vk_id=points.id';
         $cmd = new SqlCommand( $sql, $this->conn );
         $cmd->Execute();
+
 
     }
 
