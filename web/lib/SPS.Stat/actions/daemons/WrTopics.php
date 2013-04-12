@@ -68,7 +68,7 @@ class WrTopics extends wrapper
 
 
         StatPublics::update_public_info( $this->ids, $this->conn, $base_publics );
-        $this->update_quantity();
+//        $this->update_quantity();
         //проверка на разницу по времени
         $standard_parse_time = DateTimeWrapper::Now();
         $standard_parse_time->setTime(3,0,0);
