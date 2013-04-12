@@ -40,7 +40,7 @@
 59     23       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/SyncLikes/ > /dev/null
 #*/5    *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/SyncLikes/?all > /dev/null
 
-0     */3   *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/wr-topics/ > /dev/null
+5     4-20   *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/wr-topics/ > /dev/null
 */20  *      *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/MesCheckUpdates/ > /dev/null
 0   *      *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/WrAlarm/ > /dev/null
 
