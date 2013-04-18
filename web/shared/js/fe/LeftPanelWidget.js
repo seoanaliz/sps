@@ -866,7 +866,7 @@ var LeftPanelWidget = Event.extend({
                                     }
                                 });
                             };
-                            var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                            var $del = $('<div/>', {class: 'delete-attach delete'}).click(function() {
                                 $links.html('');
                             });
                             el.html(linkTplFull);
