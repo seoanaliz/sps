@@ -15,16 +15,12 @@ class PublicsParser
     const PAUSE = 2;
     private $current_public;
 
-
-    public function __construct()
-    {
-        $this->get_state();
-    }
     public function execute() {
         set_time_limit(240);
         $i = 0;
         echo 'Начианаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
+            $this->get_state();
             $ms = microtime(1);
             $take_counter = rand(50, self::PUBICS_PER_REQUEST);
             $params = array(
