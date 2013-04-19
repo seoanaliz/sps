@@ -799,22 +799,22 @@ var LeftPanelWidget = Event.extend({
         var $leftPanel = t.$leftPanel;
 
         // Быстрое редактирование поста в левой колонке
-        $leftPanel.delegate('.post.editable .content .shortcut', 'click', function() {
-            var $post = $(this).closest('.post'),
-            $content = $post.find('> .content'),
-            postId = $post.data('id');
-
-            if ($post.editing) return;
-
-            Events.fire('load_post_edit', postId, function(state, data){
-                if (state && data) {
-                    new SimpleEditPost(postId, $post, $content, data);
-                }
-            });
-        });
+//        $leftPanel.delegate('.post.editable .content .shortcut, ', 'click', function() {
+//            var $post = $(this).closest('.post'),
+//            $content = $post.find('> .content'),
+//            postId = $post.data('id');
+//
+//            if ($post.editing) return;
+//
+//            Events.fire('load_post_edit', postId, function(state, data){
+//                if (state && data) {
+//                    new SimpleEditPost(postId, $post, $content, data);
+//                }
+//            });
+//        });
 
         // Редактирование поста в левом меню
-        $leftPanel.delegate('.post .edit', 'click', function(){
+        $leftPanel.delegate('.post .edit,.post.editable .content .shortcut', 'click', function(){
             var $post = $(this).closest('.post'),
             $el = $post.find('> .content'),
             $buttonPanel = $post.find('> .bottom.d-hide'),
@@ -866,7 +866,7 @@ var LeftPanelWidget = Event.extend({
                                     }
                                 });
                             };
-                            var $del = $('<div/>', {class: 'delete-attach'}).click(function() {
+                            var $del = $('<div/>', {class: 'delete-attach delete'}).click(function() {
                                 $links.html('');
                             });
                             el.html(linkTplFull);

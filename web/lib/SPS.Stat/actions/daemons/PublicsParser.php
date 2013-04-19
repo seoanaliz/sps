@@ -11,20 +11,16 @@ class PublicsParser
 
     const LIMIT = 30000;
     const REQUESTS_PER_LAUNCH = 20;
-    const PUBICS_PER_REQUEST  = 100;
+    const PUBICS_PER_REQUEST  = 300;
     const PAUSE = 2;
     private $current_public;
 
-
-    public function __construct()
-    {
-        $this->get_state();
-    }
     public function execute() {
         set_time_limit(240);
         $i = 0;
         echo 'Начианаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
+            $this->get_state();
             $ms = microtime(1);
             $take_counter = rand(50, self::PUBICS_PER_REQUEST);
             $params = array(
@@ -63,6 +59,7 @@ class PublicsParser
 
             $this->current_public += $take_counter;
             $this->set_state($this->current_public);
+            $this->set_tries(0);
         }
     }
 
@@ -73,8 +70,21 @@ class PublicsParser
         $ds = $cmd->Execute();
         if( $ds->Next()) {
             $this->current_public = $ds->GetInteger('current_public');
-
+            $tries = $ds->GetInteger( 'tries');
+            if( $tries > 3 ) {
+                $this->current_public += 1000;
+                $tries = 0;
+            }
+            $this->set_tries( ++$tries );
         }
+    }
+
+    public static function set_tries( $tries )
+    {
+        $sql = 'update stat_parser set tries = @tries';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
+        $cmd->SetInt( '@tries', $tries );
+        $cmd->Execute();
     }
 
     public function set_state( $current_public = 0, $max_public = null , $reset = 0 )

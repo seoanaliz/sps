@@ -88,7 +88,7 @@ class getEntries {
                       publ.vk_id=gprel.public_id '
                       . $page .
                      ' AND gprel.group_id=@group_id
-                      AND publ.quantity BEETWEEN @min_quantity AND @max_quantity
+                      AND publ.quantity BETWEEN @min_quantity AND @max_quantity
                       AND closed is false
                       ' . $search . '
                 ORDER BY '
