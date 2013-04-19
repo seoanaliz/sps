@@ -43,11 +43,10 @@ class SaveArticleControl extends BaseControl
         if (!$userGroupId) {
             $userGroupId = null;
         }
-
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
         if (is_null($role)) {
-            return ObjectHelper::ToJSON(array('success' => false));
+            die(ObjectHelper::ToJSON(array('success' => false)));
         }
 
         $authorId = $this->getAuthor()->authorId;
@@ -169,9 +168,13 @@ class SaveArticleControl extends BaseControl
             $articleRecord->map = Convert::ToString($post['map']);
             $articleRecord->doc = Convert::ToString($post['doc']);
             $articleRecord->rate = 0;
-            $public_id = explode( '_', trim( $post['id'], '-'));
+            $public_id = explode( '_',  $post['id'] );
             for( $try = 0; $try < 3; $try ++) {
-                $info = StatPublics::get_publics_info( $public_id[0]);
+                if( $public_id[0][0] == '-' ) {
+                    $info = StatPublics::get_publics_info( trim( $public_id[0], '-'));
+                } else {
+                    $info = StatUsers::get_vk_user_info( $public_id[0] );
+                }
                 if ( $info ) break;
                 sleep( 0.3 );
             }

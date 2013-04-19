@@ -54,6 +54,7 @@ var QueueWidget = Event.extend({
                 $.cookie('currentTargetFeedId', targetFeedId, {expires: 7, path: '/', secure: false});
                 t.trigger('changeCurrentPage', $page);
 
+//todo scroll
                 if (isPageChanged) {
                     t.$queue.data('cancelEvent', true).scrollTop(0);
                 }
@@ -126,7 +127,7 @@ var QueueWidget = Event.extend({
             var $time = $post.find('.time');
             var gridLineId = $post.data('grid-id');
             var gridLineItemId = $post.data('grid-item-id');
-
+            var timestamp =  $page.data('timestamp');
             var time = ($input.val() == '__:__') ? '' : $input.val().split('_').join('0');
             var qid = $post.find('.post').data('queue-id');
             $input.blur().hide().val(time);
@@ -135,7 +136,7 @@ var QueueWidget = Event.extend({
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, qid, function(state){
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(state){
                         if (state) {
                             t.updatePage($page);
                         }

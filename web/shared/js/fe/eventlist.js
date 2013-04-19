@@ -138,7 +138,7 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, qid, callback) {
+    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, timestamp, qid, callback) {
         $.ajax({
             url: controlsRoot + 'grid-line-item-save/',
             dataType : "json",
@@ -146,7 +146,7 @@ var Eventlist = {
                 gridLineId: gridLineId,
                 gridLineItemId: gridLineItemId,
                 time: time,
-                timestamp: Elements.calendar(),
+                timestamp: timestamp,
                 queueId: qid
             },
             success: function(data) {
