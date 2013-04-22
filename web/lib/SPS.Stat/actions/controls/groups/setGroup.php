@@ -82,8 +82,8 @@
 
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
-            elseif ( $general && !$groupId )
-                $user_id = StatUsers::get_users();
+//            elseif ( $general && !$groupId )
+//                $user_id = StatUsers::get_users();
 
             $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
 

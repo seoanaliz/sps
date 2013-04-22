@@ -157,8 +157,8 @@
                 <page uri="controls://togglePublVisibil/">
                     <actions>SPS.Stat.togglePublVisibil</actions>
                 </page>
-                <page uri="controls://toggleGroupFave/">
-                    <actions>SPS.Stat.toggleGroupFave</actions>
+                <page uri="controls://toggleGroupGeneral/">
+                    <actions>SPS.Stat.toggleGroupGeneral</actions>
                 </page>
                 <page uri="controls://addUser/">
                     <actions>SPS.Stat.addUser</actions>

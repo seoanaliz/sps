@@ -43,8 +43,8 @@
             <action name="selectGroupAdmin">
                 <path>controls/stat/selectGroupAdmin</path>
             </action>
-            <action name="toggleGroupFave">
-                <path>controls/stat/toggleGroupFave</path>
+            <action name="toggleGroupGeneral">
+                <path>controls/stat/toggleGroupGeneral</path>
             </action>
             <action name="togglePublVisibil">
                 <path>controls/stat/togglePublVisibil</path>
