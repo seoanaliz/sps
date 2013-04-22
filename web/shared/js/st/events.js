@@ -73,7 +73,7 @@ var Eventlist = {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
-                        itemFave: data.fave
+                        itemFave: data.general
                     });
                 });
             }

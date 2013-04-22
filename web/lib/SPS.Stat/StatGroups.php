@@ -58,7 +58,7 @@
             while( $ds->Next()) {
                 $res[] = array(
                     'group_id'  =>  $ds->GetInteger( 'group_id' ),
-                    'general'   =>  $ds->GetInteger( 'general'),
+                    'general'   =>  $ds->GetBoolean( 'general'),
                     'name'      =>  $ds->GetValue( 'name' ),
                     'comments'  =>  $ds->getValue( 'comments' ),
                     'fave'      =>  $ds->GetBoolean( 'general' ),
