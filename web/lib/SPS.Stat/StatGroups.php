@@ -290,7 +290,7 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-            $cmd->SetInteger( '@user_id', $user_id );
+//            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
 
             $res = array();
