@@ -43,13 +43,15 @@
                     die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
                 //если не задан id - создаем группу, задан - обновляем
                 if ( !$groupId ) {
+                    $users = GroupsUtility::$barter_watchers;
+                    $users[] = $user_id;
                     $group = new Group;
                     $group->created_by  =   $user_id;
                     $group->name        =   $groupName;
                     $group->source      =   $group_source;
                     $group->status      =   1;
                     $group->type        =   1;
-                    $group->users_ids   =   array( $user_id ) + GroupsUtility::$barter_watchers;
+                    $group->users_ids   =   $users;
                     GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
 
                     if( !$group->group_id)
