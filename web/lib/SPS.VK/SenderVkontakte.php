@@ -266,15 +266,19 @@
         public function delete_post( $full_post_id )
         {
             list( $owner_id, $post_id ) = explode( '_', $full_post_id );
-            if( $post_id) {
+            if( $post_id ) {
                 $owner_id = trim($owner_id, '-');
                 $params = array(
                     'owner_id'      =>  '-' . $owner_id,
                     'post_id'       =>  $post_id,
                     'access_token'  =>  $this->vk_access_token
                 );
-                if( VkHelper::api_request( 'wall.delete', $params ))
+                VkHelper::api_request( 'wall.delete', $params );
+
+                $check = ParserVkontakte::get_posts_by_vk_id( $post_id );
+                if( empty( $check ))
                     return true;
+                throw new Exception('Failed on deleting ' . $post_id);
             }
             return false;
         }

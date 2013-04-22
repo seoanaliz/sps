@@ -173,13 +173,11 @@ class WrTopics extends wrapper
             } else {
                 $show_in_main = false;
             }
-
-//            if( !isset( $quan_arr[2]) ) {
-//    //            echo 'отсеял по разнице '; print_r( array( '$diff_abs' => $diff_abs, '$diff_rel' => $diff_rel ) ); echo '<br>' . $cmd->GetQuery() . '<br>' ;
-//
-//            }
-
         }
+
+        if( $quantity < self::STAT_QUANTITY_LIMIT )
+            $show_in_main =false;
+
         if ( !$only_quantity ) {
         $sql = 'UPDATE ' . TABLE_STAT_PUBLICS . '
                 SET

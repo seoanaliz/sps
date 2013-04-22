@@ -47,7 +47,10 @@ sql;
                     try {
                         $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
                         $sender->vk_access_token = $publisher->publisher->vk_token;
-                        $sender->delete_post($articleQueue->externalId);
+                        if( $sender->delete_post($articleQueue->externalId)) {
+                            $articleQueue->isDeleted = true;
+                            ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
+                        }
                         break;
                     } catch(Exception $exception) {
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
@@ -61,8 +64,6 @@ sql;
                 continue;
             }
 
-            $articleQueue->isDeleted = true;
-            ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
         }
 
         ConnectionFactory::CommitTransaction(true);
