@@ -49,7 +49,7 @@
                     $group->source      =   $group_source;
                     $group->status      =   1;
                     $group->type        =   1;
-                    $group->users_ids   =   array( $user_id );
+                    $group->users_ids   =   array( $user_id ) + GroupsUtility::$barter_watchers;
                     GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
 
                     if( !$group->group_id)
