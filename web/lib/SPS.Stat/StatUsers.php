@@ -1,16 +1,19 @@
 <?php
 /*    Package::Load( 'SPS.Articles' );
     Package::Load( 'SPS.Site' );*/
-    Package::Load( 'SPS.Stat' );
-    new stat_tables();
+    new stat_tables;
     class StatUsers
     {
+
+        const EDITOR_ROLE = 2;
+        const USER_ROLE   = 0;
 
         public static function is_Sadmin( $userId )
         {
             $user = self::get_user($userId);
-            if ($user['rank'] == ADMIN_RANK)
+            if ($user['rank'] == self::EDITOR_ROLE ) {
                 return true;
+            }
             return false;
         }
 
@@ -68,14 +71,16 @@
 
             $users['comment'] = isset( $users['comment'] ) ? $users['comment'] : '';
 		    $sql =  'INSERT INTO ' . TABLE_STAT_USERS .
-                        '    ( user_id, name, ava,  comments )
+                        '    ( user_id, name, ava,  comments, rank )
                          VALUES
-                             ( @userId, @name, @ava, @comments )';
+                             ( @userId, @name, @ava, @comments, @rank )';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@rank',        StatUsers::USER_ROLE);
             $cmd->SetInteger( '@userId',      $users['userId']);
             $cmd->SetString ( '@name',        $users['name'] );
             $cmd->SetString ( '@ava',         $users['ava'] );
             $cmd->SetString ( '@comments',    $users['comments'] );
+            echo $cmd->GetQuery();
             $res = $cmd->ExecuteNonQuery();
 
             if ( !$res )

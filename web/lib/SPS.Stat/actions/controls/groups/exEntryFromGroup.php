@@ -45,8 +45,7 @@
                 BarterEventFactory::UpdateRange( $events );
                 die( ObjectHelper::ToJSON(array( 'response' => true )));
             }
-            elseif ( !$general
-                    || ( $general && StatUsers::is_Sadmin( $user_id ))) {
+            elseif (  StatUsers::is_Sadmin( $user_id )) {
                 $m_class::extricate_entry( $group_id, $entry_id, $user_id );
                 die( ObjectHelper::ToJSON( array('response' => true )));
 

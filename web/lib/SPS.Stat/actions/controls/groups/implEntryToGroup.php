@@ -46,7 +46,7 @@
 
             }
 
-            if ( !$general || ( $general && StatUsers::is_Sadmin( $user_id ))) {
+            if (  StatUsers::is_Sadmin( $user_id )) {
                 $m_class::implement_entry( $groupId, $entry_id, $user_id );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             }

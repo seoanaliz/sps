@@ -68,6 +68,10 @@
                 die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
             }
 
+            if( !StatUsers::is_Sadmin( $user_id )) {
+                 die( ObjectHelper::ToJSON(array('response' => false)));
+            }
+
             if ( $m_class::check_group_name_used( $user_id, $groupName ))  {
                 die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
             }

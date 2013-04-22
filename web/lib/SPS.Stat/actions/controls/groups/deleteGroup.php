@@ -57,13 +57,14 @@
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             }
 
-            if ( $general AND statUsers::is_Sadmin( $user_id ) ) {
+            if ( statUsers::is_Sadmin( $user_id ) ) {
                 $res = $m_class::delete_group( $group_id );
-
-            } elseif ( !$general ) {
-                $res = $m_class::extricate_group( $group_id, $user_id );
-
-            } else {
+            }
+//            elseif ( !$general ) {
+//                $res = $m_class::extricate_group( $group_id, $user_id );
+//
+//            }
+            else {
                 die( ObjectHelper::ToJSON(array('response' => false)));
 
             }

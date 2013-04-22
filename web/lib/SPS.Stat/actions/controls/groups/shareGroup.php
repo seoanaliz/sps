@@ -44,7 +44,7 @@
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             }
 
-            if ( $general && !StatUsers::is_Sadmin( $user_id ) ) {
+            if ( !StatUsers::is_Sadmin( $user_id )) {
                 die( ObjectHelper::ToJSON( array('response' => false )));
             }
 	     

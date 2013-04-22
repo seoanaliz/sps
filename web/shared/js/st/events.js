@@ -48,7 +48,7 @@ var Eventlist = {
 
     get_user: function(userId, callback) {
     simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
-        callback(true);
+        callback(dirtyData);
     });
     },
     load_list: function(callback) {
