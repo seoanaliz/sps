@@ -39,7 +39,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.type, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
@@ -56,7 +56,7 @@
 //            echo $cmd->GetQuery();
 
             while( $ds->Next()) {
-                $res[] = array(
+                $res[group_id] = array(
                     'group_id'  =>  $ds->GetInteger( 'group_id' ),
                     'general'   =>  $ds->GetBoolean( 'general'),
                     'name'      =>  $ds->GetValue( 'name' ),
@@ -66,6 +66,7 @@
                 );
             }
 
+//            $res = array_unique( $res );
             ksort( $res );
             return $res;
         }
