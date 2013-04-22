@@ -56,7 +56,7 @@
 //            echo $cmd->GetQuery();
 
             while( $ds->Next()) {
-                $res[group_id] = array(
+                $res[] = array(
                     'group_id'  =>  $ds->GetInteger( 'group_id' ),
                     'general'   =>  $ds->GetBoolean( 'general'),
                     'name'      =>  $ds->GetValue( 'name' ),
@@ -66,7 +66,6 @@
                 );
             }
 
-//            $res = array_unique( $res );
             ksort( $res );
             return $res;
         }
