@@ -50,7 +50,8 @@ function initVK(data) {
     if (data.response) {
         var r = data.response;
         cur.dataUser = r.me;
-        Events.fire('get_user', cur.dataUser.uid, function() {
+        Events.fire('get_user', cur.dataUser.uid, function(us) {
+            cur.dataUser.isEditor = us.rank == 2 ;
             Filter.init(function() {
                 List.init(function() {
                     Table.init();

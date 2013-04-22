@@ -56,9 +56,9 @@ var TABLE_HEADER =
             'в поиске<span class="icon arrow">' +
         '</div>' +
     '</div>' +
-    '<div class="column column1" title="Действия">' +
-        '<div class="cell"></div>' +
-    '</div>' +
+        '<div class="column column1" title="Действия">' +
+            '<div class="cell"></div>' +
+        '</div>' +
 '</div>';
 
 var TABLE_BODY =
@@ -106,19 +106,21 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<div class="column column1 public-actions">' +
-        '<div class="cell">' +
-            '<span class="action add-to-list">' +
-                '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
-            '</span>' +
-            '<span class="action delete-public">' +
-                '<span class="icon delete"></span>' +
-            '</span>' +
-            '<span class="action restore-public">' +
-                '<span class="icon plus"></span>' +
-            '</span>' +
+    '<?if( cur.dataUser.isEditor ) { ?>'+
+        '<div class="column column1 public-actions">' +
+            '<div class="cell">' +
+                '<span class="action add-to-list">' +
+                    '<span class="icon <?=lists.length ? "select" : "plus"?>"></span>' +
+                '</span>' +
+                '<span class="action delete-public">' +
+                    '<span class="icon delete"></span>' +
+                '</span>' +
+                '<span class="action restore-public">' +
+                    '<span class="icon plus"></span>' +
+                '</span>' +
+            '</div>' +
         '</div>' +
-    '</div>' +
+    ' <? } ?> ' +
 '</div>';
 
 var OUR_TABLE =
