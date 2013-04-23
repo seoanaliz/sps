@@ -1,6 +1,4 @@
 <?php
-Package::Load( 'SPS.Stat' );
-Package::Load( 'SPS.Site' );
 /**
  * addPrice Action
  * @package    SPS
@@ -26,12 +24,10 @@ class getEntries {
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
-        $group_type =   Request::getInteger( 'groupType');
         $search     =   trim(pg_escape_string( Request::getString( 'search' )));
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
-        $page       =   Request::getInteger( 'page' );
 
         if( $time_to == 0 )
             $time_to = time();
@@ -335,12 +331,14 @@ class getEntries {
     private function get_groups( $userId, $public_id )
     {
         $groups = array();
-        $sql = "SELECT a.group_id from "
+        $sql = "SELECT DISTINCT(a.group_id) from "
                    . TABLE_STAT_GROUP_USER_REL   . " AS a,
-                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b
+                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b,
+                 " . TABLE_STAT_GROUPS . " AS c
                  WHERE
                         a.group_id=b.group_id
-                    AND user_id=@user_id
+                    AND a.group_id=c.group_id
+                    AND ( user_id=@user_id OR c.general )
                     AND b.public_id=@public_id";
 
 
