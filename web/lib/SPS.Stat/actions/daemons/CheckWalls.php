@@ -441,15 +441,19 @@ sql;
     //сохраняем посты(сделанные не через sb), заносим их в очередь как отправленные
     public function add_posts_to_sb_queue( $posts, $targeetFeedId, $check_time = true )
     {
-        $check_date = new DateTimeWrapper( date('r', time() - 600 ));
+//        $likes_array  = array();
+        $look_from_time = new DateTimeWrapper( date('r', time() - 600 ));
+        $look_to_time   = new DateTimeWrapper( date('r', time() - 60 ));
         $posts_c = ParserVkontakte::post_conv( $posts );
         foreach( $posts_c as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
-            //если пост уже спарсен или был опубликовн больше 10 минут назад - пропускаем
-            if ( ($check_time && $postDate <= $check_date ) || isset( $this->existing_external_ids[$post['id']] )) {
+            //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
+            $check_date_condition = $check_time &&  $postDate >= $look_from_time && $postDate <= $look_to_time;
+            //отсеиваем неподходящие по времени или уже содержащиеся в базе
+            if ( !$check_date_condition  || isset( $this->existing_external_ids[$post['id']] )) {
+//                $likes_array[ $post['id']] = array('likes' => $post['likes_tr'], 'retweet' => $post['retweet']);
                 continue;
             }
-//            $article = ParserVkontakte::get_article_from_post( $post, $targeetFeedId );
             $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
 
             $conn = ConnectionFactory::Get();
