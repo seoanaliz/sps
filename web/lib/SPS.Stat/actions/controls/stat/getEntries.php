@@ -29,6 +29,11 @@ class getEntries {
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
 
+        //"Глобальный поиск везде"
+        if ( $search ) {
+            $groupId = null;
+        }
+
         if( $time_to == 0 )
             $time_to = time();
 
@@ -133,7 +138,7 @@ class getEntries {
                 $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
-                    $groups = $this->get_groups( $userId, $row['vk_id'] );
+                    $groups = StatGroups::get_public_lists( $row['vk_id'], $userId );
                 }
                 $resul[] =  array(
                                 'id'        =>  $row['vk_id'],
@@ -326,30 +331,6 @@ class getEntries {
         }
 
         return $resul;
-    }
-
-    private function get_groups( $userId, $public_id )
-    {
-        $groups = array();
-        $sql = "SELECT DISTINCT(a.group_id) from "
-                   . TABLE_STAT_GROUP_USER_REL   . " AS a,
-                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b,
-                 " . TABLE_STAT_GROUPS . " AS c
-                 WHERE
-                        a.group_id=b.group_id
-                    AND a.group_id=c.group_id
-                    AND ( user_id=@user_id OR c.general )
-                    AND b.public_id=@public_id";
-
-
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $cmd->SetInteger( '@user_id',  $userId );
-        $cmd->SetInteger( '@public_id',  $public_id );
-        $ds = $cmd->Execute();
-        while ( $ds->next() ) {
-            $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
-        }
-        return $groups;
     }
 
     private function get_min_max()
