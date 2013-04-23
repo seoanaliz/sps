@@ -39,13 +39,13 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT c.group_id, c.type, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
                         ' . TABLE_STAT_GROUPS . ' as c
                     WHERE
-                        ( a.user_id = b.user_id OR type = ' . self::GROUP_GLOBAL . ' )
+                        ( a.user_id = b.user_id OR general  )
                         AND c.group_id = b.group_id
                         AND a.user_id = @user_id';
 
@@ -53,14 +53,15 @@
             $cmd->SetInteger( '@user_id', $userId );
             $ds  = $cmd->Execute();
             $res = array();
+//            echo $cmd->GetQuery();
 
             while( $ds->Next()) {
                 $res[] = array(
-                    'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
-                    'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
-                    'name'      =>  $ds->getValue( 'name' ),
+                    'group_id'  =>  $ds->GetInteger( 'group_id' ),
+                    'general'   =>  $ds->GetBoolean( 'general'),
+                    'name'      =>  $ds->GetValue( 'name' ),
                     'comments'  =>  $ds->getValue( 'comments' ),
-                    'fave'      =>  $ds->GetBoolean( 'fave' ),
+                    'fave'      =>  $ds->GetBoolean( 'general' ),
                     'group_type'=>  $ds->GetInteger( 'type' ),
                 );
             }
@@ -196,9 +197,9 @@
             } elseif( $groupName ) {
                 $sql = 'INSERT INTO
                         ' . TABLE_STAT_GROUPS . '
-                            ("name", comments, ava)
+                            ("name", comments, ava,general)
                         VALUES
-                            (@name, @comments, @ava)
+                            (@name, @comments, @ava,false)
                         RETURNING
                             group_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
@@ -289,7 +290,7 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-            $cmd->SetInteger( '@user_id', $user_id );
+//            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
 
             $res = array();

@@ -73,7 +73,7 @@ var Eventlist = {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
-                        itemFave: data.fave
+                        itemFave: data.general
                     });
                 });
             }
@@ -276,15 +276,15 @@ var Eventlist = {
             callback(true);
         });
     },
-    add_to_bookmark: function(listId, callback) {
-        simpleAjax('toggleGroupFave', {
+    add_to_general: function(listId, callback) {
+        simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
             callback(true);
         });
     },
-    remove_from_bookmark: function(listId, callback) {
-        simpleAjax('toggleGroupFave', {
+    remove_from_general: function(listId, callback) {
+        simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
             callback(true);

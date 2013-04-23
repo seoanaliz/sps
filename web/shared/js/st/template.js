@@ -281,7 +281,9 @@ var FILTER_LIST =
 var FILTER_LIST_ITEM =
 '<div class="item" data-id="<?=itemId?>">' +
     '<span class="text"><?=itemTitle?></span>' +
-    '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
+    '<?if( cur.dataUser.isEditor ) { ?>'+
+        '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
+    '<? } ?>'+
 '</div>';
 
 var BOX_SHARE =

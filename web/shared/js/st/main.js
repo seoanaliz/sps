@@ -446,7 +446,7 @@ var Filter = (function() {
             var $item = $icon.closest('.item');
             var listId = $item.data('id');
             if (!$icon.hasClass('selected')) {
-                Events.fire('add_to_bookmark', listId, function() {
+                Events.fire('add_to_general', listId, function() {
                     $icon.addClass('selected');
                     List.refresh(function() {
                         List.select($list.find('.item.selected').data('id'), function() {});
@@ -454,7 +454,7 @@ var Filter = (function() {
                 });
             } else {
                 $icon.removeClass('selected');
-                Events.fire('remove_from_bookmark', listId, function() {
+                Events.fire('remove_from_general', listId, function() {
                     $icon.removeClass('selected');
                     List.refresh(function() {
                         List.select($list.find('.item.selected').data('id'), function() {});
