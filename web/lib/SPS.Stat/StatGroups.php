@@ -47,7 +47,8 @@
                     WHERE
                         ( a.user_id = b.user_id OR general  )
                         AND c.group_id = b.group_id
-                        AND a.user_id = @user_id';
+                        AND a.user_id = @user_id
+                    ORDER BY c.name';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
             $cmd->SetInteger( '@user_id', $userId );
