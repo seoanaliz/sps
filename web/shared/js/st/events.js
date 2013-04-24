@@ -54,14 +54,15 @@ var Eventlist = {
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData))
-                $.each(dirtyData, function(i, data) {
+            if ($.isArray(dirtyData.list))
+                $.each(dirtyData.list, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
                         itemFave: data.fave
                     });
                 });
+            cur.dataUser.listed = intval(dirtyData.listed_by);
             callback(clearData);
         });
     },
@@ -69,7 +70,7 @@ var Eventlist = {
         simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
             var clearData = [];
             if ($.isArray(dirtyData)) {
-                $.each(dirtyData, function(i, data) {
+                $.each(dirtyData.list, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
@@ -217,7 +218,6 @@ var Eventlist = {
                     });
                 }
             }
-
             callback(clearList, clearPeriod, clearListType);
         });
     },
@@ -249,6 +249,8 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
+            cur.dataUser.listed = intval(dirtyData.listed_by);
+            Counter.refresh();
             callback(true);
         });
     },
