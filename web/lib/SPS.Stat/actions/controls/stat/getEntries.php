@@ -131,7 +131,7 @@ class getEntries {
             $cmd->SetInteger('@max_quantity', $quant_max);
             $ds = $cmd->Execute();
             $structure = BaseFactory::getObjectTree( $ds->Columns );
-            $resul = array();
+            $result = array();
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
                 $admins = array();
@@ -140,7 +140,7 @@ class getEntries {
                 if ( isset( $userId )) {
                     $groups = StatGroups::get_public_lists( $row['vk_id'], $userId );
                 }
-                $resul[] =  array(
+                $result[] =  array(
                                 'id'        =>  $row['vk_id'],
                                 'quantity'  =>  $row['quantity'],
                                 'name'      =>  $row['name'],
@@ -171,15 +171,15 @@ class getEntries {
                                             'rel_vis_grow'
             );
 
-            $resul = $this->get_our_publics_state( $time_from, $time_to, $groupId );
+            $result = $this->get_our_publics_state( $time_from, $time_to, $groupId );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'visitors';
             $a = $this->compare( $sortBy, $sortReverse );
-            usort( $resul, $a );
+            usort( $result, $a );
         }
 
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(
-                                                            'list'       =>  $resul,
+                                                            'list'       =>  $result,
                                                             'min_max'    =>  $this->get_min_max(),
                                                             'group_type' =>  empty($group) ? null : $group['type']
                                                             )
