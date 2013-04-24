@@ -47,6 +47,7 @@ $jsFiles = array(
     'js://fe/jquery.maskedinput-1.3.js',
     'js://fe/jquery.ui.slider.js',
     'js://fe/jquery.ui.datepicker.js',
+    'js://ext/history/history.js',
     'js://st/main.js',
     'js://st/events.js',
     'js://st/template.js',
