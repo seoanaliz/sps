@@ -55,8 +55,9 @@
             $ds  = $cmd->Execute();
             $res = array();
 
+
             while( $ds->Next()) {
-                $res[] = array(
+                $res[$ds->GetInteger( 'group_id' )] = array(
                     'group_id'  =>  $ds->GetInteger( 'group_id' ),
                     'general'   =>  $ds->GetBoolean( 'general'),
                     'name'      =>  $ds->GetValue( 'name' ),
@@ -65,6 +66,8 @@
                     'group_type'=>  $ds->GetInteger( 'type' ),
                 );
             }
+            $res = array_values( $res );
+
             ksort( $res );
             return $res;
         }
