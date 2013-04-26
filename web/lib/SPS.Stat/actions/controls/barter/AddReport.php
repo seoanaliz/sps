@@ -45,12 +45,11 @@ class AddReport
         $start_looking_time = explode( ',', $start_looking_time );
         $stop_looking_time  = explode( ',', $stop_looking_time  );
         $count = count($start_looking_time);
-
         $barter_events_array = array();
         for( $i = 0; $i < $count; $i++ ) {
             $start_looking_time[$i]  += $time_shift;
+            if( !isset( $stop_looking_time[$i]) || !$stop_looking_time[$i] || $stop_looking_time[$i] == 'null') {
 
-            if( !isset( $stop_looking_time[$i])) {
                 $stop_looking_time[$i] =  strtotime( 'midnight next day' );
             } else {
                 $stop_looking_time[$i]   += $time_shift;
@@ -77,7 +76,6 @@ class AddReport
             $barter_event->groups_ids  = array( $group_id, 3 );
             $barter_event->creator_id  = $user_id;
             $barter_events_array[] = $barter_event;
-
         }
 
 
@@ -103,10 +101,10 @@ class AddReport
         $sql = 'SELECT * FROM
                     barter_events
                 WHERE
-                        barter_public = @barter_public
+                      barter_public = @barter_public
                     AND target_public = @target_public
                     AND (( start_search_at <= @start_time AND @start_time <= stop_search_at)
-                      OR ( start_search_at <= @stop_time  AND @stop_time <= stop_search_at)
+                      OR ( start_search_at <= @stop_time  AND @stop_time  <= stop_search_at)
                       OR ( @start_time <= start_search_at AND stop_search_at <= @stop_time )
                     )
                     AND status in (1,2,3)
