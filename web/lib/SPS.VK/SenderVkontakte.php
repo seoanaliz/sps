@@ -102,7 +102,6 @@
         //          либо токен сгорел
         //
         //      исключения на все остальное
-
         public function send_post()
         {
             sleep( rand( 0, 12 ));
@@ -275,7 +274,7 @@
                 );
                 VkHelper::api_request( 'wall.delete', $params );
 
-                $check = ParserVkontakte::get_posts_by_vk_id( $post_id );
+                $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
                 if( empty( $check ))
                     return true;
                 throw new Exception('Failed on deleting ' . $post_id);
@@ -301,7 +300,7 @@
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:
-        // id, количество фото в нем, сколько всего таких
+        // id, количество фото в нем, сколько всего c таким названием
         private function get_album( $title_search = '' )
         {
             $title_search = $title_search ? $title_search : self::ALBUM_NAME;

@@ -54,7 +54,6 @@ class CheckWalls
         $search_results = $this->wall_search( $barters_for_search );
         StatPublics::update_population( $search_results, 'start' );
         BarterEventFactory::UpdateRange( $search_results, null, 'tst' );
-
     }
 
     //
@@ -493,4 +492,26 @@ sql;
         return GridLineItemFactory::Add( $grid_line_item );
     }
 
+    //собираем 15 последних вступивших в паблик, нужно для точки отсчта при финализации бартера
+    private function get_init_members( BarterEvent $barter_event )
+    {
+        $barter_event->init_users = array();
+
+        $params = array(
+            'gid'   =>  $barter_event->target_public,
+            'count' =>  15,
+            'sort'  =>  'time_desc'
+        );
+
+        for( $try = 0; $try < 3; $try++ ) {
+            $res = VkHelper::api_request( 'groups.getMembers', $params, 0 );
+            if( isset( $res->error )) {
+                continue;
+            } else {
+
+            }
+        }
+
+        return false;
+    }
 }
