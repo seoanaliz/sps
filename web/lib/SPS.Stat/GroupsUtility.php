@@ -5,6 +5,10 @@
     class GroupsUtility
     {
 
+        const Group_Type_Default = 1;
+        const Group_Shared = 2;
+        const Group_Shared_Special = 3;
+
         public static  $barter_watchers = array(
             '670456',
             '106175502',
@@ -126,7 +130,7 @@
         }
 
         //формирует отчет для групп. Если указан user_id, разделяет созданные им группы и нет
-        public static function form_response( $groups, $user_id, $group_source )
+        public static function form_response(  $groups, $user_id, $group_source )
         {
         //todo place
             if( !is_array( $groups ))
@@ -135,17 +139,17 @@
             $i = 1;
 
             foreach( $groups as $group ) {
-                if( $group->created_by != $user_id ) {
+                /** @var $group Group*/
+                if( $group->created_by != $user_id && $group->type != self::Group_Shared_Special ) {
                     $user_shared_groups[$group->created_by][] = $group->group_id;
                 } else {
-
                     $tmp = array(
                         'group_id'  =>  $group->group_id,
                         'type'      =>  $group->type,
                         'name'      =>  $group->type == 2 ? 'Мой первый список' : $group->name,
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
-                    if( $group->type == 2 ) {
+                    if( $group->type == 2 || $group->type == 3 ) {
                         if( !is_array( $res['user_lists']))
                             $res['user_lists'] = array();
                         array_unshift( $res['user_lists'], $tmp );
