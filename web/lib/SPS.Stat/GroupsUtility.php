@@ -149,7 +149,7 @@
                         'name'      =>  $group->type == 2 ? 'Мой первый список' : $group->name,
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
-                    if( $group->type == 2 || $group->type == 3 ) {
+                    if( $group->type == 2 ) {
                         if( !is_array( $res['user_lists']))
                             $res['user_lists'] = array();
                         array_unshift( $res['user_lists'], $tmp );
@@ -158,7 +158,6 @@
                     }
                 }
             }
-
             $users_list = array_keys( $user_shared_groups);
             $users_info = StatUsers::get_vk_user_info( $users_list );
             foreach( $user_shared_groups as $sharer_id => $sharer_groups ) {
