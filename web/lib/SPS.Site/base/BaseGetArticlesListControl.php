@@ -166,7 +166,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
     {
         $page = Request::getInteger($sessionKey);
         $page = ($page < 0) ? 0 : $page;
-        $this->search['pageSize'] = $this->pageSize + 1;
+        $this->search['pageSize'] = $this->pageSize;
         $this->search['page'] = $page;
     }
 
