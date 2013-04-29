@@ -9,28 +9,28 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
--- Name: intarray; Type: EXTENSION; Schema: -; Owner: 
+-- Name: intarray; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS intarray WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION intarray; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION intarray; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION intarray IS 'functions, operators, and index support for 1-D arrays of integers';
@@ -59,6 +59,7 @@ CREATE FUNCTION find_public_place(id integer) RETURNS integer
             $$;
 
 
+ALTER FUNCTION public.find_public_place(id integer) OWNER TO sps;
 
 --
 -- Name: if(boolean, anyelement, anyelement); Type: FUNCTION; Schema: public; Owner: sps
@@ -71,6 +72,7 @@ SELECT CASE WHEN $1 THEN $2 ELSE $3 END
 $_$;
 
 
+ALTER FUNCTION public.if(boolean, anyelement, anyelement) OWNER TO sps;
 
 --
 -- Name: set_state(integer, character varying, boolean); Type: FUNCTION; Schema: public; Owner: sps
@@ -95,6 +97,7 @@ CREATE FUNCTION set_state(id integer, column_name character varying, state boole
                 $_$;
 
 
+ALTER FUNCTION public.set_state(id integer, column_name character varying, state boolean) OWNER TO sps;
 
 --
 -- Name: update_public_info(integer, character varying, character varying); Type: FUNCTION; Schema: public; Owner: sps
@@ -120,6 +123,7 @@ CREATE FUNCTION update_public_info(id integer, p_name character varying, ava cha
                     $_$;
 
 
+ALTER FUNCTION public.update_public_info(id integer, p_name character varying, ava character varying) OWNER TO sps;
 
 --
 -- Name: update_public_info(integer, character varying, character varying, boolean); Type: FUNCTION; Schema: public; Owner: sps
@@ -144,13 +148,14 @@ CREATE FUNCTION update_public_info(id integer, p_name character varying, ava cha
                     $_$;
 
 
+ALTER FUNCTION public.update_public_info(id integer, p_name character varying, ava character varying, page boolean) OWNER TO sps;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: oadmins_posts; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_posts; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE oadmins_posts (
@@ -170,6 +175,7 @@ CREATE TABLE oadmins_posts (
 );
 
 
+ALTER TABLE public.oadmins_posts OWNER TO sps;
 
 --
 -- Name: admin_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -183,6 +189,7 @@ CREATE SEQUENCE admin_posts_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.admin_posts_id_seq OWNER TO sps;
 
 --
 -- Name: admin_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -192,7 +199,7 @@ ALTER SEQUENCE admin_posts_id_seq OWNED BY oadmins_posts.id;
 
 
 --
--- Name: albums; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: albums; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE albums (
@@ -207,9 +214,10 @@ CREATE TABLE albums (
 );
 
 
+ALTER TABLE public.albums OWNER TO sps;
 
 --
--- Name: albums_points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: albums_points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE albums_points (
@@ -222,9 +230,10 @@ CREATE TABLE albums_points (
 );
 
 
+ALTER TABLE public.albums_points OWNER TO sps;
 
 --
--- Name: barter_events; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: barter_events; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE barter_events (
@@ -254,6 +263,7 @@ CREATE TABLE barter_events (
 );
 
 
+ALTER TABLE public.barter_events OWNER TO sps;
 
 --
 -- Name: barter_events_barter_event_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -267,6 +277,7 @@ CREATE SEQUENCE barter_events_barter_event_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.barter_events_barter_event_id_seq OWNER TO sps;
 
 --
 -- Name: barter_events_barter_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -276,7 +287,7 @@ ALTER SEQUENCE barter_events_barter_event_id_seq OWNED BY barter_events.barter_e
 
 
 --
--- Name: barter_monitoring; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: barter_monitoring; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE barter_monitoring (
@@ -290,9 +301,10 @@ CREATE TABLE barter_monitoring (
 );
 
 
+ALTER TABLE public.barter_monitoring OWNER TO sps;
 
 --
--- Name: newUserRequests; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: newUserRequests; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE "newUserRequests" (
@@ -305,6 +317,7 @@ CREATE TABLE "newUserRequests" (
 );
 
 
+ALTER TABLE public."newUserRequests" OWNER TO sps;
 
 --
 -- Name: getNewUserRequests; Type: VIEW; Schema: public; Owner: sps
@@ -314,7 +327,7 @@ CREATE VIEW "getNewUserRequests" AS
     SELECT "newUserRequests"."newUserRequestId", "newUserRequests"."vkId", "newUserRequests".email, "newUserRequests"."publicIds", "newUserRequests"."statusId", "newUserRequests"."createdAt" FROM "newUserRequests" WHERE ("newUserRequests"."statusId" <> 3);
 
 
-
+ALTER TABLE public."getNewUserRequests" OWNER TO sps;
 
 --
 -- Name: get_barter_events; Type: VIEW; Schema: public; Owner: sps
@@ -324,8 +337,10 @@ CREATE VIEW get_barter_events AS
     SELECT barter_events.barter_event_id, barter_events.barter_type, barter_events.status, barter_events.barter_public, barter_events.search_string, barter_events.start_search_at, barter_events.stop_search_at, barter_events.posted_at, barter_events.deleted_at, barter_events.barter_overlaps, barter_events.start_visitors, barter_events.end_visitors, barter_events.start_subscribers, barter_events.end_subscribers, barter_events.created_at, barter_events.target_public, barter_events.post_id, barter_events.standard_mark, barter_events.groups_ids, (barter_events.end_subscribers - barter_events.start_subscribers) AS subscribers, (barter_events.end_visitors - barter_events.start_visitors) AS visitors, barter_events.creator_id, barter_events.detected_at, barter_events.init_users, barter_events.neater_subscribers FROM barter_events ORDER BY barter_events.created_at DESC, barter_events.barter_event_id DESC;
 
 
+ALTER TABLE public.get_barter_events OWNER TO sps;
+
 --
--- Name: groups; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: groups; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE groups (
@@ -340,6 +355,7 @@ CREATE TABLE groups (
 );
 
 
+ALTER TABLE public.groups OWNER TO sps;
 
 --
 -- Name: get_groups; Type: VIEW; Schema: public; Owner: sps
@@ -349,10 +365,10 @@ CREATE VIEW get_groups AS
     SELECT groups.group_id, groups.name, groups.general, groups.type, groups.users_ids, groups.created_by, groups.status, groups.source FROM groups ORDER BY groups.group_id DESC;
 
 
-
+ALTER TABLE public.get_groups OWNER TO sps;
 
 --
--- Name: stat_publics_50k; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_publics_50k; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_publics_50k (
@@ -384,6 +400,7 @@ CREATE TABLE stat_publics_50k (
 );
 
 
+ALTER TABLE public.stat_publics_50k OWNER TO sps;
 
 --
 -- Name: get_publics; Type: VIEW; Schema: public; Owner: sps
@@ -393,10 +410,10 @@ CREATE VIEW get_publics AS
     SELECT stat_publics_50k.vk_id, stat_publics_50k.ava, stat_publics_50k.name, stat_publics_50k.short_name, stat_publics_50k.diff_abs, stat_publics_50k.diff_rel, stat_publics_50k.quantity, stat_publics_50k.sh_in_main, stat_publics_50k.diff_abs_week, stat_publics_50k.diff_abs_month, stat_publics_50k.diff_rel_week, stat_publics_50k.diff_rel_month, stat_publics_50k.is_page, stat_publics_50k.visitors, stat_publics_50k.in_search, stat_publics_50k.closed, stat_publics_50k.active, stat_publics_50k.visitors_week, stat_publics_50k.visitors_month, stat_publics_50k.updated_at FROM stat_publics_50k;
 
 
-
+ALTER TABLE public.get_publics OWNER TO sps;
 
 --
--- Name: stat_groups; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_groups; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_groups (
@@ -410,6 +427,8 @@ CREATE TABLE stat_groups (
 );
 
 
+ALTER TABLE public.stat_groups OWNER TO sps;
+
 --
 -- Name: groups_group_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
 --
@@ -422,6 +441,7 @@ CREATE SEQUENCE groups_group_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.groups_group_id_seq OWNER TO sps;
 
 --
 -- Name: groups_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -442,6 +462,7 @@ CREATE SEQUENCE groups_group_id_seq1
     CACHE 1;
 
 
+ALTER TABLE public.groups_group_id_seq1 OWNER TO sps;
 
 --
 -- Name: groups_group_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -451,7 +472,7 @@ ALTER SEQUENCE groups_group_id_seq1 OWNED BY groups.group_id;
 
 
 --
--- Name: mes_activity_log; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_activity_log; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_activity_log (
@@ -461,9 +482,10 @@ CREATE TABLE mes_activity_log (
 );
 
 
+ALTER TABLE public.mes_activity_log OWNER TO sps;
 
 --
--- Name: mes_dialog_statuses; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialog_statuses; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_dialog_statuses (
@@ -472,6 +494,7 @@ CREATE TABLE mes_dialog_statuses (
 );
 
 
+ALTER TABLE public.mes_dialog_statuses OWNER TO sps;
 
 --
 -- Name: mes_dialog_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -485,6 +508,7 @@ CREATE SEQUENCE mes_dialog_statuses_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_dialog_statuses_id_seq OWNER TO sps;
 
 --
 -- Name: mes_dialog_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -494,7 +518,7 @@ ALTER SEQUENCE mes_dialog_statuses_id_seq OWNED BY mes_dialog_statuses.id;
 
 
 --
--- Name: mes_dialog_templates; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialog_templates; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_dialog_templates (
@@ -506,6 +530,7 @@ CREATE TABLE mes_dialog_templates (
 );
 
 
+ALTER TABLE public.mes_dialog_templates OWNER TO sps;
 
 --
 -- Name: mes_dialog_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -519,14 +544,17 @@ CREATE SEQUENCE mes_dialog_templates_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_dialog_templates_id_seq OWNER TO sps;
 
-
+--
+-- Name: mes_dialog_templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
+--
 
 ALTER SEQUENCE mes_dialog_templates_id_seq OWNED BY mes_dialog_templates.id;
 
 
 --
--- Name: mes_dialogs; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialogs; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_dialogs (
@@ -540,9 +568,10 @@ CREATE TABLE mes_dialogs (
 );
 
 
+ALTER TABLE public.mes_dialogs OWNER TO sps;
 
 --
--- Name: mes_dialogs_groups; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialogs_groups; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_dialogs_groups (
@@ -553,6 +582,7 @@ CREATE TABLE mes_dialogs_groups (
 );
 
 
+ALTER TABLE public.mes_dialogs_groups OWNER TO sps;
 
 --
 -- Name: mes_dialogs_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -566,6 +596,7 @@ CREATE SEQUENCE mes_dialogs_groups_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_dialogs_groups_id_seq OWNER TO sps;
 
 --
 -- Name: mes_dialogs_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -586,6 +617,7 @@ CREATE SEQUENCE mes_dialogs_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_dialogs_id_seq OWNER TO sps;
 
 --
 -- Name: mes_dialogs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -595,7 +627,7 @@ ALTER SEQUENCE mes_dialogs_id_seq OWNED BY mes_dialogs.id;
 
 
 --
--- Name: mes_group_dialog_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_group_dialog_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_group_dialog_relation (
@@ -604,9 +636,10 @@ CREATE TABLE mes_group_dialog_relation (
 );
 
 
+ALTER TABLE public.mes_group_dialog_relation OWNER TO sps;
 
 --
--- Name: mes_group_user_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_group_user_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_group_user_relation (
@@ -619,9 +652,10 @@ CREATE TABLE mes_group_user_relation (
 );
 
 
+ALTER TABLE public.mes_group_user_relation OWNER TO sps;
 
 --
--- Name: mes_queue; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_queue; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_queue (
@@ -634,6 +668,7 @@ CREATE TABLE mes_queue (
 );
 
 
+ALTER TABLE public.mes_queue OWNER TO sps;
 
 --
 -- Name: mes_queue_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -647,6 +682,7 @@ CREATE SEQUENCE mes_queue_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_queue_id_seq OWNER TO sps;
 
 --
 -- Name: mes_queue_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -656,7 +692,7 @@ ALTER SEQUENCE mes_queue_id_seq OWNED BY mes_queue.id;
 
 
 --
--- Name: mes_texts; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_texts; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE mes_texts (
@@ -668,6 +704,7 @@ CREATE TABLE mes_texts (
 );
 
 
+ALTER TABLE public.mes_texts OWNER TO sps;
 
 --
 -- Name: mes_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -681,6 +718,7 @@ CREATE SEQUENCE mes_texts_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.mes_texts_id_seq OWNER TO sps;
 
 --
 -- Name: mes_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -701,6 +739,7 @@ CREATE SEQUENCE "newUserRequests_newUserRequestId_seq"
     CACHE 1;
 
 
+ALTER TABLE public."newUserRequests_newUserRequestId_seq" OWNER TO sps;
 
 --
 -- Name: newUserRequests_newUserRequestId_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -710,7 +749,7 @@ ALTER SEQUENCE "newUserRequests_newUserRequestId_seq" OWNED BY "newUserRequests"
 
 
 --
--- Name: oadmins; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE oadmins (
@@ -721,9 +760,10 @@ CREATE TABLE oadmins (
 );
 
 
+ALTER TABLE public.oadmins OWNER TO sps;
 
 --
--- Name: oadmins_conf; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_conf; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE oadmins_conf (
@@ -735,9 +775,10 @@ CREATE TABLE oadmins_conf (
 );
 
 
+ALTER TABLE public.oadmins_conf OWNER TO sps;
 
 --
--- Name: oadmins_public_points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_public_points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE oadmins_public_points (
@@ -749,9 +790,10 @@ CREATE TABLE oadmins_public_points (
 );
 
 
+ALTER TABLE public.oadmins_public_points OWNER TO sps;
 
 --
--- Name: old_50k_points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: old_50k_points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE old_50k_points (
@@ -761,9 +803,10 @@ CREATE TABLE old_50k_points (
 );
 
 
+ALTER TABLE public.old_50k_points OWNER TO sps;
 
 --
--- Name: our_publs_points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: our_publs_points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE our_publs_points (
@@ -773,9 +816,10 @@ CREATE TABLE our_publs_points (
 );
 
 
+ALTER TABLE public.our_publs_points OWNER TO sps;
 
 --
--- Name: points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE points (
@@ -790,9 +834,10 @@ CREATE TABLE points (
 );
 
 
+ALTER TABLE public.points OWNER TO sps;
 
 --
--- Name: posts_for_likes; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: posts_for_likes; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE posts_for_likes (
@@ -804,9 +849,10 @@ CREATE TABLE posts_for_likes (
 );
 
 
+ALTER TABLE public.posts_for_likes OWNER TO sps;
 
 --
--- Name: publ_rels_names; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: publ_rels_names; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE publ_rels_names (
@@ -817,9 +863,10 @@ CREATE TABLE publ_rels_names (
 );
 
 
+ALTER TABLE public.publ_rels_names OWNER TO sps;
 
 --
--- Name: publics; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: publics; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE publics (
@@ -834,10 +881,10 @@ CREATE TABLE publics (
 );
 
 
-
+ALTER TABLE public.publics OWNER TO sps;
 
 --
--- Name: serv_access_tokens; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: serv_access_tokens; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE serv_access_tokens (
@@ -848,10 +895,10 @@ CREATE TABLE serv_access_tokens (
 );
 
 
-
+ALTER TABLE public.serv_access_tokens OWNER TO sps;
 
 --
--- Name: serv_states; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: serv_states; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE serv_states (
@@ -860,9 +907,10 @@ CREATE TABLE serv_states (
 );
 
 
+ALTER TABLE public.serv_states OWNER TO sps;
 
 --
--- Name: stat_admins; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_admins; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_admins (
@@ -877,9 +925,10 @@ CREATE TABLE stat_admins (
 );
 
 
+ALTER TABLE public.stat_admins OWNER TO sps;
 
 --
--- Name: stat_group_public_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_group_public_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_group_public_relation (
@@ -890,6 +939,7 @@ CREATE TABLE stat_group_public_relation (
 );
 
 
+ALTER TABLE public.stat_group_public_relation OWNER TO sps;
 
 --
 -- Name: TABLE stat_group_public_relation; Type: COMMENT; Schema: public; Owner: sps
@@ -899,7 +949,7 @@ COMMENT ON TABLE stat_group_public_relation IS 'СЃРѕРґРµСЂР¶РёС�
 
 
 --
--- Name: stat_group_user_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_group_user_relation; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_group_user_relation (
@@ -909,6 +959,8 @@ CREATE TABLE stat_group_user_relation (
 );
 
 
+ALTER TABLE public.stat_group_user_relation OWNER TO sps;
+
 --
 -- Name: TABLE stat_group_user_relation; Type: COMMENT; Schema: public; Owner: sps
 --
@@ -917,7 +969,7 @@ COMMENT ON TABLE stat_group_user_relation IS 'РЎРѕРґРµСЂР¶РёС‚ 
 
 
 --
--- Name: stat_our_auditory; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_our_auditory; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_our_auditory (
@@ -928,9 +980,10 @@ CREATE TABLE stat_our_auditory (
 );
 
 
+ALTER TABLE public.stat_our_auditory OWNER TO sps;
 
 --
--- Name: stat_our_publics_vis_vie; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_our_publics_vis_vie; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_our_publics_vis_vie (
@@ -941,9 +994,10 @@ CREATE TABLE stat_our_publics_vis_vie (
 );
 
 
+ALTER TABLE public.stat_our_publics_vis_vie OWNER TO sps;
 
 --
--- Name: stat_parser; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_parser; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_parser (
@@ -954,9 +1008,10 @@ CREATE TABLE stat_parser (
 );
 
 
+ALTER TABLE public.stat_parser OWNER TO sps;
 
 --
--- Name: stat_public_audit; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_public_audit; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_public_audit (
@@ -970,9 +1025,10 @@ CREATE TABLE stat_public_audit (
 );
 
 
+ALTER TABLE public.stat_public_audit OWNER TO sps;
 
 --
--- Name: stat_publics_50k_points; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_publics_50k_points; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_publics_50k_points (
@@ -986,6 +1042,7 @@ CREATE TABLE stat_publics_50k_points (
 );
 
 
+ALTER TABLE public.stat_publics_50k_points OWNER TO sps;
 
 --
 -- Name: stat_publics_50k_vk_public_id_seq; Type: SEQUENCE; Schema: public; Owner: sps
@@ -999,6 +1056,7 @@ CREATE SEQUENCE stat_publics_50k_vk_public_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.stat_publics_50k_vk_public_id_seq OWNER TO sps;
 
 --
 -- Name: stat_publics_50k_vk_public_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sps
@@ -1008,7 +1066,7 @@ ALTER SEQUENCE stat_publics_50k_vk_public_id_seq OWNED BY stat_publics_50k.vk_pu
 
 
 --
--- Name: stat_users; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_users; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE stat_users (
@@ -1021,9 +1079,10 @@ CREATE TABLE stat_users (
 );
 
 
+ALTER TABLE public.stat_users OWNER TO sps;
 
 --
--- Name: temp_users_ids_store; Type: TABLE; Schema: public; Owner: sps; Tablespace: 
+-- Name: temp_users_ids_store; Type: TABLE; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE TABLE temp_users_ids_store (
@@ -1033,6 +1092,7 @@ CREATE TABLE temp_users_ids_store (
 );
 
 
+ALTER TABLE public.temp_users_ids_store OWNER TO sps;
 
 --
 -- Name: barter_event_id; Type: DEFAULT; Schema: public; Owner: sps
@@ -1119,7 +1179,7 @@ ALTER TABLE ONLY stat_publics_50k ALTER COLUMN vk_public_id SET DEFAULT nextval(
 
 
 --
--- Name: albums_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: albums_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY albums
@@ -1127,7 +1187,7 @@ ALTER TABLE ONLY albums
 
 
 --
--- Name: albums_points_album_id_public_id_ts_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: albums_points_album_id_public_id_ts_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY albums_points
@@ -1135,7 +1195,7 @@ ALTER TABLE ONLY albums_points
 
 
 --
--- Name: barter_events_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: barter_events_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY barter_events
@@ -1143,7 +1203,7 @@ ALTER TABLE ONLY barter_events
 
 
 --
--- Name: barter_monitoring_public_id_post_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: barter_monitoring_public_id_post_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY barter_monitoring
@@ -1151,7 +1211,7 @@ ALTER TABLE ONLY barter_monitoring
 
 
 --
--- Name: gr50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: gr50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY old_50k_points
@@ -1159,7 +1219,7 @@ ALTER TABLE ONLY old_50k_points
 
 
 --
--- Name: group_pablic_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: group_pablic_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_group_public_relation
@@ -1167,7 +1227,7 @@ ALTER TABLE ONLY stat_group_public_relation
 
 
 --
--- Name: groups_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: groups_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_groups
@@ -1175,7 +1235,7 @@ ALTER TABLE ONLY stat_groups
 
 
 --
--- Name: groups_pkey1; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: groups_pkey1; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY groups
@@ -1183,7 +1243,7 @@ ALTER TABLE ONLY groups
 
 
 --
--- Name: mes_dialog_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialog_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_dialog_statuses
@@ -1191,7 +1251,7 @@ ALTER TABLE ONLY mes_dialog_statuses
 
 
 --
--- Name: mes_dialogs_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialogs_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_dialogs_groups
@@ -1199,7 +1259,7 @@ ALTER TABLE ONLY mes_dialogs_groups
 
 
 --
--- Name: mes_dialogs_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialogs_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_dialogs
@@ -1207,7 +1267,7 @@ ALTER TABLE ONLY mes_dialogs
 
 
 --
--- Name: mes_dialogs_user_id_rec_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_dialogs_user_id_rec_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_dialogs
@@ -1215,7 +1275,7 @@ ALTER TABLE ONLY mes_dialogs
 
 
 --
--- Name: mes_group_dialog_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_group_dialog_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_group_dialog_relation
@@ -1223,7 +1283,7 @@ ALTER TABLE ONLY mes_group_dialog_relation
 
 
 --
--- Name: mes_group_user_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_group_user_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_group_user_relation
@@ -1231,7 +1291,7 @@ ALTER TABLE ONLY mes_group_user_relation
 
 
 --
--- Name: mes_queue_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: mes_queue_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY mes_queue
@@ -1239,7 +1299,7 @@ ALTER TABLE ONLY mes_queue
 
 
 --
--- Name: newUserRequests_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: newUserRequests_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY "newUserRequests"
@@ -1247,7 +1307,7 @@ ALTER TABLE ONLY "newUserRequests"
 
 
 --
--- Name: new_50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: new_50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_publics_50k_points
@@ -1255,7 +1315,7 @@ ALTER TABLE ONLY stat_publics_50k_points
 
 
 --
--- Name: oadmins_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY oadmins
@@ -1263,7 +1323,7 @@ ALTER TABLE ONLY oadmins
 
 
 --
--- Name: oadmins_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY oadmins_posts
@@ -1271,7 +1331,7 @@ ALTER TABLE ONLY oadmins_posts
 
 
 --
--- Name: oadmins_posts_vk_post_id_public_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_posts_vk_post_id_public_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY oadmins_posts
@@ -1279,7 +1339,7 @@ ALTER TABLE ONLY oadmins_posts
 
 
 --
--- Name: oadmins_public_points_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: oadmins_public_points_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY oadmins_public_points
@@ -1287,7 +1347,7 @@ ALTER TABLE ONLY oadmins_public_points
 
 
 --
--- Name: publ_rels_names_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: publ_rels_names_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY publ_rels_names
@@ -1295,7 +1355,7 @@ ALTER TABLE ONLY publ_rels_names
 
 
 --
--- Name: publics_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: publics_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY publics
@@ -1303,7 +1363,7 @@ ALTER TABLE ONLY publics
 
 
 --
--- Name: serv_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: serv_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY serv_access_tokens
@@ -1311,7 +1371,7 @@ ALTER TABLE ONLY serv_access_tokens
 
 
 --
--- Name: stat_our_publics_vis_vie_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_our_publics_vis_vie_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_our_publics_vis_vie
@@ -1319,7 +1379,7 @@ ALTER TABLE ONLY stat_our_publics_vis_vie
 
 
 --
--- Name: stat_publics_50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_publics_50k_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_publics_50k
@@ -1327,7 +1387,7 @@ ALTER TABLE ONLY stat_publics_50k
 
 
 --
--- Name: stat_publics_50k_vk_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: stat_publics_50k_vk_id_key; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_publics_50k
@@ -1335,7 +1395,7 @@ ALTER TABLE ONLY stat_publics_50k
 
 
 --
--- Name: temp_users_ids_store_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: temp_users_ids_store_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY temp_users_ids_store
@@ -1343,7 +1403,7 @@ ALTER TABLE ONLY temp_users_ids_store
 
 
 --
--- Name: user_group_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: user_group_relation_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_group_user_relation
@@ -1351,7 +1411,7 @@ ALTER TABLE ONLY stat_group_user_relation
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace: 
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: sps; Tablespace:
 --
 
 ALTER TABLE ONLY stat_users
@@ -1359,7 +1419,7 @@ ALTER TABLE ONLY stat_users
 
 
 --
--- Name: name_search; Type: INDEX; Schema: public; Owner: sps; Tablespace: 
+-- Name: name_search; Type: INDEX; Schema: public; Owner: sps; Tablespace:
 --
 
 CREATE INDEX name_search ON stat_publics_50k USING btree (name);
