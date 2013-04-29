@@ -115,7 +115,7 @@ class CheckPosts
         $result = 0;
         $offset = 0;
         $new_users = abs( $barter_event->end_subscribers - $barter_event->start_subscribers ) + 60;
-
+        //перебираем новых юзеров паблика, проверяем, пришли ли они из паблика-рекламоразместителя
         while( $new_users > 0 ) {
             if ( $offset > self::OFFSET_FOR_EXECUTE_GET_MEMBERS_LIMIT ) {
                 $result = 0;
@@ -138,15 +138,13 @@ class CheckPosts
                     break;
                 sleep( VkHelper::PAUSE);
             }
-            if( isset($res->error))
-            {
-                die('fucking errors');
+            if( isset($res->error)) {
+                die();
             }
-
-
+            $check = array_intersect($barter_event->init_users, $res->users );
             if( !empty( $check )) {
                 echo 'отсечка по юзерам<br>';
-                $result += $this->get_first_inersection($res->users, $barter_event->init_users );
+                $result += $this->get_first_intersection($res->users, $barter_event->init_users );
                 break;
             }
             $result += $res->cross_users_count;
@@ -159,7 +157,7 @@ class CheckPosts
     }
 
     //возвращает число отсутствующих во втором массиве lmn первого массива( до первого совпадения )
-    private function get_first_inersection( $main_array, $search_array ) {
+    private function get_first_intersection( $main_array, $search_array ) {
         $lenght = count( $main_array );
         $search_array = array_flip( $search_array );
         for( $i = 0; $i < $lenght; $i++) {
