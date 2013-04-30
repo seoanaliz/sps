@@ -2,8 +2,7 @@
 new stat_tables(); // Чтобы виделись константы
 /**
  * @author kulikov
- * Сюда вынесены методы получения статистики пабликов, в том чичле и по группам
- * Это своего рода модель
+ * Модель. Методы получения статистики пабликов, в том числе и по группам
  */
 class EntryGetter {
     public function getEntriesData() {
@@ -11,7 +10,8 @@ class EntryGetter {
         return array(
             'list'       =>  $entries,
             'min_max'    =>  $this->get_min_max(),
-            'group_type' =>  empty($group) ? null : $group['type']
+            'group_type' =>  empty($group) ? null : $group['type'],
+            'groupId'    =>  empty($group) ? null : $group['groupId'],
         );
     }
     
@@ -31,8 +31,6 @@ class EntryGetter {
         $sortReverse=   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
  
-        $time_from  =   1366747200;
-        $time_to    =   1366833600;
         //"Глобальный поиск везде"
         if ( $search ) {
             $groupId = null;
@@ -312,13 +310,88 @@ class EntryGetter {
     public function getGroupIdBySlug($slug)
     {
         $sql = 'SELECT group_id FROM '. TABLE_STAT_GROUPS .'
-        WHERE name LIKE @slug';
+        WHERE slug LIKE @slug';
 
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetString('@slug', $slug);
         $result = $cmd->Execute();
         $result->Next();
         return $result->GetInteger('group_id');
+    }
+
+    public function updateSlugs()
+    {
+        $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .' ORDER BY group_id DESC';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $found = array();
+        $result = $cmd->Execute();
+        while ( $result->next()) {
+            $name = $result->GetString('name');
+            if (!isset($found[$name])) {
+                $found[$name] = 1;
+            } else {
+                $found[$name] += 1;
+            }
+
+            $slug = self::transliterate($name);
+            if ($found[$name] > 1) {
+                $slug .= $found[$name] - 1;
+            }
+
+            $id = $result->GetInteger('group_id');
+            $this->saveSlugForId($id, $slug);
+        }
+    }
+    
+    static public function transliterate($text) {
+        preg_match_all('/./u', $text, $text);
+        $text = $text[0];
+        $simplePairs = array('а' => 'a', 'л' => 'l', 'у' => 'u', 'б' => 'b', 'м' => 'm', 'т' => 't', 'в' => 'v', 'н' => 'n', 'ы' => 'y', 'г' => 'g', 'о' => 'o', 'ф' => 'f', 'д' => 'd', 'п' => 'p', 'и' => 'i', 'р' => 'r', 'А' => 'A', 'Л' => 'L', 'У' => 'U', 'Б' => 'B', 'М' => 'M', 'Т' => 'T', 'В' => 'V', 'Н' => 'N', 'Ы' => 'Y', 'Г' => 'G', 'О' => 'O', 'Ф' => 'F', 'Д' => 'D', 'П' => 'P', 'И' => 'I', 'Р' => 'R',);
+        $complexPairs = array('з' => 'z', 'ц' => 'c', 'к' => 'k', 'ж' => 'zh', 'ч' => 'ch', 'х' => 'h', 'е' => 'e', 'с' => 's', 'ё' => 'yo', 'э' => 'e', 'ш' => 'sh', 'й' => 'y', 'щ' => 'sh', 'ю' => 'yu', 'я' => 'ya', 'З' => 'Z', 'Ц' => 'C', 'К' => 'K', 'Ж' => 'ZH', 'Ч' => 'CH', 'Х' => 'H', 'Е' => 'E', 'С' => 'S', 'Ё' => 'YO', 'Э' => 'E', 'Ш' => 'SH', 'Й' => 'Y', 'Щ' => 'SH', 'Ю' => 'YU', 'Я' => 'YA', 'Ь' => "", 'Ъ' => "", 'ъ' => "", 'ь' => "");
+        $specialSymbols = array("'" => "", "`" => "", "^" => "", " " => "_", '.' => '', ',' => '', ':' => '', '"' => '', "'" => '', '<' => '', '>' => '', '«' => '', '»' => '', ' ' => '_',);
+        $translitLatSymbols = array('a', 'l', 'u', 'b', 'm', 't', 'v', 'n', 'y', 'g', 'o', 'f', 'd', 'p', 'i', 'r', 'z', 'c', 'k', 'e', 's', 'A', 'L', 'U', 'B', 'M', 'T', 'V', 'N', 'Y', 'G', 'O', 'F', 'D', 'P', 'I', 'R', 'Z', 'C', 'K', 'E', 'S',);
+        $simplePairsFlip = array_flip($simplePairs);
+        $complexPairsFlip = array_flip($complexPairs);
+        $specialSymbolsFlip = array_flip($specialSymbols);
+        $charsToTranslit = array_merge(array_keys($simplePairs), array_keys($complexPairs));
+        $translitTable = array();
+        foreach ($simplePairs as $key => $val)
+            $translitTable[$key] = $simplePairs[$key]; 
+        foreach ($complexPairs as $key => $val)
+            $translitTable[$key] = $complexPairs[$key];
+        foreach ($specialSymbols as $key => $val)
+            $translitTable[$key] = $specialSymbols[$key]; $result = "";
+        $nonTranslitArea = false;
+        foreach ($text as $char) {
+            if (in_array($char, array_keys($specialSymbols))) {
+                $result.= $translitTable[$char];
+            } elseif (in_array($char, $charsToTranslit)) {
+                if ($nonTranslitArea) {
+                    $result.= "";
+                    $nonTranslitArea = false;
+                } $result.= $translitTable[$char];
+            } else {
+                if (!$nonTranslitArea && in_array($char, $translitLatSymbols)) {
+                    $result.= "";
+                    $nonTranslitArea = true;
+                } $result.= $char;
+            }
+        }
+        return str_replace('yy', 'iy', strtolower(preg_replace("/[_]{2,}/", '_', $result)));
+    }
+
+    public function saveSlugForId($id, $slug) {
+        $sql = 'UPDATE '. TABLE_STAT_GROUPS .'
+            SET slug = @slug
+            WHERE group_id = @group_id';
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+        $cmd->SetString('@slug', $slug);
+        $cmd->SetInteger('@group_id', $id);
+        $updateResult = $cmd->ExecuteNonQuery();
+        echo $id . '  ' . $slug . '  ' . $updateResult . '<br />';
+        if (!$updateResult) {
+            Logger::Error('Failed to update slugs!');
+        }
     }
 }
 
