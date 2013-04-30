@@ -277,11 +277,11 @@ var CONTACT_DROPDOWN_ITEM =
 '</div>';
 
 var FILTER_LIST =
-'<div class="item selected" data-id="null">Популярные</div>' +
+'<div class="item" data-id="null" data-slug="">Популярные</div>' +
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" data-id="<?=itemId?>">' +
+'<div class="item" data-id="<?=itemId?>" data-slug="<?=slug?>">' +
     '<span class="text"><?=itemTitle?></span>' +
     '<?if( cur.dataUser.isEditor ) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
