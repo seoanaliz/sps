@@ -47,7 +47,6 @@ $jsFiles = array(
     'js://fe/jquery.maskedinput-1.3.js',
     'js://fe/jquery.ui.slider.js',
     'js://fe/jquery.ui.datepicker.js',
-    'js://ext/history/history.js',
     'js://st/main.js',
     'js://st/events.js',
     'js://st/template.js',
@@ -92,5 +91,8 @@ if(!empty($jsFilesAdds)) {
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
     <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script type="text/javascript">
+        entriesPrecache = <?=$entriesPrecache?>;
+    </script>
 </head>
 <body>
