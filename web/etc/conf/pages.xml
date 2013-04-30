@@ -19,6 +19,11 @@
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
                 <page uri="/stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                    <actions>SPS.Stat.getEntriesPrecache</actions>
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
+                <page uri="/stat/([^/]*).*" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                    <actions>SPS.Stat.getEntriesPrecache</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="/oadmins">
