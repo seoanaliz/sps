@@ -21,7 +21,7 @@
 
         public static function get_group( $groupId )
         {
-            $sql = 'SELECT group_id, name, general, name, comments,type, group_admin FROM ' . TABLE_STAT_GROUPS
+            $sql = 'SELECT group_id, name, general, name, comments, type FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $groupId);
@@ -39,7 +39,7 @@
 
         public static function get_groups( $userId )
         {
-            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, c.slug, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
@@ -64,6 +64,7 @@
                     'comments'  =>  $ds->getValue( 'comments' ),
                     'fave'      =>  $ds->GetBoolean( 'general' ),
                     'group_type'=>  $ds->GetInteger( 'type' ),
+                    'slug'      =>  $ds->GetString( 'slug' ),
                 );
             }
             $res = array_values( $res );
@@ -279,7 +280,6 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-//            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
 
             $res = array();
