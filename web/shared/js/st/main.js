@@ -311,6 +311,15 @@ var Filter = (function() {
     }
 
     function _initEvents() {
+        window.onpopstate = function(E) {
+            if (typeof E.state === 'object') {
+                if (E.state !== null && ('listId' in E.state)) {
+                    Table.changeList(E.state.listId);
+                } else {
+                    Table.changeList(null);
+                }
+            }
+        };
         (function() {
             var $slider = $audience.find('> .slider-wrap');
             var $sliderRange = $audience.find('> .slider-range');
@@ -437,8 +446,7 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            var $item = $(this);
-            listSelect($item.data('id'));
+            listSelect($(this));
         });
         $list.delegate('.item > .bookmark', 'click', function(e) {
             e.stopPropagation();
@@ -464,26 +472,24 @@ var Filter = (function() {
         });
     }
     function listRefresh(callback) {
-        var $selectedItem = $list.find('.item.selected');
-        var id = $selectedItem.data('id');
         Events.fire('load_list', function(data) {
             $list.html(tmpl(FILTER_LIST, {items: data}));
-            if (id) {
-                listSelect(id, function() {
-                    if ($.isFunction(callback)) callback();
-                });
-            } else if ($.isFunction(callback)) callback();
+            var $selectedItem = $list.find('.item.selected');
+            listSelect($selectedItem, function() {
+                if ($.isFunction(callback)) callback();
+            });
         });
     }
-    function listSelect(id, callback) {
-        var $item = $list.find('.item[data-id=' + id + ']');
+    function listSelect($item, callback) {
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) callback();
-        else {
-            List.select($item.data('id'), function() {
-                Table.changeList($item.data('id'));
+        if ($.isFunction(callback)) {
+            callback();
+        } else {
+            var id = $item.data('id');
+            List.select(id, function() {
+                Table.changeList(id, $item.data('slug'));
             });
         }
     }
@@ -540,6 +546,96 @@ var Table = (function() {
         _initEvents();
         changeList();
         if ($.isFunction(callback)) callback();
+    }
+    function prepareServerData(dirtyData) {
+        var clearList = [];
+        var clearPeriod = [];
+        var clearListType = 0;
+
+        if (dirtyData.min_max) {
+            clearPeriod = [
+                dirtyData.min_max.min,
+                dirtyData.min_max.max
+            ];
+        }
+        if (dirtyData.group_type == 2) {
+            clearListType = 1;
+        }
+        if (!clearListType) {
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    var users = [];
+                    $.each(publicItem.admins, function(i, data) {
+                        users.push({
+                            userId: data.vk_id,
+                            userName: data.name,
+                            userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                            userDescription: data.role || '&nbsp;'
+                        });
+                    });
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        publicIsActive: !!publicItem.active,
+                        publicInSearch: !!publicItem.in_search,
+                        publicVisitors: publicItem.visitors,
+                        publicAudience: publicItem.viewers,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                        users: users
+                    });
+                });
+            }
+        } else {
+            /*
+             id - id
+             name - name
+             ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+             auth_likes_eff: 0 - Авторское/спарсенное: лайки
+             auth_posts: 0 - авторских постов
+             auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+             avg_vie_grouth: null - средний суточный прирост просмотров
+             avg_vis_grouth: null - средний суточный прирост уников
+             overall_posts: 68 - общее количество постов за период
+             posts_days_rel: 0 - в среднем постов за сутки
+             sb_posts_count: 56 - постов из источников
+             sb_posts_rate: 0 - средний рейтинг постов из источников
+             views: null - просмотры
+             visitors: null - посетители
+             */
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicPosts: publicItem.overall_posts,
+                        publicViews: publicItem.views,
+                        publicVisitors: publicItem.visitors,
+                        publicPostsPerDay: publicItem.posts_days_rel,
+                        publicSbPosts: publicItem.sb_posts_count,
+                        publicSbLikes: publicItem.sb_posts_rate,
+                        publicAuthorsPosts: publicItem.auth_posts,
+                        publicAuthorsLikes: publicItem.auth_likes_eff,
+                        publicAuthorsReposts: publicItem.auth_reposts_eff,
+                        publicGrowthViews: publicItem.avg_vie_grouth,
+                        publicGrowthVisitors: intval(publicItem.abs_vis_grow),
+                        publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
+                    });
+                });
+            }
+        }
+
+        var data = {
+            clearList: clearList,
+            clearPeriod: clearPeriod,
+            clearListType: clearListType
+        };
+
+        return data;
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -741,7 +837,7 @@ var Table = (function() {
             }
         );
     }
-    function changeList(listId) {
+    function changeList(listId, slug) {
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
@@ -755,41 +851,60 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1],
             timeFrom: currentInterval[0],
-            timeTo: currentInterval[1]
+            timeTo: currentInterval[1],
+            slug: slug
         };
 
-        Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentListId = listId;
-                currentSearch = defSearch;
-                currentSortBy = defSortBy;
-                currentSortReverse = defSortReverse;
-                dataTable = data;
-                if (!listType) {
-                    $container.html(tmpl(TABLE, {rows: data}));
-                    Filter.hideInterval();
-                } else {
-                    $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.showInterval();
+        if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+            var data = prepareServerData(entriesPrecache);
+            loadTableCallback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
+            entriesPrecache = false;
+        } else {
+            Events.fire('load_table', params, loadTableCallback);
+        }
+        function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
+            if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
+                $('.filter .list').find('[data-id=' + explicitGroupId + ']').addClass('selected');
+            } else {
+                // смена URI
+                if (typeof slug !== 'undefined') {
+                    var pushedURI = '/stat'; // по умолчанию
+                    if (slug) {
+                        pushedURI = '/stat/' + slug;
+                    }
+                    history.pushState({listId: listId, slug: slug}, '', pushedURI);
                 }
-                $container.find('.' + currentSortBy).addClass('active');
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
-                } else {
-                    $container.addClass('no-list-id');
-                }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(maxPeriod[0]);
-                Filter.setSliderMax(maxPeriod[1]);
-                $('#global-loader').fadeOut(200);
             }
-        );
+
+            pagesLoaded = 1;
+            currentListType = listType;
+            currentListId = listId;
+            currentSearch = defSearch;
+            currentSortBy = defSortBy;
+            currentSortReverse = defSortReverse;
+            dataTable = data;
+            if (!listType) {
+                $container.html(tmpl(TABLE, {rows: data}));
+                Filter.hideInterval();
+            } else {
+                $container.html(tmpl(OUR_TABLE, {rows: data}));
+                Filter.showInterval();
+            }
+            $container.find('.' + currentSortBy).addClass('active');
+            if (!currentListId) {
+                $container.removeClass('no-list-id');
+            } else {
+                $container.addClass('no-list-id');
+            }
+            if (dataTable.length < Configs.tableLoadOffset) {
+                $('#load-more-table').hide();
+            } else {
+                $('#load-more-table').show();
+            }
+            Filter.setSliderMin(maxPeriod[0]);
+            Filter.setSliderMax(maxPeriod[1]);
+            $('#global-loader').fadeOut(200);
+        }
     }
 
     function _initEvents() {
@@ -1018,6 +1133,7 @@ var Table = (function() {
         editMode: editMode,
         toggleEditMode: toggleEditMode,
         setInterval: setInterval,
-        setCurrentInterval: setCurrentInterval
+        setCurrentInterval: setCurrentInterval,
+        prepareServerData: prepareServerData
     };
 })();
