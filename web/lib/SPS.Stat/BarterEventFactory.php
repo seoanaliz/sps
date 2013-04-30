@@ -112,16 +112,20 @@ class BarterEventFactory
         ,'creator_id' => array(
               'name'        => 'creator_id'
             , 'type'        => TYPE_STRING
-            )
+        )
         ,'init_users' => array(
               'name'        => 'init_users'
             , 'type'        => TYPE_ARRAY
             , 'complexType' => 'int[]'
-            )
+        )
         ,'neater_subscribers' => array(
               'name'        => 'neater_subscribers'
             , 'type'        => TYPE_INTEGER
-            )
+         )
+        ,'skiped_subcribers' => array(
+              'name'        => 'skiped_subcribers'
+            , 'type'        => TYPE_INTEGER
+        )
     )
     , 'search'    => array(
             '_barter_event_id' => array(
