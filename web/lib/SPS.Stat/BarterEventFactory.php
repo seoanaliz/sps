@@ -122,8 +122,8 @@ class BarterEventFactory
               'name'        => 'neater_subscribers'
             , 'type'        => TYPE_INTEGER
          )
-        ,'skiped_subcribers' => array(
-              'name'        => 'skiped_subcribers'
+        ,'skiped_subscribers' => array(
+              'name'        => 'skiped_subscribers'
             , 'type'        => TYPE_INTEGER
         )
     )

@@ -78,7 +78,7 @@ class BarterEvent
     public $neater_subscribers;
 
     /** @var int */
-    public $skiped_subcribers;
+    public $skiped_subscribers;
 
     public function __clone()
     {

@@ -156,8 +156,8 @@ class CheckPosts
             $offset += ( $new_users - self::OFFSET_FOR_EXECUTE_GET_MEMBERS > 0 ) ?  self::OFFSET_FOR_EXECUTE_GET_MEMBERS : $new_users;
             $new_users -=  self::OFFSET_FOR_EXECUTE_GET_MEMBERS;
         }
-        $barter_event->skiped_subcribers  = $total_subscribers;
-        $barter_event->neater_subscribers = $result;
+        $barter_event->skiped_subscribers  = $total_subscribers;
+        $barter_event->neater_subscribers  = $result;
     }
 
     //возвращает число отсутствующих во втором массиве lmn первого массива( до первого совпадения )
