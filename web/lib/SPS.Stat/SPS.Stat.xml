@@ -36,6 +36,9 @@
         <group name="Prices">
             <action name="setPostPrice">
                 <path>controls/stat/setPostPrice</path>
+            </action>            
+            <action name="getEntriesPrecache">
+                <path>controls/stat/getEntriesPrecache</path>
             </action>
             <action name="getEntries">
                 <path>controls/stat/getEntries</path>
