@@ -24,6 +24,7 @@
                 <path name="reports" value="/int/reports" />
 				<path name="stat" value="/stat" />
 				<path name="authors" value="/authors" />
+				<path name="editors_login" value="/editors_login" />
 				<path name="mobile" value="/mobile" />
 			</paths>
 			<!-- System modules Settings -->
