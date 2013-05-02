@@ -724,7 +724,7 @@
 
 
             <pageGroup name="editors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
-                <page uri="editors_login://" boot="">
+                <page uri="editors_login://" >
                     <template>tmpl://editors_login/login.tmpl.php</template>
                 </page>
             </pageGroup>

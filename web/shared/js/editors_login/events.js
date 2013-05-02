@@ -56,7 +56,7 @@ function simpleAjax(method, data, callback) {
         url: controlsRoot + method + '/',
         dataType: 'json',
         data: $.extend({
-            userId: Configs.vkId,
+            userId: 0,
             type: 'mes'
         }, data),
         success: function (result) {
