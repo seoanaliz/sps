@@ -49,7 +49,9 @@
                 $this->link             =   $post_data['link'];
                 $this->header           =   $post_data['header'];
                 $this->repost_post      =   $post_data['repost_post'];
+
             }
+
         }
 
         private function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '' )
@@ -107,6 +109,9 @@
             sleep( rand( 0, 12 ));
             $photo_array = array();
             $meth = 'wall';
+            if ( substr_count($this->post_text, '@') > 0 || substr_count($this->post_text, '[') > 0 ){
+                return false;
+            }
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
