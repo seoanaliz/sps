@@ -57,7 +57,6 @@ sql;
          */
         private function sendArticleQueue($articleQueue) {
             $result = false;
-
             //select objects
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             $articleRecord = ArticleRecordFactory::GetOne(
@@ -82,9 +81,17 @@ sql;
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
                     return false;
                 }
-                //в очереди паблишеров первыми делаем живых людей
+
+                //в очереди паблишеров первыми делаем живых людей(приоритет у запланировавшего пост)
+                //todo убрать дубль sender'а
                 $publishers = array();
+                $sender = false;
                 foreach( $targetFeed->publishers as $ptf ){
+                    //отлавливаем создателя поста. он должен посылать первым
+
+                    if( $ptf->publisher->vk_id == $article->editor ) {
+                        $sender = clone $ptf;
+                    }
                     if( $ptf->publisher->vk_seckey == 2 ) {
                         array_unshift( $publishers, $ptf );
                     } else {
@@ -92,11 +99,17 @@ sql;
                     }
                 }
 
-                $targetFeed->publishers = $publishers;                foreach ($targetFeed->publishers as $publisher) {
+                if( $sender ) {
+                    array_unshift( $publishers, $sender );
+                }
+
+                $targetFeed->publishers = $publishers;
+                foreach ($targetFeed->publishers as $publisher) {
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
                     } catch (ChangeSenderException $Ex) {
+                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $Ex->getMessage());
                     }
                 }
                 
