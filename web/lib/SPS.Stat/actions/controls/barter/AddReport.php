@@ -33,8 +33,9 @@ class AddReport
         if ( !$group_id ) {
             $group_id = $default_group->group_id;
         }
+        $group = GroupFactory::GetById( $group_id);
 
-        if ( !GroupsUtility::is_author( $group_id, $user_id ))
+        if ( !GroupsUtility::is_author( $group_id, $user_id ) && $group->type != GroupsUtility::Group_Shared_Special )
             die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
         $publics_info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $publics_info ))

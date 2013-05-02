@@ -171,6 +171,7 @@ class CheckWalls
             ,43503298
             ,43503235
             ,43503264
+            ,52223807
         );
 
         $not_our_array = array(

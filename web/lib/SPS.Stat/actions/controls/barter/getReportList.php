@@ -17,7 +17,7 @@ class getReportList
         $state          =   Request::getString ( 'state' );#мониторы/результаты
         $time_from      =   Request::getInteger( 'timeFrom' );
         $time_to        =   Request::getInteger( 'timeTo' );
-        $status         =   Request::getInteger( 'status' );
+        $status         =   Request::getString( 'status' );
         $sort_by        =   strtolower( Request::getString( 'sortBy' ));
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   Request::getString ( 'targetPublicId' );
@@ -34,19 +34,19 @@ class getReportList
 
         $default_group  = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
         if ( !$group_id ) {
-
             $group_id       = $default_group->group_id;
         }
         if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
             die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
 
-
-        if( $status ) {
-            $status_array = array( $status );
-        } elseif( strtolower( $state ) == 'complete' ) {
-            $status_array = array( 4,5,6 );
+        if ( !$state) {
+              $status_array = array( 1,2,3);
+        } elseif( strtolower( $status ) == 'complete' ) {
+            $status_array = array( 4,6 );
+        } elseif(strtolower( $status ) == 'false' ) {
+            $status_array = array(5);
         } else {
-            $status_array = array( 1,2,3,4,5,6 );
+            $status_array = array( 4,5,6 );
         }
 
         $search = array(
@@ -59,9 +59,6 @@ class getReportList
             '_barter_public'=>   $barter_public,
             '_target_public'=>   $target_public,
         );
-//        if( strtolower( $state ) != 'complete' )
-//            $search['standard_mark'] = true;
-
         if( $group_id ) {
             $group_id = explode( ',', $group_id );
             $search['_groups_ids'] = $group_id;

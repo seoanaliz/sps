@@ -82,9 +82,17 @@ sql;
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
                     return false;
                 }
+                //в очереди паблишеров первыми делаем живых людей
+                $publishers = array();
+                foreach( $targetFeed->publishers as $ptf ){
+                    if( $ptf->publisher->vk_seckey == 2 ) {
+                        array_unshift( $publishers, $ptf );
+                    } else {
+                        $publishers[] = $ptf;
+                    }
+                }
 
-                shuffle( $targetFeed->publishers );
-                foreach ($targetFeed->publishers as $publisher) {
+                $targetFeed->publishers = $publishers;                foreach ($targetFeed->publishers as $publisher) {
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;

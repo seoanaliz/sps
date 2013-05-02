@@ -72,7 +72,6 @@ class CheckPosts
                     $barter->status = 6;
                     $barter->deleted_at = $this->now;
                 }
-
                 $barter = next( $chunk );
             }
         }
@@ -115,7 +114,8 @@ class CheckPosts
         $result = 0;
         $offset = 0;
         $new_users = abs( $barter_event->end_subscribers - $barter_event->start_subscribers ) + 60;
-
+        //перебираем новых юзеров паблика, проверяем, пришли ли они из паблика-рекламоразместителя
+        $total_subscribers = 0;
         while( $new_users > 0 ) {
             if ( $offset > self::OFFSET_FOR_EXECUTE_GET_MEMBERS_LIMIT ) {
                 $result = 0;
@@ -138,28 +138,31 @@ class CheckPosts
                     break;
                 sleep( VkHelper::PAUSE);
             }
-            if( isset($res->error))
-            {
-                die('fucking errors');
+            if( isset($res->error)) {
+                die();
             }
-
-
+            $check = array_intersect($barter_event->init_users, $res->users );
             if( !empty( $check )) {
                 echo 'отсечка по юзерам<br>';
-                $result += $this->get_first_inersection($res->users, $barter_event->init_users );
+                $first_intersection  = $this->get_first_intersection($res->users, $barter_event->init_users );
+                $total_subscribers  += $first_intersection;
+                $result             += $first_intersection;
                 break;
             }
+            $total_subscribers += 24;
             $result += $res->cross_users_count;
 
             sleep( 1 );
             $offset += ( $new_users - self::OFFSET_FOR_EXECUTE_GET_MEMBERS > 0 ) ?  self::OFFSET_FOR_EXECUTE_GET_MEMBERS : $new_users;
             $new_users -=  self::OFFSET_FOR_EXECUTE_GET_MEMBERS;
         }
-        $barter_event->neater_subscribers = $result;
+        $barter_event->skiped_subscribers  = $total_subscribers;
+        $barter_event->neater_subscribers  = $result;
     }
 
     //возвращает число отсутствующих во втором массиве lmn первого массива( до первого совпадения )
-    private function get_first_inersection( $main_array, $search_array ) {
+    private function get_first_intersection( $main_array, $search_array )
+    {
         $lenght = count( $main_array );
         $search_array = array_flip( $search_array );
         for( $i = 0; $i < $lenght; $i++) {
