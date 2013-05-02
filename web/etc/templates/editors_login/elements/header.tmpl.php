@@ -52,7 +52,6 @@ $jsFiles = array(
     'js://ext/jquery.plugins/jquery.cookie.js',
     'js://editors_login/login.js',
     'js://editors_login/events.js',
-    'js://editors_login/main.js',
 
 );
 
