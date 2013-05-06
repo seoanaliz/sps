@@ -7,7 +7,7 @@
         public function Execute() {
             $requestData = Page::$RequestData;
             $slug = isset($requestData[1]) ? $requestData[1] : null;
-            
+
             $EntryGetter = new EntryGetter();
             $id = null;
             if ($slug) {
