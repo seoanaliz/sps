@@ -33,6 +33,9 @@
                 <page uri="/oadmins/cof12">
                     <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
                 </page>
+                <page uri="/test/" boot="SPS.VK.VKCheckAuth">
+                    <actions>SPS.Site.RunTest</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuthEditor">
