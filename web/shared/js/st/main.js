@@ -856,30 +856,37 @@ var Table = (function() {
             slug: slug
         };
 
+        if (typeof slug !== 'undefined') {
+            var pushedURI = '/stat'; // по умолчанию
+            if (slug) {
+                pushedURI = '/stat/' + slug;
+            }
+        }
+
         if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
             var data = prepareServerData(entriesPrecache);
             loadTableCallback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
             entriesPrecache = false;
         } else {
-            Events.fire('load_table', params, loadTableCallback);
+            if (typeof history === 'object' && 'pushState' in history) {
+                Events.fire('load_table', params, loadTableCallback);
+            } else if (pushedURI) { // для старых браузеров — перезагружаем страницу
+                location.href = pushedURI;
+            }
         }
         function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
             if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
                 listId = explicitGroupId;
             } else {
                 // смена URI
-                if (typeof slug !== 'undefined') {
-                    var pushedURI = '/stat'; // по умолчанию
-                    if (slug) {
-                        pushedURI = '/stat/' + slug;
-                    }
+                if (pushedURI) {
                     history.pushState({listId: listId, slug: slug}, '', pushedURI);
                 }
             }
 
-            var $container = $('.filter');
-            $container.find('.selected').removeClass('selected');
-            $container.find('.item').filter('[data-id=' + listId + ']').addClass('selected');
+            var $filterContainer = $('.filter');
+            $filterContainer.find('.selected').removeClass('selected');
+            $filterContainer.find('.item').filter('[data-id=' + listId + ']').addClass('selected');
 
             pagesLoaded = 1;
             currentListType = listType;

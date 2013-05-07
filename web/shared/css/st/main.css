@@ -68,6 +68,10 @@ td {
 .table>.header>.row>.column4 {
   width: 33.3%;
 }
+.table>.body>.row>.column3-5,
+.table>.header>.row>.column3-5 {
+  width: 29.1%;
+}
 .table>.body>.row>.column3,
 .table>.header>.row>.column3 {
   width: 25%;
@@ -76,13 +80,13 @@ td {
 .table>.header>.row>.column2 {
   width: 16.6%;
 }
-.table>.body>.row>.column1,
-.table>.header>.row>.column1 {
-  width: 8.3%;
-}
 .table>.body>.row>.column1-5,
 .table>.header>.row>.column1-5 {
   width: 12.5%;
+}
+.table>.body>.row>.column1,
+.table>.header>.row>.column1 {
+  width: 8.3%;
 }
 .table>.body>.row>.column,
 .table>.header>.row>.column {
