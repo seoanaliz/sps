@@ -864,7 +864,7 @@ var Table = (function() {
         }
         function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
             if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
-                $('.filter .list').find('[data-id=' + explicitGroupId + ']').addClass('selected');
+                listId = explicitGroupId;
             } else {
                 // смена URI
                 if (typeof slug !== 'undefined') {
@@ -875,6 +875,10 @@ var Table = (function() {
                     history.pushState({listId: listId, slug: slug}, '', pushedURI);
                 }
             }
+
+            var $container = $('.filter');
+            $container.find('.selected').removeClass('selected');
+            $container.find('.item').filter('[data-id=' + listId + ']').addClass('selected');
 
             pagesLoaded = 1;
             currentListType = listType;
