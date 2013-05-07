@@ -55,6 +55,7 @@ function initVK(data) {
             Filter.init(function() {
                 List.init(function() {
                     Table.init();
+                    Counter.init();
                 });
             });
         });
@@ -1139,5 +1140,26 @@ var Table = (function() {
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval,
         prepareServerData: prepareServerData
+    };
+})();
+
+var Counter = (function(){
+    var $container;
+
+    function init( callback ){
+        $container = $('#listed-counter');
+        if( cur.dataUser.isEditor ) {
+            $container.show();
+        }
+        refresh();
+    }
+
+    function refresh(){
+       $container.find('span').text( cur.dataUser.listed );
+    }
+
+    return {
+        init: init,
+        refresh: refresh
     };
 })();

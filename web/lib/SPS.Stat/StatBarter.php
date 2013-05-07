@@ -29,6 +29,7 @@
         $publics_data = StatPublics::get_publics_info( $request_line );
         $barter_events_res = array();
         foreach( $query_result as $barter_event ) {
+            /** @var $barter_event BarterEvent*/
             $overlaps = isset( $barter_event->barter_overlaps ) ? explode( ',', $barter_event->barter_overlaps ) : array(0);
             $overlaps = ( $overlaps[0] && $barter_event->posted_at )? $overlaps[0] - $barter_event->posted_at->format('U'): 0;
             $posted_at  = isset( $barter_event->posted_at ) ? $barter_event->posted_at->format('U') : 0;
@@ -59,8 +60,8 @@
                 'active'        =>   in_array( $barter_event->status, array(1,2,3)) ? true : false,
                 'groups'        =>   $groups,
                 'event_creator' =>   $user_id == $barter_event->creator_id,
-                'post_link'     =>   $barter_event->post_id ? 'http://vk.com/wall-' . $barter_event->barter_public . '_' . $barter_event->post_id : ''
-
+                'post_link'     =>   $barter_event->post_id ? 'http://vk.com/wall-' . $barter_event->barter_public . '_' . $barter_event->post_id : '',
+                'subscribers_fixed'  => $barter_event->neater_subscribers
             );
         };
         return $barter_events_res;

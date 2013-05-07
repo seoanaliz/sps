@@ -52,4 +52,9 @@
     </table>
 </div>
 <div id="go-to-top">Наверх</div>
+<div id="listed-counter"> вы накликали:
+    <span class="value-max"></span>
+</div>
+</div>
+
 {increal:tmpl://st/elements/footer.tmpl.php}

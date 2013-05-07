@@ -9,16 +9,28 @@
 class CheckPosts
 {
     private $now;
+    const OFFSET_FOR_EXECUTE_GET_MEMBERS = 24;
+    const OFFSET_FOR_EXECUTE_GET_MEMBERS_LIMIT = 1200;
 
     public function Execute()
     {
+        set_time_limit(180);
         $this->now = new DateTimeWrapper(date( 'Y-m-d H:i:s',time()));
 //        error_reporting(0);
         $barters_for_search = BarterEventFactory::Get( array( 'status' => 3 ), null, 'tst' );
 
         $this->search_for_posts( $barters_for_search );
 
-        StatPublics::update_population( $barters_for_search );
+
+        foreach( $barters_for_search as $barter ) {
+            if( $barter->status == 3 ) {
+                echo '213123';
+                continue;
+            }
+            StatPublics::update_population( $barters_for_search );
+            self::count_users_from_barter( $barter );
+        }
+
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 
@@ -33,12 +45,14 @@ class CheckPosts
                 $overposts = '';
                 unset($wall[0]);
                 $trig = false;
-
                 foreach( $wall as $post ) {
                     if( $post->id  == $barter->post_id ) {
                         if( time() >= StatBarter::TIME_INTERVAL + $barter->detected_at->format('U')) {
                             $barter->status = 4;
                             $barter->deletedAt = $this->now;
+                        } else {
+
+
                         }
                         $trig = true;
                         break;
@@ -94,5 +108,63 @@ class CheckPosts
             break;
         }
         return $count;
+    }
+
+    public function count_users_from_barter( BarterEvent $barter_event )
+    {
+        $result = 0;
+        $offset = 0;
+        $new_users = abs( $barter_event->end_subscribers - $barter_event->start_subscribers ) + 60;
+        //перебираем новых юзеров паблика, проверяем, пришли ли они из паблика-рекламоразместителя
+        while( $new_users > 0 ) {
+            if ( $offset > self::OFFSET_FOR_EXECUTE_GET_MEMBERS_LIMIT ) {
+                $result = 0;
+                break;
+            }
+            $code =    'var s=API.groups.getMembers({count: 24,gid: ' . $barter_event->target_public . ',sort: "time_desc",offset: ' . $offset . '});
+                        var uids=s.users;
+                        var cross_users_count=0;
+                        var i=0;
+                        while(i<uids.length){
+                            var uid=uids[i];
+                            cross_users_count = cross_users_count + API.groups.isMember({"gid": ' . $barter_event->barter_public . ', "uid": uid});
+                            i=i+1;
+                        };
+                        return {"cross_users_count":cross_users_count, "users": uids};';
+
+            for(  $try = 0; $try < 3; $try++ ) {
+                $res = VkHelper::api_request( 'execute', array('code' => $code), 0 );
+                if(!isset($res->error))
+                    break;
+                sleep( VkHelper::PAUSE);
+            }
+            if( isset($res->error)) {
+                die();
+            }
+            $check = array_intersect($barter_event->init_users, $res->users );
+            if( !empty( $check )) {
+                echo 'отсечка по юзерам<br>';
+                $result += $this->get_first_intersection($res->users, $barter_event->init_users );
+                break;
+            }
+            $result += $res->cross_users_count;
+
+            sleep( 1 );
+            $offset += ( $new_users - self::OFFSET_FOR_EXECUTE_GET_MEMBERS > 0 ) ?  self::OFFSET_FOR_EXECUTE_GET_MEMBERS : $new_users;
+            $new_users -=  self::OFFSET_FOR_EXECUTE_GET_MEMBERS;
+        }
+        $barter_event->neater_subscribers = $result;
+    }
+
+    //возвращает число отсутствующих во втором массиве lmn первого массива( до первого совпадения )
+    private function get_first_intersection( $main_array, $search_array ) {
+        $lenght = count( $main_array );
+        $search_array = array_flip( $search_array );
+        for( $i = 0; $i < $lenght; $i++) {
+            if( isset( $search_array[$main_array[$i]] )) {
+                return $i;
+            }
+        }
+        return $lenght;
     }
 }

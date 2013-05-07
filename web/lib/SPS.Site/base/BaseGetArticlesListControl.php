@@ -166,7 +166,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
     {
         $page = Request::getInteger($sessionKey);
         $page = ($page < 0) ? 0 : $page;
-        $this->search['pageSize'] = $this->pageSize + 1;
+        $this->search['pageSize'] = $this->pageSize;
         $this->search['page'] = $page;
     }
 
@@ -470,7 +470,7 @@ abstract class BaseGetArticlesListControl extends BaseControl
         $this->articles = ArticleFactory::Get($this->search, $this->options);
         $this->articlesCount = ArticleFactory::Count($this->search, $this->options + array(BaseFactory::WithoutPages => true));
 
-        $this->hasMore = (count($this->articles) > $this->pageSize);
+        $this->hasMore = ($this->articlesCount > $this->pageSize * ($this->search['page'] + 1));
         $this->articles = array_slice($this->articles, 0, $this->pageSize, true);
 
         // load articles records

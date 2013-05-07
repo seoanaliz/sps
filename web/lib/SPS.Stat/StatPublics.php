@@ -511,20 +511,12 @@
 
         public static function get_views_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
-            if ( !empty( $public )) {
-                $public = reset( $public );
-//                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-//                $publisher = reset( $publisher );
-            }
 
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-//            if ( isset( $publisher->publisher->vk_token ))
-//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error))
@@ -538,7 +530,6 @@
         }
 
         public static function get_average_rate( $sb_id, $time_from, $time_to ) {
-
             if ( !$time_to )
                 $time_to = time();
             $sql = 'SELECT
@@ -748,7 +739,7 @@
             $sql = "SELECT set_state( @public_id, @name, @state) AS cnanged;";
                 $cmd = new SqlCommand( $sql, $conn );
                 $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetString(  '@name',      $parameter );
+                $cmd->SetString ( '@name',      $parameter );
                 $cmd->SetBoolean( '@state',     $state);
                 $cmd->Execute();
         }
@@ -824,7 +815,7 @@
             return $res;
         }
 
-        public static  function update_population( $barter_events_array, $point = 'end' )
+        public static function update_population( $barter_events_array, $point = 'end' )
         {
             $subscribers =  $point . '_subscribers';
             $visitors    =  $point . '_visitors';
@@ -843,20 +834,28 @@
                     $barter_event->$visitors = $res['visitors'];
 
                     $count = 0;
-                    for ( $i = 0; $i < 3; $i++ ) {
+                    $init_users = array();
 
-                        $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
+                    $params = array(
+                        'gid' => $barter_event->target_public,
+                        'count' => 15,
+                        'sort'  =>  'time_desc' );
+
+                    for ( $i = 0; $i < 3; $i++ ) {
+                        $res = VkHelper::api_request( 'groups.getMembers', $params, 0, 'barter');
                         if( !isset( $res->count )) {
                             sleep( 1 );
                             continue;
                         }
-                        $count = $res->count;
+                        $count      =   $res->count;
+                        $init_users =   $res->users;
                         break;
                     }
-//                if( !$count ) {
-//                    $count = $this->get_public_members_count( $barter_event->target_public );
-//                }
+
                     $barter_event->$subscribers = $count;
+                    if( $point == 'start' ) {
+                        $barter_event->init_users  = $init_users;
+                    }
                 }
             }
         }

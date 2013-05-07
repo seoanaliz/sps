@@ -67,8 +67,8 @@
                     'slug'      =>  $ds->GetString( 'slug' ),
                 );
             }
-            $res = array_values( $res );
-
+            $res['list']        =   array_values( $res );
+            $res['listed_by']   =   self::get_listed_by_user( $userId );
             ksort( $res );
             return $res;
         }
@@ -116,6 +116,7 @@
                     $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $gr_id);
                     $cmd->SetInteger('@user_id', $id);
+
 		      if ($cmd->ExecuteNonQuery())
                         $i++;
                 }
@@ -167,6 +168,8 @@
             $cmd->SetInteger('@public_id', $publicId);
             $cmd->SetInteger('@listed_by', $listed_by);
             $cmd->Execute();
+
+            return array( 'listed_by' => self::get_listed_by_user( $user_id));
         }
 
         public static function extricate_entry( $group_id, $entry_id, $user_id = 0 )
@@ -378,6 +381,19 @@
                 $safeSlug = $slug . $nextNumber;
             }
             return $safeSlug;
+        }
+
+        public static function get_listed_by_user( $user_id )
+        {
+            $result = 0;
+            $sql = 'SELECT COUNT(*) FROM ' . TABLE_STAT_GROUP_PUBLIC_REL . ' WHERE listed_by = @user_id ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds = $cmd->Execute();
+            if( $ds->Next()) {
+                $result = $ds->GetInteger( 'count' );
+            }
+            return $result;
         }
     }
 ?>
