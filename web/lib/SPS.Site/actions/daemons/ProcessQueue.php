@@ -108,8 +108,7 @@ sql;
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
-                    } catch (ChangeSenderException $Ex) {
-                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $Ex->getMessage());
+                    } catch (Exception $Ex) {
                     }
                 }
                 
@@ -181,6 +180,7 @@ sql;
                     TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
                 }
             } catch (ChangeSenderException $Ex){
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'failed to post from publisher ' . $publisher->publisherId );
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
