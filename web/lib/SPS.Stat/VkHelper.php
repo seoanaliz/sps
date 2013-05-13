@@ -19,6 +19,8 @@
              *id аппа статистки
              */
             const APP_ID_STATISTICS = 2642172;
+            const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
+
 
             /**
              *id аппа обмена
@@ -288,6 +290,21 @@
                 if( preg_match( "/remixsid=(.*?);/", $res, $sid ))
                     return "remixchk=5; remixsid=$sid[1]";
                 return false;
+            }
+
+            public static function send_alert( $message, $reciever_vk_ids ) {
+                if( !is_array( $reciever_vk_ids )) {
+                    $reciever_vk_ids = array( $reciever_vk_ids );
+                }
+                foreach( $reciever_vk_ids as $vk_id) {
+                    $params = array(
+                        'uid'           =>   $vk_id,
+                        'message'       =>   $message . ' ' . md5(time()) ,
+                        'access_token'  =>   self::ALERT_TOKEN,
+                    );
+                    VkHelper::api_request( 'messages.send', $params );
+                    sleep( self::PAUSE );
+                }
             }
         }
     ?>
