@@ -22,7 +22,7 @@ class CheckWalls
     const MONITORING_TYPE_WALL = 'wall';
     const MONITORING_TYPE_MENTIONS = 'mentions';
     const MONITORING_TYPE_NOT_SB_POSTS = 'not_sb';
-    //v
+
     private  $monitoring_array = array(
         43005314,
         42933269,
@@ -103,8 +103,7 @@ class CheckWalls
             if ( !isset( $walls[ $public_id ][1] ))
                 continue;
             $post = $walls[ $public_id ][1];
-            $link = $this->find_memlink( $post->text );
-            $this->save_post( $public_id, $post->id, $post->text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
+            $this->save_post( $public_id, $post->id, $post->text, self::MONITORING_TYPE_NOT_SB_POSTS );
 
             //заносим отсутствующие в sb посты в sb
             $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
@@ -121,7 +120,7 @@ class CheckWalls
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
 
                 //Если этот пост уже наблюдается
-                if ( is_array($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
+                if ( isset($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
                     echo 'вылетел по причине наличия обзора над постом ' . $barter_event->barter_public . '_' . $post->id . '<br>';
                     continue;
                 }
@@ -324,15 +323,28 @@ class CheckWalls
     private function find_memlink( $text )
     {
         $matches = array();
-        if ( preg_match( '/\[(.*?)\|/', $text, $matches ))
+        if ( preg_match( '/\[(.*?)\|/', $text, $matches ) || preg_match( '/\[(.*?)\|/', $text, $matches ))
             return $matches[1];
         return null;
+    }
+
+    private function find_url( $text )
+    {
+        $matches = array();
+        if ( preg_match( '/(https?|ftp):\/\/\S+[^\s.,> )\];\'\"!?]/', $text, $matches )) {
+            return $matches[0];
+        }
+        return false;
     }
 
     private function save_post( $public_id, $post_id, $text, $type = self::MONITORING_TYPE_WALL, $link = null, $mentioned_public = null )
     {
         if( !$link ) {
             $link = $this->find_memlink( $text );
+        }
+        $outer_link = $this->find_url( $text );
+        if ( $outer_link ) {
+            $link = $outer_link;
         }
         if( $link && $type == self::MONITORING_TYPE_WALL )
             return false;
@@ -347,6 +359,10 @@ class CheckWalls
             $cmd->SetString ( '@link',     $link );
             $cmd->SetString ( '@type',     $type );
             $cmd->Execute();
+            if( $outer_link ) {
+                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id ;
+                VkHelper::send_alert( $message, array( 670456, 106175502 ));
+            }
         }
     }
 
@@ -403,7 +419,7 @@ class CheckWalls
 
             //регэкспим id паблика и поста. если нет - мимо
             preg_match( '/-(\d*?)_(\d*)/', $source, $matches );
-            if( count( $matches) != 3 ){
+            if( count( $matches) != 3 ) {
                 continue;
             }
             $source_public_id = $matches[1];
@@ -438,17 +454,17 @@ sql;
         $this->existing_external_ids = $result;
     }
 
-    //сохраняем посты(сделанные не через sb), заносим их в очередь как отправленные
+    //сохраняем посты(сделанные не через sb), заносим их в очередь(правую ленту) как отправленные
     public function add_posts_to_sb_queue( $posts, $targeetFeedId, $check_time = true )
     {
 //        $likes_array  = array();
         $look_from_time = new DateTimeWrapper( date('r', time() - 600 ));
         $look_to_time   = new DateTimeWrapper( date('r', time() - 60 ));
-        $posts_c = ParserVkontakte::post_conv( $posts );
-        foreach( $posts_c as $post ) {
+        $converted_posts = ParserVkontakte::post_conv( $posts );
+        foreach( $converted_posts as $post ) {
             $postDate = new DateTimeWrapper( date('r', $post['time'] ));
             //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
-            $check_date_condition = $check_time &&  $postDate >= $look_from_time && $postDate <= $look_to_time;
+            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time ) && ( $postDate <= $look_to_time );
             //отсеиваем неподходящие по времени или уже содержащиеся в базе
             if ( !$check_date_condition  || isset( $this->existing_external_ids[$post['id']] )) {
 //                $likes_array[ $post['id']] = array('likes' => $post['likes_tr'], 'retweet' => $post['retweet']);
