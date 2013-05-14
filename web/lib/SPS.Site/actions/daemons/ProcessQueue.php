@@ -92,18 +92,14 @@ sql;
                 $send_from_bot = in_array( $article->editor, $editors_black_list);
 
                 //сортируем издателей: создавший пост-> люди -> боты
-                foreach( $targetFeed->publishers as $ptf ){
-
+                foreach( $targetFeed->publishers as $ptf ) {
                     if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
                         $sender = clone $ptf;
                     }
 
                     if( $ptf->publisher->vk_seckey == 2 ) {
                         if( !$send_from_bot ) {
-
                             array_unshift( $publishers, $ptf );
-                        } else {
-                            echo 'Дропнули чела из списка!! ', print_r( $ptf ), '<br>';
                         }
                     } else {
                         $publishers[] = $ptf;
