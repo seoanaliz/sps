@@ -134,13 +134,13 @@ class CheckWalls
                     $barter_event->post_id      =   $post->id;
                     $barter_event->detected_at  =   date( 'Y-m-d H:i:s', time());
                     $barter_event->stop_search_at = date( 'Y-m-d H:i:s', time() + 4000);
-
                     $result[] = $barter_event;
                     //добавляем в список наблюдаемых постов
                     $this->posts_in_progress[$barter_event->creator_id][] = $barter_event->barter_public . '_' . $post->id;
                     break;
                 }
             }
+
         }
         return $result;
     }
@@ -332,7 +332,8 @@ class CheckWalls
     {
         $matches = array();
         if ( preg_match( '/(https?|ftp):\/\/\S+[^\s.,> )\];\'\"!?]/', $text, $matches )) {
-            return $matches[0];
+            if( !substr_count( $matches[0], 'vk.com') && !substr_count( $matches[0], 'vkontakte.ru'))
+                return $matches[0];
         }
         return false;
     }
@@ -428,7 +429,6 @@ class CheckWalls
             $text = $text->getString();
             $text = $text[0];
             $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );
-
         }
     }
 
@@ -509,7 +509,7 @@ sql;
         return GridLineItemFactory::Add( $grid_line_item );
     }
 
-    //собираем 15 последних вступивших в паблик, нужно для точки отсчта при финализации бартера
+    //собираем 15 последних вступивших в паблик, нужно для точки отсчета при финализации бартера
     private function get_init_members( BarterEvent $barter_event )
     {
         $barter_event->init_users = array();
