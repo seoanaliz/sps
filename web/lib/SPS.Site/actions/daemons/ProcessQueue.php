@@ -86,14 +86,25 @@ sql;
                 //todo убрать дубль sender'а
                 $publishers = array();
                 $sender = false;
-                foreach( $targetFeed->publishers as $ptf ){
-                    //отлавливаем создателя поста. он должен посылать первым
 
-                    if( $ptf->publisher->vk_id == $article->editor ) {
+                // если пост от этих издателей - он отправляется от ботов
+                $editors_black_list = array( 670456, 191774732, 106175502, 196506553, 176239625, 13049517 );
+                $send_from_bot = in_array( $article->editor, $editors_black_list);
+
+                //сортируем издателей: создавший пост-> люди -> боты
+                foreach( $targetFeed->publishers as $ptf ){
+
+                    if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
                         $sender = clone $ptf;
                     }
+
                     if( $ptf->publisher->vk_seckey == 2 ) {
-                        array_unshift( $publishers, $ptf );
+                        if( !$send_from_bot ) {
+
+                            array_unshift( $publishers, $ptf );
+                        } else {
+                            echo 'Дропнули чела из списка!! ', print_r( $ptf ), '<br>';
+                        }
                     } else {
                         $publishers[] = $ptf;
                     }
@@ -111,7 +122,7 @@ sql;
                     } catch (Exception $Ex) {
                     }
                 }
-                
+                $this->restartArticleQueue($articleQueue);
                 $err = 'Failed to post, persumably publishers are banned, public id = ' . $targetFeed->externalId;
                 Logger::Warning($err);
 
@@ -185,11 +196,10 @@ sql;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
                 Logger::Warning($err);
-
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
 
                 //ставим обратно в очередь
-                $this->restartArticleQueue($articleQueue);
+                throw $Ex;
             }
 
             //unlink temp files
