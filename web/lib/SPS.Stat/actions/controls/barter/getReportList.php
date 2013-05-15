@@ -29,7 +29,7 @@ class getReportList
         $order_array = array( 'posted_at', 'visitors', 'subscribers', 'status' );
         $sort_by  =  in_array( $sort_by, $order_array ) ? $sort_by : ( strtolower( $status ) == 'complete' ? 'posted_at': '   created_at DESC NULLS LAST, posted_at  ' );
 //        $sort_by  = ' "' . $sort_by . '" ';
-        $sort_by .= $sortReverse ? '' : 'DESC';
+        $sort_by .= $sortReverse ? '' : ' DESC';
         $sort_by .= ' NULLS LAST ';
 
         $default_group  = GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
