@@ -27,8 +27,9 @@ class CheckPosts
                 echo '213123';
                 continue;
             }
-            StatPublics::update_population( $barters_for_search );
             self::count_users_from_barter( $barter );
+            StatPublics::update_population( $barters_for_search );
+
         }
 
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
@@ -134,12 +135,12 @@ class CheckPosts
 
             for(  $try = 0; $try < 3; $try++ ) {
                 $res = VkHelper::api_request( 'execute', array('code' => $code), 0 );
-                if(!isset($res->error))
+                if( !isset($res->error ))
                     break;
                 sleep( VkHelper::PAUSE);
             }
             if( isset($res->error)) {
-                die();
+                die($res);
             }
             $check = array_intersect($barter_event->init_users, $res->users );
             if( !empty( $check )) {
