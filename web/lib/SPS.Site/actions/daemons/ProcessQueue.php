@@ -88,8 +88,7 @@ sql;
                 $sender = false;
 
                 // если пост от этих издателей - он отправляется от ботов
-                $editors_black_list = array( 670456, 191774732, 106175502, 196506553, 176239625, 13049517 );
-                $send_from_bot = in_array( $article->editor, $editors_black_list);
+                $send_from_bot = in_array( $article->editor, StatUsers::$editors_black_list );
 
                 //сортируем издателей: создавший пост-> люди -> боты
                 foreach( $targetFeed->publishers as $ptf ) {
@@ -193,8 +192,6 @@ sql;
                 $err = $Ex->getMessage();
                 Logger::Warning($err);
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
-
-                //ставим обратно в очередь
                 throw $Ex;
             }
 
