@@ -211,7 +211,7 @@
             //create new
             } elseif( $groupName ) {
                 $slug = EntryGetter::transliterate($groupName);
-                $safeSlug = $this->getSafeSlug($slug);
+                $safeSlug = self::getSafeSlug($slug);
 
                 $sql = 'INSERT INTO
                         ' . TABLE_STAT_GROUPS . '
@@ -335,7 +335,7 @@
             $cmd->Execute();
         }
 
-        public function getSimilarSlugs($slug)
+        public static function getSimilarSlugs($slug)
         {
             $sqlSelect = 'SELECT slug FROM '. TABLE_STAT_GROUPS .'
                     WHERE slug LIKE @slug';
@@ -355,7 +355,7 @@
          * @param string $slug
          * @return false|int
          */
-        public function getLargestSuffixNumber($slugs, $slug)
+        public static function getLargestSuffixNumber($slugs, $slug)
         {
             $pattern = '/^' . preg_quote($slug) . '([0-9]*)$/';
             $numbers = array_map(function ($elem) use ($pattern) {
@@ -370,10 +370,10 @@
             return max($numbers);
         }
 
-        public function getSafeSlug($slug)
+        public static function getSafeSlug($slug)
         {
-            $similarSlugs = $this->getSimilarSlugs($slug);
-            $largestNumber = $this->getLargestSuffixNumber($similarSlugs, $slug);
+            $similarSlugs = self::getSimilarSlugs($slug);
+            $largestNumber = self::getLargestSuffixNumber($similarSlugs, $slug);
             if ($largestNumber === false) {
                 $safeSlug = $slug;
             } else {
