@@ -346,7 +346,7 @@ class CheckWalls
         $outer_link = $this->find_url( $text );
         if ( $outer_link ) {
             $articleQueue = ArticleQueueFactory::GetOne( array('externalId' => '-' . $public_id . '_' . $post_id ));
-            if( empty( $articleQueue) || in_array( $articleQueue->author, StatUsers::$editors_black_list )){
+            if( !empty( $articleQueue ) && in_array( $articleQueue->author, StatUsers::$editors_black_list )) {
                     $outer_link = false;
             } else {
                 $link = $outer_link;
