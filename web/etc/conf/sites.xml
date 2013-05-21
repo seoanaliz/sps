@@ -156,7 +156,7 @@
                             <param name="resizeCommands">array( 'resize' => '\>', 'crop' => '^' )</param>
                         </mediaServer>
                         <memcache class="MemcacheHelper">
-                            <servers compress="true" autocompress="true" active="false">
+                            <servers compress="true" autocompress="true" active="true">
                                 <server host="127.0.0.1" port="40100" active="true" />
                             </servers>
                         </memcache>
