@@ -28,6 +28,7 @@
             ,35807078
             ,25817269
             ,31554488
+            ,49765084
         );
 
         public static $topface_beauty = array(
@@ -848,7 +849,9 @@
                             continue;
                         }
                         $count      =   $res->count;
-                        $init_users =   $res->users;
+                        if( $point = 'start') {
+                            $init_users =  $res->users;
+                        }
                         break;
                     }
 
