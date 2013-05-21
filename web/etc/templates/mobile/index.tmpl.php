@@ -1,64 +1,41 @@
 {increal:tmpl://mobile/elements/header.tmpl.php}
-<div id="main" class="main">
-    <div id="header">
-        <div class="inner-content block-wrapper-2">
-            <div class="block">
-                <div id="logo">
-                    SocialBoard
-                </div>
-            </div>
-            <div class="block right">
-                Widget
-            </div>
-        </div>
+<div class="topmost col">
+    <div class="wrap">
+        <a href="javascript:;" class="create-app"></a>
     </div>
-    <div id="main-content">
-        <div class="inner-content block-wrapper-2">
-            <div class="block">
-                <div class="big-title">
-                    Ваше сообщество в App&nbsp;Store и Google&nbsp;Play
-                </div>
-                <span>
-                    <button id="create-app" class="button big-button">Создать приложение</button>
-                    <div class="big-button-description">
-                        Необходима авторизация <span class="icon-vk">VK</span>
-                    </div>
-                </span>
-            </div>
-            <div class="block right">
-                <div id="mobiles"></div>
-            </div>
-        </div>
+</div>
+<div class="gradient-stripe col">
+    &nbsp;
+</div>
+<div class="n1 col">
+    &nbsp;
+</div>
+<div class="n2 col">
+    &nbsp;
+</div>
+<div class="n3 col">
+    &nbsp;
+</div>
+<div class="n4 col">
+    &nbsp;
+</div>
+<div class="n5 col">
+    &nbsp;
+</div>
+<div class="green col">
+    &nbsp;
+</div>
+<div class="footer-white col">
+    <div class="wrap">
+        <a href="http://www.inner-active.com" target="_blank" class="inneractive"></a>
+        <a href="http://www.google.com/ads/admob/" target="_blank" class="admob"></a>
+        <a href="http://www.mopub.com" target="_blank" class="mopub"></a>
+        <a href="http://www.adwired.net" target="_blank" class="adwired"></a>
     </div>
-    <div id="description">
-        <div class="inner-content block-wrapper-3">
-            <div class="block left">
-                <div class="reason">
-                    <div class="icon check"></div>
-                    <div class="title">Просто</div>
-                    <div class="description">Вам не придётся сталкиваться со сложным процессом разработки</div>
-                </div>
-            </div>
-            <div class="block center">
-                <div class="reason">
-                    <div class="icon heart"></div>
-                    <div class="title">Бесплатно</div>
-                    <div class="description">Использование платформы Public app абсолютно бесплатно</div>
-                </div>
-            </div>
-            <div class="block right">
-                <div class="reason">
-                    <div class="icon megaphone"></div>
-                    <div class="title">Эффективно</div>
-                    <div class="description">Проверенные механизмы монетизации позволят вам получать прибыль</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="footer">
-        <div class="inner-content">
-            &copy; SocialBoard 2013
-        </div>
+</div>
+<div class="footer-gray col">
+    <div class="wrap">
+        <a href="javascript:;" class="create-app"></a>
     </div>
 </div>
 {increal:tmpl://mobile/elements/footer.tmpl.php}

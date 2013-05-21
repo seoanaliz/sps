@@ -3,9 +3,6 @@
   zoom: 1;
   *display: inline;
 }
-html {
-  background-color: #f1f1f1;
-}
 span {
   vertical-align: middle;
   display: inline-block;
@@ -321,4 +318,115 @@ span {
   display: inline-block;
   zoom: 1;
   *display: inline;
+}
+
+/* --------------- */
+.create-app.disabled {
+    display: none;
+}
+
+.col {
+}
+
+.wrap {
+    width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.topmost {
+    height: 530px;
+    background: url('../../images/mobile/topmost.jpg') center no-repeat;
+}
+.topmost .wrap {
+    height: 566px;
+}
+.topmost .wrap .create-app {
+    position: absolute;
+    left: 136px;
+    top: 286px;
+    width: 343px;
+    height: 73px;
+}
+
+.gradient-stripe {
+    height: 120px;
+    background: url('../../images/mobile/gradient-stripe.jpg') center no-repeat;
+}
+
+.n1 {
+    height: 386px;
+    background: #f2f2f2 url('../../images/mobile/n1.jpg') center no-repeat;
+}
+.n2 {
+    height: 404px;
+    background: url('../../images/mobile/n2.jpg') center no-repeat;
+}
+.n3 {
+    height: 390px;
+    background: #f2f2f2 url('../../images/mobile/n3.jpg') center no-repeat;
+}
+.n4 {
+    height: 379px;
+    background: url('../../images/mobile/n4.jpg') center no-repeat;
+}
+.n5 {
+    height: 403px;
+    background: #f2f2f2 url('../../images/mobile/n5.jpg') center no-repeat;
+}
+.green {
+    height: 548px;
+    background: #00b2b4 url('../../images/mobile/green.jpg') center no-repeat;
+}
+.footer-white {
+    height: 102px;
+    background: url('../../images/mobile/footer-white.jpg') center no-repeat;
+}
+.footer-white .wrap {
+    height: 102px;
+}
+.footer-white .wrap .inneractive {
+    position: absolute;
+    top: 25px;
+    left: 152px;
+    width: 72px;
+    height: 50px;
+}
+.footer-white .wrap .admob {
+    position: absolute;
+    left: 232px;
+    top: 28px;
+    width: 80px;
+    height: 43px;
+}
+
+.footer-white .wrap .mopub {
+    position: absolute;
+    left: 320px;
+    top: 32px;
+    width: 90px;
+    height: 40px;
+}
+
+.footer-white .wrap .adwired {
+    position: absolute;
+    left: 422px;
+    top: 25px;
+    width: 40px;
+    height: 49px;
+}
+
+.footer-gray {
+    height: 388px;
+    background: #f2f2f2 url('../../images/mobile/footer-gray.jpg') center no-repeat;
+}
+.footer-gray .wrap {
+    height: 388px;
+}
+.footer-gray .wrap .create-app {
+    position: absolute;
+    left: 463px;
+    top: 197px;
+    width: 257px;
+    height: 61px;
 }
