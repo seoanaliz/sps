@@ -37,6 +37,8 @@ class PublicsParser
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
+                if( !isset( $public->type))
+                    contunue;
                 if( $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
                 if ( $public->members_count > self::LIMIT && !VkPublicFactory::Get( array( 'vk_id' => $public->gid ))) {
