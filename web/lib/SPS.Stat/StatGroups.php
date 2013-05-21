@@ -37,7 +37,7 @@
 
         }
 
-        public static function get_groups( $userId )
+        public static function get_groups( $userId = NULL )
         {
             $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
