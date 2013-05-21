@@ -325,6 +325,9 @@ span {
     display: none;
 }
 
+.col {
+}
+
 .wrap {
     width: 1200px;
     margin: 0 auto;
@@ -347,10 +350,6 @@ span {
 }
 
 .gradient-stripe {
-    height: 120px;
-    background: url('../../images/mobile/gradient-stripe-bg.png') repeat-x;
-}
-.gradient-stripe .wrap {
     height: 120px;
     background: url('../../images/mobile/gradient-stripe.jpg') center no-repeat;
 }
