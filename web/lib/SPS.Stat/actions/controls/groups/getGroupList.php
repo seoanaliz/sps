@@ -24,9 +24,9 @@
                 $type    = 'Stat';
 
             $m_class  = $type . 'Groups';
-            if ( !$user_id ) {
-                die(ERR_MISSING_PARAMS);
-            }
+//            if ( !$user_id ) {
+//                die(ERR_MISSING_PARAMS);
+//            }
             if ( $type == 'Barter' ) {
                 $source = 1;
                 GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );

@@ -31,23 +31,23 @@ $(document).ready(function() {
         });
     })(window);
 
-    VK.init({
-        apiId: Configs.appId,
-        nameTransportPath: '/xd_receiver.htm'
-    });
-    getInitData();
-
-    function getInitData() {
-        var code =
-            'return {' +
-                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-            '};';
-        VK.Api.call('execute', {code: code}, initVK);
-    }
+//    VK.init({
+//        apiId: Configs.appId,
+//        nameTransportPath: '/xd_receiver.htm'
+//    });
+//    getInitData();
+//    function getInitData() {
+//        var code =
+//            'return {' +
+//                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
+//            '};';
+//        VK.Api.call('execute', {code: code}, initVK);
+//    }
+    initVK();
 });
 
 function initVK(data) {
-    if (data.response) {
+    if (data) {
         var r = data.response;
         cur.dataUser = r.me;
         Events.fire('get_user', cur.dataUser.uid, function(us) {
@@ -57,6 +57,14 @@ function initVK(data) {
                     Table.init();
                     Counter.init();
                 });
+            });
+        });
+    } else {
+        cur.dataUser.isEditor = false;
+        Filter.init(function() {
+            List.init(function() {
+                Table.init();
+                Counter.init();
             });
         });
     }
