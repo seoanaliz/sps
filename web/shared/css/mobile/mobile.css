@@ -321,6 +321,9 @@ span {
 }
 
 /* --------------- */
+.create-app.disabled {
+    display: none;
+}
 
 .wrap {
     width: 1200px;
