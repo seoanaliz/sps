@@ -11,7 +11,7 @@ class PublicsParser
 
     const LIMIT = 30000;
     const REQUESTS_PER_LAUNCH = 20;
-    const PUBICS_PER_REQUEST  = 300;
+    const PUBLICS_PER_REQUEST  = 700;
     const PAUSE = 2;
     private $current_public;
 
@@ -22,7 +22,7 @@ class PublicsParser
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
-            $take_counter = rand(50, self::PUBICS_PER_REQUEST);
+            $take_counter = rand(50, self::PUBLICS_PER_REQUEST);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
@@ -37,6 +37,8 @@ class PublicsParser
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
+                if( !isset( $public->type))
+                    contunue;
                 if( $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
                 if ( $public->members_count > self::LIMIT && !VkPublicFactory::Get( array( 'vk_id' => $public->gid ))) {

@@ -77,6 +77,9 @@ class BarterEvent
     /** @var int */
     public $neater_subscribers;
 
+    /** @var int */
+    public $skiped_subscribers;
+
     public function __clone()
     {
         $this->barter_event_id = null;
