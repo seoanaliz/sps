@@ -1,315 +1,261 @@
 @import "../common/mixins.less";
 
-html {
-    background-color: #f1f1f1;
+.image(@name, @options: ~'') {
+    background: url("../../images/mobile/@{name}") @options;
 }
 
-span {
-    vertical-align: middle;
-    .inline-block;
+body {
+    font-family: 'Lucida Grande', sans-serif;
 }
 
-.box-wrap > .box {
-    .border-radius(3px);
-
-    & > .title {
-        padding: 15px;
-        border: 0;
-        font-size: 22px;
-        .border-radius(2px 2px 0 0);
-        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
-        .background-gradient(#659ad5, #578dd0);
-    }
-
-    & > .body {
-        border: 0;
-    }
-
-    & > .actions-wrap {
-        border: 0;
-
-        .actions {
-            padding: 20px;
-            text-align: center;
-        }
-    }
+* {
+    margin: 0;
+    padding: 0;
 }
 
-.box.box-groups {
-    & > .title {
-        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3)");
-    }
-
-    & > .body {
-        overflow: auto;
-        max-height: 550px;
-        padding: 7px;
-    }
-
-    & > .actions-wrap {
-        .box-shadow(0 -1px 5px rgba(0,0,0, 0.3));
-
-        .actions {
-            border-top: 1px solid #fff;
-
-            .button {
-                display: block;
-                width: 100%;
-            }
-        }
-    }
-
-    .groups-empty {
-        color: #777;
-        text-align: center;
-        padding: 100px 0;
-        font-size: 16px;
-    }
-
-    .group-row + .group-row {
-        border-top: 1px solid #e5edf7;
-    }
-
-    .group-row {
-        padding: 7px;
-        cursor: pointer;
-        white-space: nowrap;
-        .user-select(none);
-
-        & > div {
-            vertical-align: middle;
-            .inline-block;
-        }
-
-        .image {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-
-            img {
-                max-width: 100%;
-            }
-        }
-
-        .title {
-            margin-left: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 16px;
-            max-width: 80%;
-        }
-
-        &:hover {
-            background-color: #e5edf7;
-        }
-
-        &.selected {
-            background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
-        }
-    }
-
-    .textarea-wrap {
-        margin-right: 20px;
-    }
-    .email-input {
-        padding: 6px 9px;
-        margin-bottom: 20px;
-        font-size: 16px;
-        background-color: #f7f7f7;
-        border-color: #c7c7c7;
-        .box-shadow(~"inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1)");
-        .border-radius(3px);
-
-        &:focus {
-            background-color: #fff;
-        }
-    }
+h1, h2, h3, h4 {
+    font-weight: normal;
 }
 
-.block-wrapper-2,
-.block-wrapper-3 {
-    font-size: 0;
-
-    & > .block {
-        font-size: 12px;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: 0 !important;
-        vertical-align: top;
-        width: 100%;
-        .inline-block;
-
-        &.left {
-            text-align: left;
-        }
-
-        &.center {
-            text-align: center;
-        }
-
-        &.right {
-            text-align: right;
-        }
-    }
-}
-
-.block-wrapper-2 {
-    & > .block {
-        width: 50%;
-    }
-}
-
-.block-wrapper-3 {
-    & > .block {
-        width: 33%;
-    }
-}
-
-.big-title {
-    font-size: 42px;
-    color: #fff;
-    .text-shadow(0 1px 4px rgba(0,0,0, 0.5));
-}
-
-.big-button-description {
-    color: #fff;
-    text-align: center;
-    font-size: 18px;
-    .text-shadow(0 1px 1px rgba(0,0,0, 0.5));
-
-    .icon-vk {
-        background: center no-repeat url("../../images/mobile/vk.png");
-        font-size: 0;
-        width: 30px;
-        height: 20px;
-    }
-}
-
-.button {
-    font-size: 20px;
-    padding: 15px 30px;
-    .border-radius(2px);
-
-    &, &:hover, &:active {
-        color: #fff;
-        border: 1px solid #5d94d4;
-        .background-gradient(#6ea7e6, #5f99e0);
-        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.5));
-        .text-shadow(none);
-    }
-
-    &:active {
-        padding-top: 16px;
-        padding-bottom: 14px;
-        background: #5f99e0;
-    }
-
-    &.disabled {
-        cursor: default;
-        .pointer-events(none);
-        .opacity(0.7);
-    }
-}
-
-.big-button {
-    padding: 20px 40px;
-    font-size: 24px;
-    margin: 20px 0;
-
-    &, &:hover, &:active {
-        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.5), 0 1px 2px rgba(0,0,0, 0.3)");
-        .text-shadow(0 1px 2px rgba(0,0,0, 0.3));
-    }
-
-    &:active {
-        padding-top: 21px;
-        padding-bottom: 19px;
-    }
-}
-
-#main {
-    &, * {
-        font-family: helvetica, arial, tahoma, sans-serif !important;
-    }
-}
-
-#logo {
-    font-weight: bold;
-    color: @color_link
-}
-
-#header {
-    padding: 15px;
-    background-color: #fff;
-}
-
-#footer {
-    color: #777;
-    background-color: #f1f1f1;
-    padding: 20px;
-}
-
-#main-content {
-    background: #9d7b76 url('../../images/mobile/main-content.jpg') center;
-    height: 530px;
-    
-    .big-title {
-        margin-top: 150px;
-    }
-}
-
-#description {
-    background-color: #fff;
-    padding-top: 50px;
-    color: #666;
-
-    .reason {
-        text-align: center;
-        padding: 50px 0;
-        width: 250px;
-        .inline-block;
-
-        .icon {
-            width: 80px;
-            height: 70px;
-            margin: 20px;
-            background-position: center;
-            background-repeat: no-repeat;
-
-            &.check {
-                background-image: url("../../images/mobile/check.png");
-            }
-
-            &.heart {
-                background-image: url("../../images/mobile/heart.png");
-            }
-
-            &.megaphone {
-                background-image: url("../../images/mobile/megaphone.png");
-            }
-        }
-
-        .title {
-            font-size: 30px;
-        }
-
-        .description {
-            line-height: 2em;
-            font-size: 17px;
-        }
-    }
-}
-
-.inner-content {
-    width: 950px;
+.wrap {
+    width: 980px;
     margin: 0 auto;
+    position: relative;
 }
 
-#mobiles {
-    width: 400px;
-    height: 565px;
-    margin: 45px 0;
-    background: url("../../images/mobile/mobiles.png") center no-repeat;
-    .inline-block;
+.phone-wrap {
+    position: absolute;
+}
+
+.header {
+    height: 530px;
+    .image('header-bg.jpg', center top no-repeat);
+    color: #fff;
+
+    h1 {
+        font-size: 23px;
+        position: absolute;
+        top: 17px;
+        left: 37px;
+    }
+
+    h2 {
+        font-size: 37px;
+        position: absolute;
+        font-family: Tahoma, sans-serif;
+        top: 164px;
+        left: 37px;
+    }
+
+    h4 {
+        text-transform: uppercase;
+        position: absolute;
+        top: 376px;
+        padding-left: 41px;
+        line-height: 30px;
+    }
+
+    .ready {
+        left: 37px;
+        .image('keys-icon.png', 10px 50% no-repeat);
+    }
+    .only14 {
+        left: 211px;
+        .image('calendar-icon', 10px 50% no-repeat);
+    }
+
+    button {
+        width: 341px;
+        height: 73px;
+        position: absolute;
+        top: 286px;
+        left: 37px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 24px;
+        .text-shadow(0 1px 0 #36669e);
+        .background-gradient(#6da6e6, #5e98e0);
+        border: 1px solid;
+        border-color: #69a2e5 rgba(90, 144, 206, .7) #4e83c1;
+        .border-radius(2px);
+        .box-shadow(0 1px 0 #99c1ee inset);
+    }
+    
+    .phone-wrap {
+        width: 406px;
+        height: 611px;
+        .image('phone-header-noscreen.png');
+        top: 37px;
+        left: 539px;
+
+        img {
+            width: 245px;
+            height: 436px;
+            margin-top: 87px;
+            margin-left: 31px;
+        }
+    }
+}
+
+.available-in {
+    height: 120px;
+    .image('gradient-stripe-bg.png', repeat-x);
+
+    .appstore, .googleplay {
+        display: none;
+    }
+
+    .wrap {
+        height: 120px;
+        .image('available-in.png', 9px 4px no-repeat);
+    }
+}
+
+.n1, .n2, .n3, .n4, .n5 {
+    h2 {
+        font-size: 41px;
+        margin-bottom: 18px;
+    }
+
+    p {
+        font-size: 17px;
+        line-height: 24px;
+        color: #555;
+    }
+}
+
+.n1, .n3, .n5 {
+    background: #f2f2f2;
+}
+
+.n1 {
+    height: 386px;
+
+    .wrap {
+        padding-top: 123px;
+        padding-left: 452px;
+        width: 528px;
+    }
+
+    .phone-wrap {
+        top: 55px;
+        left: 128px;
+
+        width: 259px;
+        height: 333px;
+        .image('phone-front-noscreen.png');
+
+        img {
+            margin-top: 78px;
+            margin-left: 21px;
+        }
+    }
+}
+
+.n2 {
+    height: 404px;
+    
+    .wrap {
+        padding-top: 130px;
+        padding-left: 70px;
+        width: 910px;
+    }
+
+    .phone-wrap {
+        width: 226px;
+        height: 352px;
+        top: 52px;
+        left: 653px;
+        .image('phone-n2.jpg');
+    }
+}
+
+.n3 {
+    height: 390px;
+
+    .wrap {
+        padding-top: 132px;
+        padding-left: 454px;
+        width: 526px;
+    }
+    
+    .phone-wrap {
+        width: 231px;
+        height: 334px;
+        .image('phone-n3.jpg');
+        top: 56px;
+        left: 136px;
+    }
+}
+
+.n4 {
+    height: 379px;
+
+    .wrap {
+        padding-top: 114px;
+        padding-left: 70px;
+        width: 910px;
+    }
+
+    .phone-wrap {
+        top: 58px;
+        left: 638px;
+
+        width: 251px;
+        height: 321px;
+        .image('phone-front-noscreen-2.png');
+
+        img {
+            margin-top: 77px;
+            margin-left: 21px;
+        }
+    }
+}
+
+.n5 {
+    height: 403px;
+
+    .wrap {
+        padding-top: 89px;
+        padding-left: 452px;
+        width: 528px;
+    }
+
+    .phone-wrap {
+        width: 230px;
+        height: 340px;
+        .image('phone-n5.jpg');
+        top: 63px;
+        left: 135px;
+    }
+}
+
+.green-footer {
+    height: 555px;
+    background: #00b2b3;
+
+    .wrap {
+        .image('green-bg.png', 34px 38px no-repeat);
+        height: 555px;
+
+        .phone-wrap {
+            top: 49px;
+            left: 384px;
+            width: 366px;
+            height: 461px;
+            .image('phone-bottom-noscreen.png');
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            margin-left: -8px;
+            @triangle-size: 18px;
+            border-left: @triangle-size solid transparent;
+            border-right: @triangle-size solid transparent;
+            border-bottom: @triangle-size solid #fff;
+        }
+    }
 }
