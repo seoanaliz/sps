@@ -190,16 +190,17 @@ class SaveTargetFeedAction extends BaseSaveAction  {
      */
     protected function add( $object ) {
         ConnectionFactory::BeginTransaction();
-        $result = parent::$factory->Add( $object );
-
-        $this->objectId = $objectId = parent::$factory->GetCurrentId();
-
         if ( $object->type = TargetFeedUtility::VK_ALBUM ) {
             $res = VkHelper::api_request('groups.getById', array( 'gid' => $object->externalId ));
             if( isset($res[0])) {
                 $object->title = $res[0]->name . ' : ' . $object->title;
             }
         }
+        $result = parent::$factory->Add( $object );
+
+        $this->objectId = $objectId = parent::$factory->GetCurrentId();
+
+
 
         if ($result && !empty($object->grids)) {
             foreach ($object->grids as $grid) {
