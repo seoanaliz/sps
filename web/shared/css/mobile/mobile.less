@@ -111,7 +111,7 @@ h1, h2, h3, h4 {
     }
 }
 
-.n1, .n2, .n3, .n4, .n5 {
+.n1, .n2, .n3, .n4, .n5, .green-footer {
     h2 {
         font-size: 41px;
         margin-bottom: 18px;
@@ -236,7 +236,14 @@ h1, h2, h3, h4 {
 
     .wrap {
         .image('green-bg.png', 34px 38px no-repeat);
-        height: 555px;
+        height: 446px; /* 555 - 109 */
+        padding-top: 109px;
+        padding-left: 58px;
+        width: 922px;
+
+        h2, p {
+            color: #fff;
+        }
 
         .phone-wrap {
             top: 49px;
@@ -244,6 +251,18 @@ h1, h2, h3, h4 {
             width: 366px;
             height: 461px;
             .image('phone-bottom-noscreen.png');
+            
+            .iphone {
+                position: absolute;
+                top: 66px;
+                left: 21px;
+            }
+
+            .android {
+                position: absolute;
+                top: 53px;
+                left: 220px;
+            }
         }
 
         &:after {

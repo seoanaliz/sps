@@ -113,7 +113,8 @@ h4 {
 .n2 h2,
 .n3 h2,
 .n4 h2,
-.n5 h2 {
+.n5 h2,
+.green-footer h2 {
   font-size: 41px;
   margin-bottom: 18px;
 }
@@ -121,7 +122,8 @@ h4 {
 .n2 p,
 .n3 p,
 .n4 p,
-.n5 p {
+.n5 p,
+.green-footer p {
   font-size: 17px;
   line-height: 24px;
   color: #555;
@@ -220,7 +222,14 @@ h4 {
 }
 .green-footer .wrap {
   background: url("../../images/mobile/green-bg.png") 34px 38px no-repeat;
-  height: 555px;
+  height: 446px;
+  padding-top: 109px;
+  padding-left: 58px;
+  width: 922px;
+}
+.green-footer .wrap h2,
+.green-footer .wrap p {
+  color: #fff;
 }
 .green-footer .wrap .phone-wrap {
   top: 49px;
@@ -228,6 +237,16 @@ h4 {
   width: 366px;
   height: 461px;
   background: url("../../images/mobile/phone-bottom-noscreen.png") ;
+}
+.green-footer .wrap .phone-wrap .iphone {
+  position: absolute;
+  top: 66px;
+  left: 21px;
+}
+.green-footer .wrap .phone-wrap .android {
+  position: absolute;
+  top: 53px;
+  left: 220px;
 }
 .green-footer .wrap:after {
   content: '';

@@ -6,7 +6,7 @@
         <button class="create-app">Создать бесплатно</button>
         <h4 class="ready">готовое решение</h4>
         <h4 class="only14">всего за 14 дней</h4>
-        <div class="phone-wrap"><img alt="" src="shared/images/mobile/header-phone-screen.jpg" /></div>
+        <div class="phone-wrap"><img alt="" src="shared/images/mobile/phone-header-screen.jpg" /></div>
     </div>
 </div>
 <div class="available-in">
@@ -76,7 +76,16 @@
 </div>
 <div class="green-footer">
     <div class="wrap">
-        <div class="phone-wrap"></div>
+        <h2>Реклама</h2>
+        <p>Просто получайте прибыль<br /> 
+            с показов рекламы от самых <br />
+            эффективных рекламных сетей, <br />
+            не думая о поиске рекламодателей.
+        </p>
+        <div class="phone-wrap">
+            <img class="iphone" alt="" src="shared/images/mobile/phone-bottom-screen.png" />
+            <img class="android" alt="" src="shared/images/mobile/android-bottom-screen.png" />
+        </div>
     </div>
 </div>
 {increal:tmpl://mobile/elements/footer.tmpl.php}
