@@ -10,9 +10,9 @@ class PublicsParser
 {
 
     const LIMIT = 30000;
-    const REQUESTS_PER_LAUNCH = 20;
+    const REQUESTS_PER_LAUNCH = 70;
     const PUBLICS_PER_REQUEST  = 700;
-    const PAUSE = 2;
+    const PAUSE = 0.4;
     private $current_public;
 
     public function execute() {
@@ -22,7 +22,7 @@ class PublicsParser
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
-            $take_counter = rand(50, self::PUBLICS_PER_REQUEST);
+            $take_counter = rand(600, self::PUBLICS_PER_REQUEST);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
@@ -33,13 +33,13 @@ class PublicsParser
                 continue;
             $new_entries = array();
             foreach( $res as $public ) {
+                if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
+                    continue;
                 if( $public->name == 'DELETED' && $this->current_public > 52000000 && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
 
-                if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
-                    continue;
                 if ( $public->members_count > self::LIMIT && !VkPublicFactory::Get( array( 'vk_id' => $public->gid ))) {
                     $entry = new VkPublic();
                     $entry->vk_id = $public->gid;
