@@ -47,6 +47,7 @@
                 'wall.get'          => true,
                 'groups.getById'    => true,
                 'wall.getById'      => true,
+                'groups.getById'    => true,
 
             );
 
