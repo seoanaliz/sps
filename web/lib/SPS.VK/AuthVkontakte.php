@@ -38,14 +38,19 @@
                 $cookie_data = array();
 
                 foreach (explode('&', $vk_cookie) as $item) {
+                    if (empty($item_data[0]) || empty($item_data[1])) continue;
                     $item_data = explode('=', $item);
                     $cookie_data[$item_data[0]] = $item_data[1];
                 }
 
                 // Проверяем sig
-                $string = sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$Password);
+                if (!empty($cookie_data['expire']) && !empty($cookie_data['mid']) && !empty($cookie_data['secret']) && !empty($cookie_data['sid'])) {
+                    $string = sprintf("expire=%smid=%ssecret=%ssid=%s%s", $cookie_data['expire'], $cookie_data['mid'], $cookie_data['secret'], $cookie_data['sid'], self::$Password);
+                } else {
+                    $string = null;
+                }
 
-                if (md5($string) == $cookie_data['sig']) {
+                if (!empty($string) && md5($string) == $cookie_data['sig']) {
                     // sig не подделан - возвращаем ID пользователя ВКонтакте.
                     // авторизуем пользователя совсем надолго
                     $cookie_data['expire'] = time() + 86400 * 7;
