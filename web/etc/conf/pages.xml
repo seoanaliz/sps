@@ -290,6 +290,9 @@
                     <actions>SPS.Common.GetSystemStats</actions>
                     <template>tmpl://vt/stats.tmpl.php</template>
                 </page>
+                <page uri="vt://memcache-test/">
+                    <actions>SPS.Common.MemcacheTest</actions>
+                </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
                         <!--<actions>SPS.Site.GetIndexPage</actions>-->
