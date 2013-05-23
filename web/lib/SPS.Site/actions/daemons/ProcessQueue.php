@@ -175,7 +175,6 @@ sql;
 
             try {
                 if($targetFeed->type == TargetFeedUtility::VK_ALBUM ) {
-                    echo 'here';
                     $articleQueue->externalId = $sender->send_photo_in_album( $targetFeed->title );
                 } elseif ( !$post_data['repost_post'] ) {
                     $articleQueue->externalId = $sender->send_post();

@@ -98,17 +98,16 @@
         public function send_photo_in_album( $album_title )
         {
             $album_title = explode(' : ', $album_title );
-            $album_title = end($album_title);
-            print_r( $album_title );
+            $album_title = end( $album_title );
             $album = $this->get_album( $album_title );
             if ( !$album['id'] || $album['size'] > self::ALBUM_MAX_SIZE) {
                 $album_id = $this->create_album( $album['counter'], 0, $album_title );
             } else {
                 $album_id = $album['id'];
             }
-            foreach( $this->post_photo_array as $photo_path ) {
-                return $this->load_photo( $photo_path, 'album', $album_id, $this->post_text );
-            }
+
+            return $this->load_photo( $this->post_photo_array[0], 'album', $album_id, $this->post_text );
+
         }
 
         //возвращаемые значения
@@ -343,7 +342,6 @@
             );
 
             $res = VkHelper::api_request( 'photos.getAlbums', $params );
-
             $i = 1;
             $album_id = 0;
             $album_size = 0;
@@ -358,12 +356,7 @@
             }
 
             $res = array( 'id' => $album_id, 'counter' =>   $i, 'size'  => $album_size );
-
-            if ( $i > 1 )
-                return( $res );
-
-            return false;
-
+            return( $res );
         }
 
         public function get_album_size( $full_album_id )
@@ -388,9 +381,10 @@
             $title = $title . ' ' . $counter;
 
             $params = array(
-                'gid'       =>  $this->vk_group_id,
-                'title'     =>  $title,
-                'privacy'   =>  $privacy,
+                'gid'           =>  $this->vk_group_id,
+                'title'         =>  $title,
+                'privacy'       =>  $privacy,
+                'access_token'  =>  $this->vk_access_token,
             );
             $res = VkHelper::api_request( 'photos.createAlbum', $params );
             return  $res->aid;

@@ -48,7 +48,6 @@
                 'groups.getById'    => true,
                 'wall.getById'      => true,
                 'photos.getAlbums'  => true,
-
             );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
