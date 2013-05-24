@@ -168,7 +168,6 @@ h1, h2, h3, h4 {
 
 .create-app {
     &.disabled {
-        font-size: 17px !important;
         cursor: default;
         .pointer-events(none);
         .opacity(0.7);
@@ -179,6 +178,7 @@ h1, h2, h3, h4 {
     height: 530px;
     .image('header-bg.jpg', center top no-repeat);
     color: #fff;
+    .text-shadow(0 1px 1px #897264);
 
     h1 {
         font-size: 23px;
@@ -227,6 +227,10 @@ h1, h2, h3, h4 {
         border-color: #69a2e5 rgba(90, 144, 206, .7) #4e83c1;
         .border-radius(2px);
         .box-shadow(0 1px 0 #99c1ee inset);
+        
+        &.disabled {
+            font-size: 18px;
+        }
     }
     
     .phone-wrap {
@@ -603,5 +607,9 @@ h1, h2, h3, h4 {
         top: 51px;
         left: 316px;
         padding-bottom: 4px;
+
+        &.disabled {
+            font-size: 15px;
+        }
     }
 }
