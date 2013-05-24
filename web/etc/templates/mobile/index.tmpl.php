@@ -86,6 +86,42 @@
             <img class="iphone" alt="" src="shared/images/mobile/phone-bottom-screen.png" />
             <img class="android" alt="" src="shared/images/mobile/android-bottom-screen.png" />
         </div>
+        <ul class="options">
+            <li class="fullscreen"><h3>Полный экран</h3>До 300 рублей за 1 показ</li>
+            <li class="no-full"><h3>Баннеры</h3>От 20 до 300 рублей <br />
+                за 1000 показов</li>
+        </ul>
+    </div>
+</div>
+<div class="white-stripe">
+    <div class="wrap">
+        <ul class="ad-providers">
+            <li><a class="ad-wired" target="_blank" href="http://www.adwired.net"></a></li>
+            <li><a class="admob" target="_blank" href="http://www.google.com/ads/admob/"></a></li>
+            <li><a class="mopub" target="_blank" href="http://www.mopub.com"></a></li>
+            <li><a class="inneractive" target="_blank" href="http://www.inner-active.com"></a></li>
+        </ul>
+        <div class="pitch">
+            <p>Ваше мобильное приложение будет <br />доступно сразу на двух платформах</p>
+        </div>
+        <ul class="available-in-bottom">
+            <li class="appstore">Available in AppStore</li>
+            <li class="googleplay">Available in Google Play</li>
+        </ul>
+    </div>
+</div>
+<div class="footer-gray">
+    <div class="wrap">
+        <ul class="advantages">
+            <li class="dont-waste">Не тратьте огромных денег <br />на разработку приложения</li>
+            <li class="dont-wait">Не ждите долгого процесса <br />разработки</li>
+            <li class="dont-miss">Не упускайте возможность, <br />начните уже сегодня</li>
+        </ul>
+        <div class="button-wrap">
+            <button class="create-app">Оставить заявку</button>
+            <p>Создание приложения для вашего сообщества займет всего <br />
+            14 дней, включая рассмотрение на App Store и Google Play.</p>
+        </div>
     </div>
 </div>
 {increal:tmpl://mobile/elements/footer.tmpl.php}
