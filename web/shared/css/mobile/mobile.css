@@ -3,6 +3,158 @@
   zoom: 1;
   *display: inline;
 }
+.box-wrap > .box {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.box-wrap > .box > .title {
+  padding: 15px;
+  border: 0;
+  font-size: 22px;
+  -webkit-border-radius: 2px 2px 0 0;
+  -moz-border-radius: 2px 2px 0 0;
+  border-radius: 2px 2px 0 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+  background-color: #659ad5;
+  background-image: -webkit-linear-gradient(top,#659ad5,#578dd0);
+  background-image: -moz-linear-gradient(top,#659ad5,#578dd0);
+  background-image: -ms-linear-gradient(top,#659ad5,#578dd0);
+  background-image: -o-linear-gradient(top,#659ad5,#578dd0);
+  background-image: linear-gradient(top,#659ad5,#578dd0);
+}
+.box-wrap > .box > .body {
+  border: 0;
+}
+.box-wrap > .box > .actions-wrap {
+  border: 0;
+}
+.box-wrap > .box > .actions-wrap .actions {
+  padding: 20px;
+  text-align: center;
+}
+.box-wrap > .box .button {
+  font-size: 20px;
+  padding: 15px 30px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+.box-wrap > .box .button,
+.box-wrap > .box .button:hover,
+.box-wrap > .box .button:active {
+  color: #fff;
+  border: 1px solid #5d94d4;
+  background-color: #6ea7e6;
+  background-image: -webkit-linear-gradient(top,#6ea7e6,#5f99e0);
+  background-image: -moz-linear-gradient(top,#6ea7e6,#5f99e0);
+  background-image: -ms-linear-gradient(top,#6ea7e6,#5f99e0);
+  background-image: -o-linear-gradient(top,#6ea7e6,#5f99e0);
+  background-image: linear-gradient(top,#6ea7e6,#5f99e0);
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  -webkit-text-shadow: none;
+  -moz-text-shadow: none;
+  text-shadow: none;
+}
+.box-wrap > .box .button:active {
+  padding-top: 16px;
+  padding-bottom: 14px;
+  background: #5f99e0;
+}
+.box.box-groups > .title {
+  -webkit-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  -moz-box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3);
+}
+.box.box-groups > .body {
+  overflow: auto;
+  max-height: 550px;
+  padding: 7px;
+}
+.box.box-groups > .actions-wrap {
+  -webkit-box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
+}
+.box.box-groups > .actions-wrap .actions {
+  border-top: 1px solid #fff;
+}
+.box.box-groups > .actions-wrap .actions .button {
+  display: block;
+  width: 100%;
+}
+.box.box-groups .groups-empty {
+  color: #777;
+  text-align: center;
+  padding: 100px 0;
+  font-size: 16px;
+}
+.box.box-groups .group-row + .group-row {
+  border-top: 1px solid #e5edf7;
+}
+.box.box-groups .group-row {
+  padding: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.box.box-groups .group-row > div {
+  vertical-align: middle;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.box.box-groups .group-row .image {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+}
+.box.box-groups .group-row .image img {
+  max-width: 100%;
+}
+.box.box-groups .group-row .title {
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  max-width: 80%;
+}
+.box.box-groups .group-row:hover {
+  background-color: #e5edf7;
+}
+.box.box-groups .group-row.selected {
+  background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
+}
+.box.box-groups .textarea-wrap {
+  margin-right: 20px;
+}
+.box.box-groups .email-input {
+  padding: 6px 9px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  border-color: #c7c7c7;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.box.box-groups .email-input:focus {
+  background-color: #fff;
+}
 body {
   font-family: 'Lucida Grande', sans-serif;
 }
@@ -23,6 +175,14 @@ h4 {
 }
 .phone-wrap {
   position: absolute;
+}
+.create-app.disabled {
+  font-size: 17px !important;
+  cursor: default;
+  -webkit-pointer-events: none;
+  -moz-pointer-events: none;
+  pointer-events: none;
+  opacity: 0.7;
 }
 .header {
   height: 530px;

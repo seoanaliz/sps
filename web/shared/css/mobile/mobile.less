@@ -1,5 +1,144 @@
 @import "../common/mixins.less";
 
+.box-wrap > .box {
+    .border-radius(3px);
+
+    & > .title {
+        padding: 15px;
+        border: 0;
+        font-size: 22px;
+        .border-radius(2px 2px 0 0);
+        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
+        .background-gradient(#659ad5, #578dd0);
+    }
+
+    & > .body {
+        border: 0;
+    }
+
+    & > .actions-wrap {
+        border: 0;
+
+        .actions {
+            padding: 20px;
+            text-align: center;
+        }
+    }
+
+    .button {
+        font-size: 20px;
+        padding: 15px 30px;
+        .border-radius(2px);
+
+        &, &:hover, &:active {
+            color: #fff;
+            border: 1px solid #5d94d4;
+            .background-gradient(#6ea7e6, #5f99e0);
+            .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.5));
+            .text-shadow(none);
+        }
+
+        &:active {
+            padding-top: 16px;
+            padding-bottom: 14px;
+            background: #5f99e0;
+        }
+    }
+}
+
+.box.box-groups {
+    & > .title {
+        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3)");
+    }
+
+    & > .body {
+        overflow: auto;
+        max-height: 550px;
+        padding: 7px;
+    }
+
+    & > .actions-wrap {
+        .box-shadow(0 -1px 5px rgba(0,0,0, 0.3));
+
+        .actions {
+            border-top: 1px solid #fff;
+
+            .button {
+                display: block;
+                width: 100%;
+            }
+        }
+    }
+
+    .groups-empty {
+        color: #777;
+        text-align: center;
+        padding: 100px 0;
+        font-size: 16px;
+    }
+
+    .group-row + .group-row {
+        border-top: 1px solid #e5edf7;
+    }
+
+    .group-row {
+        padding: 7px;
+        cursor: pointer;
+        white-space: nowrap;
+        .user-select(none);
+
+        & > div {
+            vertical-align: middle;
+            .inline-block;
+        }
+
+        .image {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+
+            img {
+                max-width: 100%;
+            }
+        }
+
+        .title {
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 16px;
+            max-width: 80%;
+        }
+
+        &:hover {
+            background-color: #e5edf7;
+        }
+
+        &.selected {
+            background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
+        }
+    }
+
+    .textarea-wrap {
+        margin-right: 20px;
+    }
+    .email-input {
+        padding: 6px 9px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        background-color: #f7f7f7;
+        border-color: #c7c7c7;
+        .box-shadow(~"inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1)");
+        .border-radius(3px);
+
+        &:focus {
+            background-color: #fff;
+        }
+    }
+}
+
+/* я горжусь этим миксином, я горжусь им, мужики */
 .image(@name, @options: ~'') {
     background: url("../../images/mobile/@{name}") @options;
 }
@@ -25,6 +164,15 @@ h1, h2, h3, h4 {
 
 .phone-wrap {
     position: absolute;
+}
+
+.create-app {
+    &.disabled {
+        font-size: 17px !important;
+        cursor: default;
+        .pointer-events(none);
+        .opacity(0.7);
+    }
 }
 
 .header {
