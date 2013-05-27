@@ -32,8 +32,8 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
-        'css://common/common.css',
-        'css://mobile/mobile.css',
+        'css://common/common.less',
+        'css://mobile/mobile.less',
    ),
     AssetHelper::IE7 => array(),
 );

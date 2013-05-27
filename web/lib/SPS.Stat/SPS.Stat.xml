@@ -34,6 +34,9 @@
 
     <group name="Controls">
         <group name="Prices">
+            <action name="saveEdtiorAt">
+                <path>savePublisherAction</path>
+            </action>
             <action name="setPostPrice">
                 <path>controls/stat/setPostPrice</path>
             </action>            

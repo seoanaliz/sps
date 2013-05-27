@@ -19,7 +19,7 @@ App = Event.extend({
      */
     initPopup: function() {
         var t = this;
-        var $createApp = $('#create-app');
+        var $createApp = $('.create-app');
 
         if (t.isAlreadySent()) {
             $createApp.html('Ваша заявка рассматривается').addClass('disabled');

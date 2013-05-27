@@ -12,7 +12,7 @@
 
     class SenderVkontakte {
 
-        private $change_admin_errors = array( 5, 7, 14, 15 );
+        private $change_admin_errors = array( 5, 7, 14, 15, 214 );
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
@@ -49,7 +49,9 @@
                 $this->link             =   $post_data['link'];
                 $this->header           =   $post_data['header'];
                 $this->repost_post      =   $post_data['repost_post'];
+
             }
+
         }
 
         private function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '' )
@@ -107,6 +109,9 @@
             sleep( rand( 0, 12 ));
             $photo_array = array();
             $meth = 'wall';
+//            if ( substr_count($this->post_text, '@') > 0 || substr_count($this->post_text, '[') > 0 ){
+//                return false;
+//            }
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
@@ -145,8 +150,21 @@
                 'access_token' => $this->vk_access_token
             );
             $res = VkHelper::api_request( 'wall.repost', $params );
+            if (isset ($res->error )) {
+                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                    throw new ChangeSenderException( 'publisher is presumably dead' );
+
+                else
+                    throw new Exception( 'Error in wall.post: ' . $res->error->error_code
+                        . ', public: '. $this->vk_group_id );
+            }
+
             if ( isset( $res->success) && $res->success && isset( $res->post_id ))
                 return  '-' . $this->vk_group_id . '_' . $res->post_id;
+            else {
+                throw new Exception( 'Strange response on wall.repost: ' . ObjectHelper::ToJSON( $res )
+                    . ', public: '. $this->vk_group_id );
+            }
 
         }
 
@@ -384,7 +402,7 @@
                     throw new ChangeSenderException();
 
                 else
-                    throw new Exception( 'Error in wall.post: ' . $res->error->error_code
+                    throw new Exception( 'Error in wall.post: ' . $res->error->error_msg
                         . ', public: '. $this->vk_group_id );
         }
 

@@ -35,7 +35,7 @@
 
 <!--LiveInternet counter-->
 <script type="text/javascript"><!--
-    document.write("<a style='position:absolute; left:-9999px;' href='http://www.liveinternet.ru/click' "+
+    document.write("<a style='position:absolute;left:-9999px;top:-9999px' href='http://www.liveinternet.ru/click' "+
         "target=_blank><img src='//counter.yadro.ru/hit?t57.6;r"+
         escape(document.referrer)+((typeof(screen)=="undefined")?"":
         ";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?

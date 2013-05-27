@@ -133,10 +133,13 @@
 
             </pageGroup>
 
-            <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
 
                 <page uri="controls://getPublicMarks/">
                     <actions>SPS.Stat.getPublicMarks</actions>
+                </page>
+                <page uri="controls://saveEdtiorAt/">
+                    <actions>SPS.Stat.saveEdtiorAt</actions>
                 </page>
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
@@ -297,6 +300,9 @@
                 <page uri="vt://stats/">
                     <actions>SPS.Common.GetSystemStats</actions>
                     <template>tmpl://vt/stats.tmpl.php</template>
+                </page>
+                <page uri="vt://memcache-test/">
+                    <actions>SPS.Common.MemcacheTest</actions>
                 </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
@@ -727,7 +733,14 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+
+            <pageGroup name="editors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="editors_login://" >
+                    <template>tmpl://editors_login/login.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams">
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
@@ -760,11 +773,11 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="mobile" boot="">
+            <pageGroup name="mobile" boot="SPS.Site.GetSiteParams">
                 <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
                 </page>
-                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
+                <page uri="mobile://admin/?" boot="SPS.Common.CheckAuth">
                     <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
