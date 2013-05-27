@@ -762,11 +762,11 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="mobile" boot="">
+            <pageGroup name="mobile" boot="SPS.Site.GetSiteParams">
                 <page uri="/mobile/?">
                     <template>tmpl://mobile/index.tmpl.php</template>
                 </page>
-                <page uri="mobile://admin/?" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
+                <page uri="mobile://admin/?" boot="SPS.Common.CheckAuth">
                     <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
