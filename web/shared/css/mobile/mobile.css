@@ -238,7 +238,7 @@ h4 {
   background-image: -o-linear-gradient(top,#6da6e6,#5e98e0);
   background-image: linear-gradient(top,#6da6e6,#5e98e0);
   border: 1px solid;
-  border-color: #69a2e5 rgba(90,144,206,0.7) #4e83c1;
+  border-color: #69a2e5 #5b93d3 #4e83c1;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
