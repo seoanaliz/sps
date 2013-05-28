@@ -1,3 +1,11 @@
+<?php
+/**
+*@var $canSuggestGlobalGroups boolean
+*@var $hasAccessToPrivateGroups boolean
+*@var $canEditGlobalGroups boolean
+*/
+?>
+
 {increal:tmpl://st/elements/header.tmpl.php}
 <div id="global-loader"></div>
 <div id="main" class="main">
@@ -41,9 +49,19 @@
                                 <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
                             </div>
                         </div>
-                        <div class="list">
-                            <div class="item selected">List1</div>
-                            <div class="item">List1</div>
+                        <div class="list buttons">
+                            <div class="item selected" data-id="all">Все паблики</div>
+                            <? if ( $canEditGlobalGroups ) {?>
+                                <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
+                            <? } ?>
+                        </div>
+                        <? if ( $hasAccessToPrivateGroups ) {?>
+                            <div class="title">Личные</div>
+                            <div class="list private editor_lists">
+                            </div>
+                        <? } ?>
+                        <div class="title">Катрегории</div>
+                        <div class="list global">
                         </div>
                     </div>
                 </td>

@@ -45,9 +45,9 @@ $(document).ready(function() {
 //    }
     initVK();
 });
-
-function initVK(data) {
-    if (data) {
+cur.dataUser.rank = userRank;
+function initVK( ) {
+    if (false ) {
         var r = data.response;
         cur.dataUser = r.me;
         Events.fire('get_user', cur.dataUser.uid, function(us) {
@@ -60,7 +60,7 @@ function initVK(data) {
             });
         });
     } else {
-        cur.dataUser.isEditor = false;
+        cur.dataUser.isEditor = true;
         Filter.init(function() {
             List.init(function() {
                 Table.init();
@@ -475,8 +475,13 @@ var Filter = (function() {
     function listRefresh(callback) {
         var $selectedItem = $list.find('.item.selected');
         var id = $selectedItem.data('id');
+        var $list_global  =  $('> .list.global', $container);
+        var $list_private =  $('> .list.private', $container);
+        var $list_shared  =  $('> .list.shared', $container);
         Events.fire('load_list', function(data) {
-            $list.html(tmpl(FILTER_LIST, {items: data}));
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global_list}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private_list}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared_list}));
             if (id) {
                 listSelect(id, function() {
                     if ($.isFunction(callback)) callback();
@@ -807,8 +812,9 @@ var Table = (function() {
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
             var publicData;
+
             for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId == publicId) { publicData = dataTable[i]; break; }
             }
             _createDropdownList(e, publicData);
         });
@@ -907,8 +913,10 @@ var Table = (function() {
         if (!$dropdown) {
             Events.fire('load_list', function(dataList) {
                 if (!$el.hasClass('selected')) {
-                    var lists = dataList;
-                    $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
+                    var all_lists = dataList.private_list;
+                    all_lists.push.apply(all_lists,dataList.global_list);
+
+                    $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
                     var $input = $dropdown.find('input');
 
                     $.each(selectedLists, function(i, listId) {
@@ -1033,10 +1041,11 @@ var Table = (function() {
 
 var Counter = (function(){
     var $container;
+    var $editor_lists;
 
     function init( callback ){
         $container = $('#listed-counter');
-        if( cur.dataUser.isEditor ) {
+        if( cur.dataUser.rank == 3 ) {
             $container.show();
         }
         refresh();

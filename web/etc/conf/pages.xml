@@ -731,6 +731,7 @@
 
             <pageGroup name="stat" boot="SPS.Site.GetSiteParams">
                 <page uri="stat://">
+                    <actions>SPS.Stat.GetStatData</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">

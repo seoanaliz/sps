@@ -54,13 +54,18 @@ var Eventlist = {
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData.list))
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.fave
-                    });
+            console.log(dirtyData);
+            if ($.isArray(dirtyData.lists))
+                dirtyData.length;
+                $.each(dirtyData.lists, function(list, list_data) {
+                    clearData[list] = [];
+                    $.each(list_data, function(i, data) {
+                        clearData[list].push({
+                            itemId: data.group_id,
+                            itemTitle: data.name,
+                            itemFave: data.fave
+                        });
+                   });
                 });
             cur.dataUser.listed = intval(dirtyData.listed_by);
             callback(clearData);
@@ -70,12 +75,15 @@ var Eventlist = {
         simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
             var clearData = [];
             if ($.isArray(dirtyData)) {
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.general
-                    });
+                $.each(dirtyData.lists, function(list, list_data) {
+                    clearData[list] = [];
+                        $.each(dirtyData.list, function(i, data) {
+                            clearData.push({
+                                itemId: data.group_id,
+                                itemTitle: data.name,
+                                itemFave: data.general
+                            });
+                        });
                 });
             }
             callback(clearData);
@@ -164,7 +172,8 @@ var Eventlist = {
                             });
                         });
                         clearList.push({
-                            publicId: publicItem.id,
+                            intId: publicItem.id,
+                            publicId: publicItem.vk_id,
                             publicImg: publicItem.ava,
                             publicName: publicItem.name,
                             publicFollowers: publicItem.quantity,

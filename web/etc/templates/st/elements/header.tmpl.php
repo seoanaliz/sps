@@ -75,6 +75,7 @@ if(!empty($jsFilesAdds)) {
         var controlsRoot = '{web:controls://}';
         var vk_appId = <?= AuthVkontakte::$AppId ?>;
         var hostname = '<?= Site::$Host->GetHostname() ?>';
+        var userRank = <?= $rank?>
     </script>
 
     <title><?=$__pageTitle?></title>
