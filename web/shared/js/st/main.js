@@ -320,15 +320,6 @@ var Filter = (function() {
     }
 
     function _initEvents() {
-        window.onpopstate = function(E) {
-            if (typeof E.state === 'object') {
-                if (E.state !== null && ('listId' in E.state)) {
-                    Table.changeList(E.state.listId);
-                } else {
-                    Table.changeList(null);
-                }
-            }
-        };
         (function() {
             var $slider = $audience.find('> .slider-wrap');
             var $sliderRange = $audience.find('> .slider-range');
@@ -928,6 +919,16 @@ var Table = (function() {
     }
 
     function _initEvents() {
+       window.onpopstate = function(E) {
+            if (typeof E.state === 'object') {
+                if (E.state !== null && ('listId' in E.state)) {
+                    Table.changeList(E.state.listId);
+                } else {
+                    Table.changeList(null);
+                }
+            }
+        };
+
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
