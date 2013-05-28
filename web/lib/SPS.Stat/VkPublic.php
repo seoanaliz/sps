@@ -67,5 +67,14 @@ class VkPublic {
 
     /** @var int */
     public $vk_public_id;
+
+    /** @var int */
+    public $viewers;
+
+    /** @var int */
+    public $viewers_week;
+
+    /** @var int */
+    public $viewers_month;
 }
 ?>

@@ -44,6 +44,13 @@
                 BarterEventFactory::UpdateRange( $barter_events, null, 'tst' );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
 
+            } elseif( $type == 'Stat' ) {
+
+                $group = GroupFactory::GetById( $groupId );
+                $group->entries_ids[] = $entry_id;
+                $group->entries_ids = array_unique( $group->entries_ids );
+                $res = GroupFactory::Update( $group );
+                die( ObjectHelper::ToJSON(array( 'response' => $res )));
             }
 
             if (  StatUsers::is_Sadmin( $user_id )) {

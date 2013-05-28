@@ -13,9 +13,10 @@ class getEntries {
      * Entry Point
      */
 
-    public function Execute()
+    public function Execute2()
     {
         error_reporting( 0 );
+
         $this->conn =   ConnectionFactory::Get('tst');
         $userId     =   Request::getInteger( 'userId' );
         $groupId    =   Request::getInteger( 'groupId' );
@@ -134,7 +135,6 @@ class getEntries {
             $resul = array();
             while ($ds->next()) {
                 $row = $this->get_row( $ds, $structure );
-                $admins = array();
                 $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
@@ -179,12 +179,110 @@ class getEntries {
 
         echo ObjectHelper::ToJSON(array(
                                         'response' => array(
-                                                            'list'       =>  $resul,
-                                                            'min_max'    =>  $this->get_min_max(),
-                                                            'group_type' =>  empty($group) ? null : $group['type']
+                                                            'list'              =>  $resul,
+                                                            'min_max'           =>  $this->get_min_max(),
+                                                            'group_type'        =>  empty($group) ? null : $group['type']
                                                             )
                                         )
                                     );
+    }
+
+    public function Execute()
+    {
+        error_reporting( 0 );
+        $this->conn =   ConnectionFactory::Get('tst');
+        $user_id    =   AuthVkontakte::IsAuth();
+        $group_id   =   Request::getInteger( 'groupId' );
+        $offset     =   Request::getInteger( 'offset' );
+        $limit      =   Request::getInteger( 'limit' );
+        $quant_max  =   Request::getInteger( 'max' );
+        $quant_min  =   Request::getInteger( 'min' );
+        $period     =   Request::getInteger( 'period' );//
+        $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
+        $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
+        $time_from  =   Request::getInteger( 'timeFrom' );
+        $time_to    =   Request::getInteger( 'timeTo' );
+        $sort_reverse    =   Request::getInteger( 'sortReverse' );
+
+        $period_suffixes = array(
+            '1'     =>  '',
+            '7'     =>  '_week',
+            '30'    =>  '_month'
+        );
+        $without_suffixes  = array( 'quantity' => true, 'in_search' => true );
+
+        $search     =   array(
+             '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
+            ,'_quantityGE'  =>  $quant_min ? $quant_min : 30000
+            ,'page'         =>  round( $offset/( $limit ? $limit : 25))
+            ,'pageSize'     =>  $limit
+            ,'sh_in_main'   =>  true
+            ,'is_page'      =>  true
+        );
+
+        //поиск по названию - глобальный
+        if($search_name) {
+            $search['_nameIL'] = $search_name;
+        } elseif( $group_id ) {
+            $group = GroupFactory::GetById(  $group_id );
+            if( $group ) {
+                if ( empty($group->entries_ids)) {
+                    die( ObjectHelper::ToJSON( array(
+                            'response' => array(
+                                'list'              =>  array(),
+                                'min_max'           =>  $this->get_min_max(),
+                                'group_type'        =>  false
+                            )
+                        )
+                    ));
+                }
+
+                $search['_vk_public_id'] = $group->entries_ids;
+            }
+        }
+
+        $sort_by = $sort_by ? $sort_by : 'quantity';
+        if( !isset( $without_suffixes[$sort_by]))
+            $sort_by .= $period_suffixes[$period];
+        $sort_direction   = $sort_reverse ? ' ASC ': ' DESC ';
+        $options    =   array(
+            BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST ' ))
+        );
+        $vkPublics = VkPublicFactory::Get( $search, $options );
+        $diff_abs = 'diff_abs' .  $period_suffixes[$period];
+        $diff_rel = 'diff_rel' .  $period_suffixes[$period];
+        $visitors = 'visitors' .  $period_suffixes[$period];
+        $viewers  = 'viewers'  .  $period_suffixes[$period];
+        $result = array();
+        foreach ($vkPublics as $vkPublic ) {
+            $result[] =  array(
+                'id'        =>  $vkPublic->vk_public_id,
+                'vk_id'     =>  $vkPublic->vk_id,
+                'quantity'  =>  $vkPublic->quantity,
+                'name'      =>  $vkPublic->name,
+                'ava'       =>  $vkPublic->ava,
+                //todo список групп, в которых состоит паблик
+                'group_id'  =>  array(),
+                'admins'    =>  array(),
+                'diff_abs'  =>  $vkPublic->$diff_abs,
+                'diff_rel'  =>  $vkPublic->$diff_rel,
+                'visitors'  =>  $vkPublic->$visitors,
+                'viewers'   =>  $vkPublic->$viewers,
+                'in_search' =>  $vkPublic->in_search == 't' ? 1 : 0,
+                'active'    =>  $vkPublic->active== 't' ? true : false
+            );
+        }
+//        print_r($result);
+        die( ObjectHelper::ToJSON(array(
+                'response' => array(
+                    'list'              =>  $result,
+                    'min_max'           =>  $this->get_min_max(),
+                    'group_type'        =>  empty($group) ? null : $group->type
+                )
+            )
+        ));
+
+
     }
 
     private function get_visitors( $public_id, $period )

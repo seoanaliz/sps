@@ -44,6 +44,12 @@
                 GroupsUtility::extricate_from_group( $events, $group_id, $default_group->group_id );
                 BarterEventFactory::UpdateRange( $events );
                 die( ObjectHelper::ToJSON(array( 'response' => true )));
+            } elseif( $type == 'Stat' ) {
+                $group = GroupFactory::GetById( $group_id );
+                $k = array_search( $entry_id, $group->entries_ids );
+                unset( $group->entries_ids[$k] );
+                $res = GroupFactory::Update( $group );
+                die( ObjectHelper::ToJSON(array( 'response' => $res )));
             }
             elseif (  StatUsers::is_Sadmin( $user_id )) {
                 $m_class::extricate_entry( $group_id, $entry_id, $user_id );

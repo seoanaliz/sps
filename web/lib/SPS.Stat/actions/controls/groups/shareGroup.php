@@ -42,18 +42,15 @@
                 GroupsUtility::share_groups( $groups, $recipients_ids );
                 GroupFactory::UpdateRange( $groups );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
+            } elseif ( $type == 'Barter') {
             }
-
             if ( !StatUsers::is_Sadmin( $user_id )) {
                 die( ObjectHelper::ToJSON( array('response' => false )));
             }
 	     
             $m_class::implement_group( $group_ids, $recipients_ids );
             die( ObjectHelper::ToJSON( array( 'response' => true )));
-
         }
-
-
     }
 
 ?>

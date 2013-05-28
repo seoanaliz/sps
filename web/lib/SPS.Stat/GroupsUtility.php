@@ -6,8 +6,10 @@
     {
 
         const Group_Type_Default = 1;
-        const Group_Shared = 2;
+        const Group_Shared  = 2;
         const Group_Shared_Special = 3;
+        const Group_Private = 4;
+        const Group_Global  = 5;
 
         public static  $barter_watchers = array(
             '670456',
