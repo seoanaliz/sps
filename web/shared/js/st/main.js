@@ -416,7 +416,7 @@ var Filter = (function() {
                     Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
                 ]);
             });
-            $timeTo.datepicker('setDate', new Date((new Date.getTime()) - TIME.DAY));
+            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
             $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
             var dateFrom = $timeFrom.datepicker('getDate');
             var dateTo = $timeTo.datepicker('getDate');
