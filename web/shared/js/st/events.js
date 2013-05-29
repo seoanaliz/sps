@@ -45,16 +45,15 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-
     get_user: function(userId, callback) {
-    simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
-        callback(dirtyData);
-    });
+        simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
+            callback(dirtyData);
+        });
     },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData.list))
+            if ($.isArray(dirtyData.list)) {
                 $.each(dirtyData.list, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
@@ -63,6 +62,7 @@ var Eventlist = {
                         slug: data.slug
                     });
                 });
+            }
             cur.dataUser.listed = intval(dirtyData.listed_by);
             callback(clearData);
         });
