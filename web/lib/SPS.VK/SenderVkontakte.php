@@ -80,7 +80,7 @@
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             if (is_array($arr_of_fields)) {
-                curl_setopt( $ch, CURLOPT_POSTFIELDS, $arr_of_fields );
+                curl_setopt( $ch, CURLOPT_POSTFIELDS, http_build_query($arr_of_fields) );
 
             } else return false;
 
