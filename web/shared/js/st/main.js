@@ -863,6 +863,9 @@ var Table = (function() {
         }
 
         if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+            if (typeof history === 'object' && 'replaceState' in history) {
+                history.replaceState({listId: entriesPrecache.groupId, slug: ''}, '');
+            }
             var data = prepareServerData(entriesPrecache);
             loadTableCallback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
             entriesPrecache = false;
