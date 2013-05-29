@@ -26,7 +26,7 @@ var TABLE =
 
 var TABLE_HEADER =
 '<div class="row">' +
-    '<div class="column column4 publics">' +
+    '<div class="column column4-5 publics">' +
         '<div class="cell">' +
             '<div class="input-wrap">' +
                '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -70,7 +70,7 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public row" data-id="<?=publicId?>">' +
-    '<div class="column column4 public-info" data-id="<?=publicId?>">' +
+    '<div class="column column4-5 public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
                 '<img src="<?=publicImg?>" alt="" />' +

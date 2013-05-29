@@ -18,11 +18,11 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
-                <page uri="/stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="/stat" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.Stat.getEntriesPrecache</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-                <page uri="/stat/([^/]*).*" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="/stat/([^/]*).*" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.Stat.getEntriesPrecache</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
