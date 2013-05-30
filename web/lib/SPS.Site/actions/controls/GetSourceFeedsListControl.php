@@ -107,6 +107,15 @@ class GetSourceFeedsListControl extends BaseControl
                             'type' => $type)
                         , array(BaseFactory::WithoutPages => true)
                     );
+
+                    if( $type == SourceFeedUtility::Source ) {
+                        $sourceFeeds += SourceFeedFactory::Get(
+                              array(
+                                '_sourceFeedId' => $sourceIds,
+                                'type' => SourceFeedUtility::Topface )
+                            , array(BaseFactory::WithoutPages => true)
+                        );
+                    }
                 }
 
                 foreach ($sourceFeeds as $sourceFeed) {
