@@ -92,7 +92,7 @@ function handleUserLoggedIn(userData) {
 }
 
 function logoutFromVk() {
-    VK.Auth.logout(makeVkButton);
+    makeVkButton();
 }
 
 //function initVK(data) {
