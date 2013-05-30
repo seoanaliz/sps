@@ -47,10 +47,12 @@ function checkVkStatus(callback) {
         nameTransportPath: '/xd_receiver.htm'
     });
 
+    log('aaa');
     VK.Auth.getLoginStatus(authInfo);
 }
 
 function authInfo(response) {
+    log('bbb', response);
     if (!response.session) {
         makeVkButton();
     } else {
