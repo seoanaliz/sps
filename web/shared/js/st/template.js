@@ -8,6 +8,7 @@ var LIST =
                 '<a class="delete">Удалить</a>' +
         '</div> ' +
     ' <? } ?> ' +
+    '<div class="login-info"></div>' +
 '</div>' ;
 
 

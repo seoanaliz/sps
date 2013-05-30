@@ -671,13 +671,49 @@ td {
   white-space: nowrap;
   max-width: 150px;
 }
-.tab-bar>.actions {
+.tab-bar {
+  position: relative;
+}
+.tab-bar .actions {
   float: right;
   padding: 12px 8px 0;
   color: #999;
 }
-.tab-bar>.actions> a {
+.tab-bar .actions a {
   margin: 0 0.7em;
+}
+.login-info {
+  position: absolute;
+  right: 6px;
+  top: 3px;
+  height: 31px;
+  font-weight: bold;
+  display: table;
+}
+.login-info .userpic {
+  height: 31px;
+  width: 31px;
+  float: left;
+  margin-right: 5px;
+}
+.login-info .username {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  display: table-cell;
+  vertical-align: middle;
+  max-width: 300px;
+  margin-right: 5px;
+}
+.login-info .logout {
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 17px;
+}
+#vk-button {
+  position: absolute;
+  top: 5px;
+  right: 4px;
 }
 .box-share>.title {
   margin: 7px 0 4px;

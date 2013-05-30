@@ -1534,3 +1534,11 @@ var BOX_ACTIONS =
 
 var BOX_CLOSE =
 '<div class="close"></div>';
+
+if (typeof console !== 'undefined' && console.log) {
+    log = function () {
+        console.log.apply(console, arguments);
+    }
+} else {
+    log = function () {}
+}

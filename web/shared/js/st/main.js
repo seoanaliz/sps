@@ -31,44 +31,77 @@ $(document).ready(function() {
         });
     })(window);
 
-//    VK.init({
-//        apiId: Configs.appId,
-//        nameTransportPath: '/xd_receiver.htm'
-//    });
-//    getInitData();
-//    function getInitData() {
-//        var code =
-//            'return {' +
-//                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-//            '};';
-//        VK.Api.call('execute', {code: code}, initVK);
-//    }
-    initVK();
+    cur.dataUser.isEditor = false;
+    Filter.init(function() {
+        List.init(function() {
+            Table.init();
+            Counter.init();
+            checkVkStatus();
+        });
+    });
 });
 
-function initVK(data) {
-    if (data) {
-        var r = data.response;
-        cur.dataUser = r.me;
-        Events.fire('get_user', cur.dataUser.uid, function(us) {
-            cur.dataUser.isEditor = us.rank == 2 ;
-            Filter.init(function() {
-                List.init(function() {
-                    Table.init();
-                    Counter.init();
-                });
-            });
-        });
+function checkVkStatus(callback) {
+    VK.init({
+        apiId: Configs.appId,
+        nameTransportPath: '/xd_receiver.htm'
+    });
+
+    VK.Auth.getLoginStatus(authInfo);
+}
+
+function authInfo(response) {
+    if (!response.session) {
+        makeVkButton();
     } else {
-        cur.dataUser.isEditor = false;
-        Filter.init(function() {
-            List.init(function() {
-                Table.init();
-                Counter.init();
-            });
+        var code = 'return {' +
+            'user: API.getProfiles({fields: "photo"})[0]' +
+        '};';
+        VK.Api.call('execute', {code: code}, function (answer) {
+            if (answer && answer.response) {
+                cur.dataUser = answer.response.user;
+                handleUserLoggedIn(answer.response.user);
+            }
         });
     }
 }
+
+function makeVkButton() {
+    var $loginInfo = $('.login-info');
+    if ($loginInfo.length) {
+        $('.login-info').html('<div id="vk-button" onclick="VK.Auth.login(authInfo);"></div>');
+        VK.UI.button('vk-button'); // TODO: сделать что-нибудь, чтобы кнопка рисовалась всегда, а не только если контейнер есть | не перерисовывать при неудачном логине
+    }
+}
+
+function handleUserLoggedIn(userData) {
+    var $loginInfo = $('.login-info');
+    $loginInfo.html('<img class="userpic" alt="" /><a class="username"></a><a class="logout">Выход</a>');
+    $('.username', $loginInfo).text(userData.first_name + ' ' + userData.last_name)
+        .attr('href', 'http://vk.com/id' + userData.uid);
+    $('.userpic', $loginInfo).attr('src', userData.photo);
+    $('.logout', $loginInfo).click(logoutFromVk);
+}
+
+function logoutFromVk() {
+    VK.Auth.logout(makeVkButton);
+}
+
+//function initVK(data) {
+//    if (data) {
+//        var r = data.response;
+//        cur.dataUser = r.me;
+//        Events.fire('get_user', cur.dataUser.uid, function(us) {
+//            cur.dataUser.isEditor = us.rank == 2 ;
+//            Filter.init(function() {
+//                List.init(function() {
+//                    Table.init();
+//                    Counter.init();
+//                });
+//            });
+//        });
+//    }
+//}
 
 var List = (function() {
     var $container;

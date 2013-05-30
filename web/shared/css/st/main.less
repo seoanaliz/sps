@@ -702,15 +702,54 @@ table, tr, td {
 }
 
 .tab-bar {
-    &>.actions {
+    position: relative;
+
+    .actions {
         float: right;
         padding: 12px 8px 0;
         color: #999;
 
-        &> a {
+        a {
             margin: 0 0.7em;
         }
     }
+}
+
+.login-info {
+    position: absolute;
+    right: 6px;
+    top: 3px;
+    @pic-size: 31px;
+    height: @pic-size;
+    font-weight: bold;
+    display: table;
+
+    .userpic {
+        height: @pic-size;
+        width: @pic-size;
+        float: left;
+        margin-right: 5px;
+    }
+
+    .username {
+        .inline-block;
+        display: table-cell;
+        vertical-align: middle;
+        max-width: 300px;
+        margin-right: 5px;
+    }
+
+    .logout {
+        display: table-cell;
+        vertical-align: middle;
+        padding-left: 17px;
+    }
+}
+
+#vk-button {
+    position: absolute;
+    top: 5px;
+    right: 4px;
 }
 
 .box-share {
