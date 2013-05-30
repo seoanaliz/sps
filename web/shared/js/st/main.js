@@ -47,21 +47,17 @@ function checkVkStatus(callback) {
         nameTransportPath: '/xd_receiver.htm'
     });
 
-    log('aaa');
     VK.Auth.getLoginStatus(authInfo);
 }
 
 function authInfo(response) {
-    log('bbb', response);
     if (!response.session) {
         makeVkButton();
     } else {
-        log('ccc');
         var code = 'return {' +
             'user: API.getProfiles({fields: "photo"})[0]' +
         '};';
         VK.Api.call('execute', {code: code}, function (answer) {
-            log('ddd', answer);
             if (answer && answer.response) {
                 cur.dataUser = answer.response.user;
                 handleUserLoggedIn(answer.response.user);
