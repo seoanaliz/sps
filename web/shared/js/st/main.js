@@ -76,9 +76,11 @@ function makeVkButton() {
 
 function handleUserLoggedIn(userData) {
     var $loginInfo = $('.login-info');
-    $loginInfo.html('<img class="userpic" alt="" /><a class="username"></a><a class="logout">Выход</a>');
-    $('.username', $loginInfo).text(userData.first_name + ' ' + userData.last_name)
-        .attr('href', 'http://vk.com/id' + userData.uid);
+    $loginInfo.html('<a class="logout">Выход</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    $('.username', $loginInfo)
+        .attr('href', 'http://vk.com/id' + userData.uid)
+    .find('span')
+        .text(userData.first_name + ' ' + userData.last_name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
     $('.logout', $loginInfo).click(logoutFromVk);
 }

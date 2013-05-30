@@ -722,27 +722,30 @@ table, tr, td {
     @pic-size: 31px;
     height: @pic-size;
     font-weight: bold;
-    display: table;
+
+    .username {
+        display: table;
+
+        span {
+            display: table-cell;
+            max-width: 300px;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+    }
 
     .userpic {
         height: @pic-size;
         width: @pic-size;
-        float: left;
-        margin-right: 5px;
-    }
-
-    .username {
-        .inline-block;
-        display: table-cell;
-        vertical-align: middle;
-        max-width: 300px;
         margin-right: 5px;
     }
 
     .logout {
-        display: table-cell;
-        vertical-align: middle;
-        padding-left: 17px;
+        display: block;
+        float: right;
+        padding-left: 5px;
+        line-height: @pic-size;
+        margin-left: 13px;
     }
 }
 

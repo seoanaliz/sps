@@ -688,27 +688,27 @@ td {
   top: 3px;
   height: 31px;
   font-weight: bold;
+}
+.login-info .username {
   display: table;
+}
+.login-info .username span {
+  display: table-cell;
+  max-width: 300px;
+  vertical-align: middle;
+  overflow: hidden;
 }
 .login-info .userpic {
   height: 31px;
   width: 31px;
-  float: left;
-  margin-right: 5px;
-}
-.login-info .username {
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
-  display: table-cell;
-  vertical-align: middle;
-  max-width: 300px;
   margin-right: 5px;
 }
 .login-info .logout {
-  display: table-cell;
-  vertical-align: middle;
-  padding-left: 17px;
+  display: block;
+  float: right;
+  padding-left: 5px;
+  line-height: 31px;
+  margin-left: 13px;
 }
 #vk-button {
   position: absolute;
