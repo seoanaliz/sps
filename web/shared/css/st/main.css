@@ -699,10 +699,10 @@ td {
   overflow: hidden;
 }
 .login-info .userpic {
-  height: 31px;
-  width: 31px;
-  margin-right: 5px;
+  height: 22px;
+  padding: 4px 5px 5px 0;
 }
+.login-info .login,
 .login-info .logout {
   display: block;
   float: right;

@@ -69,8 +69,14 @@ function authInfo(response) {
 function makeVkButton() {
     var $loginInfo = $('.login-info');
     if ($loginInfo.length) {
-        $('.login-info').html('<div id="vk-button" onclick="VK.Auth.login(authInfo);"></div>');
-        VK.UI.button('vk-button'); // TODO: сделать что-нибудь, чтобы кнопка рисовалась всегда, а не только если контейнер есть | не перерисовывать при неудачном логине
+        var vkHref = 'https://oauth.vk.com/authorize?' +
+                    'client_id='+ Configs.appId +
+                    '&scope=stats,groups,offline' +
+                    '&redirect_uri='+ encodeURIComponent(location.origin + location.pathname) +
+                    '&display=page' +
+                    '&response_type=token';
+        $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
+        // TODO: сделать что-нибудь, чтобы кнопка рисовалась всегда, а не только если контейнер есть | не перерисовывать при неудачном логине
     }
 }
 
