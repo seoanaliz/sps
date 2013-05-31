@@ -343,6 +343,7 @@ class CheckWalls
         if( !$link ) {
             $link = $this->find_memlink( $text );
         }
+        $author = '';
         $outer_link = $this->find_url( $text );
         if ( $outer_link ) {
             $articleQueue = ArticleQueueFactory::GetOne( array('externalId' => '-' . $public_id . '_' . $post_id ));
@@ -351,6 +352,11 @@ class CheckWalls
             } else {
                 $link = $outer_link;
             }
+            if( !empty( $articleQueue ) && $articleQueue->author ) {
+                $author = AuthorFactory::GetOne( array( 'vkId' => $articleQueue->author ));
+                $author = ' ' . $author->FullName() . '(vk.com/id)' . $author->vkId. ' ';
+        }
+            $link = $outer_link;
         }
         if( $link && $type == self::MONITORING_TYPE_WALL )
             return false;
@@ -366,7 +372,7 @@ class CheckWalls
             $cmd->SetString ( '@type',     $type );
             $cmd->Execute();
             if( $outer_link ) {
-                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id ;
+                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id . '    ' . $author;
                 VkHelper::send_alert( $message, array( 670456, 106175502 ));
             }
         }
