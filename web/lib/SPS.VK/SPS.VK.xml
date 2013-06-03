@@ -9,6 +9,12 @@
     <action name="VKLogoutSilent">
         <path>VKLogout</path>
     </action>
+    <action name="VKLoginRedirect">
+        <path>VKLoginRedirect</path>
+        <redirects>
+            <redirect name="redirect" path="{redirect}" />
+        </redirects>
+    </action>
     <action name="VKCheckAuth">
         <path>VKCheckAuth</path>
         <redirects>

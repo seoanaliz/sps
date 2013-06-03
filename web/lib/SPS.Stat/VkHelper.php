@@ -253,13 +253,15 @@
                 $cmd->Execute();
             }
 
-            public static function connect( $link, $cookie=null, $post=null ) {
+            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true) {
                 $ch = curl_init();
 
                 curl_setopt( $ch, CURLOPT_URL, $link );
                 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
                 curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
-                curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                if ($includeHeader) {
+                    curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                }
                 curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
                 curl_setopt($ch, CURLOPT_USERAGENT,
                     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');

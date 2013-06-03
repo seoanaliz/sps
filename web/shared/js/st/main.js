@@ -50,6 +50,38 @@ function checkVkStatus(callback) {
     VK.Auth.getLoginStatus(authInfo);
 }
 
+// taken from http://www.quirksmode.org/js/cookies.html
+function createCookie(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else {
+        expires = "";
+    }
+    document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i=0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1,c.length);
+        }
+        if (c.indexOf(nameEQ) == 0) {
+            return c.substring(nameEQ.length,c.length);
+        }
+    }
+    return null;
+}
+
+function removeCookie(name) {
+    createCookie(name, "", -1);
+}
+
 function authInfo(response) {
     if (!response.session) {
         makeVkButton();
@@ -72,9 +104,9 @@ function makeVkButton() {
         var vkHref = 'https://oauth.vk.com/authorize?' +
                     'client_id='+ Configs.appId +
                     '&scope=stats,groups,offline' +
-                    '&redirect_uri='+ encodeURIComponent(location.origin + location.pathname) +
+                    '&redirect_uri='+ encodeURIComponent(location.origin + '/vk-login/?to=' + location.pathname) +
                     '&display=page' +
-                    '&response_type=token';
+                    '&response_type=code';
         $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
         // TODO: сделать что-нибудь, чтобы кнопка рисовалась всегда, а не только если контейнер есть | не перерисовывать при неудачном логине
     }
@@ -88,11 +120,10 @@ function handleUserLoggedIn(userData) {
     .find('span')
         .text(userData.first_name + ' ' + userData.last_name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
-    $('.logout', $loginInfo).click(logoutFromVk);
+    $('.logout', $loginInfo).click(logout);
 }
 
-function logoutFromVk() {
-    makeVkButton();
+function logout() {
 }
 
 //function initVK(data) {
