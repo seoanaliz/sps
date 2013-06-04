@@ -7,6 +7,9 @@
  */
 class AddArticleToQueueControl extends BaseControl
 {
+    /** in minutes*/
+    const TimeBeetwenPosts  = 5;
+    const PostsPerDayInFeed = 60;
 
     /**
      * Entry Point
@@ -16,7 +19,6 @@ class AddArticleToQueueControl extends BaseControl
         $result = array(
             'success' => false
         );
-
         $articleId = Request::getInteger('articleId');
         $targetFeedId = Request::getInteger('targetFeedId');
         $timestamp = Request::getInteger('timestamp');
@@ -29,8 +31,44 @@ class AddArticleToQueueControl extends BaseControl
             return false;
         }
 
+        // может ли планировать в ленту
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)) {
+            $result['message'] = 'AccessDenied!';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
         if ( $timestamp <  DateTimeWrapper::Now()->getTimestamp()) {
             $result['message'] = 'Too late';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        //ограничение по интервалу между постами
+        $intervalTime = new DateTimeWrapper(date('r', $timestamp));
+        $intervalTime->modify('- ' . self::TimeBeetwenPosts . ' minutes');
+        $search = array(
+            'targetFeedId'  =>  $targetFeedId,
+            'startDateFrom' =>  $intervalTime
+        );
+        $check = ArticleQueueFactory::GetOne( $search );
+        if( $check ) {
+            $result['message'] = 'Time between posts is too small';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        //ограничение по количеству постов в ленте
+        $search = array(
+            'targetFeedId'  =>  $targetFeedId,
+            'startDateFrom' =>  clone($intervalTime->modify('midnight')),
+            'startDateTo'   =>  $intervalTime->modify('+ 1 day'),
+            BaseFactoryPrepare::PageSize => 1
+        );
+        $articlesCount = ArticleQueueFactory::Count( $search);
+        if( $articlesCount >= self::PostsPerDayInFeed ) {
+            $result['message'] = 'Too many posts this day';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
@@ -45,14 +83,6 @@ class AddArticleToQueueControl extends BaseControl
             );
             echo ObjectHelper::ToJSON($result);
             return true;
-        }
-
-        // может ли планировать в ленту
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-        if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)) {
-            $result['message'] = 'AccessDenied!';
-            echo ObjectHelper::ToJSON($result);
-            return false;
         }
 
         // получаем пост
