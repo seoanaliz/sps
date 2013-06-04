@@ -348,13 +348,13 @@ class CheckWalls
         if ( $outer_link ) {
             $articleQueue = ArticleQueueFactory::GetOne( array('externalId' => '-' . $public_id . '_' . $post_id ));
             if( !empty( $articleQueue ) && in_array( $articleQueue->author, StatUsers::$editors_black_list )) {
-                    $outer_link = false;
+                $outer_link = false;
             } else {
                 $link = $outer_link;
             }
             if( !empty( $articleQueue ) && $articleQueue->author ) {
                 $author = AuthorFactory::GetOne( array( 'vkId' => $articleQueue->author ));
-                $author = ' ' . $author->FullName() . '(vk.com/id)' . $author->vkId. ' ';
+                $author = ' ' . $author->FullName() . '( vk.com/id' . $author->vkId. ') ';
         }
             $link = $outer_link;
         }

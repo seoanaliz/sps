@@ -152,7 +152,7 @@
             $res = VkHelper::api_request( 'wall.repost', $params );
             if (isset ($res->error )) {
                 if ( in_array( $res->error->error_code, $this->change_admin_errors ))
-                    throw new ChangeSenderException( 'publisher is presumably dead' );
+                    throw new ChangeSenderException(  $res->error->error_msg );
 
                 else
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_code
@@ -165,7 +165,6 @@
                 throw new Exception( 'Strange response on wall.repost: ' . ObjectHelper::ToJSON( $res )
                     . ', public: '. $this->vk_group_id );
             }
-
         }
 
         public function text_corrector( $text )
@@ -399,7 +398,7 @@
             elseif ( isset( $res->error ))
 
                 if ( in_array( $res->error->error_code, $this->change_admin_errors ))
-                    throw new ChangeSenderException();
+                    throw new ChangeSenderException($res->error->error_msg);
 
                 else
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_msg
@@ -494,7 +493,7 @@
             sleep( 0.4 );
             if ( !isset( $res->upload_url )) {
                 if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
-                    throw new ChangeSenderException();
+                    throw new ChangeSenderException($res->error->error_msg);
                 } elseif(isset ( $res->error)) {
                     throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
                         . " in post to vk.com/public" . $this->vk_group_id );
