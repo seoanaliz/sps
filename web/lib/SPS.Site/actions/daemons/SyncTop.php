@@ -28,7 +28,7 @@
                 if ( count( $sex_city ) == 2 ) {
                     $sex  = strtolower($sex_city[0]) == 'w' ?  0 : 1;
                     $city =  isset($sex_city[1] ) ? $sex_city[1] : null;
-                    if( $city)
+                    if( !$city)
                         continue;
                     $this->parseTop( $source, $sex, $city );
 
