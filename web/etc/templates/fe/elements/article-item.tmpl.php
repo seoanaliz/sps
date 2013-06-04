@@ -100,11 +100,11 @@ if (!empty($article)) {
             <? if ($isRepost) { ?>
                 <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
             <? } ?>
-            <? if (!empty($articleRecord->link)) { ?>
-                <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
+            <? if (UrlParser::IsContentWithWikiLink($articleRecord->content)) { ?>
+                <span class="attach-icon attach-icon-link" title="Пост с вики-ссылкой"><!-- --></span>
             <? } ?>
-            <? if (UrlParser::IsContentWithLink($articleRecord->content)) { ?>
-                <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>
+            <? if (UrlParser::IsContentWithLink($articleRecord->content) || !empty($articleRecord->link) ) { ?>
+                <span class="attach-icon attach-icon-link-red" title="Пост со внешней ссылкой"><!-- --></span>
             <? } ?>
             <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>

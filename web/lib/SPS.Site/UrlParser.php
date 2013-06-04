@@ -67,6 +67,11 @@
             }
         }
 
+        public static function IsContentWithWikiLink( $content ) {
+           return preg_match( '/(@[^\s\($]+(\s*\(.*?\)|))/', $content )
+                || preg_match( '/(\[(club|id|public).*?\|.*?\])/', $content ) ;
+        }
+
         public static function IsContentWithHash($content) {
             if (preg_match('/(^|\s)#(\w+)/uim', $content)) {
                 return true;
