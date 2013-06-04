@@ -26,8 +26,11 @@
             foreach($regionSources as $source ) {
                 $sex_city = explode( ' ', $source->externalId );
                 if ( count( $sex_city ) == 2 ) {
-                    $sex = strtolower($sex_city[0]) == 'w' ?  0 : 1;
-                    $this->parseTop( $source, 0, $sex );
+                    $sex  = strtolower($sex_city[0]) == 'w' ?  0 : 1;
+                    $city =  isset($sex_city[1] ) ? $sex_city[1] : null;
+                    if( $city)
+                        continue;
+                    $this->parseTop( $source, $sex, $city );
 
                 }
             }
