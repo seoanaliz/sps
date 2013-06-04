@@ -8,6 +8,8 @@
         public static $Password;
 
         public static $AuthSecret;
+        
+        protected static $CookieSecret = 't2MJebh87ZmYdN2i2btAXGLv+Z1NxrYcA4AgHNQMYvM=';
 
         public static function Init( DOMNodeList $params ) {
             foreach ( $params as $param ) {
@@ -85,6 +87,44 @@
             Cookie::setCookie( 'vk_app_trust' . self::$AppId, "", time() - 1024, '/' );
             Session::setObject('Editor', null);
             Response::setObject('__Editor', null);
+        }
+
+        public static function LoginAlternative($vkId) {
+            $editor = EditorFactory::GetOne(
+                array('vkId' => $vkId)
+            );
+            if ($editor) {
+                $expire = time() + 86400 * 7;
+                $cookieString = self::GenerateCookieContentString($editor->editorId, $vkId, $expire);
+                Cookie::setCookie('good_' . self::$AppId, $cookieString, $expire, '/');
+            }
+        }
+
+        public static function IsAuthAlternative() {
+            return self::IsCookieValid(Cookie::getString('good_' . self::$AppId));
+        }
+
+        public static function IsCookieValid($cookieString) {
+            $keys = array('version', 'expire', 'uid', 'checksum');
+            $data = explode('.', $cookieString);
+            if (count($data) === count($keys)) {
+                $cookieData = array_combine($keys, $data);
+                $editor = EditorFactory::GetOne(
+                    array('editorId' => (int) $cookieData['uid'])
+                );
+                if ($editor && (self::GenerateCookieContentString($cookieData['uid'], $editor->vkId, $cookieData['expire']) === $cookieString)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static function GenerateCookieContentString($userId, $vkId, $expire) {
+            $checkSum  = base64_encode(
+                hash('sha256', $vkId . '_' . $expire . '_' . self::$CookieSecret, $raw=true)
+            );
+            $version = 1;
+            return "$version.$expire.$userId.$checkSum";
         }
     }
 ?>

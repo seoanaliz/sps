@@ -21,10 +21,10 @@
                     '&redirect_uri=' . urlencode($protocol . '://' . trim(Request::GetHTTPHost(), '/') . '/vk-login/?to=' . $redirectUrl);
                 $answer = json_decode(
                         VkHelper::connect($tokenGetUrl, $setCookie = null, $usePost = null, $includeHeaderInOutput = false),
-                        $array = true
+                        $array=true
                 );
                 if (isset($answer['user_id'])) {
-                    //Авторизуем пользователя
+                    AuthVkontakte::LoginAlternative($answer['user_id']);
                 }
             }
 
