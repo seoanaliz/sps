@@ -126,5 +126,9 @@
             $version = 1;
             return "$version.$expire.$userId.$checkSum";
         }
+
+        public static function LogoutAlternative() {
+            Cookie::setCookie('good_' . self::$AppId, '', time() - 1000, '/');
+        }
     }
 ?>

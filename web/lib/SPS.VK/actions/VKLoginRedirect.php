@@ -26,6 +26,8 @@
                 if (isset($answer['user_id'])) {
                     AuthVkontakte::LoginAlternative($answer['user_id']);
                 }
+            } else {
+                AuthVkontakte::LogoutAlternative();
             }
 
             Response::SetString('redirect', $redirectUrl);

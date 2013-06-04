@@ -41,46 +41,50 @@ $(document).ready(function() {
     });
 });
 
-function checkVkStatus(callback) {
-    VK.init({
-        apiId: Configs.appId,
-        nameTransportPath: '/xd_receiver.htm'
-    });
+function checkVkStatus() {
+    if (typeof VK !== 'undefined') {
+        VK.init({
+            apiId: Configs.appId,
+            nameTransportPath: '/xd-receiver/'
+        });
 
-    VK.Auth.getLoginStatus(authInfo);
+        VK.Auth.getLoginStatus(authInfo);
+    } else {
+        makeVkButton();
+    }
 }
 
 // taken from http://www.quirksmode.org/js/cookies.html
-function createCookie(name, value, days) {
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        var expires = "; expires="+date.toGMTString();
-    }
-    else {
-        expires = "";
-    }
-    document.cookie = name+"="+value+expires+"; path=/";
-}
-
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for (var i=0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') {
-            c = c.substring(1,c.length);
-        }
-        if (c.indexOf(nameEQ) == 0) {
-            return c.substring(nameEQ.length,c.length);
-        }
-    }
-    return null;
-}
-
-function removeCookie(name) {
-    createCookie(name, "", -1);
-}
+//function createCookie(name, value, days) {
+//    if (days) {
+//        var date = new Date();
+//        date.setTime(date.getTime()+(days*24*60*60*1000));
+//        var expires = "; expires="+date.toGMTString();
+//    }
+//    else {
+//        expires = "";
+//    }
+//    document.cookie = name+"="+value+expires+"; path=/";
+//}
+//
+//function readCookie(name) {
+//    var nameEQ = name + "=";
+//    var ca = document.cookie.split(';');
+//    for (var i=0; i < ca.length; i++) {
+//        var c = ca[i];
+//        while (c.charAt(0)==' ') {
+//            c = c.substring(1,c.length);
+//        }
+//        if (c.indexOf(nameEQ) == 0) {
+//            return c.substring(nameEQ.length,c.length);
+//        }
+//    }
+//    return null;
+//}
+//
+//function removeCookie(name) {
+//    createCookie(name, "", -1);
+//}
 
 function authInfo(response) {
     if (!response.session) {
@@ -114,16 +118,12 @@ function makeVkButton() {
 
 function handleUserLoggedIn(userData) {
     var $loginInfo = $('.login-info');
-    $loginInfo.html('<a class="logout">Выход</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    $loginInfo.html('<a class="logout" href="/vk-login/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
     $('.username', $loginInfo)
         .attr('href', 'http://vk.com/id' + userData.uid)
     .find('span')
         .text(userData.first_name + ' ' + userData.last_name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
-    $('.logout', $loginInfo).click(logout);
-}
-
-function logout() {
 }
 
 //function initVK(data) {

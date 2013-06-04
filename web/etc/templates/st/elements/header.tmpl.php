@@ -90,6 +90,8 @@ if(!empty($jsFilesAdds)) {
     <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? if (AuthVkontakte::IsAuthAlternative()) { ?>
+        <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? } ?>
 </head>
 <body>
