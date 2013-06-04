@@ -186,7 +186,8 @@ sql;
                     TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
                 }
             } catch (ChangeSenderException $Ex){
-                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'failed to post from publisher ' . $publisher->publisherId );
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                    'failed to post from publisher ' . $publisher->publisherId .', ' . $Ex->getMessage());
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
