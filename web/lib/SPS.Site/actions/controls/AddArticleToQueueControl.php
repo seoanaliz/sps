@@ -47,25 +47,29 @@ class AddArticleToQueueControl extends BaseControl
 
         //ограничение по интервалу между постами
         $intervalTime = new DateTimeWrapper(date('r', $timestamp));
-        $intervalTime->modify('- ' . self::TimeBeetwenPosts . ' minutes');
+        $from = new DateTimeWrapper(date('r', $timestamp));
+        $from->modify( '- ' . self::TimeBeetwenPosts . ' minutes');
         $search = array(
             'targetFeedId'  =>  $targetFeedId,
-            'startDateFrom' =>  $intervalTime
+            'startDateFrom' =>  $from,
+            'startDateTo'   =>  $intervalTime->modify('+ 1 minute')
         );
-        $check = ArticleQueueFactory::GetOne( $search );
-        if( $check ) {
+        $check = ArticleQueueFactory::Get( $search );
+        if( !empty($check )) {
             $result['message'] = 'Time between posts is too small';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-
+        $midnight = new DateTimeWrapper(date('r', $timestamp));
+        $midnight = $midnight->modify('midnight');
         //ограничение по количеству постов в ленте
         $search = array(
             'targetFeedId'  =>  $targetFeedId,
-            'startDateFrom' =>  clone($intervalTime->modify('midnight')),
-            'startDateTo'   =>  $intervalTime->modify('+ 1 day'),
+            'startDateFrom' =>  $midnight,
+            'startDateTo'   =>  $intervalTime->modify('+ 1 day')->modify('midnight'),
             BaseFactoryPrepare::PageSize => 1
         );
+
         $articlesCount = ArticleQueueFactory::Count( $search);
         if( $articlesCount >= self::PostsPerDayInFeed ) {
             $result['message'] = 'Too many posts this day';
