@@ -28,7 +28,7 @@
 
             $gridLine = GridLineFactory::GetById($gridLineId);
             if (empty($gridLine)) {
-                $result['message'] = 'Time between posts is too small';
+
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -38,7 +38,8 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
-            if( ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp())) {
+            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp())) {
+                $result['message'] = 'Time between posts is too small';
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
