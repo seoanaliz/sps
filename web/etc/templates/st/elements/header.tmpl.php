@@ -88,8 +88,10 @@ if(!empty($jsFilesAdds)) {
     <? } ?>
     <link rel="icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
     <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
+    <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
     <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>
 <body>
