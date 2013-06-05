@@ -7,9 +7,7 @@
  */
 class AddArticleToQueueControl extends BaseControl
 {
-    /** in minutes*/
-    const TimeBeetwenPosts  = 5;
-    const PostsPerDayInFeed = 60;
+
 
     /**
      * Entry Point
@@ -46,40 +44,22 @@ class AddArticleToQueueControl extends BaseControl
         }
 
         //ограничение по интервалу между постами
-        $intervalTime = new DateTimeWrapper(date('r', $timestamp));
-        $from = new DateTimeWrapper(date('r', $timestamp));
-        $from->modify( '- ' . self::TimeBeetwenPosts . ' minutes');
-        $search = array(
-            'targetFeedId'  =>  $targetFeedId,
-            'startDateFrom' =>  $from,
-            'startDateTo'   =>  $intervalTime->modify('+ 1 minute')
-        );
-        $check = ArticleQueueFactory::Get( $search );
-        if( !empty($check )) {
+
+        if( ArticleUtility::IsTooCloseToPrevious( $targetFeedId, $timestamp )) {
             $result['message'] = 'Time between posts is too small';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-        $midnight = new DateTimeWrapper(date('r', $timestamp));
-        $midnight = $midnight->modify('midnight');
-        //ограничение по количеству постов в ленте
-        $search = array(
-            'targetFeedId'  =>  $targetFeedId,
-            'startDateFrom' =>  $midnight,
-            'startDateTo'   =>  $intervalTime->modify('+ 1 day')->modify('midnight'),
-            BaseFactoryPrepare::PageSize => 1
-        );
 
-        $articlesCount = ArticleQueueFactory::Count( $search);
-        if( $articlesCount >= self::PostsPerDayInFeed ) {
+        if( ArticleUtility::IsArticlesLimitReached( $targetFeedId, $timestamp )) {
             $result['message'] = 'Too many posts this day';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
 
-        if (!empty($queueId)) {
+        if (!empty( $queueId )) {
             //просто перемещаем элемент очереди
-            ArticleUtility::ChangeQueueDates($queueId, $timestamp);
+            ArticleUtility::ChangeQueueDates( $queueId, $timestamp );
 
             $result = array(
                 'success' => true,

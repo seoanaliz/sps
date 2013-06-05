@@ -37,6 +37,15 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
+            if( ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $timestamp )) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
+            if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
 
             $object = new GridLineItem();
             $object->gridLineItemId = $gridLineItemId;
