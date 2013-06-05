@@ -158,3 +158,13 @@ SELECT "public"."editors"."editorId"
 	, "public"."editors"."statusId"
  FROM "public"."editors"
 	WHERE "public"."editors"."statusId" != 3;
+
+CREATE OR REPLACE VIEW "getAccessTokens" AS
+SELECT "public"."accessTokens"."accessTokenId"
+    , "public"."accessTokens"."vkId"
+	, "public"."accessTokens"."accessToken"
+	, "public"."accessTokens"."appId"
+	, "public"."accessTokens"."createdAt"
+	, "public"."accessTokens"."statusId"
+ FROM "public"."accessTokens"
+ WHERE "public"."accessTokens"."statusId" != 3;
