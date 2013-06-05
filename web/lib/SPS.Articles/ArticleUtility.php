@@ -7,6 +7,10 @@
      */
     class ArticleUtility {
 
+        /** in minutes*/
+        const PostsPerDayInFeed = 100;
+        const TimeBeetwenPosts  = 5;
+
         public static function IsTopArticleWithSmallPhoto(SourceFeed $sourceFeed, ArticleRecord $articleRecord) {
             if (!empty($articleRecord->photos) && count($articleRecord->photos) == 1 && SourceFeedUtility::IsTopFeed($sourceFeed)) {
                 $photoItem = current($articleRecord->photos);
@@ -52,6 +56,38 @@
 
             $object->startDate->modify('-30 seconds');
             $object->endDate->modify('+9 minutes');
+        }
+
+        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp )
+        {
+            $intervalTime = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $from = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $from->modify( '- ' . self::TimeBeetwenPosts . ' minutes');
+            $search = array(
+                'targetFeedId'  =>  $targetFeedId,
+                'startDateFrom' =>  $from,
+                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . 'minutes')
+            );
+            $check = ArticleQueueFactory::Get( $search );
+            return !empty( $check );
+        }
+
+        public static function IsArticlesLimitReached($targetFeedId, $newPostTimestamp)
+        {
+            $midnightNextDay = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $midnightNextDay->modify('+ 1 day')->modify('midnight');
+            $midnight = new DateTimeWrapper(date('r', $newPostTimestamp));
+            $midnight->modify('midnight');
+            //ограничение по количеству постов в ленте
+            $search = array(
+                'targetFeedId'  =>  $targetFeedId,
+                'startDateFrom' =>  $midnight,
+                'startDateTo'   =>  $midnightNextDay,
+                BaseFactoryPrepare::PageSize => 1
+            );
+
+            $articlesCount = ArticleQueueFactory::Count( $search);
+            return $articlesCount >= self::PostsPerDayInFeed;
         }
     }
 ?>

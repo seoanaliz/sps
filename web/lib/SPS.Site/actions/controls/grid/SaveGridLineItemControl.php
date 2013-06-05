@@ -28,11 +28,22 @@
 
             $gridLine = GridLineFactory::GetById($gridLineId);
             if (empty($gridLine)) {
+
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             //check access
+            if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp())) {
+                $result['message'] = 'Time between posts is too small';
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
             if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
