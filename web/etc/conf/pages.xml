@@ -729,7 +729,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="stat" boot="SPS.Site.GetSiteParams">
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
