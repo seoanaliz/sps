@@ -5,7 +5,7 @@
         <div class="tab-bar"></div>
         <div class="button-wrap">
             <script type="text/javascript"><!--
-                document.write(VK.Share.button(false,{type: "button", text: "Поделиться ссылкой"}));
+                document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
             --></script>
         </div>
     </div>
