@@ -36,9 +36,9 @@ $(document).ready(function() {
         List.init(function() {
             Table.init();
             Counter.init();
-            checkVkStatus();
         });
     });
+    checkVkStatus();
 });
 
 function checkVkStatus() {
@@ -112,7 +112,6 @@ function makeVkButton() {
                     '&display=page' +
                     '&response_type=code';
         $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
-        // TODO: сделать что-нибудь, чтобы кнопка рисовалась всегда, а не только если контейнер есть | не перерисовывать при неудачном логине
     }
 }
 
