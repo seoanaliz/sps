@@ -8,7 +8,7 @@
     class ArticleUtility {
 
         /** in minutes*/
-        const PostsPerDayInFeed = 75;
+        const PostsPerDayInFeed = 100;
         const TimeBeetwenPosts  = 5;
 
         public static function IsTopArticleWithSmallPhoto(SourceFeed $sourceFeed, ArticleRecord $articleRecord) {
@@ -66,7 +66,7 @@
             $search = array(
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $from,
-                'startDateTo'   =>  $intervalTime->modify('+ 1 minute')
+                'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . 'minutes')
             );
             $check = ArticleQueueFactory::Get( $search );
             return !empty( $check );
