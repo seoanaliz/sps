@@ -1,11 +1,11 @@
 CREATE TABLE "accessTokens"
 (
+ "accessTokenId" serial NOT NULL,
   "vkId" character varying NOT NULL,
   "accessToken" character varying,
   "appId" integer NOT NULL,
   "createdAt" timestamp without time zone,
   "statusId" integer NOT NULL,
-  "accessTokenId" serial NOT NULL,
   CONSTRAINT "accessTokens_pkey" PRIMARY KEY ("accessTokenId" ),
   CONSTRAINT "accessTokens_statusId_fkey" FOREIGN KEY ("statusId")
       REFERENCES statuses ("statusId") MATCH SIMPLE
