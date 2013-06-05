@@ -1,6 +1,6 @@
 CREATE TABLE "accessTokens"
 (
- "accessTokenId" serial NOT NULL,
+  "accessTokenId" serial NOT NULL,
   "vkId" character varying NOT NULL,
   "accessToken" character varying,
   "appId" integer NOT NULL,
