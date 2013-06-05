@@ -14,17 +14,30 @@
          * Entry Point
          */
         public function Execute() {
-            set_time_limit(0);
+            set_time_limit(1000);
             Logger::LogLevel(ELOG_DEBUG);
 
-            $sourceFemale = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_FEMALE));
-            $sourceMale = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_MALE));
-
+            $sourceFemale   = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_FEMALE));
+            $sourceMale     = SourceFeedFactory::GetOne(array('externalId' => SourceFeedUtility::TOP_MALE));
+            $regionSources  = SourceFeedFactory::Get( array( 'type' => SourceFeedUtility::Topface ));
             $this->parseTop($sourceFemale, 0);
             $this->parseTop($sourceMale, 1);
+
+            foreach($regionSources as $source ) {
+                $sex_city = explode( ' ', $source->externalId );
+                if ( count( $sex_city ) == 2 ) {
+                    $sex  = strtolower($sex_city[0]) == 'w' ?  0 : 1;
+                    $city =  isset($sex_city[1] ) ? $sex_city[1] : null;
+                    if( !$city)
+                        continue;
+                    $this->parseTop( $source, $sex, $city );
+
+                }
+            }
+
         }
 
-        private function parseTop($source, $sex) {
+        private function parseTop($source, $sex, $city_id = null ) {
             if (empty($source)) {
                 return;
             }
@@ -39,7 +52,7 @@
                 Logger::Info('Try number ' . $i);
 
                 try {
-                    $posts = $parser->get_top($sex);
+                    $posts = $parser->get_top($sex, $city_id);
                     $this->saveFeedPosts($source, $posts);
                     break;
                 } catch (Exception $Ex) {

@@ -105,4 +105,24 @@
             <path>editors/GetEditorListAction</path>
         </action>
     </group>
+    <group name="accesstoken">
+        <action name="GetAccessTokenList">
+            <path>accessTokens/GetAccessTokenListAction</path>
+        </action>
+        <action name="SaveAccessToken">
+            <path>accessTokens/SaveAccessTokenAction</path>
+            <redirects>
+                <redirect name="success" path="vt://accessTokens/" />
+            </redirects>
+        </action>
+        <action name="DeleteAccessToken">
+            <path>accessTokens/SaveAccessTokenAction</path>
+            <parameters>
+                <request>
+                    <param name="deleteForm">1</param>
+                </request>
+            </parameters>
+        </action>
+    </group>
+
 </actions>

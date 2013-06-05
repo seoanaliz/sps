@@ -823,7 +823,7 @@
 
             foreach( $barter_events_array as $barter_event ) {
                 /** @var $barter_event BarterEvent */
-                if ( $barter_event->status != 3 || $point = 'start' ) {
+                if ( $barter_event->status != 3 || $point == 'start' ) {
                     $time = time() + self::time_shift;
 
                     $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );

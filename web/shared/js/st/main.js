@@ -42,7 +42,7 @@ $(document).ready(function() {
 });
 
 function checkVkStatus() {
-    if (typeof VK !== 'undefined') {
+    if (typeof VK !== 'undefined' && VK.Api) {
         VK.init({
             apiId: Configs.appId,
             nameTransportPath: '/xd-receiver/'
@@ -334,7 +334,7 @@ var List = (function() {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
         Events.fire('load_bookmarks', function(data) {
-            $container.html(tmpl(LIST, {items: data}));
+            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
             $actions = $('.actions', $container);
             select(id, function() {
                 if ($.isFunction(callback)) callback();

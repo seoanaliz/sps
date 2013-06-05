@@ -8,6 +8,7 @@
 class AddArticleToQueueControl extends BaseControl
 {
 
+
     /**
      * Entry Point
      */
@@ -16,7 +17,6 @@ class AddArticleToQueueControl extends BaseControl
         $result = array(
             'success' => false
         );
-
         $articleId = Request::getInteger('articleId');
         $targetFeedId = Request::getInteger('targetFeedId');
         $timestamp = Request::getInteger('timestamp');
@@ -29,15 +29,37 @@ class AddArticleToQueueControl extends BaseControl
             return false;
         }
 
+        // может ли планировать в ленту
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)) {
+            $result['message'] = 'AccessDenied!';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
         if ( $timestamp <  DateTimeWrapper::Now()->getTimestamp()) {
             $result['message'] = 'Too late';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
 
-        if (!empty($queueId)) {
+        //ограничение по интервалу между постами
+
+        if( ArticleUtility::IsTooCloseToPrevious( $targetFeedId, $timestamp )) {
+            $result['message'] = 'Time between posts is too small';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        if( ArticleUtility::IsArticlesLimitReached( $targetFeedId, $timestamp )) {
+            $result['message'] = 'Too many posts this day';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        if (!empty( $queueId )) {
             //просто перемещаем элемент очереди
-            ArticleUtility::ChangeQueueDates($queueId, $timestamp);
+            ArticleUtility::ChangeQueueDates( $queueId, $timestamp );
 
             $result = array(
                 'success' => true,
@@ -45,14 +67,6 @@ class AddArticleToQueueControl extends BaseControl
             );
             echo ObjectHelper::ToJSON($result);
             return true;
-        }
-
-        // может ли планировать в ленту
-        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-        if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)) {
-            $result['message'] = 'AccessDenied!';
-            echo ObjectHelper::ToJSON($result);
-            return false;
         }
 
         // получаем пост

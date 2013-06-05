@@ -5,6 +5,8 @@ class ParserTop
     const TOKEN = '7f31f1fe06f3ad988556b38775c15c0a75cf6590aae74f7fe8d965a35c523d00a4c892e8df9c3b3c6ee22';
     const API_URL = 'api.topface.ru/?v=2';
     const TESTING = false;
+    const MIN_LIKE_LEVEL = 95;
+
     public $counter = 0;
     private $ssid = ''; //id текущей сессии
 
@@ -64,9 +66,9 @@ class ParserTop
         $request_params = array(
             'locale'    =>  'ru',
             'platform'  =>  'vk',
-            'sandbox'   =>  1,
-            'sid'       =>  185206722,
-            'token'     =>  self::TOKEN,
+            'sandbox'   =>   1,
+            'sid'       =>   185206722,
+            'token'     =>   self::TOKEN,
             'clienttype'=>  'sdasd'
         );
         $response = $this->tf_api_wrap('auth', $request_params);
@@ -90,21 +92,11 @@ class ParserTop
 
 
         $request  = json_encode($request);
-        if (self::TESTING) {
-            echo '<br>данные запроса<br>';
-            print_r($request);
-            echo '<br>';
-        }
 
         $response = $this->qurl_request_js(self::API_URL, $request);
         $response = json_decode($response);
-        if (self::TESTING) {
-            echo '<br>ответ<br>';
-            print_r($response);
-            echo '<br>';
-        }
 
-        if (isset($response->error)){
+        if ( isset( $response->error )) {
             throw new exception('Error in ' . __CLASS__ . '::' . __FUNCTION__ .
                 ", problems with top request : " . $response->error->message);
         }
@@ -117,11 +109,13 @@ class ParserTop
     //остальных нет
     //в поле id - идентификатор юзера в topface
     //$sex: 0 - ж, 1 - м
-    public function get_top( $sex = 0 )
+    public function get_top( $sex = 0, $city_id = null )
     {
-
+        $min_likes_level = self::MIN_LIKE_LEVEL;
         $this->auth();
-        $cities = $this->get_cities();
+        $cities = ( $city_id && is_numeric( $city_id )) ? array( $city_id ) : $this->get_cities();
+        if( count( $cities) == 1 )
+            $min_likes_level = 50;
 
         $res = array();
         $uids = array();
@@ -129,13 +123,14 @@ class ParserTop
         foreach($cities as $city){
             $request_params  = array(
                 'sex'  =>  $sex,
-                'city' => $city
+                'city' =>  $city
             );
 
             $response = $this->tf_api_wrap('top', $request_params);
+
             foreach($response->users as $entry){
 
-                if ( $entry->liked < 95 || $entry->age > 35 || $entry->age < 18)
+                if ( $entry->liked < $min_likes_level || $entry->age > 35 || $entry->age < 18)
                     continue;
                 $uids[] = $entry->uid;
                 $res[] = array(
@@ -154,16 +149,6 @@ class ParserTop
             sleep(0.1);
         }
 
-
-        if (self::TESTING) {
-            echo 'count uids = ' . count($uids) . '<br>';
-            echo 'res  = '. count($res) . '<br>';
-            echo '<br>res 2 = ' . $i . '<br>';
-            foreach($res as $entry){
-                print_r($entry);
-                echo '<br>';
-            }
-        }
         return $res;
     }
 
@@ -182,7 +167,7 @@ class ParserTop
         foreach($cities as $city){
             $request_params  = array(
                 'sex'  =>  $sex,
-                'city' => $city,
+                'city' =>  $city,
                 'agebegin' => 18,
                 'ageend' => 30,
 //                                            'ero'=> true
