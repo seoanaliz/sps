@@ -11,7 +11,7 @@ CREATE TABLE "accessTokens"
       REFERENCES statuses ("statusId") MATCH SIMPLE
       ON UPDATE RESTRICT ON DELETE RESTRICT,
   CONSTRAINT "accessTokens_vkId_appId_key" UNIQUE ("vkId" , "appId" )
-)
+);
 
 CREATE OR REPLACE VIEW "getAccessTokens" AS
 SELECT "public"."accessTokens"."accessTokenId",
