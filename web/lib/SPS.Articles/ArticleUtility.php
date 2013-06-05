@@ -9,7 +9,7 @@
 
         /** in minutes*/
         const PostsPerDayInFeed = 100;
-        const TimeBeetwenPosts  = 5;
+        const TimeBeetwenPosts  = 4;
 
         public static function IsTopArticleWithSmallPhoto(SourceFeed $sourceFeed, ArticleRecord $articleRecord) {
             if (!empty($articleRecord->photos) && count($articleRecord->photos) == 1 && SourceFeedUtility::IsTopFeed($sourceFeed)) {
