@@ -97,7 +97,9 @@
                 $expire = time() + 86400 * 7;
                 $cookieString = self::GenerateCookieContentString($editor->editorId, $vkId, $expire);
                 Cookie::setCookie('good_' . self::$AppId, $cookieString, $expire, '/');
+                return true;
             }
+            return false;
         }
 
         public static function IsAuthAlternative() {
@@ -112,8 +114,11 @@
                 $editor = EditorFactory::GetOne(
                     array('editorId' => (int) $cookieData['uid'])
                 );
-                if ($editor && (self::GenerateCookieContentString($cookieData['uid'], $editor->vkId, $cookieData['expire']) === $cookieString)) {
-                    return true;
+                if ($editor &&
+                    (time() < (int) $cookieData['expire']) &&
+                    (self::GenerateCookieContentString($cookieData['uid'], $editor->vkId, $cookieData['expire']) === $cookieString)
+                   ) {
+                    return $editor->vkId;
                 }
             }
             return false;
