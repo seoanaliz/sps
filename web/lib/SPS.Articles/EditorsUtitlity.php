@@ -14,7 +14,9 @@
         {
             if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId )
                 return false;
-            self::CheckIfRegistered($userVkId);
+            $author = self::CheckIfRegistered($userVkId);
+            if( empty($author ))
+                return false;
             $publicInfo = StatPublics::get_publics_info( $publicsIds );
 
             $targetFeeds    = TargetFeedFactory::Get(array('_externalId' => $publicsIds ));
