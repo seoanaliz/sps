@@ -24,7 +24,7 @@
         </parameters>
         <redirects>
             <redirect name="login" path="/login/?{redirect}" />
-            <redirect name="empty" path="/landing/" />
+            <redirect name="empty" path="/stat/" />
         </redirects>
     </action>
     <action name="VKCheckAppAuth">

@@ -672,13 +672,27 @@ td {
   white-space: nowrap;
   max-width: 150px;
 }
-.tab-bar>.actions {
+.header .button-wrap {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  float: right;
+  margin-top: 7px;
+  margin-right: 10px;
+}
+.header>.actions {
   float: right;
   padding: 12px 8px 0;
   color: #999;
 }
-.tab-bar>.actions> a {
+.header>.actions>a {
   margin: 0 0.7em;
+}
+.tab-bar {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  width: 590px;
 }
 .box-share>.title {
   margin: 7px 0 4px;

@@ -510,6 +510,7 @@
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+
                 </pageGroup>
 
                 <pageGroup name="SPS.App">
@@ -636,6 +637,12 @@
                 </page>
             </pageGroup>
 
+            <pageGroup name="accessTokens">
+                <page uri="controls://save-access-token/">
+                    <actions>SPS.Site.SaveAccessTokenControl</actions>
+                </page>
+            </pageGroup>
+
             <pageGroup name="app" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAppAuth">
                 <page uri="app://">
                     <actions>SPS.Site.GetAppIndexPage</actions>
@@ -729,7 +736,7 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="stat" boot="SPS.Site.GetSiteParams">
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
                 <page uri="stat://">
                     <actions>SPS.Stat.GetStatData</actions>
                     <template>tmpl://st/index.tmpl.php</template>

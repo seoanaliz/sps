@@ -243,5 +243,11 @@
                 <path>app/controls/comments/MarkCommentAppControl</path>
             </action>
         </group>
+
+        <group name="accessTokens">
+            <action name="SaveAccessTokenControl">
+                <path>controls/SaveAccessTokenControl</path>
+            </action>
+        </group>
     </group>
 </actions>
