@@ -10,7 +10,7 @@
     class VKCheckAuth {
 
         public function Execute() {
-            Response::SetString('redirect', ltrim(Request::getRequestUri(), '/'));
+            Response::SetString('redirect', Request::getRequestUri());
             $vkId = AuthVkontakte::IsAuth();
             if ($vkId === false) {
                 return 'login';
