@@ -24,10 +24,7 @@
                     $array=true
                 );
                 if (isset($answer['user_id'])) {
-                    $loginResult = AuthVkontakte::Login($answer['user_id']);
-                    if (!$loginResult) {
-                        $redirectUrl = '/stat/';
-                    }
+                    AuthVkontakte::Login($answer['user_id']);
                 }
             }
 

@@ -23,19 +23,19 @@
             }
         }
 
-        public static function Login($vkId) {
+        public static function IsEditor($vkId) {
             $editor = EditorFactory::GetOne(
                 array('vkId' => $vkId)
             );
             self::PopulateSession($editor);
 
-            if ($editor) {
-                $expire = time() + 86400 * 7;
-                $cookieString = self::GenerateCookieContentString($editor->editorId, $vkId, $expire);
-                Cookie::setCookie('good_' . self::$AppId, $cookieString, $expire, '/');
-                return true;
-            }
-            return false;
+            return (bool) $editor;
+        }
+        
+        public static function Login($vkId) {
+            $expire = time() + 86400 * 7;
+            $cookieString = self::GenerateCookieContentString($vkId, $expire);
+            Cookie::setCookie('good_' . self::$AppId, $cookieString, $expire, '/');
         }
 
         public static function IsAuth() {
@@ -43,31 +43,29 @@
         }
 
         protected static function GetUserByCookie($cookieString) {
-            $keys = array('version', 'expire', 'uid', 'checksum');
+            $keys = array('version', 'expire', 'encodedVkId', 'checksum');
             $data = explode('.', $cookieString);
             if (count($data) === count($keys)) {
                 $cookieData = array_combine($keys, $data);
-                $editor = EditorFactory::GetOne(
-                    array('editorId' => (int) $cookieData['uid'])
-                );
-                if ($editor &&
+                $vkId = base64_decode($cookieData['encodedVkId']);
+                if (
                     (time() < (int) $cookieData['expire']) &&
-                    (self::GenerateCookieContentString($cookieData['uid'], $editor->vkId, $cookieData['expire']) === $cookieString)
+                    (self::GenerateCookieContentString($vkId, $cookieData['expire']) === $cookieString)
                 ) {
-                    return $editor->vkId;
+                    return $vkId;
                 }
             }
             return false;
         }
 
-        protected static function GenerateCookieContentString($userId, $vkId, $expire) {
+        protected static function GenerateCookieContentString($vkId, $expire) {
             $checkSum  = base64_encode(
                 hash('sha256', $vkId . '_' . $expire . '_' . self::$CookieSecret, $raw=true)
             );
             $version = 1;
-            return "$version.$expire.$userId.$checkSum";
+            $encodedId = base64_encode($vkId);
+            return "$version.$expire.$encodedId.$checkSum";
         }
-
 
         public static function PopulateSession($editor) {
             Session::setObject('Editor', $editor);

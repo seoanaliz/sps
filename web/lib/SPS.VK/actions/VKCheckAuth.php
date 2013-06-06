@@ -8,15 +8,16 @@
      * @author     Shuler
      */
     class VKCheckAuth {
+
         public function Execute() {
+            Response::SetString('redirect', ltrim(Request::getRequestUri(), '/'));
             $vkId = AuthVkontakte::IsAuth();
-            if ($vkId) {
-                AuthVkontakte::PopulateSession(EditorFactory::GetOne(
-                    array('vkId' => $vkId)
-                ));
-            } else {
-                Response::SetString('redirect', Request::getRequestUri());
+            if ($vkId === false) {
                 return 'login';
+            } else if (Request::getBoolean('checkEditor')) {
+                if (!AuthVkontakte::IsEditor($vkId)) {
+                    return 'stat';
+                }
             }
         }
     }
