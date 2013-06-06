@@ -24,6 +24,7 @@
                     $array=true
                 );
                 if (isset($answer['user_id'])) {
+                    AuthVkontakte::Logout();
                     AuthVkontakte::Login($answer['user_id']);
                 }
             }

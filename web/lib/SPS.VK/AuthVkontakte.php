@@ -73,7 +73,8 @@
         }
 
         public static function Logout() {
-            Cookie::setCookie('good_' . self::$AppId, '', time() - 1000, '/');
+            Cookie::setCookie( 'vk_app_' . self::$AppId,    "", time() - 1024, '/', '.' . Site::$Host->GetHostname);
+            Cookie::setCookie('good_' . self::$AppId, '', time() - 1024, '/');
             self::PopulateSession(null);
         }
 
