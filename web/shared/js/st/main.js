@@ -117,7 +117,7 @@ function makeVkButton() {
 
 function handleUserLoggedIn(userData) {
     var $loginInfo = $('.login-info');
-    $loginInfo.html('<a class="logout" href="/vk-login/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    $loginInfo.html('<a class="logout" href="/logout/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
     $('.username', $loginInfo)
         .attr('href', 'http://vk.com/id' + userData.uid)
     .find('span')
