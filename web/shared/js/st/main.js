@@ -108,7 +108,7 @@ function makeVkButton() {
         var vkHref = 'https://oauth.vk.com/authorize?' +
                     'client_id='+ Configs.appId +
                     '&scope=stats,groups,offline' +
-                    '&redirect_uri='+ encodeURIComponent(location.origin + '/vk-login/?to=' + location.pathname) +
+                    '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                     '&display=page' +
                     '&response_type=code';
         $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
