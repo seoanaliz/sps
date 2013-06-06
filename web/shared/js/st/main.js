@@ -45,7 +45,7 @@ function checkVkStatus() {
     if (typeof VK !== 'undefined' && VK.Api) {
         VK.init({
             apiId: Configs.appId,
-            nameTransportPath: '/xd-receiver/'
+            nameTransportPath: '/xd-receiver.htm'
         });
 
         VK.Auth.getLoginStatus(authInfo);

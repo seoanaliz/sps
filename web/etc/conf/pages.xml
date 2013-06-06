@@ -8,12 +8,16 @@
                     <template>tmpl://fe/index.tmpl.php</template>
                 </page>
                 <page uri="/login/" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.VK.VKLogoutSilent</actions>
+                    <actions>SPS.VK.VKLoginForm</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
+                </page>
+                <page uri="/logout/" boot="SPS.Site.GetSiteParams">
+                    <actions>SPS.VK.VKLogoutRedirect</actions>
+                    <template>tmpl://fe/empty-with-counters.tmpl.php</template>
                 </page>
                 <page uri="/vk-login/" boot="SPS.Site.GetSiteParams">
                     <actions>SPS.VK.VKLoginRedirect</actions>
-                    <template>tmpl://fe/vk-login.tmpl.php</template>
+                    <template>tmpl://fe/empty-with-counters.tmpl.php</template>
                 </page>
                 <page uri="/landing/" boot="SPS.Site.GetSiteParams">
                     <template>tmpl://fe/landing.tmpl.php</template>
@@ -28,9 +32,6 @@
                 </page>
                 <page uri="/oadmins/cof12">
                     <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
-                </page>
-                <page uri="/xd-receiver/">
-                    <template>tmpl://xd_receiver.tmpl.php</template>
                 </page>
             </pageGroup>
 

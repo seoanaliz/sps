@@ -5,7 +5,7 @@
      * VKLoginRedirect Action
      * @package    SPS
      * @subpackage VK
-     * @author     Kulikov
+     * @author     Eugene Kulikov
      */
     class VKLoginRedirect {
 
@@ -20,14 +20,15 @@
                     '&code='. $code .
                     '&redirect_uri=' . urlencode($protocol . '://' . trim(Request::GetHTTPHost(), '/') . '/vk-login/?to=' . $redirectUrl);
                 $answer = json_decode(
-                        VkHelper::connect($tokenGetUrl, $setCookie = null, $usePost = null, $includeHeaderInOutput = false),
-                        $array=true
+                    VkHelper::connect($tokenGetUrl, $setCookie = null, $usePost = null, $includeHeaderInOutput = false),
+                    $array=true
                 );
                 if (isset($answer['user_id'])) {
-                    AuthVkontakte::LoginAlternative($answer['user_id']);
+                    $loginResult = AuthVkontakte::Login($answer['user_id']);
+                    if (!$loginResult) {
+                        $redirectUrl = '/stat/';
+                    }
                 }
-            } else {
-                AuthVkontakte::LogoutAlternative();
             }
 
             Response::SetString('redirect', $redirectUrl);
