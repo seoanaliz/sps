@@ -9,7 +9,7 @@
 
         const TempPublisherId = 1;
 
-        //делаем новые фиды, назначаем/удаляем админов
+        //делаем новые фиды, назначаем/удаляем админа
         public static function SetTargetFeeds( $userVkId, $publicsIds )
         {
             if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId )
@@ -25,7 +25,7 @@
             $userFeeds      = ArrayHelper::Collapse($userFeeds, 'targetFeedId', 0);
 
             $newUserFeeds = array();
-            //массив подтвержденных пабликов. удалим связь юзера с остальными
+            //массив подтвержденных пабликов.
             $targetFeedIds = array();
 
             foreach( $publicsIds as $publicId ) {
@@ -58,8 +58,8 @@
                 UserFeedFactory::AddRange( $newUserFeeds);
             }
 
+            //удаляем лишние паблики
             $allUserTargetFeedIds = array_keys( $userFeeds );
-
             $targetFeedIds4delete = array_diff($allUserTargetFeedIds, $targetFeedIds);
             self::DeleteUserFeed($userVkId, $targetFeedIds4delete);
         }
