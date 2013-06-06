@@ -22,10 +22,6 @@
                 <page uri="/landing/" boot="SPS.Site.GetSiteParams">
                     <template>tmpl://fe/landing.tmpl.php</template>
                 </page>
-                <page uri="/logout/" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.VK.VKLogout</actions>
-                    <template>tmpl://fe/login.tmpl.php</template>
-                </page>
                 <page uri="/oadmins">
                     <actions>SPS.Stat.AdminsWork</actions>
                     <template>tmpl://vt/stat_admins/index.tmpl.php</template>
