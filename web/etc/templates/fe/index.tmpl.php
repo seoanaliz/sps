@@ -96,7 +96,7 @@
                         <a target="_blank"></a>
                     </span>
                     <span class="logout">
-                        <a href="/logout/">Выход</a>
+                        <a href="/logout/">Выйти</a>
                     </span>
                 </div>
 
