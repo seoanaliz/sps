@@ -59,10 +59,10 @@
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
                     ) {
-                        $existingToken = AccessTokenFactory::Get(
+                        $existingToken = AccessTokenFactory::GetOne(
                             array('vkId' => $vkId)
                         );
-                        if (empty($existingToken)) {
+                        if (!$existingToken) {
                             self::addAccessToken($vkId, $accessToken);
                         } else {
                             $existingToken->createdAt = DateTimeWrapper::Now();
