@@ -695,6 +695,7 @@ td {
   float: right;
   height: 31px;
   font-weight: bold;
+  min-width: 41px;
 }
 .login-info .username {
   display: table;
