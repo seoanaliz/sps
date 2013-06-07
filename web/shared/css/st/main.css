@@ -705,7 +705,7 @@ td {
 }
 .login-info .username span {
   display: table-cell;
-  max-width: 160px;
+  max-width: 150px;
   vertical-align: middle;
   overflow: hidden;
 }
