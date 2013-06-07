@@ -59,7 +59,16 @@
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
                     ) {
-                        self::addAccessToken($vkId, $accessToken);
+                        $existingToken = AccessTokenFactory::Get(
+                            array('vkId' =>  $vkId)
+                        );
+                        if (empty($existingToken)) {
+                            self::addAccessToken($vkId, $accessToken);
+                        } else {
+                            $existingToken->createdAt = DateTimeWrapper::Now();
+                            $existingToken->accessToken = $accessToken;
+                            AccessTokenFactory::Update($existingToken);
+                        }
                         EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
