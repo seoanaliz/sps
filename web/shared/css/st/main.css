@@ -691,6 +691,7 @@ td {
   display: inline-block;
   zoom: 1;
   *display: inline;
+  position: relative;
   float: right;
   height: 31px;
   font-weight: bold;
@@ -698,10 +699,12 @@ td {
 .login-info .username {
   display: table;
   padding-right: 11px;
+  margin-right: 50px;
+  height: 31px;
 }
 .login-info .username span {
   display: table-cell;
-  max-width: 300px;
+  max-width: 160px;
   vertical-align: middle;
   overflow: hidden;
 }
@@ -713,7 +716,9 @@ td {
 .login-info .login,
 .login-info .logout {
   display: block;
-  float: right;
+  height: 30px;
+  position: absolute;
+  right: 5px;
   padding-left: 5px;
   line-height: 31px;
 }

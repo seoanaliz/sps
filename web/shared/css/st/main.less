@@ -722,6 +722,7 @@ table, tr, td {
 .login-info {
     margin: 3px 7px 0 24px;
     .inline-block;
+    position: relative;
     float: right;
     @pic-size: 31px;
     height: @pic-size;
@@ -730,10 +731,12 @@ table, tr, td {
     .username {
         display: table;
         padding-right: 11px;
+        margin-right: 50px;
+        height: @pic-size;
 
         span {
             display: table-cell;
-            max-width: 300px;
+            max-width: 160px;
             vertical-align: middle;
             overflow: hidden;
         }
@@ -747,7 +750,9 @@ table, tr, td {
 
     .login, .logout {
         display: block;
-        float: right;
+        height: 30px;
+        position: absolute;
+        right: 5px;
         padding-left: 5px;
         line-height: @pic-size;
     }
