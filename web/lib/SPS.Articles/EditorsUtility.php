@@ -52,7 +52,7 @@
 
             //добавляем в список те паблики, где юзер был и остался автором
             foreach( $userFeeds as $targetFeedId => $userFeed ) {
-                if(     in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR ))
+                if(     in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR ))
                     && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
                     $newUserFeeds[] = new UserFeed( $userVkId, $targetFeedId, UserFeed::ROLE_AUTHOR );
                 }
