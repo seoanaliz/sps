@@ -65,7 +65,7 @@
                         $accessTokenData->statusId  = StatusUtility::Enabled;
                         AccessTokenFactory::Add($accessTokenData);
 
-                        EditorsUtitlity::SetTargetFeeds($vkId, $apiAnswer->publics);
+                        EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
                     }

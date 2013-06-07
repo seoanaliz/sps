@@ -5,7 +5,7 @@
      * @package SPS
      * @subpackage Articles
      */
-    class EditorsUtitlity {
+    class EditorsUtility {
 
         const TempPublisherId = 1;
 
