@@ -400,7 +400,7 @@ var QueueWidget = Event.extend({
 
             if (scrollTop <= 0) {
                 t.showNextTopPage();
-            } else if (scrollTop + queueHeight >= t.$queue[0].scrollHeight) {
+            } else if (scrollTop + queueHeight + 10 >= t.$queue[0].scrollHeight) {
                 t.showNextBottomPage();
             }
 

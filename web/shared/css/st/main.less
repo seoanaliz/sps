@@ -701,16 +701,67 @@ table, tr, td {
     }
 }
 
-.tab-bar {
+.header {
+    .button-wrap {
+        .inline-block;
+        float: right;
+        margin-top: 7px;
+    }
+
     &>.actions {
         float: right;
         padding: 12px 8px 0;
         color: #999;
 
-        &> a {
+        &>a {
             margin: 0 0.7em;
         }
     }
+}
+
+.login-info {
+    margin: 3px 7px 0 24px;
+    .inline-block;
+    float: right;
+    @pic-size: 31px;
+    height: @pic-size;
+    font-weight: bold;
+
+    .username {
+        display: table;
+        padding-right: 11px;
+
+        span {
+            display: table-cell;
+            max-width: 300px;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+    }
+
+    .userpic {
+        height: 22px;
+        padding: 3px 5px 5px 11px;
+        border: none;
+    }
+
+    .login, .logout {
+        display: block;
+        float: right;
+        padding-left: 5px;
+        line-height: @pic-size;
+    }
+}
+
+.tab-bar {
+    .inline-block;
+    width: 590px;
+}
+
+#vk-button {
+    position: absolute;
+    top: 5px;
+    right: 4px;
 }
 
 .box-share {
