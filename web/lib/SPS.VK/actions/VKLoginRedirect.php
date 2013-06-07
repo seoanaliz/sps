@@ -60,7 +60,7 @@
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
                     ) {
                         $existingToken = AccessTokenFactory::Get(
-                            array('vkId' =>  $vkId)
+                            array('vkId' => $vkId)
                         );
                         if (empty($existingToken)) {
                             self::addAccessToken($vkId, $accessToken);
