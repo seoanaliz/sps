@@ -26,8 +26,9 @@
 
             $newUserFeeds = array();
             //массив подтвержденных пабликов.
-            $targetFeedIds = array();
+            $confirmedTargetFeedIds = array();
 
+            //делаем новый список фидов, где юзер - админ
             foreach( $publicsIds as $publicId ) {
                 if( !isset( $targetFeeds[$publicId]) && isset( $publicInfo[ $publicId ])) {
 
@@ -43,27 +44,29 @@
                     SourceFeedUtility::DownloadImage( $publicId, $publicInfo[$publicId]['ava']);
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));
                     $targetFeeds[ $publicId ] = $targetFeed;
-
                 }
 
-                if (!isset ($userFeeds[$targetFeeds[ $publicId ]->targetFeedId])) {
-                    $userFeed = new UserFeed();
-                    $userFeed->targetFeedId = $targetFeeds[ $publicId ]->targetFeedId;
-                    $userFeed->role         = UserFeed::ROLE_OWNER;
-                    $userFeed->vkId         = $userVkId;
-                    $newUserFeeds[]         = $userFeed;
-                }
-
-                $targetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
+                $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_ADMINISTRATOR );
+                $confirmedTargetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
             }
+
+            //добавляем в список те паблики, где юзер был и остался автором
+            foreach( $userFeeds as $targetFeedId => $userFeed ) {
+                if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR ))
+                    && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
+                    $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_AUTHOR );
+                }
+            }
+
+            //удаляем все старые зависимости автора
+            UserFeedFactory::DeleteForVkId( $userVkId );
+
+            //сохраняем новый список фидов юзера
             if( !empty( $newUserFeeds )) {
                 UserFeedFactory::AddRange( $newUserFeeds);
             }
 
-            //удаляем лишние паблики
-            $allUserTargetFeedIds = array_keys( $userFeeds );
-            $targetFeedIds4delete = array_diff($allUserTargetFeedIds, $targetFeedIds);
-            self::DeleteUserFeed($userVkId, $targetFeedIds4delete);
+
         }
 
         public static function CheckIfRegistered( $userVkId )
