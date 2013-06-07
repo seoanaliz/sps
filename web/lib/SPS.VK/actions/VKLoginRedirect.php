@@ -37,11 +37,13 @@
         }
 
         protected static function updateUserDataFromApi($vkId, $accessToken) {
-            $code = 'return {"permissions": API.getUserSettings(), "publics": API.groups.get({filter: "admin"})};';
+            $code = 'return {
+                "permissions": API.getUserSettings(),
+                "publics": API.groups.get({filter: "admin"})
+            };';
             $wasError = false;
             try {
-                $apiAnswer = VkHelper::api_request(
-                        'execute',
+                $apiAnswer = VkHelper::api_request('execute',
                         array(
                             'uid' => $vkId,
                             'access_token' => $accessToken,
@@ -57,20 +59,23 @@
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
                     ) {
-                        $accessTokenData = new AccessToken();
-                        $accessTokenData->vkId = $vkId;
-                        $accessTokenData->accessToken = $accessToken;
-                        $accessTokenData->appId = AuthVkontakte::$AppId;
-                        $accessTokenData->createdAt = DateTimeWrapper::Now();
-                        $accessTokenData->statusId  = StatusUtility::Enabled;
-                        AccessTokenFactory::Add($accessTokenData);
-
+                        self::addAccessToken($vkId, $accessToken);
                         EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
                     } else {
                         error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
                     }
                 }
             }
+        }
+
+        protected static function addAccessToken($vkId, $accessToken) {
+            $accessTokenData = new AccessToken();
+            $accessTokenData->vkId = $vkId;
+            $accessTokenData->accessToken = $accessToken;
+            $accessTokenData->appId = AuthVkontakte::$AppId;
+            $accessTokenData->createdAt = DateTimeWrapper::Now();
+            $accessTokenData->statusId  = StatusUtility::Enabled;
+            return AccessTokenFactory::Add($accessTokenData);
         }
     }
 ?>
