@@ -25,42 +25,7 @@
                 );
                 if (isset($answer['user_id'])) {
                     if (isset($answer['access_token'])) {
-                        $code = 'return {"permissions": API.getUserSettings(), "publics": API.groups.get({filter: "admin"})};';
-
-                        $wasError = false;
-                        try {
-                            $apiAnswer = VkHelper::api_request(
-                                    'execute',
-                                    array(
-                                        'uid' => $answer['user_id'],
-                                        'access_token' => $answer['access_token'],
-                                        'code' => $code
-                                    ));
-                        } catch (Exception $E) {
-                            $wasError = true;
-                            Logger::Error('login VK API error: ' . $E->getMessage());
-                        }
-                        if (!$wasError) {
-                            // object(stdClass)#228 (2) { ["permissions"]=> int(1376256) ["publics"]=> array(1) { [0]=> int(27421965) } } ﻿
-                            if (property_exists($apiAnswer, 'permissions') && property_exists($apiAnswer, 'publics')) {
-                                if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
-                                    ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
-                                    ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
-                                ) {
-                                    $accessToken = new AccessToken();
-                                    $accessToken->vkId = $answer['user_id'];
-                                    $accessToken->accessToken = $answer['access_token'];
-                                    $accessToken->appId = AuthVkontakte::$AppId;
-                                    $accessToken->createdAt = DateTimeWrapper::Now();
-                                    $accessToken->statusId  = StatusUtility::Enabled;
-                                    AccessTokenFactory::Add($accessToken);
-                                    
-                                    
-                                } else {
-                                    Logger::Error('login permissions problem for user: ' . $answer['user_id'] . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
-                                }
-                            }
-                        }
+                        self::updateUserDataFromApi($answer['user_id'], $answer['access_token']);
                     }
                     AuthVkontakte::Logout();
                     AuthVkontakte::Login($answer['user_id']);
@@ -69,6 +34,43 @@
 
             Response::SetString('redirect', $redirectUrl);
             return 'redirect';
+        }
+
+        protected static function updateUserDataFromApi($vkId, $accessToken) {
+            $code = 'return {"permissions": API.getUserSettings(), "publics": API.groups.get({filter: "admin"})};';
+            $wasError = false;
+            try {
+                $apiAnswer = VkHelper::api_request(
+                        'execute',
+                        array(
+                            'uid' => $vkId,
+                            'access_token' => $accessToken,
+                            'code' => $code
+                        ));
+            } catch (Exception $E) {
+                $wasError = true;
+                error_log('login VK API error: ' . $E->getMessage());
+            }
+            if (!$wasError) {
+                if (property_exists($apiAnswer, 'permissions') && property_exists($apiAnswer, 'publics')) {
+                    if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
+                        ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
+                        ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
+                    ) {
+                        $accessTokenData = new AccessToken();
+                        $accessTokenData->vkId = $vkId;
+                        $accessTokenData->accessToken = $accessToken;
+                        $accessTokenData->appId = AuthVkontakte::$AppId;
+                        $accessTokenData->createdAt = DateTimeWrapper::Now();
+                        $accessTokenData->statusId  = StatusUtility::Enabled;
+                        AccessTokenFactory::Add($accessTokenData);
+
+                        EditorsUtitlity::SetTargetFeeds($vkId, $apiAnswer->publics);
+                    } else {
+                        error_log('login permissions problem for user: ' . $vkId . ' - permissions are: ' . $apiAnswer->permissions . ' instead of: ' . (VkHelper::PERM_GROUPS + VkHelper::PERM_GROUP_STATS + VkHelper::PERM_OFFLINE));
+                    }
+                }
+            }
         }
     }
 ?>
