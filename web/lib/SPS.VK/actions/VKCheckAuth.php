@@ -15,9 +15,14 @@
             if ($vkId === false) {
                 return 'login';
             } else if (Request::getBoolean('checkEditor')) {
-                if (!AuthVkontakte::IsEditor($vkId)) {
+
+                $userFeeds = UserFeedFactory::Get(array('vkId' => $vkId));
+                if( empty( $userFeeds )) {
                     return 'stat';
                 }
+//                if (!AuthVkontakte::IsEditor($vkId)) {
+//                    return 'stat';
+//                }
             }
         }
     }
