@@ -27,7 +27,7 @@
                     if (isset($answer['access_token'])) {
                         self::updateUserDataFromApi($answer['user_id'], $answer['access_token']);
                     }
-                    AuthVkontakte::Logout();
+                    AuthVkontakte::Logout(); // чтобы очистить куку клиентской авторизации (vk_app_xxxxxx)
                     AuthVkontakte::Login($answer['user_id']);
                 }
             }
@@ -59,10 +59,10 @@
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
                     ) {
-                        $existingToken = AccessTokenFactory::Get(
-                            array('vkId' =>  $vkId)
+                        $existingToken = AccessTokenFactory::GetOne(
+                            array('vkId' => $vkId)
                         );
-                        if (empty($existingToken)) {
+                        if (!$existingToken) {
                             self::addAccessToken($vkId, $accessToken);
                         } else {
                             $existingToken->createdAt = DateTimeWrapper::Now();
