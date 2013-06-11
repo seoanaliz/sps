@@ -24,12 +24,8 @@
         }
 
         public static function IsEditor($vkId) {
-            $editor = EditorFactory::GetOne(
-                array('vkId' => $vkId)
-            );
-            self::PopulateSession($editor);
-
-            return (bool) $editor;
+            $userFeeds = UserFeedFactory::Get(array('vkId' => $vkId));
+            return !empty( $userFeeds );
         }
         
         public static function Login($vkId) {
