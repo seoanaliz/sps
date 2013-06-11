@@ -86,9 +86,15 @@ var QueueWidget = Event.extend({
             var $page = $post.closest('.queue-page');
             var pid = $post.data('id');
 
-            Events.fire('rightcolumn_deletepost', pid, function() {
-                t.updatePage($page);
-            });
+            Events.fire('rightcolumn_deletepost', pid, 
+                function(id) {
+                    return function() {
+                        t.updatePage($page);
+                        var csslass = 'hidden_' + id;
+                        $('#wall').find('.' + csslass).removeClass(csslass).show();
+                    }
+                }(pid)
+            );
         });
 
         // Смена даты
