@@ -1,4 +1,4 @@
-﻿﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language name="ru">
     <months>
         <month1><![CDATA[января]]></month1>
@@ -454,14 +454,6 @@
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
     </editor>
-    <stat_user>
-      <name><![CDATA[Имя пользователя]]></name>
-      <user_id><![CDATA[]]>id</user_id>
-      <ava><![CDATA[Аватар]]></ava>
-      <comments><![CDATA[Коментарии]]></comments>
-      <rank><![CDATA[Роль]]></rank>
-      <status><![CDATA[Статус]]></status>
-    </stat_user>
   </vt>
   <objects>
     <siteParam>
