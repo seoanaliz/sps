@@ -14,6 +14,26 @@
 
         class   VkHelper {
 
+            const PERM_NOTIFY = 1;             //Пользователь разрешил отправлять ему уведомления.
+            const PERM_FRIENDS = 2;            //Доступ к друзьям.
+            const PERM_PHOTO = 4;              //Доступ к фотографиям.
+            const PERM_AUDIO = 8;              //Доступ к аудиозаписям.
+            const PERM_VIDEO = 16;             //Доступ к видеозаписям.
+            const PERM_APPS = 32;              //Доступ к предложениям.
+            const PERM_QUESTIONS = 64;         //Доступ к вопросам.
+            const PERM_WIKI = 128;             //Доступ к wiki-страницам.
+            const PERM_LEFTMENU = 256;         //Добавление ссылки на приложение в меню слева.
+            const PERM_QUICKPUBLISH = 512;     //Добавление ссылки на приложение для быстрой публикации на стенах пользователей.
+            const PERM_STATUS = 1024;          //Доступ к статусам пользователя.
+            const PERM_NOTES = 2048;           //Доступ заметкам пользователя.
+            const PERM_MSG_EXTENDED = 4096;    //(для Desktop-приложений) Доступ к расширенным методам работы с сообщениями.
+            const PERM_WALL = 8192;            //Доступ к обычным и расширенным методам работы со стеной.
+            const PERM_ADS = 32768;            //Доступ к функциям для работы с рекламным кабинетом.
+            const PERM_OFFLINE = 65536;        //Оффлайн-доступ
+            const PERM_DOCS = 131072;          //Доступ к документам пользователя.
+            const PERM_GROUPS = 262144;        //Доступ к группам пользователя.
+            const PERM_NOTIFY_ANSWER = 524288; //Доступ к оповещениям об ответах пользователю.
+            const PERM_GROUP_STATS = 1048576;  //Доступ к статистике групп и приложений пользователя, администратором которых он является.
 
             /**
              *id аппа статистки
@@ -253,13 +273,15 @@
                 $cmd->Execute();
             }
 
-            public static function connect( $link, $cookie=null, $post=null ) {
+            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true) {
                 $ch = curl_init();
 
                 curl_setopt( $ch, CURLOPT_URL, $link );
                 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
                 curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
-                curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                if ($includeHeader) {
+                    curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                }
                 curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
                 curl_setopt($ch, CURLOPT_USERAGENT,
                     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');

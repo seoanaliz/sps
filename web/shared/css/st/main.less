@@ -706,9 +706,8 @@ table, tr, td {
         .inline-block;
         float: right;
         margin-top: 7px;
-        margin-right: 10px;
     }
-    
+
     &>.actions {
         float: right;
         padding: 12px 8px 0;
@@ -720,9 +719,55 @@ table, tr, td {
     }
 }
 
+.login-info {
+    margin: 3px 7px 0 24px;
+    .inline-block;
+    position: relative;
+    float: right;
+    @pic-size: 31px;
+    height: @pic-size;
+    font-weight: bold;
+    min-width: 41px;
+
+    .username {
+        display: table;
+        padding-right: 11px;
+        margin-right: 50px;
+        height: @pic-size;
+
+        span {
+            display: table-cell;
+            max-width: 150px;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+    }
+
+    .userpic {
+        height: 22px;
+        padding: 3px 5px 5px 11px;
+        border: none;
+    }
+
+    .login, .logout {
+        display: block;
+        height: 30px;
+        position: absolute;
+        right: 5px;
+        padding-left: 5px;
+        line-height: @pic-size;
+    }
+}
+
 .tab-bar {
     .inline-block;
     width: 590px;
+}
+
+#vk-button {
+    position: absolute;
+    top: 5px;
+    right: 4px;
 }
 
 .box-share {

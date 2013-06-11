@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
-    <action name="VKLogout">
-        <path>VKLogout</path>
+    <action name="VKLoginRedirect">
+        <path>VKLoginRedirect</path>
         <redirects>
-            <redirect name="success" path="/" />
+            <redirect name="redirect" path="{redirect}" />
         </redirects>
     </action>
-    <action name="VKLogoutSilent">
-        <path>VKLogout</path>
+    <action name="VKLogoutRedirect">
+        <path>VKLogoutRedirect</path>
+        <redirects>
+            <redirect name="redirect" path="{redirect}" />
+        </redirects>
+    </action>
+    <action name="VKLoginForm">
+        <path>VKLoginForm</path>
     </action>
     <action name="VKCheckAuth">
         <path>VKCheckAuth</path>
         <redirects>
-            <redirect name="login" path="/login/?{redirect}" />
+            <redirect name="login" path="/login/?to={redirect}" />
         </redirects>
     </action>
     <action name="VKCheckAuthEditor">
@@ -23,8 +29,8 @@
             </request>
         </parameters>
         <redirects>
-            <redirect name="login" path="/login/?{redirect}" />
-            <redirect name="empty" path="/stat/" />
+            <redirect name="login" path="/login/?to={redirect}" />
+            <redirect name="stat" path="/stat/" />
         </redirects>
     </action>
     <action name="VKCheckAppAuth">

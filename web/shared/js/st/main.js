@@ -31,44 +31,117 @@ $(document).ready(function() {
         });
     })(window);
 
-//    VK.init({
-//        apiId: Configs.appId,
-//        nameTransportPath: '/xd_receiver.htm'
-//    });
-//    getInitData();
-//    function getInitData() {
-//        var code =
-//            'return {' +
-//                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-//            '};';
-//        VK.Api.call('execute', {code: code}, initVK);
-//    }
-    initVK();
+    cur.dataUser.isEditor = false;
+    Filter.init(function() {
+        List.init(function() {
+            Table.init();
+            Counter.init();
+        });
+    });
+    checkVkStatus();
 });
 
-function initVK(data) {
-    if (data) {
-        var r = data.response;
-        cur.dataUser = r.me;
-        Events.fire('get_user', cur.dataUser.uid, function(us) {
-            cur.dataUser.isEditor = us.rank == 2 ;
-            Filter.init(function() {
-                List.init(function() {
-                    Table.init();
-                    Counter.init();
-                });
-            });
+function checkVkStatus() {
+    if (typeof VK !== 'undefined' && VK.Api) {
+        VK.init({
+            apiId: Configs.appId,
+            nameTransportPath: '/xd-receiver.htm'
         });
+
+        VK.Auth.getLoginStatus(authInfo);
     } else {
-        cur.dataUser.isEditor = false;
-        Filter.init(function() {
-            List.init(function() {
-                Table.init();
-                Counter.init();
-            });
+        makeVkButton();
+    }
+}
+
+// taken from http://www.quirksmode.org/js/cookies.html
+//function createCookie(name, value, days) {
+//    if (days) {
+//        var date = new Date();
+//        date.setTime(date.getTime()+(days*24*60*60*1000));
+//        var expires = "; expires="+date.toGMTString();
+//    }
+//    else {
+//        expires = "";
+//    }
+//    document.cookie = name+"="+value+expires+"; path=/";
+//}
+//
+//function readCookie(name) {
+//    var nameEQ = name + "=";
+//    var ca = document.cookie.split(';');
+//    for (var i=0; i < ca.length; i++) {
+//        var c = ca[i];
+//        while (c.charAt(0)==' ') {
+//            c = c.substring(1,c.length);
+//        }
+//        if (c.indexOf(nameEQ) == 0) {
+//            return c.substring(nameEQ.length,c.length);
+//        }
+//    }
+//    return null;
+//}
+//
+//function removeCookie(name) {
+//    createCookie(name, "", -1);
+//}
+
+function authInfo(response) {
+    if (!response.session) {
+        makeVkButton();
+    } else {
+        var code = 'return {' +
+            'user: API.getProfiles({fields: "photo"})[0]' +
+        '};';
+        VK.Api.call('execute', {code: code}, function (answer) {
+            if (answer && answer.response) {
+                cur.dataUser = answer.response.user;
+                handleUserLoggedIn(answer.response.user);
+            }
         });
     }
 }
+
+function makeVkButton() {
+    var $loginInfo = $('.login-info');
+    if ($loginInfo.length) {
+        var vkHref = 'https://oauth.vk.com/authorize?' +
+                    'client_id='+ Configs.appId +
+                    '&scope=stats,groups,offline' +
+                    '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
+                    '&display=page' +
+                    '&response_type=code';
+        $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
+    }
+}
+
+function handleUserLoggedIn(userData) {
+    var $loginInfo = $('.login-info');
+    $loginInfo.html('<a class="logout" href="/logout/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    var name = userData.first_name + ' ' + userData.last_name;
+    $('.username', $loginInfo)
+        .attr('href', 'http://vk.com/id' + userData.uid)
+        .attr('title', name)
+    .find('span')
+        .text(name);
+    $('.userpic', $loginInfo).attr('src', userData.photo);
+}
+
+//function initVK(data) {
+//    if (data) {
+//        var r = data.response;
+//        cur.dataUser = r.me;
+//        Events.fire('get_user', cur.dataUser.uid, function(us) {
+//            cur.dataUser.isEditor = us.rank == 2 ;
+//            Filter.init(function() {
+//                List.init(function() {
+//                    Table.init();
+//                    Counter.init();
+//                });
+//            });
+//        });
+//    }
+//}
 
 var List = (function() {
     var $container;
@@ -357,9 +430,9 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3500000,
+                max: 10000000,
                 animate: 100,
-                values: [0, 3500000],
+                values: [0, 10000000],
                 create: function(event, ui) {
                     renderRange();
                 },
@@ -416,7 +489,7 @@ var Filter = (function() {
                     Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
                 ]);
             });
-            $timeTo.datepicker('setDate', new Date(Date.now() - TIME.DAY));
+            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
             $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
             var dateFrom = $timeFrom.datepicker('getDate');
             var dateTo = $timeTo.datepicker('getDate');
