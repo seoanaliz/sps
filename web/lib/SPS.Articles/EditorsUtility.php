@@ -51,13 +51,14 @@
             }
 
             //добавляем в список те паблики, где юзер был и остался автором
-            foreach( $userFeeds as $targetFeedId => $userFeed ) {
-                if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR ))
-                    && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
-                    $newUserFeeds[] = new UserFeed( $userVkId, $targetFeedId, $userFeed->role );
+            if( is_array( $userFeeds)) {
+                foreach( $userFeeds as $targetFeedId => $userFeed ) {
+                    if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR ))
+                        && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
+                        $newUserFeeds[] = new UserFeed( $userVkId, $targetFeedId, $userFeed->role );
+                    }
                 }
             }
-
             //удаляем все старые зависимости автора
             UserFeedFactory::DeleteForVkId( $userVkId );
 
@@ -97,6 +98,14 @@
             $cmd->Execute();
         }
 
+        public static function GetAdminnedPublics( $token )
+        {
+            $res = array();
+            $publics = VkHelper:: api_request( 'groups.get',array( 'filter: "admin'), 0);
+            if( !isset( $publics->error_msg))
+                $res = $publics;
+            return $res;
+        }
 
     }
 ?>
