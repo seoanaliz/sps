@@ -430,9 +430,9 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3500000,
+                max: 10000000,
                 animate: 100,
-                values: [0, 3500000],
+                values: [0, 10000000],
                 create: function(event, ui) {
                     renderRange();
                 },
