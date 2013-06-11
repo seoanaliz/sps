@@ -54,7 +54,7 @@
             foreach( $userFeeds as $targetFeedId => $userFeed ) {
                 if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR ))
                     && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
-                    $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, $userFeed->role );
+                    $newUserFeeds[] = new UserFeed( $userVkId, $targetFeedId, $userFeed->role );
                 }
             }
 
