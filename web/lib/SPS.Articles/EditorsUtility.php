@@ -7,7 +7,7 @@
      */
     class EditorsUtility {
 
-        const TempPublisherId = 1;
+        const TempPublisherId = 92;
 
         //делаем новые фиды, назначаем/удаляем админа
         public static function SetTargetFeeds( $userVkId, $publicsIds )
