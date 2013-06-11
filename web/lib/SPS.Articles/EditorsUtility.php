@@ -46,13 +46,13 @@
                     $targetFeeds[ $publicId ] = $targetFeed;
                 }
 
-                $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_ADMINISTRATOR );
+                $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_OWNER );
                 $confirmedTargetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
             }
 
             //добавляем в список те паблики, где юзер был и остался автором
             foreach( $userFeeds as $targetFeedId => $userFeed ) {
-                if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR ))
+                if( in_array( $userFeed->role, array( UserFeed::ROLE_AUTHOR, UserFeed::ROLE_EDITOR, UserFeed::ROLE_ADMINISTRATOR ))
                     && !in_array( $targetFeedId, $confirmedTargetFeedIds )) {
                     $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, $userFeed->role );
                 }
