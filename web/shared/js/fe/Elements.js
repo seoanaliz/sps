@@ -81,14 +81,21 @@ var Elements = {
                         return;
                     }
 
-                    var $page = $slot.closest('.queue-page'),
-                        $post = $(ui.draggable).closest('.post');
-
-                    Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function() {
+                    var $post = $(ui.draggable).closest('.post');
+                    Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
                         if ($post.hasClass('relocatable')) {
-                            $slot.html($post);
+                            if (isSuccess && data.success && data.html) {
+                                var $page = $(data.html);
+                                $slot.replaceWith($page);
+                                Elements.initDraggable($page);
+                                Elements.initImages($page);
+                                Elements.initLinks($page);
+                                $page.find('.post .images').imageComposition();
+                                $page.find('.post.blocked').draggable('disable');
+                            } else {
+                                $slot.html($post);
+                            }
                         }
-                        app.updateQueuePage($page);
                     });
                 }
             });

@@ -219,12 +219,12 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    callback(1, data.id);
+                    callback(1, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(0);
+                    callback(0, data);
                 }
             }
         });
