@@ -25,6 +25,9 @@
 
         public static function IsEditor($vkId) {
             $userFeeds = UserFeedFactory::Get(array('vkId' => $vkId));
+            $author = AuthorFactory::GetOne(array('vkId'=>$vkId));
+            self::PopulateSession($author);
+
             return !empty( $userFeeds );
         }
         
