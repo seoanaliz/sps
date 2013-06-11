@@ -12,7 +12,7 @@
         //делаем новые фиды, назначаем/удаляем админа
         public static function SetTargetFeeds( $userVkId, $publicsIds )
         {
-            if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId )
+            if(  !is_array( $publicsIds) || empty( $publicsIds ) || !$userVkId  || !is_numeric( $userVkId ))
                 return false;
             $author = self::CheckIfRegistered($userVkId);
             if( empty($author ))
@@ -43,6 +43,10 @@
 
                     SourceFeedUtility::DownloadImage( $publicId, $publicInfo[$publicId]['ava']);
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));
+                    if( $targetFeed->targetFeedId ) {
+                        //todo логгирование
+                        continue;
+                    }
                     $targetFeeds[ $publicId ] = $targetFeed;
                 }
 
