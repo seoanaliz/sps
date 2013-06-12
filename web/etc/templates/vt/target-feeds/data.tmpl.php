@@ -42,35 +42,36 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
                     Используется только для Facebook
                 </div>
             </div>
+
             <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 )); ?>
         </div>
         <div data-row="Albums" class="row">
             <label>{lang:vt.targetFeed.ShowAlbums}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Albums . ']', null, 'albums', null,$object->params['showTabs'][SourceFeedUtility::Albums]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Albums . ']', null, 'albums', null,isset( $object->params['showTabs'][SourceFeedUtility::Albums]) ? $object->params['showTabs'][SourceFeedUtility::Albums] : 0   ) ?>
         </div>
         <div data-row="Authors" class="row">
             <label>{lang:vt.targetFeed.ShowAuthors}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Authors . ']', null, 'authors', null,$object->params['showTabs'][SourceFeedUtility::Authors]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Authors . ']', null, 'authors', null,isset( $object->params['showTabs'][SourceFeedUtility::Authors]) ? $object->params['showTabs'][SourceFeedUtility::Authors] : 0   ) ?>
         </div>
         <div data-row="Ad" class="row">
             <label>{lang:vt.targetFeed.ShowAd}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Ads . ']', null, 'ads', null,$object->params['showTabs'][SourceFeedUtility::Ads]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Ads . ']', null, 'ads', null,isset( $object->params['showTabs'][SourceFeedUtility::Ads]) ? $object->params['showTabs'][SourceFeedUtility::Ads] : 0  ) ?>
         </div>
         <div data-row="AddAuthors" class="row">
             <label>{lang:vt.targetFeed.ShowAddAuthors}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::AuthorsList . ']', null, 'AddAuthors', null,$object->params['showTabs'][SourceFeedUtility::AuthorsList]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::AuthorsList . ']', null, 'AddAuthors', null,isset( $object->params['showTabs'][SourceFeedUtility::AuthorsList]) ? $object->params['showTabs'][SourceFeedUtility::AuthorsList] : 0  ) ?>
         </div>
         <div data-row="Sources" class="row">
             <label>{lang:vt.targetFeed.ShowSources}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Source . ']', null, 'sources', null,$object->params['showTabs'][SourceFeedUtility::Source]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Source . ']', null, 'sources', null, isset( $object->params['showTabs'][SourceFeedUtility::Source]) ? $object->params['showTabs'][SourceFeedUtility::Source] : 0 ) ?>
         </div>
         <div data-row="My" class="row">
             <label>{lang:vt.targetFeed.ShowMy}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::My . ']', null, 'my', null,$object->params['showTabs'][SourceFeedUtility::My]  ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::My . ']', null, 'my', null,isset( $object->params['showTabs'][SourceFeedUtility::My ]) ? $object->params['showTabs'][SourceFeedUtility::My] : 0 ) ?>
         </div>
         <div data-row="IsOur" class="row">
             <label>{lang:vt.targetFeed.IsOur}</label>
-            <?= FormHelper::FormCheckBox($prefix . '[params][isOur]', null, 'my', null,$object->params['isOur'] ) ?>
+            <?= FormHelper::FormCheckBox($prefix . '[params][isOur]', null, 'my', isset( $object->params['isOur']) ? $object->params['isOur'] : 0  ) ?>
         </div>
 
         <? foreach ($roles as $role => $roleName): ?>
