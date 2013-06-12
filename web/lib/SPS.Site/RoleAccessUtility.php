@@ -115,7 +115,7 @@ class RoleAccessUtility
         foreach (SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) {
             if (    $this->hasAccessToSourceType($targetFeed->targetFeedId, $sourceType)
                 &&  isset( $targetFeed->params['showTabs'][$sourceType] )
-                &&  $targetFeed->params['showTabs'][$sourceType] ) {
+                &&  $targetFeed->params['showTabs'][$sourceType] == 'on' ) {
 
                     $accessibleSourceTypes[$sourceType] = $sourceTypeTitle;
             }
