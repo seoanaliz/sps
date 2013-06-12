@@ -19,12 +19,19 @@
                 <div class="type-selector">
                     <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
+                        $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
                         ?>
-                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
-                            <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
+                        <a class="sourceType <?=($isFirst == 0 && $sourceTypeAvailable ? 'active' : '')?>" data-type="{$sourceType}"
+                            <?
+                                if( !$sourceTypeAvailable ):
+                                    echo 'style="display:none"';
+                                else:
+                                    $isFirst++;
+                                endif
+                            ?>
                            id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                         <?
-                        $isFirst++;
+
                     endforeach;
                     ?>
                 </div>
