@@ -41,6 +41,7 @@
                     $targetFeed->period      =  60;
                     $targetFeed->startTime   =  '09:00:00';
                     $targetFeed->params['showTabs'] = array( SourceFeedUtility::Authors => true );
+                    $targetFeed->params['isOur'] = 'off';
 
                     SourceFeedUtility::DownloadImage( $publicId, $publicInfo[$publicId]['ava']);
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));

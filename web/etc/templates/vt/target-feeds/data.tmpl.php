@@ -68,6 +68,10 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
             <label>{lang:vt.targetFeed.ShowMy}</label>
             <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::My . ']', null, 'my', null,$object->params['showTabs'][SourceFeedUtility::My]  ) ?>
         </div>
+        <div data-row="IsOur" class="row">
+            <label>{lang:vt.targetFeed.IsOur}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][isOur]', null, 'my', null,$object->params['isOur'] ) ?>
+        </div>
 
         <? foreach ($roles as $role => $roleName): ?>
             <div class="row user_list" data-row="editors">

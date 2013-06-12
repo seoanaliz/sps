@@ -357,6 +357,7 @@
       <ShowAddAuthors><![CDATA[Показывать добавление авторов]]></ShowAddAuthors>
       <ShowSources><![CDATA[Показывать источники]]></ShowSources>
       <ShowMy><![CDATA[Показывать личную вкладку]]></ShowMy>
+      <IsOur><![CDATA[Наш паблик]]></IsOur>
       <type><![CDATA[Тип]]></type>
       <params><![CDATA[params]]></params>
     </targetFeed>
