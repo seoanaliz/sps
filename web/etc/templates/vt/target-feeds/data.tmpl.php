@@ -49,7 +49,7 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
             <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Albums . ']', null, 'albums', null,$object->params['showTabs'][SourceFeedUtility::Albums]  ) ?>
         </div>
         <div data-row="Authors" class="row">
-            <label>{lang:vt.targetFeed.ShowAlbums}</label>
+            <label>{lang:vt.targetFeed.ShowAuthors}</label>
             <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Authors . ']', null, 'authors', null,$object->params['showTabs'][SourceFeedUtility::Authors]  ) ?>
         </div>
         <div data-row="Ad" class="row">

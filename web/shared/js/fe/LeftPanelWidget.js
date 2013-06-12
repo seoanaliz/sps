@@ -1503,8 +1503,7 @@ var LeftPanelWidget = Event.extend({
                 sourceType = null;
             }
         }
-        console.log(sourceTypes);
-        console.log(sourceType);
+
         if (sourceType != App.FEED_TYPE_SOURCE) {
             $('#slider-text').hide();
             $('#slider-cont').hide();
@@ -1657,7 +1656,8 @@ var LeftPanelWidget = Event.extend({
     savePost: function(params) {
         var $sourceFeedIds = Elements.leftdd();
         var sourceFeedId;
-        if ($sourceFeedIds.length != 1) {
+        var sourceType = Elements.leftType();
+        if (sourceType == App.FEED_TYPE_AUTHORS || $sourceFeedIds.length != 1) {
             sourceFeedId = null;
         } else {
             sourceFeedId = $sourceFeedIds[0];
