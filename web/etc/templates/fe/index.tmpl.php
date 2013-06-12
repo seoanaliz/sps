@@ -20,8 +20,11 @@
                     <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                         $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
+                        $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
+                        $sourceTypeClass .= !$sourceTypeAvailable ? ' hide ' : ' ';
+
                         ?>
-                        <a class="sourceType <?=($isFirst == 0 && $sourceTypeAvailable ? 'active' : '')?>" data-type="{$sourceType}"
+                        <a class=" <?=$sourceTypeClass?>" data-type="{$sourceType}"
                             <?
                                 if( !$sourceTypeAvailable ):
                                     echo 'style="display:none"';
