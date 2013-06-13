@@ -45,13 +45,10 @@
 
                     SourceFeedUtility::DownloadImage( $publicId, $publicInfo[$publicId]['ava']);
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));
-                    if( $targetFeed->targetFeedId ) {
-                        //todo логгирование
-                        continue;
-                    }
                     $targetFeeds[ $publicId ] = $targetFeed;
                 }
-
+                if( !isset($targetFeeds[ $publicId ]))
+                    continue;
                 $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_OWNER );
                 $confirmedTargetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
             }
