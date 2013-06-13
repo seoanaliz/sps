@@ -65,7 +65,6 @@ class SaveArticleControl extends BaseControl
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-
         //building data
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
@@ -79,7 +78,9 @@ class SaveArticleControl extends BaseControl
         $article->isCleaned = false;
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
-        $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+        $article->articleStatus =  Article::STATUS_APPROVED;
+        #$article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+
         if ($sourceFeedId) {
             $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
             if ($SourceFeed) {

@@ -60,21 +60,6 @@ class AddAuthorControl extends BaseControl
             return;
         }
 
-        // copy to editor
-        $Editor = EditorFactory::GetOne(array('vkId' => $vkId));
-        if (!$Editor) {
-            $Editor = new Editor();
-        }
-        $Editor->vkId = $vkId;
-        $Editor->lastName = $Author->lastName;
-        $Editor->firstName = $Author->firstName;
-        $Editor->avatar = $Author->avatar;
-        $Editor->statusId = $Author->statusId;
-        if ($Editor->editorId) {
-            EditorFactory::Update($Editor);
-        } else {
-            EditorFactory::Add($Editor);
-        }
 
         // добавляем права автора
         $UserFeed = new UserFeed();

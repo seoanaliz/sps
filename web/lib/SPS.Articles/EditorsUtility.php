@@ -40,16 +40,15 @@
                     $targetFeed->type        =  TargetFeedUtility::VK;
                     $targetFeed->period      =  60;
                     $targetFeed->startTime   =  '09:00:00';
+                    $targetFeed->params['showTabs'] = array( SourceFeedUtility::Authors => true );
+                    $targetFeed->params['isOur'] = 'off';
 
                     SourceFeedUtility::DownloadImage( $publicId, $publicInfo[$publicId]['ava']);
                     TargetFeedFactory::Add( $targetFeed, array( BaseFactory::WithReturningKeys => true));
-                    if( $targetFeed->targetFeedId ) {
-                        //todo логгирование
-                        continue;
-                    }
                     $targetFeeds[ $publicId ] = $targetFeed;
                 }
-
+                if( !isset($targetFeeds[ $publicId ]))
+                    continue;
                 $newUserFeeds[] = new UserFeed( $userVkId, $targetFeeds[ $publicId ]->targetFeedId, UserFeed::ROLE_OWNER );
                 $confirmedTargetFeedIds[] = $targetFeeds[ $publicId ]->targetFeedId;
             }

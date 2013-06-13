@@ -18,22 +18,22 @@ abstract class SaveVkUserAction extends BaseSaveAction
      */
     protected function afterSaveAuthor(Author $Author){
         /** @var $Editor Editor */
-        $Editor = EditorFactory::Get(array('vkId' => $Author->vkId));
-        $exist = true;
-        if (!$Editor) {
-            $Editor = new Editor();
-            $Editor->vkId = $Author->vkId;
-            $exist = false;
-        }
-        $Editor->avatar = $Author->avatar;
-        $Editor->firstName = $Author->firstName;
-        $Editor->lastName = $Author->lastName;
-        $Editor->statusId = $Author->statusId;
-        if ($exist){
-            EditorFactory::Update($Editor);
-        } else {
-            EditorFactory::Add($Editor);
-        }
+//        $Editor = EditorFactory::Get(array('vkId' => $Author->vkId));
+//        $exist = true;
+//        if (!$Editor) {
+//            $Editor = new Editor();
+//            $Editor->vkId = $Author->vkId;
+//            $exist = false;
+//        }
+//        $Editor->avatar = $Author->avatar;
+//        $Editor->firstName = $Author->firstName;
+//        $Editor->lastName = $Author->lastName;
+//        $Editor->statusId = $Author->statusId;
+//        if ($exist){
+//            EditorFactory::Update($Editor);
+//        } else {
+//            EditorFactory::Add($Editor);
+//        }
     }
 
     /**
