@@ -15,7 +15,7 @@
         public static $Types = array(
             self::VK => 'ВКонтакте',
             self::FB => 'Facebook',
-            self::vk_album => 'ВКонтакте альбом'
+            self::album => 'ВКонтакте альбом'
         );
     }
 
