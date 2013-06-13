@@ -1495,15 +1495,16 @@ var LeftPanelWidget = Event.extend({
         var $userGroupTabs = $('.user-groups-tabs');
         var targetFeedId = Elements.rightdd();
         var sourceTypes = data.accessibleSourceTypes;
+
         var sourceType = Elements.leftType();
         if( sourceTypes[sourceType] == undefined ) {
-            if (sourceTypes.lenght > 0) {
+            if (sourceTypes[0] != undefined) {
+
                 sourceType = sourceTypes[0];
             }else{
                 sourceType = null;
             }
         }
-
         if (sourceType != App.FEED_TYPE_SOURCE) {
             $('#slider-text').hide();
             $('#slider-cont').hide();
