@@ -45,7 +45,7 @@ class AddArticleToQueueControl extends BaseControl
 
         //ограничение по интервалу между постами
 
-        if( ArticleUtility::IsTooCloseToPrevious( $targetFeedId, $timestamp )) {
+        if( ArticleUtility::IsTooCloseToPrevious( $targetFeedId, $timestamp, $queueId )) {
             $result['message'] = 'Time between posts is too small';
             echo ObjectHelper::ToJSON($result);
             return false;

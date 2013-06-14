@@ -38,7 +38,7 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
-            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp())) {
+            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp(), $queueId)) {
                 $result['message'] = 'Time between posts is too small';
                 echo ObjectHelper::ToJSON($result);
                 return false;

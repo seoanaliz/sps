@@ -41,9 +41,9 @@ var RightPanelWidget = Event.extend({
 
                 // проставление типа источника
                 cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $leftPanel.find('.type-selector a[data-type="' + cookieData + '"]');
+                sourceType = $leftPanel.find('.type-selector :not(.hide) a[data-type="' + cookieData + '"]');
                 if (sourceType.length == 0) {
-                    sourceType = $leftPanel.find('.type-selector a[data-type="source"]');
+                    sourceType = $leftPanel.find('.type-selector :not(.hide)').first();
                 }
                 $leftPanel.find('.type-selector a').removeClass('active');
                 sourceType.addClass('active');

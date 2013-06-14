@@ -58,7 +58,7 @@
             $object->endDate->modify('+9 minutes');
         }
 
-        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp )
+        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp, $queueId = '' )
         {
             $intervalTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $from = new DateTimeWrapper(date('r', $newPostTimestamp));
@@ -68,7 +68,11 @@
                 'startDateFrom' =>  $from,
                 'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . 'minutes')
             );
+
             $check = ArticleQueueFactory::Get( $search );
+            //удаляем из проверки сам пост
+            if(isset( $check[$queueId]))
+                unset( $check[$queueId] );
             return !empty( $check );
         }
 

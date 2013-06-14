@@ -119,6 +119,16 @@ class SaveTargetFeedAction extends BaseSaveAction  {
 
         Response::setString('gridData', ObjectHelper::ToJSON($gridData));
 
+        //params
+        foreach( SourceFeedUtility::$Types as $type => $name ) {
+            if( isset($this->currentObject->params['showTabs'][$type])) {
+                $this->currentObject->params['showTabs'][$type] = 'off';
+            }
+        }
+        if( isset($this->currentObject->params['isOur'])) {
+            $this->currentObject->params['isOur'] = 'off';
+        }
+
         //publishers
         $publisherIds = array();
         if (!empty($this->currentObject->publishers)) {
