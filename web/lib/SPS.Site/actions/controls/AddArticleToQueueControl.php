@@ -65,6 +65,7 @@ class AddArticleToQueueControl extends BaseControl
                 'success' => true,
                 'id' => $queueId
             );
+            $result['html'] = $this->renderArticle(ArticleQueueFactory::GetById($queueId), ArticleRecordFactory::GetOne(array('articleId' => $articleId)));
             echo ObjectHelper::ToJSON($result);
             return true;
         }
@@ -181,33 +182,36 @@ class AddArticleToQueueControl extends BaseControl
             return '';
         }
         $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
-        
+
         $articleRecords = array();
-        $articleRecords[$articleQueueRecord->articleQueueId] = $articleQueueRecord;
+        $articleRecords[$articleQueueItem->articleQueueId] = $articleQueueRecord;
+        $articlesQueue = array();
+        $articlesQueue[$articleQueueItem->articleQueueId] = $articleQueueItem;
 
         $timestamp = Request::getInteger( 'timestamp' );
         $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
         $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
- 
+
         $place = null;
         foreach ($grid as $key => $gridItem) {
             if ($gridItem['dateTime'] >= $articleQueueItem->startDate && $gridItem['dateTime'] <= $articleQueueItem->endDate) {
                 if (empty($gridItem['queue'])) {
                     $place = $key;
-                    break;
+                    break; // ------------ BREAK
                 }
             }
         }
 
         if ($place !== null) {
+            $now = DateTimeWrapper::Now();
             $grid[$place]['queue'] = $articleQueueItem;
             $grid[$place]['blocked'] = ($articleQueueItem->statusId != 1 || $articleQueueItem->endDate <= $now);
             $grid[$place]['failed'] = ($articleQueueItem->statusId != StatusUtility::Finished && $articleQueueItem->endDate <= $now);
             $gridItem = $grid[$place];
         } else {
-            return '';
+            return ''; // ---------------- RETURN
         }
-        
+
         ob_start();
         include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
         $html = ob_get_clean();

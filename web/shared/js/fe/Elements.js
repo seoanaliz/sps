@@ -60,47 +60,45 @@ var Elements = {
             });
         }
     },
-    initDroppable: function($elem) {
-        var $block = $elem.find('.slot.empty:not(.locked)');
-        if ($block.length) {
-            $block.each(function() {
-                Elements.initDroppable($(this));
-            });
-        } else {
-            if ($elem.data('droppable_inited')) {
-                return;
-            }
-            $elem.data('droppable_inited', true);
-            $elem.droppable({
-                activeClass: 'ui-state-active',
-                hoverClass: 'ui-state-hover',
-                drop: function(e, ui) {
-                    var $slot = $(this);
-
-                    if (!$slot.hasClass('slot')) {
-                        return;
-                    }
-
-                    var $post = $(ui.draggable).closest('.post');
-                    Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
-                        if (isSuccess && data.success && data.html) {
-                            var $page = $(data.html);
-                            $slot.replaceWith($page);
-                            Elements.initDraggable($page);
-                            Elements.initImages($page);
-                            Elements.initLinks($page);
-                            $page.find('.post .images').imageComposition();
-                            $page.find('.post.blocked').draggable('disable');
-                            if ($post.hasClass('relocatable')) {
-                                $post.addClass('hidden_' + data.id).hide();
-                            }
-                        } else if ($post.hasClass('relocatable')) {
-                            $slot.html($post);
-                        }
-                    });
-                }
-            });
+    initDroppable: function() {
+        $('.queue-page').find('.slot.empty:not(.locked)').each(function() {
+            Elements.attachDroppable($(this));
+        });
+    },
+    attachDroppable: function($elem) {
+        if ($elem.data('droppable_inited')) {
+            return;
         }
+        $elem.data('droppable_inited', true);
+        $elem.droppable({
+            activeClass: 'ui-state-active',
+            hoverClass: 'ui-state-hover',
+            drop: function(e, ui) {
+                var $slot = $(this);
+
+                if (!$slot.hasClass('slot')) {
+                    return;
+                }
+
+                var $post = $(ui.draggable).closest('.post');
+                Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
+                    if (isSuccess && data.success && data.html) {
+                        var $page = $(data.html);
+                        $slot.replaceWith($page);
+                        Elements.initDraggable($page);
+                        Elements.initImages($page);
+                        Elements.initLinks($page);
+                        $page.find('.post .images').imageComposition();
+                        $page.find('.post.blocked').draggable('disable');
+                        if ($post.hasClass('relocatable')) {
+                            $post.addClass('hidden_' + data.id).hide();
+                        }
+                    } else if ($post.hasClass('relocatable')) {
+                        $slot.html($post);
+                    }
+                });
+            }
+        });
     },
     initLinks: function($block) {
         $block.find('img.ajax-loader').each(function(){
@@ -113,7 +111,7 @@ var Elements = {
         }).get();
     },
     rightdd: function(value){
-        if (typeof value == 'undefined') {
+        if (typeof value === 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
             $("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
@@ -126,7 +124,7 @@ var Elements = {
         return $('#right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        if (typeof value == 'undefined') {
+        if (typeof value === 'undefined') {
             var time = $('#calendar').datepicker('getDate').getTime();
             var timestamp = Math.round(time / 1000) - (new Date().getTimezoneOffset() * 60) + 14400;
             return timestamp;

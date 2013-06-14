@@ -51,6 +51,34 @@
                     "QueueId $id deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->editorId
                 );
             }
+            $result = array(
+                'html' => $this->renderEmptySlot()
+            );
+            echo ObjectHelper::ToJSON($result);
+        }
+
+        protected function renderEmptySlot() {
+            $gridId = Request::getInteger('gridId');
+            $canEditQueue = true;
+
+            $timestamp = Request::getInteger('timestamp');
+            $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
+            $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
+            $gridItem = null;
+            foreach ($grid as $key => $gi) {
+                if ($gi['gridLineId'] == Request::getString('gridId')) {
+                    $gridItem = $gi;
+                    break; // --------------------- BREAK
+                }
+            }
+            if (!$gridItem) {
+                return ''; // --------------------- RETURN
+            }
+
+            ob_start();
+            include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
+            $html = ob_get_clean();
+            return $html;
         }
     }
 ?>

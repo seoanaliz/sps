@@ -51,7 +51,7 @@
         <div class="post movable
             <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'blocked' : '' ?>
             <?= !empty($gridItem['failed']) ? 'failed' : '' ?>"
-             data-id="{$articleQueueId}"
+             data-id="<?=  $isEmptyItem ? '' : $gridItem['queue']->articleId ?>"
              data-queue-id="{$articleQueueId}">
             <div class="content">
                 {increal:tmpl://fe/elements/articles-queue-item-content.tmpl.php}
