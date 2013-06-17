@@ -26,14 +26,6 @@
                     <actions>SPS.VK.VKLogout</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
                 </page>
-                <page uri="/stat" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.Stat.getEntriesPrecache</actions>
-                    <template>tmpl://st/index.tmpl.php</template>
-                </page>
-                <page uri="/stat/([^/]*).*" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.Stat.getEntriesPrecache</actions>
-                    <template>tmpl://st/index.tmpl.php</template>
-                </page>
                 <page uri="/oadmins">
                     <actions>SPS.Stat.AdminsWork</actions>
                     <template>tmpl://vt/stat_admins/index.tmpl.php</template>
@@ -756,11 +748,16 @@
             </pageGroup>
 
             <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
-                <page uri="stat://">
-                    <template>tmpl://st/index.tmpl.php</template>
-                </page>
                 <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
+                </page>
+                <page uri="stat://">
+                    <actions>SPS.Stat.getEntriesPrecache</actions>
+                    <template>tmpl://st/index.tmpl.php</template>
+                </page>
+                <page uri="stat://([^/]*).*">
+                    <actions>SPS.Stat.getEntriesPrecache</actions>
+                    <template>tmpl://st/index.tmpl.php</template>
                 </page>
             </pageGroup>
 

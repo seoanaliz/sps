@@ -339,30 +339,41 @@ class EntryGetter {
             }
 
             $id = $result->GetInteger('group_id');
-            $this->saveSlugForId($id, $slug);
+            $updateResult = $this->saveSlugForId($id, $slug);
+            echo "$id - $name - $slug  [$updateResult]<br />";
         }
     }
-    
-    static public function transliterate($text) {
-        preg_match_all('/./u', $text, $text);
-        $text = $text[0];
+
+    static public function transliterate($rawText) {
+        $text = iconv('windows-1251', 'UTF-8',
+            iconv('UTF-8', 'windows-1251//TRANSLIT', $rawText)
+        );
+
+        $specialSpecial = array('ье' => 'ie', 'ЬЕ' => 'IE', 'Топфейс' => 'Topface'); // символы, которые заменяются группами
+        foreach ($specialSpecial as $from => $to) {
+            $text = str_replace($from, $to, $text);
+        }
+
+        $matches = array();
+        preg_match_all('/./u', $text, $matches);
+        $chars = $matches[0];
         $simplePairs = array('а' => 'a', 'л' => 'l', 'у' => 'u', 'б' => 'b', 'м' => 'm', 'т' => 't', 'в' => 'v', 'н' => 'n', 'ы' => 'y', 'г' => 'g', 'о' => 'o', 'ф' => 'f', 'д' => 'd', 'п' => 'p', 'и' => 'i', 'р' => 'r', 'А' => 'A', 'Л' => 'L', 'У' => 'U', 'Б' => 'B', 'М' => 'M', 'Т' => 'T', 'В' => 'V', 'Н' => 'N', 'Ы' => 'Y', 'Г' => 'G', 'О' => 'O', 'Ф' => 'F', 'Д' => 'D', 'П' => 'P', 'И' => 'I', 'Р' => 'R',);
         $complexPairs = array('з' => 'z', 'ц' => 'c', 'к' => 'k', 'ж' => 'zh', 'ч' => 'ch', 'х' => 'h', 'е' => 'e', 'с' => 's', 'ё' => 'yo', 'э' => 'e', 'ш' => 'sh', 'й' => 'y', 'щ' => 'sh', 'ю' => 'yu', 'я' => 'ya', 'З' => 'Z', 'Ц' => 'C', 'К' => 'K', 'Ж' => 'ZH', 'Ч' => 'CH', 'Х' => 'H', 'Е' => 'E', 'С' => 'S', 'Ё' => 'YO', 'Э' => 'E', 'Ш' => 'SH', 'Й' => 'Y', 'Щ' => 'SH', 'Ю' => 'YU', 'Я' => 'YA', 'Ь' => "", 'Ъ' => "", 'ъ' => "", 'ь' => "");
         $specialSymbols = array("'" => "", "`" => "", "^" => "", " " => "_", '.' => '', ',' => '', ':' => '', '"' => '', "'" => '', '<' => '', '>' => '', '«' => '', '»' => '', ' ' => '_',);
         $translitLatSymbols = array('a', 'l', 'u', 'b', 'm', 't', 'v', 'n', 'y', 'g', 'o', 'f', 'd', 'p', 'i', 'r', 'z', 'c', 'k', 'e', 's', 'A', 'L', 'U', 'B', 'M', 'T', 'V', 'N', 'Y', 'G', 'O', 'F', 'D', 'P', 'I', 'R', 'Z', 'C', 'K', 'E', 'S',);
-        $simplePairsFlip = array_flip($simplePairs);
-        $complexPairsFlip = array_flip($complexPairs);
-        $specialSymbolsFlip = array_flip($specialSymbols);
         $charsToTranslit = array_merge(array_keys($simplePairs), array_keys($complexPairs));
         $translitTable = array();
-        foreach ($simplePairs as $key => $val)
-            $translitTable[$key] = $simplePairs[$key]; 
-        foreach ($complexPairs as $key => $val)
+        foreach ($complexPairs as $key => $val) {
             $translitTable[$key] = $complexPairs[$key];
-        foreach ($specialSymbols as $key => $val)
+        }
+        foreach ($simplePairs as $key => $val) {
+            $translitTable[$key] = $simplePairs[$key];
+        }
+        foreach ($specialSymbols as $key => $val) {
             $translitTable[$key] = $specialSymbols[$key]; $result = "";
+        }
         $nonTranslitArea = false;
-        foreach ($text as $char) {
+        foreach ($chars as $char) {
             if (in_array($char, array_keys($specialSymbols))) {
                 $result.= $translitTable[$char];
             } elseif (in_array($char, $charsToTranslit)) {
@@ -388,10 +399,10 @@ class EntryGetter {
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
         $updateResult = $cmd->ExecuteNonQuery();
-        echo $id . '  ' . $slug . '  ' . $updateResult . '<br />';
         if (!$updateResult) {
             Logger::Error('Failed to update slugs!');
         }
+        return $updateResult;
     }
 }
 

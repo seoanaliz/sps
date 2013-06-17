@@ -11,7 +11,7 @@
             $EntryGetter = new EntryGetter();
             $id = null;
             if ($slug) {
-                if ($slug === "~update") {
+                if ($slug === "~update-sAPDixIx6SNVl4~gX0QM307hADw--cxpuO3rYwnKeyB") {
                     $EntryGetter->updateSlugs();
                     die('done');
                 }
