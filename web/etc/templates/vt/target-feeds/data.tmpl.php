@@ -42,10 +42,37 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
                     Используется только для Facebook
                 </div>
             </div>
-            <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 ) ); ?>
+
+            <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 )); ?>
         </div>
-
-
+        <div data-row="Albums" class="row">
+            <label>{lang:vt.targetFeed.ShowAlbums}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Albums . ']', null, 'albums', null,isset( $object->params['showTabs'][SourceFeedUtility::Albums]) ? $object->params['showTabs'][SourceFeedUtility::Albums] : false   ) ?>
+        </div>
+        <div data-row="Authors" class="row">
+            <label>{lang:vt.targetFeed.ShowAuthors}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Authors . ']', null, 'authors', null,isset( $object->params['showTabs'][SourceFeedUtility::Authors]) ? $object->params['showTabs'][SourceFeedUtility::Authors] : false   ) ?>
+        </div>
+        <div data-row="Ad" class="row">
+            <label>{lang:vt.targetFeed.ShowAd}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Ads . ']', null, 'ads', null,isset( $object->params['showTabs'][SourceFeedUtility::Ads]) ? $object->params['showTabs'][SourceFeedUtility::Ads] : false  ) ?>
+        </div>
+        <div data-row="AddAuthors" class="row">
+            <label>{lang:vt.targetFeed.ShowAddAuthors}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::AuthorsList . ']', null, 'AddAuthors', null,isset( $object->params['showTabs'][SourceFeedUtility::AuthorsList]) ? $object->params['showTabs'][SourceFeedUtility::AuthorsList] : false  ) ?>
+        </div>
+        <div data-row="Sources" class="row">
+            <label>{lang:vt.targetFeed.ShowSources}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Source . ']', null, 'sources', null, isset( $object->params['showTabs'][SourceFeedUtility::Source]) ? $object->params['showTabs'][SourceFeedUtility::Source] : false ) ?>
+        </div>
+        <div data-row="My" class="row">
+            <label>{lang:vt.targetFeed.ShowMy}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::My . ']', null, 'my', null,isset( $object->params['showTabs'][SourceFeedUtility::My ]) ? $object->params['showTabs'][SourceFeedUtility::My] : false ) ?>
+        </div>
+        <div data-row="IsOur" class="row">
+            <label>{lang:vt.targetFeed.IsOur}</label>
+            <?= FormHelper::FormCheckBox($prefix . '[isOur]', null,'isOur', null, $object->isOur  ) ?>
+        </div>
 
         <? foreach ($roles as $role => $roleName): ?>
             <div class="row user_list" data-row="editors">

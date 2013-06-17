@@ -445,7 +445,6 @@ var LeftPanelWidget = Event.extend({
             type: sourceType,
             targetFeedId: targetFeedId
         };
-
         switch (sourceType) {
             case App.FEED_TYPE_AUTHORS:
                 requestData.userGroupId = Elements.getUserGroupId();
@@ -1495,9 +1494,17 @@ var LeftPanelWidget = Event.extend({
         var $leftPanelTabs = $leftPanel.find('.type-selector');
         var $userGroupTabs = $('.user-groups-tabs');
         var targetFeedId = Elements.rightdd();
-        var sourceType = Elements.leftType();
         var sourceTypes = data.accessibleSourceTypes;
 
+        var sourceType = Elements.leftType();
+        if( sourceTypes[sourceType] == undefined ) {
+            if (sourceTypes[0] != undefined) {
+
+                sourceType = sourceTypes[0];
+            }else{
+                sourceType = null;
+            }
+        }
         if (sourceType != App.FEED_TYPE_SOURCE) {
             $('#slider-text').hide();
             $('#slider-cont').hide();
@@ -1533,7 +1540,7 @@ var LeftPanelWidget = Event.extend({
                 if (data.authorsFilters.all_my_filter) {
                     showSwitcherType = 'all';
                 } else {
-                    showSwitcherType = 'deferred';
+                    showSwitcherType = 'approved';
                 }
                 $wallSwitcher.show();
                 $wallSwitcher.find('a').hide();
@@ -1650,7 +1657,8 @@ var LeftPanelWidget = Event.extend({
     savePost: function(params) {
         var $sourceFeedIds = Elements.leftdd();
         var sourceFeedId;
-        if ($sourceFeedIds.length != 1) {
+        var sourceType = Elements.leftType();
+        if (sourceType == App.FEED_TYPE_AUTHORS || $sourceFeedIds.length != 1) {
             sourceFeedId = null;
         } else {
             sourceFeedId = $sourceFeedIds[0];

@@ -77,6 +77,9 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
+                ),'isOur' => array(
+                    'name'          => 'isOur'
+                    , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array(
                 'grids' => array(

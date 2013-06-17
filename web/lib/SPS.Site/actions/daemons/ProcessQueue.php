@@ -92,22 +92,24 @@ sql;
 
                 //сортируем издателей: создавший пост-> люди -> боты
                 foreach( $targetFeed->publishers as $ptf ) {
-                    if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
-                        $sender = clone $ptf;
-                    }
+//                    if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
+//                        $sender = clone $ptf;
+//                    }
 
                     if( $ptf->publisher->vk_seckey == 2 ) {
                         if( !$send_from_bot ) {
-                            array_unshift( $publishers, $ptf );
+//                            array_unshift( $publishers, $ptf );
+                            continue;
+
                         }
                     } else {
                         $publishers[] = $ptf;
                     }
                 }
 
-                if( $sender ) {
-                    array_unshift( $publishers, $sender );
-                }
+//                if( $sender ) {
+//                    array_unshift( $publishers, $sender );
+//                }
 
                 $targetFeed->publishers = $publishers;
                 foreach ($targetFeed->publishers as $publisher) {
@@ -186,7 +188,8 @@ sql;
                     TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
                 }
             } catch (ChangeSenderException $Ex){
-                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, 'failed to post from publisher ' . $publisher->publisherId );
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                    'failed to post from publisher ' . $publisher->publisherId .', ' . $Ex->getMessage());
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();

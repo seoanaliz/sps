@@ -85,6 +85,9 @@
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
+                if(!isset($public->params['isOur']) || $public->params['isOur'] =='off')
+                    continue;
+
                 // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
                 if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
                     ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
@@ -823,7 +826,7 @@
 
             foreach( $barter_events_array as $barter_event ) {
                 /** @var $barter_event BarterEvent */
-                if ( $barter_event->status != 3 || $point = 'start' ) {
+                if ( $barter_event->status != 3 || $point == 'start' ) {
                     $time = time() + self::time_shift;
 
                     $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );

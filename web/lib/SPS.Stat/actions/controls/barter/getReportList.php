@@ -22,7 +22,7 @@ class getReportList
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $target_public  =   Request::getString ( 'targetPublicId' );
         $barter_public  =   Request::getString ( 'barterPublicId' );
-        $group_id       =   Request::getInteger( 'groupId');
+        $group_id       =   Request::getString( 'groupId');
 
         $time_from = $time_from ? date( 'Y-m-d H:i:s', $time_from ) : 0;
         $time_to   = $time_to   ? date( 'Y-m-d H:i:s', $time_to ) : 0;
@@ -68,6 +68,7 @@ class getReportList
 //        $options = array( 'orderBy' => ' "posted_at" desc NULLS LAST, "created_at" desc NULLS LAST ');
 
         $res     =   BarterEventFactory::Get( $search, $options, 'tst' );
+
         die( ObjectHelper::ToJSON( array('response' => StatBarter::form_response( $res, $default_group->group_id ))));
     }
 }

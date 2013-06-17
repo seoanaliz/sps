@@ -101,19 +101,23 @@ class RoleAccessUtility
             }
             return true;
         }
-        return true;
+        return true;    
     }
 
     /**
-     * Созвращает массив источников, доступных для ленты
+     * Созвращает массив источников, доступных для ленты (с учетом настроек ленты)
      * @param $targetFeedId
      * @return array
      */
-    public function getAccessibleSourceTypes($targetFeedId){
+    public function getAccessibleSourceTypes($targetFeedId) {
+        $targetFeed = TargetFeedFactory::GetById( $targetFeedId );
         $accessibleSourceTypes = array();
         foreach (SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) {
-            if ($this->hasAccessToSourceType($targetFeedId, $sourceType)) {
-                $accessibleSourceTypes[$sourceType] = $sourceTypeTitle;
+            if (    $this->hasAccessToSourceType($targetFeed->targetFeedId, $sourceType)
+                &&  isset( $targetFeed->params['showTabs'][$sourceType] )
+                &&  $targetFeed->params['showTabs'][$sourceType] == 'on' ) {
+
+                    $accessibleSourceTypes[$sourceType] = $sourceTypeTitle;
             }
         }
         return array_keys($accessibleSourceTypes);
