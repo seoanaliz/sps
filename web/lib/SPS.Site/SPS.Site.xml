@@ -91,6 +91,9 @@
             <action name="DeleteArticleQueueControl">
                 <path>controls/DeleteArticleQueueControl</path>
             </action>
+            <action name="RenderEmptyQueueItemControl">
+                <path>controls/RenderEmptyQueueItemControl</path>
+            </action>
             <action name="AddArticleToQueueControl">
                 <path>controls/AddArticleToQueueControl</path>
             </action>

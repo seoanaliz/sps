@@ -101,15 +101,36 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_deletepost: function(post_id, callback){
+    rightcolumn_deletepost: function(post_id, gridId, timestamp, callback){
         $.ajax({
             url: controlsRoot + 'article-queue-delete/',
+            dataType : "json",
             data: {
-                id: post_id
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
             },
-            success: function() {
-                if (typeof callback == 'function') {
-                    callback(true);
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    rightcolumn_render_empty: function(post_id, gridId, timestamp, callback){
+        $.ajax({
+            url: controlsRoot + 'article-queue-get-empty/',
+            dataType : "json",
+            data: {
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
                 }
             }
         });
@@ -206,12 +227,12 @@ var Eventlist = {
         });
     },
 
-    post_moved: function(post_id, slot_id, queueId, callback){
+    post_moved: function(article_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
             data: {
-                articleId: post_id,
+                articleId: article_id,
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
@@ -219,12 +240,12 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    callback(1, data.id);
+                    callback(1, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(0);
+                    callback(0, data);
                 }
             }
         });

@@ -42,7 +42,7 @@ var QueueWidget = Event.extend({
                     var $page = $(data);
                     t.$queue.html($page);
                     Elements.initDraggable($page);
-                    Elements.initDroppable($('#right-panel'));
+                    Elements.initDroppable();
                     Elements.initImages($page);
                     Elements.initLinks($page);
                     $page.find('.post .images').imageComposition();
@@ -75,6 +75,32 @@ var QueueWidget = Event.extend({
         return deferred;
     },
 
+    deleteArticleInSlot: function($slot, isEmpty) {
+        if (typeof isEmpty === 'undefined') {
+            isEmpty = false;
+        }
+        
+        var $post = $slot.find('.post');
+        var pid = $post.data('queue-id');
+
+        var eventName = isEmpty ? 'rightcolumn_render_empty' : 'rightcolumn_deletepost';
+        Events.fire(eventName, pid, $slot.data('grid-id'), $slot.data('id'),
+            function(id, $slot) {
+                return function(isOk, data) {
+                    if (!isEmpty) {
+                        var csslass = 'hidden_' + id;
+                        $('#wall').find('.' + csslass).removeClass(csslass).show();
+                    }
+                    if (isOk && data && data.html) {
+                        var $content = $(data.html);
+                        $slot.replaceWith($content);
+                        Elements.attachDroppable($content);
+                    }
+                }
+            }(pid, $slot)
+        );
+    },
+
     initQueue: function() {
         var t = this;
         var $queue = this.$queue;
@@ -82,13 +108,7 @@ var QueueWidget = Event.extend({
         // Удаление постов
         $queue.delegate('.delete', 'click', function() {
             var $slot = $(this).closest('.slot');
-            var $post = $slot.find('.post');
-            var $page = $post.closest('.queue-page');
-            var pid = $post.data('id');
-
-            Events.fire('rightcolumn_deletepost', pid, function() {
-                t.updatePage($page);
-            });
+            t.deleteArticleInSlot($slot);
         });
 
         // Смена даты
@@ -564,7 +584,7 @@ var QueueWidget = Event.extend({
         }
 
         Elements.initDraggable($page);
-        Elements.initDroppable($('#right-panel'));
+        Elements.initDroppable();
         Elements.initImages($page);
         Elements.initLinks($page);
         $page.find('.post.blocked').draggable('disable');
