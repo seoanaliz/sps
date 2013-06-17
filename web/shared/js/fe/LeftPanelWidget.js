@@ -516,7 +516,7 @@ var LeftPanelWidget = Event.extend({
                 var $block = $(tmpEl).html(html);
                 t.$wall.append($block);
                 Elements.initDraggable($block);
-                Elements.initDroppable($('#right-panel'));
+                Elements.initDroppable();
                 Elements.initImages($block);
                 Elements.initLinks($block);
                 if (!$block.find('.post').length) {

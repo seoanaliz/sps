@@ -65,6 +65,7 @@ class AddArticleToQueueControl extends BaseControl
                 'success' => true,
                 'id' => $queueId
             );
+            $result['html'] = $this->renderArticle(ArticleQueueFactory::GetById($queueId), ArticleRecordFactory::GetOne(array('articleId' => $articleId)));
             echo ObjectHelper::ToJSON($result);
             return true;
         }
@@ -133,7 +134,7 @@ class AddArticleToQueueControl extends BaseControl
         if ($sqlResult) {
             $articleQueueRecord->articleQueueId = $ArticleQueue->articleQueueId;
 
-            $sqlResult = ArticleRecordFactory::Add($articleQueueRecord);
+            $sqlResult = ArticleRecordFactory::Add($articleQueueRecord, array(BaseFactory::WithReturningKeys => true));
         }
 
         ConnectionFactory::CommitTransaction($sqlResult);
@@ -166,10 +167,55 @@ class AddArticleToQueueControl extends BaseControl
             } else {
                 $result['moved'] = false;
             }
+
+            $result['html'] = $this->renderArticle($ArticleQueue, $articleQueueRecord);
         } else {
             $result['message'] = 'Cant Create Article Queue';
         }
         echo ObjectHelper::ToJSON($result);
+    }
+
+    protected function renderArticle($articleQueueItem, $articleQueueRecord) {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $role = $TargetFeedAccessUtility->getRoleForTargetFeed(Request::getInteger('targetFeedId'));
+        if (is_null($role)){
+            return '';
+        }
+        $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+
+        $articleRecords = array();
+        $articleRecords[$articleQueueItem->articleQueueId] = $articleQueueRecord;
+        $articlesQueue = array();
+        $articlesQueue[$articleQueueItem->articleQueueId] = $articleQueueItem;
+
+        $timestamp = Request::getInteger( 'timestamp' );
+        $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
+        $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
+
+        $place = null;
+        foreach ($grid as $key => $gridItem) {
+            if ($gridItem['dateTime'] >= $articleQueueItem->startDate && $gridItem['dateTime'] <= $articleQueueItem->endDate) {
+                if (empty($gridItem['queue'])) {
+                    $place = $key;
+                    break; // ------------ BREAK
+                }
+            }
+        }
+
+        if ($place !== null) {
+            $now = DateTimeWrapper::Now();
+            $grid[$place]['queue'] = $articleQueueItem;
+            $grid[$place]['blocked'] = ($articleQueueItem->statusId != 1 || $articleQueueItem->endDate <= $now);
+            $grid[$place]['failed'] = ($articleQueueItem->statusId != StatusUtility::Finished && $articleQueueItem->endDate <= $now);
+            $gridItem = $grid[$place];
+        } else {
+            return ''; // ---------------- RETURN
+        }
+
+        ob_start();
+        include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
     }
 }
 
