@@ -57,6 +57,9 @@
                 <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
                 </page>
+                <page uri="controls://article-queue-get-empty/">
+                    <actions>SPS.Site.RenderEmptyQueueItemControl</actions>
+                </page>
                 <page uri="controls://article-queue-item-save/">
                     <actions>SPS.Site.SaveQueueItemControl</actions>
                 </page>
