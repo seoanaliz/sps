@@ -28,6 +28,12 @@
                 return;
             }
 
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($object->targetFeedId);
+            if (is_null($role)){
+                return;
+            }
+            $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+
             $o = new ArticleQueue();
             $o->statusId = 3;
             $o->deleteAt = null;
@@ -52,33 +58,9 @@
                 );
             }
             $result = array(
-                'html' => $this->renderEmptySlot()
+                'html' => SlotUtility::renderEmpty($object->targetFeedId, $canEditQueue)
             );
             echo ObjectHelper::ToJSON($result);
-        }
-
-        protected function renderEmptySlot() {
-            $gridId = Request::getInteger('gridId');
-            $canEditQueue = true;
-
-            $timestamp = Request::getInteger('timestamp');
-            $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
-            $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
-            $gridItem = null;
-            foreach ($grid as $key => $gi) {
-                if ($gi['gridLineId'] == Request::getString('gridId')) {
-                    $gridItem = $gi;
-                    break; // --------------------- BREAK
-                }
-            }
-            if (!$gridItem) {
-                return ''; // --------------------- RETURN
-            }
-
-            ob_start();
-            include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
-            $html = ob_get_clean();
-            return $html;
         }
     }
 ?>

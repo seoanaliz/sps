@@ -75,16 +75,21 @@ var QueueWidget = Event.extend({
         return deferred;
     },
 
-    deleteArticleInSlot: function($slot) {
+    deleteArticleInSlot: function($slot, isEmpty) {
+        if (typeof isEmpty === 'undefined') {
+            isEmpty = false;
+        }
+        
         var $post = $slot.find('.post');
         var pid = $post.data('queue-id');
 
-        Events.fire('rightcolumn_deletepost', pid, $slot.data('grid-id'), $slot.data('id'),
+        var eventName = isEmpty ? 'rightcolumn_render_empty' : 'rightcolumn_deletepost';
+        Events.fire(eventName, pid, $slot.data('grid-id'), $slot.data('id'),
             function(id, $slot) {
                 return function(isOk, data) {
                     var csslass = 'hidden_' + id;
                     $('#wall').find('.' + csslass).removeClass(csslass).show();
-                    if (isOk && data.html) {
+                    if (isOk && data && data.html) {
                         var $content = $(data.html);
                         $slot.replaceWith($content);
                         Elements.attachDroppable($content);

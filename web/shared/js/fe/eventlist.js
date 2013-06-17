@@ -109,7 +109,23 @@ var Eventlist = {
                 id: post_id,
                 gridId: gridId,
                 timestamp: timestamp,
-                targetFeedId: Elements.rightdd(),
+                type: Elements.rightType(),
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    rightcolumn_render_empty: function(post_id, gridId, timestamp, callback){
+        $.ajax({
+            url: controlsRoot + 'article-queue-get-empty/',
+            dataType : "json",
+            data: {
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
                 type: Elements.rightType(),
             },
             success: function(data) {

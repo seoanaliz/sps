@@ -80,6 +80,11 @@ var Elements = {
                     return;
                 }
 
+                var maybeSlot = ui.draggable.closest('.slot');
+                if (maybeSlot.length) {
+                    app.getRightPanelWidget().getQueueWidget().deleteArticleInSlot(maybeSlot, /* isEmpty */ true);
+                }
+
                 var $post = $(ui.draggable).closest('.post');
                 Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
                     if (isSuccess && data.success && data.html) {
