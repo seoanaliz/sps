@@ -1497,9 +1497,8 @@ var LeftPanelWidget = Event.extend({
         var sourceTypes = data.accessibleSourceTypes;
 
         var sourceType = Elements.leftType();
-        if( sourceTypes[sourceType] == undefined ) {
+        if( !~$.inArray(sourceType, sourceTypes)) {
             if (sourceTypes[0] != undefined) {
-
                 sourceType = sourceTypes[0];
             }else{
                 sourceType = null;
