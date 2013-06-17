@@ -87,8 +87,10 @@ var QueueWidget = Event.extend({
         Events.fire(eventName, pid, $slot.data('grid-id'), $slot.data('id'),
             function(id, $slot) {
                 return function(isOk, data) {
-                    var csslass = 'hidden_' + id;
-                    $('#wall').find('.' + csslass).removeClass(csslass).show();
+                    if (!isEmpty) {
+                        var csslass = 'hidden_' + id;
+                        $('#wall').find('.' + csslass).removeClass(csslass).show();
+                    }
                     if (isOk && data && data.html) {
                         var $content = $(data.html);
                         $slot.replaceWith($content);
