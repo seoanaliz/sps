@@ -75,9 +75,6 @@
                 <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
-                <page uri="controls://parse-url/">
-                    <actions>SPS.Site.ParseUrlControl</actions>
-                </page>
                 <page uri="controls://image-upload/" boot="">
                     <actions>SPS.Site.ImageUploadControl</actions>
                 </page>
@@ -115,6 +112,9 @@
                 <page uri="controls://article-reject/">
                     <actions>SPS.Site.RejectArticleControl</actions>
                 </page>
+                <page uri="controls://send-posteponed/">
+                    <actions>SPS.Site.SendPostControl</actions>
+                </page>
 
 
                 <page uri="controls://add-user-group/">
@@ -127,6 +127,12 @@
                     <actions>SPS.Site.RemoveUserFromUserGroup</actions>
                 </page>
 
+            </pageGroup>
+
+            <pageGroup name="urlParser">
+                <page uri="controls://parse-url/">
+                    <actions>SPS.Site.ParseUrlControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
@@ -181,6 +187,7 @@
                 </page>
 
             </pageGroup>
+
             <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://addReport/">
                     <actions>SPS.Stat.addReport</actions>
@@ -747,7 +754,10 @@
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            </pageGroup>
+
+            <pageGroup name="obmen" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="obmen://" >
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>
