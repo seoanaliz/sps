@@ -188,14 +188,14 @@ class AddArticleToQueueControl extends BaseControl
         $articlesQueue = array();
         $articlesQueue[$articleQueueItem->articleQueueId] = $articleQueueItem;
 
-        var_dump($articleQueueRecord->repostArticleRecordId);
-//        $repostArticleRecords = array();
-//        if ($articleQueueRecord->repostArticleRecordId) {
-//            $maybeRepostArticleRecord = ArticleRecordFactory::GetById($articleQueueRecord->repostArticleRecordId);
-//            if ($maybeRepostArticleRecord) {
-//                $repostArticleRecords[$articleRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
-//            }
-//        }
+        $repostArticleRecords = array();
+        if ($articleQueueRecord->repostArticleRecordId) {
+            $maybeRepostArticleRecord = ArticleRecordFactory::GetById($articleQueueRecord->repostArticleRecordId);
+            var_dump($maybeRepostArticleRecord);
+            if ($maybeRepostArticleRecord) {
+                $repostArticleRecords[$articleRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
+            }
+        }
 
         $timestamp = Request::getInteger( 'timestamp' );
         $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
