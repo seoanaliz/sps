@@ -199,7 +199,7 @@ class AddArticleToQueueControl extends BaseControl
         $timestamp = Request::getInteger( 'timestamp' );
         $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
         $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
-
+        $grid = array_reverse( $grid);
         $place = null;
         foreach ($grid as $key => $gridItem) {
             if ($gridItem['dateTime'] >= $articleQueueItem->startDate && $gridItem['dateTime'] <= $articleQueueItem->endDate) {

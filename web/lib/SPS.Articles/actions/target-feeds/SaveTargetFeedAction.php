@@ -210,6 +210,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             $result = TargetFeedGridFactory::AddRange($object->grids);
         }
 
+
         if ($result && !empty($object->publishers)) {
             foreach ($object->publishers as $publisher) {
                 $publisher->targetFeedId = $objectId;
@@ -233,6 +234,9 @@ class SaveTargetFeedAction extends BaseSaveAction  {
      * @return bool
      */
     protected function update( $object ) {
+        foreach($object->params['showTabs'] as &$tab) {
+            $tab = 'on';
+        }
         ConnectionFactory::BeginTransaction();
 
         $result = parent::$factory->Update( $object );
@@ -257,6 +261,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
                 $result = true;
             }
         }
+
 
         ConnectionFactory::CommitTransaction($result);
         return $result;
