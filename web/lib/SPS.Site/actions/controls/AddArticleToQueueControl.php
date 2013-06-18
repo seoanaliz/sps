@@ -191,9 +191,8 @@ class AddArticleToQueueControl extends BaseControl
         $repostArticleRecords = array();
         if ($articleQueueRecord->repostArticleRecordId) {
             $maybeRepostArticleRecord = ArticleRecordFactory::GetById($articleQueueRecord->repostArticleRecordId);
-            var_dump($maybeRepostArticleRecord);
             if ($maybeRepostArticleRecord) {
-                $repostArticleRecords[$articleRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
+                $repostArticleRecords[$articleQueueRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
             }
         }
 
