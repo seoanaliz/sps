@@ -164,14 +164,15 @@ MonitorPage = Page.extend({
 
             if (data.length < t.limit) {
                 t.isEnded = true;
-            } else {
-                var $tmpElement = $(document.createElement('div'));
-                $tmpElement.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
-                t.makeTime($tmpElement.find('.time'));
-                t.makeDate($tmpElement.find('.date'));
-                $results.append($tmpElement.html());
-                $tmpElement.remove();
-            }
+            };
+
+            var $tmpElement = $(document.createElement('div'));
+            $tmpElement.html(tmpl(REPORTS.MONITOR.LIST, {items: data}));
+            t.makeTime($tmpElement.find('.time'));
+            t.makeDate($tmpElement.find('.date'));
+            $results.append($tmpElement.html());
+            $tmpElement.remove();
+
         });
     }
 });
