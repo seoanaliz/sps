@@ -63,6 +63,10 @@
                     <label>{lang:vt.targetFeed.statusId}</label>
                     <?= FormHelper::FormSelect( "search[statusId]", StatusUtility::$Common[$__currentLang], "", "", $search['statusId'], null, null, true ); ?>
                 </div>
+                <div class="row">
+                    <label>{lang:vt.targetFeed.IsOur}</label>
+                    <?= FormHelper::FormCheckbox( "search[isOur]", null, "isOur",null, $search['isOur']  ); ?>
+                </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
 		</div>

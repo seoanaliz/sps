@@ -79,7 +79,7 @@
 
         public static function get_our_publics_list( $selector = 0 )
         {
-            $publics = TargetFeedFactory::Get();
+            $publics = TargetFeedFactory::Get(array('isOur' => true ));
 
             $res = array();
             foreach ( $publics as $public ) {
