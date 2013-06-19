@@ -80,15 +80,15 @@ ResultPage = Page.extend({
 
             if (data.length < t.limit) {
                 t.isEnded = true;
-            } else {
-                var $tmpElement = $(document.createElement('div'));
-                $tmpElement.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
-                t.makeFullTime($tmpElement.find('.time'));
-                t.makeDate($tmpElement.find('.date'));
-                t.makeDiffTime($tmpElement.find('.diff-time'));
-                $results.append($tmpElement.html());
-                $tmpElement.remove();
-            }
+            };
+            var $tmpElement = $(document.createElement('div'));
+            $tmpElement.html(tmpl(REPORTS.RESULT.LIST, {items: data}));
+            t.makeFullTime($tmpElement.find('.time'));
+            t.makeDate($tmpElement.find('.date'));
+            t.makeDiffTime($tmpElement.find('.diff-time'));
+            $results.append($tmpElement.html());
+            $tmpElement.remove();
+
         });
     }
 });
