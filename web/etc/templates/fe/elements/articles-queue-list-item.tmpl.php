@@ -1,11 +1,13 @@
 <?  $id = $gridItem['dateTime']->format('U');
     $isEmptyItem = empty($gridItem['queue']);
+    $canBeUsed = time() < $gridItem['dateTime']->format('U');
 ?>
 <div class="slot
     <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : ''?>
     <?= $isEmptyItem ? 'empty' : ''?>
     <?= 'gridLine_' . $gridItem['gridLineId'] ?>
     <?= $gridItem['repeat'] ? 'repeat' : ''?>"
+    <?= $canBeUsed ? ' ui-droppable ' : ''?>
      data-id="{$id}"
      data-grid-id="{$gridItem[gridLineId]}"
      data-grid-item-id="{$gridItem[gridLineItemId]}"
