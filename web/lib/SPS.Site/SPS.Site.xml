@@ -82,6 +82,9 @@
             <action name="DeleteArticleControl">
                 <path>controls/DeleteArticleControl</path>
             </action>
+            <action name="ArticleQueueToggleRepeat">
+                <path>controls/ArticleQueueToggleRepeat</path>
+            </action>
             <action name="ClearArticleTextControl">
                 <path>controls/ClearArticleTextControl</path>
             </action>

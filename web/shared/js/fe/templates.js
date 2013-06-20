@@ -39,7 +39,7 @@ var QUEUE_SLOT_ADD =
 '<div class="new slot empty">' +
     '<div class="slot-header">' +
         '<span class="time">__:__</span>' +
-        '<span class="datepicker"></span>' +
+        '<span class="repeater"></span>' +
     '</div>' +
 '</div>';
 

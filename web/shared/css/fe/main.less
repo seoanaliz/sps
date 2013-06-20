@@ -439,6 +439,7 @@ i {font-style: italic;}
     height: 20px;
     .opacity(0);
     .transition(0.2s opacity);
+    z-index: 1;
 
     &:hover {
         .opacity(1) !important;
@@ -533,15 +534,30 @@ i {font-style: italic;}
                 left: 7px;
                 z-index: 1;
                 margin: 0;
+                width: 349px;
+            }
+            
+            .repeater {
+                .inline-block;
+                width: 13px;
+                height: 14px;
+                padding-right: 3px;
+                background: url('../../images/fe/repeat.png') center no-repeat;
+                opacity: .3;
+                position: relative;
+                top: 2px;
+                
+                &:hover {
+                    cursor: pointer;
+                }
             }
 
-            .time-of-removal,
-            .datepicker {
+            .time-of-removal {
                 vertical-align: top;
                 display: inline-block;
                 height: 13px;
                 width: 13px;
-                background: url('../../images/fe/datepicker-dis.png') center no-repeat;
+                background: url('../../images/common/delete.png') center no-repeat;
                 cursor: pointer;
                 margin-top: 2px;
                 margin-left: 4px;
@@ -552,10 +568,6 @@ i {font-style: italic;}
                 &:hover {
                     .opacity(1);
                 }
-            }
-
-            .time-of-removal {
-                background: url('../../images/common/delete.png') center no-repeat;
             }
 
             input.hasDatepick {
@@ -648,6 +660,12 @@ i {font-style: italic;}
                 .delete {
                     .opacity(0.5);
                 }
+            }
+        }
+        
+        .slot.repeat {
+            .repeater {
+                opacity: 1;
             }
         }
     }

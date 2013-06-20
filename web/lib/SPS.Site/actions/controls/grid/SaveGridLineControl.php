@@ -50,15 +50,18 @@
             $object->targetFeedId = $targetFeedId;
 
             if (empty($object->gridLineId)) {
-                $queryResult = GridLineFactory::Add($object);
+                $object->repeat = false;
+                $queryResult = GridLineFactory::Add($object, array(BaseFactory::WithReturningKeys => true));
             } else {
-                $queryResult = GridLineFactory::Update($object);
+                $queryResult = GridLineFactory::Update($object, array(BaseFactory::WithReturningKeys => true));
             }
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
+                $canEdit = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) != UserFeed::ROLE_AUTHOR;
+                $result['html'] = SlotUtility::renderEmpty($object, $object->time, $canEdit);
             }
 
             echo ObjectHelper::ToJSON($result);

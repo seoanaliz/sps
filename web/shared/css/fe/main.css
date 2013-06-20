@@ -448,6 +448,7 @@ i {
   -moz-transition: 0.2s opacity;
   -o-transition: 0.2s opacity;
   transition: 0.2s opacity;
+  z-index: 1;
 }
 .delete:hover {
   opacity: 1 !important;
@@ -537,14 +538,29 @@ i {
   left: 7px;
   z-index: 1;
   margin: 0;
+  width: 349px;
 }
-.right-panel .items .slot .time-of-removal,
-.right-panel .items .slot .datepicker {
+.right-panel .items .slot .repeater {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  width: 13px;
+  height: 14px;
+  padding-right: 3px;
+  background: url('../../images/fe/repeat.png') center no-repeat;
+  opacity: .3;
+  position: relative;
+  top: 2px;
+}
+.right-panel .items .slot .repeater:hover {
+  cursor: pointer;
+}
+.right-panel .items .slot .time-of-removal {
   vertical-align: top;
   display: inline-block;
   height: 13px;
   width: 13px;
-  background: url('../../images/fe/datepicker-dis.png') center no-repeat;
+  background: url('../../images/common/delete.png') center no-repeat;
   cursor: pointer;
   margin-top: 2px;
   margin-left: 4px;
@@ -555,13 +571,8 @@ i {
   transition: 0.2s all;
 }
 .right-panel .items .slot .time-of-removal.active,
-.right-panel .items .slot .time-of-removal:hover,
-.right-panel .items .slot .datepicker.active,
-.right-panel .items .slot .datepicker:hover {
+.right-panel .items .slot .time-of-removal:hover {
   opacity: 1;
-}
-.right-panel .items .slot .time-of-removal {
-  background: url('../../images/common/delete.png') center no-repeat;
 }
 .right-panel .items .slot input.hasDatepick {
   width: 15px;
@@ -639,6 +650,9 @@ i {
 }
 .right-panel .items .slot:hover .delete {
   opacity: 0.5;
+}
+.right-panel .items .slot.repeat .repeater {
+  opacity: 1;
 }
 .right-panel .expanded-post {
   display: none;

@@ -40,7 +40,8 @@
                   gl."startDate",
                   gl."endDate",
                   COALESCE(CAST(gli."date" as TIME), gl."time") as "time",
-                  gli."gridLineItemId"
+                  gli."gridLineItemId",
+                  gl.repeat
                 FROM "gridLines" gl
                 LEFT JOIN "gridLineItems" gli ON (
                     gl."gridLineId" = gli."gridLineId"
@@ -67,6 +68,7 @@ sql;
                     'startDate' => $ds->GetDateTime('startDate'),
                     'endDate' => $ds->GetDateTime('endDate'),
                     'dateTime' => $ds->GetDateTime('time'),
+                    'repeat' => $ds->GetBoolean('repeat'),
                 );
 
                 $item['dateTime'] = new DateTimeWrapper($date->DefaultDateFormat() . ' ' . $item['dateTime']->DefaultTimeFormat() );
