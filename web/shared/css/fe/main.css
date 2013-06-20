@@ -448,6 +448,7 @@ i {
   -moz-transition: 0.2s opacity;
   -o-transition: 0.2s opacity;
   transition: 0.2s opacity;
+  z-index: 1;
 }
 .delete:hover {
   opacity: 1 !important;
