@@ -41,7 +41,7 @@ class SlotUtility {
 
         $gridItem = array(
             'gridLineId' => $GridItem->gridLineId,
-            'dateTime' => $GridItem->time,
+            'dateTime' => $customizedGridItem ? $customizedGridItem->date : $GridItem->time,
             'repeat' => $GridItem->repeat,
             'gridLineItemId' => $customizedGridItem ? $customizedGridItem->gridLineItemId : null,
             'startDate' => $GridItem->startDate,
