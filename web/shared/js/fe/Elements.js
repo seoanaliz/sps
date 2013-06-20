@@ -88,13 +88,7 @@ var Elements = {
                 var $post = $(ui.draggable).closest('.post');
                 Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
                     if (isSuccess && data.success && data.html) {
-                        var $page = $(data.html);
-                        $slot.replaceWith($page);
-                        Elements.initDraggable($page);
-                        Elements.initImages($page);
-                        Elements.initLinks($page);
-                        $page.find('.post .images').imageComposition();
-                        $page.find('.post.blocked').draggable('disable');
+                        app.getRightPanelWidget().getQueueWidget().setSlotHtml($slot, data.html);
                         if ($post.hasClass('relocatable')) {
                             $post.addClass('hidden_' + data.id).hide();
                         }
