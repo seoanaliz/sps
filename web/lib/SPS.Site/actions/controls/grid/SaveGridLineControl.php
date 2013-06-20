@@ -50,6 +50,7 @@
             $object->targetFeedId = $targetFeedId;
 
             if (empty($object->gridLineId)) {
+                $object->repeat = false;
                 $queryResult = GridLineFactory::Add($object, array(BaseFactory::WithReturningKeys => true));
             } else {
                 $queryResult = GridLineFactory::Update($object, array(BaseFactory::WithReturningKeys => true));
