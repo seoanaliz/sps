@@ -161,6 +161,12 @@ var QueueWidget = Event.extend({
                             t.updatePage($page);
                         }
                     });
+                } else {
+                    Events.fire('rightcolumn_save_slot', /*gridLineId*/ null, time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
+                        if (isOk && data && data.html) {
+                            $post.replaceWith($(data.html));
+                        }
+                    });
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
@@ -216,66 +222,41 @@ var QueueWidget = Event.extend({
             }
         });
 
-        $queue.delegate('.datepicker', 'click', function() {
-            var $target = $(this);
-            var $header = $target.parent();
+        $queue.delegate('.repeater', 'click', function () {
+            var $slot = $(this).closest('.slot');
 
-            if (!$header.data('datepicker')) {
-                var $datepicker = $('<input type="text" />');
-                var $slot = $target.closest('.slot');
-                var $page = $slot.closest('.queue-page');
-                var $time = $slot.find('.time');
-                var gridLineId = $slot.data('grid-id');
-                var startDate = $slot.data('start-date');
-                var endDate = $slot.data('end-date');
-                var defStartDate = $slot.data('start-date');
-                var defEndDate = $slot.data('end-date');
-                var time = $time.text();
-
-                $header.data('datepicker', $datepicker);
-                $target.after($datepicker);
-                $target.remove();
-                $datepicker.datepick({
-                    rangeSelect: true,
-                    showTrigger: $target,
-                    showAnim: 'fadeIn',
-                    showSpeed: 'fast',
-                    monthsToShow: 2,
-                    minDate: 0,
-                    renderer: $.extend($.datepick.defaultRenderer, {
-                        picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
-                    }),
-                    onSelect: function(dates) {
-                        $slot.data('start-date', $.datepick.formatDate(dates[0]));
-                        $slot.data('end-date', $.datepick.formatDate(dates[1]));
-                        startDate = $slot.data('start-date');
-                        endDate = $slot.data('end-date');
-                    },
-                    onShow: function() {
-                        $header.find('span.datepicker').addClass('active');
-                        $queue.css('overflow', 'hidden');
-                    },
-                    onClose: function() {
-                        time = $time.text();
-                        $header.find('span.datepicker').removeClass('active');
-                        $queue.css('overflow', 'auto');
-                        if ($slot.hasClass('new')) {
-                            // Добавление ячейки
-                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                t.updatePage($page);
-                            });
-                        } else {
-                            // Редактироваиние ячейки
-                            if (defStartDate != startDate || defEndDate != endDate) {
-                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                    t.updatePage($page);
-                                });
+            var gridLineId = $slot.data('grid-id');
+            var timestamp = $slot.data('id');
+            Events.fire('article-queue-toggle-repeat', gridLineId, timestamp, function(isOk, data) {
+                if (isOk) {
+                    if (data) {
+                        if (!data.success && data.message) {
+                            popupError(data.message, {timeout: 7000});
+                        }
+                        if (data.success) {
+                            var cssClass = 'gridLine_' + gridLineId;
+                            if (data.repeat) {
+                                t.updatePage($slot.closest('.queue-page'));
+                            } else { // no-repeat
+                                t.clearCache();
+                                $queue.find('.' + cssClass).removeClass('repeat');
+                                if (data.endDate) {
+                                    var currentDate;
+                                    var endDate = parseInt(data.endDate, 10);
+                                    $queue.find('.queue-page').each(function(_, elem) {
+                                        currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
+                                        if (currentDate > endDate) {
+                                            $(elem).find('.' + cssClass)
+                                                .addClass('locked') // не удаляем элемент из DOM, чтобы скролл не "дёрнулся"
+                                                .droppable('option', 'disabled', true);
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
-                });
-                $datepicker.val(startDate + ' - ' + endDate).focus();
-            }
+                }
+            });
         });
 
         // Показать полностью в правом меню

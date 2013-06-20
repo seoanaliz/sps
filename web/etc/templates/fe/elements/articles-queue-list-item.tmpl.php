@@ -2,8 +2,10 @@
     $isEmptyItem = empty($gridItem['queue']);
 ?>
 <div class="slot
-    <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : '' ?>
-    <?= $isEmptyItem ? 'empty' : '' ?>"
+    <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : ''?>
+    <?= $isEmptyItem ? 'empty' : ''?>
+    <?= 'gridLine_' . $gridItem['gridLineId'] ?>
+    <?= $gridItem['repeat'] ? 'repeat' : ''?>"
      data-id="{$id}"
      data-grid-id="{$gridItem[gridLineId]}"
      data-grid-item-id="{$gridItem[gridLineItemId]}"
@@ -12,7 +14,7 @@
     <? if ($isEmptyItem) { ?>
         <div class="slot-header">
             <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
-            <span class="datepicker"></span>
+            <span class="repeater"></span>
         </div>
         <div class="editing-post">
             <div class="textarea-wrap">
@@ -42,7 +44,7 @@
         <? if ($canEditQueue) { ?>
             <div class="slot-header">
                 <span class="time"><?= $gridItem['dateTime']->defaultTimeFormat() ?></span>
-                <span class="datepicker"></span>
+                <span class="repeater"></span>
                 <span class="time-of-removal"></span>
                 <span class="time-of-remove"><?= $deleteAt ? $deleteAt : '' ?></span>
                 {increal:tmpl://fe/elements/articles-queue-item-header.tmpl.php}
