@@ -58,7 +58,7 @@
                 );
             }
             $result = array(
-                'html' => SlotUtility::renderEmpty($object->targetFeedId, $canEditQueue)
+                'html' => SlotUtility::renderEmptyOld($object->targetFeedId, $canEditQueue)
             );
             echo ObjectHelper::ToJSON($result);
         }

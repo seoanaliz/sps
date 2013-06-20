@@ -91,7 +91,11 @@
          * @return mixed
          */
         public function GetValue( $name, $type = TYPE_STRING ) {
-            return PgSqlConvert::FromParameter( $this->data[$this->cursor][$name], $type );
+            if ( isset( $this->data[$this->cursor][$name] ) ) {
+                return PgSqlConvert::FromParameter( $this->data[$this->cursor][$name], $type );
+            }
+
+            return null;
         }
 
 
