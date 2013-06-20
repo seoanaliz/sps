@@ -381,7 +381,6 @@ var QueueWidget = Event.extend({
         var text = $.trim($textarea.val());
         var imageUploader = $slot.data('imageUploader');
         var photos = imageUploader && imageUploader.getPhotos();
-        var $page = $slot.closest('.queue-page');
 
         if (text || photos) {
             $slot.addClass('locked');
@@ -391,14 +390,26 @@ var QueueWidget = Event.extend({
             }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-                    Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.updatePage($page);
+                    Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
+                        if (isOk && data && data.html) {
+                            t.setSlotHtml($slot, data.html);
+                        }
                     });
                 }
             });
         } else {
             $textarea.focus();
         }
+    },
+
+    setSlotHtml: function ($slot, html) {
+        var $page = $(html);
+        $slot.replaceWith($page);
+        Elements.initDraggable($page);
+        Elements.initImages($page);
+        Elements.initLinks($page);
+        $page.find('.post .images').imageComposition();
+        $page.find('.post.blocked').draggable('disable');
     },
 
     /**
