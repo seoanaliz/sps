@@ -29,21 +29,16 @@ class SlotUtility {
 
     /**
      * @param GridLineItem $GridItem
-     * @param DateTimeWrapper $GridTime
+     * @param DateTimeWrapper $Date
      * @param bool $canEditQueue Используется внутри шаблона!
      * @return string
      */
-    public static function renderEmpty($GridItem, $GridTime, $canEditQueue) {
-        $customizedGridItem = GridLineItemFactory::GetOne(array(
-            'gridLineId' => $GridItem->gridLineId,
-            'date' => $GridTime,
-        ));
-
+    public static function renderNew($GridItem, $Date, $canEditQueue) {
         $gridItem = array(
             'gridLineId' => $GridItem->gridLineId,
-            'dateTime' => $customizedGridItem ? $customizedGridItem->date : $GridItem->time,
+            'dateTime' => new DateTimeWrapper($Date->DefaultDateFormat() . ' ' . $GridItem->time->DefaultTimeFormat()),
             'repeat' => $GridItem->repeat,
-            'gridLineItemId' => $customizedGridItem ? $customizedGridItem->gridLineItemId : null,
+            'gridLineItemId' => null,
             'startDate' => $GridItem->startDate,
             'endDate' => $GridItem->endDate,
         );

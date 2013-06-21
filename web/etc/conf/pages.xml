@@ -78,9 +78,6 @@
                 <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
-                <page uri="controls://parse-url/">
-                    <actions>SPS.Site.ParseUrlControl</actions>
-                </page>
                 <page uri="controls://image-upload/" boot="">
                     <actions>SPS.Site.ImageUploadControl</actions>
                 </page>
@@ -130,6 +127,12 @@
                     <actions>SPS.Site.RemoveUserFromUserGroup</actions>
                 </page>
 
+            </pageGroup>
+
+            <pageGroup name = "parseUrl">
+                <page uri="controls://parse-url/">
+                    <actions>SPS.Site.ParseUrlControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
@@ -590,6 +593,9 @@
             <pageGroup name="daemons" boot="">
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
+                </page>
+                <page uri="daemons://sync-suggests/">
+                    <actions>SPS.Site.SyncSuggestedPosts</actions>
                 </page>
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>
