@@ -24,6 +24,8 @@
          */
         const MAX_POST_LIKE_COUNT = 90;
 
+
+
         public function __construct($public_id = '')
         {
             if ($public_id != '') $this ->set_page($public_id);
@@ -170,23 +172,47 @@
             $res = VkHelper::api_request( 'wall.get', $params );
             sleep(self::PAUSE);
             unset( $res[0] );
+
             $posts = self::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
-
 
             return $posts;
         }
 
-        //
-        public static function post_conv( $posts )
+        public function get_suggested_posts($last_post_id, $access_token )
+        {
+            sleep(rand( 1,12 ));
+            $params = array(
+                'access_token'  =>   $access_token,
+                'count'         =>   30,
+                'filter'        =>  'suggests',
+                'owner_id'      =>  '-' . $this->page_id
+            );
+            $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            sleep(self::PAUSE);
+            unset( $res[0] );
+
+            $posts = self::post_conv( $res, $last_post_id );
+            $posts = $this->kill_attritions( $posts );
+
+            return $posts;
+
+        }
+
+        //$stop_post_id - если id поста меньше этого, возвращаем результат
+        public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
 
             foreach( $posts as $post ) {
+
+                if( $stop_post_id && $post->id <= $stop_post_id){
+                    break;
+                }
                 $id         =   $post->to_id . '_' . $post->id;
-                $likes      =   $post->likes->count;
+                $likes      =   isset($post->likes) ? $post->likes->count : 0;
                 $likes_tr   =   $likes;
-                $retweet    =   $post->reposts->count;
+                $retweet    =   isset($post->reposts) ? $post->reposts->count : 0;
                 $time       =   $post->date;
                 $text       =   self::remove_tags( $post->text);
                 $source     =   isset( $post->post_source->type) ? $post->post_source->type : null;
@@ -198,6 +224,7 @@
                 $video = array();
                 $audio = array();
                 $text_links = array();
+                $author = isset($post->from_id) ? $post->from_id : false;
 
                 if ( isset( $post->attachments )) {
                     foreach( $post->attachments as $attachment ) {
@@ -244,12 +271,14 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source
+                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source,
+                                              'author'  => $author,  'pid' => $post->id
                 );
 
             }
             return $result_posts_array;
         }
+
         /** @return Article */
         public static function get_article_from_post( $post, $target_feed_id )
         {
@@ -651,4 +680,5 @@
             $posts = self::post_conv( $res );
             return $posts;
         }
+
     }
