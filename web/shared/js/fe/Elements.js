@@ -42,7 +42,6 @@ var Elements = {
                 Elements.initDraggable($(this));
             });
         } else if ($elem.is('.movable:not(.blocked)')) {
-            islog && console.log($elem.find('> .content'));
             $elem.find('> .content').draggable({
                 revert: 'invalid',
                 appendTo: 'body',
@@ -80,20 +79,18 @@ var Elements = {
                     return;
                 }
 
-                var maybeSlot = ui.draggable.closest('.slot');
-                if (maybeSlot.length) {
-                    app.getRightPanelWidget().getQueueWidget().deleteArticleInSlot(maybeSlot, /* isEmpty */ true);
-                }
-
                 var $post = $(ui.draggable).closest('.post');
                 Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
                     if (isSuccess && data.success && data.html) {
+                        var maybeSlot = ui.draggable.closest('.slot'); // кодга перетаскиваем из одной ячейки в другую, очистим ячейку-источник
+                        if (maybeSlot.length) {
+                            app.getRightPanelWidget().getQueueWidget().deleteArticleInSlot(maybeSlot, /* isEmpty */ true);
+                        }
+  
                         app.getRightPanelWidget().getQueueWidget().setSlotArticleHtml($slot, data.html);
-                        if ($post.hasClass('relocatable')) {
+                        if ($post.hasClass('relocatable')) { // скроем в "источниках"
                             $post.addClass('hidden_' + data.id).hide();
                         }
-                    } else if ($post.hasClass('relocatable')) {
-                        $slot.html($post);
                     }
                 });
             }
