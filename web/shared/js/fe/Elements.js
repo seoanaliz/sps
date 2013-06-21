@@ -88,7 +88,7 @@ var Elements = {
                 var $post = $(ui.draggable).closest('.post');
                 Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
                     if (isSuccess && data.success && data.html) {
-                        app.getRightPanelWidget().getQueueWidget().setSlotHtml($slot, data.html);
+                        app.getRightPanelWidget().getQueueWidget().setSlotArticleHtml($slot, data.html);
                         if ($post.hasClass('relocatable')) {
                             $post.addClass('hidden_' + data.id).hide();
                         }

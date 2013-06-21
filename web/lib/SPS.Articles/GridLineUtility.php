@@ -67,11 +67,10 @@ sql;
                     'gridLineItemId' => $ds->GetInteger('gridLineItemId'),
                     'startDate' => $ds->GetDateTime('startDate'),
                     'endDate' => $ds->GetDateTime('endDate'),
-                    'dateTime' => $ds->GetDateTime('time'),
                     'repeat' => $ds->GetBoolean('repeat'),
                 );
 
-                $item['dateTime'] = new DateTimeWrapper($date->DefaultDateFormat() . ' ' . $item['dateTime']->DefaultTimeFormat() );
+                $item['dateTime'] = new DateTimeWrapper($date->DefaultDateFormat() . ' ' . $ds->GetDateTime('time')->DefaultTimeFormat());
                 $item['blocked'] = ($item['dateTime'] <= $now);
 
                 $result[] = $item;
