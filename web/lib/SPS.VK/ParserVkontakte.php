@@ -190,6 +190,9 @@
             );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
             sleep(self::PAUSE);
+            if(!is_array($res) || count($res) < 2 ) {
+                return array();
+            }
             unset( $res[0] );
 
             $posts = self::post_conv( $res, $last_post_id );
