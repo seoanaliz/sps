@@ -162,9 +162,11 @@ var QueueWidget = Event.extend({
                         }
                     });
                 } else {
-                    Events.fire('rightcolumn_save_slot', /*gridLineId*/ null, time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
+                    Events.fire('create-grid-line', time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
                         if (isOk && data && data.html) {
-                            $post.replaceWith($(data.html));
+                            var $newSlot = $(data.html);
+                            $post.replaceWith($newSlot);
+                            Elements.attachDroppable($newSlot);
                         }
                     });
                 }
@@ -373,7 +375,7 @@ var QueueWidget = Event.extend({
                     var postId = data.articleId;
                     Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
                         if (isOk && data && data.html) {
-                            t.setSlotHtml($slot, data.html);
+                            t.setSlotArticleHtml($slot, data.html);
                         }
                     });
                 }
@@ -383,7 +385,7 @@ var QueueWidget = Event.extend({
         }
     },
 
-    setSlotHtml: function ($slot, html) {
+    setSlotArticleHtml: function ($slot, html) {
         var $page = $(html);
         $slot.replaceWith($page);
         Elements.initDraggable($page);
