@@ -156,8 +156,8 @@ var QueueWidget = Event.extend({
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(state){
-                        if (state) {
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk){
+                        if (isOk) {
                             t.updatePage($page);
                         }
                     });
