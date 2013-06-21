@@ -250,7 +250,7 @@ var QueueWidget = Event.extend({
                                         var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
                                         if (currentDate > endDate) {
                                             var $toDelete = $(elem).find('.' + cssClass);
-                                            var heightCorrection = window.opera ? 0 : 1; // непонятная ошибка в вычислении scrollHeight
+                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
                                             heightToDelete += $toDelete[0].scrollHeight + heightCorrection;
                                             $elems = $elems.add($toDelete);
                                         }
