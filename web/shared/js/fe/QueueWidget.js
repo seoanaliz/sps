@@ -243,16 +243,22 @@ var QueueWidget = Event.extend({
                                 t.clearCache();
                                 $queue.find('.' + cssClass).removeClass('repeat');
                                 if (data.endDate) {
-                                    var currentDate;
+                                    var $elems = $();
+                                    var heightToDelete = 0;
                                     var endDate = parseInt(data.endDate, 10);
                                     $queue.find('.queue-page').each(function(_, elem) {
-                                        currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
+                                        var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
                                         if (currentDate > endDate) {
-                                            $(elem).find('.' + cssClass)
-                                                .addClass('locked') // не удаляем элемент из DOM, чтобы скролл не "дёрнулся"
-                                                .droppable('option', 'disabled', true);
+                                            var $toDelete = $(elem).find('.' + cssClass);
+                                            var heightCorrection = window.opera ? 0 : 1; // непонятная ошибка в вычислении scrollHeight
+                                            heightToDelete += $toDelete[0].scrollHeight + heightCorrection;
+                                            $elems = $elems.add($toDelete);
                                         }
                                     });
+                                    if ($elems.length) {
+                                        t.$queue.scrollTop(t.$queue.scrollTop() - heightToDelete);
+                                        $elems.remove();
+                                    }
                                 }
                             }
                         }
