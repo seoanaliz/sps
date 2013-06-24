@@ -63,6 +63,7 @@
                     }
 
                     if( !isset($posts[0])) {
+                        Logger::Warning( "Up to date:  {$targetFeed->externalId}");
                         $this->daemon->Unlock();
                         continue;
                     }
@@ -114,6 +115,8 @@
             if (empty($authorsExternalIds))
                 return false;
 
+
+
             $authorsExternalIds = array_unique( $authorsExternalIds);
             $vkAuthorsData = StatUsers::get_vk_user_info($authorsExternalIds);
             $authors = AuthorFactory::Get(array('vkIdIn' => $authorsExternalIds));
@@ -121,7 +124,7 @@
             if( !empty($authors)) {
                 $authors = ArrayHelper::Collapse($authors, 'vkId', false);
             }
-
+            //добавляем новых авторов
             $newAuthors = array();
             $newUserFeeds = array();
             foreach( $authorsExternalIds as $vkId ) {
@@ -134,16 +137,24 @@
                     $newAuthor->statusId  = StatusUtility::Enabled;
                     $newAuthor->lastName  = isset( $name[1]) ? $name[1] : '';
                     AuthorFactory::Add($newAuthor, array(BaseFactory::WithReturningKeys=>true));
-                    $newUserFeeds[] = new UserFeed($vkId, $targetFeedId, UserFeed::ROLE_AUTHOR);
                     $newAuthors[$vkId] = $newAuthor;
                 }
             }
+            $authors = $authors + $newAuthors;
 
+            //прописываем роли авторам
+            $userFeeds = UserFeedFactory::Get( array(
+                'targetFeedId' => $targetFeedId
+            ));//берем из базы уже имеющиеся
+            $userFeeds = ArrayHelper::Collapse($userFeeds, 'vkId', false);
+            foreach($authors as $vkId->$author) {
+                if( !isset( $userFeeds[$vkId] )){
+                    $newUserFeeds[] = new UserFeed($vkId, $targetFeedId, UserFeed::ROLE_AUTHOR);
+                }
+            }
             if(!empty($newUserFeeds)) {
                 UserFeedFactory::AddRange($newUserFeeds);
             }
-
-            $authors = $authors + $newAuthors;
             return $authors;
         }
     }
