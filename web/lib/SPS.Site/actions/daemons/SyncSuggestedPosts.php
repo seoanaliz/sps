@@ -147,7 +147,7 @@
                 'targetFeedId' => $targetFeedId
             ));//берем из базы уже имеющиеся
             $userFeeds = ArrayHelper::Collapse($userFeeds, 'vkId', false);
-            foreach($authors as $vkId->$author) {
+            foreach($authors as $vkId => $author) {
                 if( !isset( $userFeeds[$vkId] )){
                     $newUserFeeds[] = new UserFeed($vkId, $targetFeedId, UserFeed::ROLE_AUTHOR);
                 }
