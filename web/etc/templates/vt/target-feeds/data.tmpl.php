@@ -42,9 +42,14 @@ JsHelper::PushFile('js://vt/targetFeedEdit.js');
                     Используется только для Facebook
                 </div>
             </div>
-
             <?= FormHelper::FormInput( $prefix . '[params][token]', !empty($object->params['token']) ? $object->params['token'] : '', 'token', null, array( 'size' => 80 )); ?>
+
         </div>
+        <div data-row="lastSuggestedPost" class="row">
+            <label>{lang:vt.targetFeed.LastSuggestedPost}</label>
+            <?= FormHelper::FormInput( $prefix . '[params][lastSuggestedPost]', !empty($object->params['lastSuggestedPost']) ? $object->params['lastSuggestedPost'] : 0, 'lsp', null, array( 'size' => 20 )); ?>
+        </div>
+
         <div data-row="Albums" class="row">
             <label>{lang:vt.targetFeed.ShowAlbums}</label>
             <?= FormHelper::FormCheckBox($prefix . '[params][showTabs][' . SourceFeedUtility::Albums . ']', null, 'albums', null,isset( $object->params['showTabs'][SourceFeedUtility::Albums]) ? $object->params['showTabs'][SourceFeedUtility::Albums] : false   ) ?>
