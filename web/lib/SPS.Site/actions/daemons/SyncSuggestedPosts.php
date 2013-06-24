@@ -57,6 +57,7 @@
                     try {
                         $posts = $parser->get_suggested_posts( $targetFeed->params['lastSuggestedPost'], $token->accessToken );
                     } catch (Exception $Ex) {
+                        Logger::Warning( "Import error:  {$Ex->getMessage()}");
                         AuditUtility::CreateEvent('importErrors', 'feed', $targetFeed->externalId, $Ex->getMessage());
                         continue;
                     }
