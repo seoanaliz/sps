@@ -18,7 +18,7 @@ class UserFeedFactory implements IFactory
     public static $mapping = array(
         'class' => 'UserFeed',
         'table' => 'userFeed',
-        'view' => 'userFeed',
+        'view'  => 'userFeed',
         //, 'flags'     => array( 'CanCache' => 'CanCache' )
         //, 'cacheDeps' => array()
         'fields' => array(
@@ -33,6 +33,22 @@ class UserFeedFactory implements IFactory
             'role' => array(
                 'name' => 'role',
                 'type' => TYPE_INTEGER
+            )
+        ),'search' => array(
+            'vkIdIn' => array(
+                  'name'       => 'vkId'
+                , 'type'       => TYPE_INTEGER
+                , 'searchType' => SEARCHTYPE_ARRAY
+            )
+            ,'_targetFeedId' => array(
+                  'name'        => 'targetFeedId'
+                , 'type'        => TYPE_INTEGER
+                , 'searchType'  => SEARCHTYPE_ARRAY
+            )
+            ,'_role' => array(
+                  'name'        => 'role'
+                , 'type'        => TYPE_INTEGER
+                , 'searchType'  => SEARCHTYPE_ARRAY
             )
         )
     );
