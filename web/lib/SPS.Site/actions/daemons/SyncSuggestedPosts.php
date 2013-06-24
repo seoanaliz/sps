@@ -40,7 +40,12 @@
                 foreach ($targetFeeds as $targetFeed ) {
                     if(!isset( $targetFeed->params['lastSuggestedPost']))
                         $targetFeed->params['lastSuggestedPost'] = 0;
-                    $token = AccessTokenUtility::getTokenForTargetFeedId($targetFeed->targetFeedId, true);
+                    $token = AccessTokenUtility::getTokenForTargetFeed($targetFeed, true);
+                    if( !$token ) {
+                        //времянка, пока не перейдем на новую систему токенов
+                        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed, true );
+                    }
+                    //мы упрямые!
                     if( !$token) {
                         Logger::Warning( "No token for targetFeed {$targetFeed->targetFeedId}");
                         continue;
@@ -55,7 +60,7 @@
                         continue;
                     }
                     try {
-                        $posts = $parser->get_suggested_posts( $targetFeed->params['lastSuggestedPost'], $token->accessToken );
+                        $posts = $parser->get_suggested_posts( $targetFeed->params['lastSuggestedPost'], $token );
                     } catch (Exception $Ex) {
                         Logger::Warning( "Import error:  {$Ex->getMessage()}");
                         AuditUtility::CreateEvent('importErrors', 'feed', $targetFeed->externalId, $Ex->getMessage());
