@@ -62,6 +62,7 @@
                     }
 
                     if( !isset($posts[0])) {
+                        $this->daemon->Unlock();
                         continue;
                     }
                     $authors = $this->addAuthors($posts, $targetFeed->targetFeedId);
@@ -69,6 +70,7 @@
                     $targetFeeds4update[] = $targetFeed;
 
                     $targetFeed->params['lastSuggestedPost'] = $posts[0]['pid'];
+                    $this->daemon->Unlock();
                 }
                 TargetFeedFactory::UpdateRange( $targetFeeds4update );
 
