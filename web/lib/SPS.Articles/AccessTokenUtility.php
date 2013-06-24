@@ -24,12 +24,11 @@
         /** @var $targetFeed TargetFeed*/
         public static function getPublisherTokenForTargetFeed($targetFeed, $random = false )
         {
-            $publishers = TargetFeedPublisherFactory::Get($targetFeed->targetFeedId);
+            $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeed->targetFeedId));
             if( empty($publishers))
                 return false;
-
             $index = $random ? array_rand( $publishers) : 0;
-            $publisher = PublisherFactory::GetById( $publishers[0]->publisherId);
+            $publisher = PublisherFactory::GetById( $publishers[$index]->publisherId);
 
             if( !empty( $publisher->vk_token ))
                 return $publisher->vk_token;
