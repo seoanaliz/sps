@@ -28,6 +28,7 @@
 
 
             $targetFeeds = $this->getNextChunkOfFeeds();
+
             $parser = new ParserVkontakte();
             //делаем левый source
             $source = new SourceFeed();
@@ -110,8 +111,8 @@
             if (empty($authorsExternalIds))
                 return false;
 
+            $authorsExternalIds = array_unique( $authorsExternalIds);
             $vkAuthorsData = StatUsers::get_vk_user_info($authorsExternalIds);
-
             $authors = AuthorFactory::Get(array('vkIdIn' => $authorsExternalIds));
 
             if( !empty($authors)) {
