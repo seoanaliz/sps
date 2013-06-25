@@ -53,7 +53,6 @@
 
                     $parser->set_page( $targetFeed->externalId );
 
-
                     $this->daemon->name = "feed$targetFeed->externalId";
                     if ( !$this->daemon->Lock() ) {
                         Logger::Warning( "Failed to lock {$this->daemon->name}");
@@ -96,7 +95,7 @@
 
             $targetFeeds = array();
             /** @var $targetFeeds TargetFeed[]*/
-            $sql = 'SELECT * FROM "targetFeeds" WHERE "isOur" = true OFFSET @offset LIMIT @limit';
+            $sql = 'SELECT * FROM "targetFeeds" WHERE "collectSuggests" = true OFFSET @offset LIMIT @limit';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
             $cmd->SetInt( '@offset', $offset);
             $cmd->SetInt( '@limit', self::FeedsChunkSize);
