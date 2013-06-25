@@ -101,7 +101,6 @@
                 ),'isSuggested' => array(
                       'name'        => 'isSuggested'
                     , 'type'        => TYPE_BOOLEAN
-                    ,'default'      => false,
                 ))
             , 'lists'     => array()
             , 'search'    => array(

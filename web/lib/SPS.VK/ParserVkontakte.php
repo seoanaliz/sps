@@ -295,6 +295,8 @@
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
             $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            $article->isSuggested = false;
+
             return $article;
         }
 
