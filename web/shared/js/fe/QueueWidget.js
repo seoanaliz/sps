@@ -243,24 +243,25 @@ var QueueWidget = Event.extend({
                                 t.clearCache();
                                 $queue.find('.' + cssClass).removeClass('repeat');
                                 if (data.endDate) {
-                                    var $elems = $();
-                                    var heightToDelete = 0;
                                     var endDate = parseInt(data.endDate, 10);
                                     $queue.find('.queue-page').each(function(_, elem) {
                                         var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
                                         if (currentDate > endDate) {
-                                            var $toDelete = $(elem).find('.' + cssClass);
-                                            var heightCorrection = 0; // в некоторых браузерах необходима коррекция высоты на 1px
-                                            heightToDelete += $toDelete[0].scrollHeight + heightCorrection;
-                                            $elems = $elems.add($toDelete);
-                                            
-                                            //<div class="empty-queue">Пусто</div>
+                                            var $elem = $(elem);
+                                            var $toDelete = $elem.find('.' + cssClass);
+                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
+                                            var height = $toDelete[0].scrollHeight + heightCorrection;
+                                            $toDelete.remove();
+                                            t.$queue.scrollTop(t.$queue.scrollTop() - height);
+                                            var $meaningfulChildren = $elem.children(':not(.queue-title)');
+                                            if (!$meaningfulChildren.length) {
+                                                var $emptyPlaceholder = $('<div class="empty-queue">Пусто</div>');
+                                                $elem.append($emptyPlaceholder);
+                                                height = $emptyPlaceholder[0].scrollHeight;
+                                                t.$queue.scrollTop(t.$queue.scrollTop() + height);
+                                            }
                                         }
                                     });
-                                    if ($elems.length) {
-                                        t.$queue.scrollTop(t.$queue.scrollTop() - heightToDelete);
-                                        $elems.remove();
-                                    }
                                 }
                             }
                         }
