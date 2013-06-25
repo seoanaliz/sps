@@ -65,7 +65,7 @@
                 </div>
                 <div class="row">
                     <label>{lang:vt.targetFeed.IsOur}</label>
-                    <?= FormHelper::FormCheckbox( "search[isOur]", null, "isOur",null, $search['isOur']  ); ?>
+                    <?= FormHelper::FormCheckbox( "search[isOur]", null, "isOur",null, $search['isOur'] ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
