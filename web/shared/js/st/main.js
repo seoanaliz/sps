@@ -31,34 +31,117 @@ $(document).ready(function() {
         });
     })(window);
 
-    VK.init({
-        apiId: Configs.appId,
-        nameTransportPath: '/xd_receiver.htm'
+    cur.dataUser.isEditor = false;
+    Filter.init(function() {
+        List.init(function() {
+            Table.init();
+            Counter.init();
+        });
     });
-    getInitData();
-
-    function getInitData() {
-        var code =
-            'return {' +
-                'me: API.getProfiles({uids: API.getVariable({key: 1280}), fields: "photo"})[0]' +
-            '};';
-        VK.Api.call('execute', {code: code}, initVK);
-    }
+    checkVkStatus();
 });
 
-function initVK(data) {
-    if (data.response) {
-        var r = data.response;
-        cur.dataUser = r.me;
-        Events.fire('get_user', cur.dataUser.uid, function() {
-            Filter.init(function() {
-                List.init(function() {
-                    Table.init();
-                });
-            });
+function checkVkStatus() {
+    if (typeof VK !== 'undefined' && VK.Api) {
+        VK.init({
+            apiId: Configs.appId,
+            nameTransportPath: '/xd-receiver.htm'
+        });
+
+        VK.Auth.getLoginStatus(authInfo);
+    } else {
+        makeVkButton();
+    }
+}
+
+// taken from http://www.quirksmode.org/js/cookies.html
+//function createCookie(name, value, days) {
+//    if (days) {
+//        var date = new Date();
+//        date.setTime(date.getTime()+(days*24*60*60*1000));
+//        var expires = "; expires="+date.toGMTString();
+//    }
+//    else {
+//        expires = "";
+//    }
+//    document.cookie = name+"="+value+expires+"; path=/";
+//}
+//
+//function readCookie(name) {
+//    var nameEQ = name + "=";
+//    var ca = document.cookie.split(';');
+//    for (var i=0; i < ca.length; i++) {
+//        var c = ca[i];
+//        while (c.charAt(0)==' ') {
+//            c = c.substring(1,c.length);
+//        }
+//        if (c.indexOf(nameEQ) == 0) {
+//            return c.substring(nameEQ.length,c.length);
+//        }
+//    }
+//    return null;
+//}
+//
+//function removeCookie(name) {
+//    createCookie(name, "", -1);
+//}
+
+function authInfo(response) {
+    if (!response.session) {
+        makeVkButton();
+    } else {
+        var code = 'return {' +
+            'user: API.getProfiles({fields: "photo"})[0]' +
+        '};';
+        VK.Api.call('execute', {code: code}, function (answer) {
+            if (answer && answer.response) {
+                cur.dataUser = answer.response.user;
+                handleUserLoggedIn(answer.response.user);
+            }
         });
     }
 }
+
+function makeVkButton() {
+    var $loginInfo = $('.login-info');
+    if ($loginInfo.length) {
+        var vkHref = 'https://oauth.vk.com/authorize?' +
+                    'client_id='+ Configs.appId +
+                    '&scope=stats,groups,offline' +
+                    '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
+                    '&display=page' +
+                    '&response_type=code';
+        $('.login-info').html( $('<a />', {'class': 'login', href: vkHref}).text('Войти') );
+    }
+}
+
+function handleUserLoggedIn(userData) {
+    var $loginInfo = $('.login-info');
+    $loginInfo.html('<a class="logout" href="/logout/?to='+ encodeURIComponent(location.pathname) +'">Выйти</a><a class="username"><img class="userpic" alt="" /><span></span></a>');
+    var name = userData.first_name + ' ' + userData.last_name;
+    $('.username', $loginInfo)
+        .attr('href', 'http://vk.com/id' + userData.uid)
+        .attr('title', name)
+    .find('span')
+        .text(name);
+    $('.userpic', $loginInfo).attr('src', userData.photo);
+}
+
+//function initVK(data) {
+//    if (data) {
+//        var r = data.response;
+//        cur.dataUser = r.me;
+//        Events.fire('get_user', cur.dataUser.uid, function(us) {
+//            cur.dataUser.isEditor = us.rank == 2 ;
+//            Filter.init(function() {
+//                List.init(function() {
+//                    Table.init();
+//                    Counter.init();
+//                });
+//            });
+//        });
+//    }
+//}
 
 var List = (function() {
     var $container;
@@ -252,7 +335,7 @@ var List = (function() {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
         Events.fire('load_bookmarks', function(data) {
-            $container.html(tmpl(LIST, {items: data}));
+            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
             $actions = $('.actions', $container);
             select(id, function() {
                 if ($.isFunction(callback)) callback();
@@ -347,9 +430,9 @@ var Filter = (function() {
             $slider.slider({
                 range: true,
                 min: 0,
-                max: 3500000,
+                max: 10000000,
                 animate: 100,
-                values: [0, 3500000],
+                values: [0, 10000000],
                 create: function(event, ui) {
                     renderRange();
                 },
@@ -406,7 +489,7 @@ var Filter = (function() {
                     Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
                 ]);
             });
-            $timeTo.datepicker('setDate', new Date(Date.now() - TIME.DAY));
+            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
             $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
             var dateFrom = $timeFrom.datepicker('getDate');
             var dateTo = $timeTo.datepicker('getDate');
@@ -445,7 +528,7 @@ var Filter = (function() {
             var $item = $icon.closest('.item');
             var listId = $item.data('id');
             if (!$icon.hasClass('selected')) {
-                Events.fire('add_to_bookmark', listId, function() {
+                Events.fire('add_to_general', listId, function() {
                     $icon.addClass('selected');
                     List.refresh(function() {
                         List.select($list.find('.item.selected').data('id'), function() {});
@@ -453,7 +536,7 @@ var Filter = (function() {
                 });
             } else {
                 $icon.removeClass('selected');
-                Events.fire('remove_from_bookmark', listId, function() {
+                Events.fire('remove_from_general', listId, function() {
                     $icon.removeClass('selected');
                     List.refresh(function() {
                         List.select($list.find('.item.selected').data('id'), function() {});
@@ -792,16 +875,6 @@ var Table = (function() {
     }
 
     function _initEvents() {
-        $container.delegate('.contact', 'click', function(e) {
-            var $el = $(this);
-            var $public = $el.closest('.public');
-            var publicId = $public.data('id');
-            var publicData;
-            for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
-            }
-            _createDropdownContact(e, publicData);
-        });
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
@@ -833,6 +906,7 @@ var Table = (function() {
 
         var sortFields = {
             followers: '.followers',
+            viewers: '.audience',
             growth: '.growth',
             isActive: '.is-active',
             inSearch: '.in-search',
@@ -849,9 +923,9 @@ var Table = (function() {
         };
 
         $.each(sortFields, function(sortFieldKey, sortFieldSelector) {
-            $container.delegate(sortFieldSelector, 'click', function(e) {
+            $container.delegate(sortFieldSelector, 'click', function() {
                 var $target = $(this);
-                $target.closest('.list-head').find('.item').not($target).removeClass('reverse active');
+                $target.closest('.list-head').find('.column').not($target).removeClass('reverse active');
                 if ($target.hasClass('active') && !$target.hasClass('reverse')) {
                     $target.addClass('reverse');
                     sort(sortFieldKey, true);
@@ -890,60 +964,6 @@ var Table = (function() {
                 }
             });
         })();
-    }
-
-    function _createDropdownContact(e, publicData) {
-        var $el = $(e.currentTarget);
-        var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
-        var $public = $el.closest('.public');
-        var publicId = $public.data('id');
-        var users = publicData.users;
-
-        e.stopPropagation();
-
-        if (!$el.hasClass('selected')) {
-            $el.addClass('selected');
-            if (!$dropdown) {
-                $dropdown = $(tmpl(CONTACT_DROPDOWN, {users: users})).appendTo('body');
-
-                $dropdown.delegate('.item', 'mousedown', function(e) {
-                    if ($(e.target).is('a')) return false;
-                    var $item = $(this);
-                    $dropdown.find('.item.selected').removeClass('selected');
-                    $item.addClass('selected');
-                    onChange($item);
-                });
-                $(document).mousedown(function() {
-                    if ($dropdown.is(':hidden')) return;
-                    $dropdown.hide();
-                    $el.removeClass('selected');
-                });
-
-                function onChange($item) {
-                    var userId = $item.data('user-id');
-                    var $contact = $el.closest('.contact');
-                    var user;
-                    for (var i in users) {
-                        if (users[i].userId == userId) { user = users[i]; break; }
-                    }
-                    $contact.css('opacity', .5);
-                    Events.fire('change_user', userId, currentListId, publicId, function(data) {
-                        if (!data) return;
-                        $contact
-                            .html(tmpl(CONTACT, user))
-                            .animate({opacity: 1}, 100)
-                        ;
-                    });
-                }
-                $el.data('dropdown', $dropdown);
-            }
-            $dropdown.show().css({
-                top: offset.top + $el.outerHeight(),
-                left: offset.left - 1,
-                width: $el.outerWidth()
-            });
-        }
     }
 
     function _createDropdownList(e, publicData) {
@@ -1006,7 +1026,7 @@ var Table = (function() {
                     });
 
                     function onSave(text) {
-                        Events.fire('add_list', text, function(data) {
+                        Events.fire('add_list', text, function() {
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
@@ -1081,5 +1101,26 @@ var Table = (function() {
         toggleEditMode: toggleEditMode,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval
+    };
+})();
+
+var Counter = (function(){
+    var $container;
+
+    function init( callback ){
+        $container = $('#listed-counter');
+        if( cur.dataUser.isEditor ) {
+            $container.show();
+        }
+        refresh();
+    }
+
+    function refresh(){
+       $container.find('span').text( cur.dataUser.listed );
+    }
+
+    return {
+        init: init,
+        refresh: refresh
     };
 })();

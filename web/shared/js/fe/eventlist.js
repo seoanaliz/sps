@@ -1,5 +1,6 @@
 Control = $.extend(Control, {
     root: controlsRoot,
+    type: 'GET',
     dataType: 'html',
 
     controlMap: {
@@ -54,6 +55,14 @@ Control = $.extend(Control, {
             params: {
                 articleId: 'id'
             }
+        },
+        get_queue: {
+            name: 'articles-queue-timeline'
+        },
+        post: {
+            name: 'article-save',
+            dataType: 'json',
+            type: 'POST'
         }
     }
 });
@@ -92,26 +101,62 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_deletepost: function(post_id, callback){
+    rightcolumn_deletepost: function(post_id, gridId, timestamp, callback){
         $.ajax({
             url: controlsRoot + 'article-queue-delete/',
+            dataType : "json",
             data: {
-                id: post_id
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
             },
             success: function(data) {
-                app.loadQueue();
-                if (typeof callback == 'function') {
-                    callback(true);
+                if (typeof callback === 'function') {
+                    callback(true, data);
                 }
             }
         });
     },
-    rightcolumn_save_slot: function(gridLineId, time, startDate, endDate, callback) {
+    rightcolumn_render_empty: function(post_id, gridId, timestamp, callback){
         $.ajax({
-            url: controlsRoot + 'grid-line-save/',
+            url: controlsRoot + 'article-queue-get-empty/',
             dataType : "json",
             data: {
-                gridLineId : gridLineId,
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    'article-queue-toggle-repeat': function(gridLineId, timestamp, callback){
+        $.ajax({
+            url: controlsRoot + 'article-queue-toggle-repeat/',
+            dataType : "json",
+            data: {
+                gridLineId: gridLineId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+                targetFeedId: Elements.rightdd()
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    'create-grid-line': function(time, startDate, endDate, callback) {
+        $.ajax({
+            url: controlsRoot + 'create-grid-line/',
+            dataType : "json",
+            data: {
                 startDate : startDate,
                 endDate : endDate,
                 time: time,
@@ -119,9 +164,8 @@ var Eventlist = {
                 targetFeedId: Elements.rightdd()
             },
             success: function (data) {
-                if(data.success) {
-                    callback(true);
-                    app.loadQueue();
+                if (data.success) {
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -131,7 +175,7 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, qid, callback) {
+    rightcolumn_time_edit: function(gridLineId, gridLineItemId, time, timestamp, qid, callback) {
         $.ajax({
             url: controlsRoot + 'grid-line-item-save/',
             dataType : "json",
@@ -139,13 +183,12 @@ var Eventlist = {
                 gridLineId: gridLineId,
                 gridLineItemId: gridLineItemId,
                 time: time,
-                timestamp: Elements.calendar(),
+                timestamp: timestamp,
                 queueId: qid
             },
-            success: function (data) {
-                if(data.success) {
+            success: function(data) {
+                if (data.success) {
                     callback(true);
-                    app.loadQueue();
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -172,13 +215,40 @@ var Eventlist = {
             }
         });
     },
+    rightcolumn_post_edit: function(text, photos, link, dataQueueId, callback){
+        var $sourceFeedIds = Elements.leftdd();
+        var $sourceFeedId;
+        if ($sourceFeedIds.length != 1) {
+            $sourceFeedId = null;
+        } else {
+            $sourceFeedId = $sourceFeedIds[0];
+        }
 
-    post_moved: function(post_id, slot_id, queueId, callback){
+        $.ajax({
+            url: controlsRoot + 'article-queue-item-save/',
+            type: 'POST',
+            dataType : "json",
+            data: {
+                articleQueueId: dataQueueId,
+                text: text,
+                photos: photos,
+                link: link,
+                sourceFeedId: $sourceFeedId,
+                targetFeedId: Elements.rightdd(),
+                userGroupId: Elements.getUserGroupId()
+            },
+            success: function(data) {
+                callback(data);
+            }
+        });
+    },
+
+    post_moved: function(article_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
             data: {
-                articleId: post_id,
+                articleId: article_id,
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
@@ -186,13 +256,12 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    callback(1, data.id);
-                    app.loadQueue();
+                    callback(1, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(0);
+                    callback(0, data);
                 }
             }
         });
@@ -229,34 +298,6 @@ var Eventlist = {
         });
     },
 
-    post: function(text, photos, link, id, callback){
-        var $sourceFeedIds = Elements.leftdd();
-        var $sourceFeedId;
-        if ($sourceFeedIds.length != 1) {
-            $sourceFeedId = null;
-        } else {
-            $sourceFeedId = $sourceFeedIds[0];
-        }
-
-        $.ajax({
-            url: controlsRoot + 'article-save/',
-            type: 'POST',
-            dataType : "json",
-            data: {
-                articleId: id,
-                text: text,
-                photos: photos,
-                link: link,
-                sourceFeedId: $sourceFeedId,
-                targetFeedId: Elements.rightdd(),
-                userGroupId: Elements.getUserGroupId()
-            },
-            success: function(data) {
-                callback(data);
-            }
-        });
-    },
-
     post_link_data: function(data, callback) {
         $('div.link-description').html('<img src="' + root + 'shared/images/fe/ajax-loader.gif">');
         $.ajax({
@@ -269,10 +310,11 @@ var Eventlist = {
             success: function (data) {
                 if (data) {
                     $('.reload-link').click();
-                    callback(data);
                 } else {
                     popupError('Ошибка сохренения информации о ссылке');
-                    callback(false);
+                }
+                if (typeof callback == 'function') {
+                    callback(data);
                 }
             }
         });

@@ -4,7 +4,7 @@ if (!isset($__activeElement)) $__activeElement = NULL;
 /**
  * Manual set meta or reset of meta
  */
-$__sitePageTitle    = 'Stat';
+$__sitePageTitle    = 'Рейтинг сообществ ВКонтакте';
 $__pageTitle        = !empty($__pageTitle) ? $__pageTitle : '';
 $__metaDescription  = !empty($__metaDescription) ? $__metaDescription : '';
 $__metaKeywords     = !empty($__metaKeywords) ? $__metaKeywords : '';
@@ -32,8 +32,8 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
-        'css://common/common.css',
-        'css://st/main.css',
+        'css://common/common.less',
+        'css://st/main.less',
         'css://fe/jquery-ui.css',
         'css://fe/custom.css',
    ),
@@ -86,10 +86,14 @@ if(!empty($jsFilesAdds)) {
     <? if (!empty($__params[SiteParamHelper::GoogleMeta])) { ?>
         <meta name='google-site-verification' content='<?= $__params[SiteParamHelper::GoogleMeta]->value ?>' />
     <? } ?>
-    <link rel="icon" href="{web:/favicon.ico}" type="image/x-icon" />
-    <link rel="shortcut icon" href="{web:/favicon.ico}" type="image/x-icon" />
+    <link rel="icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
+    <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
+    <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? if (AuthVkontakte::IsAuth()) { ?>
+        <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? } ?>
+    <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>
 <body>

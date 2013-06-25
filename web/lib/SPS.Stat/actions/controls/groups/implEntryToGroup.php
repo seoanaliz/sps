@@ -46,9 +46,13 @@
 
             }
 
-            if ( !$general || ( $general && StatUsers::is_Sadmin( $user_id ))) {
-                $m_class::implement_entry( $groupId, $entry_id, $user_id );
-                die( ObjectHelper::ToJSON( array( 'response' => true )));
+            if (  StatUsers::is_Sadmin( $user_id )) {
+                $res = $m_class::implement_entry( $groupId, $entry_id, $user_id );
+                if( !is_array( $res ))
+                    $res = array();
+                $res['result'] = true;
+
+                die( ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
             die( ObjectHelper::ToJSON( array( 'response' => false )));

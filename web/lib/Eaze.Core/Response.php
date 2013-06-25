@@ -48,9 +48,9 @@
         public static function HttpStatusCode( $code, $message = '') {
             Package::$DisablePackageCompile = true;
             if (substr(php_sapi_name(), 0, 3) == 'cgi')  {
-                header('Status: ' . $code . $message, true );
+                header('Status: ' . $code . ' ' . $message, true );
             } else {
-                header( $_SERVER['SERVER_PROTOCOL'] . ' ' . $code . $message);
+                header( $_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $message);
             }
 
             $fileName    = sprintf( '%s/%s.html', CONFPATH_ERRORS, $code);

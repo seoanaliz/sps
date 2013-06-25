@@ -43,13 +43,15 @@
                     die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
                 //если не задан id - создаем группу, задан - обновляем
                 if ( !$groupId ) {
+                    $users = GroupsUtility::$barter_watchers;
+                    $users[] = $user_id;
                     $group = new Group;
                     $group->created_by  =   $user_id;
                     $group->name        =   $groupName;
                     $group->source      =   $group_source;
                     $group->status      =   1;
                     $group->type        =   1;
-                    $group->users_ids   =   array( $user_id );
+                    $group->users_ids   =   $users;
                     GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
 
                     if( !$group->group_id)
@@ -66,6 +68,10 @@
                 die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
             }
 
+            if( !StatUsers::is_Sadmin( $user_id )) {
+                 die( ObjectHelper::ToJSON(array('response' => false)));
+            }
+
             if ( $m_class::check_group_name_used( $user_id, $groupName ))  {
                 die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
             }
@@ -76,8 +82,8 @@
 
             //если мы создаем general группу, ее надо применить ко всем юзерам, посему
             //вместо id текущего юзера мы посылаем массив всех
-            elseif ( $general && !$groupId )
-                $user_id = StatUsers::get_users();
+//            elseif ( $general && !$groupId )
+//                $user_id = StatUsers::get_users();
 
             $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
 

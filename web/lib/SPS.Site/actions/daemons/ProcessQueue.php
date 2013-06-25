@@ -57,7 +57,6 @@ sql;
          */
         private function sendArticleQueue($articleQueue) {
             $result = false;
-
             //select objects
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
             $articleRecord = ArticleRecordFactory::GetOne(
@@ -83,15 +82,49 @@ sql;
                     return false;
                 }
 
-                shuffle( $targetFeed->publishers );
+                //в очереди паблишеров первыми делаем живых людей(приоритет у запланировавшего пост)
+                //todo убрать дубль sender'а
+                $publishers = array();
+                $sender = false;
+
+                // если пост от этих издателей - он отправляется от ботов
+                $send_from_bot = in_array( $article->editor, StatUsers::$editors_black_list );
+
+                //сортируем издателей: создавший пост-> люди -> боты
+                foreach( $targetFeed->publishers as $ptf ) {
+//                    if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
+//                        $sender = clone $ptf;
+//                    }
+
+                    if( $ptf->publisher->vk_seckey == 2 ) {
+                        if( !$send_from_bot ) {
+//                            array_unshift( $publishers, $ptf );
+                            continue;
+
+                        }
+                    } else {
+                        $publishers[] = $ptf;
+                    }
+                }
+
+//                if( $sender ) {
+//                    array_unshift( $publishers, $sender );
+//                }
+
+                $targetFeed->publishers = $publishers;
                 foreach ($targetFeed->publishers as $publisher) {
                     try {
                         $this->sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher->publisher, $article);
                         return true;
-                    } catch (ChangeSenderException $Ex) {
-                        //ниче не делаем
+                    } catch (Exception $Ex) {
                     }
                 }
+                $this->restartArticleQueue($articleQueue);
+                $err = 'Failed to post, persumably publishers are banned, public id = ' . $targetFeed->externalId;
+                Logger::Warning($err);
+
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
+                  
             }
         }
 
@@ -122,6 +155,7 @@ sql;
                 'video_id' => array(),
                 'link' => $link,
                 'header' => '',
+                'repost_post' => $articleRecord->repostExternalId
             );
 
             if (!empty($articleRecord->photos)) {
@@ -142,7 +176,11 @@ sql;
             $sender = new SenderVkontakte($post_data);
 
             try {
-                $articleQueue->externalId = $sender->send_post();
+                if ( !$post_data['repost_post'] ) {
+                    $articleQueue->externalId = $sender->send_post();
+                } else {
+                    $articleQueue->externalId = $sender->repost();
+                }
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
 
@@ -150,15 +188,14 @@ sql;
                     TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
                 }
             } catch (ChangeSenderException $Ex){
+                AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                    'failed to post from publisher ' . $publisher->publisherId .', ' . $Ex->getMessage());
                 throw $Ex;
             } catch (Exception $Ex){
                 $err = $Ex->getMessage();
                 Logger::Warning($err);
-
                 AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId, $err);
-
-                //ставим обратно в очередь
-                $this->restartArticleQueue($articleQueue);
+                throw $Ex;
             }
 
             //unlink temp files

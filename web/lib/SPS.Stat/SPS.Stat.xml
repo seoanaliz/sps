@@ -26,11 +26,17 @@
         <action name="TokenChecker">
             <path>daemons/TokenChecker</path>
         </action>
+        <action name="PublicsParser">
+            <path>daemons/PublicsParser</path>
+        </action>
 
     </group>
 
     <group name="Controls">
         <group name="Prices">
+            <action name="saveEdtiorAt">
+                <path>savePublisherAction</path>
+            </action>
             <action name="setPostPrice">
                 <path>controls/stat/setPostPrice</path>
             </action>
@@ -40,8 +46,8 @@
             <action name="selectGroupAdmin">
                 <path>controls/stat/selectGroupAdmin</path>
             </action>
-            <action name="toggleGroupFave">
-                <path>controls/stat/toggleGroupFave</path>
+            <action name="toggleGroupGeneral">
+                <path>controls/stat/toggleGroupGeneral</path>
             </action>
             <action name="togglePublVisibil">
                 <path>controls/stat/togglePublVisibil</path>
@@ -79,6 +85,19 @@
             <action name="getPublics">
                 <path>controls/authors/getPublics</path>
             </action>
+        </group>
+
+        <group name="NewUsers">
+            <action name="saveNewUser">
+                <path>controls/newUsers/AddNewUserControl</path>
+            </action>
+            <action name="getNewUsers">
+                <path>controls/newUsers/GetNewUserControl</path>
+            </action>
+            <action name="approveNewUser">
+                <path>controls/newUsers/ApproveNewUserControl</path>
+            </action>
+
         </group>
 
         <group name="Groups">

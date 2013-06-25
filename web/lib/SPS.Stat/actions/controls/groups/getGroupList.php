@@ -24,12 +24,20 @@
                 $type    = 'Stat';
 
             $m_class  = $type . 'Groups';
-            if ( !$user_id ) {
-                die(ERR_MISSING_PARAMS);
-            }
+//            if ( !$user_id ) {
+//                die(ERR_MISSING_PARAMS);
+//            }
             if ( $type == 'Barter' ) {
                 $source = 1;
-                $groups = GroupFactory::Get( array( 'status' => 1, 'source' => Group::BARTER_GROUP, '_users_ids' => array( $user_id )));
+                GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
+                $search = array(
+                    'status' => 1,
+                    'source' => Group::BARTER_GROUP,
+                    '_users_ids' => array( $user_id )
+                );
+
+                $options = array( 'orderBy' => 'type' );
+                $groups = GroupFactory::Get( $search, $options );
                 die( ObjectHelper::ToJSON( array( 'response' => GroupsUtility::form_response( $groups, $user_id, Group::BARTER_GROUP ))));
             }
             $res = $m_class::get_groups( $user_id );

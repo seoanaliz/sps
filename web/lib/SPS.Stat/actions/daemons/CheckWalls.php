@@ -6,12 +6,16 @@
  * Time: 21:06
  * To change this template use File | Settings | File Templates.
  */
-
+//монструозина
+//изначально нужна была только для отслеживания бартеров. Основная фича
+// парс большого количества стен(особенно наших пабликов) . появился до функционал(отслеживание всех
+//исходящих ссылей, отслеживание упоминаний.
+//теперь здесь же будут мониторится посты, созданные не через sb и туда вноситься
 class CheckWalls
 {
-
     private $posts_in_progress;
     private $cookie = null;
+    private $existing_external_ids;
 
     const url_mentions = 'http://vk.com/feed?section=mentions&obj=';
     const DEFAULT_AUTO_EVENTS_GROUP = 46;
@@ -37,6 +41,7 @@ class CheckWalls
         set_time_limit( 0 );
 
         $this->get_mentions();
+        $this->get_existing_external_ids();
         $this->posts_in_progress = $this->get_posts_under_observation();
         if ( date('H') == 1 && date('i') < 15 ) {
             //установка новых автомониторов
@@ -49,9 +54,9 @@ class CheckWalls
         $search_results = $this->wall_search( $barters_for_search );
         StatPublics::update_population( $search_results, 'start' );
         BarterEventFactory::UpdateRange( $search_results, null, 'tst' );
-
     }
 
+    //
     public function kill_overtimed()
     {
         //ищем просроченные
@@ -79,16 +84,18 @@ class CheckWalls
         $our_publics = StatPublics::get_our_publics_list();
         $our_publics_ids = array_keys( $our_publics);
 
-        foreach( $publics as $barter_event )
+        //массив id пабликов для мониторинга бартеров
+        foreach( $publics as $barter_event ) {
             $ids_array[] = $barter_event->barter_public;
-        //левая тема для записи последнего поста паблика, нужна для отлова левых постов
+        }
+        //добавляем стены пабликов для отслеживания внешних ссылок
         $ids_array = array_merge( $ids_array, $this->monitoring_array, $our_publics_ids);
         $ids_array = array_unique( $ids_array );
 
         $walls = StatPublics::get_public_walls_mk2( $ids_array, 'barter' );
         foreach( $this->monitoring_array as $public_id ) {
             $post = $walls[ $public_id ][1];
-            $this->save_post( $public_id, $post->id, $post->text);
+            $this->save_post( $public_id, $post->id, $post->text );
         }
 
         //сохраняем активность наших пабликов
@@ -96,11 +103,10 @@ class CheckWalls
             if ( !isset( $walls[ $public_id ][1] ))
                 continue;
             $post = $walls[ $public_id ][1];
-            $link = $this->find_memlink( $post->text );
+            $this->save_post( $public_id, $post->id, $post->text, self::MONITORING_TYPE_NOT_SB_POSTS );
 
-            //не сохраняем текст для опубликованных чз sb постов
-            $text =  ( $this->check_if_via_sb( $public_id, $post->id ) && $link ) ? 'with bare hands' : $post->text;
-            $this->save_post( $public_id, $post->id, $text, self::MONITORING_TYPE_NOT_SB_POSTS, $link );
+            //заносим отсутствующие в sb посты в sb
+            $this->add_posts_to_sb_queue( $walls[$public_id], $our_publics[$public_id]['sb_id'] );
         }
 
         //перебор мониторов, поиск постов на соответств. стенах
@@ -114,7 +120,7 @@ class CheckWalls
             foreach( $walls[ $barter_event->barter_public ] as $post ) {
 
                 //Если этот пост уже наблюдается
-                if ( is_array($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
+                if ( isset($this->posts_in_progress[$barter_event->creator_id]) && in_array( $barter_event->barter_public . '_' . $post->id, $this->posts_in_progress[$barter_event->creator_id] )) {
                     echo 'вылетел по причине наличия обзора над постом ' . $barter_event->barter_public . '_' . $post->id . '<br>';
                     continue;
                 }
@@ -128,13 +134,13 @@ class CheckWalls
                     $barter_event->post_id      =   $post->id;
                     $barter_event->detected_at  =   date( 'Y-m-d H:i:s', time());
                     $barter_event->stop_search_at = date( 'Y-m-d H:i:s', time() + 4000);
-
                     $result[] = $barter_event;
                     //добавляем в список наблюдаемых постов
                     $this->posts_in_progress[$barter_event->creator_id][] = $barter_event->barter_public . '_' . $post->id;
                     break;
                 }
             }
+
         }
         return $result;
     }
@@ -164,6 +170,7 @@ class CheckWalls
             ,43503298
             ,43503235
             ,43503264
+            ,52223807
         );
 
         $not_our_array = array(
@@ -316,9 +323,19 @@ class CheckWalls
     private function find_memlink( $text )
     {
         $matches = array();
-        if ( preg_match( '/\[(.*?)\|/', $text, $matches ))
+        if ( preg_match( '/\[(.*?)\|/', $text, $matches ) || preg_match( '/\[(.*?)\|/', $text, $matches ))
             return $matches[1];
         return null;
+    }
+
+    private function find_url( $text )
+    {
+        $matches = array();
+        if ( preg_match( '/(https?|ftp):\/\/\S+[^\s.,> )\];\'\"!?]/', $text, $matches )) {
+            if( !substr_count( $matches[0], 'vk.com') && !substr_count( $matches[0], 'vkontakte.ru'))
+                return $matches[0];
+        }
+        return false;
     }
 
     private function save_post( $public_id, $post_id, $text, $type = self::MONITORING_TYPE_WALL, $link = null, $mentioned_public = null )
@@ -326,7 +343,23 @@ class CheckWalls
         if( !$link ) {
             $link = $this->find_memlink( $text );
         }
-        if( $link && $type == self::MONITORING_TYPE_WALL )  return false;
+        $author = '';
+        $outer_link = $this->find_url( $text );
+        if ( $outer_link ) {
+            $articleQueue = ArticleQueueFactory::GetOne( array('externalId' => '-' . $public_id . '_' . $post_id ));
+            if( !empty( $articleQueue ) && in_array( $articleQueue->author, StatUsers::$editors_black_list )) {
+                $outer_link = false;
+            } else {
+                $link = $outer_link;
+            }
+            if( !empty( $articleQueue ) && $articleQueue->author ) {
+                $author = AuthorFactory::GetOne( array( 'vkId' => $articleQueue->author ));
+                $author = ' ' . $author->FullName() . '( vk.com/id' . $author->vkId. ') ';
+        }
+            $link = $outer_link;
+        }
+        if( $link && $type == self::MONITORING_TYPE_WALL )
+            return false;
 
         if( !$this->check_if_post_registered( $public_id, $post_id )) {
             $sql = 'INSERT INTO barter_monitoring VALUES (@public_id, @post_id, now(), @text, @link, @type, @mentioned_public)';
@@ -338,13 +371,16 @@ class CheckWalls
             $cmd->SetString ( '@link',     $link );
             $cmd->SetString ( '@type',     $type );
             $cmd->Execute();
+            if( $outer_link ) {
+                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id . '    ' . $author;
+                VkHelper::send_alert( $message, array( 670456, 106175502 ));
+            }
         }
     }
 
     private function get_publics_for_mentions()
     {
-        return array(
-        );
+        return array();
     }
 
     //собирает упоминания пабликов
@@ -365,7 +401,6 @@ class CheckWalls
             $this->parse_mentions_page( $page, $public_id );
         }
     }
-
 
     private function parse_mentions_page( $page, $public_id )
     {
@@ -396,7 +431,7 @@ class CheckWalls
 
             //регэкспим id паблика и поста. если нет - мимо
             preg_match( '/-(\d*?)_(\d*)/', $source, $matches );
-            if( count( $matches) != 3 ){
+            if( count( $matches) != 3 ) {
                 continue;
             }
             $source_public_id = $matches[1];
@@ -405,13 +440,106 @@ class CheckWalls
             $text = $text->getString();
             $text = $text[0];
             $this->save_post( $source_public_id, $source_post_id, $text, self::MONITORING_TYPE_MENTIONS, null, $public_id );
-
         }
     }
 
-    public function check_if_via_sb( $public_id, $post_id)
+    public function get_existing_external_ids()
     {
-        $check = ArticleQueueFactory::Get( array( 'externalId' => '-' . $public_id . '_' . $post_id ));
-        return !empty( $check );
+        $result = array();
+        //выбираем внешние id отправленных чз sb(или уже спаренных) постов
+        $sql = <<<sql
+            SELECT "externalId"
+            FROM   "articleQueues"
+            WHERE
+                   "sentAt" IS NOT NULL
+               AND "sentAt" > now() - interval '15 minute'
+               AND "externalId" IS NOT NULL
+sql;
+
+        $cmd = new SqlCommand($sql, ConnectionFactory::Get());
+        $ds = $cmd->Execute();
+        while( $ds->Next()) {
+            $result[$ds->GetValue('externalId')] = 1;
+        }
+
+        $this->existing_external_ids = $result;
+    }
+
+    //сохраняем посты(сделанные не через sb), заносим их в очередь(правую ленту) как отправленные
+    public function add_posts_to_sb_queue( $posts, $targeetFeedId, $check_time = true )
+    {
+//        $likes_array  = array();
+        $look_from_time = new DateTimeWrapper( date('r', time() - 600 ));
+        $look_to_time   = new DateTimeWrapper( date('r', time() - 60 ));
+        $converted_posts = ParserVkontakte::post_conv( $posts );
+        foreach( $converted_posts as $post ) {
+            $postDate = new DateTimeWrapper( date('r', $post['time'] ));
+            //общее условие поиска по времени( посты, опубликованные от 1 до 10 минут назад)
+            $check_date_condition = $check_time &&  ( $postDate >= $look_from_time ) && ( $postDate <= $look_to_time );
+            //отсеиваем неподходящие по времени или уже содержащиеся в базе
+            if ( !$check_date_condition  || isset( $this->existing_external_ids[$post['id']] )) {
+//                $likes_array[ $post['id']] = array('likes' => $post['likes_tr'], 'retweet' => $post['retweet']);
+                continue;
+            }
+            $articleRecord = ParserVkontakte::get_articleRecord_from_post( $post );
+
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+            $articleQueue = ParserVkontakte::get_articleQueue_from_article( $post, $postDate, $targeetFeedId );
+            ArticleQueueFactory::Add( $articleQueue, array(BaseFactory::WithReturningKeys => true) );
+            $articleRecord->articleQueueId = $articleQueue->articleQueueId;
+            $this->make_grids( $targeetFeedId, $postDate );
+            $result = ArticleRecordFactory::Add( $articleRecord );
+
+            if(  $result && $articleRecord->articleQueueId ) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+        }
+    }
+
+    public function make_grids( $target_feed_id, $sent_at )
+    {
+        $date = $sent_at->format('d.m.Y');
+        $grid_line = new GridLine();
+        $grid_line->startDate = $date;
+        $grid_line->endDate = $date;
+        $grid_line->targetFeedId = $target_feed_id;
+        $grid_line->time = $sent_at->format('H:i:s');
+        $grid_line->type = GridLineUtility::TYPE_CONTENT;
+        $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
+
+        if (!$result )
+            return false;
+
+        $grid_line_item = new GridLineItem();
+        $grid_line_item->gridLineId = $grid_line->gridLineId;
+        $grid_line_item->date = $sent_at;
+
+        return GridLineItemFactory::Add( $grid_line_item );
+    }
+
+    //собираем 15 последних вступивших в паблик, нужно для точки отсчета при финализации бартера
+    private function get_init_members( BarterEvent $barter_event )
+    {
+        $barter_event->init_users = array();
+
+        $params = array(
+            'gid'   =>  $barter_event->target_public,
+            'count' =>  15,
+            'sort'  =>  'time_desc'
+        );
+
+        for( $try = 0; $try < 3; $try++ ) {
+            $res = VkHelper::api_request( 'groups.getMembers', $params, 0 );
+            if( isset( $res->error )) {
+                continue;
+            } else {
+
+            }
+        }
+
+        return false;
     }
 }

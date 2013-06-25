@@ -7,38 +7,41 @@
  */
 class TokenChecker
 {
-
-    const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
     public function execute() {
-        $publishers = PublisherFactory::Get(array('status_id' => 1));
         $errors = 0;
+
+        //токены издателей
+        $publishers = PublisherFactory::Get(array('status_id' => 1));
         foreach( $publishers as $publisher ) {
-            $res = VkHelper::get_vk_time( $publisher->vk_token );
-            if( isset( $res->error )) {
-                print_r($res->error->error_msg);
-                echo '<br>' . $publisher->vk_id . '<br><br>';
-                AuditUtility::CreateEvent(
-                      'accessTokenDead'
-                    , 'publisher'
-                    , $publisher->publisherId
-                    , $publisher->name . " ( " . $publisher->vk_id . " )" . " was presumably banned ");
-                $errors ++;
-            }
+            $errors += $this->check_token( $publisher->vk_token, $publisher->vk_id, 'sb');
             sleep(1);
         }
 
-        if ( $errors ) $this->send_alert();
-
+        //служебные
+        $tokens = VkHelper::get_all_service_tokens();
+        foreach( $tokens as $vk_id=>$token ) {
+            $errors += $this->check_token( $token, $vk_id, 'serv');
+            sleep(1);
+        }
+        if ( $errors ) {
+            VkHelper::send_alert('rise and shine! Tokens are dead', 670456 );
+        }
     }
 
-
-
-    private function send_alert() {
-        $params = array(
-            'uid'           =>   670456,
-            'message'       =>  'rise and shine! tokens are dead. ' . md5(time()) ,
-            'access_token'  =>  self::ALERT_TOKEN,
-        );
-        VkHelper::api_request( 'messages.send', $params );
+    private function check_token( $token, $vk_id, $type )
+    {
+        $res = VkHelper::get_vk_time( $token );
+        if( isset( $res->error )) {
+            print_r($res->error->error_msg);
+            echo '<br>' . $vk_id . '<br><br>';
+            AuditUtility::CreateEvent(
+                  'accessTokenDead'
+                , 'publisher'
+                , $vk_id
+                ,  " Bot " . $vk_id . " was presumably banned (" . $type .  ")");
+            return 1;
+        }
+        return 0;
     }
+
 }

@@ -1,5 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language name="ru">
+    <months>
+        <month1><![CDATA[января]]></month1>
+        <month2><![CDATA[февраля]]></month2>
+        <month3><![CDATA[марта]]></month3>
+        <month4><![CDATA[апреля]]></month4>
+        <month5><![CDATA[мая]]></month5>
+        <month6><![CDATA[июня]]></month6>
+        <month7><![CDATA[июля]]></month7>
+        <month8><![CDATA[августа]]></month8>
+        <month9><![CDATA[сентября]]></month9>
+        <month10><![CDATA[октября]]></month10>
+        <month11><![CDATA[ноября]]></month11>
+        <month12><![CDATA[декабря]]></month12>
+    </months>
   <fe>
     <common>
       <records>
@@ -215,9 +229,9 @@
         <editTitle><![CDATA[Редактирование автора]]></editTitle>
       </author>
       <editor>
-        <list><![CDATA[Список редакторов]]></list>
-        <addTitle><![CDATA[Добавление редактора]]></addTitle>
-        <editTitle><![CDATA[Редактирование редактора]]></editTitle>
+        <list><![CDATA[Список админов]]></list>
+        <addTitle><![CDATA[Добавление админа]]></addTitle>
+        <editTitle><![CDATA[Редактирование админа]]></editTitle>
       </editor>
     </screens>
     <vfs>
@@ -258,7 +272,7 @@
       <articlesQueue><![CDATA[Очередь]]></articlesQueue>
       <publishers><![CDATA[Издатели]]></publishers>
       <authors><![CDATA[Авторы]]></authors>
-      <editors><![CDATA[Редакторы]]></editors>
+      <editors><![CDATA[Админы]]></editors>
     </menu>
     <metaDetail>
       <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
@@ -337,6 +351,15 @@
       <vkIds><![CDATA[VkId редакторов]]></vkIds>
       <publishers><![CDATA[Издатели]]></publishers>
       <token><![CDATA[Token]]></token>
+      <ShowAlbums><![CDATA[Показывать альбомы]]></ShowAlbums>
+      <ShowAuthors><![CDATA[Показывать аворскую вкладку]]></ShowAuthors>
+      <ShowAd><![CDATA[Показывать рекламную вкладку]]></ShowAd>
+      <ShowAddAuthors><![CDATA[Показывать добавление авторов]]></ShowAddAuthors>
+      <ShowSources><![CDATA[Показывать источники]]></ShowSources>
+      <ShowMy><![CDATA[Показывать личную вкладку]]></ShowMy>
+      <IsOur><![CDATA[Наш паблик]]></IsOur>
+      <collectSuggests><![CDATA[Собирать предложенные]]></collectSuggests>
+      <LastSuggestedPost><![CDATA[ID последнего предл. поста]]></LastSuggestedPost>
       <type><![CDATA[Тип]]></type>
       <params><![CDATA[params]]></params>
     </targetFeed>
@@ -388,6 +411,11 @@
       <video><![CDATA[Видео]]></video>
       <music><![CDATA[Музыка]]></music>
       <textLinks><![CDATA[Ссылки в тексте]]></textLinks>
+      <repostArticleRecordId><![CDATA[id статьи репоста]]></repostArticleRecordId>
+      <repostExternalId><![CDATA[внешний id репоста]]></repostExternalId>
+      <createdVia><![CDATA[пост создан через ]]></createdVia>
+      <repostPublicImage><![CDATA[ава паблика ]]></repostPublicImage>
+      <repostPublicTitle><![CDATA[ название паблика ]]></repostPublicTitle>
     </articleRecord>
     <publisher>
       <deleteString><![CDATA[Вы действительно хотите удалить издателя?]]></deleteString>
@@ -419,12 +447,13 @@
       <statusId><![CDATA[Статус]]></statusId>
     </author>
     <editor>
-      <deleteString><![CDATA[Вы действительно хотите удалить редактора?]]></deleteString>
-      <header><![CDATA[редакторы]]></header>
+      <deleteString><![CDATA[Вы действительно хотите удалить админа?]]></deleteString>
+      <header><![CDATA[админы]]></header>
       <vkId><![CDATA[Vk Id]]></vkId>
       <firstName><![CDATA[Имя]]></firstName>
       <lastName><![CDATA[Фамилия]]></lastName>
       <avatar><![CDATA[Аватар]]></avatar>
+      <targetFeeds><![CDATA[Ленты отправки]]></targetFeeds>
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
     </editor>
@@ -524,9 +553,9 @@
     <editor>
       <single><![CDATA[редактор]]></single>
       <plural><![CDATA[редакторы]]></plural>
-      <pluralGenitive><![CDATA[редакторов]]></pluralGenitive>
-      <singleGenitive><![CDATA[редактора]]></singleGenitive>
-      <singleAccusative><![CDATA[редактора]]></singleAccusative>
+      <pluralGenitive><![CDATA[админов]]></pluralGenitive>
+      <singleGenitive><![CDATA[админа]]></singleGenitive>
+      <singleAccusative><![CDATA[админа]]></singleAccusative>
     </editor>
   </objects>
 </language>

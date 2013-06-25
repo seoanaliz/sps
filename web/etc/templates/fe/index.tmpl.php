@@ -19,12 +19,22 @@
                 <div class="type-selector">
                     <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
+                        $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
+                        $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
+                        $sourceTypeClass .= !$sourceTypeAvailable ? ' hide ' : ' ';
+
                         ?>
-                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
-                            <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
+                        <a class=" <?=$sourceTypeClass?>" data-type="{$sourceType}"
+                            <?
+                                if( !$sourceTypeAvailable ):
+                                    echo 'style="display:none"';
+                                else:
+                                    $isFirst++;
+                                endif
+                            ?>
                            id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                         <?
-                        $isFirst++;
+
                     endforeach;
                     ?>
                 </div>
@@ -96,7 +106,7 @@
                         <a target="_blank"></a>
                     </span>
                     <span class="logout">
-                        <a href="/login/">Выход</a>
+                        <a href="/logout/">Выйти</a>
                     </span>
                 </div>
 
@@ -142,11 +152,7 @@
                 </div>
             </div>
 
-            <div class="queue-title">&nbsp;</div>
             <div class="items drop" id="queue"></div>
-            <div class="queue-footer">
-                <a class="add-button">Добавить ячейку</a>
-            </div>
         </div>
     </div>
 </div>

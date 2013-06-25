@@ -48,20 +48,21 @@ var Eventlist = {
 
     get_user: function(userId, callback) {
     simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
-        callback(true);
+        callback(dirtyData);
     });
     },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            if ($.isArray(dirtyData))
-                $.each(dirtyData, function(i, data) {
+            if ($.isArray(dirtyData.list))
+                $.each(dirtyData.list, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
                         itemFave: data.fave
                     });
                 });
+            cur.dataUser.listed = intval(dirtyData.listed_by);
             callback(clearData);
         });
     },
@@ -69,11 +70,11 @@ var Eventlist = {
         simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
             var clearData = [];
             if ($.isArray(dirtyData)) {
-                $.each(dirtyData, function(i, data) {
+                $.each(dirtyData.list, function(i, data) {
                     clearData.push({
                         itemId: data.group_id,
                         itemTitle: data.name,
-                        itemFave: data.fave
+                        itemFave: data.general
                     });
                 });
             }
@@ -106,6 +107,7 @@ var Eventlist = {
         */
         var clearSortBy = {
             followers: 'quantity',
+            viewers: 'viewers',
             contacts: '',
             growth: 'diff_abs',
             isActive: 'active',
@@ -171,6 +173,7 @@ var Eventlist = {
                             publicIsActive: !!publicItem.active,
                             publicInSearch: !!publicItem.in_search,
                             publicVisitors: publicItem.visitors,
+                            publicAudience: publicItem.viewers,
                             lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
                             users: users
                         });
@@ -215,7 +218,6 @@ var Eventlist = {
                     });
                 }
             }
-
             callback(clearList, clearPeriod, clearListType);
         });
     },
@@ -247,6 +249,8 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
+            cur.dataUser.listed = intval(dirtyData.listed_by);
+            Counter.refresh();
             callback(true);
         });
     },
@@ -274,15 +278,15 @@ var Eventlist = {
             callback(true);
         });
     },
-    add_to_bookmark: function(listId, callback) {
-        simpleAjax('toggleGroupFave', {
+    add_to_general: function(listId, callback) {
+        simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
             callback(true);
         });
     },
-    remove_from_bookmark: function(listId, callback) {
-        simpleAjax('toggleGroupFave', {
+    remove_from_general: function(listId, callback) {
+        simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
             callback(true);

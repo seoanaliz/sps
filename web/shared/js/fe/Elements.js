@@ -15,15 +15,15 @@ var Elements = {
         $block.find('.post-image-top img').bind('load', function () {
             var src = $(this).attr('src');
             var img = new Image();
-            var link = $(this).closest('.post').find('.ajax-loader-ext');
+            var $link = $(this).closest('.post').find('.ajax-loader-ext');
 
             img.onload = function() {
                 if (this.width < 250 && this.height < 250) {
                     //small
-                    Elements.initLinkLoader(link, true);
+                    Elements.initLinkLoader($link, true);
                 } else {
                     //big
-                    Elements.initLinkLoader(link, false);
+                    Elements.initLinkLoader($link, false);
                 }
             };
 
@@ -42,7 +42,6 @@ var Elements = {
                 Elements.initDraggable($(this));
             });
         } else if ($elem.is('.movable:not(.blocked)')) {
-            islog && console.log($elem.find('> .content'));
             $elem.find('> .content').draggable({
                 revert: 'invalid',
                 appendTo: 'body',
@@ -60,33 +59,42 @@ var Elements = {
             });
         }
     },
-    initDroppable: function($elem) {
-        var $block = $elem.find('.slot');
-        if ($block.length) {
-            $block.each(function() {
-                Elements.initDroppable($(this));
-            });
-        } else {
-            $elem.droppable({
-                activeClass: 'ui-state-active',
-                hoverClass: 'ui-state-hover',
-                drop: function(e, ui) {
-                    var $target = $(this),
-                        $post = $(ui.draggable).closest('.post');
-
-                    if ($target.hasClass('empty')) {
-                        Events.fire('post_moved', $post.data('id'), $target.data('id'), $post.data('queue-id'), function(state, newId) {
-                            if (state) {
-                                if ($post.hasClass('relocatable')) {
-                                    $target.html($post);
-                                }
-                                $target.addClass('image-compositing');
-                            }
-                        });
-                    }
-                }
-            });
+    initDroppable: function() {
+        $('.queue-page').find('.slot.empty:not(.locked)').each(function() {
+            Elements.attachDroppable($(this));
+        });
+    },
+    attachDroppable: function($elem) {
+        if ($elem.data('droppable_inited')) {
+            return;
         }
+        $elem.data('droppable_inited', true);
+        $elem.droppable({
+            activeClass: 'ui-state-active',
+            hoverClass: 'ui-state-hover',
+            drop: function(e, ui) {
+                var $slot = $(this);
+
+                if (!$slot.hasClass('slot')) {
+                    return;
+                }
+
+                var $post = $(ui.draggable).closest('.post');
+                Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
+                    if (isSuccess && data.success && data.html) {
+                        var maybeSlot = ui.draggable.closest('.slot'); // кодга перетаскиваем из одной ячейки в другую, очистим ячейку-источник
+                        if (maybeSlot.length) {
+                            app.getRightPanelWidget().getQueueWidget().deleteArticleInSlot(maybeSlot, /* isEmpty */ true);
+                        }
+  
+                        app.getRightPanelWidget().getQueueWidget().setSlotArticleHtml($slot, data.html);
+                        if ($post.hasClass('relocatable')) { // скроем в "источниках"
+                            $post.addClass('hidden_' + data.id).hide();
+                        }
+                    }
+                });
+            }
+        });
     },
     initLinks: function($block) {
         $block.find('img.ajax-loader').each(function(){
@@ -99,7 +107,7 @@ var Elements = {
         }).get();
     },
     rightdd: function(value){
-        if (typeof value == 'undefined') {
+        if (typeof value === 'undefined') {
             return $("#right-drop-down").data("selected");
         } else {
             $("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
@@ -112,7 +120,7 @@ var Elements = {
         return $('#right-panel .type-selector a.active').data('type');
     },
     calendar: function(value){
-        if (typeof value == 'undefined') {
+        if (typeof value === 'undefined') {
             var time = $('#calendar').datepicker('getDate').getTime();
             var timestamp = Math.round(time / 1000) - (new Date().getTimezoneOffset() * 60) + 14400;
             return timestamp;
@@ -120,9 +128,9 @@ var Elements = {
             $('#calendar').datepicker('setDate', value).closest('.calendar').find('.caption').html('&nbsp;');
         }
     },
-    initLinkLoader: function(obj, full){
-        var container   = obj.parents('div.link-info-content');
-        var link        = obj.attr('rel');
+    initLinkLoader: function($link, full){
+        var container   = $link.parents('div.link-info-content');
+        var link        = $link.attr('rel');
 
         $.ajax({
             url: 'http://im.' + hostname + '/int/controls/parse-url/',

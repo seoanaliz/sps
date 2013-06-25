@@ -8,6 +8,7 @@
 class AddArticleToQueueControl extends BaseControl
 {
 
+
     /**
      * Entry Point
      */
@@ -16,7 +17,6 @@ class AddArticleToQueueControl extends BaseControl
         $result = array(
             'success' => false
         );
-
         $articleId = Request::getInteger('articleId');
         $targetFeedId = Request::getInteger('targetFeedId');
         $timestamp = Request::getInteger('timestamp');
@@ -29,30 +29,45 @@ class AddArticleToQueueControl extends BaseControl
             return false;
         }
 
-        if ( $timestamp <  DateTimeWrapper::Now()->getTimestamp()) {
-            $result['message'] = 'Too late';
-            echo ObjectHelper::ToJSON($result);
-            return false;
-        }
-
-        if (!empty($queueId)) {
-            //просто перемещаем элемент очереди
-            ArticleUtility::ChangeQueueDates($queueId, $timestamp);
-
-            $result = array(
-                'success' => true,
-                'id' => $queueId
-            );
-            echo ObjectHelper::ToJSON($result);
-            return true;
-        }
-
         // может ли планировать в ленту
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         if (!$TargetFeedAccessUtility->canAddArticlesQueue($targetFeedId)) {
             $result['message'] = 'AccessDenied!';
             echo ObjectHelper::ToJSON($result);
             return false;
+        }
+
+        if ( $timestamp <  DateTimeWrapper::Now()->getTimestamp()) {
+            $result['message'] = 'Too late';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        //ограничение по интервалу между постами
+
+        if( ArticleUtility::IsTooCloseToPrevious( $targetFeedId, $timestamp, $queueId )) {
+            $result['message'] = 'Time between posts is too small';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        if( ArticleUtility::IsArticlesLimitReached( $targetFeedId, $timestamp )) {
+            $result['message'] = 'Too many posts this day';
+            echo ObjectHelper::ToJSON($result);
+            return false;
+        }
+
+        if (!empty( $queueId )) {
+            //просто перемещаем элемент очереди
+            ArticleUtility::ChangeQueueDates( $queueId, $timestamp );
+
+            $result = array(
+                'success' => true,
+                'id' => $queueId
+            );
+            $result['html'] = $this->renderArticle(ArticleQueueFactory::GetById($queueId), ArticleRecordFactory::GetOne(array('articleId' => $articleId)));
+            echo ObjectHelper::ToJSON($result);
+            return true;
         }
 
         // получаем пост
@@ -119,7 +134,7 @@ class AddArticleToQueueControl extends BaseControl
         if ($sqlResult) {
             $articleQueueRecord->articleQueueId = $ArticleQueue->articleQueueId;
 
-            $sqlResult = ArticleRecordFactory::Add($articleQueueRecord);
+            $sqlResult = ArticleRecordFactory::Add($articleQueueRecord, array(BaseFactory::WithReturningKeys => true));
         }
 
         ConnectionFactory::CommitTransaction($sqlResult);
@@ -152,10 +167,63 @@ class AddArticleToQueueControl extends BaseControl
             } else {
                 $result['moved'] = false;
             }
+
+            $result['html'] = $this->renderArticle($ArticleQueue, $articleQueueRecord);
         } else {
             $result['message'] = 'Cant Create Article Queue';
         }
         echo ObjectHelper::ToJSON($result);
+    }
+
+    protected function renderArticle($articleQueueItem, $articleQueueRecord) {
+        $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
+        $role = $TargetFeedAccessUtility->getRoleForTargetFeed(Request::getInteger('targetFeedId'));
+        if (is_null($role)){
+            return '';
+        }
+        $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+
+        $articleRecords = array();
+        $articleRecords[$articleQueueItem->articleQueueId] = $articleQueueRecord;
+        $articlesQueue = array();
+        $articlesQueue[$articleQueueItem->articleQueueId] = $articleQueueItem;
+
+        $repostArticleRecords = array();
+        if ($articleQueueRecord->repostArticleRecordId) {
+            $maybeRepostArticleRecord = ArticleRecordFactory::GetById($articleQueueRecord->repostArticleRecordId);
+            if ($maybeRepostArticleRecord) {
+                $repostArticleRecords[$articleQueueRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
+            }
+        }
+
+        $timestamp = Request::getInteger( 'timestamp' );
+        $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
+        $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
+        $grid = array_reverse( $grid);
+        $place = null;
+        foreach ($grid as $key => $gridItem) {
+            if ($gridItem['dateTime'] >= $articleQueueItem->startDate && $gridItem['dateTime'] <= $articleQueueItem->endDate) {
+                if (empty($gridItem['queue'])) {
+                    $place = $key;
+                    break; // ------------ BREAK
+                }
+            }
+        }
+
+        if ($place !== null) {
+            $now = DateTimeWrapper::Now();
+            $grid[$place]['queue'] = $articleQueueItem;
+            $grid[$place]['blocked'] = ($articleQueueItem->statusId != 1 || $articleQueueItem->endDate <= $now);
+            $grid[$place]['failed'] = ($articleQueueItem->statusId != StatusUtility::Finished && $articleQueueItem->endDate <= $now);
+            $gridItem = $grid[$place];
+        } else {
+            return ''; // ---------------- RETURN
+        }
+
+        ob_start();
+        include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
+        $html = ob_get_clean();
+        return $html;
     }
 }
 

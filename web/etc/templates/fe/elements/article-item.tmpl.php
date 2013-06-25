@@ -5,6 +5,7 @@
 /** @var $sourceInfo array */
 /** @var $isWebUserEditor bool */
 /** @var $sourceFeedType String */
+/** $var $repostArticleRecord ArticleRecord */
 
 if (!empty($article)) {
     $canEditPost = true;
@@ -12,6 +13,8 @@ if (!empty($article)) {
     $isPostMovable = false;
     $isPostRelocatable = true;
     $showApproveBlock = $isWebUserEditor && $article->articleStatus == Article::STATUS_REVIEW;
+    $isRepost = false;
+    $originalId = false;
 
     if (!empty($sourceFeed) && SourceFeedUtility::IsTopFeed($sourceFeed) && !empty($articleRecord->photos)) {
         $extLinkLoader = true;
@@ -44,6 +47,13 @@ if (!empty($article)) {
     if (!empty($sourceFeed) && $sourceFeed->type == SourceFeedUtility::Albums) {
         $canEditPost = false;
     }
+
+    if (isset($repostArticleRecord) && $repostArticleRecord) {
+        $isRepost = true;
+        $originalId = $articleRecord->repostExternalId;
+    } elseif (!empty($sourceInfo[$article->sourceFeedId])) {
+        $originalId = $article->externalId;
+    }
 ?>
 <div
     class="post bb
@@ -52,6 +62,7 @@ if (!empty($article)) {
     <?= !empty($author) ? 'author' : '' ?>
     <?= $isPostRelocatable ? 'relocatable' : '' ?>"
     data-group="{$article->sourceFeedId}"
+    data-repost-id="{$articleRecord->repostExternalId}"
     <? if (!empty($author)) { ?>
         data-author-id="{$author->authorId}"
     <? } ?>
@@ -73,6 +84,9 @@ if (!empty($article)) {
     <? } ?>
     <div class="content">
         {increal:tmpl://fe/elements/article-item-content.tmpl.php}
+        <? if ($isRepost) { ?>
+            {increal:tmpl://fe/elements/article-item-content-repost.tmpl.php}
+        <? } ?>
     </div>
     <div class="bottom d-hide">
         <div class="l">
@@ -83,18 +97,21 @@ if (!empty($article)) {
             <? } ?>
         </div>
         <div class="r">
-            <? if (!empty($articleRecord->link)) { ?>
-                <span class="attach-icon attach-icon-link" title="Пост со ссылкой"><!-- --></span>
+            <? if ($isRepost) { ?>
+                <span class="hash-span" title="Пост с репостом"><b>Репост</b></span>
             <? } ?>
-            <? if (UrlParser::IsContentWithLink($articleRecord->content)) { ?>
-                <span class="attach-icon attach-icon-link-red" title="Пост со ссылкой в контенте"><!-- --></span>
+            <? if (UrlParser::IsContentWithWikiLink($articleRecord->content)) { ?>
+                <span class="attach-icon attach-icon-link" title="Пост с вики-ссылкой"><!-- --></span>
+            <? } ?>
+            <? if (UrlParser::IsContentWithLink($articleRecord->content) || !empty($articleRecord->link) ) { ?>
+                <span class="attach-icon attach-icon-link-red" title="Пост со внешней ссылкой"><!-- --></span>
             <? } ?>
             <? if (UrlParser::IsContentWithHash($articleRecord->content)) { ?>
                 <span class="hash-span" title="Пост с хештэгом">#hash</span>
             <? } ?>
             <span class="original">
-                <? if ($article->externalId != -1) { ?>
-                    <a href="{$articleLinkPrefix}{$article->externalId}" target="_blank">Оригинал</a>
+                <? if ($originalId) { ?>
+                    <a href="http://vk.com/wall{$originalId}" target="_blank">Оригинал</a>
                 <? } else {
                     $sign = '';
                     if (!is_null($article->sentAt)) {
@@ -111,8 +128,7 @@ if (!empty($article)) {
                                 $sign = 'Ожидает рассмотрения';
                                 break;
                         }
-                    }
-                    ?>
+                    } ?>
                     {$sign}
                 <? } ?>
             </span>

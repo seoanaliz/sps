@@ -31,10 +31,11 @@ class SaveArticleControl extends BaseControl
         $result = array(
             'success' => false
         );
-
         $id = Request::getInteger('articleId');
         $text = trim(Request::getString('text'));
+
         $link = trim(Request::getString('link'));
+        $repostExternalId = trim(Request::getString('repostExternalId'));
         $photos = Request::getArray('photos');
         $targetFeedId = Request::getInteger('targetFeedId');
         $userGroupId = Request::getInteger('userGroupId');
@@ -42,11 +43,10 @@ class SaveArticleControl extends BaseControl
         if (!$userGroupId) {
             $userGroupId = null;
         }
-
         $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
         $role = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId);
         if (is_null($role)) {
-            return ObjectHelper::ToJSON(array('success' => false));
+            die(ObjectHelper::ToJSON(array('success' => false)));
         }
 
         $authorId = $this->getAuthor()->authorId;
@@ -60,17 +60,16 @@ class SaveArticleControl extends BaseControl
             $link = null;
         }
 
-        if (empty($text) && empty($photos) && empty($link)) {
+        if (empty($text) && empty($photos) && empty($link) && empty($repostExternalId)) {
             $result['message'] = 'emptyArticle';
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-
         //building data
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = $article->createdAt;
-        $article->sourceFeedId = -1;
+        $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
         $article->targetFeedId = $targetFeedId;
         $article->externalId = -1;
         $article->rate = 0;
@@ -79,7 +78,8 @@ class SaveArticleControl extends BaseControl
         $article->isCleaned = false;
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
-        $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+        $article->articleStatus =  Article::STATUS_APPROVED;
+        #$article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
 
         if ($sourceFeedId) {
             $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
@@ -93,11 +93,16 @@ class SaveArticleControl extends BaseControl
         }
 
         $articleRecord = new ArticleRecord();
-        $articleRecord->content = $text;
+        $articleRecord->content = $text ? $text : '';
         $articleRecord->likes = 0;
         $articleRecord->photos = !empty($photos) ? $photos : array();
         $articleRecord->link = $link;
-
+        if( $repostExternalId && $repostExternalId != 'null' ) {
+            $articleRecord->repostArticleRecordId = $this->add_repost_article( $repostExternalId );
+            if( $articleRecord->repostArticleRecordId ) {
+                $articleRecord->repostExternalId = $repostExternalId;
+            }
+        }
         if (!empty($id)) {
             $queryResult = $this->update($id, $articleRecord);
         } else {
@@ -138,11 +143,68 @@ class SaveArticleControl extends BaseControl
     {
         ConnectionFactory::BeginTransaction();
 
-        $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link'), array('articleId' => $id));
+        $result = ArticleRecordFactory::UpdateByMask($articleRecord, array('content', 'photos', 'link', 'repostArticleRecordId','repostExternalId'), array('articleId' => $id));
 
         ConnectionFactory::CommitTransaction($result);
         return $result;
     }
-}
 
+    private function add_repost_article( $repostExternalId )
+    {
+        $articleRecord = new ArticleRecord();
+        try {
+            $posts =  ParserVkontakte::get_posts_by_vk_id( $repostExternalId );
+            if( !isset( $posts[0])){
+                throw new Exception( "failed to load post");
+            }
+            $post = $posts[0];
+            $articleRecord->content = $post['text']? $post['text'] : '';
+            $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
+            $articleRecord->link = Convert::ToString($post['link']);
+            $articleRecord->retweet = Convert::ToArray($post['retweet']);
+            $articleRecord->text_links = Convert::ToArray($post['text_links']);
+            $articleRecord->video = Convert::ToArray($post['video']);
+            $articleRecord->music = Convert::ToArray($post['music']);
+            $articleRecord->poll = Convert::ToString($post['poll']);
+            $articleRecord->map = Convert::ToString($post['map']);
+            $articleRecord->doc = Convert::ToString($post['doc']);
+            $articleRecord->rate = 0;
+            $public_id = explode( '_',  $post['id'] );
+            for( $try = 0; $try < 3; $try ++) {
+                if( $public_id[0][0] == '-' ) {
+                    $info = StatPublics::get_publics_info( trim( $public_id[0], '-'));
+                } else {
+                    $info = StatUsers::get_vk_user_info( $public_id[0] );
+                }
+                if ( $info ) break;
+                sleep( 0.3 );
+            }
+            $info = current( $info );
+            $articleRecord->repostPublicImage = $info['ava'];
+            $articleRecord->repostPublicTitle = $info['name'];
+            $photos = array();
+            foreach ($post['photo'] as $photo) {
+                $photos[] = array(
+                    'filename' => '',
+                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                    'url' => $photo['url'],
+                );
+            }
+            $articleRecord->photos = $photos;
+            $conn = ConnectionFactory::Get();
+            $conn->begin();
+
+            ArticleRecordFactory::Add( $articleRecord, array(BaseFactory::WithReturningKeys => true));
+            if ($articleRecord->articleRecordId) {
+                $conn->commit();
+            } else {
+                $conn->rollback();
+            }
+        } catch (Exception $e) {
+            die( ObjectHelper::ToJSON(array('success'=>false, 'message'=>$e->getMessage())));
+        }
+
+        return $articleRecord->articleRecordId;
+    }
+}
 ?>

@@ -23,48 +23,51 @@
         {
             $sql = 'SELECT group_id, name, general, name, comments,type, group_admin FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ) );
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $groupId);
             $ds = $cmd->Execute();
             $ds->Next();
             return array (
                 'groupId'   =>  $ds->getInteger( 'group_id' ),
-                'general'   =>  $ds->getInteger( 'general'),
-                'name'      =>  $ds->getValue( 'name' ),
-                'comments'  =>  $ds->getValue( 'comments' ),
+                'general'   =>  $ds->getBoolean( 'general'),
+                'name'      =>  $ds->getValue(   'name' ),
+                'comments'  =>  $ds->getValue(   'comments' ),
                 'type'      =>  $ds->getInteger( 'type' ),
             );
 
         }
 
-        public static function get_groups( $userId )
+        public static function get_groups( $userId = NULL )
         {
-            $sql = 'SELECT c.group_id, c.type, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
                         ' . TABLE_STAT_GROUPS . ' as c
                     WHERE
-                        ( a.user_id = b.user_id OR type = ' . self::GROUP_GLOBAL . ' )
+                        ( a.user_id = b.user_id OR general  )
                         AND c.group_id = b.group_id
-                        AND a.user_id = @user_id';
+                        AND a.user_id = @user_id
+                    ORDER BY c.name';
 
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
             $cmd->SetInteger( '@user_id', $userId );
             $ds  = $cmd->Execute();
             $res = array();
 
+
             while( $ds->Next()) {
-                $res[] = array(
-                    'group_id'  =>  $ds->getValue( 'group_id', TYPE_INTEGER ),
-                    'general'   =>  $ds->getValue( 'general',  TYPE_INTEGER ),
-                    'name'      =>  $ds->getValue( 'name' ),
+                $res[$ds->GetInteger( 'group_id' )] = array(
+                    'group_id'  =>  $ds->GetInteger( 'group_id' ),
+                    'general'   =>  $ds->GetBoolean( 'general'),
+                    'name'      =>  $ds->GetValue( 'name' ),
                     'comments'  =>  $ds->getValue( 'comments' ),
-                    'fave'      =>  $ds->GetBoolean( 'fave' ),
+                    'fave'      =>  $ds->GetBoolean( 'general' ),
                     'group_type'=>  $ds->GetInteger( 'type' ),
                 );
             }
-
+            $res['list']        =   array_values( $res );
+            $res['listed_by']   =   self::get_listed_by_user( $userId );
             ksort( $res );
             return $res;
         }
@@ -112,6 +115,7 @@
                     $cmd = new SqlCommand( $query, ConnectionFactory::Get('tst') );
                     $cmd->SetInteger('@group_id', $gr_id);
                     $cmd->SetInteger('@user_id', $id);
+
 		      if ($cmd->ExecuteNonQuery())
                         $i++;
                 }
@@ -148,12 +152,23 @@
             $group = self::get_group( $group_id );
             if ( $group['type'] == self::GROUP_GLOBAL )
                 return true;
-            $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '(public_id,group_id)
-                       VALUES (@public_id,@group_id)';
+            //надо ли отмечать, кто добавил паблик в лист(да - если лист общий и паблик нигде не состоит)
+            $listed_by = null;
+            if( $group['general'] ) {
+                $check = self::get_public_lists( $publicId );
+                if( empty( $check )) {
+                    $listed_by = $user_id;
+                }
+            }
+            $sql = 'INSERT INTO ' . TABLE_STAT_GROUP_PUBLIC_REL . '( public_id, group_id, listed_by )
+                       VALUES ( @public_id, @group_id, @listed_by )';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@group_id', $group_id);
+            $cmd->SetInteger('@group_id',  $group_id);
             $cmd->SetInteger('@public_id', $publicId);
+            $cmd->SetInteger('@listed_by', $listed_by);
             $cmd->Execute();
+
+            return array( 'listed_by' => self::get_listed_by_user( $user_id));
         }
 
         public static function extricate_entry( $group_id, $entry_id, $user_id = 0 )
@@ -196,9 +211,9 @@
             } elseif( $groupName ) {
                 $sql = 'INSERT INTO
                         ' . TABLE_STAT_GROUPS . '
-                            ("name", comments, ava)
+                            ("name", comments, ava,general)
                         VALUES
-                            (@name, @comments, @ava)
+                            (@name, @comments, @ava,false)
                         RETURNING
                             group_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
@@ -231,28 +246,6 @@
             $cmd->SetInteger('@public_id',   $public_id);
             $cmd->SetInteger('@admin_id',    $adminId);
             $cmd->Execute();
-        }
-
-        public static function check_group_name_free( $user_id, $group_name )
-        {
-            $sql = 'SELECT a.group_id
-                    FROM
-                    ' . TABLE_STAT_GROUP_USER_REL . ' as a
-                    , ' . TABLE_STAT_GROUPS . ' as b
-                    WHERE
-                        a.group_id = b.group_id
-                        AND a.user_id = @user_id
-                        AND b.name = @group_name';
-            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-            $cmd->SetInteger('@user_id',      $user_id);
-            $cmd->SetString ('@group_name',   $group_name);
-            $ds = $cmd->Execute();
-            $ds->Next();
-
-            if ($a = $ds->getValue( 'group_id' , TYPE_INTEGER ))
-                return false;
-
-            return true;
         }
 
         public static function delete_group( $group_id )
@@ -289,7 +282,7 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-            $cmd->SetInteger( '@user_id', $user_id );
+//            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
 
             $res = array();
@@ -299,5 +292,56 @@
             return $res;
         }
 
+        public static function get_public_lists( $public_id,  $userId = 0 )
+        {
+            $groups = array();
+            $sql = "SELECT DISTINCT(a.group_id) from "
+                . TABLE_STAT_GROUP_USER_REL   . " AS a,
+                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b,
+                 " . TABLE_STAT_GROUPS . " AS c
+                 WHERE
+                        a.group_id=b.group_id
+                    AND a.group_id=c.group_id
+                    AND ( user_id=@user_id OR c.general )
+                    AND b.public_id=@public_id";
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@user_id',  $userId );
+            $cmd->SetInteger( '@public_id',  $public_id );
+            $ds = $cmd->Execute();
+            while ( $ds->next() ) {
+                $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
+            }
+            return $groups;
+        }
+
+        public static function set_listed_by( $groupId, $publicId, $userId)
+        {
+            $sql = "UPDATE " . TABLE_STAT_GROUP_PUBLIC_REL . "
+                    SET
+                        listed_by = @userId
+                    WHERE
+                            groupId   = @groupId
+                        AND publicId  = @publicId";
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
+            $cmd->SetInteger( '@userId',   $userId );
+            $cmd->SetInteger( '@groupId',  $groupId );
+            $cmd->SetInteger( '@publicId', $publicId );
+            $cmd->Execute();
+        }
+
+        public static function get_listed_by_user( $user_id )
+        {
+            $result = 0;
+            $sql = 'SELECT COUNT(*) FROM ' . TABLE_STAT_GROUP_PUBLIC_REL . ' WHERE listed_by = @user_id ';
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $cmd->SetInteger( '@user_id', $user_id );
+            $ds = $cmd->Execute();
+            if( $ds->Next()) {
+                $result = $ds->GetInteger( 'count' );
+            }
+            return $result;
+        }
     }
 ?>

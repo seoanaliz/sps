@@ -51,6 +51,11 @@
                     , 'max'         => 10
                     , 'nullable'    => 'CheckEmpty'
                 )
+                ,'repeat' => array(
+                    'name'          => 'repeat'
+                    , 'type'        => TYPE_BOOLEAN
+                    , 'nullable'    => 'Yes'
+                )
                 ,'targetFeedId' => array(
                     'name'          => 'targetFeedId'
                     , 'type'        => TYPE_INTEGER

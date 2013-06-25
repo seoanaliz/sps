@@ -3,6 +3,12 @@
 <div id="main" class="main">
     <div class="header">
         <div class="tab-bar"></div>
+        <div class="login-info"></div>
+        <div class="button-wrap">
+            <script type="text/javascript"><!--
+                document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
+            --></script>
+        </div>
     </div>
     <table>
         <tbody>
@@ -52,4 +58,9 @@
     </table>
 </div>
 <div id="go-to-top">Наверх</div>
+<div id="listed-counter"> вы накликали:
+    <span class="value-max"></span>
+</div>
+</div>
+
 {increal:tmpl://st/elements/footer.tmpl.php}

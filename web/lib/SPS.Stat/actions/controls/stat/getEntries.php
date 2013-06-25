@@ -1,6 +1,4 @@
 <?php
-Package::Load( 'SPS.Stat' );
-Package::Load( 'SPS.Site' );
 /**
  * addPrice Action
  * @package    SPS
@@ -26,19 +24,22 @@ class getEntries {
         $quant_max  =   Request::getInteger( 'max' );
         $quant_min  =   Request::getInteger( 'min' );
         $period     =   Request::getInteger( 'period' );//
-        $group_type =   Request::getInteger( 'groupType');
         $search     =   trim(pg_escape_string( Request::getString( 'search' )));
         $sortBy     =   pg_escape_string( Request::getString( 'sortBy' ));
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
-        $page       =   Request::getInteger( 'page' );
+
+        //"Глобальный поиск везде"
+        if ( $search ) {
+            $groupId = null;
+        }
 
         if( $time_to == 0 )
             $time_to = time();
 
         $sortReverse    =   Request::getInteger( 'sortReverse' );
         $show_in_mainlist = Request::getInteger( 'show' );
-        $page           =   $page ? ' AND publ.page=true ' : ' ';
+        $page           =   ' AND publ.is_page=true ';
         $quant_max      =   $quant_max ? $quant_max : 100000000;
         $quant_min      =   $quant_min ? $quant_min : 0;
         $offset         =   $offset ? $offset : 0;
@@ -48,29 +49,29 @@ class getEntries {
         $group  = StatGroups::get_group( $groupId );
         //1 тип статистики
         if ( empty( $group) || $group['type'] != 2 ) {
-            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search' );
+            $allowed_sort_values = array('diff_abs', 'quantity', 'diff_rel', 'visitors', 'active', 'in_search', 'viewers' );
             $sortBy  = $sortBy && in_array( $sortBy, $allowed_sort_values, 1 )  ? $sortBy  : 'diff_abs';
             $show_in_mainlist = $show_in_mainlist && !$groupId ? ' AND sh_in_main = TRUE ' : '';
 
             if ( $period == 7 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' )
+                if ( $sortBy == 'diff_abs' || $sortBy == 'visitors' || $sortBy == 'viewers' )
                     $sortBy   .= '_week';
                 $diff_rel = 'diff_rel_week';
                 $diff_abs = 'diff_abs_week';
-                $diff_vis = 'diff_vis_week';
                 $visitors = 'visitors_week';
+                $viewers  = 'viewers_week';
             } else if( $period == 30 ) {
-                if ( $sortBy == 'diff_abs' || $sortBy = 'visitors' )
+                if ( $sortBy == 'diff_abs' || $sortBy == 'visitors' || $sortBy == 'viewers')
                     $sortBy   .= '_month';
                 $diff_rel = 'diff_rel_month';
                 $diff_abs = 'diff_abs_month';
-                $diff_vis = 'diff_vis_month';
                 $visitors = 'visitors_month';
+                $viewers  = 'viewers_month';
             } else {
                 $diff_rel = 'diff_rel';
                 $diff_abs = 'diff_abs';
-                $diff_vis = 'diff_vis';
                 $visitors = 'visitors';
+                $viewers  = 'viewers';
             }
 
             $sortBy  = $sortBy  .  (( $sortReverse? '' : ' DESC ') . ' NULLS LAST ');
@@ -78,8 +79,8 @@ class getEntries {
                 $search = $search ? " AND publ.name ILIKE '%" . $search . "%' " : '';
 
                 $sql = 'SELECT
-                    publ.vk_id, publ.ava, publ.name, publ.price, publ.' . $diff_abs . ',
-                    publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.quantity, gprel.main_admin,
+                    publ.vk_id, publ.ava, publ.name,  publ.' . $diff_abs . ',
+                    publ.' . $diff_rel . ', publ.' . $visitors . ',  publ.' . $viewers .',  publ.quantity, gprel.main_admin,
                     publ.in_search,publ.active
                 FROM
                         ' . TABLE_STAT_PUBLICS . ' as publ,
@@ -88,8 +89,7 @@ class getEntries {
                       publ.vk_id=gprel.public_id '
                       . $page .
                      ' AND gprel.group_id=@group_id
-                      AND publ.quantity >= @min_quantity
-                      AND publ.quantity <= @max_quantity
+                      AND publ.quantity BETWEEN @min_quantity AND @max_quantity
                       AND closed is false
                       ' . $search . '
                 ORDER BY '
@@ -107,14 +107,13 @@ class getEntries {
                 $search   =   $search ? "AND name ILIKE '%" . $search . "%' ": '';
 
                 $sql = 'SELECT
-                            vk_id, ava, name, price, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ', quantity,in_search,active
+                            vk_id, ava, name, ' . $diff_abs . ', ' . $diff_rel . ',' . $visitors . ',' . $viewers . ', quantity,in_search,active
                         FROM '
                             . TABLE_STAT_PUBLICS . ' as publ
                         WHERE
-                            quantity > @min_quantity '
+                            quantity BETWEEN @min_quantity AND @max_quantity '
                             . $page .
-                          ' AND quantity < @max_quantity
-                            AND quantity > 100'.
+                          ' AND quantity > 100'.
                             $search . $show_in_mainlist .
                       ' ORDER BY '
                             . $sortBy .
@@ -139,19 +138,19 @@ class getEntries {
                 $admins = $this->get_admins( $row['vk_id'], $row['main_admin'] );
                 $groups = array();
                 if ( isset( $userId )) {
-                    $groups = $this->get_groups( $userId, $row['vk_id'] );
+                    $groups = StatGroups::get_public_lists( $row['vk_id'], $userId );
                 }
                 $resul[] =  array(
                                 'id'        =>  $row['vk_id'],
                                 'quantity'  =>  $row['quantity'],
                                 'name'      =>  $row['name'],
                                 'ava'       =>  $row['ava'],
-                                'price'     =>  $row['price'],
                                 'group_id'  =>  $groups,
                                 'admins'    =>  $admins,
                                 'diff_abs'  =>  $row[$diff_abs],
                                 'diff_rel'  =>  $row[$diff_rel],
                                 'visitors'  =>  $row[$visitors],
+                                'viewers'   =>  $row[$viewers],
                                 'in_search' =>  $row['in_search'] == 't' ? 1 : 0,
                                 'active'    =>  $row['active']== 't' ? true : false
                 );
@@ -332,28 +331,6 @@ class getEntries {
         }
 
         return $resul;
-    }
-
-    private function get_groups( $userId, $public_id )
-    {
-        $groups = array();
-        $sql = "SELECT a.group_id from "
-                   . TABLE_STAT_GROUP_USER_REL   . " AS a,
-                 " . TABLE_STAT_GROUP_PUBLIC_REL . " AS b
-                 WHERE
-                        a.group_id=b.group_id
-                    AND user_id=@user_id
-                    AND b.public_id=@public_id";
-
-
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $cmd->SetInteger( '@user_id',  $userId );
-        $cmd->SetInteger( '@public_id',  $public_id );
-        $ds = $cmd->Execute();
-        while ( $ds->next() ) {
-            $groups[] = $ds->getValue('group_id', TYPE_INTEGER);
-        }
-        return $groups;
     }
 
     private function get_min_max()

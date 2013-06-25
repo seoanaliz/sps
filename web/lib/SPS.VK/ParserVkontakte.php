@@ -24,6 +24,8 @@
          */
         const MAX_POST_LIKE_COUNT = 90;
 
+
+
         public function __construct($public_id = '')
         {
             if ($public_id != '') $this ->set_page($public_id);
@@ -170,24 +172,53 @@
             $res = VkHelper::api_request( 'wall.get', $params );
             sleep(self::PAUSE);
             unset( $res[0] );
-            $posts = $this->post_conv( $res );
-            $posts = $this->kill_attritions( $posts );
 
+            $posts = self::post_conv( $res );
+            $posts = $this->kill_attritions( $posts );
 
             return $posts;
         }
 
-        private function post_conv( $posts, $trig_inc = false )
+        public function get_suggested_posts($last_post_id, $access_token )
+        {
+            sleep(rand( 1,12 ));
+            $params = array(
+                'access_token'  =>   $access_token,
+                'count'         =>   30,
+                'filter'        =>  'suggests',
+                'owner_id'      =>  '-' . $this->page_id
+            );
+            $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            sleep(self::PAUSE);
+            if(!is_array($res) || count($res) < 2 ) {
+                return array();
+            }
+            unset( $res[0] );
+
+            $posts = self::post_conv( $res, $last_post_id );
+            $posts = $this->kill_attritions( $posts );
+
+            return $posts;
+
+        }
+
+        //$stop_post_id - если id поста меньше этого, возвращаем результат
+        public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
 
             foreach( $posts as $post ) {
-                $id         =   $this->page_id . '_' . $post->id;
-                $likes      =   $post->likes->count;
+
+                if( $stop_post_id && $post->id <= $stop_post_id){
+                    break;
+                }
+                $id         =   $post->to_id . '_' . $post->id;
+                $likes      =   isset($post->likes) ? $post->likes->count : 0;
                 $likes_tr   =   $likes;
-                $retweet    =   $post->reposts->count;
+                $retweet    =   isset($post->reposts) ? $post->reposts->count : 0;
                 $time       =   $post->date;
                 $text       =   self::remove_tags( $post->text);
+                $source     =   isset( $post->post_source->type) ? $post->post_source->type : null;
                 $maps = '';
                 $doc  = '';
                 $link = '';
@@ -196,23 +227,13 @@
                 $video = array();
                 $audio = array();
                 $text_links = array();
+                $author = isset($post->from_id) ? $post->from_id : false;
 
                 if ( isset( $post->attachments )) {
-                    foreach( $post->attachments as $attachment )
-                    {
-
+                    foreach( $post->attachments as $attachment ) {
                         switch( $attachment->type ) {
                             case 'photo':
-
-                                if ( isset( $attachment->photo->src_xxbig )) {
-                                    $url = $attachment->photo->src_xxbig;
-                                }elseif (isset( $attachment->photo->src_xbig )) {
-                                    $url = $attachment->photo->src_xbig;
-                                }elseif (isset( $attachment->photo->src_big )) {
-                                    $url = $attachment->photo->src_big;
-                                }else {
-                                    $url = $attachment->photo->src;
-                                }
+                                $url = self::get_biggest_picture( $attachment );
 
                                  $photo[] =
                                      array(
@@ -253,10 +274,102 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links
+                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source,
+                                              'author'  => $author,  'pid' => $post->id
                 );
+
             }
             return $result_posts_array;
+        }
+
+        /** @return Article */
+        public static function get_article_from_post( $post, $target_feed_id )
+        {
+            $article = new Article();
+            $article->externalId = $post['id'];
+            $article->targetFeedId = $target_feed_id;
+            $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->importedAt = DateTimeWrapper::Now();
+            $article->isCleaned = false;
+            $article->statusId = 3;
+            $article->articleStatus = Article::STATUS_APPROVED;
+            $article->rate = 0;
+            $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            return $article;
+        }
+
+        /** @return ArticleRecord */
+        public static function get_articleRecord_from_post( $post )
+        {
+            $articleRecord = new ArticleRecord();
+            $articleRecord->content = $post['text'] ? $post['text'] :"";
+            $articleRecord->likes = Convert::ToInteger($post['likes_tr']);
+            $articleRecord->link = Convert::ToString($post['link']);
+            $articleRecord->retweet = Convert::ToArray($post['retweet']);
+            $articleRecord->text_links = Convert::ToArray($post['text_links']);
+            $articleRecord->video = Convert::ToArray($post['video']);
+            $articleRecord->music = Convert::ToArray($post['music']);
+            $articleRecord->poll = Convert::ToString($post['poll']);
+            $articleRecord->map = Convert::ToString($post['map']);
+            $articleRecord->doc = Convert::ToString($post['doc']);
+            $articleRecord->createdVia = Convert::ToString($post['createdVia']);
+            $articleRecord->rate = 0;
+            $articleRecord->photos = self::savePostPhotos($post['photo']);
+            return $articleRecord;
+        }
+
+        /** @return ArticleQueue */
+        public static function get_articleQueue_from_article( $post ,$sent_at, $target_feed_id )
+        {
+            $articleQueue = new ArticleQueue();
+            $articleQueue->collectLikes = true;
+            $articleQueue->sentAt = $sent_at;
+            $articleQueue->externalId = $post['id'];
+            $articleQueue->externalLikes = (int)$post['likes_tr'];
+            $articleQueue->externalRetweets = (int)$post['retweet'];
+            $articleQueue->startDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->startDate->modify( '-5 minutes');
+            $articleQueue->endDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->endDate->modify( '+5 minutes');
+            $articleQueue->targetFeedId = $target_feed_id;
+            $articleQueue->statusId = StatusUtility::Finished;
+            $articleQueue->createdAt = $sent_at;
+            $articleQueue->isDeleted = false;
+            $articleQueue->type = 'content'; //неспортивно
+            return $articleQueue;
+        }
+
+        public static function savePostPhotos($data) {
+            $result = array();
+
+            foreach ($data as $photo) {
+                $result[] = array(
+                    'filename' => '',
+                    'title' => !empty($photo['desc']) ? TextHelper::ToUTF8($photo['desc']) : '',
+                    'url' => $photo['url'],
+                );
+            }
+
+            return $result;
+        }
+
+        public static function get_biggest_picture( $data )
+        {
+
+            if( isset($data->photo))
+                $data = $data->photo;
+            if ( isset( $data->src_xxxbig )) {
+                $url = $data->src_xxxbig;
+            } elseif ( isset( $data->src_xxbig )) {
+                $url = $data->src_xxbig;
+            }elseif (isset( $data->src_xbig )) {
+                $url = $data->src_xbig;
+            }elseif (isset( $data->src_big )) {
+                $url = $data->src_big;
+            }else {
+                $url = $data->src;
+            }
+            return $url;
         }
 
         private function get_average( array &$a )
@@ -404,39 +517,39 @@
         private function get_page($page = '')
         {
 
-    if ($page == '')
-    $page = $this->page_adr;
-    if (self::TESTING) echo '<br>get page url = ' . $page;
-    $hnd = curl_init($page);
-        //            curl_setopt($hnd , CURLOPT_HEADER, 1);
-    curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
-    $a = curl_exec($hnd);
-    if (curl_errno($hnd))
-    throw new Exception('curl error : ' . curl_error($hnd) . ' trying
-                    to get ' . $page);
-    if (!$a)  throw new Exception("can't download page " . $page);
-    file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
-        //проверка на доступность
-    if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
-    substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
-    throw new Exception('access denied to http://vk.com/public' . $page);
+            if ($page == '')
+            $page = $this->page_adr;
+            if (self::TESTING) echo '<br>get page url = ' . $page;
+            $hnd = curl_init($page);
+                //            curl_setopt($hnd , CURLOPT_HEADER, 1);
+            curl_setopt($hnd, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($hnd, CURLOPT_FOLLOWLOCATION, true);
+            $a = curl_exec($hnd);
+            if (curl_errno($hnd))
+            throw new Exception('curl error : ' . curl_error($hnd) . ' trying
+                            to get ' . $page);
+            if (!$a)  throw new Exception("can't download page " . $page);
+            file_put_contents(Site::GetRealPath('temp://page.txt'), $a);
+                //проверка на доступность
+            if( substr_count($a, 'Вы не можете просматривать стену этого сообщества.') > 0 ||
+            substr_count($a, $this->u_w('Вы не можете просматривать стену этого сообщества.')) > 0 )
+            throw new Exception('access denied to http://vk.com/public' . $page);
 
-    if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
-    (substr_count($a, '404 Not Found') == 0) &&
-    (substr_count($a, 'общество не найден') == 0))  ;
-    else
-    {
-    throw new Exception('page not found : ' . $page);
-    }
-if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
-    (substr_count($a, 'Страница заблокирована') == 0))  ;
-else
-{
-    throw new Exception('page is blocked: ' . $page);
-}
-return $a;
-}
+            if (substr_count($a, $this->u_w('ообщество не найден')) == 0 &&
+            (substr_count($a, '404 Not Found') == 0) &&
+            (substr_count($a, 'общество не найден') == 0))  ;
+            else
+            {
+            throw new Exception('page not found : ' . $page);
+            }
+            if (substr_count($a, $this->u_w('Страница заблокирована')) == 0 &&
+                (substr_count($a, 'Страница заблокирована') == 0))  ;
+            else
+            {
+                throw new Exception('page is blocked: ' . $page);
+            }
+            return $a;
+        }
 
         public static  function remove_tags($text)
         {
@@ -558,4 +671,17 @@ return $a;
             }
             return $res;
         }
-}
+
+        public static function get_posts_by_vk_id( $ids )
+        {
+            $replace_array = array( 'wall', 'post' );
+            if( is_array( $ids ))
+                $ids = implode( ',', $ids );
+
+            $ids = str_replace( $replace_array, '', $ids );
+            $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
+            $posts = self::post_conv( $res );
+            return $posts;
+        }
+
+    }

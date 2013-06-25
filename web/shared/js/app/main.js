@@ -118,7 +118,7 @@ var App = (function() {
                 if (itemId != 'my') {
                     $selectedItem.find('.counter').fadeOut(200);
                 }
-                t.showPage({
+                t.appendPageData({
                     userGroupId: null
                 });
             });
@@ -135,14 +135,14 @@ var App = (function() {
                 var $tab = $(this);
                 $wallGroups.find('.tab.selected').removeClass('selected');
                 $tab.addClass('selected');
-                t.showPage();
+                t.appendPageData();
             });
 
             $wallTabs.delegate('.tab', 'click', function() {
                 var $tab = $(this);
                 $wallTabs.find('.tab.selected').removeClass('selected');
                 $tab.addClass('selected');
-                t.showPage({
+                t.appendPageData({
                     articlesOnly: true
                 }, function(data) {
                     t.$wallList.html(data);
@@ -154,7 +154,7 @@ var App = (function() {
                 var $target = $(this);
                 $target.parent().find('a[data-switch-to="' + $target.data('mode') + '"]').show();
                 $target.hide();
-                t.showPage();
+                t.appendPageData();
             });
 
             t._bindNewPostEvents();
@@ -301,7 +301,7 @@ var App = (function() {
                         $target.html('Скрыть записи в очереди');
                     }
                 } else {
-                    t.showPage({
+                    t.appendPageData({
                         mode: 'deferred',
                         articlesOnly: true
                     }, function(html) {
@@ -391,7 +391,7 @@ var App = (function() {
                     $button.removeClass('load');
                     $textarea.val('').focus();
                     $photos.html('');
-                    t.showPage();
+                    t.appendPageData();
                 });
             }
         },
@@ -422,7 +422,7 @@ var App = (function() {
                 return;
             }
             t.$loadMore.addClass('load').html('&nbsp;');
-            t.showPage({
+            t.appendPageData({
                 articlesOnly: true,
                 page: ++t.wallPage
             }, function(data) {
@@ -432,7 +432,7 @@ var App = (function() {
             });
         },
 
-        showPage: function(options, callback) {
+        appendPageData: function(options, callback) {
             var t = this;
             var $selectedTab = $('#groups').find('.tab.selected');
             var $selectedItem = t.$menu.find('.item.selected');

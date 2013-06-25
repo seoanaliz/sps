@@ -40,7 +40,7 @@ class GetArticleItemControl extends BaseControl
 
         // определяем роль
         if ($Article->sourceFeedId && !in_array($Article->sourceFeedId, array(SourceFeedUtility::FakeSourceAuthors,
-            SourceFeedUtility::FakeSourceTopface))){
+            SourceFeedUtility::FakeSourceTopface, SourceFeedUtility::FakeSourceRepost))){
             // если у поста есть источник, то проверяем, привязана ли он к ленте и по ленте определяем роль
             $SourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
             if ($SourceFeed){
@@ -66,8 +66,7 @@ class GetArticleItemControl extends BaseControl
         }
 
         $sourceFeed = SourceFeedFactory::GetById($Article->sourceFeedId);
-        $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $Article->articleId));
-
+        if( !$sourceFeed ) $sourceFeed = new SourceFeed();
         if (!empty($Article->authorId)) {
             $author = AuthorFactory::GetById($Article->authorId);
             Response::setParameter('author', $author);
@@ -78,6 +77,13 @@ class GetArticleItemControl extends BaseControl
             $articleLinkPrefix = 'http://vk.com/photo';
         }
 
+        $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $Article->articleId));
+        $repostArticleRecord = null;
+        if( $articleRecord->repostArticleRecordId ) {
+            $repostArticleRecord = ArticleRecordFactory::GetOne(array('articleRecordId' => $articleRecord->repostArticleRecordId ));
+        }
+
+        Response::setParameter('articleRecord', $repostArticleRecord);
         Response::setParameter('article', $Article);
         Response::setParameter('articleRecord', $articleRecord);
         Response::setParameter('sourceFeed', $sourceFeed);

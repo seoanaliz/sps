@@ -27,6 +27,7 @@ class GetArticlesQueueListControl extends BaseControl {
         $targetFeed   = TargetFeedFactory::GetById($targetFeedId);
 
         $articleRecords = array();
+        $repostArticleRecords = array();
         $articlesQueues  = array();
         $authors = array();
 
@@ -40,10 +41,17 @@ class GetArticlesQueueListControl extends BaseControl {
 
         if(!empty($targetFeedId) && !empty($targetFeed)) {
             //вытаскиваем всю очередь на этот день на этот паблик
+            $startDate = new DateTimeWrapper($date);
+            $startDate->modify('-30 seconds');
+
+            $endDate = new DateTimeWrapper($date);
+            $endDate->modify('+1 day -31 seconds');
+
             $articlesQueues = ArticleQueueFactory::Get(
                 array(
                     'targetFeedId' => $targetFeedId,
-                    'startDateAsDate' => $date,
+                    'startDateFrom' => $startDate,
+                    'startDateTo' => $endDate,
                     'type' => ($type == GridLineUtility::TYPE_ALL) ? null : $type,
                 )
                 , array(
@@ -117,12 +125,23 @@ class GetArticlesQueueListControl extends BaseControl {
                 );
                 if (!empty($articleRecords)) {
                     $articleRecords = BaseFactoryPrepare::Collapse($articleRecords, 'articleQueueId', false);
+
+                    $repostArticleRecordsIds =   array_filter( ArrayHelper::GetObjectsFieldValues($articleRecords, array('repostArticleRecordId')));
+                    if (!empty($repostArticleRecordsIds)) {
+                        $repostRecords = ArticleRecordFactory::Get(
+                            array('_articleRecordId' => array_unique($repostArticleRecordsIds)),
+                            array(BaseFactory::WithoutPages => true)
+                        );
+                        $repostArticleRecords = BaseFactoryPrepare::Collapse($repostRecords, 'articleRecordId', false);
+                    }
                 }
             }
         }
 
+        Response::setArray('repostArticleRecords', $repostArticleRecords);
         Response::setArray('articleRecords', $articleRecords);
         Response::setArray('articlesQueue', $articlesQueues);
+        Response::setObject('queueDate', $queueDate);
 
         if ($isHistory) {
             Page::$TemplatePath = 'tmpl://fe/elements/articles-queue-history.tmpl.php';

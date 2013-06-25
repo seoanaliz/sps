@@ -8,20 +8,27 @@
 
         const time_shift = 0;
         const FAVE_PUBLS_URL = 'http://vk.com/al_fans.php?act=show_publics_box&al=1&oid=';
+
+        const WARNING_DATA_NOT_ACCURATE = 1;
+        const WARNING_DATA_FROM_YESTERDAY = 2;
+        const WARNING_DATA_ACCURATE = 3;
+
+
         //массив пабликов, которые не надо включать в сбор/отбражение данных
         public static $exception_publics_array = array(
-         25678227
-        ,26776509
-        ,43503789
-        ,346191
-        ,33704958
-        ,38000521
-        ,1792796
-        ,27421965
-        ,34010064
-        ,25749497
-        ,35807078
-        ,25817269
+             26776509
+            ,43503789
+            ,346191
+            ,33704958
+            ,38000521
+            ,1792796
+            ,27421965
+            ,34010064
+            ,25749497
+            ,35807078
+            ,25817269
+            ,31554488
+            ,49765084
         );
 
         public static $topface_beauty = array(
@@ -72,12 +79,15 @@
 
         public static function get_our_publics_list( $selector = 0 )
         {
-            $publics = TargetFeedFactory::Get();
+            $publics = TargetFeedFactory::Get(array('isOur' => true ));
 
             $res = array();
             foreach ( $publics as $public ) {
                 if( $public->type != 'vk' || in_array( $public->externalId, self::$exception_publics_array ))
                     continue;
+                if(!isset($public->params['isOur']) || $public->params['isOur'] =='off')
+                    continue;
+
                 // селектором выбираем только топфейсовские паблики(1) или только не топфесовские(2)
                 if(( $selector == 1 && in_array( $public->externalId, self::$topface_beauty)) ||
                     ($selector == 2 && !in_array( $public->externalId, self::$topface_beauty)))
@@ -412,6 +422,7 @@
                 'count'      =>  round( $ds->GetFloat( 'count' )),
             );
             return $res;
+
         }
 
         public static function get_average_visitors( $sb_id, $time_from, $time_to )
@@ -504,33 +515,25 @@
 
         public static function get_views_visitors_from_vk( $public_id, $time_from, $time_to )
         {
-            $public = TargetFeedFactory::Get( array( 'externalId' => $public_id ));
-            if ( !empty( $public )) {
-                $public = reset( $public );
-//                $publisher = TargetFeedPublisherFactory::Get( array( 'targetFeedId' => $public->targetFeedId ));
-//                $publisher = reset( $publisher );
-            }
 
             $params = array(
                 'gid'           =>  $public_id,
                 'date_from'     =>  date( 'Y-m-d', $time_from ),
                 'date_to'       =>  date( 'Y-m-d', $time_to )
             );
-//            if ( isset( $publisher->publisher->vk_token ))
-//                $params['access_token']  =  $publisher->publisher->vk_token;
 
             $res = VkHelper::api_request( 'stats.get', $params, 0 );
             if ( !empty ( $res->error))
                 return false;
             $connect = ConnectionFactory::Get( 'tst' );
             foreach( $res as $day ) {
-                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $day->day, $connect );
+                $subs = isset($day->reach_subscribers) ? $day->reach_subscribers : 0;
+                StatPublics::save_view_visitor( $public_id, $day->views, $day->visitors, $subs, $day->day, $connect );
             }
             sleep(0.3);
         }
 
         public static function get_average_rate( $sb_id, $time_from, $time_to ) {
-
             if ( !$time_to )
                 $time_to = time();
             $sql = 'SELECT
@@ -561,7 +564,7 @@
             return 0;
         }
 
-        public static function save_view_visitor( $public_id, $views, $visitors, $date, $connect )
+        public static function save_view_visitor( $public_id, $views, $visitors, $reach, $date, $connect )
         {
             $sql = 'select * from
                 stat_publics_50k_points
@@ -578,17 +581,11 @@
                         stat_publics_50k_points
                     SET
                         visitors=@visitors,
-                        views   =@views
+                        views   =@views,
+                        reach   =@reach
                     WHERE
                         id=@public_id
                         AND time=@date';
-                $cmd = new SqlCommand( $sql, $connect );
-                $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetInteger( '@visitors',  $visitors );
-                $cmd->SetInteger( '@views',     $views );
-                $cmd->SetString ( '@date',      $date );
-
-                $cmd->Execute();
             } else {
                 $sql = 'INSERT INTO
                         stat_publics_50k_points
@@ -597,15 +594,18 @@
                            @date,
                            0,
                            @visitors,
-                           @views
+                           @views,
+                           @reach
                     )';
-                $cmd = new SqlCommand( $sql, $connect );
-                $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetInteger( '@visitors',  $visitors );
-                $cmd->SetInteger( '@views',     $views );
-                $cmd->SetString ( '@date',      $date );
-                $cmd->Execute();
+
             }
+            $cmd = new SqlCommand( $sql, $connect );
+            $cmd->SetInteger( '@public_id', $public_id );
+            $cmd->SetInteger( '@visitors',  $visitors );
+            $cmd->SetInteger( '@views',     $views );
+            $cmd->SetInteger( '@reach',     $reach );
+            $cmd->SetString ( '@date',      $date );
+            $cmd->Execute();
 
         }
 
@@ -635,11 +635,10 @@
             foreach( $sliced_walls_array as $chunk ) {
                 $code = '';
                 $return = "return{";
-                //Р·Р°РїСЂР°С€РёРІР°РµРј СЃС‚РµРЅС‹ РїР°Р±Р»РёРєРѕРІ РїРѕ 25 РїР°Р±Р»РёРєРѕРІ, 10 РїРѕСЃС‚РѕРІ
                 $i = 0;
                 foreach( $chunk as $public ) {
                     $id = trim( $public );
-                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count":10 });';
+                    $code   .= 'var id' . $id . ' = API.wall.get({"owner_id":-' . $id . ',"count": 6 });';
                     $return .=  "\"id$id\":id$id,";
                     $i++;
                 }
@@ -687,7 +686,7 @@
         public static function get_publics_info_from_base( $public_ids )
         {
             $public_ids = implode( ',', $public_ids );
-            $sql = 'SELECT vk_id, name, ava, quantity, page
+            $sql = 'SELECT vk_id, name, ava, quantity, is_page
                     FROM ' . TABLE_STAT_PUBLICS . '
                     WHERE vk_id IN (' . $public_ids . ')';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
@@ -699,7 +698,7 @@
                     'name'      =>   $ds->GetString ( 'name' ),
                     'ava'       =>   $ds->GetString ( 'ava' ),
                     'quantity'  =>   $ds->GetInteger( 'quantity' ),
-                    'page'      =>   $ds->GetBoolean( 'page')
+                    'page'      =>   $ds->GetBoolean( 'is_page')
                 );
             }
             return $res;
@@ -710,7 +709,6 @@
         {
             $base_publics = array_flip( $base_publics );
             $public_chunks = array_chunk( $publics, 500 );
-
             foreach( $public_chunks as $ids ) {
                 $line = implode( ',', $ids );
                 $res = VkHelper::api_request('groups.getById', array( 'gids' => $line ), 0);
@@ -718,18 +716,20 @@
                 foreach( $res as $public ) {
                     if( !isset($public->gid) || !isset($public->photo) || !isset($public->name) || !isset($public->type))
                         continue;
-                    if( !$base_publics || isset(  $base_publics[$public->gid] )) {
+                    if( !$base_publics || isset(  $base_publics[$public->gid] ) || in_array( $public->gid, WrTopics::$toface_beauty )) {
                         //проверяет, изменяется ли название паблика. если да - записывает изменения в stat_public_audit
-                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name';
+                        $sql = 'SELECT update_public_info( @public_id, @name, @photo, @page ) AS old_name;
+                                UPDATE '. TABLE_STAT_PUBLICS . ' set closed = @closed WHERE vk_id = @public_id';
                     } else {
-                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","page","sh_in_main")
-                                                               VALUES ( @public_id, @photo, @name, true, true)';
+                        $sql = 'INSERT INTO ' . TABLE_STAT_PUBLICS . '("vk_id","ava","name","is_page","sh_in_main","closed")
+                                                               VALUES ( @public_id, @photo, @name, true, true, @closed)';
                     }
                     $cmd = new SqlCommand( $sql, $conn );
                     $cmd->SetInteger( '@public_id', $public->gid );
                     $cmd->SetString(  '@name',   $public->name );
                     $cmd->SetString(  '@photo',  $public->photo);
                     $cmd->SetBoolean( '@page', ( $public->type == 'page' ? true : false ));
+                    $cmd->SetBoolean( '@closed', (boolean)$public->is_closed);
                     $cmd->Execute();
                 }
             }
@@ -743,7 +743,7 @@
             $sql = "SELECT set_state( @public_id, @name, @state) AS cnanged;";
                 $cmd = new SqlCommand( $sql, $conn );
                 $cmd->SetInteger( '@public_id', $public_id );
-                $cmd->SetString(  '@name',      $parameter );
+                $cmd->SetString ( '@name',      $parameter );
                 $cmd->SetBoolean( '@state',     $state);
                 $cmd->Execute();
         }
@@ -793,7 +793,7 @@
             //поиск id паблика
             $int_search = (int) $search_string;
 
-            $sql = 'SELECT vk_id,ava, name,quantity,page
+            $sql = 'SELECT vk_id,ava, name,quantity,is_page
                     FROM ' . TABLE_STAT_PUBLICS .
                    ' WHERE
                         ( name ILIKE @search_string
@@ -819,14 +819,14 @@
             return $res;
         }
 
-        public static  function update_population( $barter_events_array, $point = 'end' )
+        public static function update_population( $barter_events_array, $point = 'end' )
         {
             $subscribers =  $point . '_subscribers';
             $visitors    =  $point . '_visitors';
 
             foreach( $barter_events_array as $barter_event ) {
                 /** @var $barter_event BarterEvent */
-                if ( $barter_event->status != 3 || $point = 'start' ) {
+                if ( $barter_event->status != 3 || $point == 'start' ) {
                     $time = time() + self::time_shift;
 
                     $res = StatPublics::get_visitors_from_vk( $barter_event->target_public, $time, $time,'barter' );
@@ -838,23 +838,43 @@
                     $barter_event->$visitors = $res['visitors'];
 
                     $count = 0;
-                    for ( $i = 0; $i < 3; $i++ ) {
+                    $init_users = array();
 
-                        $res = VkHelper::api_request( 'groups.getMembers', array( 'gid' => $barter_event->target_public, 'count' => 1 ), 0, 'barter');
+                    $params = array(
+                        'gid' => $barter_event->target_public,
+                        'count' => 15,
+                        'sort'  =>  'time_desc' );
+
+                    for ( $i = 0; $i < 3; $i++ ) {
+                        $res = VkHelper::api_request( 'groups.getMembers', $params, 0, 'barter');
                         if( !isset( $res->count )) {
                             sleep( 1 );
                             continue;
                         }
-                        $count = $res->count;
+                        $count      =   $res->count;
+                        if( $point = 'start') {
+                            $init_users =  $res->users;
+                        }
                         break;
                     }
-//                if( !$count ) {
-//                    $count = $this->get_public_members_count( $barter_event->target_public );
-//                }
+
                     $barter_event->$subscribers = $count;
+                    if( $point == 'start' ) {
+                        $barter_event->init_users  = $init_users;
+                    }
                 }
             }
         }
 
+        public static function get_last_stat_demon_time()
+        {
+            $sql = 'SELECT MAX("createdAt") FROM ' . TABLE_STAT_PUBLICS_POINTS;
+
+            $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst'));
+            $ds = $cmd->Execute();
+            echo $cmd->GetQuery();
+            $ds->Next();
+            return $ds->Next() ? $ds->GetDateTime( 'max' ) : DateTimeWrapper::Now() ;
+        }
     }
 ?>

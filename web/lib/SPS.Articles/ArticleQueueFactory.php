@@ -76,7 +76,6 @@
                 ,'articleId' => array(
                     'name'          => 'articleId'
                     , 'type'        => TYPE_INTEGER
-                    , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Article'
                 )
                 ,'targetFeedId' => array(
@@ -143,6 +142,16 @@
                     'name'         => 'externalLikes',
                     'type'          => TYPE_BOOLEAN,
                     'searchType' => SEARCHTYPE_NULL
+                )
+                , 'startDateFrom' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_GE
+                )
+                , 'startDateTo' => array(
+                    'name'         => 'startDate'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_LE
                 ))
         );
         

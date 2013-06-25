@@ -8,18 +8,19 @@
                     <template>tmpl://fe/index.tmpl.php</template>
                 </page>
                 <page uri="/login/" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.VK.VKLogoutSilent</actions>
+                    <actions>SPS.VK.VKLoginForm</actions>
                     <template>tmpl://fe/login.tmpl.php</template>
+                </page>
+                <page uri="/logout/" boot="SPS.Site.GetSiteParams">
+                    <actions>SPS.VK.VKLogoutRedirect</actions>
+                    <template>tmpl://fe/empty-with-counters.tmpl.php</template>
+                </page>
+                <page uri="/vk-login/" boot="SPS.Site.GetSiteParams">
+                    <actions>SPS.VK.VKLoginRedirect</actions>
+                    <template>tmpl://fe/empty-with-counters.tmpl.php</template>
                 </page>
                 <page uri="/landing/" boot="SPS.Site.GetSiteParams">
                     <template>tmpl://fe/landing.tmpl.php</template>
-                </page>
-                <page uri="/logout/" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.VK.VKLogout</actions>
-                    <template>tmpl://fe/login.tmpl.php</template>
-                </page>
-                <page uri="/stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
-                    <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="/oadmins">
                     <actions>SPS.Stat.AdminsWork</actions>
@@ -49,8 +50,21 @@
                     <actions>SPS.Site.GetArticlesQueueListControl</actions>
                     <template>tmpl://fe/elements/articles-queue-list.tmpl.php</template>
                 </page>
+                <page uri="controls://articles-queue-timeline/">
+                    <actions>SPS.Site.GetArticlesQueueTimelineControl</actions>
+                    <template>tmpl://fe/elements/articles-queue-timeline.tmpl.php</template>
+                </page>
                 <page uri="controls://article-queue-delete/">
                     <actions>SPS.Site.DeleteArticleQueueControl</actions>
+                </page>
+                <page uri="controls://article-queue-get-empty/">
+                    <actions>SPS.Site.RenderEmptyQueueItemControl</actions>
+                </page>
+                <page uri="controls://article-queue-toggle-repeat/">
+                    <actions>SPS.Site.ArticleQueueToggleRepeat</actions>
+                </page>
+                <page uri="controls://article-queue-item-save/">
+                    <actions>SPS.Site.SaveQueueItemControl</actions>
                 </page>
                 <page uri="controls://article-add-to-queue/">
                     <actions>SPS.Site.AddArticleToQueueControl</actions>
@@ -64,9 +78,6 @@
                 <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
-                <page uri="controls://parse-url/">
-                    <actions>SPS.Site.ParseUrlControl</actions>
-                </page>
                 <page uri="controls://image-upload/" boot="">
                     <actions>SPS.Site.ImageUploadControl</actions>
                 </page>
@@ -79,8 +90,8 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
-                <page uri="controls://grid-line-save/">
-                    <actions>SPS.Site.SaveGridLineControl</actions>
+                <page uri="controls://create-grid-line/">
+                    <actions>SPS.Site.CreateGridLineControl</actions>
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
@@ -118,10 +129,19 @@
 
             </pageGroup>
 
-            <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name = "parseUrl">
+                <page uri="controls://parse-url/">
+                    <actions>SPS.Site.ParseUrlControl</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
 
                 <page uri="controls://getPublicMarks/">
                     <actions>SPS.Stat.getPublicMarks</actions>
+                </page>
+                <page uri="controls://saveEdtiorAt/">
+                    <actions>SPS.Stat.saveEdtiorAt</actions>
                 </page>
                 <page uri="controls://setPostPrice/">
                     <actions>SPS.Stat.setPostPrice</actions>
@@ -150,8 +170,8 @@
                 <page uri="controls://togglePublVisibil/">
                     <actions>SPS.Stat.togglePublVisibil</actions>
                 </page>
-                <page uri="controls://toggleGroupFave/">
-                    <actions>SPS.Stat.toggleGroupFave</actions>
+                <page uri="controls://toggleGroupGeneral/">
+                    <actions>SPS.Stat.toggleGroupGeneral</actions>
                 </page>
                 <page uri="controls://addUser/">
                     <actions>SPS.Stat.addUser</actions>
@@ -182,12 +202,27 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+            <pageGroup name="AuthorControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://getAuthors/">
                     <actions>SPS.Stat.getAuthors</actions>
                 </page>
                 <page uri="controls://getPublics/">
                     <actions>SPS.Stat.getPublics</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="controls://saveNewUser/">
+                    <actions>SPS.Stat.saveNewUser</actions>
+                </page>
+                <page uri="controls://getNewUsers/">
+                    <actions>SPS.Stat.getNewUsers</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="NewUserControls" boot="SPS.Site.GetSiteParams, SPS.Common.CheckAuth">
+                <page uri="controls://approveNewUser/">
+                    <actions>SPS.Stat.approveNewUser</actions>
                 </page>
             </pageGroup>
 
@@ -267,6 +302,9 @@
                 <page uri="vt://stats/">
                     <actions>SPS.Common.GetSystemStats</actions>
                     <template>tmpl://vt/stats.tmpl.php</template>
+                </page>
+                <page uri="vt://memcache-test/">
+                    <actions>SPS.Common.MemcacheTest</actions>
                 </page>
                 <pageGroup name="SPS.Common">
                     <page uri="vt://statistics">
@@ -485,6 +523,7 @@
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+
                 </pageGroup>
 
                 <pageGroup name="SPS.App">
@@ -555,6 +594,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-suggests/">
+                    <actions>SPS.Site.SyncSuggestedPosts</actions>
+                </page>
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>
                 </page>
@@ -588,6 +630,9 @@
                 <page uri="daemons://token-checker/">
                     <actions>SPS.Stat.TokenChecker</actions>
                 </page>
+                <page uri="daemons://PublicsParser/">
+                    <actions>SPS.Stat.PublicsParser</actions>
+                </page>
                  <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
                  </page>
@@ -605,6 +650,12 @@
             <pageGroup name="vtControls" boot="">
                 <page uri="controls://generate-grid-sql/">
                     <actions>SPS.Articles.GenerateGridSQL</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="accessTokens">
+                <page uri="controls://save-access-token/">
+                    <actions>SPS.Site.SaveAccessTokenControl</actions>
                 </page>
             </pageGroup>
 
@@ -694,11 +745,18 @@
                 </page>
             </pageGroup>
 
-            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+
+            <pageGroup name="editors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="editors_login://" >
+                    <template>tmpl://editors_login/login.tmpl.php</template>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-                <page uri="stat://reports/" boot="">
+                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>
@@ -718,6 +776,21 @@
             <pageGroup name="reports" boot="">
                 <page uri="reports://topface-user-posts/">
                     <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="mobileSettings" boot="">
+                <page uri="/settings/29905631/(android|ios:?)/settings.php">
+                    <actions>SPS.Mobile.GetSettings</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="mobile" boot="SPS.Site.GetSiteParams">
+                <page uri="/mobile/?">
+                    <template>tmpl://mobile/index.tmpl.php</template>
+                </page>
+                <page uri="mobile://admin/?" boot="SPS.Common.CheckAuth">
+                    <template>tmpl://mobile/admin.tmpl.php</template>
                 </page>
             </pageGroup>
 

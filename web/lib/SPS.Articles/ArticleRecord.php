@@ -65,5 +65,21 @@
 
         /** @var ArticleQueue */
         public $articleQueue;
+
+        /** @var int */
+        public $repostArticleRecordId;
+
+        /** @var string */
+        public $repostExternalId;
+
+        /** @var string */
+        public $createdVia;
+
+        /** @var string */
+        public $repostPublicImage;
+
+        /** @var string */
+        public $repostPublicTitle;
+
     }
 ?>

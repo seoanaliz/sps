@@ -32,11 +32,11 @@ $__pageTitle = !empty($__pageTitle) ? $__pageTitle : $__sitePageTitle;
 
 $cssFiles = array(
     AssetHelper::AnyBrowser => array(
-        'css://common/common.css',
+        'css://common/common.less',
+        'css://st/main.less',
+        'css://reports/main.less',
         'css://fe/jquery-ui.css',
         'css://fe/custom.css',
-        'css://st/main.css',
-        'css://reports/main.css',
    ),
     AssetHelper::IE7 => array(),
 );
@@ -48,6 +48,7 @@ $jsFiles = array(
     'js://common/event.js',
     'js://common/model.js',
     'js://common/widget.js',
+    'js://common/deferred.js',
     'js://common/control.js',
     'js://common/collection.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',

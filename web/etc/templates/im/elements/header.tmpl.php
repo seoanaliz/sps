@@ -47,6 +47,7 @@ $jsFiles = array(
     'js://common/model.js',
     'js://common/collection.js',
     'js://common/widget.js',
+    'js://common/deferred.js',
     'js://common/control.js',
     'js://common/jquery.easydate-0.2.4.js',
     'js://ext/jquery.plugins/jquery.cookie.js',

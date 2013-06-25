@@ -68,14 +68,22 @@ class BarterEvent
     /** @var int array*/
     public $groups_ids;
 
-    /** @var int array*/
+    /** @var int */
     public $creator_id;
+
+    /** @var int array*/
+    public $init_users;
+
+    /** @var int */
+    public $neater_subscribers;
+
+    /** @var int */
+    public $skiped_subscribers;
 
     public function __clone()
     {
         $this->barter_event_id = null;
         $this->created_at = date ( 'Y-m-d H:i:s', time());
     }
-
 }
 ?>

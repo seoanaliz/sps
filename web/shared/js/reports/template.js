@@ -66,10 +66,10 @@ var REPORTS = {
     '<div class="tab-bar">' +
         '<div id="tab-monitors" class="tab selected">Мониторы</div>' +
         '<div id="tab-results" class="tab">Результаты</div>' +
-        '<div class="actions">' +
-            '<a id="share-list" class="share">Поделиться списком</a> |' +
-            '<a id="delete-list" class="share">Удалить</a>' +
-        '</div>' +
+    '</div>' +
+    '<div class="actions">' +
+        '<a id="share-list" class="share">Поделиться списком</a> |' +
+        '<a id="delete-list" class="share">Удалить</a>' +
     '</div>' +
     '<div id="list-add-monitor" class="list-add-monitor"></div>',
 
@@ -174,7 +174,7 @@ var REPORTS = {
             '<div class="column diff-time" title="Удалён через"><?=isset("deleted_at") ? deleted_at : "-" ?></div>' +
             '<div class="column diff-time" title="Перекрыт через"><?=(isset("overlaps") && overlaps.length) ? overlaps[0] : "-" ?></div>' +
             '<div class="column visitors<?=(isset("visitors") && visitors > 0) ? " plus" : " minus"?>" title="Уникальных посетителей"><?=isset("visitors") ? visitors : "0" ?></div>' +
-            '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?></div>' +
+            '<div class="column subscribers<?=(isset("subscribers") && subscribers > 0) ? " plus" : " minus"?>" title="Подписалось"><?=isset("subscribers") ? subscribers : "0" ?>  </div>' +
         '</div>'
     }
 };

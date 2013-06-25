@@ -16,7 +16,7 @@
     }
 </style>
 <div id="login" class="login">
-    <a id="loginBtn" href="{$loginUrl}" class="button">Получить ключ доступа</a>
+    <button id="loginBtn" data-url="{$loginUrl}" class="button">Получить ключ доступа</button>
     <input id="accessToken" type="text" placeholder="Введите URL нового окна..." />
     <div class="hint"></div>
     <div class="result"></div>

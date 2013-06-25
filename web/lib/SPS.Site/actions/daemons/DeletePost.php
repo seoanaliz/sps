@@ -21,7 +21,8 @@ class DeletePost
                 AND "articleQueues"."deleteAt" IS NOT NULL
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
-                LIMIT 10 FOR UPDATE;
+                ORDER BY "articleQueues"."deleteAt" DESC
+                LIMIT 20 FOR UPDATE;
 sql;
         $sender = new SenderVkontakte();
 
@@ -47,7 +48,10 @@ sql;
                     try {
                         $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
                         $sender->vk_access_token = $publisher->publisher->vk_token;
-                        $sender->delete_post($articleQueue->externalId);
+                        if( $sender->delete_post($articleQueue->externalId)) {
+                            $articleQueue->isDeleted = true;
+                            ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
+                        }
                         break;
                     } catch(Exception $exception) {
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
@@ -61,8 +65,6 @@ sql;
                 continue;
             }
 
-            $articleQueue->isDeleted = true;
-            ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
         }
 
         ConnectionFactory::CommitTransaction(true);

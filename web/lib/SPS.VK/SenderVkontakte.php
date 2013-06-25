@@ -12,7 +12,7 @@
 
     class SenderVkontakte {
 
-        private $change_admin_errors = array( 5, 7, 14, 15 );
+        private $change_admin_errors = array( 5, 7, 14, 15, 214 );
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
@@ -25,6 +25,7 @@
         private $header;                        //заголовок ссылки
         private $audio_id = array();            //заголовок ссылки
         private $video_id = array();            //заголовок ссылки
+        private $repost_post;
 
         const METH          =   'https://api.vk.com/method/';
         const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
@@ -47,10 +48,13 @@
                 $this->video_id         =   isset( $post_data['video_id'] ) ? $post_data['video_id'] : array();//массив вида array('audioXXXX_YYYYYYY','...')
                 $this->link             =   $post_data['link'];
                 $this->header           =   $post_data['header'];
+                $this->repost_post      =   $post_data['repost_post'];
+
             }
+
         }
 
-        private function qurl_request($url, $arr_of_fields, $headers = '', $uagent = '')
+        private function qurl_request( $url, $arr_of_fields, $headers = '', $uagent = '' )
         {
             if (empty($url)) {
                 return false;
@@ -100,12 +104,14 @@
         //          либо токен сгорел
         //
         //      исключения на все остальное
-
         public function send_post()
         {
             sleep( rand( 0, 12 ));
             $photo_array = array();
             $meth = 'wall';
+//            if ( substr_count($this->post_text, '@') > 0 || substr_count($this->post_text, '[') > 0 ){
+//                return false;
+//            }
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
@@ -135,11 +141,39 @@
                 return '-' . $this->vk_group_id . '_' . $check_id;
         }
 
+        public function repost()
+        {
+            $params = array(
+                'object'    =>  'wall' . $this->repost_post,
+                'message'   =>  '',
+                'gid'       =>  $this->vk_group_id,
+                'access_token' => $this->vk_access_token
+            );
+            $res = VkHelper::api_request( 'wall.repost', $params );
+            if (isset ($res->error )) {
+                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                    throw new ChangeSenderException(  $res->error->error_msg );
+
+                else
+                    throw new Exception( 'Error in wall.post: ' . $res->error->error_code
+                        . ', public: '. $this->vk_group_id );
+            }
+
+            if ( isset( $res->success) && $res->success && isset( $res->post_id ))
+                return  '-' . $this->vk_group_id . '_' . $res->post_id;
+            else {
+                throw new Exception( 'Strange response on wall.repost: ' . ObjectHelper::ToJSON( $res )
+                    . ', public: '. $this->vk_group_id );
+            }
+        }
+
         public function text_corrector( $text )
         {
             $text = strip_tags( $text );
-    //            $text = htmlspecialchars( $text );
-            $text = str_replace( '@', ' @', $text );
+            //cURL пытается найти файл по любой строке, начинающейся с @
+//            preg_replace( '/^@/', '^ @', $text );
+            if ( $text[0] == '@')
+                $text = ' ' . $text;
             return $text;
         }
 
@@ -248,15 +282,19 @@
         public function delete_post( $full_post_id )
         {
             list( $owner_id, $post_id ) = explode( '_', $full_post_id );
-            if( $post_id) {
+            if( $post_id ) {
                 $owner_id = trim($owner_id, '-');
                 $params = array(
                     'owner_id'      =>  '-' . $owner_id,
                     'post_id'       =>  $post_id,
                     'access_token'  =>  $this->vk_access_token
                 );
-                if( VkHelper::api_request( 'wall.delete', $params ))
+                VkHelper::api_request( 'wall.delete', $params );
+
+                $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
+                if( empty( $check ))
                     return true;
+                throw new Exception('Failed on deleting ' . $post_id);
             }
             return false;
         }
@@ -279,7 +317,7 @@
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:
-        // id, количество фото в нем, сколько всего таких
+        // id, количество фото в нем, сколько всего c таким названием
         private function get_album( $title_search = '' )
         {
             $title_search = $title_search ? $title_search : self::ALBUM_NAME;
@@ -360,10 +398,10 @@
             elseif ( isset( $res->error ))
 
                 if ( in_array( $res->error->error_code, $this->change_admin_errors ))
-                    throw new ChangeSenderException();
+                    throw new ChangeSenderException($res->error->error_msg);
 
                 else
-                    throw new Exception( 'Error in wall.post: ' . $res->error->error_code
+                    throw new Exception( 'Error in wall.post: ' . $res->error->error_msg
                         . ', public: '. $this->vk_group_id );
         }
 
@@ -455,7 +493,7 @@
             sleep( 0.4 );
             if ( !isset( $res->upload_url )) {
                 if ( isset ( $res->error) && in_array( $res->error->error_code, $this->change_admin_errors )) {
-                    throw new ChangeSenderException();
+                    throw new ChangeSenderException($res->error->error_msg);
                 } elseif(isset ( $res->error)) {
                     throw new exception( " Error uploading photo. Response : " . $res->error->error_msg
                         . " in post to vk.com/public" . $this->vk_group_id );

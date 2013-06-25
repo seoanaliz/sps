@@ -28,12 +28,38 @@ if (!window.localStorage) {
 
 if (!window.console) {
     window.console = {
-        log: function(params) {},
-        dir: function(params) {},
-        group: function(groupName) {},
-        groupCollapsed: function(groupName) {},
-        groupEnd: function(groupName) {},
-        error: function(params) {}
+        /**
+         @param {...*} message
+         */
+        info: function(message) {},
+        /**
+         @param {...*} message
+         */
+        warn: function(message) {},
+        /**
+         @param {...*} message
+         */
+        error: function(message) {},
+        /**
+         @param {...*} message
+         */
+        log: function(message) {},
+        /**
+         @param {...*} message
+         */
+        dir: function(message) {},
+        group: function() {},
+        groupCollapsed: function() {},
+        groupEnd: function() {},
+        trace: function() {},
+        /**
+         @param {string} timerName
+         */
+        time: function(timerName) {},
+        /**
+         @param {string} timerName
+         */
+        timeEnd: function(timerName) {}
     };
 }
 
@@ -105,10 +131,44 @@ function strval(value) {
     return value + '';
 }
 
+/**
+ * @param num
+ * @param {string} [separator=" "]
+ * @returns {string}
+ */
+function numberWithSeparator(num, separator) {
+    return typeof num == 'string' ? num.replace(/\B(?=(\d{3})+(?!\d))/g, separator || ' ') : num;
+}
+
 // Парсинг URL
 function getURLParameter(name, search) {
     search = search || location.search;
     return decodeURIComponent((new RegExp(name + '=' + '(.+?)(&|$)').exec(search)||[,null])[1]);
+}
+
+function windowOpen(url, windowName) {
+    var screenX = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
+    var screenY = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
+    var outerWidth = $(window).width();
+    var width = 400;
+    var height = 200;
+    var top = parseInt(screenY + 280);
+    var left = parseInt(screenX + ((outerWidth - width) / 2));
+    var params = {
+        top: top,
+        left: left,
+        width: width,
+        height: height,
+        menubar: 'no',
+        toolbar: 'no',
+        resizable: 'no',
+        scrollbars: 'no',
+        directories: 'no',
+        location: 'yes',
+        status: 'no'
+    };
+    var windowFeatures = $.param(params).split('&').join(',');
+    return window.open(url, windowName, windowFeatures);
 }
 
 // Выделение текста в инпутах
@@ -317,20 +377,19 @@ function getURLParameter(name, search) {
                 $wrap.data(DATA_KEY, true);
                 $wrap.addClass(CLASS_LOADING);
 
-                (function loadImage(i) {
+                var loadedImages = 0;
+                $images.each(function(i) {
+                    var src = $(this).attr('src');
                     var img = new Image();
-                    var src = $($images[i]).attr('src');
-
                     img.onload = function() {
-                        imagesSizes.push([img.width, img.height]);
-                        if (i == imagesNum - 1) {
-                            return onLoadImages();
-                        } else {
-                            loadImage(i + 1);
+                        imagesSizes[i] = [img.width, img.height];
+                        loadedImages++;
+                        if (loadedImages >= imagesNum) {
+                            onLoadImages();
                         }
                     };
                     img.src = src;
-                })(0);
+                });
 
                 function onLoadImages() {
                     if ((imagesNum - 1) % imagesPerColumn == 1) {
@@ -516,27 +575,17 @@ var Box = (function() {
     var $body;
     var $html;
     var $layout;
-    var boxesCollection = {};
-    var boxesHistory = [];
+    var history = [];
     var htmlOverflow;
 
     return function(options) {
-        if (typeof options != 'object') {
-            if (boxesCollection[options]) {
-                return boxesCollection[options];
-            } else {
-                return false;
-            }
-        }
-
-        var box = {};
         var params = $.extend({
-            id: false,
             title: '',
             html: '',
             closeBtn: true,
             buttons: [],
             width: 400,
+            additionalClass: '',
             onshow: function() {},
             onhide: function() {},
             oncreate: function() {}
@@ -545,121 +594,124 @@ var Box = (function() {
         if (!$layout) {
             $body = $('body');
             $html = $('html');
-            $layout = $(tmpl(BOX_LAYOUT)).click(function(e) {
-                if (e.target == e.currentTarget) {
-                    if (boxesHistory[boxesHistory.length-1]) {
-                        boxesHistory[boxesHistory.length-1].hide();
-                        if (!boxesHistory.length) {
-                            $layout.hide();
-                        }
-                    }
-                }
-            }).addClass('box-layout').appendTo($body);
-
-            $(document).keydown(function(e) {
-                if (e.keyCode == KEY.ESC) {
-                    $layout.click();
-                }
-            });
+            $layout = $(tmpl(BOX_LAYOUT)).appendTo($body);
         } else {
             $layout = $('body > .box-layout');
         }
 
-        if (params.id) {
-            if (boxesCollection[params.id]) {
-                return boxesCollection[params.id];
-            } else {
-                boxesCollection[params.id] = box;
-            }
-        }
-
-        var $box = $(tmpl(BOX_WRAP, {})).appendTo($layout).width(params.width).hide();
+        var $boxWrap = $(tmpl(BOX_WRAP)).appendTo($body).hide();
+        var $box = $boxWrap.find('> .box').width(params.width);
 
         $box.delegate('.title > .close', 'click', function() {
             box.hide();
         });
 
-        box.$el = box.$box = $box;
-        box.show = show;
-        box.hide = hide;
-        box.remove = remove;
-        box.setHTML = setHTML;
-        box.setTitle = setTitle;
-        box.setButtons = setButtons;
-        box.refreshTop = refreshTop;
-        box.visible = false;
+        $boxWrap.on('click', function(e) {
+            if (e.target == this) {
+                box.hide();
+            }
+        });
+
+        var box = {
+            $el: $box,
+            $box: $box,
+            visible: false,
+            show: show,
+            hide: hide,
+            remove: remove,
+            setHTML: setHTML,
+            setTitle: setTitle,
+            setButtons: setButtons,
+            refreshTop: refreshTop,
+            addClass: addClass,
+            removeClass: removeClass
+        };
 
         box.setTitle(params.title);
         box.setHTML(params.html);
         box.setButtons(params.buttons);
+        box.addClass(params.additionalClass);
 
         function show() {
-            if (boxesHistory.length) {
-                if (boxesHistory[boxesHistory.length-1] != box) {
-                    boxesHistory[boxesHistory.length-1].$box.hide();
+            var prevBox = history[history.length-1];
+            if (prevBox != box) {
+                history.push(box);
+                if (prevBox) {
+                    prevBox.hide();
+                } else {
+                    htmlOverflow = $html.css('overflow-y');
+                    $html.width($body.width()).css('overflow-y', 'hidden');
+                    $layout.show();
                 }
-            } else {
-                htmlOverflow = $html.css('overflow-y');
-                $html.width($body.width()).css('overflow-y', 'hidden');
-                $layout.show();
             }
 
-            boxesHistory.push(box);
+            $(document).off('keydown.box').on('keydown.box', function(e) {
+                if (e.keyCode == KEY.ESC) {
+                    box.hide();
+                }
+            });
+
+            $boxWrap.show();
             box.visible = true;
-            $box.show();
             box.refreshTop();
             params.onshow.call(box, $box);
+
             return box;
         }
+
         function hide() {
             box.visible = false;
-            $box.hide();
-            boxesHistory.pop();
+            $boxWrap.hide();
 
-            if (boxesHistory.length) {
-                if (boxesHistory[boxesHistory.length-1] != box) {
-                    boxesHistory[boxesHistory.length-1].$box.show();
+            var prevBox = history[history.length-2];
+            if (prevBox != box) {
+                history.pop();
+                if (prevBox) {
+                    prevBox.show();
+                } else {
+                    $html.css('overflow-y', htmlOverflow).width('auto');
+                    $layout.hide();
                 }
-            } else {
-                $html.css('overflow-y', htmlOverflow).width('auto');
-                $layout.hide();
             }
 
             params.onhide.call(box, $box);
             return box;
         }
+
         function remove() {
             if (box.visible) {
                 box.hide();
             }
-            delete boxesCollection[params.id];
             $box.remove();
         }
+
         function setHTML(html) {
             $box.find('> .body').html(html);
             box.refreshTop();
             return box;
         }
+
         function setTitle(title) {
             if (!title) {
                 $box.find('> .title').remove();
             } else {
                 if (!$box.find('> .title').length) {
-                    $box.prepend('<div class="title"><span class="text"></span></div>');
+                    $box.prepend(tmpl(BOX_TITLE));
                     if (params.closeBtn) {
-                        $box.find('> .title').append('<div class="close"></div>');
+                        $box.find('> .title').append(tmpl(BOX_CLOSE));
                     }
                 }
                 $box.find('> .title .text').text(title);
             }
             return box;
         }
+
         function setButtons(buttons) {
             if (!buttons || !buttons.length) {
                 $box.find('> .actions-wrap').remove();
             } else {
                 if (!$box.find('> .actions-wrap').length) {
-                    $box.append('<div class="actions-wrap"><div class="actions"></div></div>');
+                    $box.append(tmpl(BOX_ACTIONS));
                 }
                 $box.find('> .actions-wrap .actions').empty();
                 $.each(buttons, function(i, button) {
@@ -670,8 +722,17 @@ var Box = (function() {
             }
             return box;
         }
+
+        function addClass(cssClass) {
+            $box.addClass(cssClass);
+        }
+
+        function removeClass(cssClass) {
+            $box.removeClass(cssClass);
+        }
+
         function refreshTop() {
-            var top = ($(window).height() / 3) - ($box.height() / 2);
+            var top = ($(window).height() / 2.5) - ($box.height() / 2);
             $box.css({
                 marginTop: top < 20 ? 20 : top
             });
@@ -1416,7 +1477,8 @@ var tmpl = (function($) {
                     'print=function(){p.push.apply(p,arguments)},' +
                     'isset=function(v){return !!obj[v]},' +
                     'each=function(ui,obj){for(var i in obj) { print(tmpl(ui, $.extend(obj[i],{i:i}))) }};' +
-                    'count=function(obj){var cnt = 0; for(var i in obj) { if (obj.hasOwnProperty(i)) cnt++; } return cnt};' +
+                    'count=function(obj){return (obj instanceof Array) ? obj.length : countObj(obj)};' +
+                    'countObj=function(obj){var cnt = 0; for(var i in obj) { if (obj.hasOwnProperty(i)) cnt++; } return cnt};' +
                     "with(obj){p.push('" + format(str) + "');} return p.join('');"
             ));
             return (cache[str] = fn(data || {}));
@@ -1436,24 +1498,26 @@ var BOX_LAYOUT =
 
 var BOX_WRAP =
 '<div class="box-wrap">' +
-    '<? if (isset("title")) { ?>' +
-        '<div class="title">' +
-            '<span class="text"><?=title?></span>' +
-            '<? if (isset("closeBtn")) { ?>' +
-                '<div class="close"></div>' +
+    '<div class="box">' +
+        '<? if (isset("title")) { ?>' +
+            '<div class="title">' +
+                '<span class="text"><?=title?></span>' +
+                '<? if (isset("closeBtn")) { ?>' +
+                    '<div class="close"></div>' +
+                '<? } ?>' +
+            '</div>' +
+        '<? } ?>' +
+        '<div class="body clear-fix">' +
+            '<? if (isset("body")) { ?>' +
+                '<?=body?>' +
             '<? } ?>' +
         '</div>' +
-    '<? } ?>' +
-    '<div class="body clear-fix">' +
-        '<? if (isset("body")) { ?>' +
-            '<?=body?>' +
+        '<? if (isset("buttons") && buttons.length) { ?>' +
+            '<div class="actions-wrap">' +
+                '<div class="actions"></div>' +
+            '</div>' +
         '<? } ?>' +
     '</div>' +
-    '<? if (isset("buttons") && buttons.length) { ?>' +
-        '<div class="actions-wrap">' +
-            '<div class="actions"></div>' +
-        '</div>' +
-    '<? } ?>' +
 '</div>';
 
 var BOX_ACTION =
@@ -1461,3 +1525,20 @@ var BOX_ACTION =
 
 var BOX_LOADING =
 '<div class="box-loading" style="<?=isset("height") ? "min-height: " + height + "px" : ""?>"></div>';
+
+var BOX_TITLE =
+'<div class="title"><span class="text"></span></div>';
+
+var BOX_ACTIONS =
+'<div class="actions-wrap"><div class="actions"></div></div>';
+
+var BOX_CLOSE =
+'<div class="close"></div>';
+
+if (typeof console !== 'undefined' && console.log) {
+    log = function () {
+        console.log.apply(console, arguments);
+    }
+} else {
+    log = function () {}
+}

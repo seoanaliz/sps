@@ -101,6 +101,23 @@
                     'name'          => 'articleQueueId'
                     , 'type'        => TYPE_INTEGER
                     , 'foreignKey'  => 'ArticleQueue'
+                )
+                ,'repostArticleRecordId' => array(
+                    'name'          => 'repostArticleRecordId'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'repostExternalId' => array(
+                    'name'          => 'repostExternalId'
+                    , 'type'        => TYPE_STRING
+                ),'createdVia' => array(
+                    'name'          => 'createdVia'
+                    , 'type'        => TYPE_STRING
+                ),'repostPublicImage' => array(
+                    'name'          => 'repostPublicImage'
+                    , 'type'        => TYPE_STRING
+                ),'repostPublicTitle' => array(
+                    'name'          => 'repostPublicTitle'
+                    , 'type'        => TYPE_STRING
                 ))
             , 'lists'     => array()
             , 'search'    => array(
@@ -109,11 +126,18 @@
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
                 )
+                ,'_articleRecordId' => array(
+                    'name'         => 'articleRecordId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
                 ,'_articleQueueId' => array(
                     'name'         => 'articleQueueId'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_ARRAY
-                ))
+                ),
+
+            )
         );
         
         /** @return array */

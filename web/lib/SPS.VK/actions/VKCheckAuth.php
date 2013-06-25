@@ -10,15 +10,13 @@
     class VKCheckAuth {
 
         public function Execute() {
-            $checkEditor = Request::getBoolean( 'checkEditor' );
-
-            $vk_auth = AuthVkontakte::IsAuth($checkEditor);
-            if ($vk_auth === false) {
+            Response::SetString('redirect', Request::getRequestUri());
+            $vkId = AuthVkontakte::IsAuth();
+            if ($vkId === false) {
                 return 'login';
-            } else if ($checkEditor) {
-                $logged = AuthVkontakte::Login($vk_auth);
-                if (empty($logged)) {
-                    return 'empty';
+            } else if (Request::getBoolean('checkEditor')) {
+                if (!AuthVkontakte::IsEditor($vkId)) {
+                    return 'stat';
                 }
             }
         }

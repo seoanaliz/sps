@@ -19,7 +19,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanel = t.$rightPanel;
 
         $('#right-drop-down').dropdown({
-            data: rightPanelData,
+            data: window.rightPanelData,
             type: 'radio',
             addClass: 'right',
             onchange: function(item) {
@@ -41,9 +41,9 @@ var RightPanelWidget = Event.extend({
 
                 // проставление типа источника
                 cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $leftPanel.find('.type-selector a[data-type="' + cookieData + '"]');
+                sourceType = $leftPanel.find('.type-selector :not(.hide) a[data-type="' + cookieData + '"]');
                 if (sourceType.length == 0) {
-                    sourceType = $leftPanel.find('.type-selector a[data-type="source"]');
+                    sourceType = $leftPanel.find('.type-selector :not(.hide)').first();
                 }
                 $leftPanel.find('.type-selector a').removeClass('active');
                 sourceType.addClass('active');
@@ -77,24 +77,20 @@ var RightPanelWidget = Event.extend({
             $(this).addClass('active');
 
             $.cookie('targetTypes' + Elements.rightdd(), Elements.rightType());
-            t.loadQueue();
+            t.updateQueue();
         });
     },
 
     initCalendar: function() {
         var t = this;
         var $calendar = t.$calendar;
-        $calendar
-            .datepicker()
-            .keydown(function(e){
-                if(!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
-                    e.preventDefault();
-                }
-            })
-            .change(function(){
-                $(this).parent().find('.caption').toggleClass('default', !$(this).val().length);
-                t.loadQueue();
-            });
+        $calendar.datepicker().keydown(function(e){
+            if (!(e.keyCode >= 112 && e.keyCode <= 123 || e.keyCode < 32)) {
+                e.preventDefault();
+            }
+        }).change(function() {
+            t.updateQueue();
+        });
 
         $('.calendar .tip, #calendar-fix').click(function(){
             $calendar.focus();
@@ -103,17 +99,44 @@ var RightPanelWidget = Event.extend({
         // Приведение вида календаря из 22.12.2012 в 22 декабря
         var d = $calendar.val().split('.');
         var date = [d[1], d[0], d[2]].join('/');
-        $calendar.datepicker('setDate', new Date(date)).trigger('change');
+        t.setDate(new Date(date));
 
         // Кнопки вперед-назад в календаре
         $('.calendar .prev').click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date - TIME.DAY)).trigger('change');
+            t.setPrevDay(true);
         });
+
         $('.calendar .next').click(function(){
-            var date = $calendar.datepicker('getDate').getTime();
-            $calendar.datepicker('setDate', new Date(date + TIME.DAY)).trigger('change');
+            t.setNextDay(true);
         });
+    },
+
+    setDate: function(date, isTrigger) {
+        var $calendar = this.$calendar;
+        $calendar.datepicker('setDate', date);
+        $calendar.parent().find('.caption').toggleClass('default', !$calendar.val().length);
+
+        if (isTrigger) {
+            $calendar.trigger('change');
+        }
+    },
+
+    getTime: function() {
+        var $calendar = this.$calendar;
+        return $calendar.datepicker('getDate').getTime();
+    },
+
+    offsetTime: function(time, isTrigger) {
+        var currentTime = this.getTime();
+        this.setDate(new Date(currentTime + time), isTrigger);
+    },
+
+    setNextDay: function(isTrigger) {
+        this.offsetTime(TIME.DAY, isTrigger);
+    },
+
+    setPrevDay: function(isTrigger) {
+        this.offsetTime(-TIME.DAY, isTrigger);
     },
 
     initExpander: function() {
@@ -138,7 +161,7 @@ var RightPanelWidget = Event.extend({
         var $rightPanel = t.$rightPanel;
         var $rightPanelBackground = t.$rightPanelBackground;
         $rightPanel.addClass('expanded');
-        $rightPanel.find('.images-ready').imageComposition();
+        $rightPanel.find('.expanded-post .images').imageComposition();
         $rightPanelBackground.show();
         $('html').width($('html').width()).css('overflow-y', 'hidden');
     },
@@ -185,11 +208,23 @@ var RightPanelWidget = Event.extend({
     },
 
     initQueue: function() {
-        this.getQueueWidget().initQueue();
+        var t = this;
+        t.getQueueWidget().initQueue();
+        t.getQueueWidget().on('changeCurrentPage', function($page) {
+            var date = new Date(t.getQueueWidget().getPageTimestamp($page) * 1000);
+            t.setDate(new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + 14400000), false);
+        });
     },
 
-    loadQueue: function() {
-        this.getQueueWidget().load();
+    updateQueue: function(timestamp) {
+        if (timestamp === undefined) {
+            this.getQueueWidget().clearCache();
+        }
+        this.getQueueWidget().update(timestamp);
+    },
+
+    updateQueuePage: function($page) {
+        return this.getQueueWidget().updatePage($page);
     },
 
     updateDropdown: function() {
@@ -241,6 +276,6 @@ var RightPanelWidget = Event.extend({
             addCellButton.hide();
         }
 
-        t.loadQueue();
+        t.updateQueue();
     }
 });

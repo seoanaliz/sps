@@ -36,6 +36,9 @@
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
         </action>
+        <action name="SyncSuggestedPosts">
+            <path>daemons/SyncSuggestedPosts</path>
+        </action>
         <action name="SyncAlbums">
             <path>daemons/SyncAlbums</path>
         </action>
@@ -63,6 +66,9 @@
         <action name="ImageUploadControl">
             <path>controls/ImageUploadControl</path>
         </action>
+        <action name="SendPostControl">
+            <path>controls/SendPostControl</path>
+        </action>
         <action name="ParseUrlControl">
             <path>controls/ParseUrlControl</path>
         </action>
@@ -82,6 +88,9 @@
             <action name="DeleteArticleControl">
                 <path>controls/DeleteArticleControl</path>
             </action>
+            <action name="ArticleQueueToggleRepeat">
+                <path>controls/ArticleQueueToggleRepeat</path>
+            </action>
             <action name="ClearArticleTextControl">
                 <path>controls/ClearArticleTextControl</path>
             </action>
@@ -91,11 +100,17 @@
             <action name="DeleteArticleQueueControl">
                 <path>controls/DeleteArticleQueueControl</path>
             </action>
+            <action name="RenderEmptyQueueItemControl">
+                <path>controls/RenderEmptyQueueItemControl</path>
+            </action>
             <action name="AddArticleToQueueControl">
                 <path>controls/AddArticleToQueueControl</path>
             </action>
             <action name="SaveArticleControl">
                 <path>controls/SaveArticleControl</path>
+            </action>
+            <action name="SaveQueueItemControl">
+                <path>controls/SaveQueueItemControl</path>
             </action>
             <action name="GetArticleControl">
                 <path>controls/GetArticleControl</path>
@@ -109,11 +124,14 @@
             <action name="PostDeletePlanControl">
                 <path>controls/PostDeletePlanControl</path>
             </action>
+            <action name="GetArticlesQueueTimelineControl">
+                <path>controls/GetArticlesQueueTimelineControl</path>
+            </action>
         </group>
 
         <group name="Grid">
-            <action name="SaveGridLineControl">
-                <path>controls/grid/SaveGridLineControl</path>
+            <action name="CreateGridLineControl">
+                <path>controls/grid/CreateGridLineControl</path>
             </action>
             <action name="SaveGridLineItemControl">
                 <path>controls/grid/SaveGridLineItemControl</path>
@@ -235,6 +253,12 @@
             </action>
             <action name="MarkCommentAppControl">
                 <path>app/controls/comments/MarkCommentAppControl</path>
+            </action>
+        </group>
+
+        <group name="accessTokens">
+            <action name="SaveAccessTokenControl">
+                <path>controls/SaveAccessTokenControl</path>
             </action>
         </group>
     </group>

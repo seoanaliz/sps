@@ -12,6 +12,8 @@
         /**
          * Constructor
          */
+        private $old_userFeeds = array();
+
         public function __construct() {
             parent::__construct();
             parent::$factory = new EditorFactory();
@@ -77,5 +79,62 @@
             
             return $result;
         }
+
+        protected function afterAction($result) {
+            parent::afterAction($result);
+
+            $targetFeedIds = Request::getArray('targetFeedIds');
+            if( !$targetFeedIds)
+                $targetFeedIds = array();
+
+            //стираем все роли юзера
+            if (is_numeric( $this->currentObject->vkId) &&  $this->currentObject->vkId) {
+                UserFeedFactory::DeleteForVkId( $this->currentObject->vkId );
+            }
+            $all_roles = array();
+            foreach( $this->old_userFeeds as $omg ) {
+                $all_roles = array_merge($all_roles, $omg );
+            }
+            $UserFeeds = array();
+            foreach ($targetFeedIds as $targetFeedId ) {
+                $UserFeed = new UserFeed();
+                $UserFeed->role = UserFeed::ROLE_ADMINISTRATOR;
+                $UserFeed->targetFeedId = $targetFeedId;
+                $UserFeed->vkId = $this->currentObject->vkId;
+                $UserFeeds[$targetFeedId] = $UserFeed;
+            }
+
+            //восстанавливаем для юзера неадминские роли
+            foreach( $all_roles as $old_role ) {
+                /** @var $old_role UserFeed*/
+               if( !isset($UserFeeds[$old_role->targetFeedId]) && $old_role->role != UserFeed::ROLE_ADMINISTRATOR )
+                   $UserFeeds[$old_role->targetFeedId] = $old_role;
+            }
+
+            if ($UserFeeds) {
+                UserFeedFactory::AddRange($UserFeeds);
+            }
+            $this->setTargetFeedsList();
+        }
+
+        protected function beforeSave() {
+            $this->setTargetFeedsList();
+        }
+
+        protected function setTargetFeedsList()
+        {
+            $targetFeedsIds = array();
+            if( isset( $this->currentObject->vkId )) {
+                //выбираем паблики, где юзер админит
+                $this->old_userFeeds =  UserFeedFactory::GetForVkId( $this->currentObject->vkId );
+                if(isset($this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR])) {
+                    foreach( $this->old_userFeeds[UserFeed::ROLE_ADMINISTRATOR] as $userFeed ) {
+                        $targetFeedsIds[$userFeed->targetFeedId] = $userFeed->targetFeedId;
+                    }
+                }
+            }
+            Response::setArray( 'targetFeedsIds', $targetFeedsIds );
+        }
+
     }
 ?>

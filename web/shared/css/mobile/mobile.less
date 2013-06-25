@@ -1,0 +1,614 @@
+@import "../common/mixins.less";
+
+.box-wrap > .box {
+    .border-radius(3px);
+
+    & > .title {
+        padding: 15px;
+        border: 0;
+        font-size: 22px;
+        .border-radius(2px 2px 0 0);
+        .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.3));
+        .background-gradient(#659ad5, #578dd0);
+    }
+
+    & > .body {
+        border: 0;
+    }
+
+    & > .actions-wrap {
+        border: 0;
+
+        .actions {
+            padding: 20px;
+            text-align: center;
+        }
+    }
+
+    .button {
+        font-size: 20px;
+        padding: 15px 30px;
+        .border-radius(2px);
+
+        &, &:hover, &:active {
+            color: #fff;
+            border: 1px solid #5d94d4;
+            .background-gradient(#6ea7e6, #5f99e0);
+            .box-shadow(inset 0 1px 1px rgba(255,255,255, 0.5));
+            .text-shadow(none);
+        }
+
+        &:active {
+            padding-top: 16px;
+            padding-bottom: 14px;
+            background: #5f99e0;
+        }
+    }
+}
+
+.box.box-groups {
+    & > .title {
+        .box-shadow(~"inset 0 1px 1px rgba(255,255,255, 0.3), 0 1px 5px rgba(0,0,0, 0.3)");
+    }
+
+    & > .body {
+        overflow: auto;
+        max-height: 550px;
+        padding: 7px;
+    }
+
+    & > .actions-wrap {
+        .box-shadow(0 -1px 5px rgba(0,0,0, 0.3));
+
+        .actions {
+            border-top: 1px solid #fff;
+
+            .button {
+                display: block;
+                width: 100%;
+            }
+        }
+    }
+
+    .groups-empty {
+        color: #777;
+        text-align: center;
+        padding: 100px 0;
+        font-size: 16px;
+    }
+
+    .group-row + .group-row {
+        border-top: 1px solid #e5edf7;
+    }
+
+    .group-row {
+        padding: 7px;
+        cursor: pointer;
+        white-space: nowrap;
+        .user-select(none);
+
+        & > div {
+            vertical-align: middle;
+            .inline-block;
+        }
+
+        .image {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+
+            img {
+                max-width: 100%;
+            }
+        }
+
+        .title {
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 16px;
+            max-width: 80%;
+        }
+
+        &:hover {
+            background-color: #e5edf7;
+        }
+
+        &.selected {
+            background: #c3d6eb url("../../images/mobile/check-white.png") 97% center no-repeat;
+        }
+    }
+
+    .textarea-wrap {
+        margin-right: 20px;
+    }
+    .email-input {
+        padding: 6px 9px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        background-color: #f7f7f7;
+        border-color: #c7c7c7;
+        .box-shadow(~"inset 0 1px 2px rgba(0,0,0, 0.3), 0 1px 2px rgba(255,255,255, 1)");
+        .border-radius(3px);
+
+        &:focus {
+            background-color: #fff;
+        }
+    }
+}
+
+/* я горжусь этим миксином, я горжусь им, мужики */
+.image(@name, @options: ~'') {
+    background: url("../../images/mobile/@{name}") @options;
+}
+
+body {
+    font-family: 'Lucida Grande', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4 {
+    font-weight: normal;
+}
+
+.wrap {
+    width: 980px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.phone-wrap {
+    position: absolute;
+}
+
+.create-app {
+    &.disabled {
+        cursor: default;
+        .pointer-events(none);
+        .opacity(0.7);
+    }
+}
+
+.header {
+    height: 530px;
+    .image('header-bg.jpg', center top no-repeat);
+    color: #fff;
+    .text-shadow(0 1px 1px #897264);
+
+    h1 {
+        font-size: 23px;
+        position: absolute;
+        top: 17px;
+        left: 37px;
+    }
+
+    h2 {
+        font-size: 37px;
+        position: absolute;
+        font-family: Tahoma, sans-serif;
+        top: 164px;
+        left: 37px;
+    }
+
+    h4 {
+        text-transform: uppercase;
+        position: absolute;
+        top: 376px;
+        padding-left: 41px;
+        line-height: 30px;
+    }
+
+    .ready {
+        left: 37px;
+        .image('icon-keys-mini.png', 10px 50% no-repeat);
+    }
+    .only14 {
+        left: 211px;
+        .image('icon-calendar-mini.png', 10px 50% no-repeat);
+    }
+
+    .create-app {
+        width: 341px;
+        height: 73px;
+        position: absolute;
+        top: 286px;
+        left: 37px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 24px;
+        .text-shadow(0 1px 0 #36669e);
+        .background-gradient(#6da6e6, #5e98e0);
+        border: 1px solid;
+        border-color: #69a2e5 #5b93d3 #4e83c1;
+        .border-radius(2px);
+        .box-shadow(0 1px 0 #99c1ee inset);
+        
+        &.disabled {
+            font-size: 18px;
+        }
+    }
+    
+    .phone-wrap {
+        width: 406px;
+        height: 611px;
+        .image('phone-header-noscreen.png');
+        top: 37px;
+        left: 539px;
+
+        img {
+            width: 245px;
+            height: 436px;
+            margin-top: 87px;
+            margin-left: 31px;
+        }
+    }
+}
+
+.available-in {
+    height: 120px;
+    .image('gradient-stripe-bg.png', repeat-x);
+
+    .appstore, .googleplay {
+        display: none;
+    }
+
+    .wrap {
+        height: 120px;
+        .image('available-in.png', 9px 4px no-repeat);
+    }
+}
+
+.n1, .n2, .n3, .n4, .n5, .green-footer {
+    h2 {
+        font-size: 41px;
+        margin-bottom: 18px;
+    }
+
+    p {
+        font-size: 17px;
+        line-height: 24px;
+        color: #555;
+    }
+}
+
+.n1, .n3, .n5 {
+    background: #f2f2f2;
+}
+
+.n1 {
+    height: 386px;
+
+    .wrap {
+        padding-top: 123px;
+        padding-left: 452px;
+        width: 528px;
+    }
+
+    .phone-wrap {
+        top: 55px;
+        left: 128px;
+
+        width: 259px;
+        height: 333px;
+        .image('phone-front-noscreen.png');
+
+        img {
+            margin-top: 78px;
+            margin-left: 21px;
+        }
+    }
+}
+
+.n2 {
+    height: 404px;
+    
+    .wrap {
+        padding-top: 130px;
+        padding-left: 70px;
+        width: 910px;
+    }
+
+    .phone-wrap {
+        width: 226px;
+        height: 352px;
+        top: 52px;
+        left: 653px;
+        .image('phone-n2.jpg');
+    }
+}
+
+.n3 {
+    height: 390px;
+
+    .wrap {
+        padding-top: 132px;
+        padding-left: 454px;
+        width: 526px;
+    }
+    
+    .phone-wrap {
+        width: 231px;
+        height: 334px;
+        .image('phone-n3.jpg');
+        top: 56px;
+        left: 136px;
+    }
+}
+
+.n4 {
+    height: 379px;
+
+    .wrap {
+        padding-top: 114px;
+        padding-left: 70px;
+        width: 910px;
+    }
+
+    .phone-wrap {
+        top: 58px;
+        left: 638px;
+
+        width: 251px;
+        height: 321px;
+        .image('phone-front-noscreen-2.png');
+
+        img {
+            margin-top: 77px;
+            margin-left: 21px;
+        }
+    }
+}
+
+.n5 {
+    height: 403px;
+
+    .wrap {
+        padding-top: 89px;
+        padding-left: 452px;
+        width: 528px;
+    }
+
+    .phone-wrap {
+        width: 230px;
+        height: 340px;
+        .image('phone-n5.jpg');
+        top: 63px;
+        left: 135px;
+    }
+}
+
+.green-footer {
+    height: 555px;
+    background: #00b2b3;
+
+    .wrap {
+        .image('green-bg.png', 34px 38px no-repeat);
+        height: 446px; /* 555 - 109 */
+        padding-top: 109px;
+        padding-left: 58px;
+        width: 922px;
+
+        h2, p {
+            color: #fff;
+        }
+
+        .phone-wrap {
+            top: 49px;
+            left: 384px;
+            width: 366px;
+            height: 461px;
+            .image('phone-bottom-noscreen.png');
+            
+            .iphone {
+                position: absolute;
+                top: 66px;
+                left: 21px;
+            }
+
+            .android {
+                position: absolute;
+                top: 53px;
+                left: 220px;
+            }
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            margin-left: -8px;
+            @triangle-size: 18px;
+            border-left: @triangle-size solid transparent;
+            border-right: @triangle-size solid transparent;
+            border-bottom: @triangle-size solid #fff;
+        }
+    }
+
+    .options {
+        list-style: none;
+        color: #fff;
+        font-size: 13.5px;
+        position: absolute;
+        left: 780px;
+        top: 147px;
+
+        h3 {
+            font-size: 21px;
+            margin-bottom: 7px;
+        }
+        
+        .no-full {
+            margin-top: 140px;
+        }
+    }
+}
+
+.white-stripe {
+    height: 80px;
+
+    .wrap {
+        height: 80px;
+    }
+
+    .ad-providers {
+        list-style: none;
+        position: absolute;
+        height: 60px;
+        left: 37px;
+        
+        li, a {
+            .inline-block;
+            vertical-align: top;
+        }
+
+        .ad-wired {
+            width: 42px;
+            height: 56px;
+            margin-top: 12px;
+            .image('logo-ad-wired.png');
+        }
+
+        .admob {
+            width: 82px;
+            height: 42px;
+            margin-left: 17px;
+            margin-top: 19px;
+            .image('logo-admob.png');
+        }
+
+        .mopub {
+            width: 95px;
+            height: 32px;
+            margin-left: 11px;
+            margin-top: 20px;
+            .image('logo-mopub.png');
+        }
+
+        .inneractive {
+            width: 77px;
+            height: 47px;
+            margin-left: 3px;
+            margin-top: 14px;
+            .image('logo-inneractive.png');
+        }
+    }
+
+    .pitch {
+        position: absolute;
+        margin-left: 50%;
+        
+        p {
+            position: relative;
+            top: 22px;
+            margin-left: -37.5%;
+            color: #676767;
+            line-height: 15px;
+        }
+    }
+
+    .available-in-bottom {
+        position: absolute;
+        left: 703px;
+        top: 17px;
+ 
+        list-style: none;
+
+        li {
+            .inline-block;
+            height: 40px;
+            overflow: hidden;
+            text-indent: -9999px;
+        }
+        .appstore {
+            width: 123px;
+            .image('available-appstore.png');
+        }
+        .googleplay {
+            width: 124px;
+            .image('available-googleplay.png');
+            margin-left: 17px;
+        }
+    }
+}
+
+.footer-gray {
+    height: 399px;
+    background: #f2f2f2;
+
+    .advantages {
+        list-style: none;
+        height: 136px;
+        width: 903px;
+        margin-left: 50px;
+        border-bottom: 1px solid #e1e1e1;
+        color: #676767;
+        font-size: 13px;
+        line-height: 17px;
+        overflow: hidden;
+
+        li {
+            .inline-block;
+            width: 185px;
+            height: 70px;
+            margin-top: 46px;
+            padding-top: 15px;
+        }
+
+        .dont-waste {
+            .image('icon-wallet.png', no-repeat 0 10px);
+            margin-left: 4px;
+            padding-left: 81px;
+        }
+        .dont-wait {
+            .image('icon-calendar.png', no-repeat 0 3px);
+            margin-left: 49px;
+            padding-left: 67px;
+        }
+        .dont-miss {
+            .image('icon-keys.png', no-repeat);
+            margin-left: 65px;
+            padding-left: 69px;
+        }
+    }
+
+    .button-wrap {
+        width: 903px;
+        margin-left: 50px;
+        border-top: 1px solid #fff;
+        height: 250px;
+        position: relative;
+        color: #676767;
+        
+        p {
+            text-align: center;
+            position: relative;
+            top: 143px;
+            font-size: 13px;
+            line-height: 17px;
+        }
+    }
+
+    .create-app {
+        border: none;
+        width: 257px;
+        height: 61px;
+        background: #4f83c5;
+        color: #fff;
+        .border-radius(5px);
+        cursor: pointer;
+        font-size: 20px;
+        position: absolute;
+        top: 51px;
+        left: 316px;
+
+        &.disabled {
+            font-size: 15px;
+        }
+    }
+}

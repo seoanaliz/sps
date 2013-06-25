@@ -9,6 +9,8 @@
 new stat_tables();
 class WrAlarm
 {
+    const PAUSE = 1;
+
     private $ids = '';
     private $error_text = '';
     private $connect;
@@ -18,22 +20,11 @@ class WrAlarm
     {
         set_time_limit(0);
         $this->connect = ConnectionFactory::Get( 'tst' );
-
-
-//         $publics = $this->get_monitoring_publs();
-//         print_r($publics);
-//         $this->check_block( $publics );
-//        print_R($this->wasted_array);
-//        $report = $this->form_report();
-//        print_R($report);
-//        die();
-
-        StatPublics::update_public_info( $this->get_id_arr(), $this->connect );
         $publics = $this->get_monitoring_publs();
         $this->check_in_search( $publics );
-        $this->check_block( $publics );
+//        $this->check_block( $publics );
 
-        $report = $this->form_report_2();
+//        $report = $this->form_report_2();
 //        if ( $report )
 //            $this->send_report( $report );
     }
@@ -53,15 +44,14 @@ class WrAlarm
 
             $code .= trim( $return, ',' ) . "};";
             $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
-            sleep(0.3);
+            sleep(self::PAUSE);
             $susp_ids = array();
             foreach( $res as $apublic_id => $body ) {
                 $public_id =  trim( $apublic_id, 'a');
                 if ( empty( $body )) {
                     $susp_ids[] = $public_id;
                 } else {
-                    if(!$public_id)
-                    {
+                    if( !$public_id ) {
                         print_r($res);
                         die();
                     }
@@ -79,7 +69,7 @@ class WrAlarm
                 if ( substr_count( $res->error->error_msg, 'community members' ) > 0 ) {
                     StatPublics::set_state( $id, 'closed', true, $this->connect );
                     $this->wasted_array[$id] = 'closed';
-                } elseif (  substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
+                } elseif ( substr_count( $res->error->error_msg, 'blocked' ) > 0 ) {
                     StatPublics::set_state( $id, 'active', false, $this->connect );
                     StatPublics::set_state( $id, 'in_search', false, $this->connect );
                     $this->wasted_array[$id] = 'blocked';
@@ -106,15 +96,18 @@ class WrAlarm
                 $return .=  "\"a$id\":a$id,";
 
             }
+
             $code .= trim( $return, ',' ) . "};";
-            $res = VkHelper::api_request( 'execute', array( 'code' => $code,
-                'access_token' => '06eeb8340cffbb250cffbb25420cd4e5a100cff0cea83bb1cbb13f120e10746' ), 0 );
-            sleep(0.5);
+            $res = VkHelper::api_request( 'execute', array( 'code' => $code ), 0 );
+            sleep(self::PAUSE);
             foreach( $res as $apublic_id => $search_result ) {
+
                 if ( $apublic_id == 'error' ) {
                     break;
                 }
                 $public_id = trim( $apublic_id, 'a');
+                if( !is_array( $search_result ))
+                    continue;
                 unset( $search_result[0]);
                 foreach( $search_result as $entry ){
                     if( (int)$entry->gid == (int)$public_id ) {
@@ -122,7 +115,6 @@ class WrAlarm
                         continue(2);
                     }
                 }
-
 
                 $this->wasted_array[$public_id] = 'search';
                 StatPublics::set_state( $public_id, 'in_search', false, $this->connect );
@@ -143,9 +135,8 @@ class WrAlarm
     {
         $sql = 'SELECT vk_id,name
                 FROM stat_publics_50k
-                WHERE   quantity>100000';
+                WHERE   quantity > 30000';
         $cmd = new SqlCommand( $sql, $this->connect );
-        echo $cmd->getQuery();
         $ds  = $cmd->Execute();
         $res = array();
         while ( $ds->Next()) {

@@ -14,10 +14,33 @@
 
         class   VkHelper {
 
+            const PERM_NOTIFY = 1;             //Пользователь разрешил отправлять ему уведомления.
+            const PERM_FRIENDS = 2;            //Доступ к друзьям.
+            const PERM_PHOTO = 4;              //Доступ к фотографиям.
+            const PERM_AUDIO = 8;              //Доступ к аудиозаписям.
+            const PERM_VIDEO = 16;             //Доступ к видеозаписям.
+            const PERM_APPS = 32;              //Доступ к предложениям.
+            const PERM_QUESTIONS = 64;         //Доступ к вопросам.
+            const PERM_WIKI = 128;             //Доступ к wiki-страницам.
+            const PERM_LEFTMENU = 256;         //Добавление ссылки на приложение в меню слева.
+            const PERM_QUICKPUBLISH = 512;     //Добавление ссылки на приложение для быстрой публикации на стенах пользователей.
+            const PERM_STATUS = 1024;          //Доступ к статусам пользователя.
+            const PERM_NOTES = 2048;           //Доступ заметкам пользователя.
+            const PERM_MSG_EXTENDED = 4096;    //(для Desktop-приложений) Доступ к расширенным методам работы с сообщениями.
+            const PERM_WALL = 8192;            //Доступ к обычным и расширенным методам работы со стеной.
+            const PERM_ADS = 32768;            //Доступ к функциям для работы с рекламным кабинетом.
+            const PERM_OFFLINE = 65536;        //Оффлайн-доступ
+            const PERM_DOCS = 131072;          //Доступ к документам пользователя.
+            const PERM_GROUPS = 262144;        //Доступ к группам пользователя.
+            const PERM_NOTIFY_ANSWER = 524288; //Доступ к оповещениям об ответах пользователю.
+            const PERM_GROUP_STATS = 1048576;  //Доступ к статистике групп и приложений пользователя, администратором которых он является.
+
             /**
              *id аппа статистки
              */
             const APP_ID_STATISTICS = 2642172;
+            const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
+
 
             /**
              *id аппа обмена
@@ -40,19 +63,24 @@
 
             );
 
+            public static  $open_methods = array(
+                'wall.get'          => true,
+                'groups.getById'    => true,
+                'wall.getById'      => true,
+
+            );
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
                 $app_id = $app == 'barter' ? self::APP_ID_BARTER : self::APP_ID_STATISTICS;
-                if ( !isset( $request_params['access_token'] ))
+                if ( !isset( $request_params['access_token']) && !isset( self::$open_methods[ $method ]))
                     $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
                 $a = VkHelper::qurl_request( $url, $request_params );
-                if ( $method == 'stats.get')
-                {
-                    $start = strpos( $a, ',"sex"');
-                    $a = substr_replace( $a, '}]}', $start );
-                }
+//                if ( $method == 'stats.get') {
+//                    $start = strpos( $a, ',"sex"');
+//                    $a = substr_replace( $a, '}]}', $start );
+//                }
                 $res = json_decode(  $a );
                 if( !$res )
                     return array();
@@ -62,9 +90,9 @@
                             throw new AccessTokenIsDead();
                         else
                             throw new Exception('Error : ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ) );
-                    }
-                    else
+                    } else {
                         return $res;
+                    }
                 return $res->response;
             }
 
@@ -92,7 +120,7 @@
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 if (is_array( $arr_of_fields )) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $arr_of_fields);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($arr_of_fields));
 
                 } else return false;
 
@@ -198,6 +226,19 @@
                 }
             }
 
+            public static function get_all_service_tokens()
+            {
+                $connect =  ConnectionFactory::Get( 'tst' );
+                $sql = 'SELECT access_token,user_id  FROM serv_access_tokens';
+                $cmd = new SqlCommand( $sql, $connect );
+                $ds  = $cmd->Execute();
+                $result = array();
+                while( $ds->Next()) {
+                    $result[$ds->GetInteger('user_id')] = $ds->GetValue('access_token');
+                }
+                return $result;
+            }
+
             public static function deactivate_at( $access_token )
             {
                 if ( !$access_token )
@@ -232,13 +273,15 @@
                 $cmd->Execute();
             }
 
-            public static function connect( $link, $cookie=null, $post=null ) {
+            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true) {
                 $ch = curl_init();
 
                 curl_setopt( $ch, CURLOPT_URL, $link );
                 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
                 curl_setopt( $ch, CURLOPT_TIMEOUT, 0 );
-                curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                if ($includeHeader) {
+                    curl_setopt( $ch, CURLOPT_HEADER, 1 );
+                }
                 curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
                 curl_setopt($ch, CURLOPT_USERAGENT,
                     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17');
@@ -269,6 +312,21 @@
                 if( preg_match( "/remixsid=(.*?);/", $res, $sid ))
                     return "remixchk=5; remixsid=$sid[1]";
                 return false;
+            }
+
+            public static function send_alert( $message, $reciever_vk_ids ) {
+                if( !is_array( $reciever_vk_ids )) {
+                    $reciever_vk_ids = array( $reciever_vk_ids );
+                }
+                foreach( $reciever_vk_ids as $vk_id) {
+                    $params = array(
+                        'uid'           =>   $vk_id,
+                        'message'       =>   $message . ' ' . md5(time()) ,
+                        'access_token'  =>   self::ALERT_TOKEN,
+                    );
+                    VkHelper::api_request( 'messages.send', $params );
+                    sleep( self::PAUSE );
+                }
             }
         }
     ?>
