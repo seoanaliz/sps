@@ -26,7 +26,6 @@
             $this->daemon->method           = 'SyncSuggestedPosts';
             $this->daemon->maxExecutionTime = '01:00:00';
 
-
             $targetFeeds = $this->getNextChunkOfFeeds();
 
             $parser = new ParserVkontakte();
@@ -40,10 +39,10 @@
                 foreach ($targetFeeds as $targetFeed ) {
                     if(!isset( $targetFeed->params['lastSuggestedPost']))
                         $targetFeed->params['lastSuggestedPost'] = 0;
-                    $token = AccessTokenUtility::getTokenForTargetFeed($targetFeed, true);
+                    //времянка, пока не перейдем на новую систему токенов
+                    $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed, true );
                     if( !$token ) {
-                        //времянка, пока не перейдем на новую систему токенов
-                        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed, true );
+                        $token = AccessTokenUtility::getTokenForTargetFeed($targetFeed, true);
                     }
                     //мы упрямые!
                     if( !$token) {
@@ -51,13 +50,13 @@
                         continue;
                     }
 
-                    $parser->set_page( $targetFeed->externalId );
-
                     $this->daemon->name = "feed$targetFeed->externalId";
                     if ( !$this->daemon->Lock() ) {
                         Logger::Warning( "Failed to lock {$this->daemon->name}");
                         continue;
                     }
+
+                    $parser->set_page( $targetFeed->externalId );
                     try {
                         $posts = $parser->get_suggested_posts( $targetFeed->params['lastSuggestedPost'], $token );
                     } catch (Exception $Ex) {
@@ -83,8 +82,6 @@
                 if (count($targetFeeds) < self::FeedsChunkSize)
                     break;
             }
-
-
         }
 
         /** @return TargetFeed[]*/
@@ -118,8 +115,6 @@
             }
             if (empty($authorsExternalIds))
                 return false;
-
-
 
             $authorsExternalIds = array_unique( $authorsExternalIds);
             $vkAuthorsData = StatUsers::get_vk_user_info($authorsExternalIds);
