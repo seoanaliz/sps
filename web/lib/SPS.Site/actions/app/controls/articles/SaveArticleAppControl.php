@@ -76,11 +76,7 @@ class SaveArticleAppControl extends AppBaseControl {
         $article->statusId = 1;
         $article->isSuggested = false;
         // при создании статус - на рассмотрении
-        if ($role == UserFeed::ROLE_AUTHOR)  {
-            $article->articleStatus = Article::STATUS_REVIEW;
-        } else {
-            $article->articleStatus = Article::STATUS_APPROVED;
-        }
+        $article->articleStatus = Article::STATUS_APPROVED;
         $article->userGroupId = $userGroupId;
 
         $articleRecord = new ArticleRecord();
