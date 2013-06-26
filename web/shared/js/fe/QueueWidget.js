@@ -20,6 +20,15 @@ var QueueWidget = Event.extend({
         })
     },
 
+    loadSingleDay: function(timestamp) {
+        return Control.fire('get_queue', {
+            direction: 'single-day',
+            timestamp: timestamp,
+            targetFeedId: Elements.rightdd(),
+            type: Elements.rightType()
+        })
+    },
+
     /**
      * Обновление ленты очереди
      * @param {number} timestamp
@@ -73,6 +82,22 @@ var QueueWidget = Event.extend({
         }
 
         return deferred;
+    },
+
+    updateSinglePage: function($page) {
+        var t = this;
+        t.loadSingleDay( $page.data('timestamp') ).success(function(data) {
+            if (data) {
+                var $loadedPage = $(data);
+                $page.replaceWith($loadedPage);
+                Elements.initDraggable($loadedPage);
+                Elements.initDroppable();
+                Elements.initImages($loadedPage);
+                Elements.initLinks($loadedPage);
+                $loadedPage.find('.post .images').imageComposition();
+                $loadedPage.find('.post.blocked').draggable('disable');
+            }
+         });
     },
 
     deleteArticleInSlot: function($slot, isEmpty) {
@@ -158,7 +183,7 @@ var QueueWidget = Event.extend({
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk){
                         if (isOk) {
-                            t.updatePage($page);
+                            t.updateSinglePage($page);
                         }
                     });
                 } else {
@@ -219,7 +244,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
-                    t.updatePage($page);
+                    t.updateSinglePage($page);
                 });
             }
         });
