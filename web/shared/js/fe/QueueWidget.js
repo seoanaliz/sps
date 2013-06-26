@@ -84,8 +84,12 @@ var QueueWidget = Event.extend({
         return deferred;
     },
 
+    /**
+     * @return Deferred
+     */
     updateSinglePage: function($page) {
         var t = this;
+        var Def = new Deferred();
         t.loadSingleDay( $page.data('timestamp') ).success(function(data) {
             if (data) {
                 var $loadedPage = $(data);
@@ -96,8 +100,10 @@ var QueueWidget = Event.extend({
                 Elements.initLinks($loadedPage);
                 $loadedPage.find('.post .images').imageComposition();
                 $loadedPage.find('.post.blocked').draggable('disable');
+                Def.fireSuccess($loadedPage);
             }
-         });
+        });
+        return Def;
     },
 
     deleteArticleInSlot: function($slot, isEmpty) {
@@ -181,9 +187,27 @@ var QueueWidget = Event.extend({
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk){
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
                         if (isOk) {
-                            t.updateSinglePage($page);
+                            var gridLineItemId = data.gridLineItemId;
+                            var queueHeight = t.$queue.height();
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (gridLineItemId) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
+                                       if (verticalPosition < 0) {
+                                           delta = verticalPosition - 70;
+                                       } else if (verticalPosition > t.$queue.height()) {
+                                           delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
+                                       }
+                                       if (delta !== 0) {
+                                           t.$queue.animate({scrollTop: t.$queue.scrollTop() + delta}, 500);
+                                       }
+                                    }
+                                }
+                            });
                         }
                     });
                 } else {
