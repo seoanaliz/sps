@@ -18,11 +18,11 @@ class PublicsParser
     public function execute() {
         set_time_limit(240);
         $i = 0;
-        echo 'Начианаем с: ', $this->current_public, '<br>';
+        echo 'Начинаем с: ', $this->current_public, '<br>';
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
-            $take_counter = rand(50, self::PUBLICS_PER_REQUEST);
+            $take_counter = rand(450, self::PUBLICS_PER_REQUEST);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
@@ -72,13 +72,16 @@ class PublicsParser
         if( $ds->Next()) {
             $this->current_public = $ds->GetInteger('current_public');
             $tries = $ds->GetInteger( 'tries');
+
             if( $tries > 3 ) {
                 $this->current_public += 1000;
-                $tries = 0;
+                $this->set_state( $this->current_public);
+            } else {
+                $this->set_tries( ++$tries );
             }
-            $this->set_tries( ++$tries );
         }
     }
+
 
     public static function set_tries( $tries )
     {

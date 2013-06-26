@@ -113,6 +113,8 @@
                 $article->isCleaned     = false;
                 $article->statusId      = 1;
                 $article->articleStatus  = Article::STATUS_APPROVED;
+                $article->isSuggested = false;
+
 
                 $articleRecord = new ArticleRecord();
                 $articleRecord->content = !empty($post['text']) ? $post['text'] : '';

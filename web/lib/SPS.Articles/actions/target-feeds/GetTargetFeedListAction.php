@@ -34,6 +34,10 @@
             if (isset($search['isOur']) && $search['isOur'] == 'on') {
                 $search['isOur']  = true;
             }
+            //настройки по умолчанию
+            if (!isset($search)) {
+                $search = array('isOur'  => true);
+            }
             return $search;
         }
     }

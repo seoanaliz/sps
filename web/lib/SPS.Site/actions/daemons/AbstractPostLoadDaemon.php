@@ -15,24 +15,28 @@ abstract class AbstractPostLoadDaemon {
      * Метод синхронизации постов
      * @param SourceFeed    $source лента откуда получили посты
      * @param array         $posts массив постов
+     * @param int           $targetFeedId id ленты отправки
+     * @param Author[]      $authors массив авторов( key = VkId)
      * @return bool нужно ли обновить processed у $source
      */
-    protected function saveFeedPosts($source, $posts) {
+    protected function saveFeedPosts($source, $posts, $targetFeedId = null, $authors = array()) {
         /**
          * Ищем в базе уже возможно сохраненные
          * Попутно собираем id тех, которые надо пропустить
          */
         $externalIds = array();
         $skipIds = array();
-        $targetDate = new DateTimeWrapper('-1 day'); //проспускаем посты, которым еще нет 1 суток
-        foreach ($posts as $post) {
-            $externalId = TextHelper::ToUTF8($post['id']);
-            $externalIds[] = $externalId;
+        $targetDate = new DateTimeWrapper('-1 day'); //проспускаем посты, которым еще нет 1 суток(к предложенным не относится)
+        if( !$targetFeedId) {
+            foreach ($posts as $post) {
+                $externalId = TextHelper::ToUTF8($post['id']);
+                $externalIds[] = $externalId;
 
-            //если пост новее чем $targetDate - пропускаем
-            $postDate = new DateTimeWrapper(date('r', $post['time']));
-            if ($postDate >= $targetDate) {
-                $skipIds[] = $externalId;
+                //если пост новее чем $targetDate - пропускаем
+                $postDate = new DateTimeWrapper(date('r', $post['time']));
+                if ($postDate >= $targetDate) {
+                    $skipIds[] = $externalId;
+                }
             }
         }
 
@@ -53,16 +57,15 @@ abstract class AbstractPostLoadDaemon {
         if (!empty($originalObjects)) {
             $originalObjects = BaseFactoryPrepare::Collapse($originalObjects, 'externalId', false);
         }
-
         /**
          * Обходим посты и созраняем их в бд, попутно сливая фотки
          */
         foreach ($posts as $post) {
             $externalId = TextHelper::ToUTF8($post['id']);
 
-            if (in_array($externalId, $skipIds)) {
-                continue; //пропускаем определенные
-            }
+//            if (in_array($externalId, $skipIds)) {
+//                continue; //пропускаем определенные
+//            }
 
             $article = new Article();
             $article->sourceFeedId = $source->sourceFeedId;
@@ -71,9 +74,16 @@ abstract class AbstractPostLoadDaemon {
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 1;
+            $article->isSuggested = false;
             // демон загружает уже одобренные посты. ха
             $article->articleStatus = ( $source->type == SourceFeedUtility::Albums ) ?
                 Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+            if( $targetFeedId && $post['author']) {
+                $article->editor = $post['author'];
+                $article->targetFeedId = $targetFeedId;
+                $article->isSuggested  = true;
+                $article->authorId     = $authors[$post['author']]->authorId;
+            }
 
             $articleRecord = new ArticleRecord();
             $articleRecord->content = $post['text'];
@@ -137,7 +147,8 @@ abstract class AbstractPostLoadDaemon {
         /**
          * если массив $skipIds непуст, то значит по каким-то условиям не сохраняем все посты
          */
-        if (empty($skipIds)) {
+
+        if (empty($skipIds) && $source->sourceFeedId != -1) {
             //обновляем pagesCountProcessed в базе, снимаем лок параллельному потоку
             $source->processed = Convert::ToInt($source->processed) + 1;
             SourceFeedFactory::UpdateByMask($source, array('processed'), array('sourceFeedId' => $source->sourceFeedId));
