@@ -20,6 +20,15 @@ var QueueWidget = Event.extend({
         })
     },
 
+    loadSingleDay: function(timestamp) {
+        return Control.fire('get_queue', {
+            direction: 'single-day',
+            timestamp: timestamp,
+            targetFeedId: Elements.rightdd(),
+            type: Elements.rightType()
+        })
+    },
+
     /**
      * Обновление ленты очереди
      * @param {number} timestamp
@@ -73,6 +82,28 @@ var QueueWidget = Event.extend({
         }
 
         return deferred;
+    },
+
+    /**
+     * @return Deferred
+     */
+    updateSinglePage: function($page) {
+        var t = this;
+        var Def = new Deferred();
+        t.loadSingleDay( $page.data('timestamp') ).success(function(data) {
+            if (data) {
+                var $loadedPage = $(data);
+                $page.replaceWith($loadedPage);
+                Elements.initDraggable($loadedPage);
+                Elements.initDroppable();
+                Elements.initImages($loadedPage);
+                Elements.initLinks($loadedPage);
+                $loadedPage.find('.post .images').imageComposition();
+                $loadedPage.find('.post.blocked').draggable('disable');
+                Def.fireSuccess($loadedPage);
+            }
+        });
+        return Def;
     },
 
     deleteArticleInSlot: function($slot, isEmpty) {
@@ -156,9 +187,31 @@ var QueueWidget = Event.extend({
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk){
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
                         if (isOk) {
-                            t.updatePage($page);
+                            var gridLineItemId = data.gridLineItemId;
+                            var queueHeight = t.$queue.height();
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (gridLineItemId) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
+                                       if (verticalPosition < 0) {
+                                           delta = verticalPosition - 70;
+                                       } else if (verticalPosition > t.$queue.height()) {
+                                           delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
+                                       }
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.animate({scrollTop: newScrollTop}, 500);
+                                       }
+                                    }
+                                }
+                            });
                         }
                     });
                 } else {
@@ -174,6 +227,7 @@ var QueueWidget = Event.extend({
                 if ($post.hasClass('new')) {
                     $post.transition({height: 0}, 200, function() {
                         $(this).remove();
+                        app.getRightPanelWidget().getQueueWidget().markIfEmpty($page, false /*doScroll*/);
                     });
                 }
             }
@@ -219,7 +273,7 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
-                    t.updatePage($page);
+                    t.updateSinglePage($page);
                 });
             }
         });
@@ -243,14 +297,17 @@ var QueueWidget = Event.extend({
                                 t.clearCache();
                                 $queue.find('.' + cssClass).removeClass('repeat');
                                 if (data.endDate) {
-                                    var currentDate;
                                     var endDate = parseInt(data.endDate, 10);
                                     $queue.find('.queue-page').each(function(_, elem) {
-                                        currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
+                                        var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
                                         if (currentDate > endDate) {
-                                            $(elem).find('.' + cssClass)
-                                                .addClass('locked') // не удаляем элемент из DOM, чтобы скролл не "дёрнулся"
-                                                .droppable('option', 'disabled', true);
+                                            var $elem = $(elem);
+                                            var $toDelete = $elem.find('.' + cssClass);
+                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
+                                            var height = $toDelete[0].scrollHeight + heightCorrection;
+                                            $toDelete.remove();
+                                            t.$queue.scrollTop(t.$queue.scrollTop() - height);
+                                            t.markIfEmpty($elem);
                                         }
                                     });
                                 }
@@ -283,6 +340,22 @@ var QueueWidget = Event.extend({
         t.initInlineCreate();
     },
 
+    markIfEmpty: function($elem, doScroll) {
+        if (typeof doScroll === 'undefined') {
+            doScroll = true;
+        }
+        var t = this;
+        var $meaningfulChildren = $elem.children(':not(.queue-title)');
+        if (!$meaningfulChildren.length) {
+            var $emptyPlaceholder = $('<div class="empty-queue">Пусто</div>');
+            $elem.append($emptyPlaceholder);
+            if (doScroll) {
+                height = $emptyPlaceholder[0].scrollHeight;
+                t.$queue.scrollTop(t.$queue.scrollTop() + height);
+            }
+        }
+    },
+
     initSlotCreate: function() {
         var t = this;
         t.$queue.delegate('.add-button', 'click', function() {
@@ -296,6 +369,7 @@ var QueueWidget = Event.extend({
             $newSlot.data('start-date', dateString);
             $newSlot.data('end-date', dateString);
             $newSlot.find('.time').click();
+            $page.find('.empty-queue').remove();
         });
     },
 
