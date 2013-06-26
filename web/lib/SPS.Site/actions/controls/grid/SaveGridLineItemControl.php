@@ -55,15 +55,16 @@
             $object->date = $itemDate;
 
             if (!empty($object->gridLineItemId)) {
-                $queryResult = GridLineItemFactory::Update($object);
+                $queryResult = GridLineItemFactory::Update($object, array(BaseFactory::WithReturningKeys => true));
             } else {
-                $queryResult = GridLineItemFactory::Add($object);
+                $queryResult = GridLineItemFactory::Add($object, array(BaseFactory::WithReturningKeys => true));
             }
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
+                $result['gridLineItemId'] = $object->gridLineItemId;
             }
 
             if (!empty($queueId)) {
