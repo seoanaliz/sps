@@ -10,9 +10,9 @@ class PublicsParser
 {
 
     const LIMIT = 30000;
-    const REQUESTS_PER_LAUNCH = 20;
-    const PUBLICS_PER_REQUEST  = 700;
-    const PAUSE = 2;
+    const REQUESTS_PER_LAUNCH = 120;
+    const PUBLICS_PER_REQUEST  = 500;
+    const PAUSE = 0.1;
     private $current_public;
 
     public function execute() {
@@ -32,6 +32,7 @@ class PublicsParser
             if( !$res)
                 continue;
             $new_entries = array();
+            echo 'Обработал: ' , count($res), '<br>' ;
             foreach( $res as $public ) {
                 if( $public->name == 'DELETED' && $this->current_public > 52000000 && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
