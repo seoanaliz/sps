@@ -199,6 +199,7 @@ var QueueWidget = Event.extend({
                 if ($post.hasClass('new')) {
                     $post.transition({height: 0}, 200, function() {
                         $(this).remove();
+                        app.getRightPanelWidget().getQueueWidget().markIfEmpty($page, false /*doScroll*/);
                     });
                 }
             }
@@ -268,14 +269,17 @@ var QueueWidget = Event.extend({
                                 t.clearCache();
                                 $queue.find('.' + cssClass).removeClass('repeat');
                                 if (data.endDate) {
-                                    var currentDate;
                                     var endDate = parseInt(data.endDate, 10);
                                     $queue.find('.queue-page').each(function(_, elem) {
-                                        currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
+                                        var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
                                         if (currentDate > endDate) {
-                                            $(elem).find('.' + cssClass)
-                                                .addClass('locked') // не удаляем элемент из DOM, чтобы скролл не "дёрнулся"
-                                                .droppable('option', 'disabled', true);
+                                            var $elem = $(elem);
+                                            var $toDelete = $elem.find('.' + cssClass);
+                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
+                                            var height = $toDelete[0].scrollHeight + heightCorrection;
+                                            $toDelete.remove();
+                                            t.$queue.scrollTop(t.$queue.scrollTop() - height);
+                                            t.markIfEmpty($elem);
                                         }
                                     });
                                 }
@@ -308,6 +312,22 @@ var QueueWidget = Event.extend({
         t.initInlineCreate();
     },
 
+    markIfEmpty: function($elem, doScroll) {
+        if (typeof doScroll === 'undefined') {
+            doScroll = true;
+        }
+        var t = this;
+        var $meaningfulChildren = $elem.children(':not(.queue-title)');
+        if (!$meaningfulChildren.length) {
+            var $emptyPlaceholder = $('<div class="empty-queue">Пусто</div>');
+            $elem.append($emptyPlaceholder);
+            if (doScroll) {
+                height = $emptyPlaceholder[0].scrollHeight;
+                t.$queue.scrollTop(t.$queue.scrollTop() + height);
+            }
+        }
+    },
+
     initSlotCreate: function() {
         var t = this;
         t.$queue.delegate('.add-button', 'click', function() {
@@ -321,6 +341,7 @@ var QueueWidget = Event.extend({
             $newSlot.data('start-date', dateString);
             $newSlot.data('end-date', dateString);
             $newSlot.find('.time').click();
+            $page.find('.empty-queue').remove();
         });
     },
 
