@@ -203,7 +203,11 @@ var QueueWidget = Event.extend({
                                            delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
                                        }
                                        if (delta !== 0) {
-                                           t.$queue.animate({scrollTop: t.$queue.scrollTop() + delta}, 500);
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.animate({scrollTop: newScrollTop}, 500);
                                        }
                                     }
                                 }
