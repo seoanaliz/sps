@@ -188,12 +188,12 @@ var Eventlist = {
             },
             success: function(data) {
                 if (data.success) {
-                    callback(true);
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(false);
+                    callback(false, data);
                 }
             }
         });
