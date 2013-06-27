@@ -242,6 +242,8 @@ var RightPanelWidget = Event.extend({
     },
 
     dropdownChangeRightPanel: function(data) {
+        var t = this;
+
         // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
@@ -249,14 +251,10 @@ var RightPanelWidget = Event.extend({
             $sourceTypeLink.addClass('active');
         }
 
-        var t = this;
-        var sourceType = Elements.leftType();
-        var gridTypes = data.accessibleGridTypes;
         var showCount = 0;
-
-        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(i, item){
+        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(_, item){
             item = $(item);
-            if ($.inArray(item.data('type'), gridTypes) == -1){
+            if ($.inArray(item.data('type'), data.accessibleGridTypes) === -1){
                 item.hide();
             } else {
                 showCount++;
@@ -267,13 +265,6 @@ var RightPanelWidget = Event.extend({
             $('.grid_type.all').show();
         } else {
             $('.grid_type.all').hide();
-        }
-
-        var addCellButton = $('.queue-footer > a.add-button');
-        if (data.canAddPlanCell) {
-            addCellButton.show();
-        } else {
-            addCellButton.hide();
         }
 
         t.updateQueue();
