@@ -217,7 +217,7 @@ var RightPanelWidget = Event.extend({
     },
 
     updateQueue: function(timestamp) {
-        if (timestamp === undefined) {
+        if (typeof timestamp === 'undefined') {
             this.getQueueWidget().clearCache();
         }
         this.getQueueWidget().update(timestamp);
