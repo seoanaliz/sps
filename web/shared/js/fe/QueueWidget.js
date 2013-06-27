@@ -5,6 +5,8 @@ var QueueWidget = Event.extend({
         t.initAutoload();
     },
 
+    scrollAtEditBegin: 0,
+
     /**
      * Загрузка ленты очереди
      * @param {number=} timestamp
@@ -100,6 +102,7 @@ var QueueWidget = Event.extend({
                 Elements.initLinks($loadedPage);
                 $loadedPage.find('.post .images').imageComposition();
                 $loadedPage.find('.post.blocked').draggable('disable');
+                //t.$queue.trigger('scroll');
                 Def.fireSuccess($loadedPage);
             }
         });
@@ -145,7 +148,6 @@ var QueueWidget = Event.extend({
         // Смена даты
         $queue.delegate('.time', 'click', function() {
             var $time = $(this);
-            var $post = $time.closest('.slot-header');
             var $input = $time.data('time-edit');
 
             if (!$input) {
@@ -155,11 +157,16 @@ var QueueWidget = Event.extend({
                 .width($time.width() + 2)
                 .val($time.text())
                 .mask('29:59')
-                .appendTo($post);
+                .appendTo($time.closest('.slot-header'));
                 $time.data('time-edit', $input);
             } else {
                 $input.show();
             }
+
+            // запомним позицию скролла. Если юзер скроллит, пока редактирует, мы не будем потом корректировать позицию
+            var $post = $time.closest('.slot');
+            t.scrollAtEditBegin = $post.closest('.queue-page').position().top + $post.position().top;
+
             $input.focus().select();
         });
 
@@ -189,11 +196,31 @@ var QueueWidget = Event.extend({
                     // Редактирование времени ячейки для текущего дня
                     Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
                         if (isOk) {
-                            var gridLineItemId = data.gridLineItemId;
-                            var queueHeight = t.$queue.height();
+                            var oldVerticalPosition = $page.position().top + $post.position().top;
                             t.updateSinglePage($page).success(function($newPage) {
-                                if (gridLineItemId) {
-                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ gridLineItemId +'"]');
+                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = verticalPosition - oldVerticalPosition;
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.scrollTop(newScrollTop);
+                                       }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Events.fire('create-grid-line', time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
+                        if (isOk && data) {
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineId) {
+                                    var $elem = $newPage.find('.slot[data-grid-id="'+ data.gridLineId +'"]');
                                     if ($elem.length) {
                                        var verticalPosition = $newPage.position().top + $elem.position().top;
                                        var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
@@ -214,18 +241,10 @@ var QueueWidget = Event.extend({
                             });
                         }
                     });
-                } else {
-                    Events.fire('create-grid-line', time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
-                        if (isOk && data && data.html) {
-                            var $newSlot = $(data.html);
-                            $post.replaceWith($newSlot);
-                            Elements.attachDroppable($newSlot);
-                        }
-                    });
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
-                    $post.transition({height: 0}, 200, function() {
+                    $post.animate({height: 0}, 200, function() {
                         $(this).remove();
                         app.getRightPanelWidget().getQueueWidget().markIfEmpty($page, false /*doScroll*/);
                     });
@@ -350,7 +369,7 @@ var QueueWidget = Event.extend({
             var $emptyPlaceholder = $('<div class="empty-queue">Пусто</div>');
             $elem.append($emptyPlaceholder);
             if (doScroll) {
-                height = $emptyPlaceholder[0].scrollHeight;
+                var height = $emptyPlaceholder[0].scrollHeight;
                 t.$queue.scrollTop(t.$queue.scrollTop() + height);
             }
         }
@@ -362,9 +381,10 @@ var QueueWidget = Event.extend({
             var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
             var dateString = $.datepick.formatDate(new Date(t.getPageTimestamp($page) * 1000));
-            $newSlot.prependTo($page).transition({height: 110}, 200);
+            var newSlotHeight = 110;
+            $newSlot.prependTo($page).animate({height: newSlotHeight}, 200);
             if ($page.position().top < 0) {
-                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top);
+                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top + newSlotHeight);
             }
             $newSlot.data('start-date', dateString);
             $newSlot.data('end-date', dateString);
@@ -484,7 +504,6 @@ var QueueWidget = Event.extend({
 
             var scrollTop = t.$queue.scrollTop();
             var queueHeight = t.$queue.height();
-            var $pages = t.getPages();
 
             if (scrollTop <= 0) {
                 t.showNextTopPage();
@@ -492,7 +511,7 @@ var QueueWidget = Event.extend({
                 t.showNextBottomPage();
             }
 
-            $pages.each(function() {
+            t.$queue.find('.queue-page').each(function() {
                 var $page = $(this);
                 if ($page.position().top + $page.outerHeight() > 0) {
                     t.setCurrentPage($page);
@@ -502,17 +521,9 @@ var QueueWidget = Event.extend({
         });
 
         t.on('changeCurrentPage', function($page) {
-            t.getPages().find('.queue-title').removeClass('fixed');
+            t.$queue.find('.fixed.queue-title').removeClass('fixed');
             $page.find('.queue-title').first().addClass('fixed');
         });
-    },
-
-    /**
-     * Возвращает все страницы в ленте очереди
-     * @returns {jQuery}
-     */
-    getPages: function() {
-        return this._$pages || (this._$pages = this.$queue.find('.queue-page'));
     },
 
     /**
@@ -574,7 +585,7 @@ var QueueWidget = Event.extend({
      * @returns {jQuery}
      */
     getCurrentPage: function() {
-        return this._$currentPage || (this._$currentPage = this.getPages().first());
+        return this._$currentPage || (this._$currentPage = this.$queue.find('.queue-page').first());
     },
 
     /**
@@ -591,14 +602,14 @@ var QueueWidget = Event.extend({
      * @returns {number}
      */
     getFirstPageTimestamp: function() {
-        return this.getPageTimestamp(this.getPages().first());
+        return this.getPageTimestamp(this.$queue.find('.queue-page').first());
     },
 
     /**
      * @returns {number}
      */
     getLastPageTimestamp: function() {
-        return this.getPageTimestamp(this.getPages().last());
+        return this.getPageTimestamp(this.$queue.find('.queue-page').last());
     },
 
     /**
@@ -629,7 +640,6 @@ var QueueWidget = Event.extend({
     clearCache: function() {
         this._chachedPages = null;
         this._$currentPage = null;
-        this._$pages = null;
     },
 
     /**
@@ -656,7 +666,6 @@ var QueueWidget = Event.extend({
         Elements.initImages($page);
         Elements.initLinks($page);
         $page.find('.post.blocked').draggable('disable');
-        t._$pages = null;
     },
 
     /**

@@ -26,9 +26,6 @@ $.datepicker.setDefaults({
     altField: '#calendar-fix',
     altFormat: 'd MM'
 });
-if (!$.support.transition) {
-    $.fn.transition = $.fn.animate;
-}
 
 var UserGroupModel = Model.extend({
     init: function() {

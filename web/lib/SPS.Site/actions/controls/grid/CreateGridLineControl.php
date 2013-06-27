@@ -53,8 +53,7 @@
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
-                $canEdit = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) != UserFeed::ROLE_AUTHOR;
-                $result['html'] = SlotUtility::renderNew($object, $object->startDate, $canEdit);
+                $result['gridLineId'] = $object->gridLineId;
             }
 
             echo ObjectHelper::ToJSON($result);

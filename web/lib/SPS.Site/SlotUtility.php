@@ -26,27 +26,6 @@ class SlotUtility {
         $html = ob_get_clean();
         return $html;
     }
-
-    /**
-     * @param GridLineItem $GridItem
-     * @param DateTimeWrapper $Date
-     * @param bool $canEditQueue Используется внутри шаблона!
-     * @return string
-     */
-    public static function renderNew($GridItem, $Date, $canEditQueue) {
-        $gridItem = array(
-            'gridLineId' => $GridItem->gridLineId,
-            'dateTime' => new DateTimeWrapper($Date->DefaultDateFormat() . ' ' . $GridItem->time->DefaultTimeFormat()),
-            'repeat' => $GridItem->repeat,
-            'gridLineItemId' => null,
-            'startDate' => $GridItem->startDate,
-            'endDate' => $GridItem->endDate,
-        );
-
-        ob_start();
-        include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
-        return ob_get_clean();
-    }
 }
 
 ?>
