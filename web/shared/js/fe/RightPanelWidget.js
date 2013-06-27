@@ -241,7 +241,7 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    queueInited: false,
+    queueInited: false;
 
     dropdownChangeRightPanel: function(data) {
         var t = this;
