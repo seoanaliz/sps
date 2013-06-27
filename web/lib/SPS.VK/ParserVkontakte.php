@@ -335,6 +335,7 @@
             $articleQueue->statusId = StatusUtility::Finished;
             $articleQueue->createdAt = $sent_at;
             $articleQueue->isDeleted = false;
+            $articleQueue->author    = $author = isset($post->from_id) ? $post->from_id : false;
             $articleQueue->type = 'content'; //неспортивно
             return $articleQueue;
         }
