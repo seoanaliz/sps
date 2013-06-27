@@ -57,10 +57,6 @@ var App = (function() {
             return this.getLeftPanelWidget().loadArticles(clean);
         },
 
-        updateRightPanelDropdown: function() {
-            return this.getRightPanelWidget().updateDropdown();
-        },
-
         updateQueue: function(timestamp) {
             return this.getRightPanelWidget().updateQueue(timestamp);
         },

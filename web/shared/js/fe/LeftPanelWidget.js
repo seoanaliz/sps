@@ -1150,7 +1150,7 @@ var LeftPanelWidget = Event.extend({
             } else {
                 $('body').removeClass('editor-mode');
                 $(window).data('disable-load-more', false);
-                app.updateRightPanelDropdown();
+                app.getRightPanelWidget().updateDropdown(false /*updateQueue*/);
             }
         });
 

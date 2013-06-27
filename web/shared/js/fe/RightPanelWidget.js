@@ -227,22 +227,25 @@ var RightPanelWidget = Event.extend({
         return this.getQueueWidget().updatePage($page);
     },
 
-    updateDropdown: function() {
+    updateDropdown: function(updateQueue) {
         var t = this;
 
         Control.fire('get_source_list', {
             targetFeedId: Elements.rightdd(),
             type: Elements.leftType()
         }).success(function(data) {
-            t.dropdownChangeRightPanel(data);
+            t.dropdownChangeRightPanel(data, updateQueue);
             t.trigger('updateDropdown', data);
         }).error(function() {
             t.trigger('updateDropdown', false);
         });
     },
 
-    dropdownChangeRightPanel: function(data) {
+    dropdownChangeRightPanel: function(data, updateQueue) {
         var t = this;
+        if (typeof updateQueue === 'undefined') {
+            updateQueue = true;
+        }
 
         // возможно тот тип, что мы запрашивали не доступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
@@ -267,6 +270,8 @@ var RightPanelWidget = Event.extend({
             $('.grid_type.all').hide();
         }
 
-        t.updateQueue();
+        if (updateQueue) {
+            t.updateQueue();
+        }
     }
 });
