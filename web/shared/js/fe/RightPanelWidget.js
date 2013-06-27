@@ -244,7 +244,7 @@ var RightPanelWidget = Event.extend({
     dropdownChangeRightPanel: function(data) {
         var t = this;
 
-        // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+        // возможно тот тип, что мы запрашивали не доступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
             $('.sourceType.active').removeClass('active');
