@@ -241,12 +241,9 @@ var RightPanelWidget = Event.extend({
         });
     },
 
-    queueInited: false;
-
     dropdownChangeRightPanel: function(data) {
         var t = this;
 
-        var originalRightType = Elements.rightType();
         // возможно тот тип, что мы запрашивали не доступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
@@ -270,9 +267,6 @@ var RightPanelWidget = Event.extend({
             $('.grid_type.all').hide();
         }
 
-        if (($.inArray(originalRightType, data.accessibleGridTypes) === -1) || !t.queueInited) {
-            t.queueInited = true;
-            t.updateQueue();
-        }
+        t.updateQueue();
     }
 });
