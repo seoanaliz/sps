@@ -1642,14 +1642,6 @@ var LeftPanelWidget = Event.extend({
         return match && match[1] ? match[1] : null;
     },
 
-    getPostIdByURL_test: function() {
-        var t = this;
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
-        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall3967881_12359'));
-    },
-
     /**
      * @param {{text: string, link: string, photos: Array, articleId: (number=), repostExternalId: number}} params
      * @returns {Deferred}
