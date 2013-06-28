@@ -11,10 +11,10 @@
     class CreateGridLineControl extends BaseControl {
 
         public function Execute() {
-            $time = Request::getString( 'time' );
+            $time = Request::getString( 'time' ); // время (например, 12:40)
             $type = Request::getString( 'type' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
-            $timestamp = Request::getString( 'timestamp' );
+            $timestamp = Request::getString( 'timestamp' ); // timestamp начала дня (нужен для даты)
 
             $result = array(
                 'success' => false
