@@ -21,8 +21,6 @@
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                         $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
                         $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
-                        $sourceTypeClass .= !$sourceTypeAvailable ? ' hide ' : ' ';
-
                         ?>
                         <a class=" <?=$sourceTypeClass?>" data-type="{$sourceType}"
                             <?
