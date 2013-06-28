@@ -311,7 +311,8 @@ var QueueWidget = Event.extend({
                         if (data.success) {
                             var cssClass = 'gridLine_' + gridLineId;
                             if (data.repeat) {
-                                t.updatePage($slot.closest('.queue-page'));
+                                t.removeInvisiblePages();
+                                t.updateVisiblePages();
                             } else { // no-repeat
                                 t.clearCache();
                                 $queue.find('.' + cssClass).removeClass('repeat');
@@ -523,6 +524,34 @@ var QueueWidget = Event.extend({
         t.on('changeCurrentPage', function($page) {
             t.$queue.find('.fixed.queue-title').removeClass('fixed');
             $page.find('.queue-title').first().addClass('fixed');
+        });
+    },
+
+    removeInvisiblePages: function() {
+        var t = this;
+
+        var heightBefore = 0;
+        var invisibleBefore = $();
+        var invisibleAfter = $();
+        t.$queue.find('.queue-page').each(function(_, page) {
+            var $page = $(page);
+            if ($page.position().top + $page.outerHeight() < 0) {
+                invisibleBefore.add($page);
+                heightBefore += $page[0].scrollHeight;
+            } else if ( $page.position().top > t.$queue.height() ) {
+                invisibleAfter = invisibleAfter.add($page);
+            }
+        });
+        invisibleAfter.remove();
+        t.$queue.scrollTop(t.$queue.scrollTop() - heightBefore);
+        invisibleBefore.remove();
+    },
+
+    updateVisiblePages: function() {
+        var t = this; 
+        t.$queue.find('.queue-page').each(function(_, page) {
+            var $page = $(page);
+            t.updateSinglePage($page);
         });
     },
 
