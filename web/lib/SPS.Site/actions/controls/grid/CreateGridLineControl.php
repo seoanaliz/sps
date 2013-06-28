@@ -11,17 +11,16 @@
     class CreateGridLineControl extends BaseControl {
 
         public function Execute() {
-            $time = Request::getString( 'time' );
+            $time = Request::getString( 'time' ); // время (например, 12:40)
             $type = Request::getString( 'type' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
-            $startDate = Request::getDateTime('startDate');
-            $endDate = Request::getDateTime('endDate');
+            $timestamp = Request::getString( 'timestamp' ); // timestamp начала дня (нужен для даты)
 
             $result = array(
                 'success' => false
             );
 
-            if (empty($time) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
+            if (empty($time) || empty($timestamp) || !is_numeric($timestamp) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -39,9 +38,11 @@
                 return false;
             }
 
+            $Date = new DateTimeWrapper(date('d.m.Y', $timestamp));
+
             $object = new GridLine();
-            $object->startDate = $startDate;
-            $object->endDate = $endDate;
+            $object->startDate = $Date;
+            $object->endDate = $Date;
             $object->time = new DateTimeWrapper($time);
             $object->type = $type;
             $object->targetFeedId = $targetFeedId;
