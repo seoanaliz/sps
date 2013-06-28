@@ -34,24 +34,17 @@ var RightPanelWidget = Event.extend({
                     icon.attr('src', item.icon);
                 }
 
-                var targetFeedId = Elements.rightdd(),
-                    cookieData = '',
-                    sourceType = '',
-                    targetType = '';
-
                 // проставление типа источника
-                cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $leftPanel.find('.type-selector :not(.hide) a[data-type="' + cookieData + '"]');
-                if (sourceType.length == 0) {
-                    sourceType = $leftPanel.find('.type-selector :not(.hide)').first();
-                }
-                $leftPanel.find('.type-selector a').removeClass('active');
+                var cookieData = $.cookie('sourceType');
+                var sourceType = $leftPanel.find('.sourceType[data-type="' + cookieData + '"]');
+                $leftPanel.find('.sourceType.active').removeClass('active');
                 sourceType.addClass('active');
 
                 // проставление типа ленты отправки
+                var targetFeedId = Elements.rightdd();
                 cookieData = $.cookie('targetTypes' + targetFeedId);
-                targetType = $rightPanel.find('.type-selector a[data-type="' + cookieData + '"]');
-                if (targetType.length == 0) {
+                var targetType = $rightPanel.find('.type-selector a[data-type="' + cookieData + '"]');
+                if (targetType.length === 0) {
                     targetType = $rightPanel.find('.type-selector a[data-type="content"]');
                 }
                 $rightPanel.find('.type-selector a').removeClass('active');
