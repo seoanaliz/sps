@@ -216,7 +216,7 @@ var QueueWidget = Event.extend({
                         }
                     });
                 } else {
-                    Events.fire('create-grid-line', time, $post.data('start-date'), $post.data('end-date'), function(isOk, data) {
+                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
                         if (isOk && data) {
                             t.updateSinglePage($page).success(function($newPage) {
                                 if (data.gridLineId) {
@@ -381,14 +381,9 @@ var QueueWidget = Event.extend({
         t.$queue.delegate('.add-button', 'click', function() {
             var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
-            var dateString = $.datepick.formatDate(new Date(t.getPageTimestamp($page) * 1000));
-            var newSlotHeight = 110;
-            $newSlot.prependTo($page).animate({height: newSlotHeight}, 200);
-            if ($page.position().top < 0) {
-                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top + newSlotHeight);
-            }
-            $newSlot.data('start-date', dateString);
-            $newSlot.data('end-date', dateString);
+            $newSlot.prependTo($page).animate({height: 110}, 200, function () {
+                t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top);
+            });
             $newSlot.find('.time').click();
             $page.find('.empty-queue').remove();
         });
