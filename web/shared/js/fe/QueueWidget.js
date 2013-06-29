@@ -23,9 +23,14 @@ var QueueWidget = Event.extend({
     },
 
     loadSingleDay: function(timestamp) {
+        return this.loadPagesRange(timestamp, timestamp);
+    },
+
+    loadPagesRange: function(timestampBegin, timestampEnd) {
         return Control.fire('get_queue', {
-            direction: 'single-day',
-            timestamp: timestamp,
+            direction: 'range',
+            timestampBegin: timestampBegin,
+            timestampEnd: timestampEnd,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
         })
@@ -95,18 +100,21 @@ var QueueWidget = Event.extend({
         t.loadSingleDay( $page.data('timestamp') ).success(function(data) {
             if (data) {
                 var $loadedPage = $(data);
-                $page.replaceWith($loadedPage);
-                Elements.initDraggable($loadedPage);
-                Elements.initDroppable();
-                Elements.initImages($loadedPage);
-                Elements.initLinks($loadedPage);
-                $loadedPage.find('.post .images').imageComposition();
-                $loadedPage.find('.post.blocked').draggable('disable');
-                //t.$queue.trigger('scroll');
+                $page.replaceWith($loadedPage); 
+                t.initLoadedPage($loadedPage);
                 Def.fireSuccess($loadedPage);
             }
         });
         return Def;
+    },
+
+    initLoadedPage: function ($loadedPage) {
+        Elements.initDraggable($loadedPage);
+        Elements.initDroppable();
+        Elements.initImages($loadedPage);
+        Elements.initLinks($loadedPage);
+        $loadedPage.find('.post .images').imageComposition();
+        $loadedPage.find('.post.blocked').draggable('disable');
     },
 
     deleteArticleInSlot: function($slot, isEmpty) {
@@ -299,9 +307,9 @@ var QueueWidget = Event.extend({
 
         $queue.delegate('.repeater', 'click', function () {
             var $slot = $(this).closest('.slot');
-
             var gridLineId = $slot.data('grid-id');
             var timestamp = $slot.data('id');
+            var pageTimestamp = $slot.closest('.queue-page').data('timestamp');
             Events.fire('article-queue-toggle-repeat', gridLineId, timestamp, function(isOk, data) {
                 if (isOk) {
                     if (data) {
@@ -309,29 +317,17 @@ var QueueWidget = Event.extend({
                             popupError(data.message, {timeout: 7000});
                         }
                         if (data.success) {
-                            var cssClass = 'gridLine_' + gridLineId;
-                            if (data.repeat) {
-                                t.removeInvisiblePages();
-                                t.updateVisiblePages();
-                            } else { // no-repeat
-                                t.clearCache();
-                                $queue.find('.' + cssClass).removeClass('repeat');
-                                if (data.endDate) {
-                                    var endDate = parseInt(data.endDate, 10);
-                                    $queue.find('.queue-page').each(function(_, elem) {
-                                        var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
-                                        if (currentDate > endDate) {
-                                            var $elem = $(elem);
-                                            var $toDelete = $elem.find('.' + cssClass);
-                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
-                                            var height = $toDelete[0].scrollHeight + heightCorrection;
-                                            $toDelete.remove();
-                                            t.$queue.scrollTop(t.$queue.scrollTop() - height);
-                                            t.markIfEmpty($elem);
-                                        }
-                                    });
+                            t.removeInvisiblePages();
+                            var scrollBefore = $slot.closest('.queue-page').position().top + $slot.position().top;
+                            t.updateVisiblePages().success(function () {
+                                var $page = t.$queue.find('.queue-page[data-timestamp='+ pageTimestamp +']');
+                                if ($page.length) {
+                                    var $newSlot = $page.find('.slot[data-id='+ timestamp +']');
+                                    var scrollAfter = $page.position().top + $newSlot.position().top;
+                                    var newScrollTop = t.$queue.scrollTop() - (scrollBefore - scrollAfter);
+                                    t.$queue.scrollTop(newScrollTop);
                                 }
-                            }
+                            });
                         }
                     }
                 }
@@ -358,6 +354,43 @@ var QueueWidget = Event.extend({
 
         t.initSlotCreate();
         t.initInlineCreate();
+    },
+
+    updateVisiblePages: function () {
+        var t = this;
+        var timestampNewest = t.$queue.find('.queue-page').first().data('timestamp');
+        var timestampOldest = t.$queue.find('.queue-page').last().data('timestamp');
+        var Def = new Deferred();
+        t.loadPagesRange(timestampOldest, timestampNewest).success(function (data) {
+            if (data) {
+                t.clearCache();
+                var $loadedPages = $(data);
+                t.$queue.html($loadedPages);
+                t.initLoadedPage($loadedPages);
+                Def.fireSuccess();
+            }
+        });
+        return Def;
+    },
+
+    removeInvisiblePages: function() {
+        var t = this;
+
+        var heightBefore = 0;
+        var invisibleBefore = $();
+        var invisibleAfter = $();
+        t.$queue.find('.queue-page').each(function(_, page) {
+            var $page = $(page);
+            if ($page.position().top + $page.outerHeight() < -1600) {
+                invisibleBefore = invisibleBefore.add($page);
+                heightBefore += $page[0].scrollHeight;
+            } else if ( $page.position().top > t.$queue.height() + 700) {
+                invisibleAfter = invisibleAfter.add($page);
+            }
+        });
+        invisibleAfter.remove();
+        t.$queue.scrollTop(t.$queue.scrollTop() - heightBefore);
+        invisibleBefore.remove();
     },
 
     markIfEmpty: function($elem, doScroll) {
@@ -519,34 +552,6 @@ var QueueWidget = Event.extend({
         t.on('changeCurrentPage', function($page) {
             t.$queue.find('.fixed.queue-title').removeClass('fixed');
             $page.find('.queue-title').first().addClass('fixed');
-        });
-    },
-
-    removeInvisiblePages: function() {
-        var t = this;
-
-        var heightBefore = 0;
-        var invisibleBefore = $();
-        var invisibleAfter = $();
-        t.$queue.find('.queue-page').each(function(_, page) {
-            var $page = $(page);
-            if ($page.position().top + $page.outerHeight() < 0) {
-                invisibleBefore.add($page);
-                heightBefore += $page[0].scrollHeight;
-            } else if ( $page.position().top > t.$queue.height() ) {
-                invisibleAfter = invisibleAfter.add($page);
-            }
-        });
-        invisibleAfter.remove();
-        t.$queue.scrollTop(t.$queue.scrollTop() - heightBefore);
-        invisibleBefore.remove();
-    },
-
-    updateVisiblePages: function() {
-        var t = this; 
-        t.$queue.find('.queue-page').each(function(_, page) {
-            var $page = $(page);
-            t.updateSinglePage($page);
         });
     },
 

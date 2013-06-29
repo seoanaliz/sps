@@ -114,19 +114,36 @@
          * Обрабатываем реквест
          */
         private function processRequest() {
-            $timestamp = Request::getInteger( 'timestamp' );
-            $this->date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
-
             $this->type = Request::getString('type');
             if (empty($this->type) || empty(GridLineUtility::$Types[$this->type])) {
                 $this->type = GridLineUtility::TYPE_ALL;
             }
 
             $this->direction = Request::getString('direction');
-            if (empty($this->direction) || !in_array($this->direction, array('up', 'down', 'single-day'))) {
+            if (empty($this->direction) || !in_array($this->direction, array('up', 'down', 'range'))) {
                 $this->direction = 'down';
             }
 
+            if ($this->direction === 'range') {
+                $timestampBegin = Request::getString('timestampBegin');
+                $timestampEnd = Request::getString('timestampEnd');
+                if (!is_numeric($timestampBegin)) {
+                    $timestampBegin = 0;
+                }
+                if (!is_numeric($timestampEnd)) {
+                    $timestampEnd = 0;
+                }
+                $this->date = date('d.m.Y', $timestampBegin);
+                $this->endDate = new DateTimeWrapper(date('d.m.Y', $timestampEnd));
+            } else {
+                $timestamp = Request::getInteger( 'timestamp' );
+                if (!is_numeric($timestamp)) {
+                    $timestamp = 0;
+                }
+                $this->date = date('d.m.Y', $timestamp);
+            }
+            $this->startDate = new DateTimeWrapper($this->date);
+            
             $targetFeedId       = Request::getInteger( 'targetFeedId' );
             $this->targetFeed   = TargetFeedFactory::GetById($targetFeedId);
         }
@@ -138,32 +155,32 @@
          */
         private function buildGrid() {
             $iterator = new DateTimeWrapper($this->date);
-            $this->startDate = new DateTimeWrapper($this->date);
 
             $loadedCount = 0;
             while ($loadedCount < self::TARGET_ITEMS_COUNT) {
-                /**
-                 * Подгружаем сетку на конкретный день
-                 */
+                // подгружаем сетку на конкретный день
                 $grid = GridLineUtility::GetGrid($this->targetFeed->targetFeedId, $iterator->DefaultDateFormat(), $this->type);
 
                 $timestamp = $iterator->format('U');
-
                 $loadedCount += empty($grid) ? 1 : count($grid);
-                if ($this->direction === 'up') {
-                    //если листаем вверх - добавляем полученные данные перед результатом
-                    $this->grid = array($timestamp => $grid) + $this->grid;
-
-                    $iterator->modify('+1 day');
-                } else {
-                    //иначе - добавляем полученные данные в конец результата
-                    $this->grid = $this->grid + array($timestamp => $grid);
-
-                    $iterator->modify('-1 day');
-                }
-
-                if ($this->direction === 'single-day') {
-                    break; //---------------- BREAK
+                switch ($this->direction) {
+                    case 'up':
+                        $this->grid = array($timestamp => $grid) + $this->grid;
+                        $iterator->modify('+1 day');
+                    break;
+                
+                    case 'range':
+                        $this->grid = array($timestamp => $grid) + $this->grid;
+                        if ($iterator >= $this->endDate) {
+                            break 2; // ------------------------ BREAK
+                        } else {
+                            $iterator->modify('+1 day');
+                        }
+                    break;
+                
+                    default:
+                        $this->grid = $this->grid + array($timestamp => $grid);
+                        $iterator->modify('-1 day');
                 }
             }
 
