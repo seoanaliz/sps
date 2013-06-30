@@ -67,6 +67,9 @@
                 <page uri="controls://article-queue-get-empty/">
                     <actions>SPS.Site.RenderEmptyQueueItemControl</actions>
                 </page>
+                <page uri="controls://article-queue-toggle-repeat/">
+                    <actions>SPS.Site.ArticleQueueToggleRepeat</actions>
+                </page>
                 <page uri="controls://article-queue-item-save/">
                     <actions>SPS.Site.SaveQueueItemControl</actions>
                 </page>
@@ -82,9 +85,6 @@
                 <page uri="controls://article-restore/">
                     <actions>SPS.Site.RestoreArticleControl</actions>
                 </page>
-                <page uri="controls://parse-url/">
-                    <actions>SPS.Site.ParseUrlControl</actions>
-                </page>
                 <page uri="controls://image-upload/" boot="">
                     <actions>SPS.Site.ImageUploadControl</actions>
                 </page>
@@ -97,8 +97,8 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
-                <page uri="controls://grid-line-save/">
-                    <actions>SPS.Site.SaveGridLineControl</actions>
+                <page uri="controls://create-grid-line/">
+                    <actions>SPS.Site.CreateGridLineControl</actions>
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
@@ -134,6 +134,12 @@
                     <actions>SPS.Site.RemoveUserFromUserGroup</actions>
                 </page>
 
+            </pageGroup>
+
+            <pageGroup name = "parseUrl">
+                <page uri="controls://parse-url/">
+                    <actions>SPS.Site.ParseUrlControl</actions>
+                </page>
             </pageGroup>
 
             <pageGroup name="feStatsControls" boot="SPS.Site.GetSiteParams">
@@ -594,6 +600,9 @@
             <pageGroup name="daemons" boot="">
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
+                </page>
+                <page uri="daemons://sync-suggests/">
+                    <actions>SPS.Site.SyncSuggestedPosts</actions>
                 </page>
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>

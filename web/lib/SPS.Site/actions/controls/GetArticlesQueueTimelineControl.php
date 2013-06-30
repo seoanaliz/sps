@@ -123,7 +123,7 @@
             }
 
             $this->direction = Request::getString('direction');
-            if (empty($this->direction) || !in_array($this->direction, array('up', 'down'))) {
+            if (empty($this->direction) || !in_array($this->direction, array('up', 'down', 'single-day'))) {
                 $this->direction = 'down';
             }
 
@@ -150,16 +150,20 @@
                 $timestamp = $iterator->format('U');
 
                 $loadedCount += empty($grid) ? 1 : count($grid);
-                if ($this->direction == 'down') {
-                    //если листаем вниз - добавляем полученные данные в конец результата
-                    $this->grid = $this->grid + array($timestamp => $grid);
-
-                    $iterator->modify('-1 day');
-                } else {
+                if ($this->direction === 'up') {
                     //если листаем вверх - добавляем полученные данные перед результатом
                     $this->grid = array($timestamp => $grid) + $this->grid;
 
                     $iterator->modify('+1 day');
+                } else {
+                    //иначе - добавляем полученные данные в конец результата
+                    $this->grid = $this->grid + array($timestamp => $grid);
+
+                    $iterator->modify('-1 day');
+                }
+
+                if ($this->direction === 'single-day') {
+                    break; //---------------- BREAK
                 }
             }
 

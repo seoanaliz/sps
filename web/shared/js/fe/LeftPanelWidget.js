@@ -405,7 +405,8 @@ var LeftPanelWidget = Event.extend({
             id: id,
             targetFeedId: Elements.rightdd()
         }).success(function(data) {
-            var $elem = $('.post[data-id=' + id + ']');
+            var $leftPanel = $('#left-panel');
+    	    var $elem = $leftPanel.find('.post[data-id=' + id + ']');
             var $newElem = $(data);
             $elem.replaceWith($newElem);
             Elements.initDraggable($newElem);
@@ -1497,9 +1498,8 @@ var LeftPanelWidget = Event.extend({
         var sourceTypes = data.accessibleSourceTypes;
 
         var sourceType = Elements.leftType();
-        if( sourceTypes[sourceType] == undefined ) {
+        if( !~$.inArray(sourceType, sourceTypes)) {
             if (sourceTypes[0] != undefined) {
-
                 sourceType = sourceTypes[0];
             }else{
                 sourceType = null;

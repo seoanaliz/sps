@@ -48,6 +48,9 @@
         /** @var boolean */
         public $isOur;
 
+        /** @var boolean */
+        public $collectSuggests;
+
         /** @var Status */
         public $status;
 

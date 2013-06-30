@@ -135,21 +135,36 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_save_slot: function(gridLineId, time, startDate, endDate, callback) {
+    'article-queue-toggle-repeat': function(gridLineId, timestamp, callback){
         $.ajax({
-            url: controlsRoot + 'grid-line-save/',
+            url: controlsRoot + 'article-queue-toggle-repeat/',
             dataType : "json",
             data: {
-                gridLineId : gridLineId,
-                startDate : startDate,
-                endDate : endDate,
+                gridLineId: gridLineId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+                targetFeedId: Elements.rightdd()
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    'create-grid-line': function(time, timestamp, callback) {
+        $.ajax({
+            url: controlsRoot + 'create-grid-line/',
+            dataType : "json",
+            data: {
+                timestamp : timestamp,
                 time: time,
                 type: Elements.rightType(),
                 targetFeedId: Elements.rightdd()
             },
             success: function (data) {
-                if(data.success) {
-                    callback(true);
+                if (data.success) {
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -172,12 +187,12 @@ var Eventlist = {
             },
             success: function(data) {
                 if (data.success) {
-                    callback(true);
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(false);
+                    callback(false, data);
                 }
             }
         });

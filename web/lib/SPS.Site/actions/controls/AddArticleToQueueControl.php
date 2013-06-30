@@ -188,10 +188,18 @@ class AddArticleToQueueControl extends BaseControl
         $articlesQueue = array();
         $articlesQueue[$articleQueueItem->articleQueueId] = $articleQueueItem;
 
+        $repostArticleRecords = array();
+        if ($articleQueueRecord->repostArticleRecordId) {
+            $maybeRepostArticleRecord = ArticleRecordFactory::GetById($articleQueueRecord->repostArticleRecordId);
+            if ($maybeRepostArticleRecord) {
+                $repostArticleRecords[$articleQueueRecord->repostArticleRecordId] = $maybeRepostArticleRecord;
+            }
+        }
+
         $timestamp = Request::getInteger( 'timestamp' );
         $date = date('d.m.Y', !empty($timestamp) ? $timestamp : null);
         $grid = GridLineUtility::GetGrid(Request::getInteger('targetFeedId'), $date, Request::getString('type'));
-
+        $grid = array_reverse( $grid);
         $place = null;
         foreach ($grid as $key => $gridItem) {
             if ($gridItem['dateTime'] >= $articleQueueItem->startDate && $gridItem['dateTime'] <= $articleQueueItem->endDate) {

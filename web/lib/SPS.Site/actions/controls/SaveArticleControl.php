@@ -79,6 +79,8 @@ class SaveArticleControl extends BaseControl
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
         $article->articleStatus =  Article::STATUS_APPROVED;
+        $article->isSuggested = false;
+
         #$article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
 
         if ($sourceFeedId) {

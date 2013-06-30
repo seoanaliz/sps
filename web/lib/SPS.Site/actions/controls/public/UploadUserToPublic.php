@@ -15,7 +15,7 @@ class UploadUserToPublic {
         $text = Request::getString('text');
 
         $article = new Article();
-
+        $article->isSuggested = false;
         $article->createdAt = DateTimeWrapper::Now();
         $article->importedAt = DateTimeWrapper::Now();
         $article->externalId = -1;

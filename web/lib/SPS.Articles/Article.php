@@ -82,6 +82,9 @@ class Article
     /** @var bool */
     public $isCleaned;
 
+    /** @var bool */
+    public $isSuggested;
+
     /** @var int */
     public $statusId;
 

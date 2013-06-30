@@ -39,6 +39,9 @@
         <action name="SyncSources">
             <path>daemons/SyncSources</path>
         </action>
+        <action name="SyncSuggestedPosts">
+            <path>daemons/SyncSuggestedPosts</path>
+        </action>
         <action name="SyncAlbums">
             <path>daemons/SyncAlbums</path>
         </action>
@@ -66,6 +69,9 @@
         <action name="ImageUploadControl">
             <path>controls/ImageUploadControl</path>
         </action>
+        <action name="SendPostControl">
+            <path>controls/SendPostControl</path>
+        </action>
         <action name="ParseUrlControl">
             <path>controls/ParseUrlControl</path>
         </action>
@@ -84,6 +90,9 @@
             </action>
             <action name="DeleteArticleControl">
                 <path>controls/DeleteArticleControl</path>
+            </action>
+            <action name="ArticleQueueToggleRepeat">
+                <path>controls/ArticleQueueToggleRepeat</path>
             </action>
             <action name="ClearArticleTextControl">
                 <path>controls/ClearArticleTextControl</path>
@@ -124,8 +133,8 @@
         </group>
 
         <group name="Grid">
-            <action name="SaveGridLineControl">
-                <path>controls/grid/SaveGridLineControl</path>
+            <action name="CreateGridLineControl">
+                <path>controls/grid/CreateGridLineControl</path>
             </action>
             <action name="SaveGridLineItemControl">
                 <path>controls/grid/SaveGridLineItemControl</path>
