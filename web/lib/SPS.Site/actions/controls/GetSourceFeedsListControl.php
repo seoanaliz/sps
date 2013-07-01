@@ -18,6 +18,7 @@ class GetSourceFeedsListControl extends BaseControl
         $type = Request::getString('type');
 
         $accessibleSourceTypes = $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId);
+        var_dump( $ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type) );
         if (!isset(SourceFeedUtility::$Types[$type]) || !$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
             $type = reset($accessibleSourceTypes);
         }
@@ -128,7 +129,7 @@ class GetSourceFeedsListControl extends BaseControl
         if ($role != UserFeed::ROLE_AUTHOR && ($type == SourceFeedUtility::Authors || $type == SourceFeedUtility::Albums)) {
             $authorsFilters['article_status_filter'] = array();
         }
-
+var_dump( $ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type) );
         echo ObjectHelper::ToJSON(array(
             'type' => $type,
             'sourceFeeds' => $sourceFeedResult,
