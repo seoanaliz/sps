@@ -1588,6 +1588,7 @@ var LeftPanelWidget = Event.extend({
             }
         });
 
+        $.cookie('sourceType', sourceType);
         articlesLoading = true;
         t.updateSlider(targetFeedId, sourceType);
         t.setMultiSelectData(data.sourceFeeds, targetFeedId);
