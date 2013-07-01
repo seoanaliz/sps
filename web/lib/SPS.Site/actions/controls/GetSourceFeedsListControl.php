@@ -19,7 +19,6 @@ class GetSourceFeedsListControl extends BaseControl
 
         $accessibleSourceTypes = $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId);
         if (!isset(SourceFeedUtility::$Types[$type]) || !$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
-            // запросили недоступный тип, но мы тогда вернем дефолтный
             $type = reset($accessibleSourceTypes);
         }
 
