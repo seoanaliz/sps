@@ -188,13 +188,20 @@ var LeftPanelWidget = Event.extend({
         this.loadArticles(true);
     },
 
+    skipSourceFeedsCookieCreation: false,
+
     saveMultiSelectData: function() {
+        var t = this;
         var targetFeedId = Elements.rightdd();
-        $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId, Elements.leftdd().join('.'), { expires: 7, path: '/', secure: false });
+        if (!t.skipSourceFeedsCookieCreation) {
+            $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId, Elements.leftdd().join('.'), { expires: 7, path: '/', secure: false });
+        }
+        t.skipSourceFeedsCookieCreation = false;
     },
 
     setMultiSelectData: function(sourceFeeds, targetFeedId) {
         var t = this;
+
         var $multiSelect = t.$multiSelect;
         $multiSelect.find('option').remove();
         for (var i in sourceFeeds) {
@@ -202,7 +209,6 @@ var LeftPanelWidget = Event.extend({
             $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
         }
 
-        //get data from cookie
         var cookie = $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId);
         if (cookie) {
             var selectedSources = cookie.split('.');
@@ -215,8 +221,9 @@ var LeftPanelWidget = Event.extend({
         }
 
         $multiSelect.multiselect('refresh');
-        if (Elements.leftdd().length == 0) {
-            $multiSelect.multiselect('checkAll').multiselect('refresh');
+        if (cookie === null) { // кука не установлена
+            t.skipSourceFeedsCookieCreation = true; // TODO: переделать механизм обновления дропдауна, избавившись от таких костылей
+            $multiSelect.multiselect('checkAll').multiselect('refresh'); // да, это второй вызов 'refresh', не трогайте!
         }
     },
 
