@@ -1138,6 +1138,7 @@ var LeftPanelWidget = Event.extend({
             $(this).addClass('active');
 
             var type = $(this).data('type');
+            $.cookie('sourceType', type);
             if (type == App.FEED_TYPE_AUTHORS_LIST) {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
