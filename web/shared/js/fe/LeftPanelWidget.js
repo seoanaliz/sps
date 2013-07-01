@@ -160,11 +160,10 @@ var LeftPanelWidget = Event.extend({
 
     initMultiSelect: function() {
         var t = this;
-        var $multiSelect = t.$multiSelect;
-        $multiSelect.multiselect({
+        t.$multiSelect.multiselect({
             minWidth: 250,
             height: 250,
-            classes: $multiSelect.data('classes'),
+            classes: t.$multiSelect.data('classes'),
             checkAllText: 'Выделить все',
             uncheckAllText: 'Сбросить',
             noneSelectedText: '<span class="gray">Источник не выбран</span>',
@@ -179,7 +178,7 @@ var LeftPanelWidget = Event.extend({
                 t.updateMultiSelect();
             }
         });
-        $multiSelect.bind('multiselectclick', function() {
+        t.$multiSelect.bind('multiselectclick', function() {
             t.updateMultiSelect();
         });
     },
