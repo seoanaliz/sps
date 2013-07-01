@@ -191,10 +191,7 @@ var LeftPanelWidget = Event.extend({
 
     saveMultiSelectData: function() {
         var targetFeedId = Elements.rightdd();
-        var leftType = Elements.leftType();
-        if (leftType == 'source') {
-            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
-        }
+        $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId, Elements.leftdd().join('.'), { expires: 7, path: '/', secure: false });
     },
 
     setMultiSelectData: function(sourceFeeds, targetFeedId) {
@@ -207,9 +204,9 @@ var LeftPanelWidget = Event.extend({
         }
 
         //get data from cookie
-        var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+        var cookie = $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId);
         if (cookie) {
-            var selectedSources = cookie.split(',');
+            var selectedSources = cookie.split('.');
             if (selectedSources) {
                 var $options = $multiSelect.find('option');
                 for (i in selectedSources) {
@@ -395,8 +392,9 @@ var LeftPanelWidget = Event.extend({
         sliderRange.find('a:last').html(top == 100 ? 'TOP' : top);
 
         var targetFeedId = Elements.rightdd();
-        if (targetFeedId) {
-            $.cookie(sliderRange.data('sourceType') + 'FeedRange' + targetFeedId, sliderRange.slider('values', 0) + ':' + sliderRange.slider('values', 1), { expires: 7, path: '/', secure: false });
+        var rangeSourceType = sliderRange.data('sourceType');
+        if (targetFeedId && rangeSourceType) {
+            $.cookie(rangeSourceType + 'FeedRange' + targetFeedId, sliderRange.slider('values', 0) + ':' + sliderRange.slider('values', 1), { expires: 7, path: '/', secure: false });
         }
     },
 
@@ -1134,7 +1132,7 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $leftPanel = t.$leftPanel;
 
-        // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
+        // Вкладки 'Источники', 'Мои публикации', 'Авторские', 'Альбомы' в левом меню
         $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
             if (articlesLoading) {
                 return;
@@ -1143,7 +1141,9 @@ var LeftPanelWidget = Event.extend({
             $leftPanel.find('.type-selector .sourceType').removeClass('active');
             $(this).addClass('active');
 
-            if ($(this).data('type') == App.FEED_TYPE_AUTHORS_LIST) {
+            var type = $(this).data('type');
+            $.cookie('sourceType', type);
+            if (type == App.FEED_TYPE_AUTHORS_LIST) {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
                 t.updateAuthorListPage();
@@ -1593,7 +1593,6 @@ var LeftPanelWidget = Event.extend({
             }
         });
 
-        $.cookie('sourceTypes' + targetFeedId, sourceType);
         articlesLoading = true;
         t.updateSlider(targetFeedId, sourceType);
         t.setMultiSelectData(data.sourceFeeds, targetFeedId);
@@ -1640,14 +1639,6 @@ var LeftPanelWidget = Event.extend({
     getPostIdByURL: function(url) {
         var match = url.match(/wall(-?\d+_\d+)/im);
         return match && match[1] ? match[1] : null;
-    },
-
-    getPostIdByURL_test: function() {
-        var t = this;
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
-        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall3967881_12359'));
     },
 
     /**
