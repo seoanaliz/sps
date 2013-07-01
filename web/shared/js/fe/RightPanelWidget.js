@@ -210,7 +210,7 @@ var RightPanelWidget = Event.extend({
     },
 
     updateQueue: function(timestamp) {
-        if (timestamp === undefined) {
+        if (typeof timestamp === 'undefined') {
             this.getQueueWidget().clearCache();
         }
         this.getQueueWidget().update(timestamp);
@@ -220,36 +220,37 @@ var RightPanelWidget = Event.extend({
         return this.getQueueWidget().updatePage($page);
     },
 
-    updateDropdown: function() {
+    updateDropdown: function(updateQueue) {
         var t = this;
 
         Control.fire('get_source_list', {
             targetFeedId: Elements.rightdd(),
             type: Elements.leftType()
         }).success(function(data) {
-            t.dropdownChangeRightPanel(data);
+            t.dropdownChangeRightPanel(data, updateQueue);
             t.trigger('updateDropdown', data);
         }).error(function() {
             t.trigger('updateDropdown', false);
         });
     },
 
-    dropdownChangeRightPanel: function(data) {
-        // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+    dropdownChangeRightPanel: function(data, updateQueue) {
+        var t = this;
+        if (typeof updateQueue === 'undefined') {
+            updateQueue = true;
+        }
+
+        // возможно тот тип, что мы запрашивали не доступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
             $('.sourceType.active').removeClass('active');
             $sourceTypeLink.addClass('active');
         }
 
-        var t = this;
-        var sourceType = Elements.leftType();
-        var gridTypes = data.accessibleGridTypes;
         var showCount = 0;
-
-        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(i, item){
+        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(_, item){
             item = $(item);
-            if ($.inArray(item.data('type'), gridTypes) == -1){
+            if ($.inArray(item.data('type'), data.accessibleGridTypes) === -1){
                 item.hide();
             } else {
                 showCount++;
@@ -262,13 +263,8 @@ var RightPanelWidget = Event.extend({
             $('.grid_type.all').hide();
         }
 
-        var addCellButton = $('.queue-footer > a.add-button');
-        if (data.canAddPlanCell) {
-            addCellButton.show();
-        } else {
-            addCellButton.hide();
+        if (updateQueue) {
+            t.updateQueue();
         }
-
-        t.updateQueue();
     }
 });

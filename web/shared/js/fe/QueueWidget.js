@@ -467,13 +467,6 @@ var QueueWidget = Event.extend({
             var $slot = $(this).closest('.slot');
             t.saveArticle($slot);
         });
-
-        $('.queue-footer .add-button').click(function() {
-            $queue.scrollTo(0);
-            var $newPost = $(QUEUE_SLOT_ADD);
-            $newPost.prependTo($queue).animate({height: 110}, 200);
-            $newPost.find('.time').click();
-        });
     },
 
     /**
