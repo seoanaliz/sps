@@ -161,4 +161,16 @@ class RoleAccessUtility
         }
         return true;
     }
+
+    public function getDefaultType($targetFeedId){
+        if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
+            switch (self::$FeedRulesByFeed[$targetFeedId]) {
+                case UserFeed::ROLE_AUTHOR:
+                    return SourceFeedUtility::Authors;
+                break;
+                default:
+                    return SourceFeedUtility::Source;
+            }
+        }
+    }
 }
