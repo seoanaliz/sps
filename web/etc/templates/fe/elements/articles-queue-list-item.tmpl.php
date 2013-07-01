@@ -5,6 +5,7 @@
 <div class="slot
     <?= !$canEditQueue || !empty($gridItem['blocked']) ? 'locked' : ''?>
     <?= $isEmptyItem ? 'empty' : ''?>
+    <?= 'gridLine_' . $gridItem['gridLineId'] ?>
     <?= $gridItem['repeat'] ? 'repeat' : ''?>"
     <?= $canBeUsed ? ' ui-droppable ' : ''?>
      data-id="{$id}"
