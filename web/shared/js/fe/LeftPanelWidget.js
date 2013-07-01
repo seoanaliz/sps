@@ -195,25 +195,29 @@ var LeftPanelWidget = Event.extend({
 
     setMultiSelectData: function(sourceFeeds, targetFeedId) {
         var t = this;
-
-        t.$multiSelect.find('option').remove();
+        var $multiSelect = t.$multiSelect;
+        $multiSelect.find('option').remove();
         for (var i in sourceFeeds) {
-            t.$multiSelect.append('<option value="' + sourceFeeds[i].id + '">' + sourceFeeds[i].title + '</option>');
+            var item = sourceFeeds[i];
+            $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
         }
 
+        //get data from cookie
         var cookie = $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId);
         if (cookie) {
             var selectedSources = cookie.split('.');
             if (selectedSources) {
-                var $options = t.$multiSelect.find('option');
+                var $options = $multiSelect.find('option');
                 for (i in selectedSources) {
                     $options.filter('[value="' + selectedSources[i] + '"]').prop('selected', true);
                 }
             }
-        } else if (cookie === null) { // куки не установлена
-            t.$multiSelect.multiselect('checkAll');
         }
-        t.$multiSelect.multiselect('refresh');
+
+        $multiSelect.multiselect('refresh');
+        if (Elements.leftdd().length == 0) {
+            $multiSelect.multiselect('checkAll').multiselect('refresh');
+        }
     },
 
     initWall: function() {
