@@ -18,8 +18,8 @@ class GetSourceFeedsListControl extends BaseControl
         $type = Request::getString('type');
 
         $accessibleSourceTypes = $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId);
-        if (!isset(SourceFeedUtility::$Types[$type]) || !$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
-            $type = reset($accessibleSourceTypes);
+        if (!isset($accessibleSourceTypes[$type])) {
+             $type = reset($accessibleSourceTypes);
         }
 
         /**
