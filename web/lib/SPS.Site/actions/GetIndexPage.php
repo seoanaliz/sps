@@ -43,14 +43,13 @@ class GetIndexPage extends BaseControl
             if (!empty($targetFeeds)) {
                 $currentTargetFeedId = current(array_keys($targetFeeds));
             } else {
-                $currentTargetFeedId = -1;
+                $currentTargetFeedId = 0;
             }
         }
 
-
         $availableSourceTypes = $gridTypes = array();
-        if ($currentTargetFeedId) {
-            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($currentTargetFeedId);
+        if ( $currentTargetFeedId && isset( $targetFeeds[$currentTargetFeedId])) {
+            $availableSourceTypes = $SourceAccessUtility->getAccessibleSourceTypes($targetFeeds[$currentTargetFeedId]);
             $gridTypes = $SourceAccessUtility->getAccessibleGridTypes($currentTargetFeedId);
         }
 

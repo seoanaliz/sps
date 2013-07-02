@@ -106,7 +106,7 @@ class RoleAccessUtility
 
     /**
      * Созвращает массив источников, доступных для ленты (с учетом настроек ленты)
-     * @param $targetFeedId
+     * @param $targetFeed TargetFeed
      * @return array
      */
     public function getAccessibleSourceTypes($targetFeed) {
@@ -164,11 +164,11 @@ class RoleAccessUtility
     public function getDefaultType($targetFeedId){
         if (isset(self::$FeedRulesByFeed[$targetFeedId])) {
             switch (self::$FeedRulesByFeed[$targetFeedId]) {
-                case UserFeed::ROLE_AUTHOR:
+               case UserFeed::ROLE_AUTHOR:
                     return SourceFeedUtility::Authors;
-                break;
-                default:
-                    return SourceFeedUtility::Source;
+               break;
+               default:
+                return SourceFeedUtility::Source;
             }
         }
     }
