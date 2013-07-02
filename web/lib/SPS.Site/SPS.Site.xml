@@ -130,8 +130,8 @@
         </group>
 
         <group name="Grid">
-            <action name="SaveGridLineControl">
-                <path>controls/grid/SaveGridLineControl</path>
+            <action name="CreateGridLineControl">
+                <path>controls/grid/CreateGridLineControl</path>
             </action>
             <action name="SaveGridLineItemControl">
                 <path>controls/grid/SaveGridLineItemControl</path>

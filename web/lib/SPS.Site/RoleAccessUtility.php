@@ -109,8 +109,7 @@ class RoleAccessUtility
      * @param $targetFeedId
      * @return array
      */
-    public function getAccessibleSourceTypes($targetFeedId) {
-        $targetFeed = TargetFeedFactory::GetById( $targetFeedId );
+    public function getAccessibleSourceTypes($targetFeed) {
         $accessibleSourceTypes = array();
         foreach (SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) {
             if (    $this->hasAccessToSourceType($targetFeed->targetFeedId, $sourceType)
