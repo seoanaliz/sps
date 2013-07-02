@@ -193,8 +193,31 @@ var QueueWidget = Event.extend({
 
             if (time && time != $time.text()) {
                 $time.text(time);
-                if ($post.hasClass('new')) {
-                     Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
+                if (!$post.hasClass('new')) {
+                    // Редактирование времени ячейки для текущего дня
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
+                        if (isOk) {
+                            var oldVerticalPosition = $page.position().top + $post.position().top;
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = verticalPosition - oldVerticalPosition;
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.scrollTop(newScrollTop);
+                                       }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
                         if (isOk && data) {
                             t.updateSinglePage($page).success(function($newPage) {
                                 if (data.gridLineId) {
@@ -213,29 +236,6 @@ var QueueWidget = Event.extend({
                                                newScrollTop = 0;
                                            }
                                            t.$queue.animate({scrollTop: newScrollTop}, 500);
-                                       }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
-                        if (isOk) {
-                            var oldVerticalPosition = $page.position().top + $post.position().top;
-                            t.updateSinglePage($page).success(function($newPage) {
-                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
-                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
-                                    if ($elem.length) {
-                                       var verticalPosition = $newPage.position().top + $elem.position().top;
-                                       var delta = verticalPosition - oldVerticalPosition;
-                                       if (delta !== 0) {
-                                           var newScrollTop = t.$queue.scrollTop() + delta;
-                                           if (newScrollTop < 0) {
-                                               newScrollTop = 0;
-                                           }
-                                           t.$queue.scrollTop(newScrollTop);
                                        }
                                     }
                                 }
