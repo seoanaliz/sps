@@ -152,6 +152,10 @@
                     'name'         => 'startDate'
                     , 'type'       => TYPE_DATETIME
                     , 'searchType' => SEARCHTYPE_LE
+                ), 'createdAtNE' => array(
+                      'name'       => 'createdAt'
+                    , 'type'       => TYPE_DATETIME
+                    , 'searchType' => SEARCHTYPE_NOT_EQUALS
                 ))
         );
         
