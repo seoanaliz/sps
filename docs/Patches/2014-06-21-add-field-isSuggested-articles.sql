@@ -1,6 +1,5 @@
 alter table "articles" add column "isSuggested" boolean NOT NULL default false;
 
-DROP VIEW "getArticles";
 CREATE OR REPLACE VIEW "getArticles" AS
 SELECT "public"."articles"."articleId"
 	, "public"."articles"."importedAt"
@@ -16,6 +15,7 @@ SELECT "public"."articles"."articleId"
 	, "public"."articles"."isCleaned"
 	, "public"."articles"."statusId"
 	, "public"."articles"."articleStatus"
+	, "public"."articles"."userGroupId"
 	, "public"."articles"."isSuggested"
  FROM "public"."articles"
 	WHERE "public"."articles"."statusId" != 3

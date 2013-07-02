@@ -11,17 +11,21 @@
     class CreateGridLineControl extends BaseControl {
 
         public function Execute() {
-            $time = Request::getString( 'time' );
+            $time = Request::getString( 'time' ); // время (например, 12:40)
             $type = Request::getString( 'type' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
-            $startDate = Request::getDateTime('startDate');
-            $endDate = Request::getDateTime('endDate');
+            $timestamp = Request::getString( 'timestamp' ); // timestamp начала дня (нужен для даты)
 
             $result = array(
                 'success' => false
             );
 
-            if (empty($time) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
+            if (!preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9]$/', $time)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
+            if (empty($timestamp) || !is_numeric($timestamp) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -39,9 +43,11 @@
                 return false;
             }
 
+            $Date = new DateTimeWrapper(date('d.m.Y', $timestamp));
+
             $object = new GridLine();
-            $object->startDate = $startDate;
-            $object->endDate = $endDate;
+            $object->startDate = $Date;
+            $object->endDate = $Date;
             $object->time = new DateTimeWrapper($time);
             $object->type = $type;
             $object->targetFeedId = $targetFeedId;
@@ -53,8 +59,7 @@
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
-                $canEdit = $TargetFeedAccessUtility->getRoleForTargetFeed($targetFeedId) != UserFeed::ROLE_AUTHOR;
-                $result['html'] = SlotUtility::renderNew($object, $object->startDate, $canEdit);
+                $result['gridLineId'] = $object->gridLineId;
             }
 
             echo ObjectHelper::ToJSON($result);

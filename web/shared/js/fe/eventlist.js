@@ -152,13 +152,12 @@ var Eventlist = {
             }
         });
     },
-    'create-grid-line': function(time, startDate, endDate, callback) {
+    'create-grid-line': function(time, timestamp, callback) {
         $.ajax({
             url: controlsRoot + 'create-grid-line/',
             dataType : "json",
             data: {
-                startDate : startDate,
-                endDate : endDate,
+                timestamp : timestamp,
                 time: time,
                 type: Elements.rightType(),
                 targetFeedId: Elements.rightdd()
@@ -188,12 +187,12 @@ var Eventlist = {
             },
             success: function(data) {
                 if (data.success) {
-                    callback(true);
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(false);
+                    callback(false, data);
                 }
             }
         });

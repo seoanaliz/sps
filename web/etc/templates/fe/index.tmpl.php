@@ -21,8 +21,6 @@
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
                         $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
                         $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
-                        $sourceTypeClass .= !$sourceTypeAvailable ? ' hide ' : ' ';
-
                         ?>
                         <a class=" <?=$sourceTypeClass?>" data-type="{$sourceType}"
                             <?
@@ -142,11 +140,9 @@
 
                     <div class="type-selector">
                         <a class="grid_type all" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <?
-                        $isFirst=0;
-                        foreach ($gridTypes as $type => $name): ?>
-                            <a class="grid_type <?=!$isFirst++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
-                            <? endforeach; ?>
+                        <? foreach ($gridTypes as $type => $name): ?>
+                            <a class="grid_type" data-type="<?= $type ?>"><?=$name?></a>
+                        <? endforeach; ?>
                     </div>
 
                 </div>

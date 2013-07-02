@@ -34,24 +34,17 @@ var RightPanelWidget = Event.extend({
                     icon.attr('src', item.icon);
                 }
 
-                var targetFeedId = Elements.rightdd(),
-                    cookieData = '',
-                    sourceType = '',
-                    targetType = '';
-
                 // проставление типа источника
-                cookieData = $.cookie('sourceTypes' + targetFeedId);
-                sourceType = $leftPanel.find('.type-selector :not(.hide) a[data-type="' + cookieData + '"]');
-                if (sourceType.length == 0) {
-                    sourceType = $leftPanel.find('.type-selector :not(.hide)').first();
-                }
-                $leftPanel.find('.type-selector a').removeClass('active');
+                var cookieData = $.cookie('sourceType');
+                var sourceType = $leftPanel.find('.sourceType[data-type="' + cookieData + '"]');
+                $leftPanel.find('.sourceType.active').removeClass('active');
                 sourceType.addClass('active');
 
                 // проставление типа ленты отправки
+                var targetFeedId = Elements.rightdd();
                 cookieData = $.cookie('targetTypes' + targetFeedId);
-                targetType = $rightPanel.find('.type-selector a[data-type="' + cookieData + '"]');
-                if (targetType.length == 0) {
+                var targetType = $rightPanel.find('.type-selector a[data-type="' + cookieData + '"]');
+                if (targetType.length === 0) {
                     targetType = $rightPanel.find('.type-selector a[data-type="content"]');
                 }
                 $rightPanel.find('.type-selector a').removeClass('active');
@@ -217,7 +210,7 @@ var RightPanelWidget = Event.extend({
     },
 
     updateQueue: function(timestamp) {
-        if (timestamp === undefined) {
+        if (typeof timestamp === 'undefined') {
             this.getQueueWidget().clearCache();
         }
         this.getQueueWidget().update(timestamp);
@@ -227,36 +220,37 @@ var RightPanelWidget = Event.extend({
         return this.getQueueWidget().updatePage($page);
     },
 
-    updateDropdown: function() {
+    updateDropdown: function(updateQueue) {
         var t = this;
 
         Control.fire('get_source_list', {
             targetFeedId: Elements.rightdd(),
             type: Elements.leftType()
         }).success(function(data) {
-            t.dropdownChangeRightPanel(data);
+            t.dropdownChangeRightPanel(data, updateQueue);
             t.trigger('updateDropdown', data);
         }).error(function() {
             t.trigger('updateDropdown', false);
         });
     },
 
-    dropdownChangeRightPanel: function(data) {
-        // возможно тот тип, что мы запрашивали недоступен, и нам вернули новый тип
+    dropdownChangeRightPanel: function(data, updateQueue) {
+        var t = this;
+        if (typeof updateQueue === 'undefined') {
+            updateQueue = true;
+        }
+
+        // возможно тот тип, что мы запрашивали не доступен, и нам вернули новый тип
         var $sourceTypeLink = $('#sourceType-' + data.type);
         if (!$sourceTypeLink.hasClass('active')) {
             $('.sourceType.active').removeClass('active');
             $sourceTypeLink.addClass('active');
         }
 
-        var t = this;
-        var sourceType = Elements.leftType();
-        var gridTypes = data.accessibleGridTypes;
         var showCount = 0;
-
-        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(i, item){
+        t.$rightPanel.find('.type-selector').children('.grid_type').each(function(_, item){
             item = $(item);
-            if ($.inArray(item.data('type'), gridTypes) == -1){
+            if ($.inArray(item.data('type'), data.accessibleGridTypes) === -1){
                 item.hide();
             } else {
                 showCount++;
@@ -269,13 +263,8 @@ var RightPanelWidget = Event.extend({
             $('.grid_type.all').hide();
         }
 
-        var addCellButton = $('.queue-footer > a.add-button');
-        if (data.canAddPlanCell) {
-            addCellButton.show();
-        } else {
-            addCellButton.hide();
+        if (updateQueue) {
+            t.updateQueue();
         }
-
-        t.updateQueue();
     }
 });

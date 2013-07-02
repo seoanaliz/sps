@@ -74,6 +74,7 @@ abstract class AbstractPostLoadDaemon {
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 1;
+            $article->isSuggested = false;
             // демон загружает уже одобренные посты. ха
             $article->articleStatus = ( $source->type == SourceFeedUtility::Albums ) ?
                 Article::STATUS_REVIEW : Article::STATUS_APPROVED;
