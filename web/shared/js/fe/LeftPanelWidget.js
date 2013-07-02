@@ -814,7 +814,7 @@ var LeftPanelWidget = Event.extend({
 //        });
 
         // Редактирование поста в левом меню
-        $leftPanel.delegate('.post .edit,.post.editable .content .shortcut', 'click', function(){
+        $leftPanel.delegate('.post .edit, .post.editable .content .shortcut', 'click', function(){
             var $post = $(this).closest('.post'),
             $el = $post.find('> .content'),
             $buttonPanel = $post.find('> .bottom.d-hide'),
