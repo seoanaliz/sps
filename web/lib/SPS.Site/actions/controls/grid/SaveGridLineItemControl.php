@@ -8,18 +8,22 @@
     class SaveGridLineItemControl extends BaseControl {
 
         public function Execute() {
+            $result = array(
+                'success' => false
+            );
+
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
             $gridLineId = Request::getInteger( 'gridLineId' );
             $gridLineItemId = Request::getInteger( 'gridLineItemId' );
             $time = Request::getString( 'time' );
+            if (!preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9]$/', $time)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
             $timestamp = Request::getInteger( 'timestamp' );
             $itemDate = new DateTimeWrapper(date('d.m.Y', !empty($timestamp) ? $timestamp : null) . ' ' . $time);
             $queueId = Request::getInteger( 'queueId' );
-
-            $result = array(
-                'success' => false
-            );
 
             if (empty($time) || empty($gridLineId)) {
                 echo ObjectHelper::ToJSON($result);

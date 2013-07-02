@@ -15,17 +15,14 @@ class GetSourceFeedsListControl extends BaseControl
         $ArticleAccessUtility = new ArticleAccessUtility($this->vkId);
 
         $targetFeedId = Request::getInteger('targetFeedId');
+        $targetFeed = TargetFeedFactory::GetById($targetFeedId);
+        $accessibleSourceTypes = $ArticleAccessUtility->getAccessibleSourceTypes($targetFeed);
 
         $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
 
         $type = Request::getString('type');
-        if (empty($type) || empty(SourceFeedUtility::$Types[$type])) {
-            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
-        }
-
-        if (!$ArticleAccessUtility->hasAccessToSourceType($targetFeedId, $type)) {
-            // запросили недоступный тип, но мы тогда вернем дефолтный
-            $type = $ArticleAccessUtility->getDefaultType($targetFeedId);
+        if ( !isset(SourceFeedUtility::$Types[$type]) || !in_array($type, $accessibleSourceTypes)) {
+            $type = reset( $accessibleSourceTypes );
         }
 
         /**
@@ -138,7 +135,7 @@ class GetSourceFeedsListControl extends BaseControl
         echo ObjectHelper::ToJSON(array(
             'type' => $type,
             'sourceFeeds' => $sourceFeedResult,
-            'accessibleSourceTypes' => $ArticleAccessUtility->getAccessibleSourceTypes($targetFeedId),
+            'accessibleSourceTypes' => $accessibleSourceTypes,
             'accessibleGridTypes' => array_keys($ArticleAccessUtility->getAccessibleGridTypes($targetFeedId)),
             'canAddPlanCell' => $ArticleAccessUtility->canAddPlanCell($targetFeedId),
             'accessibleMyArticleStatuses' => $ArticleAccessUtility->getArticleStatusesForTargetFeed($targetFeedId),
