@@ -21,7 +21,7 @@ class GetSourceFeedsListControl extends BaseControl
         $role = $ArticleAccessUtility->getRoleForTargetFeed($targetFeedId);
 
         $type = Request::getString('type');
-        if ( empty($type) || empty(SourceFeedUtility::$Types[$type]) || !in_array($type, $accessibleSourceTypes)) {
+        if ( !isset(SourceFeedUtility::$Types[$type]) || !in_array($type, $accessibleSourceTypes)) {
             $type = reset( $accessibleSourceTypes );
         }
 
