@@ -12,22 +12,39 @@
          */
         public function Execute() {
             $articleId = Request::getInteger( 'articleId' );
-            if (empty($articleId)) return;
+            $articleQueueId = Request::getInteger( 'queueId' );
 
-            $article = ArticleFactory::GetById($articleId);
+            if (!$articleQueueId) {
+                if (!$articleId) {
+                    return; // --------------------- RETURN
+                }
+                
+                $article = ArticleFactory::GetById($articleId);
+                if (!$article) {
+                    return; // --------------------- RETURN
+                }
 
-            if (empty($article)) return;
+                $feedId = $article->sourceFeedId;
+                $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
+            } else {
+                $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
+                if (!$articleQueue) {
+                    return; // --------------------- RETURN
+                }
 
-            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
-            //check access
-            if (!$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
-                return;
+                $feedId = $articleQueue->targetFeedId;
+                $articleRecord = ArticleRecordFactory::GetOne(array('articleQueueId' => $articleQueueId));
             }
 
-            $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
+            if (empty($articleRecord)) {
+                return; // ------------------------- RETURN
+            }
 
-            if (empty($articleRecord)) return;
+            // проверим доступ
+            $SourceAccessUtility = new SourceAccessUtility($this->vkId);
+            if ( !$SourceAccessUtility->hasAccessToSourceFeed($feedId) ) {
+                return; // ------------------------- RETURN
+            }
 
             $photos = array();
             if (!empty($articleRecord->photos)) {
