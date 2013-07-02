@@ -405,7 +405,8 @@ var LeftPanelWidget = Event.extend({
             id: id,
             targetFeedId: Elements.rightdd()
         }).success(function(data) {
-            var $elem = $('.post[data-id=' + id + ']');
+            var $leftPanel = $('#left-panel');
+    	    var $elem = $leftPanel.find('.post[data-id=' + id + ']');
             var $newElem = $(data);
             $elem.replaceWith($newElem);
             Elements.initDraggable($newElem);

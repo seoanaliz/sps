@@ -5,6 +5,8 @@ var QueueWidget = Event.extend({
         t.initAutoload();
     },
 
+    scrollAtEditBegin: 0,
+
     /**
      * Загрузка ленты очереди
      * @param {number=} timestamp
@@ -14,6 +16,15 @@ var QueueWidget = Event.extend({
     loadPages: function(timestamp, isUp) {
         return Control.fire('get_queue', {
             direction: isUp ? 'up' : 'down',
+            timestamp: timestamp,
+            targetFeedId: Elements.rightdd(),
+            type: Elements.rightType()
+        })
+    },
+
+    loadSingleDay: function(timestamp) {
+        return Control.fire('get_queue', {
+            direction: 'single-day',
             timestamp: timestamp,
             targetFeedId: Elements.rightdd(),
             type: Elements.rightType()
@@ -75,6 +86,29 @@ var QueueWidget = Event.extend({
         return deferred;
     },
 
+    /**
+     * @return Deferred
+     */
+    updateSinglePage: function($page) {
+        var t = this;
+        var Def = new Deferred();
+        t.loadSingleDay( $page.data('timestamp') ).success(function(data) {
+            if (data) {
+                var $loadedPage = $(data);
+                $page.replaceWith($loadedPage);
+                Elements.initDraggable($loadedPage);
+                Elements.initDroppable();
+                Elements.initImages($loadedPage);
+                Elements.initLinks($loadedPage);
+                $loadedPage.find('.post .images').imageComposition();
+                $loadedPage.find('.post.blocked').draggable('disable');
+                //t.$queue.trigger('scroll');
+                Def.fireSuccess($loadedPage);
+            }
+        });
+        return Def;
+    },
+
     deleteArticleInSlot: function($slot, isEmpty) {
         if (typeof isEmpty === 'undefined') {
             isEmpty = false;
@@ -114,7 +148,6 @@ var QueueWidget = Event.extend({
         // Смена даты
         $queue.delegate('.time', 'click', function() {
             var $time = $(this);
-            var $post = $time.closest('.slot-header');
             var $input = $time.data('time-edit');
 
             if (!$input) {
@@ -124,11 +157,16 @@ var QueueWidget = Event.extend({
                 .width($time.width() + 2)
                 .val($time.text())
                 .mask('29:59')
-                .appendTo($post);
+                .appendTo($time.closest('.slot-header'));
                 $time.data('time-edit', $input);
             } else {
                 $input.show();
             }
+
+            // запомним позицию скролла. Если юзер скроллит, пока редактирует, мы не будем потом корректировать позицию
+            var $post = $time.closest('.slot');
+            t.scrollAtEditBegin = $post.closest('.queue-page').position().top + $post.position().top;
+
             $input.focus().select();
         });
 
@@ -156,16 +194,59 @@ var QueueWidget = Event.extend({
                 $time.text(time);
                 if (!$post.hasClass('new')) {
                     // Редактирование времени ячейки для текущего дня
-                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(state){
-                        if (state) {
-                            t.updatePage($page);
+                    Events.fire('rightcolumn_time_edit', gridLineId, gridLineItemId, time, timestamp, qid, function(isOk, data){
+                        if (isOk) {
+                            var oldVerticalPosition = $page.position().top + $post.position().top;
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineItemId && (t.scrollAtEditBegin === oldVerticalPosition)) {
+                                    var $elem = $newPage.find('.slot[data-grid-item-id="'+ data.gridLineItemId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = verticalPosition - oldVerticalPosition;
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.scrollTop(newScrollTop);
+                                       }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Events.fire('create-grid-line', time, timestamp, function(isOk, data) {
+                        if (isOk && data) {
+                            t.updateSinglePage($page).success(function($newPage) {
+                                if (data.gridLineId) {
+                                    var $elem = $newPage.find('.slot[data-grid-id="'+ data.gridLineId +'"]');
+                                    if ($elem.length) {
+                                       var verticalPosition = $newPage.position().top + $elem.position().top;
+                                       var delta = 0; // сколько нужно скроллить, чтобы увидеть элемент: вверх "-" или вниз "+" за экран
+                                       if (verticalPosition < 0) {
+                                           delta = verticalPosition - 70;
+                                       } else if (verticalPosition > t.$queue.height()) {
+                                           delta = verticalPosition - t.$queue.height() + $elem.height() + 50;
+                                       }
+                                       if (delta !== 0) {
+                                           var newScrollTop = t.$queue.scrollTop() + delta;
+                                           if (newScrollTop < 0) {
+                                               newScrollTop = 0;
+                                           }
+                                           t.$queue.animate({scrollTop: newScrollTop}, 500);
+                                       }
+                                    }
+                                }
+                            });
                         }
                     });
                 }
             } else if (!time) {
                 if ($post.hasClass('new')) {
-                    $post.transition({height: 0}, 200, function() {
+                    $post.animate({height: 0}, 200, function() {
                         $(this).remove();
+                        app.getRightPanelWidget().getQueueWidget().markIfEmpty($page, false /*doScroll*/);
                     });
                 }
             }
@@ -211,71 +292,49 @@ var QueueWidget = Event.extend({
 
             if (time) {
                 Events.fire('rightcolumn_removal_time_edit', gridLineId, gridLineItemId, time, qid, function() {
-                    t.updatePage($page);
+                    t.updateSinglePage($page);
                 });
             }
         });
 
-        $queue.delegate('.datepicker', 'click', function() {
-            var $target = $(this);
-            var $header = $target.parent();
+        $queue.delegate('.repeater', 'click', function () {
+            var $slot = $(this).closest('.slot');
 
-            if (!$header.data('datepicker')) {
-                var $datepicker = $('<input type="text" />');
-                var $slot = $target.closest('.slot');
-                var $page = $slot.closest('.queue-page');
-                var $time = $slot.find('.time');
-                var gridLineId = $slot.data('grid-id');
-                var startDate = $slot.data('start-date');
-                var endDate = $slot.data('end-date');
-                var defStartDate = $slot.data('start-date');
-                var defEndDate = $slot.data('end-date');
-                var time = $time.text();
-
-                $header.data('datepicker', $datepicker);
-                $target.after($datepicker);
-                $target.remove();
-                $datepicker.datepick({
-                    rangeSelect: true,
-                    showTrigger: $target,
-                    showAnim: 'fadeIn',
-                    showSpeed: 'fast',
-                    monthsToShow: 2,
-                    minDate: 0,
-                    renderer: $.extend($.datepick.defaultRenderer, {
-                        picker: $.datepick.defaultRenderer.picker.replace(/\{link:today\}/, '')
-                    }),
-                    onSelect: function(dates) {
-                        $slot.data('start-date', $.datepick.formatDate(dates[0]));
-                        $slot.data('end-date', $.datepick.formatDate(dates[1]));
-                        startDate = $slot.data('start-date');
-                        endDate = $slot.data('end-date');
-                    },
-                    onShow: function() {
-                        $header.find('span.datepicker').addClass('active');
-                        $queue.css('overflow', 'hidden');
-                    },
-                    onClose: function() {
-                        time = $time.text();
-                        $header.find('span.datepicker').removeClass('active');
-                        $queue.css('overflow', 'auto');
-                        if ($slot.hasClass('new')) {
-                            // Добавление ячейки
-                            Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                t.updatePage($page);
-                            });
-                        } else {
-                            // Редактироваиние ячейки
-                            if (defStartDate != startDate || defEndDate != endDate) {
-                                Events.fire('rightcolumn_save_slot', gridLineId, time, startDate, endDate, function() {
-                                    t.updatePage($page);
-                                });
+            var gridLineId = $slot.data('grid-id');
+            var timestamp = $slot.data('id');
+            Events.fire('article-queue-toggle-repeat', gridLineId, timestamp, function(isOk, data) {
+                if (isOk) {
+                    if (data) {
+                        if (!data.success && data.message) {
+                            popupError(data.message, {timeout: 7000});
+                        }
+                        if (data.success) {
+                            var cssClass = 'gridLine_' + gridLineId;
+                            if (data.repeat) {
+                                t.updatePage($slot.closest('.queue-page'));
+                            } else { // no-repeat
+                                t.clearCache();
+                                $queue.find('.' + cssClass).removeClass('repeat');
+                                if (data.endDate) {
+                                    var endDate = parseInt(data.endDate, 10);
+                                    $queue.find('.queue-page').each(function(_, elem) {
+                                        var currentDate = parseInt(elem.getAttribute('data-timestamp'), 10);
+                                        if (currentDate > endDate) {
+                                            var $elem = $(elem);
+                                            var $toDelete = $elem.find('.' + cssClass);
+                                            var heightCorrection = window.opera ? 0 : 1; // в некоторых браузерах необходима коррекция высоты на 1px
+                                            var height = $toDelete[0].scrollHeight + heightCorrection;
+                                            $toDelete.remove();
+                                            t.$queue.scrollTop(t.$queue.scrollTop() - height);
+                                            t.markIfEmpty($elem);
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
-                });
-                $datepicker.val(startDate + ' - ' + endDate).focus();
-            }
+                }
+            });
         });
 
         // Показать полностью в правом меню
@@ -300,19 +359,32 @@ var QueueWidget = Event.extend({
         t.initInlineCreate();
     },
 
+    markIfEmpty: function($elem, doScroll) {
+        if (typeof doScroll === 'undefined') {
+            doScroll = true;
+        }
+        var t = this;
+        var $meaningfulChildren = $elem.children(':not(.queue-title)');
+        if (!$meaningfulChildren.length) {
+            var $emptyPlaceholder = $('<div class="empty-queue">Пусто</div>');
+            $elem.append($emptyPlaceholder);
+            if (doScroll) {
+                var height = $emptyPlaceholder[0].scrollHeight;
+                t.$queue.scrollTop(t.$queue.scrollTop() + height);
+            }
+        }
+    },
+
     initSlotCreate: function() {
         var t = this;
         t.$queue.delegate('.add-button', 'click', function() {
             var $newSlot = $(QUEUE_SLOT_ADD);
             var $page = $(this).closest('.queue-page');
-            var dateString = $.datepick.formatDate(new Date(t.getPageTimestamp($page) * 1000));
-            $newSlot.prependTo($page).transition({height: 110}, 200);
-            if ($page.position().top < 0) {
+            $newSlot.prependTo($page).animate({height: 110}, 200, function () {
                 t.$queue.scrollTop(t.$queue.scrollTop() + $page.position().top);
-            }
-            $newSlot.data('start-date', dateString);
-            $newSlot.data('end-date', dateString);
+            });
             $newSlot.find('.time').click();
+            $page.find('.empty-queue').remove();
         });
     },
 
@@ -381,7 +453,6 @@ var QueueWidget = Event.extend({
         var text = $.trim($textarea.val());
         var imageUploader = $slot.data('imageUploader');
         var photos = imageUploader && imageUploader.getPhotos();
-        var $page = $slot.closest('.queue-page');
 
         if (text || photos) {
             $slot.addClass('locked');
@@ -391,14 +462,26 @@ var QueueWidget = Event.extend({
             }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-                    Events.fire('post_moved', postId, $slot.data('id'), null, function() {
-                        t.updatePage($page);
+                    Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
+                        if (isOk && data && data.html) {
+                            t.setSlotArticleHtml($slot, data.html);
+                        }
                     });
                 }
             });
         } else {
             $textarea.focus();
         }
+    },
+
+    setSlotArticleHtml: function ($slot, html) {
+        var $page = $(html);
+        $slot.replaceWith($page);
+        Elements.initDraggable($page);
+        Elements.initImages($page);
+        Elements.initLinks($page);
+        $page.find('.post .images').imageComposition();
+        $page.find('.post.blocked').draggable('disable');
     },
 
     /**
@@ -416,7 +499,6 @@ var QueueWidget = Event.extend({
 
             var scrollTop = t.$queue.scrollTop();
             var queueHeight = t.$queue.height();
-            var $pages = t.getPages();
 
             if (scrollTop <= 0) {
                 t.showNextTopPage();
@@ -424,7 +506,7 @@ var QueueWidget = Event.extend({
                 t.showNextBottomPage();
             }
 
-            $pages.each(function() {
+            t.$queue.find('.queue-page').each(function() {
                 var $page = $(this);
                 if ($page.position().top + $page.outerHeight() > 0) {
                     t.setCurrentPage($page);
@@ -434,17 +516,9 @@ var QueueWidget = Event.extend({
         });
 
         t.on('changeCurrentPage', function($page) {
-            t.getPages().find('.queue-title').removeClass('fixed');
+            t.$queue.find('.fixed.queue-title').removeClass('fixed');
             $page.find('.queue-title').first().addClass('fixed');
         });
-    },
-
-    /**
-     * Возвращает все страницы в ленте очереди
-     * @returns {jQuery}
-     */
-    getPages: function() {
-        return this._$pages || (this._$pages = this.$queue.find('.queue-page'));
     },
 
     /**
@@ -506,7 +580,7 @@ var QueueWidget = Event.extend({
      * @returns {jQuery}
      */
     getCurrentPage: function() {
-        return this._$currentPage || (this._$currentPage = this.getPages().first());
+        return this._$currentPage || (this._$currentPage = this.$queue.find('.queue-page').first());
     },
 
     /**
@@ -523,14 +597,14 @@ var QueueWidget = Event.extend({
      * @returns {number}
      */
     getFirstPageTimestamp: function() {
-        return this.getPageTimestamp(this.getPages().first());
+        return this.getPageTimestamp(this.$queue.find('.queue-page').first());
     },
 
     /**
      * @returns {number}
      */
     getLastPageTimestamp: function() {
-        return this.getPageTimestamp(this.getPages().last());
+        return this.getPageTimestamp(this.$queue.find('.queue-page').last());
     },
 
     /**
@@ -561,7 +635,6 @@ var QueueWidget = Event.extend({
     clearCache: function() {
         this._chachedPages = null;
         this._$currentPage = null;
-        this._$pages = null;
     },
 
     /**
@@ -588,7 +661,6 @@ var QueueWidget = Event.extend({
         Elements.initImages($page);
         Elements.initLinks($page);
         $page.find('.post.blocked').draggable('disable');
-        t._$pages = null;
     },
 
     /**

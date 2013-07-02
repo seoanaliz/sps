@@ -358,6 +358,8 @@
       <ShowSources><![CDATA[Показывать источники]]></ShowSources>
       <ShowMy><![CDATA[Показывать личную вкладку]]></ShowMy>
       <IsOur><![CDATA[Наш паблик]]></IsOur>
+      <collectSuggests><![CDATA[Собирать предложенные]]></collectSuggests>
+      <LastSuggestedPost><![CDATA[ID последнего предл. поста]]></LastSuggestedPost>
       <type><![CDATA[Тип]]></type>
       <params><![CDATA[params]]></params>
     </targetFeed>

@@ -36,10 +36,10 @@ class AddReport
         $group = GroupFactory::GetById( $group_id);
 
         if ( !GroupsUtility::is_author( $group_id, $user_id ) && $group->type != GroupsUtility::Group_Shared_Special )
-            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
+            die( ObjectHelper::ToJSON( array( 'response' => false, 'message' =>  'Вам сюда нельзя' )));
         $publics_info = StatBarter::get_page_name( array( $target_public_id, $barter_public_id ));
         if ( empty( $publics_info ))
-            die( ObjectHelper::ToJSON( array('response' => 'wrong publics data')));
+            die( ObjectHelper::ToJSON( array('response' => false, 'message' => 'Проверьте правильность адреса пабликов. Попробуйте просто id ввести')));
 
         //поправка на timezone. клиент присылает свой сдвиг, меняем его на московский
         $time_shift = ( self::DEFAULT_TIMESHIFT - $time_shift) * 60;
@@ -59,7 +59,7 @@ class AddReport
             if ( $stop_looking_time[$i] < $start_looking_time[$i])
                 $stop_looking_time[$i] = $start_looking_time[$i] + 86400;
             if ( $start_looking_time[$i] <= time() - 300 )
-                die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'too late' )));
+                die(  ObjectHelper::ToJSON( array( 'response' => false, 'message'  =>  'Время начала меньше текущего :(' )));
 
             $barter_event = new BarterEvent();
             $repeat_check = $this->repeat_check( $publics_info['target']['id'], $publics_info['barter']['id'], $start_looking_time[$i], $stop_looking_time[$i], $user_id );
@@ -87,12 +87,12 @@ class AddReport
         }
 
         if ( $repeat_check )
-            die( ObjectHelper::ToJSON( array('response' => 'matches','matches' => StatBarter::form_response( $repeat_check, $default_group->group_id ))));
+            die( ObjectHelper::ToJSON( array('response' => false,'message' => 'Подобный обмен уже есть, проверьте плз')));
 
         if ( $check ) {
             die( ObjectHelper::ToJSON( array('response' => true )));
         } else
-            die(  ObjectHelper::ToJSON( array( 'response' => false, 'err_mes'   =>  'something went wrong' )));
+            die(  ObjectHelper::ToJSON( array( 'response' => false, 'message'   =>  'Хмм, нечто странное только что произошло. не удалось сохранить' )));
     }
 
     private function repeat_check( $target_public_id, $barter_public_id, $start_time, $stop_time, $creator_id )

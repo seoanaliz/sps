@@ -60,6 +60,9 @@
                 <page uri="controls://article-queue-get-empty/">
                     <actions>SPS.Site.RenderEmptyQueueItemControl</actions>
                 </page>
+                <page uri="controls://article-queue-toggle-repeat/">
+                    <actions>SPS.Site.ArticleQueueToggleRepeat</actions>
+                </page>
                 <page uri="controls://article-queue-item-save/">
                     <actions>SPS.Site.SaveQueueItemControl</actions>
                 </page>
@@ -87,8 +90,8 @@
                 <page uri="controls://source-feeds-list/">
                     <actions>SPS.Site.GetSourceFeedsListControl</actions>
                 </page>
-                <page uri="controls://grid-line-save/">
-                    <actions>SPS.Site.SaveGridLineControl</actions>
+                <page uri="controls://create-grid-line/">
+                    <actions>SPS.Site.CreateGridLineControl</actions>
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
@@ -112,9 +115,6 @@
                 <page uri="controls://article-reject/">
                     <actions>SPS.Site.RejectArticleControl</actions>
                 </page>
-                <page uri="controls://send-posteponed/">
-                    <actions>SPS.Site.SendPostControl</actions>
-                </page>
 
 
                 <page uri="controls://add-user-group/">
@@ -129,7 +129,7 @@
 
             </pageGroup>
 
-            <pageGroup name="urlParser">
+            <pageGroup name = "parseUrl">
                 <page uri="controls://parse-url/">
                     <actions>SPS.Site.ParseUrlControl</actions>
                 </page>
@@ -187,7 +187,6 @@
                 </page>
 
             </pageGroup>
-
             <pageGroup name="BarterControls" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="controls://addReport/">
                     <actions>SPS.Stat.addReport</actions>
@@ -595,6 +594,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-suggests/">
+                    <actions>SPS.Site.SyncSuggestedPosts</actions>
+                </page>
                 <page uri="daemons://delete-post/">
                     <actions>SPS.Site.DeletePost</actions>
                 </page>
@@ -754,10 +756,7 @@
                 <page uri="stat://">
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
-            </pageGroup>
-
-            <pageGroup name="obmen" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
-                <page uri="obmen://" >
+                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
             </pageGroup>

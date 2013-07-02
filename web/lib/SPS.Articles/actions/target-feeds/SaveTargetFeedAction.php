@@ -275,11 +275,11 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
         Response::setArray( "publishers", $publishers );
 
-        $editors = EditorFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+        $editors = AuthorFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
         $users = array();
         foreach ($editors as $editor){
-            /** @var $editor Editor */
-            $users[$editor->vkId] = $editor->getName();
+            /** @var $editor Author */
+            $users[$editor->vkId] = $editor->FullName();
         }
 
         JsHelper::AddVar('editors', $users);
@@ -317,5 +317,6 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         }
 
     }
+
 }
 ?>

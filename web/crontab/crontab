@@ -50,6 +50,9 @@
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/delete-post/ > /dev/null
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/CheckPosts/ > /dev/null
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/CheckWalls/ > /dev/null
+
+*/20     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-suggests/ > /dev/null
+
 */5    6-23     *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/PublicsParser/ > /dev/null
 
 0       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/token-checker/ > /dev/null
