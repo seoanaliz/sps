@@ -820,7 +820,9 @@ var LeftPanelWidget = Event.extend({
         $el = $post.find('.content'),
         $buttonPanel = $post.find('.bottom.d-hide'),
         postId = $post.data('id'),
-        queueId = $post.data('queue-id');
+        queueId = $post.data('queue-id'),
+        $slot = $post.closest('.slot'),
+        timestamp = $slot.data('id');
 
         if ($post.editing) return;
 
@@ -1006,9 +1008,15 @@ var LeftPanelWidget = Event.extend({
                             photos: photos,
                             link: link,
                             articleId: postId,
-                            repostExternalId: repostId
+                            timestamp: timestamp,
+                            repostExternalId: repostId,
+                            queueId: queueId
                         }).success(function() {
-                            app.getLeftPanelWidget().reloadArticle(data.id);
+                            if (queueId) { // редактировали в "правой" ленте (лента отправки)
+                                app.getRightPanelWidget().getQueueWidget().updateSinglePage($post.closest('.queue-page'));
+                            } else { // лента источников
+                                app.getLeftPanelWidget().reloadArticle(data.id);
+                            }
                         });
                     }
                 };
@@ -1669,10 +1677,13 @@ var LeftPanelWidget = Event.extend({
             link: params.link,
             photos: params.photos,
             articleId: params.articleId,
+            timestamp: params.timestamp,
             repostExternalId: params.repostExternalId,
             sourceFeedId: sourceFeedId,
             targetFeedId: Elements.rightdd(),
-            userGroupId: Elements.getUserGroupId()
+            userGroupId: Elements.getUserGroupId(),
+            type: Elements.rightType(),
+            queueId: params.queueId
         });
     }
 });

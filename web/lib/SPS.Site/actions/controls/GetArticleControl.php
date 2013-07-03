@@ -18,14 +18,13 @@
                 if (!$articleId) {
                     return; // --------------------- RETURN
                 }
-                
+
                 $article = ArticleFactory::GetById($articleId);
                 if (!$article) {
                     return; // --------------------- RETURN
                 }
 
                 $feedId = $article->sourceFeedId;
-                $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
             } else {
                 $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
                 if (!$articleQueue) {
@@ -33,16 +32,17 @@
                 }
 
                 $feedId = $articleQueue->targetFeedId;
-                $articleRecord = ArticleRecordFactory::GetOne(array('articleQueueId' => $articleQueueId));
-            }
-
-            if (empty($articleRecord)) {
-                return; // ------------------------- RETURN
+                $articleId = $articleQueue->articleId;
             }
 
             // проверим доступ
             $SourceAccessUtility = new SourceAccessUtility($this->vkId);
             if ( !$SourceAccessUtility->hasAccessToSourceFeed($feedId) ) {
+                return; // ------------------------- RETURN
+            }
+
+            $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
+            if (empty($articleRecord)) {
                 return; // ------------------------- RETURN
             }
 
