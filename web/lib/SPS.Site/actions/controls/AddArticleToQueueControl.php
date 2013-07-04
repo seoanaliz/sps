@@ -8,7 +8,6 @@
 class AddArticleToQueueControl extends BaseControl
 {
 
-
     /**
      * Entry Point
      */
@@ -22,6 +21,7 @@ class AddArticleToQueueControl extends BaseControl
         $timestamp = Request::getInteger('timestamp');
         $queueId = Request::getInteger('queueId');
         $type = Request::getString('type');
+        $vkPostId = Request::getInteger('vkPostId');
 
         if (empty($articleId) || empty($targetFeedId) || empty($timestamp) || empty($type) || empty(GridLineUtility::$Types[$type])) {
             $result['message'] = 'Wrong data';
@@ -70,15 +70,27 @@ class AddArticleToQueueControl extends BaseControl
             return true;
         }
 
+        $targetFeed = TargetFeedFactory::GetById($targetFeedId);
         // получаем пост
-        $article = ArticleFactory::GetById($articleId);
+        if( $vkPostId ) {
+            $articleArray   = $this->addArticle($vkPostId, $targetFeed->targetFeedId);
+            if ( empty( $articleArray)) {
+                $result['message'] = 'PostNotFound: ' . $vkPostId;
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+            $article        = $articleArray['article'];
+            $articleRecord  = $articleArray['articleRecord'];
+
+        } else {
+            $article = ArticleFactory::GetById($articleId);
+            $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
+        }
         if (!$article) {
             $result['message'] = 'ArticleNotFound:' . $articleId;
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-        $targetFeed = TargetFeedFactory::GetById($targetFeedId);
-        $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
 
         if (empty($targetFeed)) {
             $result['message'] = 'Empty Target Feed';
@@ -92,7 +104,6 @@ class AddArticleToQueueControl extends BaseControl
             return false;
         }
 
-
         //source feed
         $sourceFeed = SourceFeedFactory::GetById($article->sourceFeedId);
         $sourceFeed = !empty($sourceFeed) ? $sourceFeed : new SourceFeed();
@@ -100,7 +111,7 @@ class AddArticleToQueueControl extends BaseControl
         if ($sourceFeed->type != SourceFeedUtility::Ads) {
             //проверяем, если ли такая $articleId в этой $targetFeedId
             $existsCount = ArticleQueueFactory::Count(
-                array('articleId' => $articleId, 'targetFeedId' => $targetFeedId)
+                array('articleId' => $article->articleId, 'targetFeedId' => $targetFeedId)
             );
 
             if ($existsCount) {
@@ -224,6 +235,34 @@ class AddArticleToQueueControl extends BaseControl
         include Template::GetCachedRealPath('tmpl://fe/elements/articles-queue-list-item.tmpl.php');
         $html = ob_get_clean();
         return $html;
+    }
+
+    protected function addArticle( $postVkId, $targetFeed ) {
+        $article = false;
+        $fullPostId = '-' . $targetFeed->externalId . '_' . $postVkId;
+        try {
+            $posts = ParserVkontakte::get_posts_by_vk_id( array($fullPostId));
+        } catch ( Exception $e) {
+            return $article;
+        }
+        if( !empty( $posts)) {
+            $article = ParserVkontakte::get_article_from_post(
+                current($posts),
+                $targetFeed->targetFeedId
+            );
+        }
+
+        if( ArticleFactory::Add($article, array( BaseFactory::WithReturningKeys => true ))) {
+            $articleRecord = ParserVkontakte::get_articleRecord_from_post( current($posts));
+            $articleRecord->articleId = $article->articleId;
+            if ( ArticleRecordFactory::Add( $articleRecord, array( BaseFactory::WithReturningKeys => true ))) {
+                return array(
+                    'article'       =>  $article,
+                    'articleRecord' =>  $articleRecord,
+                );
+            }
+        }
+        return false;
     }
 }
 
