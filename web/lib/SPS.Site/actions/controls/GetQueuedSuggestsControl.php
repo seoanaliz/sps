@@ -1,11 +1,8 @@
 <?php
     Package::Load( 'SPS.Site' );
 
-    /**
-     * GetLinkInfoControl Action
-     * @package    SPS
-     * @subpackage Site
-     * @author     Shuler
+    /*
+     * возвращает массив id постов, которые не нужно отображать в левой ленте на вкладке предложенных постов
      */
     class GetQueuedSuggestsControl extends BaseControl {
 
