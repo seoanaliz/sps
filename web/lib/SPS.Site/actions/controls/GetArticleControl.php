@@ -12,22 +12,39 @@
          */
         public function Execute() {
             $articleId = Request::getInteger( 'articleId' );
-            if (empty($articleId)) return;
+            $articleQueueId = Request::getInteger( 'queueId' );
 
-            $article = ArticleFactory::GetById($articleId);
+            if (!$articleQueueId) {
+                if (!$articleId) {
+                    return; // --------------------- RETURN
+                }
 
-            if (empty($article)) return;
+                $article = ArticleFactory::GetById($articleId);
+                if (!$article) {
+                    return; // --------------------- RETURN
+                }
 
+                $feedId = $article->sourceFeedId;
+            } else {
+                $articleQueue = ArticleQueueFactory::GetById($articleQueueId);
+                if (!$articleQueue) {
+                    return; // --------------------- RETURN
+                }
+
+                $feedId = $articleQueue->targetFeedId;
+                $articleId = $articleQueue->articleId;
+            }
+
+            // проверим доступ
             $SourceAccessUtility = new SourceAccessUtility($this->vkId);
-
-            //check access
-            if (!$SourceAccessUtility->hasAccessToSourceFeed($article->sourceFeedId)) {
-                return;
+            if ( !$SourceAccessUtility->hasAccessToSourceFeed($feedId) ) {
+                return; // ------------------------- RETURN
             }
 
             $articleRecord = ArticleRecordFactory::GetOne(array('articleId' => $articleId));
-
-            if (empty($articleRecord)) return;
+            if (empty($articleRecord)) {
+                return; // ------------------------- RETURN
+            }
 
             $photos = array();
             if (!empty($articleRecord->photos)) {

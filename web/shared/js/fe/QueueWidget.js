@@ -346,6 +346,7 @@ var QueueWidget = Event.extend({
         // Показать полностью в правом меню
         $queue.delegate('.toggle-text', 'click', function() {
             $(this).parent().toggleClass('collapsed');
+            return false;
         });
 
         // Показать полностью в раскрытом правом меню

@@ -266,12 +266,13 @@ var Eventlist = {
         });
     },
 
-    load_post_edit: function(id, callback){
+    load_post_edit: function(articleId, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-get/',
             dataType : "json",
             data: {
-                articleId: id
+                articleId: articleId,
+                queueId: queueId
             },
             success: function (data) {
                 if(data && data.id) {
