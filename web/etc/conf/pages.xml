@@ -96,6 +96,9 @@
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
+                <page uri="controls://get-suggests-post-ids/">
+                    <actions>SPS.Site.GetQueuedSuggestsControl</actions>
+                </page>
                 <page uri="controls://authors-list/">
                     <actions>SPS.Site.GetAuthorsListControl</actions>
                     <template>tmpl://fe/elements/authors-list.tmpl.php</template>
@@ -593,6 +596,9 @@
             <pageGroup name="daemons" boot="">
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
+                </page>
+                <page uri="daemons://sync-fb-sources/">
+                    <actions>SPS.Site.SyncFbSources</actions>
                 </page>
                 <page uri="daemons://sync-suggests/">
                     <actions>SPS.Site.SyncSuggestedPosts</actions>
