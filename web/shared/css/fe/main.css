@@ -705,7 +705,7 @@ i {
   cursor: pointer;
   position: absolute;
   right: 0;
-  bottom: 1px;
+  top: -1px;
   color: #205f82;
   font-weight: bold;
   font-size: 14px;
