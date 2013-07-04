@@ -12,7 +12,7 @@
 
     class SenderVkontakte {
 
-        private $change_admin_errors = array( 5, 7, 14, 15, 214 );
+        private $change_admin_errors = array( 5, 7, 15, 214 );
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
@@ -27,12 +27,14 @@
         private $video_id = array();            //заголовок ссылки
         private $repost_post;
 
-        const METH          =   'https://api.vk.com/method/';
-        const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
-    //    const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
-        const TESTING       =   false;
-        const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
-        const ALBUM_NAME    =   'wall photo';
+        private $post_try_counter = 0;
+
+        const METH                  =   'https://api.vk.com/method/';
+        const ANTIGATE_KEY          =   'cae95d19a0b446cafc82e21f5248c945';
+        const TESTING               =    false;
+        const FALSE_COUNTER         =    3; //количество попыток совершить какое-либо действие
+        const ALBUM_NAME            =    'wall photo';
+        const CAPTCHA_ERROR_CODE    =    14;
 
         //(например, получение разгаданной капчи)
 
@@ -115,9 +117,9 @@
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
-
+            echo 1;
             $attachments = array_merge( $photo_array, $this->audio_id, $this->video_id );
-            if (  $this->post_text =='©' || ( $this->post_text == '' && count( $attachments ) == 1 ) ) {
+            if (  $this->post_text =='©' || ( $this->post_text == '' && count( $attachments ) == 1 )) {
 //            $this->post_text = "&#01;";
             }
             if( count( $photo_array ) == 0 && $this->link ) {
@@ -141,22 +143,36 @@
                 return '-' . $this->vk_group_id . '_' . $check_id;
         }
 
-        public function repost()
+        public function repost($captcha = array())
         {
+            $this->post_try_counter ++;
+            if($this->post_try_counter > 3) {
+                throw new Exception('too many tries');
+            }
+
             $params = array(
                 'object'    =>  'wall' . $this->repost_post,
                 'message'   =>  '',
                 'gid'       =>  $this->vk_group_id,
                 'access_token' => $this->vk_access_token
             );
+            if(!empty($captcha )) {
+                $params = array_merge($params, $captcha);
+            }
+
             $res = VkHelper::api_request( 'wall.repost', $params );
             if (isset ($res->error )) {
-                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                if ( $res->error->error_code == self::CAPTCHA_ERROR_CODE ) {
+                    $this->repost( array(
+                        'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
+                        'captcha_sid'   =>  $res->error->captcha_sid
+                    ));
+                } elseif ( in_array( $res->error->error_code, $this->change_admin_errors )) {
                     throw new ChangeSenderException(  $res->error->error_msg );
-
-                else
+                } else {
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_code
                         . ', public: '. $this->vk_group_id );
+                }
             }
 
             if ( isset( $res->success) && $res->success && isset( $res->post_id ))
@@ -189,7 +205,7 @@
         // нужно учитывать это время
         //если повезет, возвращает  текст капчи,
         // false в случае неправильной разгадки/недоступности работников распознавания
-        private function captcha( $url, $vk_sid )
+        private function captcha( $url )
         {
             //не требующие пока изменений настройки
             $domain="antigate.com";
@@ -205,77 +221,67 @@
             $try_counter = 0;
             while (true) {
                 $try_counter ++;
-                if ($try_counter > self::FALSE_COUNTER)
+                if ($try_counter > 3)
                     return false;
-                $jp = file_get_contents($url );
-                file_put_contents('capcha.jpg', $jp);
+                $tmpCaptcha  = Site::GetRealPath('temp://upl_' . md5($url) . '.jpg');
+                $jp = file_get_contents($url);
+                file_put_contents($tmpCaptcha, $jp);
 
-                $filename = realpath('capcha.jpg');
-
-                if (!file_exists($filename))
-                {
-                    if (self::TESTING) echo "file $filename not found\n";
+                if (!file_exists($tmpCaptcha)) {
                     return false;
                 }
                 $postdata = array(
                     'method'        => 'post',
                     'key'           => self::ANTIGATE_KEY,
-                    'file'          => '@' . $filename,
+                    'file'          => '@' . $tmpCaptcha,
                     'phrase'        => $is_phrase,
                     'regsense'      => $is_regsense,
                     'numeric'       => $is_numeric,
                     'min_len'       => $min_len,
                     'max_len'       => $max_len,
-
                 );
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,             "http://$domain/in.php");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER,     1);
-                curl_setopt($ch, CURLOPT_TIMEOUT,             60);
-                curl_setopt($ch, CURLOPT_POST,                 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS,         $postdata);
+                curl_setopt($ch, CURLOPT_URL,             "http://$domain/in.php" );
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,  1 );
+                curl_setopt($ch, CURLOPT_TIMEOUT,         60 );
+                curl_setopt($ch, CURLOPT_POST,            1 );
+                curl_setopt($ch, CURLOPT_POSTFIELDS,      $postdata );
                 $result = curl_exec($ch);
-                if (curl_errno($ch))
-                {
-                    if (self::TESTING) echo "CURL returned error: ".curl_error($ch)."\n";
-                    return false;
+                unlink( $tmpCaptcha);
+                if (curl_errno($ch)) {
+                    throw new Exception('Error in captcha recoginition, ' . curl_error($ch));
                 }
                 curl_close($ch);
+
                 if (strpos($result, "ERROR")!==false) {
-                    if (self::TESTING) echo "server returned error: $result\n";
-                    return false;
+                    throw new Exception('Error in captcha recoginition, ' . $result );
                 } else {
                     $ex = explode("|", $result);
                     $captcha_id = $ex[1];
-                    if (self::TESTING) echo "captcha sent, got captcha ID $captcha_id\n";
                     $waittime = 0;
-                    if (self::TESTING) echo "waiting for $rtimeout seconds\n";
                     sleep($rtimeout);
                     while(true) {
-                        $result = file_get_contents("http://$domain/res.php?key=".self::ANTIGATE_KEY.'&action=get&id='.$captcha_id);
+                        $result = file_get_contents("http://$domain/res.php?key=" . self::ANTIGATE_KEY . '&action=get&id=' . $captcha_id);
                         if (strpos($result, 'ERROR') !== false) {
-                            if (self::TESTING) echo "server returned error: $result\n";
                             continue(2);
                         }
                         if ($result=="CAPCHA_NOT_READY") {
-                            if (self::TESTING) echo "captcha is not ready yet\n";
                             $waittime += $rtimeout;
-                            if ($waittime>$mtimeout) {
-                                if (self::TESTING) echo "timelimit ($mtimeout) hit\n";
-                                continue(2);
+                            if ($waittime > $mtimeout) {
+                                throw new Exception('Error in captcha recoginition, too long'  );
                             }
-                            if ( self::TESTING ) echo "waiting for $rtimeout seconds\n";
                             sleep($rtimeout);
                         } else {
                             $ex = explode( '|', $result );
-                            if ( trim( $ex[ 0 ] )=='OK' ) return trim($ex[1]);
+                            if ( trim( $ex[ 0 ] )=='OK' )
+                                return trim($ex[1]);
                         }
                     }
-                    return false;
+
                 }
             }
-            return false;
+            throw new Exception('Error in captcha recoginition, too long' );
         }
 
         //$post_id  = idпаблика_idпоста
@@ -377,8 +383,11 @@
             return  $res->aid  ;
         }
 
-        private function post( $attaches )
-        {
+        private function post( $attaches, $captcha = array()) {
+            $this->post_try_counter ++;
+            if($this->post_try_counter > 3) {
+                throw new Exception('too many tries');
+            }
             $attaches = implode( ',', $attaches );
             $params = array(
                 'owner_id'      =>  '-' . $this->vk_group_id,
@@ -388,6 +397,9 @@
                 'from_group'    =>  1
             );
 
+            if(!empty($captcha )) {
+                $params = array_merge($params, $captcha);
+            }
             $res = VkHelper::api_request( 'wall.post', $params, false );
             if ( isset( $res->post_id ))
                 return $res->post_id;
@@ -396,13 +408,18 @@
                 return true;
 
             elseif ( isset( $res->error ))
-
-                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                if( $res->error->error_code  == self::CAPTCHA_ERROR_CODE && isset( $res->error->captcha_img)) {
+                    $this->post($attaches, array(
+                        'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
+                        'captcha_sid'   =>  $res->error->captcha_sid
+                    ));
+                } elseif ( in_array( $res->error->error_code, $this->change_admin_errors )) {
                     throw new ChangeSenderException($res->error->error_msg);
 
-                else
+                } else {
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_msg
                         . ', public: '. $this->vk_group_id );
+                }
         }
 
         private function delivery_check( $attacments_count )
