@@ -1,7 +1,7 @@
 var LIST =
 '<div class="tab-bar clear-fix">' +
     '<div class="tab selected" data-id="null">Популярные</div>' +
-    '<?if( cur.dataUser.rank > 2 ) { ?>'+
+    '<?if( cur.dataUser.rank > 7 ) { ?>'+
         '<div class="actions">' +
                 '<a class="share">Поделиться</a> |' +
                 '<a class="edit">Редактировать</a> |' +
