@@ -74,6 +74,7 @@
                 if ( !GroupFactory::Update( $group, array()))
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
             }
+            GroupFactory::Update($group);
             die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
 
 
