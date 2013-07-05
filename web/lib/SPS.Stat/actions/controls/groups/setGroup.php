@@ -61,10 +61,9 @@
                 if( !$group->group_id)
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
                 if ( $type == 'Stat'  ) {
-                    $user = StatUserFactory::GetOne(array('user_id'=> $user_id ));
-                    $user->groups_ids[] = $group->group_id;
-                    $user->groups_ids   = array_unique( $user->groups_ids );
-                    StatUserFactory::Update($user);
+                    //прикрепляем группу к юзеру
+                    $groupUser = new GroupUser($group->group_id, $user_id, Group::STAT_GROUP);
+                    GroupUserFactory::Add($groupUser);
                 }
             } else {
                 $group = GroupFactory::GetOne( array( 'group_id' => $groupId, 'created_by' => $user_id ));
