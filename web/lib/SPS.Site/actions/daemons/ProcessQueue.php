@@ -134,6 +134,7 @@ sql;
          * @param ArticleQueue $articleQueue
          * @param ArticleRecord $articleRecord
          * @param Publisher $publisher
+         * @param Article $article
          */
         private function sendPostToVk($sourceFeed, $targetFeed, $articleQueue, $articleRecord, $publisher, $article) {
             $isWithSmallPhoto = ArticleUtility::IsTopArticleWithSmallPhoto($sourceFeed, $articleRecord);
@@ -184,6 +185,10 @@ sql;
                 //закрываем
                 $this->finishArticleQueue($articleQueue);
 
+                if( $article->isSuggested ) {
+                    $sender->delete_post( $article->externalId );
+                }
+
                 if ($article->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {
                     TopfaceUtility::AcceptPost($article, $articleRecord, $articleQueue->externalId);
                 }
@@ -204,6 +209,7 @@ sql;
                     @unlink($localPath);
                 }
             }
+
         }
 
         /**
