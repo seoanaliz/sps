@@ -15,8 +15,9 @@
          */
         public function Execute() {
             error_reporting( 0 );
+            $response  = array('success' => false);
             $user_id  = AuthVkontakte::IsAuth();
-            $groupId  = Request::getInteger ( 'groupId' );
+            $group_id  = Request::getInteger ( 'groupId' );
             $entry_id = Request::getInteger ( 'publId'  );
             if ( !$entry_id )
                 $entry_id = Request::getInteger ( 'entryId'  );
@@ -31,35 +32,36 @@
             $m_class    = $type . 'Groups';
             $general    = $general ? $general : 0;
 
-            if ( !$groupId || !$entry_id || !$user_id ) {
-                die(ERR_MISSING_PARAMS);
+            if ( !$group_id || !$entry_id ) {
+                $response['message'] = 'Wrong data';
+                die(ObjectHelper::ToJSON($response));
             }
 
             if ( $type == 'Barter' ) {
-                $source = 1;
-                if ( !GroupsUtility::is_author( $groupId, $user_id ))
+                if ( !GroupsUtility::is_author( $group_id, $user_id ))
                     die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
                 $barter_events = BarterEventFactory::Get( array( 'barter_event_id' => $entry_id ));
-                GroupsUtility::implement_to_group( $barter_events, $groupId, 1 );
+                GroupsUtility::implement_to_group( $barter_events, $group_id, 1 );
                 BarterEventFactory::UpdateRange( $barter_events, null, 'tst' );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
 
             } elseif( $type == 'Stat' ) {
+                if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
+                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'sourceType' => Group::STAT_GROUP));
+                    if( !empty( $check)) {
+                        $response['message'] = 'В этом списке уже есть данная запись';
+                        die(ObjectHelper::ToJSON($response));
+                    }
+                    $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP);
 
-                $group = GroupFactory::GetById( $groupId );
-                $group->entries_ids[] = $entry_id;
-                $group->entries_ids = array_unique( $group->entries_ids );
-                $res = GroupFactory::Update( $group );
-                die( ObjectHelper::ToJSON(array( 'response' => $res )));
-            }
+                    if( GroupEntryFactory::Add($groupEntry)) {
+                        $response['success'] = true;
+                        die( ObjectHelper::ToJSON(array( 'response' => true )));
+                    }
+                } else {
+                    $response['message'] = "access denied";
+                }
 
-            if (  StatUsers::is_Sadmin( $user_id )) {
-                $res = $m_class::implement_entry( $groupId, $entry_id, $user_id );
-                if( !is_array( $res ))
-                    $res = array();
-                $res['result'] = true;
-
-                die( ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
             die( ObjectHelper::ToJSON( array( 'response' => false )));

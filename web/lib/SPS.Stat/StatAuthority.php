@@ -5,12 +5,12 @@
      */
 
     /**
-     * StatUsersAuthority
+     * StatAuthority
      *
      * @package stat
      * @subpackage 
      */
-    class StatUsersAuthority {
+    class StatAuthority {
 
         /**
          * Роль редактор

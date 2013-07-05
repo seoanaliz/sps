@@ -11,6 +11,15 @@
         const Group_Private = 4;
         const Group_Global  = 5;
 
+        const Group_Id_Special_All = 'all';
+        const Group_Id_Special_All_Not = 'all_not_listed';
+
+
+        public static $special_group_ids = array(
+            self::Group_Id_Special_All      => 'Все',
+            self::Group_Id_Special_All_Not  => 'Не в группе',
+        );
+
         public static  $barter_watchers = array(
             '670456',
             '106175502',

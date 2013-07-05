@@ -192,7 +192,7 @@ class getEntries {
         error_reporting( 0 );
         $this->conn =   ConnectionFactory::Get('tst');
         $user_id    =   AuthVkontakte::IsAuth();
-        $group_id   =   Request::getInteger( 'groupId' );
+        $group_id   =   Request::getString( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
         $limit      =   Request::getInteger( 'limit' );
         $quant_max  =   Request::getInteger( 'max' );
@@ -203,6 +203,13 @@ class getEntries {
         $time_from  =   Request::getInteger( 'timeFrom' );
         $time_to    =   Request::getInteger( 'timeTo' );
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
+
+        $mode = null;
+        if( !in_array( $group_id, GroupsUtility::$special_group_ids ) && !is_numeric($group_id)) {
+            $group_id = null;
+        } elseif( $group_id == GroupsUtility::Group_Id_Special_All ) {
+            $group_id = null;
+        }
 
         $period_suffixes = array(
             '1'     =>  '',
@@ -224,21 +231,27 @@ class getEntries {
         if($search_name) {
             $search['_nameIL'] = $search_name;
         } elseif( $group_id ) {
-            $group = GroupFactory::GetById(  $group_id );
-            if( $group ) {
-                if ( empty($group->entries_ids)) {
-                    die( ObjectHelper::ToJSON( array(
-                            'response' => array(
-                                'list'              =>  array(),
-                                'min_max'           =>  $this->get_min_max(),
-                                'group_type'        =>  false
-                            )
-                        )
-                    ));
-                }
-
-                $search['_vk_public_id'] = $group->entries_ids;
+            $group_entries_by_group = GroupEntryFactory::Get(array(
+                'groupId'   =>  $group_id,
+                'sourceType'=>  Group::STAT_GROUP,
+            ));
+            $entry_ids = array();
+            foreach( $group_entries_by_group as $ge) {
+                $entry_ids[] = $ge->entryId;
             }
+            if( !empty( $group_entries_by_group )) {
+                $search['_vk_public_id'] = $entry_ids;
+            } else {
+                 die( ObjectHelper::ToJSON(array(
+                         'response' => array(
+                             'list'              =>  array(),
+                             'min_max'           =>  $this->get_min_max(),
+                             'group_type'        =>  empty($group) ? null : $group->type
+                         )
+                     )
+                 ));
+            }
+
         }
 
         $sort_by = $sort_by ? $sort_by : 'quantity';
@@ -255,14 +268,21 @@ class getEntries {
         $viewers  = 'viewers'  .  $period_suffixes[$period];
         $result = array();
         foreach ($vkPublics as $vkPublic ) {
+            $groups_ids = array();
+            $group_entries_by_entry = GroupEntryFactory::Get( array(
+                'entryId'   =>  $vkPublic->vk_public_id,
+                'sourceType'=>  Group::STAT_GROUP
+            ));
+            foreach( $group_entries_by_entry as $ge) {
+                $groups_ids[] = $ge->groupId;
+            }
             $result[] =  array(
                 'id'        =>  $vkPublic->vk_public_id,
                 'vk_id'     =>  $vkPublic->vk_id,
                 'quantity'  =>  $vkPublic->quantity,
                 'name'      =>  $vkPublic->name,
                 'ava'       =>  $vkPublic->ava,
-                //todo список групп, в которых состоит паблик
-                'group_id'  =>  array(),
+                'group_id'  =>  $groups_ids,
                 'admins'    =>  array(),
                 'diff_abs'  =>  $vkPublic->$diff_abs,
                 'diff_rel'  =>  $vkPublic->$diff_rel,
@@ -272,7 +292,6 @@ class getEntries {
                 'active'    =>  $vkPublic->active== 't' ? true : false
             );
         }
-//        print_r($result);
         die( ObjectHelper::ToJSON(array(
                 'response' => array(
                     'list'              =>  $result,

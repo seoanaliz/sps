@@ -45,11 +45,17 @@
                 BarterEventFactory::UpdateRange( $events );
                 die( ObjectHelper::ToJSON(array( 'response' => true )));
             } elseif( $type == 'Stat' ) {
-                $group = GroupFactory::GetById( $group_id );
-                $k = array_search( $entry_id, $group->entries_ids );
-                unset( $group->entries_ids[$k] );
-                $res = GroupFactory::Update( $group );
-                die( ObjectHelper::ToJSON(array( 'response' => $res )));
+                if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
+                    GroupEntryFactory::DeleteByMask( array(
+                        'groupId'       =>  $group_id,
+                        'entryId'       =>  $entry_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                    ));
+                    $response['success'] = true;
+                    die( ObjectHelper::ToJSON(array( 'response' => true )));
+                } else {
+                    $response['message'] = "access denied";
+                }
             }
             elseif (  StatUsers::is_Sadmin( $user_id )) {
                 $m_class::extricate_entry( $group_id, $entry_id, $user_id );

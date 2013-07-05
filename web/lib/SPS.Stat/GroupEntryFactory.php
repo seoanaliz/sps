@@ -7,40 +7,48 @@
     Package::Load( 'stat.' );
 
     /**
-     * StatUsersAuthority Factory
+     * GroupEntry Factory
      *
      * @package stat
      * @subpackage 
      */
-    class StatUsersAuthorityFactory implements IFactory {
+    class GroupEntryFactory implements IFactory {
 
         /** Default Connection Name */
         const DefaultConnection = 'tst';
 
-        /** StatUsersAuthority instance mapping  */
+        /** GroupEntry instance mapping  */
         public static $mapping = array (
-            'class'       => 'StatUsersAuthority'
-            , 'table'     => 'stat_users_authorities'
-            , 'view'      => 'getStat_users_authorities'
-            , 'flags'     => array( 'WithoutTemplates' => 'WithoutTemplates' )
+            'class'       => 'GroupEntry'
+            , 'table'     => 'group_entry'
+            , 'view'      => 'getGroup_entry'
+            , 'flags'     => array(  )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'user_id' => array(
-                    'name'          => 'user_id'
+                'groupId' => array(
+                    'name'          => 'groupId'
                     , 'type'        => TYPE_INTEGER
-                    , 'key'         => true
                 )
-                ,'source' => array(
-                    'name'          => 'source'
+                ,'entryId' => array(
+                    'name'          => 'entryId'
                     , 'type'        => TYPE_INTEGER
-                    , 'key'         => true
                 )
-                ,'rank' => array(
-                    'name'          => 'rank'
+                ,'sourceType' => array(
+                    'name'          => 'sourceType'
                     , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
-            , 'search'    => array()
+            , 'search'    => array(
+                'groupIdIn' => array(
+                    'name'         => 'groupId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                )
+                ,'entryIdIn' => array(
+                    'name'         => 'entryId'
+                    , 'type'       => TYPE_INTEGER
+                    , 'searchType' => SEARCHTYPE_ARRAY
+                ))
         );
         
         /** @return array */
@@ -90,17 +98,17 @@
             return BaseFactory::Count( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return StatUsersAuthority[] */
+        /** @return GroupEntry[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 
-        /** @return StatUsersAuthority */
+        /** @return GroupEntry */
         public static function GetById( $id, $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetById( $id, $searchArray, self::$mapping, $options, $connectionName );
         }
         
-        /** @return StatUsersAuthority */
+        /** @return GroupEntry */
         public static function GetOne( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetOne( $searchArray, self::$mapping, $options, $connectionName );
         }
@@ -125,10 +133,10 @@
             return BaseFactory::LogicalDelete( $object, self::$mapping, $connectionName );
         }
 
-        /** @return StatUsersAuthority */
+        /** @return GroupEntry */
         public static function GetFromRequest( $prefix = null, $connectionName = self::DefaultConnection ) {
             return BaseFactory::GetFromRequest( $prefix, self::$mapping, null, $connectionName );
         }
-        
+
     }
 ?>

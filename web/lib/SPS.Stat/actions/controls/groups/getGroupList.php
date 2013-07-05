@@ -22,20 +22,24 @@
             if ( !$type || !in_array( $type, $type_array ))
                 $type    = 'Stat';
 
-            $m_class  = $type . 'Groups';
-//            if ( !$user_id ) {
-//                die(ERR_MISSING_PARAMS);
-//            }
-
             if( $type = 'Stat') {
                 $global_groups = GroupFactory::Get(array( 'type' => GroupsUtility::Group_Global, 'source'=>Group::STAT_GROUP));
                 $user_groups = array();
                 $shared_groups = array();
                 if( $user_id ) {
-                    $user = StatUserFactory::GetOne( array('user_id' => $user_id ));
-                    if( $user && !empty( $user->groups_ids )) {
-                        //получаем личные группы юзера
-                        $user_groups  = GroupFactory::Get(array( 'type' => GroupsUtility::Group_Private, '_group_id' => $user->groups_ids));
+                    $groupsUsers = GroupUserFactory::Get(array(
+                        'vkId'          => $user_id,
+                        'sourceType'    => Group::STAT_GROUP)
+                    );
+                    $groups_ids = array();
+                    foreach( $groupsUsers as $GroupUser ) {
+                        $groups_ids[] = $GroupUser->groupId;
+                    }
+
+                    if( !empty($groups_ids) ) {
+                        $user_groups = GroupFactory::Get(array(
+                            '_group_id' =>  $groups_ids
+                        ));
                     }
                 }
 

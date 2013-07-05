@@ -6,46 +6,43 @@
  * Time: 18:16
  * To change this template use File | Settings | File Templates.
  */
-class StatUserAccessUtility
+class StatAccessUtility
 {
     /**
-     *@var $_instance StatUserAccessUtility
+     *@var $_instance StatAccessUtility
     */
     protected static $_instance;
     protected $rules_array = array();
     /**
-     * @var $user StatUser
+     * @var $user Author
      */
-    protected $user;
+    protected $user = null;
     protected $source;
 
     private function __construct(){}
 
-    public static function GetInstance( $vk_id, $idFromVk = true )
+    public static function GetInstance( $vk_id )
     {
         if ( self::$_instance === null )
             self::$_instance = new self;
-        self::$_instance->SetUser( $vk_id, $idFromVk);
+        self::$_instance->SetUser( $vk_id );
         self::$_instance->GetRules( $vk_id );
 
         return self::$_instance;
     }
 
-    public function SetUser( $id, $idFromVk = true )
+    public function SetUser( $id )
     {
-        if( $id ) {
-            if( $idFromVk ) {
-                self::$_instance->user = StatUserFactory::GetOne( array( 'user_id' => $id ));
-            } else {
-                self::$_instance->user = StatUserFactory::GetOne( array( 'id' => $id ));
-            }
+        $user = AuthorFactory::GetOne( array( 'vkId' => $id ));
+        if(!empty($user)) {
+            $this->user = $user;
         }
     }
 
-    protected function GetRules( $user_id )
+    protected function GetRules(  )
     {
-        if ( $user_id ) {
-            $suaf = StatUsersAuthorityFactory::Get( array( 'user_id' => $this->user->id ));
+        if ( $this->user ) {
+            $suaf = StatAuthorityFactory::Get( array( 'user_id' => $this->user->vkId ));
             foreach( $suaf as $access_rule ) {
                 self::$_instance->rules_array[$access_rule->source] = $access_rule->rank;
             }
@@ -59,8 +56,8 @@ class StatUserAccessUtility
         if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
             $res = in_array($acessUtility->rules_array[ $source ],
                         array(
-                            StatUsersAuthority::STAT_ROLE_ADMIN,
-                            StatUsersAuthority::STAT_ROLE_EDITOR
+                            StatAuthority::STAT_ROLE_ADMIN,
+                            StatAuthority::STAT_ROLE_EDITOR
                         )
                    );
         }
@@ -73,8 +70,8 @@ class StatUserAccessUtility
         if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
             $res = in_array($acessUtility->rules_array[ $source ],
                 array(
-                    StatUsersAuthority::STAT_ROLE_ADMIN,
-                    StatUsersAuthority::STAT_ROLE_EDITOR
+                    StatAuthority::STAT_ROLE_ADMIN,
+                    StatAuthority::STAT_ROLE_EDITOR
                 )
             );
         }
@@ -86,7 +83,7 @@ class StatUserAccessUtility
         $acessUtility = self::GetInstance($vk_id);
         if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ]))
             return $acessUtility->rules_array[ $source ];
-        return false;
+        return StatAuthority::STAT_ROLE_GUEST;
     }
 
 

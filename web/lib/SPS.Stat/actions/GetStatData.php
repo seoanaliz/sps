@@ -13,12 +13,12 @@ class GetStatData extends BaseControl
         $hasAccessToPrivateGroups   =   false;
         $canEditGlobalGroups        =   false;
         $canSuggestGlobalGroups     =   false;
-        $user_rank = 0;
+        $rank = StatAuthority::STAT_ROLE_GUEST;
 
         if( $this->vkId ) {
-            $hasAccessToPrivateGroups = StatUserAccessUtility::HasAccessToPrivateGroups( $this->vkId, Group::STAT_GROUP );
-            $canEditGlobalGroups      = StatUserAccessUtility::CanEditGlobalGroups( $this->vkId, Group::STAT_GROUP );
-            $rank                     = StatUserAccessUtility::GetRankInSource($this->vkId, Group::STAT_GROUP );
+            $hasAccessToPrivateGroups = StatAccessUtility::HasAccessToPrivateGroups( $this->vkId, Group::STAT_GROUP );
+            $canEditGlobalGroups      = StatAccessUtility::CanEditGlobalGroups( $this->vkId, Group::STAT_GROUP );
+            $rank                     = StatAccessUtility::GetRankInSource($this->vkId, Group::STAT_GROUP );
         }
 
         Response::setParameter('hasAccessToPrivateGroups', $hasAccessToPrivateGroups);
