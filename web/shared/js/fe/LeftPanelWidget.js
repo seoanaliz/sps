@@ -4,7 +4,6 @@ var LeftPanelWidget = Event.extend({
     wallAutohideEnabled: false,
 
     init: function() {
-        this.$leftPanel = $('#left-panel');
         this.$multiSelect = $('#source-select');
         this.$wall = $('#wall');
 
@@ -22,7 +21,7 @@ var LeftPanelWidget = Event.extend({
 
     initLeftPanel: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
+        var $leftPanel = $('#left-panel');
 
         // Очистка текста
         $leftPanel.delegate('.clear-text', 'click', function(){
@@ -160,11 +159,10 @@ var LeftPanelWidget = Event.extend({
 
     initMultiSelect: function() {
         var t = this;
-        var $multiSelect = t.$multiSelect;
-        $multiSelect.multiselect({
+        t.$multiSelect.multiselect({
             minWidth: 250,
             height: 250,
-            classes: $multiSelect.data('classes'),
+            classes: t.$multiSelect.data('classes'),
             checkAllText: 'Выделить все',
             uncheckAllText: 'Сбросить',
             noneSelectedText: '<span class="gray">Источник не выбран</span>',
@@ -179,7 +177,7 @@ var LeftPanelWidget = Event.extend({
                 t.updateMultiSelect();
             }
         });
-        $multiSelect.bind('multiselectclick', function() {
+        t.$multiSelect.bind('multiselectclick', function() {
             t.updateMultiSelect();
         });
     },
@@ -189,16 +187,20 @@ var LeftPanelWidget = Event.extend({
         this.loadArticles(true);
     },
 
+    skipSourceFeedsCookieCreation: false,
+
     saveMultiSelectData: function() {
+        var t = this;
         var targetFeedId = Elements.rightdd();
-        var leftType = Elements.leftType();
-        if (leftType == 'source') {
-            $.cookie('sourceFeedIds' + targetFeedId, Elements.leftdd(), { expires: 7, path: '/', secure: false });
+        if (!t.skipSourceFeedsCookieCreation) {
+            $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId, Elements.leftdd().join('.'), { expires: 7, path: '/', secure: false });
         }
+        t.skipSourceFeedsCookieCreation = false;
     },
 
     setMultiSelectData: function(sourceFeeds, targetFeedId) {
         var t = this;
+
         var $multiSelect = t.$multiSelect;
         $multiSelect.find('option').remove();
         for (var i in sourceFeeds) {
@@ -206,10 +208,9 @@ var LeftPanelWidget = Event.extend({
             $multiSelect.append('<option value="' + item.id + '">' + item.title + '</option>');
         }
 
-        //get data from cookie
-        var cookie = $.cookie('sourceFeedIds' + targetFeedId);
+        var cookie = $.cookie('sourceFeedIds_'+ Elements.leftType() + '_' + targetFeedId);
         if (cookie) {
-            var selectedSources = cookie.split(',');
+            var selectedSources = cookie.split('.');
             if (selectedSources) {
                 var $options = $multiSelect.find('option');
                 for (i in selectedSources) {
@@ -219,8 +220,9 @@ var LeftPanelWidget = Event.extend({
         }
 
         $multiSelect.multiselect('refresh');
-        if (Elements.leftdd().length == 0) {
-            $multiSelect.multiselect('checkAll').multiselect('refresh');
+        if (cookie === null) { // кука не установлена
+            t.skipSourceFeedsCookieCreation = true; // TODO: переделать механизм обновления дропдауна, избавившись от таких костылей
+            $multiSelect.multiselect('checkAll').multiselect('refresh'); // да, это второй вызов 'refresh', не трогайте!
         }
     },
 
@@ -318,8 +320,7 @@ var LeftPanelWidget = Event.extend({
 
     initWallFilter: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
-        $leftPanel.find('.drop-down').change(function() {
+        $('#left-panel').find('.drop-down').change(function() {
             t.updateMultiSelect();
         });
 
@@ -395,8 +396,9 @@ var LeftPanelWidget = Event.extend({
         sliderRange.find('a:last').html(top == 100 ? 'TOP' : top);
 
         var targetFeedId = Elements.rightdd();
-        if (targetFeedId) {
-            $.cookie(sliderRange.data('sourceType') + 'FeedRange' + targetFeedId, sliderRange.slider('values', 0) + ':' + sliderRange.slider('values', 1), { expires: 7, path: '/', secure: false });
+        var rangeSourceType = sliderRange.data('sourceType');
+        if (targetFeedId && rangeSourceType) {
+            $.cookie(rangeSourceType + 'FeedRange' + targetFeedId, sliderRange.slider('values', 0) + ':' + sliderRange.slider('values', 1), { expires: 7, path: '/', secure: false });
         }
     },
 
@@ -405,7 +407,8 @@ var LeftPanelWidget = Event.extend({
             id: id,
             targetFeedId: Elements.rightdd()
         }).success(function(data) {
-            var $elem = $('.post[data-id=' + id + ']');
+            var $leftPanel = $('#left-panel');
+    	    var $elem = $leftPanel.find('.post[data-id=' + id + ']');
             var $newElem = $(data);
             $elem.replaceWith($newElem);
             Elements.initDraggable($newElem);
@@ -445,7 +448,6 @@ var LeftPanelWidget = Event.extend({
             type: sourceType,
             targetFeedId: targetFeedId
         };
-
         switch (sourceType) {
             case App.FEED_TYPE_AUTHORS:
                 requestData.userGroupId = Elements.getUserGroupId();
@@ -517,7 +519,7 @@ var LeftPanelWidget = Event.extend({
                 var $block = $(tmpEl).html(html);
                 t.$wall.append($block);
                 Elements.initDraggable($block);
-                Elements.initDroppable($('#right-panel'));
+                Elements.initDroppable();
                 Elements.initImages($block);
                 Elements.initLinks($block);
                 if (!$block.find('.post').length) {
@@ -796,7 +798,6 @@ var LeftPanelWidget = Event.extend({
 
     initEditPost: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
 
         // Быстрое редактирование поста в левой колонке
 //        $leftPanel.delegate('.post.editable .content .shortcut, ', 'click', function() {
@@ -814,249 +815,260 @@ var LeftPanelWidget = Event.extend({
 //        });
 
         // Редактирование поста в левом меню
-        $leftPanel.delegate('.post .edit,.post.editable .content .shortcut', 'click', function(){
-            var $post = $(this).closest('.post'),
-            $el = $post.find('> .content'),
-            $buttonPanel = $post.find('> .bottom.d-hide'),
-            postId = $post.data('id');
+        $('#left-panel').delegate('.post .edit, .post.editable .content .shortcut', 'click', t.editPostInline);
+        $('#right-panel').delegate('.post .text', 'click', t.editPostInline);
+    },
 
-            if ($post.editing) return;
+    editPostInline: function(){
+        var $post = $(this).closest('.post'),
+        $el = $post.find('.content'),
+        $buttonPanel = $post.find('.bottom.d-hide'),
+        postId = $post.data('id'),
+        queueId = $post.data('queue-id'),
+        $slot = $post.closest('.slot'),
+        timestamp = $slot.data('id');
 
-            Events.fire('load_post_edit', postId, function(state, data){
-                if (state && data) {
-                    function setSelectionRange(input, selectionStart, selectionEnd) {
-                        if (input.setSelectionRange) {
-                            input.focus();
-                            input.setSelectionRange(selectionStart, selectionEnd);
-                        } else if (input.createTextRange) {
-                            var range = input.createTextRange();
-                            range.collapse(true);
-                            range.moveEnd('character', selectionEnd);
-                            range.moveStart('character', selectionStart);
-                            range.select();
-                        }
-                    }
-                    function setCaretToPos (input, pos) {
-                        setSelectionRange(input, pos, pos);
-                    }
+        if ($post.editing) return;
 
-                    function parseUrl(txt, callback) {
-                        var matches = txt.match(pattern);
-                        if (matches && matches[0] && matches[1]) {
-                            var foundLink = matches[0];
-                            var foundDomain = matches[2];
-                            if ($.isFunction(callback)) callback(foundLink, foundDomain);
-                        }
-                    }
-                    function addLink(link, domain, el) {
-                        Events.fire('post_describe_link', link, function(data) {
-                            var savePost = function(d) {
-                                d = d || {};
-                                Events.fire('post_link_data', {
-                                    link: d.link || link,
-                                    header: d.title || data.title,
-                                    coords: d.coords || data.coords,
-                                    description: d.description || data.description
-                                }, function(data) {
-                                    if (data) {
-                                        if (data.img) {
-                                            el.find('.link-img').css('background-image', 'url(' + data.img + ')');
-                                        }
-                                        popupSuccess('Изменения сохранены');
-                                    }
-                                });
-                            };
-                            var $del = $('<div/>', {class: 'delete-attach delete'}).click(function() {
-                                $links.html('');
-                            });
-                            el.html(linkTplFull);
-                            el.find('a').attr('href', link).html(domain);
-                            el.find('.link-status-content').append($del);
-
-                            if (data.img) {
-                                el.find('.link-img')
-                                .css('background-image', 'url(' + data.img + ')')
-                                .click(function() {
-                                    var originalImage = new Image();
-                                    originalImage.src = data.imgOriginal;
-                                    originalImage.onload = function () {
-                                        var linkImageCoords = {};
-                                        var closePopup = function() {
-                                            $popup.remove();
-                                            $bg.remove();
-                                        };
-                                        var showPreview = function(coords) {
-                                            linkImageCoords = coords;
-                                            var $preview = $popup.find('.preview');
-                                            var rx = $preview.width() / coords.w;
-                                            var ry = $preview.height() / coords.h;
-
-                                            $preview.find('> img').css({
-                                                width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
-                                                height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
-                                                marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-                                                marginTop: '-' + Math.round(ry * coords.y) + 'px'
-                                            });
-                                        };
-                                        var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
-                                        var $popup = $('<div/>', {
-                                            'class': 'popup-image-edit',
-                                            'html': '<div class="title">Редактировать изображение</div>'+
-                                            '<div class="close"></div>' +
-                                            '<div class="left-column">' +
-                                            '<div class="original"><img src="'+originalImage.src+'" /></div>' +
-                                            '</div>' +
-                                            '<div class="right-column">' +
-                                            '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
-                                            '<div class="button save">Сохранить</div>'+
-                                            '</div>'
-                                        })
-                                        .appendTo('body');
-
-                                        $bg.click(closePopup);
-                                        $popup.css({'margin-left': -$popup.width()/2});
-                                        $popup.find('.close').click(closePopup);
-                                        $popup.find('.save').click(function() {
-                                            data.coords = linkImageCoords;
-                                            savePost({coords: linkImageCoords});
-                                            closePopup();
-                                        });
-                                        $popup.find('.original > img').Jcrop({
-                                            onChange: showPreview,
-                                            onSelect: showPreview,
-                                            aspectRatio: 2.06,
-                                            minSize: [130,63],
-                                            setSelect: [0,0,130,63]
-                                        });
-                                    };
-                                });
-                            } else {
-                                el.find('.link-img').remove();
-                            }
-                            if (data.title) {
-                                el.find('div.link-description-text a')
-                                .text(data.title)
-                                .click(function() {
-                                    var $title = $(this);
-                                    $title.attr('contenteditable', true).focus();
-                                    return false;
-                                })
-                                .blur(function() {
-                                    var $title = $(this);
-                                    $title.attr('contenteditable', false);
-                                    data.title = $title.text();
-                                    savePost({title: $title.text()});
-                                });
-                            }
-                            if (data.description) {
-                                el.find('.link-description-text p')
-                                .text(data.description)
-                                .click(function() {
-                                    var $description = $(this);
-                                    $description.attr('contenteditable', true).focus();
-                                    return false;
-                                })
-                                .blur(function() {
-                                    var $description = $(this);
-                                    $description.attr('contenteditable', false);
-                                    data.description = $description.text();
-                                    savePost({description: $description.text()});
-                                });
-                            }
-                        });
-                    }
-
-                    var cache = {
-                        html: $el.html(),
-                        scroll: $(window).scrollTop()
-                    };
-                    $post.find('> .content').draggable('disable');
-                    $post.editing = true;
-                    $buttonPanel.hide();
-                    $el.html('');
-
-                    var $edit = $('<div/>', {class: 'editing'}).appendTo($el);
-                    var $content = $('<div/>').appendTo($edit);
-                    var $attachments = $('<div/>', {class: 'attachments'}).appendTo($edit);
-                    var $text = $('<textarea/>').appendTo($content);
-                    var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
-                    var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
-                    var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
-                    var $saveBtn = $('<button/>', {class: 'save button', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
-                    var $cancelBtn = $('<button/>', {class: 'cancel button', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
-                    var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
-
-                    var imageUploader = app.imageUploader({
-                        $element: $uploadBtn,
-                        $listElement: $attachments
-                    });
-
-                    var onSave = function() {
-                        var text = $text.val();
-                        var link = $links.find('a').attr('href');
-                        var photos = imageUploader.getPhotos();
-                        var repostId = $post.data('repost-id');
-                        if (!($.trim(text) || link || photos.length || repostId)) {
-                            return $text.focus();
-                        } else {
-                            t.savePost({
-                                text: text,
-                                photos: photos,
-                                link: link,
-                                articleId: postId,
-                                repostExternalId: repostId
-                            }).success(function() {
-                                t.reloadArticle(data.id);
-                            });
-                        }
-                    };
-                    var onCancel = function() {
-                        $post.find('> .content').draggable('enable');
-                        $post.editing = false;
-                        $buttonPanel.show();
-                        $el.html(cache.html);
-                        $edit.remove();
-                    };
-
-                    if (true || data.text) {
-                        var text = data.text;
-                        $text
-                        .val(text.split('<br />').join(''))
-                        .appendTo($content)
-                        .bind('paste', function(e) {
-                            setTimeout(function() {
-                                parseUrl($text.val(), function(link, domain) {
-                                    if ($text.link && $links.html() || $text.link == link) return;
-                                    $text.link = link;
-                                    addLink(link, domain, $links);
-                                });
-                            }, 0);
-                        })
-                        .bind('keyup', function(e) {
-                            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                                onSave();
-                            }
-                        })
-                        .autoResize()
-                        .keyup().focus();
-                        setCaretToPos($text.get(0), text.length);
-                    }
-
-                    if (data.link) {
-                        var link = data.link;
-                        parseUrl(data.link, function(link, domain) {
-                            addLink(link, domain, $links);
-                        });
-                    }
-
-                    if (data.photos) {
-                        var photos = eval(data.photos);
-                        $(photos).each(function() {
-                            imageUploader.addPhoto(this.path, this);
-                        });
+        Events.fire('load_post_edit', postId, queueId, function(state, data){
+            if (state && data) {
+                function setSelectionRange(input, selectionStart, selectionEnd) {
+                    if (input.setSelectionRange) {
+                        input.focus();
+                        input.setSelectionRange(selectionStart, selectionEnd);
+                    } else if (input.createTextRange) {
+                        var range = input.createTextRange();
+                        range.collapse(true);
+                        range.moveEnd('character', selectionEnd);
+                        range.moveStart('character', selectionStart);
+                        range.select();
                     }
                 }
-            });
+                function setCaretToPos (input, pos) {
+                    setSelectionRange(input, pos, pos);
+                }
+
+                function parseUrl(txt, callback) {
+                    var matches = txt.match(pattern);
+                    if (matches && matches[0] && matches[1]) {
+                        var foundLink = matches[0];
+                        var foundDomain = matches[2];
+                        if ($.isFunction(callback)) callback(foundLink, foundDomain);
+                    }
+                }
+                function addLink(link, domain, el) {
+                    Events.fire('post_describe_link', link, function(data) {
+                        var savePost = function(d) {
+                            d = d || {};
+                            Events.fire('post_link_data', {
+                                link: d.link || link,
+                                header: d.title || data.title,
+                                coords: d.coords || data.coords,
+                                description: d.description || data.description
+                            }, function(data) {
+                                if (data) {
+                                    if (data.img) {
+                                        el.find('.link-img').css('background-image', 'url(' + data.img + ')');
+                                    }
+                                    popupSuccess('Изменения сохранены');
+                                }
+                            });
+                        };
+                        var $del = $('<div/>', {class: 'delete-attach delete'}).click(function() {
+                            $links.html('');
+                        });
+                        el.html(linkTplFull);
+                        el.find('a').attr('href', link).html(domain);
+                        el.find('.link-status-content').append($del);
+
+                        if (data.img) {
+                            el.find('.link-img')
+                            .css('background-image', 'url(' + data.img + ')')
+                            .click(function() {
+                                var originalImage = new Image();
+                                originalImage.src = data.imgOriginal;
+                                originalImage.onload = function () {
+                                    var linkImageCoords = {};
+                                    var closePopup = function() {
+                                        $popup.remove();
+                                        $bg.remove();
+                                    };
+                                    var showPreview = function(coords) {
+                                        linkImageCoords = coords;
+                                        var $preview = $popup.find('.preview');
+                                        var rx = $preview.width() / coords.w;
+                                        var ry = $preview.height() / coords.h;
+
+                                        $preview.find('> img').css({
+                                            width: Math.round(rx * $('.jcrop-holder').width()) + 'px',
+                                            height: Math.round(ry * $('.jcrop-holder').height()) + 'px',
+                                            marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+                                            marginTop: '-' + Math.round(ry * coords.y) + 'px'
+                                        });
+                                    };
+                                    var $bg = $('<div/>', {class: 'popup-bg'}).appendTo('body');
+                                    var $popup = $('<div/>', {
+                                        'class': 'popup-image-edit',
+                                        'html': '<div class="title">Редактировать изображение</div>'+
+                                        '<div class="close"></div>' +
+                                        '<div class="left-column">' +
+                                        '<div class="original"><img src="'+originalImage.src+'" /></div>' +
+                                        '</div>' +
+                                        '<div class="right-column">' +
+                                        '<div class="preview"><img src="'+originalImage.src+'" /></div>'+
+                                        '<div class="button save">Сохранить</div>'+
+                                        '</div>'
+                                    })
+                                    .appendTo('body');
+
+                                    $bg.click(closePopup);
+                                    $popup.css({'margin-left': -$popup.width()/2});
+                                    $popup.find('.close').click(closePopup);
+                                    $popup.find('.save').click(function() {
+                                        data.coords = linkImageCoords;
+                                        savePost({coords: linkImageCoords});
+                                        closePopup();
+                                    });
+                                    $popup.find('.original > img').Jcrop({
+                                        onChange: showPreview,
+                                        onSelect: showPreview,
+                                        aspectRatio: 2.06,
+                                        minSize: [130,63],
+                                        setSelect: [0,0,130,63]
+                                    });
+                                };
+                            });
+                        } else {
+                            el.find('.link-img').remove();
+                        }
+                        if (data.title) {
+                            el.find('div.link-description-text a')
+                            .text(data.title)
+                            .click(function() {
+                                var $title = $(this);
+                                $title.attr('contenteditable', true).focus();
+                                return false;
+                            })
+                            .blur(function() {
+                                var $title = $(this);
+                                $title.attr('contenteditable', false);
+                                data.title = $title.text();
+                                savePost({title: $title.text()});
+                            });
+                        }
+                        if (data.description) {
+                            el.find('.link-description-text p')
+                            .text(data.description)
+                            .click(function() {
+                                var $description = $(this);
+                                $description.attr('contenteditable', true).focus();
+                                return false;
+                            })
+                            .blur(function() {
+                                var $description = $(this);
+                                $description.attr('contenteditable', false);
+                                data.description = $description.text();
+                                savePost({description: $description.text()});
+                            });
+                        }
+                    });
+                }
+
+                var cache = {
+                    html: $el.html(),
+                    scroll: $(window).scrollTop()
+                };
+                $post.find('> .content').draggable('disable');
+                $post.editing = true;
+                $buttonPanel.hide();
+                $el.html('');
+
+                var $edit = $('<div/>', {class: 'editing'}).appendTo($el);
+                var $content = $('<div/>').appendTo($edit);
+                var $attachments = $('<div/>', {class: 'attachments'}).appendTo($edit);
+                var $text = $('<textarea/>').appendTo($content);
+                var $links = $('<div/>', {class: 'links link-info-content'}).appendTo($attachments);
+                var $photos = $('<div/>', {class: 'photos'}).appendTo($attachments);
+                var $actions = $('<div/>', {class: 'actions'}).appendTo($edit);
+                var $saveBtn = $('<button/>', {class: 'save button', html: 'Сохранить'}).click(function() {onSave()}).appendTo($actions);
+                var $cancelBtn = $('<button/>', {class: 'cancel button', html: 'Отменить'}).click(function() {onCancel()}).appendTo($actions);
+                var $uploadBtn = $('<a/>', {class: 'upload r', html: 'Прикрепить'}).appendTo($actions);
+
+                var imageUploader = app.imageUploader({
+                    $element: $uploadBtn,
+                    $listElement: $attachments
+                });
+
+                var onSave = function() {
+                    var text = $text.val();
+                    var link = $links.find('a').attr('href');
+                    var photos = imageUploader.getPhotos();
+                    var repostId = $post.data('repost-id');
+                    if (!($.trim(text) || link || photos.length || repostId)) {
+                        return $text.focus();
+                    } else {
+                        app.getLeftPanelWidget().savePost({
+                            text: text,
+                            photos: photos,
+                            link: link,
+                            articleId: postId,
+                            timestamp: timestamp,
+                            repostExternalId: repostId,
+                            queueId: queueId
+                        }).success(function() {
+                            if (queueId) { // редактировали в "правой" ленте (лента отправки)
+                                app.getRightPanelWidget().getQueueWidget().updateSinglePage($post.closest('.queue-page'));
+                            } else { // лента источников
+                                app.getLeftPanelWidget().reloadArticle(data.id);
+                            }
+                        });
+                    }
+                };
+                var onCancel = function() {
+                    $post.find('> .content').draggable('enable');
+                    $post.editing = false;
+                    $buttonPanel.show();
+                    $el.html(cache.html);
+                    $edit.remove();
+                };
+
+                if (true || data.text) {
+                    var text = data.text;
+                    $text
+                    .val(text.split('<br />').join(''))
+                    .appendTo($content)
+                    .bind('paste', function(e) {
+                        setTimeout(function() {
+                            parseUrl($text.val(), function(link, domain) {
+                                if ($text.link && $links.html() || $text.link == link) return;
+                                $text.link = link;
+                                addLink(link, domain, $links);
+                            });
+                        }, 0);
+                    })
+                    .bind('keyup', function(e) {
+                        if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+                            onSave();
+                        }
+                    })
+                    .autoResize()
+                    .keyup().focus();
+                    setCaretToPos($text.get(0), text.length);
+                }
+
+                if (data.link) {
+                    parseUrl(data.link, function(link, domain) {
+                        addLink(link, domain, $links);
+                    });
+                }
+
+                if (data.photos) {
+                    var photos = eval(data.photos);
+                    $(photos).each(function() {
+                        imageUploader.addPhoto(this.path, this);
+                    });
+                }
+            }
         });
     },
 
@@ -1132,9 +1144,9 @@ var LeftPanelWidget = Event.extend({
 
     initTabs: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
+        var $leftPanel = $('#left-panel');
 
-        // Вкладки Источники Мои публикации Авторские Альбомы Topface в левом меню
+        // Вкладки 'Источники', 'Мои публикации', 'Авторские', 'Альбомы' в левом меню
         $leftPanel.find('.type-selector').delegate('.sourceType', 'click', function() {
             if (articlesLoading) {
                 return;
@@ -1143,14 +1155,16 @@ var LeftPanelWidget = Event.extend({
             $leftPanel.find('.type-selector .sourceType').removeClass('active');
             $(this).addClass('active');
 
-            if ($(this).data('type') == App.FEED_TYPE_AUTHORS_LIST) {
+            var type = $(this).data('type');
+            $.cookie('sourceType', type);
+            if (type == App.FEED_TYPE_AUTHORS_LIST) {
                 $('body').addClass('editor-mode');
                 $(window).data('disable-load-more', true);
                 t.updateAuthorListPage();
             } else {
                 $('body').removeClass('editor-mode');
                 $(window).data('disable-load-more', false);
-                app.updateRightPanelDropdown();
+                app.getRightPanelWidget().updateDropdown(false /*updateQueue*/);
             }
         });
 
@@ -1383,7 +1397,7 @@ var LeftPanelWidget = Event.extend({
     // Отклонение или одобрения авторских постов
     initModeration: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
+        var $leftPanel = $('#left-panel');
 
         $leftPanel.delegate('.moderation .button.approve', 'click', function() {
             var $post = $(this).closest('.post');
@@ -1469,8 +1483,7 @@ var LeftPanelWidget = Event.extend({
      */
     initUserFilter: function() {
         var t = this;
-        var $leftPanel = t.$leftPanel;
-        $leftPanel.delegate('.post.author .name', 'click', function() {
+        $('#left-panel').delegate('.post.author .name', 'click', function() {
             var userId = $(this).closest('.post').data('author-id');
             t.userFilter(userId);
         });
@@ -1483,7 +1496,7 @@ var LeftPanelWidget = Event.extend({
     userFilter: function(userId) {
         var t = this;
         t.filterAuthorId = userId;
-        t.$leftPanel.find('.header .tab.selected').removeClass('selected');
+        $('#left-panel').find('.header .tab.selected').removeClass('selected');
         t.loadArticles(true);
     },
 
@@ -1491,13 +1504,20 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var $wallSwitcher = $('#wall-switcher');
         var $multiSelect = $('#source-select');
-        var $leftPanel = t.$leftPanel;
+        var $leftPanel = $('#left-panel');
         var $leftPanelTabs = $leftPanel.find('.type-selector');
         var $userGroupTabs = $('.user-groups-tabs');
         var targetFeedId = Elements.rightdd();
-        var sourceType = Elements.leftType();
         var sourceTypes = data.accessibleSourceTypes;
 
+        var sourceType = Elements.leftType();
+        if( !~$.inArray(sourceType, sourceTypes)) {
+            if (sourceTypes[0] != undefined) {
+                sourceType = sourceTypes[0];
+            }else{
+                sourceType = null;
+            }
+        }
         if (sourceType != App.FEED_TYPE_SOURCE) {
             $('#slider-text').hide();
             $('#slider-cont').hide();
@@ -1533,7 +1553,7 @@ var LeftPanelWidget = Event.extend({
                 if (data.authorsFilters.all_my_filter) {
                     showSwitcherType = 'all';
                 } else {
-                    showSwitcherType = 'deferred';
+                    showSwitcherType = 'approved';
                 }
                 $wallSwitcher.show();
                 $wallSwitcher.find('a').hide();
@@ -1586,7 +1606,6 @@ var LeftPanelWidget = Event.extend({
             }
         });
 
-        $.cookie('sourceTypes' + targetFeedId, sourceType);
         articlesLoading = true;
         t.updateSlider(targetFeedId, sourceType);
         t.setMultiSelectData(data.sourceFeeds, targetFeedId);
@@ -1601,15 +1620,16 @@ var LeftPanelWidget = Event.extend({
      */
     enableKeyboardDecision: function() {
         var t = this;
+        var $leftPanel = $('#left-panel');
         $(window).on('keydown.keyboardDecision', function(e) {
             if (e.ctrlKey || e.metaKey) {
                 switch (String.fromCharCode(e.which).toLowerCase()) {
                     case 'd':
-                        t.declineArticle(t.$leftPanel.find('.post:first').data('id'));
+                        t.declineArticle($leftPanel.find('.post:first').data('id'));
                         e.preventDefault();
                         break;
                     case 'a':
-                        t.acceptArticle(t.$leftPanel.find('.post:first').data('id'));
+                        t.acceptArticle($leftPanel.find('.post:first').data('id'));
                         e.preventDefault();
                         break;
                 }
@@ -1635,14 +1655,6 @@ var LeftPanelWidget = Event.extend({
         return match && match[1] ? match[1] : null;
     },
 
-    getPostIdByURL_test: function() {
-        var t = this;
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/feed?w=wall-3967881_12359/all'));
-        console.log('-3967881_12359' === t.getPostIdByURL('http://vk.com/wall-3967881_12359'));
-        console.log('3967881_12359' === t.getPostIdByURL('http://vk.com/wall3967881_12359'));
-    },
-
     /**
      * @param {{text: string, link: string, photos: Array, articleId: (number=), repostExternalId: number}} params
      * @returns {Deferred}
@@ -1650,7 +1662,8 @@ var LeftPanelWidget = Event.extend({
     savePost: function(params) {
         var $sourceFeedIds = Elements.leftdd();
         var sourceFeedId;
-        if ($sourceFeedIds.length != 1) {
+        var sourceType = Elements.leftType();
+        if (sourceType == App.FEED_TYPE_AUTHORS || $sourceFeedIds.length != 1) {
             sourceFeedId = null;
         } else {
             sourceFeedId = $sourceFeedIds[0];
@@ -1661,10 +1674,13 @@ var LeftPanelWidget = Event.extend({
             link: params.link,
             photos: params.photos,
             articleId: params.articleId,
+            timestamp: params.timestamp,
             repostExternalId: params.repostExternalId,
             sourceFeedId: sourceFeedId,
             targetFeedId: Elements.rightdd(),
-            userGroupId: Elements.getUserGroupId()
+            userGroupId: Elements.getUserGroupId(),
+            type: Elements.rightType(),
+            queueId: params.queueId
         });
     }
 });

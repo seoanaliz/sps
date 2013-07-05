@@ -119,6 +119,16 @@ class SaveTargetFeedAction extends BaseSaveAction  {
 
         Response::setString('gridData', ObjectHelper::ToJSON($gridData));
 
+        //params
+        foreach( SourceFeedUtility::$Types as $type => $name ) {
+            if( isset($this->currentObject->params['showTabs'][$type])) {
+                $this->currentObject->params['showTabs'][$type] = 'off';
+            }
+        }
+        if( isset($this->currentObject->params['isOur'])) {
+            $this->currentObject->params['isOur'] = 'off';
+        }
+
         //publishers
         $publisherIds = array();
         if (!empty($this->currentObject->publishers)) {
@@ -209,6 +219,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             $result = TargetFeedGridFactory::AddRange($object->grids);
         }
 
+
         if ($result && !empty($object->publishers)) {
             foreach ($object->publishers as $publisher) {
                 $publisher->targetFeedId = $objectId;
@@ -232,6 +243,9 @@ class SaveTargetFeedAction extends BaseSaveAction  {
      * @return bool
      */
     protected function update( $object ) {
+        foreach($object->params['showTabs'] as &$tab) {
+            $tab = 'on';
+        }
         ConnectionFactory::BeginTransaction();
 
         $result = parent::$factory->Update( $object );
@@ -257,6 +271,7 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             }
         }
 
+
         ConnectionFactory::CommitTransaction($result);
         return $result;
     }
@@ -269,11 +284,11 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         $publishers = PublisherFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
         Response::setArray( "publishers", $publishers );
 
-        $editors = EditorFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
+        $editors = AuthorFactory::Get( null, array( BaseFactory::WithoutPages => true ) );
         $users = array();
         foreach ($editors as $editor){
-            /** @var $editor Editor */
-            $users[$editor->vkId] = $editor->getName();
+            /** @var $editor Author */
+            $users[$editor->vkId] = $editor->FullName();
         }
 
         JsHelper::AddVar('editors', $users);
@@ -311,5 +326,6 @@ class SaveTargetFeedAction extends BaseSaveAction  {
         }
 
     }
+
 }
 ?>

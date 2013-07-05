@@ -6,7 +6,15 @@ Control = $.extend(Control, {
     },
 
     commonResponse: function(data) {
-        return data ? data.response : [];
+        if (data.message ) {
+            new Box({
+                title: 'Ошибка',
+                html: data.message
+            }).show();
+            return[];
+        }else{
+            return data ? data.response : [];
+        }
     },
 
     controlMap: {

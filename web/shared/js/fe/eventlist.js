@@ -101,34 +101,70 @@ var Eventlist = {
             }
         });
     },
-    rightcolumn_deletepost: function(post_id, callback){
+    rightcolumn_deletepost: function(post_id, gridId, timestamp, callback){
         $.ajax({
             url: controlsRoot + 'article-queue-delete/',
+            dataType : "json",
             data: {
-                id: post_id
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
             },
-            success: function() {
-                if (typeof callback == 'function') {
-                    callback(true);
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
                 }
             }
         });
     },
-    rightcolumn_save_slot: function(gridLineId, time, startDate, endDate, callback) {
+    rightcolumn_render_empty: function(post_id, gridId, timestamp, callback){
         $.ajax({
-            url: controlsRoot + 'grid-line-save/',
+            url: controlsRoot + 'article-queue-get-empty/',
             dataType : "json",
             data: {
-                gridLineId : gridLineId,
-                startDate : startDate,
-                endDate : endDate,
+                id: post_id,
+                gridId: gridId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    'article-queue-toggle-repeat': function(gridLineId, timestamp, callback){
+        $.ajax({
+            url: controlsRoot + 'article-queue-toggle-repeat/',
+            dataType : "json",
+            data: {
+                gridLineId: gridLineId,
+                timestamp: timestamp,
+                type: Elements.rightType(),
+                targetFeedId: Elements.rightdd()
+            },
+            success: function(data) {
+                if (typeof callback === 'function') {
+                    callback(true, data);
+                }
+            }
+        });
+    },
+    'create-grid-line': function(time, timestamp, callback) {
+        $.ajax({
+            url: controlsRoot + 'create-grid-line/',
+            dataType : "json",
+            data: {
+                timestamp : timestamp,
                 time: time,
                 type: Elements.rightType(),
                 targetFeedId: Elements.rightdd()
             },
             success: function (data) {
-                if(data.success) {
-                    callback(true);
+                if (data.success) {
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
@@ -151,12 +187,12 @@ var Eventlist = {
             },
             success: function(data) {
                 if (data.success) {
-                    callback(true);
+                    callback(true, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(false);
+                    callback(false, data);
                 }
             }
         });
@@ -206,12 +242,12 @@ var Eventlist = {
         });
     },
 
-    post_moved: function(post_id, slot_id, queueId, callback){
+    post_moved: function(article_id, slot_id, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
             data: {
-                articleId: post_id,
+                articleId: article_id,
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
@@ -219,23 +255,24 @@ var Eventlist = {
             },
             success: function (data) {
                 if(data.success) {
-                    callback(1, data.id);
+                    callback(1, data);
                 } else {
                     if (data.message) {
                         popupError(Lang[data.message]);
                     }
-                    callback(0);
+                    callback(0, data);
                 }
             }
         });
     },
 
-    load_post_edit: function(id, callback){
+    load_post_edit: function(articleId, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-get/',
             dataType : "json",
             data: {
-                articleId: id
+                articleId: articleId,
+                queueId: queueId
             },
             success: function (data) {
                 if(data && data.id) {

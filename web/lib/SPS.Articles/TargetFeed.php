@@ -45,6 +45,12 @@
         /** @var int */
         public $statusId;
 
+        /** @var boolean */
+        public $isOur;
+
+        /** @var boolean */
+        public $collectSuggests;
+
         /** @var Status */
         public $status;
 
@@ -53,5 +59,6 @@
 
         /** @var TargetFeedPublisher[] */
         public $publishers;
+
     }
 ?>

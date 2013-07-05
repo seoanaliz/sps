@@ -26,9 +26,6 @@ $.datepicker.setDefaults({
     altField: '#calendar-fix',
     altFormat: 'd MM'
 });
-if (!$.support.transition) {
-    $.fn.transition = $.fn.animate;
-}
 
 var UserGroupModel = Model.extend({
     init: function() {
@@ -83,12 +80,13 @@ function popupSuccess( message ) {
     });
 }
 
-function popupError( message ) {
+function popupError( message, o ) {
+    o = o || {};
     $.blockUI({
         message: message,
         fadeIn: 600,
         fadeOut: 1000,
-        timeout: 2500,
+        timeout: o.timeout || 2500,
         showOverlay: false,
         centerY: false,
         css: {

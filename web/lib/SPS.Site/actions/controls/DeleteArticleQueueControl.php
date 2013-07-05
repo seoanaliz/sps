@@ -28,6 +28,12 @@
                 return;
             }
 
+            $role = $TargetFeedAccessUtility->getRoleForTargetFeed($object->targetFeedId);
+            if (is_null($role)){
+                return;
+            }
+            $canEditQueue = ($role != UserFeed::ROLE_AUTHOR);
+
             $o = new ArticleQueue();
             $o->statusId = 3;
             $o->deleteAt = null;
@@ -48,9 +54,13 @@
                     'articleQueueDelete',
                     'article',
                     $object->articleId,
-                    "QueueId $id deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->editorId
+                    "QueueId $id deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->authorId
                 );
             }
+            $result = array(
+                'html' => SlotUtility::renderEmptyOld($object->targetFeedId, $canEditQueue)
+            );
+            echo ObjectHelper::ToJSON($result);
         }
     }
 ?>

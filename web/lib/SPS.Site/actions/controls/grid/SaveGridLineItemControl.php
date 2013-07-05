@@ -8,18 +8,22 @@
     class SaveGridLineItemControl extends BaseControl {
 
         public function Execute() {
+            $result = array(
+                'success' => false
+            );
+
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
 
             $gridLineId = Request::getInteger( 'gridLineId' );
             $gridLineItemId = Request::getInteger( 'gridLineItemId' );
             $time = Request::getString( 'time' );
+            if (!preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9]$/', $time)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
             $timestamp = Request::getInteger( 'timestamp' );
             $itemDate = new DateTimeWrapper(date('d.m.Y', !empty($timestamp) ? $timestamp : null) . ' ' . $time);
             $queueId = Request::getInteger( 'queueId' );
-
-            $result = array(
-                'success' => false
-            );
 
             if (empty($time) || empty($gridLineId)) {
                 echo ObjectHelper::ToJSON($result);
@@ -28,7 +32,6 @@
 
             $gridLine = GridLineFactory::GetById($gridLineId);
             if (empty($gridLine)) {
-
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -38,13 +41,8 @@
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
-            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp())) {
+            if( $queueId && ArticleUtility::IsTooCloseToPrevious( $gridLine->targetFeedId, $itemDate->getTimestamp(), $queueId)) {
                 $result['message'] = 'Time between posts is too small';
-                echo ObjectHelper::ToJSON($result);
-                return false;
-            }
-
-            if (!$TargetFeedAccessUtility->canSaveGridLine($gridLine->targetFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
@@ -55,15 +53,16 @@
             $object->date = $itemDate;
 
             if (!empty($object->gridLineItemId)) {
-                $queryResult = GridLineItemFactory::Update($object);
+                $queryResult = GridLineItemFactory::Update($object, array(BaseFactory::WithReturningKeys => true));
             } else {
-                $queryResult = GridLineItemFactory::Add($object);
+                $queryResult = GridLineItemFactory::Add($object, array(BaseFactory::WithReturningKeys => true));
             }
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
+                $result['gridLineItemId'] = $object->gridLineItemId;
             }
 
             if (!empty($queueId)) {

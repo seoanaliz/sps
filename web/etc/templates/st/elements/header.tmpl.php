@@ -4,7 +4,7 @@ if (!isset($__activeElement)) $__activeElement = NULL;
 /**
  * Manual set meta or reset of meta
  */
-$__sitePageTitle    = 'Рейтинг сообществ';
+$__sitePageTitle    = 'Рейтинг сообществ ВКонтакте';
 $__pageTitle        = !empty($__pageTitle) ? $__pageTitle : '';
 $__metaDescription  = !empty($__metaDescription) ? $__metaDescription : '';
 $__metaKeywords     = !empty($__metaKeywords) ? $__metaKeywords : '';
@@ -92,7 +92,9 @@ if(!empty($jsFilesAdds)) {
     <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
     <?= JsHelper::Flush(); ?>
-    <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? if (AuthVkontakte::IsAuth()) { ?>
+        <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <? } ?>
     <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>
 <body>

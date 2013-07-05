@@ -506,6 +506,7 @@ sql;
         $grid_line->endDate = $date;
         $grid_line->targetFeedId = $target_feed_id;
         $grid_line->time = $sent_at->format('H:i:s');
+        $grid_line->repeat = false;
         $grid_line->type = GridLineUtility::TYPE_CONTENT;
         $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
 

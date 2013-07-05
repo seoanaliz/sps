@@ -351,6 +351,15 @@
       <vkIds><![CDATA[VkId редакторов]]></vkIds>
       <publishers><![CDATA[Издатели]]></publishers>
       <token><![CDATA[Token]]></token>
+      <ShowAlbums><![CDATA[Показывать альбомы]]></ShowAlbums>
+      <ShowAuthors><![CDATA[Показывать аворскую вкладку]]></ShowAuthors>
+      <ShowAd><![CDATA[Показывать рекламную вкладку]]></ShowAd>
+      <ShowAddAuthors><![CDATA[Показывать добавление авторов]]></ShowAddAuthors>
+      <ShowSources><![CDATA[Показывать источники]]></ShowSources>
+      <ShowMy><![CDATA[Показывать личную вкладку]]></ShowMy>
+      <IsOur><![CDATA[Наш паблик]]></IsOur>
+      <collectSuggests><![CDATA[Собирать предложенные]]></collectSuggests>
+      <LastSuggestedPost><![CDATA[ID последнего предл. поста]]></LastSuggestedPost>
       <type><![CDATA[Тип]]></type>
       <params><![CDATA[params]]></params>
     </targetFeed>

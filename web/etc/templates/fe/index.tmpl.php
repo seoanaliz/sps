@@ -19,12 +19,20 @@
                 <div class="type-selector">
                     <? $isFirst=0;
                     foreach($sourceTypes as $sourceType => $sourceTypeTitle):
+                        $sourceTypeAvailable = in_array($sourceType, $availableSourceTypes);
+                        $sourceTypeClass = "sourceType" .( $isFirst == 0 && $sourceTypeAvailable ? ' active ' : ' ' );
                         ?>
-                        <a class="sourceType <?=($isFirst == 0 ? 'active' : '')?>" data-type="{$sourceType}"
-                            <?=!in_array($sourceType, $availableSourceTypes) ? 'style="display:none"' : ''?>
+                        <a class=" <?=$sourceTypeClass?>" data-type="{$sourceType}"
+                            <?
+                                if( !$sourceTypeAvailable ):
+                                    echo 'style="display:none"';
+                                else:
+                                    $isFirst++;
+                                endif
+                            ?>
                            id="sourceType-<?=$sourceType?>"><?=$sourceTypeTitle?></a>
                         <?
-                        $isFirst++;
+
                     endforeach;
                     ?>
                 </div>
@@ -96,7 +104,7 @@
                         <a target="_blank"></a>
                     </span>
                     <span class="logout">
-                        <a href="/login/">Выход</a>
+                        <a href="/logout/">Выйти</a>
                     </span>
                 </div>
 
@@ -132,11 +140,9 @@
 
                     <div class="type-selector">
                         <a class="grid_type all" data-type="<?= GridLineUtility::TYPE_ALL ?>">Все записи</a>
-                        <?
-                        $isFirst=0;
-                        foreach ($gridTypes as $type => $name): ?>
-                            <a class="grid_type <?=!$isFirst++ ? 'active' : ''?>" data-type="<?= $type ?>"><?=$name?></a>
-                            <? endforeach; ?>
+                        <? foreach ($gridTypes as $type => $name): ?>
+                            <a class="grid_type" data-type="<?= $type ?>"><?=$name?></a>
+                        <? endforeach; ?>
                     </div>
 
                 </div>

@@ -35,7 +35,7 @@
             self::Source => 'Источники',
             self::Ads => 'Реклама',
             self::My => 'Мои публикации',
-            self::Authors => 'Авторские',
+            self::Authors => 'Заметки',
             self::Albums => 'Альбомы',
             self::Topface => 'Topface',
             self::AuthorsList => '+',

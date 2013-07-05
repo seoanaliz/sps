@@ -40,6 +40,7 @@ class SaveArticleControl extends BaseControl
         $targetFeedId = Request::getInteger('targetFeedId');
         $userGroupId = Request::getInteger('userGroupId');
         $sourceFeedId = Request::getInteger('sourceFeedId');
+        $timestamp = Request::getString('timestamp');
         if (!$userGroupId) {
             $userGroupId = null;
         }
@@ -65,7 +66,6 @@ class SaveArticleControl extends BaseControl
             echo ObjectHelper::ToJSON($result);
             return false;
         }
-
         //building data
         $article = new Article();
         $article->createdAt = DateTimeWrapper::Now();
@@ -79,7 +79,11 @@ class SaveArticleControl extends BaseControl
         $article->isCleaned = false;
         $article->statusId = 1;
         $article->userGroupId = $userGroupId;
-        $article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+        $article->articleStatus =  Article::STATUS_APPROVED;
+        $article->isSuggested = false;
+
+        #$article->articleStatus = $role == UserFeed::ROLE_AUTHOR ? Article::STATUS_REVIEW : Article::STATUS_APPROVED;
+
         if ($sourceFeedId) {
             $SourceFeed = SourceFeedFactory::GetById($sourceFeedId);
             if ($SourceFeed) {
@@ -121,6 +125,22 @@ class SaveArticleControl extends BaseControl
             $result['articleId'] = $article->articleId;
         }
 
+        if ($timestamp && is_numeric($timestamp)) {
+            Request::setString('id', Request::getString('queueId'));
+            ob_start();
+            include __DIR__ . '/DeleteArticleQueueControl.php';
+            $Deleter = new DeleteArticleQueueControl();
+            $Deleter->Execute();
+            $resultOfDeletion = ob_get_clean();
+
+            Request::setParameter('queueId', null);
+            ob_start();
+            include __DIR__ . '/AddArticleToQueueControl.php';
+            $Adder = new AddArticleToQueueControl();
+            $Adder->Execute();
+            $resultOfAddition = ob_get_clean();
+        }
+        
         echo ObjectHelper::ToJSON($result);
     }
 

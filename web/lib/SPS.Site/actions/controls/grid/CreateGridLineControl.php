@@ -2,63 +2,64 @@
     Package::Load('SPS.Site/base');
 
     /**
-     * SaveGridLineControl Action
+     * CreateGridLineControl Action
      * @package    SPS
      * @subpackage Site
      * @author     Shuler
+     * @author     Eugene Kulikov
      */
-    class SaveGridLineControl extends BaseControl {
+    class CreateGridLineControl extends BaseControl {
 
         public function Execute() {
-            $gridLineId = Request::getInteger( 'gridLineId' );
-            $time = Request::getString( 'time' );
+            $time = Request::getString( 'time' ); // время (например, 12:40)
             $type = Request::getString( 'type' );
             $targetFeedId = Request::getInteger( 'targetFeedId' );
-            $startDate = Request::getDateTime('startDate');
-            $endDate = Request::getDateTime('endDate');
+            $timestamp = Request::getString( 'timestamp' ); // timestamp начала дня (нужен для даты)
 
             $result = array(
                 'success' => false
             );
 
-            if (empty($time) || empty($targetFeedId) || empty($type) || empty(GridLineUtility::$Types[$type])) {
+            if (!preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9]$/', $time)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
+            if (empty($timestamp) || !is_numeric($timestamp) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             $targetFeed = TargetFeedFactory::GetById($targetFeedId);
-
             if (empty($targetFeed)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
             $TargetFeedAccessUtility = new TargetFeedAccessUtility($this->vkId);
-
             //check access
             if (!$TargetFeedAccessUtility->canSaveGridLine($targetFeedId)) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }
 
+            $Date = new DateTimeWrapper(date('d.m.Y', $timestamp));
+
             $object = new GridLine();
-            $object->gridLineId = $gridLineId;
-            $object->startDate = $startDate;
-            $object->endDate = $endDate;
+            $object->startDate = $Date;
+            $object->endDate = $Date;
             $object->time = new DateTimeWrapper($time);
             $object->type = $type;
             $object->targetFeedId = $targetFeedId;
+            $object->repeat = false;
 
-            if (empty($object->gridLineId)) {
-                $queryResult = GridLineFactory::Add($object);
-            } else {
-                $queryResult = GridLineFactory::Update($object);
-            }
+            $queryResult = GridLineFactory::Add($object, array(BaseFactory::WithReturningKeys => true));
 
             if (!$queryResult) {
                 $result['message'] = 'saveError';
             } else {
                 $result['success'] = true;
+                $result['gridLineId'] = $object->gridLineId;
             }
 
             echo ObjectHelper::ToJSON($result);

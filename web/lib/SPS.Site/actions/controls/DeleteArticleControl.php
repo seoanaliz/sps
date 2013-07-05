@@ -33,7 +33,7 @@
                 'articleDelete',
                 'article',
                 $id,
-                "Deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->editorId
+                "Deleted by editor VkId " . AuthUtility::GetCurrentUser('Editor')->vkId . " UserId " . AuthUtility::GetCurrentUser('Editor')->authorId
             );
 
             //topface moderation failed

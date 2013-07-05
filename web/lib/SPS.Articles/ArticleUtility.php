@@ -58,7 +58,7 @@
             $object->endDate->modify('+9 minutes');
         }
 
-        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp )
+        public static function IsTooCloseToPrevious( $targetFeedId, $newPostTimestamp, $queueId = '' )
         {
             $intervalTime = new DateTimeWrapper(date('r', $newPostTimestamp));
             $from = new DateTimeWrapper(date('r', $newPostTimestamp));
@@ -68,7 +68,11 @@
                 'startDateFrom' =>  $from,
                 'startDateTo'   =>  $intervalTime->modify('+' . self::TimeBeetwenPosts . 'minutes')
             );
+
             $check = ArticleQueueFactory::Get( $search );
+            //удаляем из проверки сам пост
+            if(isset( $check[$queueId]))
+                unset( $check[$queueId] );
             return !empty( $check );
         }
 
@@ -80,10 +84,11 @@
             $midnight->modify('midnight');
             //ограничение по количеству постов в ленте
             $search = array(
+                'createdAtNE'   =>  ParserVkontakte::false_created_time,
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $midnight,
                 'startDateTo'   =>  $midnightNextDay,
-                BaseFactoryPrepare::PageSize => 1
+                 BaseFactoryPrepare::PageSize => 1
             );
 
             $articlesCount = ArticleQueueFactory::Count( $search);

@@ -98,6 +98,9 @@
                     'name'          => 'articleStatus'
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
+                ),'isSuggested' => array(
+                      'name'        => 'isSuggested'
+                    , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array()
             , 'search'    => array(

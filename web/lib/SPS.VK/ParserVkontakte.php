@@ -8,6 +8,7 @@
         private $page_short_name;
         private $count;
 
+        const false_created_time = '1970-01-01 00:00:00';
         const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
@@ -18,11 +19,13 @@
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
         const ALBUM_MIN_LIKES_LIMIT = 10;
-        const WALL_MIN_LIKES_LIMIT = 30;
+        const WALL_MIN_LIKES_LIMIT  = 30;
         /**
          * Максимальное количество постов, для которых можно запросить лайки
          */
         const MAX_POST_LIKE_COUNT = 90;
+
+
 
         public function __construct($public_id = '')
         {
@@ -170,23 +173,50 @@
             $res = VkHelper::api_request( 'wall.get', $params );
             sleep(self::PAUSE);
             unset( $res[0] );
+
             $posts = self::post_conv( $res );
             $posts = $this->kill_attritions( $posts );
-
 
             return $posts;
         }
 
-        //
-        public static function post_conv( $posts )
+        public function get_suggested_posts($last_post_id, $access_token )
+        {
+            sleep(rand( 1,12 ));
+            $params = array(
+                'access_token'  =>   $access_token,
+                'count'         =>   30,
+                'filter'        =>  'suggests',
+                'owner_id'      =>  '-' . $this->page_id
+            );
+            $res = VkHelper::api_request( 'wall.get', $params, 0 );
+            sleep(self::PAUSE);
+            if(!is_array($res) || count($res) < 2 ) {
+                return array();
+            }
+            unset( $res[0] );
+
+            $posts = self::post_conv( $res, $last_post_id );
+            $posts = $this->kill_attritions( $posts );
+
+            return $posts;
+
+        }
+
+        //$stop_post_id - если id поста меньше этого, возвращаем результат
+        public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
 
             foreach( $posts as $post ) {
+
+                if( $stop_post_id && $post->id <= $stop_post_id){
+                    break;
+                }
                 $id         =   $post->to_id . '_' . $post->id;
-                $likes      =   $post->likes->count;
+                $likes      =   isset($post->likes) ? $post->likes->count : 0;
                 $likes_tr   =   $likes;
-                $retweet    =   $post->reposts->count;
+                $retweet    =   isset($post->reposts) ? $post->reposts->count : 0;
                 $time       =   $post->date;
                 $text       =   self::remove_tags( $post->text);
                 $source     =   isset( $post->post_source->type) ? $post->post_source->type : null;
@@ -198,6 +228,7 @@
                 $video = array();
                 $audio = array();
                 $text_links = array();
+                $author = isset($post->from_id) ? $post->from_id : false;
 
                 if ( isset( $post->attachments )) {
                     foreach( $post->attachments as $attachment ) {
@@ -244,12 +275,14 @@
                                               'retweet' => $retweet, 'time'  => $time,  'text'     => $text,
                                               'map'     => $maps,    'doc'   => $doc,   'photo'    => $photo,
                                               'music'   => $audio,   'video' => $video, 'link'     => $link,
-                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source
+                                              'poll'    => $poll,    'text_links'   =>  $text_links, 'createdVia'=>$source,
+                                              'author'  => $author,  'pid' => $post->id
                 );
 
             }
             return $result_posts_array;
         }
+
         /** @return Article */
         public static function get_article_from_post( $post, $target_feed_id )
         {
@@ -263,6 +296,8 @@
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
             $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            $article->isSuggested = false;
+
             return $article;
         }
 
@@ -287,23 +322,25 @@
         }
 
         /** @return ArticleQueue */
-        public static function get_articleQueue_from_article( $post ,$sent_at, $target_feed_id )
+        public static function get_articleQueue_from_article( $post, $sent_at, $target_feed_id )
         {
             $articleQueue = new ArticleQueue();
             $articleQueue->collectLikes = true;
-            $articleQueue->sentAt = $sent_at;
-            $articleQueue->externalId = $post['id'];
+            $articleQueue->sentAt       = $sent_at;
+            $articleQueue->externalId   = $post['id'];
             $articleQueue->externalLikes = (int)$post['likes_tr'];
             $articleQueue->externalRetweets = (int)$post['retweet'];
-            $articleQueue->startDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->startDate    = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->endDate      = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->endDate->modify( '+5 minutes');
             $articleQueue->targetFeedId = $target_feed_id;
-            $articleQueue->statusId = StatusUtility::Finished;
-            $articleQueue->createdAt = $sent_at;
-            $articleQueue->isDeleted = false;
-            $articleQueue->type = 'content'; //неспортивно
+            $articleQueue->statusId     = StatusUtility::Finished;
+            $articleQueue->createdAt    = new DateTimeWrapper(self::false_created_time);
+            $articleQueue->isDeleted    = false;
+            $articleQueue->author       = $author = isset($post->from_id) ? $post->from_id : false;
+            $articleQueue->type         = 'content'; //неспортивно
+
             return $articleQueue;
         }
 
@@ -651,4 +688,5 @@
             $posts = self::post_conv( $res );
             return $posts;
         }
+
     }

@@ -11,6 +11,7 @@
 <div id="main" class="main">
     <div class="header">
         <div class="tab-bar"></div>
+        <div class="login-info"></div>
         <div class="button-wrap">
             <script type="text/javascript"><!--
                 document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
