@@ -163,7 +163,7 @@
             $res = VkHelper::api_request( 'wall.repost', $params );
             if (isset ($res->error )) {
                 if ( $res->error->error_code == self::CAPTCHA_ERROR_CODE ) {
-                    $this->repost( array(
+                    return $this->repost( array(
                         'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
                         'captcha_sid'   =>  $res->error->captcha_sid
                     ));
@@ -409,7 +409,7 @@
 
             elseif ( isset( $res->error ))
                 if( $res->error->error_code  == self::CAPTCHA_ERROR_CODE && isset( $res->error->captcha_img)) {
-                    $this->post($attaches, array(
+                    return $this->post($attaches, array(
                         'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
                         'captcha_sid'   =>  $res->error->captcha_sid
                     ));
