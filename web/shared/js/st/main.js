@@ -964,7 +964,10 @@ var Table = (function() {
                         Events.fire('add_list', text, function() {
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
+                                var all_lists = dataList.private_list;
+                                all_lists.push.apply(all_lists,dataList.global_list);
+
+                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                                 $dropdown.html($tmpDropdown.html());
                                 $input = $dropdown.find('input');
                                 Filter.listRefresh();
