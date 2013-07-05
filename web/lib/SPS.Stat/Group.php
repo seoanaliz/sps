@@ -45,7 +45,4 @@ class Group
     /** @var int*/
     public $source;
 
-    /** @var int[]*/
-    public $entries_ids;
-
 }

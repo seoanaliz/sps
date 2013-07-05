@@ -55,11 +55,7 @@ class GroupFactory
               'name'        => 'source'
             , 'type'        => TYPE_INTEGER
         )
-        ,'entries_ids' => array(
-              'name'        => 'entries_ids'
-            , 'type'        => TYPE_ARRAY
-            , 'complexType' => 'int[]'
-        )
+
     )
     , 'search'    => array(
         '_group_id' => array(
@@ -92,12 +88,7 @@ class GroupFactory
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_ARRAY
         )
-        ,'_entries_ids' => array(
-              'name'        => 'entries_ids'
-            , 'type'        => TYPE_INTEGER
-            , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
-            , 'complexType' => 'int[]'
-        )
+
         ,'pageSize' => array(
               'name'         => 'pageSize'
             , 'type'       => TYPE_INTEGER
