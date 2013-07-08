@@ -47,9 +47,9 @@
 
             } elseif( $type == 'Stat' ) {
                 if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
-                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'sourceType' => Group::STAT_GROUP));
+                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'group_id' => $group_id, 'sourceType' => Group::STAT_GROUP));
                     if( !empty( $check)) {
-                        $response['message'] = 'В этом списке уже есть данная запись';
+                        $response['message'] = 'it\'s already there';
                         die(ObjectHelper::ToJSON($response));
                     }
                     $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP);
