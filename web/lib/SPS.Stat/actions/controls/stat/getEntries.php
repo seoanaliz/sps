@@ -51,6 +51,9 @@ class getEntries {
 
         //поиск по названию - глобальный
         if($search_name) {
+            if( strlen( $search_name) > 5) {
+                $search_name = substr($search_name, -2);
+            }
             $search['_nameIL'] = $search_name;
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
             $search['inLists'] = false;
@@ -152,14 +155,6 @@ class getEntries {
         return $ds->GetInteger( 'visitors');
     }
 
-    private function get_row( $ds, $structure )
-    {
-        $res = array();
-        foreach( $structure as $field ) {
-            $res[ $field ] = $ds->getValue( $field );
-        }
-        return $res;
-    }
 
     //возвращает данные о наших пабликах
     private function get_our_publics_state( $time_start, $time_stop, $groupId )
@@ -232,44 +227,6 @@ class getEntries {
         if ( $rev == 0 && \$b['$field'] == null ) return -1;
         return  $rev * strnatcmp(\$a['$field'], \$b['$field']);";
         return create_function('$a,$b', $code );
-    }
-
-    private function get_ava( $public_id )
-    {
-        $sql = 'SELECT ava
-                FROM ' . TABLE_STAT_PUBLICS .
-               ' WHERE vk_id=@publ_id';
-        $cmd = new SqlCommand( $sql, $this->conn );
-        $cmd->SetInteger( '@publ_id', $public_id);
-        $ds = $cmd->Execute();
-        $ds->Next();
-        return $ds->getValue('ava');
-    }
-
-    //выбирает админов, в 0 элемент помещает "главного" для этой выборки
-    private function get_admins( $publ, $sadmin ='' )
-    {
-        $resul = array();
-        $sql = "select vk_id,role,name,ava,comments from " . TABLE_STAT_ADMINS . " where publ_id=@publ_id";
-        $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $cmd->SetInteger( '@publ_id',  $publ );
-        $ds = $cmd->Execute();
-        $structure  = BaseFactory::getObjectTree( $ds->Columns );
-        while ( $ds->next()) {
-            $vk_id = $ds->getValue( 'vk_id', TYPE_INTEGER );
-            if ( $vk_id == $sadmin ) {
-                if ( isset( $resul[0] ) )
-                    $k = $resul[0];
-
-                $resul[0] = $this->get_row($ds, $structure);
-
-                if ( $k )
-                    $resul[] = $k;
-            } else
-                 $resul[] = $this->get_row($ds, $structure);
-        }
-
-        return $resul;
     }
 
     private function get_min_max()
