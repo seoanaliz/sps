@@ -1,7 +1,7 @@
 var LIST =
 '<div class="tab-bar clear-fix">' +
     '<div class="tab selected" data-id="null">Популярные</div>' +
-    '<?if( cur.dataUser.rank > 7 ) { ?>'+
+    '<?if( cur.dataUser.isEditor ) { ?>'+
         '<div class="actions">' +
                 '<a class="share">Поделиться</a> |' +
                 '<a class="edit">Редактировать</a> |' +
@@ -108,7 +108,8 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<? if( cur.dataUser.rank > 2 ) { ?>'+
+    '<? if( cur.dataUser.isEditor ) { ?>'+
+
         '<div class="column column1 public-actions">' +
             '<div class="cell">' +
                 '<span class="action add-to-list">' +
@@ -186,7 +187,7 @@ var FILTER_LIST =
 var FILTER_LIST_ITEM =
 '<div class="item" data-id="<?=itemId?>">' +
     '<span class="text"><?=itemTitle?></span>' +
-    '<?if( cur.dataUser.rank == 4 ) { ?>'+
+    '<?if( cur.dataUser.isEditor ) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
     '<? } ?>'+
 '</div>';
