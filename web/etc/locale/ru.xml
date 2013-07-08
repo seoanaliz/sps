@@ -265,6 +265,12 @@
       <navigations><![CDATA[Элементы навигации]]></navigations>
       <navigationTypes><![CDATA[Типы навигации]]></navigationTypes>
       <siteParams><![CDATA[Параметры]]></siteParams>
+      <mobParams><![CDATA[Моби]]></mobParams>
+      <andSettings><![CDATA[Андроид]]></andSettings>
+      <iosSettings><![CDATA[IOS]]></iosSettings>
+      <banners><![CDATA[Баннеры]]></banners>
+      <categories><![CDATA[Категории]]></categories>
+      <promPosts><![CDATA[Пром посты]]></promPosts>
       <exit><![CDATA[Выход]]></exit>
       <articles><![CDATA[Статьи]]></articles>
       <sourceFeeds><![CDATA[Источники]]></sourceFeeds>

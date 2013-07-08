@@ -68,6 +68,31 @@
                     , "link" => "vt://daemons/"
                 ),
             )            
+        ) , "mobile-params" => array(
+            "title"  => "vt.menu.mobParams"
+            , "link" => "vt://moby-params/"
+            , "menu" => array(
+                array(
+                    "title"  => "vt.menu.andSettings"
+                    , "link" => "vt://and-settings/"
+                ),
+                array(
+                    "title"  => "vt.menu.iosSettings"
+                    , "link" => "vt://ios-settings/"
+                ),
+                array(
+                    "title"  => "vt.menu.banners"
+                    , "link" => "vt://banners/"
+                ),
+                array(
+                    "title"  => "vt.menu.categories"
+                    , "link" => "vt://categories/"
+                ),
+                array(
+                    "title"  => "vt.menu.promPosts"
+                    , "link" => "vt://promotion-posts/"
+                ),
+            )
         )
         , "exit" => array (
             "title"  => "vt.menu.exit"
