@@ -51,6 +51,15 @@
                         'entryId'       =>  $entry_id,
                         'sourceType'    =>  Group::STAT_GROUP,
                     ));
+                    $inLists = GroupEntryFactory::Count(array(
+                        'entryId'       =>  $entry_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                    ));
+                    if( !$inLists) {
+                        $public = new VkPublic();
+                        $public->inLists = false;
+                        VkPublicFactory::UpdateByMask($public, array('inLists'), array('vk_public_id' => $entry_id));
+                    }
                     $response['success'] = true;
                     die( ObjectHelper::ToJSON(array( 'response' => true )));
                 } else {

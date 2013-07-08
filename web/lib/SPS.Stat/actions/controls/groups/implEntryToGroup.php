@@ -47,7 +47,8 @@
 
             } elseif( $type == 'Stat' ) {
                 if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
-                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'group_id' => $group_id, 'sourceType' => Group::STAT_GROUP));
+                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'groupId' => $group_id, 'sourceType' => Group::STAT_GROUP));
+                    print_r( $check);
                     if( !empty( $check)) {
                         $response['message'] = 'it\'s already there';
                         die(ObjectHelper::ToJSON($response));
@@ -55,6 +56,9 @@
                     $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP);
 
                     if( GroupEntryFactory::Add($groupEntry)) {
+                        $public = new VkPublic();
+                        $public->inLists = true;
+                        VkPublicFactory::UpdateByMask($public, array('inLists'), array('vk_public_id' => $entry_id));
                         $response['success'] = true;
                         die( ObjectHelper::ToJSON(array( 'response' => true )));
                     }

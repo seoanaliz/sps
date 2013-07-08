@@ -76,5 +76,8 @@ class VkPublic {
 
     /** @var int */
     public $viewers_month;
+
+    /** @var bool */
+    public $inLists;
 }
 ?>
