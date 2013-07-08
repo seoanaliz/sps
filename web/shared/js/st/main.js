@@ -870,7 +870,7 @@ var Table = (function() {
             var publicData;
 
             for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId == publicId) { publicData = dataTable[i]; break; }
             }
             _createDropdownList(e, publicData);
         });
