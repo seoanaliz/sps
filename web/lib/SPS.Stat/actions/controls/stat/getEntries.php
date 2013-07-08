@@ -52,7 +52,7 @@ class getEntries {
         //поиск по названию - глобальный
         if($search_name) {
             if( strlen( $search_name) > 5) {
-                $search_name = substr($search_name,0, (strlen($search_name) - 3));
+                $search_name = mb_substr($search_name,0, (strlen($search_name) - 3));
             }
             $search['_nameIL'] = $search_name;
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
