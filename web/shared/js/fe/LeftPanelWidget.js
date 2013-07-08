@@ -1182,16 +1182,62 @@ var LeftPanelWidget = Event.extend({
 
         // Кастомные подвкладки
         $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
-            if (articlesLoading) {
-                return;
-            }
-
             var $tab = $(this);
-            $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
+            $leftPanel.find('.user-groups-tabs .tab.selected').removeClass('selected');
             $tab.addClass('selected');
 
-            t.loadArticles(true);
+            if ($tab.hasClass('proposed')) {
+                $('#wall').html('');
+                t.loadProposed();
+            } else {
+                if (articlesLoading) {
+                    return;
+                }
+
+                t.loadArticles(true);
+            }
         });
+    },
+
+    // показывает "Предложенные"
+    loadProposed: function () {
+        var t = this;
+
+        var Def = Control.fire('get-queued-suggests', {
+            targetFeedId: Elements.rightdd()
+        });
+        t.getSuggests().success(function (suggests) {
+            //can_edit: 1
+            //comments: Object
+            //date: 1373011597
+            //from_id: -27421965
+            //id: 3246
+            //likes: Object
+            //post_type: "post"
+            //reposts: Object
+            //text: "gvgjj"
+            //to_id: -27421965
+            //attachment: Object
+            //attachments: Array[1]
+            Def.success(function (data) {
+                log('lo-lo-lo', data);
+            });
+        });
+    },
+
+    getSuggests: function () {
+        var Def = new Deferred();
+        VK && VK.Api.call('wall.get', {
+            owner_id: -Elements.currentExternalId(),
+            count: 100,
+           // filter: 'suggests'
+        }, function (resp) {
+            if (resp && !resp.error && resp.response) {
+                resp.response.shift();
+                Def.fireSuccess(resp.response);
+            }
+        });
+        return Def;
     },
 
     // Список авторов
@@ -1573,6 +1619,7 @@ var LeftPanelWidget = Event.extend({
                     $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }
             }
+            $userGroupTabs.append('<div class="tab proposed">Предложенные</div>');
         } else {
             $userGroupTabs.addClass('hidden');
         }

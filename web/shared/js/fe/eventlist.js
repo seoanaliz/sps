@@ -63,6 +63,10 @@ Control = $.extend(Control, {
             name: 'article-save',
             dataType: 'json',
             type: 'POST'
+        },
+        'get-queued-suggests': {
+            name: 'get-queued-suggests',
+            dataType: 'json'
         }
     }
 });

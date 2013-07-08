@@ -13,6 +13,9 @@ var RightPanelWidget = Event.extend({
         this.initQueue();
     },
 
+    // вконтактовский id текущего выбранного справа паблика
+    currentExternalId: null,
+
     initRightPanel: function() {
         var t = this;
         var $leftPanel = t.$leftPanel;
@@ -33,6 +36,7 @@ var RightPanelWidget = Event.extend({
                     }
                     icon.attr('src', item.icon);
                 }
+                t.currentExternalId = item.externalId;
 
                 // проставление типа источника
                 var cookieData = $.cookie('sourceType');

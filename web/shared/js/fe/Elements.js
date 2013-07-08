@@ -113,6 +113,10 @@ var Elements = {
             $("#right-drop-down").dropdown('getMenu').find('.ui-dropdown-menu-item[data-id="' + value + '"]').mouseup();
         }
     },
+    // вконтактовский id текущего выбранного справа паблика
+    currentExternalId: function() {
+        return app.getRightPanelWidget().currentExternalId;
+    },
     leftType: function(){
         return $('#left-panel .type-selector a.active').data('type');
     },
