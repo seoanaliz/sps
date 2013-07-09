@@ -1206,7 +1206,7 @@ var LeftPanelWidget = Event.extend({
         var Def = Control.fire('get-queued-suggests', {
             targetFeedId: Elements.rightdd()
         });
-        t.getSuggests().success(function (suggests) {
+        t.getSuggests(0).success(function (suggests) {
             //can_edit: 1
             //comments: Object
             //date: 1373011597
@@ -1219,22 +1219,44 @@ var LeftPanelWidget = Event.extend({
             //to_id: -27421965
             //attachment: Object
             //attachments: Array[1]
-            Def.success(function (data) {
-                log('lo-lo-lo', data);
-            });
+
+//            Def.success(function (data) {
+//                log('lo-lo-lo', data);
+//            });
+
+            log('o-lo-lo', suggests);
         });
     },
 
-    getSuggests: function () {
+    itemsPerPage: 100,
+
+    /**
+     * @param {Int} pageOffset Номер страницы, начиная с нуля 
+     */
+    getSuggests: function (pageOffset) {
+        var t = this;
+
         var Def = new Deferred();
+        var itemsOffset = t.itemsPerPage * pageOffset;
         VK && VK.Api.call('wall.get', {
             owner_id: -Elements.currentExternalId(),
-            count: 100,
+            count: t.itemsPerPage,
+            offset: itemsOffset
            // filter: 'suggests'
         }, function (resp) {
-            if (resp && !resp.error && resp.response) {
-                resp.response.shift();
-                Def.fireSuccess(resp.response);
+            if (resp && !resp.error) {
+                var result = resp.response;
+                if (result) {
+                    var totalCount = result.shift();
+                    var data = {hasMore: false,
+                        result: result // shifted
+                    };
+
+                    if (totalCount > itemsOffset + result.length) {
+                        data.hasMore = true;
+                    }
+                    Def.fireSuccess(data);
+                }
             }
         });
         return Def;
