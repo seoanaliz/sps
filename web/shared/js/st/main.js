@@ -94,7 +94,7 @@ function authInfo(response) {
         VK.Api.call('execute', {code: code}, function (answer) {
             if (answer && answer.response) {
                 cur.dataUser = answer.response.user;
-                cur.dataUser.isEditor = (window.$rank > 2);
+                cur.dataUser.isEditor = (window.rank > 2);
                 handleUserLoggedIn(answer.response.user);
             };
         });
