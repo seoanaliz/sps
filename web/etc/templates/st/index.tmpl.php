@@ -66,7 +66,7 @@
                             <div class="list private editor_lists">
                             </div>
                         <? } ?>
-                        <div class="title">Катрегории</div>
+                        <div class="title">Категории</div>
                         <div class="list global">
                         </div>
                     </div>
@@ -76,9 +76,6 @@
     </table>
 </div>
 <div id="go-to-top">Наверх</div>
-<div id="listed-counter"> вы накликали:
-    <span class="value-max"></span>
-</div>
 </div>
 
 {increal:tmpl://st/elements/footer.tmpl.php}
