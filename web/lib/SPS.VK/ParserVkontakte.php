@@ -8,6 +8,7 @@
         private $page_short_name;
         private $count;
 
+        const false_created_time = '1970-01-01 00:00:00';
         const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
@@ -18,7 +19,7 @@
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
         const ALBUM_MIN_LIKES_LIMIT = 10;
-        const WALL_MIN_LIKES_LIMIT = 30;
+        const WALL_MIN_LIKES_LIMIT  = 30;
         /**
          * Максимальное количество постов, для которых можно запросить лайки
          */
@@ -320,24 +321,25 @@
         }
 
         /** @return ArticleQueue */
-        public static function get_articleQueue_from_article( $post ,$sent_at, $target_feed_id )
+        public static function get_articleQueue_from_article( $post, $sent_at, $target_feed_id )
         {
             $articleQueue = new ArticleQueue();
             $articleQueue->collectLikes = true;
-            $articleQueue->sentAt = $sent_at;
-            $articleQueue->externalId = $post['id'];
+            $articleQueue->sentAt       = $sent_at;
+            $articleQueue->externalId   = $post['id'];
             $articleQueue->externalLikes = (int)$post['likes_tr'];
             $articleQueue->externalRetweets = (int)$post['retweet'];
-            $articleQueue->startDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->startDate    = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->endDate      = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->endDate->modify( '+5 minutes');
             $articleQueue->targetFeedId = $target_feed_id;
-            $articleQueue->statusId = StatusUtility::Finished;
-            $articleQueue->createdAt = $sent_at;
-            $articleQueue->isDeleted = false;
-            $articleQueue->author    = $author = isset($post->from_id) ? $post->from_id : false;
-            $articleQueue->type = 'content'; //неспортивно
+            $articleQueue->statusId     = StatusUtility::Finished;
+            $articleQueue->createdAt    = new DateTimeWrapper(self::false_created_time);
+            $articleQueue->isDeleted    = false;
+            $articleQueue->author       = $author = isset($post->from_id) ? $post->from_id : false;
+            $articleQueue->type         = 'content'; //неспортивно
+
             return $articleQueue;
         }
 

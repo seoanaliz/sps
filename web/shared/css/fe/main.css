@@ -705,7 +705,7 @@ i {
   cursor: pointer;
   position: absolute;
   right: 0;
-  bottom: 1px;
+  top: -1px;
   color: #205f82;
   font-weight: bold;
   font-size: 14px;
@@ -1351,7 +1351,7 @@ i {
   margin-left: 5px;
 }
 .post .editing textarea {
-  width: 516px;
+  width: 93%;
 }
 .post .actions {
   margin-top: 10px;

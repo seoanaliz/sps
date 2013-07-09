@@ -40,6 +40,7 @@ class SaveArticleControl extends BaseControl
         $targetFeedId = Request::getInteger('targetFeedId');
         $userGroupId = Request::getInteger('userGroupId');
         $sourceFeedId = Request::getInteger('sourceFeedId');
+        $timestamp = Request::getString('timestamp');
         if (!$userGroupId) {
             $userGroupId = null;
         }
@@ -124,6 +125,22 @@ class SaveArticleControl extends BaseControl
             $result['articleId'] = $article->articleId;
         }
 
+        if ($timestamp && is_numeric($timestamp)) {
+            Request::setString('id', Request::getString('queueId'));
+            ob_start();
+            include __DIR__ . '/DeleteArticleQueueControl.php';
+            $Deleter = new DeleteArticleQueueControl();
+            $Deleter->Execute();
+            $resultOfDeletion = ob_get_clean();
+
+            Request::setParameter('queueId', null);
+            ob_start();
+            include __DIR__ . '/AddArticleToQueueControl.php';
+            $Adder = new AddArticleToQueueControl();
+            $Adder->Execute();
+            $resultOfAddition = ob_get_clean();
+        }
+        
         echo ObjectHelper::ToJSON($result);
     }
 
