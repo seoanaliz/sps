@@ -57,7 +57,7 @@ class SyncSuggestedPosts extends AbstractPostLoadDaemon {
                 }
                 if( $targetFeed->targetFeedId == 9826) {
                     $token  =   'c4d2030b23785030efb9496bacd80f78f33bc91fd00c78b69810bfb99b1c8ec1864b657924dc72be0131c';}
-                elseif( in_array($targetFeed->targetFeedId, array(33,27)) {
+                elseif( in_array($targetFeed->targetFeedId, array(33,27))) {
                     $token  =   '1ae17c839729af411c04ca697f7d63cb767125beed88ac62b5b0de6b44d6664e783ac20739ba4157e6527';
                 } else {
                     $token  =   'ab819c5c52b436c614fc9e1769f63168b44860a01387d2689fddb1fd56d23041178784b50d535610637b5';
