@@ -33,6 +33,7 @@
         const TESTING       =   false;
         const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
         const ALBUM_NAME    =   'wall photo';
+        const ALBUM_MAX_SIZE=   489;
 
         //(например, получение разгаданной капчи)
 
@@ -94,6 +95,21 @@
             return $result;
         }
 
+        public function send_photo_in_album( $album_title )
+        {
+            $album_title = explode(' : ', $album_title );
+            $album_title = end( $album_title );
+            $album = $this->get_album( $album_title );
+            if ( !$album['id'] || $album['size'] > self::ALBUM_MAX_SIZE) {
+                $album_id = $this->create_album( $album['counter'], 0, $album_title );
+            } else {
+                $album_id = $album['id'];
+            }
+
+            return $this->load_photo( $this->post_photo_array[0], 'album', $album_id, $this->post_text );
+
+        }
+
         //возвращаемые значения
         //Удачная отсылка
         //      -ХХХ_УУУ - id поста (ХХХ - id паблика, УУУ - поста в этом паблике)
@@ -117,9 +133,7 @@
             }
 
             $attachments = array_merge( $photo_array, $this->audio_id, $this->video_id );
-            if (  $this->post_text =='©' || ( $this->post_text == '' && count( $attachments ) == 1 ) ) {
-//            $this->post_text = "&#01;";
-            }
+
             if( count( $photo_array ) == 0 && $this->link ) {
                 $attachments[] = $this->link;
 
@@ -167,12 +181,12 @@
             }
         }
 
-        public function text_corrector( $text )
+        public function text_corrector( $text = '' )
         {
             $text = strip_tags( $text );
             //cURL пытается найти файл по любой строке, начинающейся с @
 //            preg_replace( '/^@/', '^ @', $text );
-            if ( $text[0] == '@')
+            if ( $text && $text[0] == '@')
                 $text = ' ' . $text;
             return $text;
         }
@@ -317,7 +331,7 @@
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:
-        // id, количество фото в нем, сколько всего c таким названием
+        // id,size - количество фото в нем, counter - сколько всего альбомов c таким названием
         private function get_album( $title_search = '' )
         {
             $title_search = $title_search ? $title_search : self::ALBUM_NAME;
@@ -327,24 +341,21 @@
             );
 
             $res = VkHelper::api_request( 'photos.getAlbums', $params );
-
             $i = 1;
-            $album_id = '';
+            $album_id = 0;
+            $album_size = 0;
             foreach ( $res as $album ) {
                 if ( substr_count( mb_convert_case( $album->title, MB_CASE_LOWER, "UTF-8" ), $title_search ) > 0 ) {
                     $i++;
-                    $album_id   = $album->aid;
-                    $album_size = $album->size;
+                    if( $album->aid > $album_id ) {
+                        $album_id   =  $album->aid ;
+                        $album_size =  $album->size;
+                    }
                 }
             }
 
             $res = array( 'id' => $album_id, 'counter' =>   $i, 'size'  => $album_size );
-
-            if ( $i > 1 )
-                return( $res );
-
-            return false;
-
+            return( $res );
         }
 
         public function get_album_size( $full_album_id )
@@ -363,18 +374,19 @@
             return false;
         }
 
-        private function create_album( $counter = 1, $privacy = 1, $title = '' )
+        private function create_album( $counter_value = 1, $privacy = 1, $title = '' )
         {
-            $counter = $counter ? $counter : 1;
-            $title = $title ? $title : self::ALBUM_NAME . ' ' . $counter;
+            $counter = $counter_value ? $counter_value : 1;
+            $title = $title . ' ' . $counter;
 
             $params = array(
-                'gid'       =>  $this->vk_group_id,
-                'title'     =>  $title,
-                'privacy'   =>  $privacy,
+                'gid'           =>  $this->vk_group_id,
+                'title'         =>  $title,
+                'privacy'       =>  $privacy,
+                'access_token'  =>  $this->vk_access_token,
             );
             $res = VkHelper::api_request( 'photos.createAlbum', $params );
-            return  $res->aid  ;
+            return  $res->aid;
         }
 
         private function post( $attaches )
@@ -453,7 +465,7 @@
         }
 
         //todo описания фоток матьматьмать
-        public function load_photo( $path, $destination = 'wall', $caption = '' )
+        public function load_photo( $path, $destination = 'wall', $album_id = '', $caption = '' )
         {
             if ( !file_exists( $path ))
                 throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
@@ -462,21 +474,14 @@
             $aid = '';
             switch ( $destination ) {
                 case 'wall':
-                    $method_get_server = 'photos.getWallUploadServer';
-                    $method_save_photo = 'photos.saveWallPhoto';
-                    $photo_list        = 'photo' ;
+                    $method_get_server  =   'photos.getWallUploadServer';
+                    $method_save_photo  =   'photos.saveWallPhoto';
+                    $photo_list         =   'photo';
                     break;
                 case 'album':
-                    $album = $this->get_album();
-
-                    if ( !$album || $album['size'] > 470 )
-                        $aid = $this->create_album( $album[ 'counter' ] );
-                    else
-                        $aid = $album['id'];
-
                     $method_get_server  =   'photos.getUploadServer';
                     $method_save_photo  =   'photos.save';
-                    $photo_list         =   'photos_list' ;
+                    $photo_list         =   'photos_list';
                     break;
                 default:
                     return false;
@@ -485,7 +490,7 @@
             $params = array(
                 'gid'           =>  $this->vk_group_id,
                 'access_token'  =>  $this->vk_access_token,
-                'aid'           =>  $aid
+                'aid'           =>  $album_id
             );
 
             //первый запрос, получение адреса для заливки фото
@@ -525,13 +530,11 @@
                 'photo'         =>  $content->$photo_list,
                 'photos_list'   =>  $content->$photo_list,
                 'access_token'  =>  $this->vk_access_token,
-                'aid'           =>  $aid,
+                'aid'           =>  $album_id,
                 'caption'       =>  $caption
             );
 
             $res = VkHelper::api_request( $method_save_photo, $params );
-            if( isset( $res->error ))
-                ;
             $res = $res[0];
 
             if( $destination == 'wall' )

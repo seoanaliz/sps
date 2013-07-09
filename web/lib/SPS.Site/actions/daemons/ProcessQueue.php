@@ -77,7 +77,7 @@ sql;
                 $this->sendPostToFb($targetFeed, $articleQueue, $articleRecord);
             }
 
-            if ($targetFeed->type == TargetFeedUtility::VK) {
+            if ($targetFeed->type == TargetFeedUtility::VK || $targetFeed->type == TargetFeedUtility::VK_ALBUM) {
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
                     return false;
                 }
@@ -176,7 +176,9 @@ sql;
             $sender = new SenderVkontakte($post_data);
 
             try {
-                if ( !$post_data['repost_post'] ) {
+                if($targetFeed->type == TargetFeedUtility::VK_ALBUM ) {
+                    $articleQueue->externalId = $sender->send_photo_in_album( $targetFeed->title );
+                } elseif ( !$post_data['repost_post'] ) {
                     $articleQueue->externalId = $sender->send_post();
                 } else {
                     $articleQueue->externalId = $sender->repost();

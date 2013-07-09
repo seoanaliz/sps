@@ -44,6 +44,27 @@
                 GroupsUtility::extricate_from_group( $events, $group_id, $default_group->group_id );
                 BarterEventFactory::UpdateRange( $events );
                 die( ObjectHelper::ToJSON(array( 'response' => true )));
+            } elseif( $type == 'Stat' ) {
+                if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
+                    GroupEntryFactory::DeleteByMask( array(
+                        'groupId'       =>  $group_id,
+                        'entryId'       =>  $entry_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                    ));
+                    $inLists = GroupEntryFactory::Count(array(
+                        'entryId'       =>  $entry_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                    ));
+                    if( !$inLists) {
+                        $public = new VkPublic();
+                        $public->inLists = false;
+                        VkPublicFactory::UpdateByMask($public, array('inLists'), array('vk_public_id' => $entry_id));
+                    }
+                    $response['success'] = true;
+                    die( ObjectHelper::ToJSON(array( 'response' => true )));
+                } else {
+                    $response['message'] = "access denied";
+                }
             }
             elseif (  StatUsers::is_Sadmin( $user_id )) {
                 $m_class::extricate_entry( $group_id, $entry_id, $user_id );

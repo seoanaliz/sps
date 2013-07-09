@@ -1,6 +1,6 @@
 <?
     $appId = 2842244;
-    $scope = 'wall,offline,groups,pages,albums,photos';
+    $scope = 'wall,friends,offline,groups,pages';
     $loginUrl = 'https://oauth.vk.com/authorize' .
         '?client_id=' . $appId .
         '&scope=' . $scope .
