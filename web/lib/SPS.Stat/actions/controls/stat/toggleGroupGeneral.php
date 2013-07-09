@@ -33,9 +33,10 @@
                         GroupUserFactory::DeleteByMask( array(
                             'groupId'       =>  $group_id,
                             'vkId'          =>  $user_id,
-                            'sourceTyoe'    =>  Group::STAT_GROUP
+                            'sourceType'    =>  Group::STAT_GROUP
                         ));
                     }
+                    GroupFactory::Update($group);
                     die( ObjectHelper::ToJSON(array( 'response' => true )));
                 }
             };
