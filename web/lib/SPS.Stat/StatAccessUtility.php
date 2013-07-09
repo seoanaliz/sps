@@ -78,12 +78,17 @@ class StatAccessUtility
         return $res;
     }
 
-    public static function GetRankInSource( $vk_id, $source)
+    public static function GetRankInSource( $vk_id, $source )
     {
+        if( !$vk_id ) {
+            return StatAuthority::STAT_ROLE_GUEST;
+        }
+
         $acessUtility = self::GetInstance($vk_id);
         if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ]))
             return $acessUtility->rules_array[ $source ];
-        return StatAuthority::STAT_ROLE_GUEST;
+
+        return StatAuthority::STAT_ROLE_USER;
     }
 
 
