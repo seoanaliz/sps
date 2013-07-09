@@ -100,7 +100,8 @@ class SyncSuggestedPosts extends AbstractPostLoadDaemon {
 
         $targetFeeds = array();
         /** @var $targetFeeds TargetFeed[]*/
-        $sql = 'SELECT * FROM "targetFeeds" WHERE "collectSuggests" = true and "externalId" in (\'10639516\',\'52833601\', \'36775802\', \'26776509\' , \'34010064\' ) OFFSET @offset LIMIT @limit';            $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
+        $sql = 'SELECT * FROM "targetFeeds" WHERE "collectSuggests" = true and "externalId" in (\'10639516\',\'52833601\', \'36775802\', \'26776509\' , \'34010064\' ) OFFSET @offset LIMIT @limit';         
+        $cmd = new SqlCommand( $sql, ConnectionFactory::Get());
         $cmd->SetInt( '@offset', $offset);
         $cmd->SetInt( '@limit', self::FeedsChunkSize);
         $ds = $cmd->Execute();
