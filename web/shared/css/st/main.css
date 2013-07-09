@@ -237,12 +237,11 @@ td {
 #main .right-column > div>.period input {
   margin-right: 5px;
 }
-/*#main .right-column > div>.list {*/
-  /*margin: 10px 10px 0;*/
-  /*padding-top: 7px;*/
-  /*border-top: 1px solid #D8DFEA;*/
-/*}*/
-
+#main .right-column > div>.list {
+  margin: 10px 10px 0;
+  padding-top: 7px;
+  border-top: 1px solid #D8DFEA;
+}
 #main .right-column > div>.list>.item {
   padding: 4px 1.5em 4px 9px;
   cursor: pointer;
@@ -662,7 +661,7 @@ td {
   position: relative;
   cursor: pointer;
   -webkit-transition: all .2s;
-  hidden: true;
+  overflow: hidden;
 }
 .contact-dropdown>.item>.content > .description {
   color: #808080;
