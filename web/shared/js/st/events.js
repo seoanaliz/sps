@@ -279,13 +279,6 @@ var Eventlist = {
             callback(true);
         });
     },
-    hide_public: function(public_id, callback) {
-        simpleAjax('togglePublVisibil', {
-            publId: public_id
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
     add_to_general: function(listId, callback) {
         simpleAjax('toggleGroupGeneral', {
             groupId: listId

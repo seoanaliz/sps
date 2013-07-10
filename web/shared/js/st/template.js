@@ -155,7 +155,6 @@ var DROPDOWN =
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
     '<div class="item show-input">Создать список</div>' +
-    '<div class="item hide-public">Скрыть паблик</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =

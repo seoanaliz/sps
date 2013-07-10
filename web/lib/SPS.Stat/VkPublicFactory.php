@@ -105,7 +105,7 @@ class VkPublicFactory implements IFactory {
               'name'        => 'vk_public_id'
             , 'type'        => TYPE_INTEGER
             , 'key'         => true
-            )
+        )
         ,'viewers' => array(
               'name'        => 'viewers'
             , 'type'        => TYPE_INTEGER

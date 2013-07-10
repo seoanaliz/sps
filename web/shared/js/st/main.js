@@ -987,21 +987,7 @@ var Table = (function() {
                     $dropdown.delegate('.show-input', 'click', function() {
                         $input.show().focus();
                     });
-                    $dropdown.delegate('.hide-public', 'click', function() {
-                        var $item = $(this);
-                        if ($item.hasClass('selected')) {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.removeClass('selected');
-                                $public.css('opacity', 1);
-                            });
-                        } else {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.addClass('selected');
-                                $public.css('opacity',.5);
-                            });
-                        }
-                    });
-                    $dropdown.delegate('.item:not(.show-input):not(.hide-public)', 'mousedown', function(e) {
+                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
                         var $item = $(this);
                         onChange($item);
                     });
