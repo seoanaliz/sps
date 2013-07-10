@@ -130,12 +130,6 @@ table, tr, td {
         &>.interval-wrapper {
             display: none;
         }
-        &>div > .title,
-        &>.title {
-            color: #555;
-            font-weight: bold;
-            padding: 10px 10px 0;
-        }
         &>div > .interval,
         &>.interval {
             padding: 10px 10px 0;
@@ -180,17 +174,6 @@ table, tr, td {
                 &>.value-max {
                     float: right;
                 }
-            }
-        }
-        &>div > .period,
-        &>.period {
-            padding: 7px 7px 0;
-
-            label {
-                padding: 3px;
-            }
-            input {
-                margin-right: 5px;
             }
         }
     }
@@ -438,49 +421,64 @@ table, tr, td {
 }
 
 .right-column {
-    .list {
-        &>.item {
-            padding: 4px 1.5em 4px 9px;
-            cursor: pointer;
-            color: #2B587A;
-            overflow: hidden;
-            position: relative;
-            text-overflow: ellipsis;
+    .item {
+        padding: 4px 1.5em 4px 18px;
+        cursor: pointer;
+        color: #2B587A;
+        overflow: hidden;
+        position: relative;
+        text-overflow: ellipsis;
 
-            &:hover {
-                background-color: #E1E7ED;
-
-                .icon {
-                    display: block;
-                    .opacity(0.5);
-                }
-            }
+        &:hover {
+            background-color: #E1E7ED;
 
             .icon {
-                position: absolute;
-                margin-top: -.66em;
-                top: 50%;
-                right: 4px;
-                display: none;
-                padding: 1px;
-                background-image: url('../../images/st/star.png');
-
-                &:hover,
-                &.selected {
-                    display: block;
-                    opacity: 1;
-                }
+                display: block;
+                .opacity(0.5);
             }
+        }
 
+        .icon {
+            position: absolute;
+            margin-top: -.66em;
+            top: 50%;
+            right: 4px;
+            display: none;
+            padding: 1px;
+            background-image: url('../../images/st/star.png');
+
+            &:hover,
             &.selected {
-                background-color: #5E82A8;
-                color: #fff;
-                box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
-
-                .icon {
-                    background-image: url('../../images/st/star-white.png');
-                }
+                display: block;
+                opacity: 1;
             }
+        }
+
+        &.selected {
+            background-color: #5E82A8;
+            color: #fff;
+            box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
+
+            .icon {
+                background-image: url('../../images/st/star-white.png');
+            }
+        }
+    }
+
+    .title {
+        color: #555;
+        font-weight: bold;
+        padding: 12px 10px 0;
+    }
+
+    .period {
+        padding: 7px 7px 0;
+
+        label {
+            padding: 3px;
+        }
+        input {
+            margin-right: 5px;
         }
     }
 

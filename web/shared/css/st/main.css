@@ -166,12 +166,6 @@ td {
 #main .right-column > div>.interval-wrapper {
   display: none;
 }
-#main .right-column > div>div > .title,
-#main .right-column > div>.title {
-  color: #555;
-  font-weight: bold;
-  padding: 10px 10px 0;
-}
 #main .right-column > div>div > .interval,
 #main .right-column > div>.interval {
   padding: 10px 10px 0;
@@ -224,18 +218,6 @@ td {
 #main .right-column > div>div > .audience .slider-range>.value-max,
 #main .right-column > div>.audience .slider-range>.value-max {
   float: right;
-}
-#main .right-column > div>div > .period,
-#main .right-column > div>.period {
-  padding: 7px 7px 0;
-}
-#main .right-column > div>div > .period label,
-#main .right-column > div>.period label {
-  padding: 3px;
-}
-#main .right-column > div>div > .period input,
-#main .right-column > div>.period input {
-  margin-right: 5px;
 }
 #main .left-column > .content {
   width: 900px;
@@ -429,22 +411,22 @@ td {
 #main .left-column > .content .table.no-list-id .public-actions .action.selected .icon {
   opacity: 1;
 }
-.right-column .list>.item {
-  padding: 4px 1.5em 4px 9px;
+.right-column .item {
+  padding: 4px 1.5em 4px 18px;
   cursor: pointer;
   color: #2B587A;
   overflow: hidden;
   position: relative;
   text-overflow: ellipsis;
 }
-.right-column .list>.item:hover {
+.right-column .item:hover {
   background-color: #E1E7ED;
 }
-.right-column .list>.item:hover .icon {
+.right-column .item:hover .icon {
   display: block;
   opacity: 0.5;
 }
-.right-column .list>.item .icon {
+.right-column .item .icon {
   position: absolute;
   margin-top: -0.66em;
   top: 50%;
@@ -453,18 +435,32 @@ td {
   padding: 1px;
   background-image: url('../../images/st/star.png');
 }
-.right-column .list>.item .icon:hover,
-.right-column .list>.item .icon.selected {
+.right-column .item .icon:hover,
+.right-column .item .icon.selected {
   display: block;
   opacity: 1;
 }
-.right-column .list>.item.selected {
+.right-column .item.selected {
   background-color: #5E82A8;
   color: #fff;
   box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
 }
-.right-column .list>.item.selected .icon {
+.right-column .item.selected .icon {
   background-image: url('../../images/st/star-white.png');
+}
+.right-column .title {
+  color: #555;
+  font-weight: bold;
+  padding: 12px 10px 0;
+}
+.right-column .period {
+  padding: 7px 7px 0;
+}
+.right-column .period label {
+  padding: 3px;
+}
+.right-column .period input {
+  margin-right: 5px;
 }
 .right-column .buttons {
   margin-top: 15px;
