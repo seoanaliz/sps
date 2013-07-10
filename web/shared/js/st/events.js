@@ -54,7 +54,6 @@ var Eventlist = {
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            console.log(dirtyData);
             if ($.isArray(dirtyData.lists))
                 dirtyData.length;
                 $.each(dirtyData.lists, function(list, list_data) {

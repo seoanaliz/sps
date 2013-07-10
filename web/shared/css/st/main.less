@@ -193,55 +193,6 @@ table, tr, td {
                 margin-right: 5px;
             }
         }
-        &>.list {
-            margin: 10px 10px 0;
-            padding-top: 7px;
-            border-top: 1px solid #D8DFEA;
-
-            &>.item {
-                padding: 4px 1.5em 4px 9px;
-                cursor: pointer;
-                color: #2B587A;
-                overflow: hidden;
-                position: relative;
-                text-overflow: ellipsis;
-
-                &:hover {
-                    background-color: #E1E7ED;
-
-                    .icon {
-                        display: block;
-                        .opacity(0.5);
-                    }
-                }
-
-                .icon {
-                    position: absolute;
-                    margin-top: -.66em;
-                    top: 50%;
-                    right: 4px;
-                    display: none;
-                    padding: 1px;
-                    background-image: url('../../images/st/star.png');
-
-                    &:hover,
-                    &.selected {
-                        display: block;
-                        opacity: 1;
-                    }
-                }
-
-                &.selected {
-                    background-color: #5E82A8;
-                    color: #fff;
-                    box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
-
-                    .icon {
-                        background-image: url('../../images/st/star-white.png');
-                    }
-                }
-            }
-        }
     }
 
     .left-column > .content {
@@ -482,6 +433,66 @@ table, tr, td {
                     }
                 }
             }
+        }
+    }
+}
+
+.right-column {
+    .list {
+        &>.item {
+            padding: 4px 1.5em 4px 9px;
+            cursor: pointer;
+            color: #2B587A;
+            overflow: hidden;
+            position: relative;
+            text-overflow: ellipsis;
+
+            &:hover {
+                background-color: #E1E7ED;
+
+                .icon {
+                    display: block;
+                    .opacity(0.5);
+                }
+            }
+
+            .icon {
+                position: absolute;
+                margin-top: -.66em;
+                top: 50%;
+                right: 4px;
+                display: none;
+                padding: 1px;
+                background-image: url('../../images/st/star.png');
+
+                &:hover,
+                &.selected {
+                    display: block;
+                    opacity: 1;
+                }
+            }
+
+            &.selected {
+                background-color: #5E82A8;
+                color: #fff;
+                box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
+
+                .icon {
+                    background-image: url('../../images/st/star-white.png');
+                }
+            }
+        }
+    }
+
+    .buttons {
+        margin-top: 15px;
+        
+        &:before {
+            content: '';
+            height: 0;
+            display: block;
+            border-top: 1px solid #D8DFEA;
+            margin: 0 8px 12px;
         }
     }
 }

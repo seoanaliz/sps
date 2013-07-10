@@ -237,48 +237,6 @@ td {
 #main .right-column > div>.period input {
   margin-right: 5px;
 }
-#main .right-column > div>.list {
-  margin: 10px 10px 0;
-  padding-top: 7px;
-  border-top: 1px solid #D8DFEA;
-}
-#main .right-column > div>.list>.item {
-  padding: 4px 1.5em 4px 9px;
-  cursor: pointer;
-  color: #2B587A;
-  overflow: hidden;
-  position: relative;
-  text-overflow: ellipsis;
-}
-#main .right-column > div>.list>.item:hover {
-  background-color: #E1E7ED;
-}
-#main .right-column > div>.list>.item:hover .icon {
-  display: block;
-  opacity: 0.5;
-}
-#main .right-column > div>.list>.item .icon {
-  position: absolute;
-  margin-top: -0.66em;
-  top: 50%;
-  right: 4px;
-  display: none;
-  padding: 1px;
-  background-image: url('../../images/st/star.png');
-}
-#main .right-column > div>.list>.item .icon:hover,
-#main .right-column > div>.list>.item .icon.selected {
-  display: block;
-  opacity: 1;
-}
-#main .right-column > div>.list>.item.selected {
-  background-color: #5E82A8;
-  color: #fff;
-  box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
-}
-#main .right-column > div>.list>.item.selected .icon {
-  background-image: url('../../images/st/star-white.png');
-}
 #main .left-column > .content {
   width: 900px;
 }
@@ -470,6 +428,53 @@ td {
 #main .left-column > .content .table.no-list-id .public-actions .action:hover .icon,
 #main .left-column > .content .table.no-list-id .public-actions .action.selected .icon {
   opacity: 1;
+}
+.right-column .list>.item {
+  padding: 4px 1.5em 4px 9px;
+  cursor: pointer;
+  color: #2B587A;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+}
+.right-column .list>.item:hover {
+  background-color: #E1E7ED;
+}
+.right-column .list>.item:hover .icon {
+  display: block;
+  opacity: 0.5;
+}
+.right-column .list>.item .icon {
+  position: absolute;
+  margin-top: -0.66em;
+  top: 50%;
+  right: 4px;
+  display: none;
+  padding: 1px;
+  background-image: url('../../images/st/star.png');
+}
+.right-column .list>.item .icon:hover,
+.right-column .list>.item .icon.selected {
+  display: block;
+  opacity: 1;
+}
+.right-column .list>.item.selected {
+  background-color: #5E82A8;
+  color: #fff;
+  box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
+}
+.right-column .list>.item.selected .icon {
+  background-image: url('../../images/st/star-white.png');
+}
+.right-column .buttons {
+  margin-top: 15px;
+}
+.right-column .buttons:before {
+  content: '';
+  height: 0;
+  display: block;
+  border-top: 1px solid #D8DFEA;
+  margin: 0 8px 12px;
 }
 #global-loader {
   position: fixed;

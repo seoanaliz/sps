@@ -870,9 +870,14 @@ var Table = (function() {
             var publicData;
 
             for (var i in dataTable) {
-                if (dataTable[i].intId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId == publicId) {
+                    publicData = dataTable[i];
+                    break; // ------------------- BREAK
+                }
             }
-            _createDropdownList(e, publicData);
+            if (publicData) {
+                _createDropdownList(e, publicData);
+            }
         });
 
         $container.delegate('.action.delete-public', 'click', function(e) {
