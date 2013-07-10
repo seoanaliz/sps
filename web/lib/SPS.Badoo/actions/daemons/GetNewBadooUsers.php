@@ -1,18 +1,29 @@
 <?php
+include_once('BadooParser.php');
 
 class GetNewBadooUsers extends BadooParser
 {
     const START_USER_ID = 328209453;
-    const USERS_RANGE   = 1000;
+    const USERS_RANGE   = 10;
 
     public function Execute() {
         $lastUserId = $this->getLastUser();
-        $usersIds = range( $lastUserId + 1, $lastUserId + 1 + self::USERS_RANGE);
+        $usersIds = range( $lastUserId + 1, $lastUserId + self::USERS_RANGE);
+        $start = microtime(1);
 
         $userProfiles = $this->multiget( $usersIds );
+        echo round(microtime(1) - $start , 2) . '<br>';
+
         foreach( $userProfiles as $id => $profilePage ) {
-            if ( !strpos( $profilePage, 'class="crt m_meet"')) {
-                //todo сделать обработку имен, ошибок
+            if ( !strpos( $profilePage, 'class="page_profile"')) {
+                //todo сделать обработку имен, ошибок document moved
+                echo 'page_profile';
+                if( strpos($profilePage, 'document moved')) {
+                    file_put_contents('c:/wrk/3.txt', $profilePage);
+                    continue;
+                }
+                print_r($profilePage);
+                die();
                 continue;
             }
 
@@ -27,6 +38,8 @@ class GetNewBadooUsers extends BadooParser
                 continue;
             }
             BadooUserFactory::Add($BadooUser);
+            print_r( $BadooUser );
+            die();
         }
     }
 
@@ -43,7 +56,7 @@ class GetNewBadooUsers extends BadooParser
         $BadooUser = new BadooUser();
 
         if( !preg_match('/pf_hd_h\".id=\"uid(\d+?)\">(.+)</', $page, $matches) || count($matches) != 3 ) {
-            throw new Exception( ' Can\'t read usert \\ pa');
+            throw new Exception( ' Can\'t read user page');
         }
         $externalId = $matches[1];
         list($name, $age)  = explode(',', $matches[2]);
