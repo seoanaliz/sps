@@ -155,11 +155,10 @@ var DROPDOWN =
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
     '<div class="item show-input">Создать список</div>' +
-    '<div class="item hide-public">Скрыть паблик</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
+'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
 
 var CONTACT_DROPDOWN =
 '<div class="contact-dropdown">' +
@@ -185,7 +184,7 @@ var FILTER_LIST =
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" data-id="<?=itemId?>">' +
+'<div class="item" title="<?=itemTitle?>" data-id="<?=itemId?>">' +
     '<span class="text"><?=itemTitle?></span>' +
     '<?if( cur.dataUser.isEditor ) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
