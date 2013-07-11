@@ -420,10 +420,6 @@ var LeftPanelWidget = Event.extend({
     loadArticles: function(clean) {
         var t = this;
 
-        if ($('.user-groups-tabs .selected').hasClass('.proposed')) {
-            return t.showMoreProposed();
-        }
-        
         if (articlesLoading) {
             return;
         }
@@ -434,17 +430,24 @@ var LeftPanelWidget = Event.extend({
             $(window).data('disable-load-more', false);
         }
 
-        var targetFeedId = Elements.rightdd();
-        var switcherType = Elements.getSwitcherType();
         var $newPost = $('.newpost');
-        var $wallLoader = Elements.getWallLoader();
-        t.wallPage++;
-        articlesLoading = true;
-
-        $wallLoader.show();
         $newPost.hide();
+        t.wallPage++;
 
         var sourceType = Elements.leftType();
+
+        // костыль
+        if ((sourceType === App.FEED_TYPE_AUTHORS) && $('.user-groups-tabs .selected').hasClass('proposed')) {
+            return t.showMoreProposed();
+        }
+
+        var $wallLoader = Elements.getWallLoader();
+        $wallLoader.show();
+        var targetFeedId = Elements.rightdd();
+        var switcherType = Elements.getSwitcherType();
+
+        articlesLoading = true;
+
         var requestData = {
             sortType: Elements.getSortType(),
             page: t.wallPage,
@@ -516,7 +519,7 @@ var LeftPanelWidget = Event.extend({
         }).success(function(html) {
             if (!html) {
                 $(window).data('disable-load-more', true);
-                $('.wall-title span.count').text('нет записей');
+                $('.wall-title .count').text('нет записей');
             } else {
                 t.appendWallContent(html);
             }
@@ -1091,7 +1094,7 @@ var LeftPanelWidget = Event.extend({
                 if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
                     t.loadArticles(false);
                 }
-            }, 200);
+            }, 50);
         });
     },
 
@@ -1196,37 +1199,41 @@ var LeftPanelWidget = Event.extend({
             $tab.addClass('selected');
 
             if ($tab.hasClass('proposed')) {
-                $('#wall').html('');
-                t.showMoreProposed();
+                t.initProposed();
+                $('#wall-switcher').hide();
+                t.$wall.empty();
             } else {
+                $('#wall-switcher').show();
                 if (articlesLoading) {
-                    return;
+                    return; // ------------------ RETURN
                 }
-
-                t.loadArticles(true);
             }
+
+            t.loadArticles(true);
         });
     },
 
-    cachedProposed: [],
-    itemsPerShow: 20,
-    hasMoreProposed: true,
-    loadingMore: null,
-
+    initProposed: function () {
+        var t = this;
+        t.cachedProposed = [];
+        t.itemsPerShow = 20;
+        t.hasMoreRemote = true;
+        t.loadingMore = null;
+        t.currentPageOffset = 0;
+        t.queuedProposedIds = null;
+        t.cachedAuthorsInfo = {};
+        t.itemsPerRequest = 80; 
+    },
+   
     showMoreProposed: function () {
         var t = this;
         if (t.cachedProposed.length) {
             t.renderProposed();
-
-            // если после рендера в кеше осталось на одну порцию или меньше
-            if ((t.cachedProposed.length <= t.itemsPerShow) && t.hasMoreProposed) {
+            if ((t.cachedProposed.length <= (t.itemsPerShow + 10)) && !t.loadingMore) {
                 t.loadingMore = t.loadProposed();
             }
-        } else if (t.hasMoreProposed) {
-            (t.loadingMore ? t.loadingMore : t.loadProposed()).success(function (proposed, hasMore) {
-                t.loadingMore = null;
-                t.hasMoreProposed = hasMore;
-                t.cachedProposed.push.apply(t.cachedProposed, proposed);
+        } else {
+            (t.loadingMore ? t.loadingMore : t.loadProposed()).success(function () {
                 t.showMoreProposed();
             });
         }
@@ -1272,25 +1279,28 @@ var LeftPanelWidget = Event.extend({
         })
 
         t.appendWallContent(html);
-        if (t.cachedProposed.length || t.hasMoreProposed) {
-            t.initWallAutoload();
+        if (t.cachedProposed.length || t.hasMoreRemote) {
+            // ничего не делаем, можно подгружать дальше
         } else {
-            $(window).data('disable-load-more', true);
+            $(window).data('disable-load-more', false);
         }
     },
-
-    currentPageOffset: 0,
-    queuedProposedIds: null,
-    cachedAuthorsInfo: {},
 
     loadProposed: function () {
         var t = this;
 
         var Def = new Deferred();
+
+        if (!t.hasMoreRemote) {
+            return Def; // --------------- RETURN
+        }
+
         var ExternalSuggests = t.requestProposed(t.currentPageOffset); // запускаем асинхронное действие!
         t.currentPageOffset++;
 
         var externalItemsChecker = function (externalData) {
+            t.hasMoreRemote = externalData.hasMore;
+
             var fromIdsUsers = [];
             var fromIdsPublics = [];
 
@@ -1337,11 +1347,15 @@ var LeftPanelWidget = Event.extend({
                             };
                         });
 
-                        Def.fireSuccess(nonhiddenPortion, externalData.hasMore);
+                        t.cachedProposed.push.apply(t.cachedProposed, nonhiddenPortion);
+                        t.loadingMore = null;
+                        Def.fireSuccess();
                     }
                 });
             } else {
-                Def.fireSuccess(nonhiddenPortion, externalData.hasMore);
+                t.cachedProposed.push.apply(t.cachedProposed, nonhiddenPortion);
+                t.loadingMore = null;
+                Def.fireSuccess();
             }
         };
 
@@ -1370,8 +1384,6 @@ var LeftPanelWidget = Event.extend({
         return Def;
     },
 
-    itemsPerRequest: 50,
-
     /**
      * @param {Int} pageOffset Номер страницы, начиная с нуля 
      */
@@ -1383,14 +1395,17 @@ var LeftPanelWidget = Event.extend({
         VK && VK.Api.call('wall.get', {
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
-            offset: itemsOffset,
-            filter: 'suggests'
+            offset: itemsOffset
+            //filter: 'suggests'
         }, function (resp) {
             if (resp && !resp.error) {
                 var result = resp.response;
                 if (result) {
                     var totalCount = result.shift();
-                    var data = {hasMore: false,
+                    $('.wall-title .count').text(totalCount + ' ' + Lang.declOfNum(totalCount, ['запись', 'записи', 'записей']));
+
+                    var data = {
+                        hasMore: false,
                         result: result // shifted
                     };
 
