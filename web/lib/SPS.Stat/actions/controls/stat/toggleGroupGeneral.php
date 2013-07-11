@@ -21,7 +21,7 @@
                 die( ObjectHelper::ToJSON(array( 'response' => false )));
             }
 
-            if( StatAccessUtility::CanEditGlobalGroups( $user_id, Group::STAT_GROUP)) {
+            if( StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP)) {
                 $group = GroupFactory::GetById($group_id);
                 if( !empty( $group )) {
                     if( $group->type == GroupsUtility::Group_Global) {

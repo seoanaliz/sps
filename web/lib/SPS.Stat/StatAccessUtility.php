@@ -72,6 +72,20 @@ class StatAccessUtility
                 array(
                     StatAuthority::STAT_ROLE_ADMIN,
                     StatAuthority::STAT_ROLE_EDITOR
+
+                )
+            );
+        }
+        return $res;
+    }
+
+    public static function  CanManageGlobalGroups($vk_id, $source) {
+        $acessUtility = self::GetInstance($vk_id);
+        $res = false;
+        if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
+            $res = in_array($acessUtility->rules_array[ $source ],
+                array(
+                    StatAuthority::STAT_ROLE_ADMIN
                 )
             );
         }

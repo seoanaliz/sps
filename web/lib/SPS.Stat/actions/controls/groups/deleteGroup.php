@@ -56,18 +56,23 @@
                 }
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             } elseif ( $type == 'Stat' ) {
+                $res = false;
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if ( $group && $group->type != GroupsUtility::Group_Global  ) {
-                    if( $group->created_by == $user_id ) {
-                        $group->status = 2;
-                        $res = GroupFactory::Update($group);
-                    } else {
-                        $statUser = StatUserFactory::GetOne( array( 'user_id' => $user_id ));
-                        $k = array_search($group->group_id, $statUser->groups_ids);
-                        unset( $statUser->groups_ids[$k]);
-                        $res = StatUserFactory::Update($statUser);
-                    }
+                if( empty( $group)) {
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
                 }
+
+                $is_global_can_delete = $group->type == GroupsUtility::Group_Global &&
+                    StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP );
+
+                $is_private_can_delete = $group->type == GroupsUtility::Group_Private &&
+                    StatAccessUtility::HasAccessToPrivateGroups( $user_id, Group::STAT_GROUP );
+
+                if ( $is_global_can_delete || $is_private_can_delete ) {
+                    $group->status = 2;
+                    $res = GroupFactory::Update( $group );
+                }
+
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
