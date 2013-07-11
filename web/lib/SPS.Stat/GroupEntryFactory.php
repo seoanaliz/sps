@@ -19,7 +19,7 @@
 
         /** GroupEntry instance mapping  */
         public static $mapping = array (
-            'class'       => 'GroupEntry'
+              'class'     => 'GroupEntry'
             , 'table'     => 'group_entry'
             , 'view'      => 'getGroup_entry'
             , 'flags'     => array(  )
@@ -35,6 +35,10 @@
                 )
                 ,'sourceType' => array(
                     'name'          => 'sourceType'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'addedBy' => array(
+                    'name'          => 'addedBy'
                     , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
