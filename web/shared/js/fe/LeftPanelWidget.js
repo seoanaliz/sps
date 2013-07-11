@@ -1188,7 +1188,7 @@ var LeftPanelWidget = Event.extend({
 
             if ($tab.hasClass('proposed')) {
                 $('#wall').html('');
-                t.loadProposed();
+                t.showMoreProposed();
             } else {
                 if (articlesLoading) {
                     return;
@@ -1199,48 +1199,156 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
-    // показывает "Предложенные"
+    cachedProposed: [],
+    itemsPerShow: 20,
+    hasMoreProposed: true,
+    loadingMore: null,
+
+    showMoreProposed: function () {
+        var t = this;
+        if (t.cachedProposed.length) {
+            t.renderProposed();
+
+            // если после рендера в кеше осталось на одну порцию или меньше
+            if ((t.cachedProposed.length <= t.itemsPerShow) && t.hasMoreProposed) {
+                t.loadingMore = t.loadProposed();
+            }
+        } else if (t.hasMoreProposed) {
+            (t.loadingMore ? t.loadingMore : t.loadProposed()).success(function (proposed, hasMore) {
+                t.loadingMore = null;
+                t.hasMoreProposed = hasMore;
+                t.cachedProposed.push.apply(t.cachedProposed, proposed);
+                t.showMoreProposed();
+            });
+        }
+    },
+
+    renderProposed: function() {
+        var t = this;
+        var portion = t.cachedProposed.splice(0, t.itemsPerShow);
+
+        //render portion
+
+        //can_edit: 1
+        //comments: Object
+        //date: 1373011597
+        //from_id: -27421965
+        //id: 3246
+        //likes: Object
+        //post_type: "post"
+        //reposts: Object
+        //text: "gvgjj"
+        //to_id: -27421965
+        //attachment: Object
+        //attachments: Array[1]
+
+        if (t.cachedProposed.length || t.hasMoreProposed) {
+            //навесить эвент
+        }
+    },
+
+    currentPageOffset: 0,
+    queuedProposedIds: null,
+    cachedAuthorsInfo: {},
+
     loadProposed: function () {
         var t = this;
 
-        var Def = Control.fire('get-queued-suggests', {
-            targetFeedId: Elements.rightdd()
-        });
-        t.getSuggests(0).success(function (suggests) {
-            //can_edit: 1
-            //comments: Object
-            //date: 1373011597
-            //from_id: -27421965
-            //id: 3246
-            //likes: Object
-            //post_type: "post"
-            //reposts: Object
-            //text: "gvgjj"
-            //to_id: -27421965
-            //attachment: Object
-            //attachments: Array[1]
+        var Def = new Deferred();
+        var ExternalSuggests = t.requestProposed(t.currentPageOffset); // запускаем асинхронное действие!
+        t.currentPageOffset++;
 
-//            Def.success(function (data) {
-//                log('lo-lo-lo', data);
-//            });
+        var externalItemsChecker = function (externalData) {
+            var fromIdsUsers = [];
+            var fromIdsPublics = [];
 
-            log('o-lo-lo', suggests);
-        });
+            // фильтруем скрытые элементы, собираем id авторов нескрытых
+            var nonhiddenPortion = jQuery.map(externalData.result, function (elem) {
+                if (-1 === jQuery.inArray(elem.id, t.queuedProposedIds)) {
+                    if (!(elem.from_id in t.cachedAuthorsInfo)) {
+                        if (elem.from_id < 0) {
+                            fromIdsPublics.push(-elem.from_id);
+                        } else {
+                            fromIdsUsers.push(elem.from_id);
+                        }
+                    }
+
+                    return elem;
+                }
+            });
+
+            // получаем данные авторов
+            if (fromIdsUsers.length || fromIdsPublics.length) {
+                var codeParts = [];
+                if (fromIdsUsers.length) {
+                    codeParts.push('users: API.users.get({uids:['+ fromIdsUsers.join(',') +'], fields:"photo_50"})');
+                }
+                if (fromIdsPublics.length) {
+                    codeParts.push('groups: API.groups.getById({gids:['+ fromIdsPublics.join(',') +']})');
+                }
+                var code = 'return {'+ codeParts.join(',') +'};';
+                VK.Api.call('execute', {code: code}, function (resp) {
+                    if (!resp.execute_errors && resp.response) {
+                        jQuery.map(resp.response.users || [], function (elem) {
+                            t.cachedAuthorsInfo[elem.uid] = {
+                                name: elem.first_name + ' ' + elem.last_name,
+                                photo: elem.photo_50
+                            };
+                        });
+ 
+                        jQuery.map(resp.response.groups || [], function (elem) {
+                            t.cachedAuthorsInfo[-elem.gid] = {
+                                name: elem.name,
+                                photo: elem.photo
+                            };
+                        });
+
+                        Def.fireSuccess(nonhiddenPortion, externalData.hasMore);
+                    }
+                });
+            } else {
+                Def.fireSuccess(nonhiddenPortion, externalData.hasMore);
+            }
+        };
+
+        if (t.queuedProposedIds === null) {
+            t.getQueuedProposedIds().success(function (results) {
+                t.queuedProposedIds = results;
+                ExternalSuggests.success(externalItemsChecker);
+            });
+        } else {
+            ExternalSuggests.success(externalItemsChecker);
+        }
+
+        return Def;
     },
 
-    itemsPerPage: 100,
+    getQueuedProposedIds: function () {
+        var Def = new Deferred();
+        Control.fire('get-queued-suggests', {
+            targetFeedId: Elements.rightdd()
+        }).success(function (serviceResp) {
+            if (serviceResp.success) {
+                Def.fireSuccess(serviceResp.result);
+            }
+        });
+
+        return Def;
+    },
+
+    itemsPerRequest: 50,
 
     /**
      * @param {Int} pageOffset Номер страницы, начиная с нуля 
      */
-    getSuggests: function (pageOffset) {
+    requestProposed: function (pageOffset) {
         var t = this;
 
         var Def = new Deferred();
-        var itemsOffset = t.itemsPerPage * pageOffset;
+        var itemsOffset = t.itemsPerRequest * pageOffset;
         VK && VK.Api.call('wall.get', {
             owner_id: -Elements.currentExternalId(),
-            count: t.itemsPerPage,
+            count: t.itemsPerRequest,
             offset: itemsOffset
            // filter: 'suggests'
         }, function (resp) {
