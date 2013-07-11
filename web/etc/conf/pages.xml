@@ -167,9 +167,6 @@
                 <page uri="controls://exPublic/">
                     <actions>SPS.Stat.exEntryFromGroup</actions>
                 </page>
-                <page uri="controls://togglePublVisibil/">
-                    <actions>SPS.Stat.togglePublVisibil</actions>
-                </page>
                 <page uri="controls://toggleGroupGeneral/">
                     <actions>SPS.Stat.toggleGroupGeneral</actions>
                 </page>

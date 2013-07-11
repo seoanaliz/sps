@@ -166,12 +166,6 @@ td {
 #main .right-column > div>.interval-wrapper {
   display: none;
 }
-#main .right-column > div>div > .title,
-#main .right-column > div>.title {
-  color: #555;
-  font-weight: bold;
-  padding: 10px 10px 0;
-}
 #main .right-column > div>div > .interval,
 #main .right-column > div>.interval {
   padding: 10px 10px 0;
@@ -224,61 +218,6 @@ td {
 #main .right-column > div>div > .audience .slider-range>.value-max,
 #main .right-column > div>.audience .slider-range>.value-max {
   float: right;
-}
-#main .right-column > div>div > .period,
-#main .right-column > div>.period {
-  padding: 7px 7px 0;
-}
-#main .right-column > div>div > .period label,
-#main .right-column > div>.period label {
-  padding: 3px;
-}
-#main .right-column > div>div > .period input,
-#main .right-column > div>.period input {
-  margin-right: 5px;
-}
-/*#main .right-column > div>.list {*/
-  /*margin: 10px 10px 0;*/
-  /*padding-top: 7px;*/
-  /*border-top: 1px solid #D8DFEA;*/
-/*}*/
-
-#main .right-column > div>.list>.item {
-  padding: 4px 1.5em 4px 9px;
-  cursor: pointer;
-  color: #2B587A;
-  overflow: hidden;
-  position: relative;
-  text-overflow: ellipsis;
-}
-#main .right-column > div>.list>.item:hover {
-  background-color: #E1E7ED;
-}
-#main .right-column > div>.list>.item:hover .icon {
-  display: block;
-  opacity: 0.5;
-}
-#main .right-column > div>.list>.item .icon {
-  position: absolute;
-  margin-top: -0.66em;
-  top: 50%;
-  right: 4px;
-  display: none;
-  padding: 1px;
-  background-image: url('../../images/st/star.png');
-}
-#main .right-column > div>.list>.item .icon:hover,
-#main .right-column > div>.list>.item .icon.selected {
-  display: block;
-  opacity: 1;
-}
-#main .right-column > div>.list>.item.selected {
-  background-color: #5E82A8;
-  color: #fff;
-  box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
-}
-#main .right-column > div>.list>.item.selected .icon {
-  background-image: url('../../images/st/star-white.png');
 }
 #main .left-column > .content {
   width: 900px;
@@ -472,6 +411,67 @@ td {
 #main .left-column > .content .table.no-list-id .public-actions .action.selected .icon {
   opacity: 1;
 }
+.right-column .item {
+  padding: 4px 1.5em 4px 18px;
+  cursor: pointer;
+  color: #2B587A;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+}
+.right-column .item:hover {
+  background-color: #E1E7ED;
+}
+.right-column .item:hover .icon {
+  display: block;
+  opacity: 0.5;
+}
+.right-column .item .icon {
+  position: absolute;
+  margin-top: -0.66em;
+  top: 50%;
+  right: 4px;
+  display: none;
+  padding: 1px;
+  background-image: url('../../images/st/star.png');
+}
+.right-column .item .icon:hover,
+.right-column .item .icon.selected {
+  display: block;
+  opacity: 1;
+}
+.right-column .item.selected {
+  background-color: #5E82A8;
+  color: #fff;
+  box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
+}
+.right-column .item.selected .icon {
+  background-image: url('../../images/st/star-white.png');
+}
+.right-column .title {
+  color: #555;
+  font-weight: bold;
+  padding: 12px 10px 0;
+}
+.right-column .period {
+  padding: 7px 7px 0;
+}
+.right-column .period label {
+  padding: 3px;
+}
+.right-column .period input {
+  margin-right: 5px;
+}
+.right-column .buttons {
+  margin-top: 15px;
+}
+.right-column .buttons:before {
+  content: '';
+  height: 0;
+  display: block;
+  border-top: 1px solid #D8DFEA;
+  margin: 0 8px 12px;
+}
 #global-loader {
   position: fixed;
   top: 0;
@@ -662,7 +662,7 @@ td {
   position: relative;
   cursor: pointer;
   -webkit-transition: all .2s;
-  hidden: true;
+  overflow: hidden;
 }
 .contact-dropdown>.item>.content > .description {
   color: #808080;

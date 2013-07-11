@@ -54,7 +54,6 @@ var Eventlist = {
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
             var clearData = [];
-            console.log(dirtyData);
             if ($.isArray(dirtyData.lists))
                 dirtyData.length;
                 $.each(dirtyData.lists, function(list, list_data) {
@@ -275,13 +274,6 @@ var Eventlist = {
         simpleAjax('selectGroupAdmin', {
             adminId: user_id,
             groupId: list_id,
-            publId: public_id
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    hide_public: function(public_id, callback) {
-        simpleAjax('togglePublVisibil', {
             publId: public_id
         }, function(dirtyData) {
             callback(true);
