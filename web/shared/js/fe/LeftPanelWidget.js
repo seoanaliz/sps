@@ -419,8 +419,11 @@ var LeftPanelWidget = Event.extend({
 
     loadArticles: function(clean) {
         var t = this;
-        var filterAuthorId = t.filterAuthorId;
 
+        if ($('.user-groups-tabs .selected').hasClass('.proposed')) {
+            return t.showMoreProposed();
+        }
+        
         if (articlesLoading) {
             return;
         }
@@ -431,7 +434,6 @@ var LeftPanelWidget = Event.extend({
             $(window).data('disable-load-more', false);
         }
 
-        var sourceType = Elements.leftType();
         var targetFeedId = Elements.rightdd();
         var switcherType = Elements.getSwitcherType();
         var $newPost = $('.newpost');
@@ -442,6 +444,7 @@ var LeftPanelWidget = Event.extend({
         $wallLoader.show();
         $newPost.hide();
 
+        var sourceType = Elements.leftType();
         var requestData = {
             sortType: Elements.getSortType(),
             page: t.wallPage,
@@ -495,9 +498,9 @@ var LeftPanelWidget = Event.extend({
                 break;
         }
 
-        if (filterAuthorId) {
+        if (t.filterAuthorId) {
             requestData.mode = 'posted';
-            requestData.authorId = filterAuthorId;
+            requestData.authorId = t.filterAuthorId;
         }
 
         if (!clean) {
@@ -515,21 +518,27 @@ var LeftPanelWidget = Event.extend({
                 $(window).data('disable-load-more', true);
                 $('.wall-title span.count').text('нет записей');
             } else {
-                var tmpEl = document.createElement('div');
-                var $block = $(tmpEl).html(html);
-                t.$wall.append($block);
-                Elements.initDraggable($block);
-                Elements.initDroppable();
-                Elements.initImages($block);
-                Elements.initLinks($block);
-                if (!$block.find('.post').length) {
-                    $(window).data('disable-load-more', true);
-                }
+                t.appendWallContent(html);
             }
             t.trigger('loadArticles', html);
         }).error(function() {
             t.trigger('loadArticles', false);
         });
+    },
+
+    appendWallContent: function(html) {
+        var t = this;
+
+        var tmpEl = document.createElement('div');
+        var $block = $(tmpEl).html(html);
+        t.$wall.append($block);
+        Elements.initDraggable($block);
+        Elements.initDroppable();
+        Elements.initImages($block);
+        Elements.initLinks($block);
+        if (!$block.find('.post').length) {
+            $(window).data('disable-load-more', true);
+        }
     },
 
     initAddPost: function() {
@@ -1227,23 +1236,46 @@ var LeftPanelWidget = Event.extend({
         var t = this;
         var portion = t.cachedProposed.splice(0, t.itemsPerShow);
 
-        //render portion
+        var html = '';
+        jQuery.map(portion, function (elem) {
+            var data = {
+                id: elem.id
+            };
 
-        //can_edit: 1
-        //comments: Object
-        //date: 1373011597
-        //from_id: -27421965
-        //id: 3246
-        //likes: Object
-        //post_type: "post"
-        //reposts: Object
-        //text: "gvgjj"
-        //to_id: -27421965
-        //attachment: Object
-        //attachments: Array[1]
+            var authorInfo = t.cachedAuthorsInfo[elem.from_id];
+            if (authorInfo) {
+                data['name'] = authorInfo.name;
+                data['photo'] = authorInfo.photo;
+                data['href'] = authorInfo.href;
+            }
 
+            var text = elem.text || '';
+            data['content1'] = text.substring(0, 300);
+            data['content2'] = text.substring(300);
+
+            var photos = [];
+            for (var i in (elem.attachments || [])) {
+                var att = elem.attachments[i];
+                if (att.type === 'photo') {
+                    photos.push({
+                        parentId: elem.id,
+                        url: att.photo.src_big,
+                        title: att.photo.text
+                    });
+                } else if ((att.type === 'link') && !data.link) { // сохраняем первую найденную ссылку
+                    data['link'] = att.link.url;
+                }
+            }
+            data['photos'] = photos;
+
+            html += tmpl(ARTICLE_ITEM, data);
+        })
+
+        t.appendWallContent(html);
         if (t.cachedProposed.length || t.hasMoreProposed) {
-            //навесить эвент
+            t.initWallAutoload();
+        } else {
+            $(window).data('disable-load-more', true);
         }
     },
 
@@ -1292,14 +1324,16 @@ var LeftPanelWidget = Event.extend({
                         jQuery.map(resp.response.users || [], function (elem) {
                             t.cachedAuthorsInfo[elem.uid] = {
                                 name: elem.first_name + ' ' + elem.last_name,
-                                photo: elem.photo_50
+                                photo: elem.photo_50,
+                                href: 'http://vk.com/id' + elem.uid
                             };
                         });
  
                         jQuery.map(resp.response.groups || [], function (elem) {
                             t.cachedAuthorsInfo[-elem.gid] = {
                                 name: elem.name,
-                                photo: elem.photo
+                                photo: elem.photo,
+                                href: 'http://vk.com/public' + elem.gid
                             };
                         });
 
@@ -1349,8 +1383,8 @@ var LeftPanelWidget = Event.extend({
         VK && VK.Api.call('wall.get', {
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
-            offset: itemsOffset
-           // filter: 'suggests'
+            offset: itemsOffset,
+            filter: 'suggests'
         }, function (resp) {
             if (resp && !resp.error) {
                 var result = resp.response;
