@@ -1373,9 +1373,14 @@ var LeftPanelWidget = Event.extend({
         };
 
         if (t.queuedProposedIds === null) {
-            t.getQueuedProposedIds().success(function (results) {
-                t.queuedProposedIds = results;
-                ExternalSuggests.success(externalItemsChecker);
+            t.getQueuedProposedIds().success(function () {
+                ExternalSuggests.success(function (result) {
+                    externalItemsChecker(result);
+
+                    // обновим счётчик сверху
+                    var count = t.totalCount - t.queuedProposedIds.length;
+                    $('.wall-title .count').text((count || 'нет') + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей']));
+                });
             });
         } else {
             ExternalSuggests.success(externalItemsChecker);
@@ -1386,16 +1391,14 @@ var LeftPanelWidget = Event.extend({
 
     getQueuedProposedIds: function () {
         var t = this;
+
         var Def = new Deferred();
         Control.fire('get-queued-suggests', {
             targetFeedId: Elements.rightdd()
         }).success(function (serviceResp) {
             if (serviceResp.success) {
-                Def.fireSuccess(serviceResp.result);
-
-                // обновим счётчик сверху
-                var count = t.totalCount - serviceResp.result.length;
-                $('.wall-title .count').text(count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей']));
+                t.queuedProposedIds = serviceResp.result;
+                Def.fireSuccess();
             }
         });
 
