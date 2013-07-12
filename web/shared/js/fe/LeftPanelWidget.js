@@ -1239,6 +1239,15 @@ var LeftPanelWidget = Event.extend({
         }
     },
 
+    timestampToHumanReadable: function(timestamp) {
+        var date = new Date(timestamp*1000);
+        var months = ['Янв','Фев','Мар','Апр','Мая','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+        var month = months[date.getMonth()];
+        var hour = ('0' + date.getHours()).slice(-2);
+        var min = ('0' + date.getMinutes()).slice(-2);
+        return date.getDate() +' '+ month +' '+ date.getFullYear() +'&nbsp; '+ hour +':'+ min;
+    },
+
     renderProposed: function() {
         var t = this;
         var portion = t.cachedProposed.splice(0, t.itemsPerShow);
@@ -1274,6 +1283,10 @@ var LeftPanelWidget = Event.extend({
                 }
             }
             data['photos'] = photos;
+
+            if (elem.date) {
+                data['date'] = t.timestampToHumanReadable(elem.date);
+            }
 
             html += tmpl(ARTICLE_ITEM, data);
         })

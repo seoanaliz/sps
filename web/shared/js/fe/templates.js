@@ -138,6 +138,13 @@ var ARTICLE_ITEM =
             '</div>' +
         '<? } ?>' +
     '</div>' +
+
+    '<div class="bottom d-hide">' +
+        '<div class="l">' +
+            '<span class="timestamp"><?=date?></span>' +
+        '</div>' +
+    '</div>' +
+
     '<div class="clear"></div>' +
 '</div>';
 
