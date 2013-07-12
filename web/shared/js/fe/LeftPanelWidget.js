@@ -1406,10 +1406,10 @@ var LeftPanelWidget = Event.extend({
         var Def = new Deferred();
         var itemsOffset = t.itemsPerRequest * pageOffset;
         VK && VK.Api.call('wall.get', {
+            filter: 'suggests',
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
             offset: itemsOffset
-            //filter: 'suggests'
         }, function (resp) {
             if (resp && !resp.error) {
                 var result = resp.response;
@@ -1419,7 +1419,7 @@ var LeftPanelWidget = Event.extend({
 
                     var data = {
                         hasMore: false,
-                        result: result // shifted
+                        result: result //shifted
                     };
 
                     if (totalCount > itemsOffset + result.length) {

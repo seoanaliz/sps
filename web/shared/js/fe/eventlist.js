@@ -246,7 +246,7 @@ var Eventlist = {
         });
     },
 
-    post_moved: function(article_id, slot_id, queueId, callback){
+    post_moved: function(article_id, slot_id, queueId, externalId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
@@ -255,7 +255,8 @@ var Eventlist = {
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
-                type: Elements.rightType()
+                type: Elements.rightType(),
+                vkPostId: externalId
             },
             success: function (data) {
                 if(data.success) {

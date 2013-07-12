@@ -80,7 +80,11 @@ var Elements = {
                 }
 
                 var $post = $(ui.draggable).closest('.post');
-                Events.fire('post_moved', $post.data('id'), $slot.data('id'), $post.data('queue-id'), function(isSuccess, data) {
+                var postId = $post.data('id');
+                if ($post.hasClass("external")) {
+                    var externalId = postId;
+                }
+                Events.fire('post_moved', postId, $slot.data('id'), $post.data('queue-id'), externalId, function(isSuccess, data) {
                     if (isSuccess && data.success && data.html) {
                         var maybeSlot = ui.draggable.closest('.slot'); // кодга перетаскиваем из одной ячейки в другую, очистим ячейку-источник
                         if (maybeSlot.length) {

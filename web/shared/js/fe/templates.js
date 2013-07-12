@@ -105,7 +105,7 @@ var ATTACHMENT_PREVIEW_LINK =
 '</div>';
 
 var ARTICLE_ITEM =
-'<div class="post bb movable relocatable"' +
+'<div class="post bb movable relocatable external"' +
     'data-id="<?=id?>">' +
 
     '<div class="l d-hide">' +
@@ -142,6 +142,12 @@ var ARTICLE_ITEM =
     '<div class="bottom d-hide">' +
         '<div class="l">' +
             '<span class="timestamp"><?=date?></span>' +
+        '</div>' +
+
+        '<div class="r">' +
+            '<? if (isset("link")) { ?>' +
+                '<span class="attach-icon attach-icon-link-red" title="Пост со ссылкой"><!-- --></span>' +
+            '<? } ?>' +
         '</div>' +
     '</div>' +
 
