@@ -1215,16 +1215,17 @@ var LeftPanelWidget = Event.extend({
 
     initProposed: function () {
         var t = this;
-        t.cachedProposed = [];
-        t.itemsPerShow = 20;
-        t.hasMoreRemote = true;
-        t.loadingMore = null;
-        t.currentPageOffset = 0;
-        t.queuedProposedIds = null;
-        t.cachedAuthorsInfo = {};
-        t.itemsPerRequest = 80; 
+        t.itemsPerRequest = 80; // сколько брать с удалённого сервера (VK) за раз
+        t.cachedProposed = []; // взятые с удалённого сервера, но пока не отрисованные предложенные
+        t.itemsPerShow = 20; // сколько отрисовывать за раз
+        t.hasMoreRemote = true; // остались ли ещё на удалённом сервере предложенные
+        t.loadingMore = null; // хранит Deferred уже запущенного запроса на удалённый сервер, используется в префетчинге
+        t.currentPageOffset = 0; // какую по счёту порцию взять с удалённого сервера, начиная с 0
+        t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении с удалённого сервера
+        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообщества) и т.п.)
+        t.totalCount = 0; // число предложенных (на удалённом сервере)
     },
-   
+
     showMoreProposed: function () {
         var t = this;
         if (t.cachedProposed.length) {
@@ -1305,7 +1306,7 @@ var LeftPanelWidget = Event.extend({
         var Def = new Deferred();
 
         if (!t.hasMoreRemote) {
-            return Def; // --------------- RETURN
+            return Def; // RETURN
         }
 
         var ExternalSuggests = t.requestProposed(t.currentPageOffset); // запускаем асинхронное действие!
