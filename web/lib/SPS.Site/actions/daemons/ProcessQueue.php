@@ -77,39 +77,16 @@ sql;
                 $this->sendPostToFb($targetFeed, $articleQueue, $articleRecord);
             }
 
-            if ($targetFeed->type == TargetFeedUtility::VK || $targetFeed->type == TargetFeedUtility::VK_ALBUM) {
+            if ($targetFeed->type == TargetFeedUtility::VK ) {
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleRecord)) {
                     return false;
                 }
 
-                //в очереди паблишеров первыми делаем живых людей(приоритет у запланировавшего пост)
-                //todo убрать дубль sender'а
                 $publishers = array();
-                $sender = false;
 
-                // если пост от этих издателей - он отправляется от ботов
-                $send_from_bot = in_array( $article->editor, StatUsers::$editors_black_list );
-
-                //сортируем издателей: создавший пост-> люди -> боты
                 foreach( $targetFeed->publishers as $ptf ) {
-//                    if( !$send_from_bot && $ptf->publisher->vk_id == $article->editor ) {
-//                        $sender = clone $ptf;
-//                    }
-
-                    if( $ptf->publisher->vk_seckey == 2 ) {
-                        if( !$send_from_bot ) {
-//                            array_unshift( $publishers, $ptf );
-                            continue;
-
-                        }
-                    } else {
-                        $publishers[] = $ptf;
-                    }
+                    $publishers[] = $ptf;
                 }
-
-//                if( $sender ) {
-//                    array_unshift( $publishers, $sender );
-//                }
 
                 $targetFeed->publishers = $publishers;
                 foreach ($targetFeed->publishers as $publisher) {
@@ -176,9 +153,7 @@ sql;
             $sender = new SenderVkontakte($post_data);
 
             try {
-                if($targetFeed->type == TargetFeedUtility::VK_ALBUM ) {
-                    $articleQueue->externalId = $sender->send_photo_in_album( $targetFeed->title );
-                } elseif ( !$post_data['repost_post'] ) {
+                if ( !$post_data['repost_post'] ) {
                     $articleQueue->externalId = $sender->send_post();
                 } else {
                     $articleQueue->externalId = $sender->repost();
