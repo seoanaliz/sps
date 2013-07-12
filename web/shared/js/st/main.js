@@ -12,7 +12,9 @@ var Configs = {
 };
 
 var cur = {
-    dataUser: {}
+    dataUser: {
+        isEditor: (window.rank > 2),
+    }
 };
 
 $(document).ready(function() {
@@ -61,8 +63,7 @@ function authInfo(response) {
         '};';
         VK.Api.call('execute', {code: code}, function (answer) {
             if (answer && answer.response) {
-                cur.dataUser = answer.response.user;
-                cur.dataUser.isEditor = (window.rank > 2);
+                jQuery.extend(cur.dataUser, answer.response.user);
                 handleUserLoggedIn(answer.response.user);
             };
         });
@@ -1059,7 +1060,6 @@ var Table = (function() {
 
 var Counter = (function(){
     var $container;
-    var $editor_lists;
 
     function init( callback ){
         $container = $('#listed-counter');
