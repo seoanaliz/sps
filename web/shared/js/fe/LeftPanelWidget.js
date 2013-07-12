@@ -1213,6 +1213,7 @@ var LeftPanelWidget = Event.extend({
         });
     },
 
+    // всяческие кеши и глобальное состояние для "Предложенных"
     initProposed: function () {
         var t = this;
         t.itemsPerRequest = 80; // сколько брать с удалённого сервера (VK) за раз
@@ -1318,7 +1319,7 @@ var LeftPanelWidget = Event.extend({
 
             // фильтруем скрытые элементы, собираем id авторов нескрытых
             var nonhiddenPortion = jQuery.map(result, function (elem) {
-                if (-1 === jQuery.inArray(elem.id, t.queuedProposedIds)) {
+                if (-1 === jQuery.inArray(String(elem.id), t.queuedProposedIds)) {
                     if (!(elem.from_id in t.cachedAuthorsInfo)) {
                         if (elem.from_id < 0) {
                             fromIdsPublics.push(-elem.from_id);
