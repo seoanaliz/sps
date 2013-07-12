@@ -182,12 +182,12 @@
 
         public function get_suggested_posts($last_post_id, $access_token )
         {
-            sleep(rand( 1,12 ));
+            sleep(rand( 1,5 ));
             $params = array(
                 'access_token'  =>   $access_token,
-                'count'         =>   30,
+                'count'         =>   100,
                 'filter'        =>  'suggests',
-                'owner_id'      =>  '-' . $this->page_id
+                'owner_id'      =>  '-' . $this->page_id,
             );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
             sleep(self::PAUSE);
@@ -207,7 +207,6 @@
         public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
-
             foreach( $posts as $post ) {
 
                 if( $stop_post_id && $post->id <= $stop_post_id){
@@ -295,7 +294,7 @@
             $article->statusId = 3;
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
-            $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
             $article->isSuggested = false;
 
             return $article;
@@ -682,7 +681,6 @@
             $replace_array = array( 'wall', 'post' );
             if( is_array( $ids ))
                 $ids = implode( ',', $ids );
-
             $ids = str_replace( $replace_array, '', $ids );
             $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
             $posts = self::post_conv( $res );
