@@ -674,13 +674,15 @@
             return $res;
         }
 
-        public static function get_posts_by_vk_id( $ids )
+        public static function get_posts_by_vk_id( $ids, $access_token = false )
         {
             $replace_array = array( 'wall', 'post' );
             if( is_array( $ids ))
                 $ids = implode( ',', $ids );
             $ids = str_replace( $replace_array, '', $ids );
-            $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
+            $params['posts'] = $ids;
+            if( $access_token ) $params['access_token'] = $access_token;
+            $res = VkHelper::api_request( 'wall.getById', $params);
             $posts = self::post_conv( $res );
             return $posts;
         }

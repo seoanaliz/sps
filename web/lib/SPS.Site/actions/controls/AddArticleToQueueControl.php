@@ -235,12 +235,19 @@ class AddArticleToQueueControl extends BaseControl
         return $html;
     }
 
-    /** вернет массив из Article и ArticleRecord */
+    /** вернет массив из Article и ArticleRecord
+     *@var $targetFeed TargetFeed
+     * */
     protected function createArticle( $postVkId, $targetFeed ) {
         $result = false;
         $fullPostId = '-' . $targetFeed->externalId . '_' . $postVkId;
+        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed);
+        if( !$token) {
+            $token = AccessTokenUtility::getTokenForTargetFeed( $targetFeed );
+        }
+
         try {
-            $posts = ParserVkontakte::get_posts_by_vk_id( array($fullPostId));
+            $posts = ParserVkontakte::get_posts_by_vk_id( array( $fullPostId ), $token);
         } catch ( Exception $e) {
             return $result;
         }
