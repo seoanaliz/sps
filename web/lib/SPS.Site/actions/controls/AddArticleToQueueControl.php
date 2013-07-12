@@ -241,9 +241,9 @@ class AddArticleToQueueControl extends BaseControl
     protected function createArticle( $postVkId, $targetFeed ) {
         $result = false;
         $fullPostId = '-' . $targetFeed->externalId . '_' . $postVkId;
-        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed);
+        $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed->targetFeedId);
         if( !$token) {
-            $token = AccessTokenUtility::getTokenForTargetFeed( $targetFeed );
+            $token = AccessTokenUtility::getTokenForTargetFeed( $targetFeed->targetFeedId );
         }
 
         try {
