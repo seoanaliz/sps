@@ -684,12 +684,13 @@ td {
   float: right;
   margin-top: 7px;
 }
-.header>.actions {
-  float: right;
+.header .actions {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
   padding: 12px 8px 0;
-  color: #999;
 }
-.header>.actions>a {
+.header .actions a {
   margin: 0 0.7em;
 }
 .login-info {
