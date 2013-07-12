@@ -19,10 +19,10 @@
             $user_id    =   AuthVkontakte::IsAuth();
             $type       =   ucfirst( Request::getString( 'type' ));
             $type_array = array( 'Stat', 'Mes', 'Barter' );
-            if ( !$type || !in_array( $type, $type_array ))
+            if ( !$type || !in_array( $type, $type_array )) {
                 $type    = 'Stat';
-
-            if( $type = 'Stat') {
+            }
+            if ( $type == 'Stat') {
                 $global_groups = GroupFactory::Get(array( 'type' => GroupsUtility::Group_Global, 'source'=>Group::STAT_GROUP));
                 $user_groups = array();
                 $shared_groups = array();
@@ -49,7 +49,6 @@
                     'shared_list' => $shared_groups,
                 );
             }
-
 
             if ( $type == 'Barter' ) {
                 $source = 1;

@@ -144,6 +144,7 @@
         public static function form_response(  $groups, $user_id, $group_source )
         {
         //todo place
+            $user_shared_groups = array();
             if( !is_array( $groups ))
                 $groups = array( $groups );
             $res = array();
