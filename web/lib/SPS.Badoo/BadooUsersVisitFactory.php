@@ -1,21 +1,15 @@
 <?php
-    /**
-     * WTF MFD EG 1.6
-     * Copyright (c) The 1ADW. All rights reserved.
-     */
-          
-    Package::Load( 'Untitled.Badoo' );
 
     /**
      * BadooUsersVisit Factory
      *
-     * @package Untitled
+     * @package SPS
      * @subpackage Badoo
      */
     class BadooUsersVisitFactory implements IFactory {
 
         /** Default Connection Name */
-        const DefaultConnection = null;
+        const DefaultConnection = 'tst';
 
         /** BadooUsersVisit instance mapping  */
         public static $mapping = array (
@@ -25,7 +19,7 @@
             , 'flags'     => array(  )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'userId' => array(
+                'user_id' => array(
                     'name'          => 'user_id'
                     , 'type'        => TYPE_INTEGER
                 )

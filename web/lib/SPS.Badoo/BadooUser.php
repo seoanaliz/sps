@@ -13,10 +13,13 @@
     class BadooUser {
 
         /** @var int */
-        public $externalId;
+        public $external_id;
 
         /** @var string */
         public $name;
+
+        /** @var string */
+        public $shortname;
 
         /** @var string */
         public $country;
@@ -28,12 +31,12 @@
         public $age;
 
         /** @var int */
-        public $registeredAt;
+        public $registered_at;
 
         /** @var int*/
-        public $updatedAt;
+        public $updated_at;
 
         /** @var boolean*/
-        public $isVip;
+        public $is_vip;
     }
 ?>

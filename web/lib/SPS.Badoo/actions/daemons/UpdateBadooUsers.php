@@ -1,36 +1,44 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: user
- * Date: 10.07.13
- * Time: 11:05
- * To change this template use File | Settings | File Templates.
- */
+
+include_once('BadooParser.php');
+
 class UpdateBadooUsers extends BadooParser
 {
-    const PARSE_INTERVAL_SECONDS = 86400;
+    const PARSE_INTERVAL_SECONDS = 8640;
 
     public function Execute() {
         $BadooUsers = $this->getUsersRange();
         $badooUsersIds = array_keys( $BadooUsers );
         $FailedUsers = array();
+        $now = time();
+        $shortNames = array();
 
         $userProfiles = $this->multiget( $badooUsersIds );
         foreach( $userProfiles as $id => $profilePage ) {
             if ( !$this->parseProfile( $BadooUsers[$id], $profilePage )) {
                 $FailedUsers[$id] = $BadooUsers[$id];
-//                unset( $BadooUsers[$id]);
+                $BadooUsers[$id]->updated_at = $now;
             }
         }
 
-        //todo обработка неудачных id
+        foreach ( $FailedUsers as $FailedUser ) {
+            if( $FailedUser->shortname ) {
+                $shortNames[] = $FailedUser->shortname;
+            }
+        }
+
+        $userProfiles = $this->multiget( $shortNames, true );
+        foreach( $userProfiles as $id => $profilePage ) {
+            $this->parseProfile( $BadooUsers[$id], $profilePage );
+        }
 
         BadooUserFactory::UpdateRange( $BadooUsers );
     }
 
     public function getUsersRange() {
         $search = array(
-            'timestampLE' => time() - self::PARSE_INTERVAL_SECONDS
+            'updated_atLE' => time() - self::PARSE_INTERVAL_SECONDS,
+            'pageSize'     => 1000
         );
         return BadooUserFactory::Get( $search );
     }

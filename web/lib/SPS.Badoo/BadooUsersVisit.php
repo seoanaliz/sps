@@ -13,14 +13,14 @@
     class BadooUsersVisit {
 
         /** @var int */
-        public $userId;
+        public $user_id;
 
         /** @var int */
         public $timestamp;
 
         public function __construct( $userId = null, $timestamp = null) {
             if( $userId && $timestamp ) {
-                $this->userId       = $userId;
+                $this->user_id       = $userId;
                 $this->timestamp    = $timestamp;
             }
         }

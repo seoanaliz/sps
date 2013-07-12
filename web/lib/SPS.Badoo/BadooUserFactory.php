@@ -15,7 +15,7 @@
     class BadooUserFactory implements IFactory {
 
         /** Default Connection Name */
-        const DefaultConnection = null;
+        const DefaultConnection = 'tst';
 
         /** BadooUser instance mapping  */
         public static $mapping = array (
@@ -25,7 +25,7 @@
             , 'flags'     => array( 'CanPages' => 'CanPages', 'AddablePK' => 'AddablePK' )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'externalId' => array(
+                'external_id' => array(
                       'name'        => 'external_id'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
@@ -46,15 +46,20 @@
                     'name'          => 'age'
                     , 'type'        => TYPE_INTEGER
                 )
-                ,'registeredAt' => array(
+                ,'registered_at' => array(
                     'name'          => 'registered_at'
                     , 'type'        => TYPE_INTEGER
                 )
-                ,'updatedAt' => array(
+                ,'updated_at' => array(
                     'name'          => 'updated_at'
                     , 'type'        => TYPE_INTEGER
-                ),'isVip' => array(
+                )
+                ,'is_vip' => array(
                     'name'          => 'is_vip'
+                    , 'type'        => TYPE_BOOLEAN
+                )
+                ,'shortname' => array(
+                      'name'        => 'shortname'
                     , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array()
@@ -69,8 +74,8 @@
                     , 'type'       => TYPE_INTEGER
                     , 'default'    => 25
                 )
-                ,'timestampLE' => array(
-                      'name'       => 'timestamp'
+                ,'updated_atLE' => array(
+                      'name'       => 'updated_at'
                     , 'type'       => TYPE_INTEGER
                     , 'searchType' => SEARCHTYPE_LE
                 ))

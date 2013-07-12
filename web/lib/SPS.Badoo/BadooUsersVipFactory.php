@@ -15,7 +15,7 @@
     class BadooUsersVipFactory implements IFactory {
 
         /** Default Connection Name */
-        const DefaultConnection = null;
+        const DefaultConnection = 'tst';
 
         /** BadooUsersVip instance mapping  */
         public static $mapping = array (
@@ -25,7 +25,7 @@
             , 'flags'     => array(  )
             , 'cacheDeps' => array()
             , 'fields'    => array(
-                'userId' => array(
+                'user_id' => array(
                     'name'          => 'user_id'
                     , 'type'        => TYPE_INTEGER
                 )
@@ -33,7 +33,7 @@
                     'name'          => 'timestamp'
                     , 'type'        => TYPE_INTEGER
                 )
-                ,'getVip' => array(
+                ,'get_vip' => array(
                     'name'          => 'get_vip'
                     , 'type'        => TYPE_INTEGER
                 ))

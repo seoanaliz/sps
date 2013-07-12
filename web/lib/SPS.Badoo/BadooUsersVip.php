@@ -13,20 +13,21 @@
     class BadooUsersVip {
 
         /** @var int */
-        public $userId;
+        public $user_id;
 
         /** @var int */
         public $timestamp;
 
-        /** @var int */
-        public $getVip;
+        /** @var boolean */
+        public $get_vip;
 
         public function __construct( $userId = null, $timestamp = null, $getVip = null) {
             if( $userId && $timestamp && $getVip ) {
-                $this->userId       = $userId;
+                $this->user_id      = $userId;
                 $this->timestamp    = $timestamp;
-                $this->getVip       = $getVip;
+                $this->get_vip      = $getVip;
             }
         }
     }
+
 ?>

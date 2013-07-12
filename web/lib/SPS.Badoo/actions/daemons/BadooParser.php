@@ -56,11 +56,13 @@ class BadooParser
         }
 
         foreach( $urls_pack as $pack ) {
+            sleep(1);
             $mh = curl_multi_init();
             unset( $conn );
             foreach ( $pack as $i => $id )
             {
                 $conn[$i]=curl_init( self::BADOO_USER_URL . $id_prefix . trim( $id ));
+                echo self::BADOO_USER_URL . $id_prefix . trim( $id ).'<br>';
                 curl_setopt($conn[$i], CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($conn[$i], CURLOPT_TIMEOUT, self::MG_CONNECT_TIME );
                 curl_setopt($conn[$i], CURLOPT_USERAGENT, $useragent );
@@ -84,7 +86,7 @@ class BadooParser
     }
 
     public function isVip( $page ) {
-        return strpos( $page, '"custom-spp"');
+        return (boolean) strpos( $page, '"custom-spp"');
     }
 
     public function visitedToday( $status ) {
@@ -95,7 +97,6 @@ class BadooParser
                 return true;
             }
         }
-
         return false;
     }
 
@@ -108,15 +109,15 @@ class BadooParser
         $status = $matches[1];
         $now = time();
 
-        $BadooUser->updatedAt = $now;
+        $BadooUser->updated_at = $now;
         if ($this->visitedToday( $status )) {
-            $BadooUserVisit = new BadooUsersVisit( $BadooUser->externalId, time());
+            $BadooUserVisit = new BadooUsersVisit( $BadooUser->external_id, time());
             BadooUsersVisitFactory::Add($BadooUserVisit);
         }
 
-        if ( $this->isVip( $page ) ^ $BadooUser->isVip ) {
-            $BadooUser->isVip = !$BadooUser->isVip;
-            $BadooUserVip = new  BadooUsersVip( $BadooUser->externalId, $now, $BadooUser->isVip);
+        if ( $this->isVip( $page ) ^ $BadooUser->is_vip ) {
+            $BadooUser->is_vip = !$BadooUser->is_vip;
+            $BadooUserVip = new  BadooUsersVip( $BadooUser->external_id, $now, $BadooUser->is_vip);
             BadooUsersVipFactory::Add( $BadooUserVip );
         }
 
@@ -137,4 +138,14 @@ class BadooParser
         }
     }
 
+    public function getShortName( $page ) {
+        print_r('dsfsdf');
+        $log = file_get_contents('c:/wrk/3.txt');
+        file_get_contents('c:/wrk/3.txt', $log. $page . " \n\n\n");
+        if( preg_match('/href="http:\/\/badoo.com\/(..{1,25})\/"/', $page, $matches)) {
+            print_r($matches);
+            return $matches[1];
+        }
+        return false;
+    }
 }
