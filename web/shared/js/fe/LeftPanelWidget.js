@@ -1375,15 +1375,8 @@ var LeftPanelWidget = Event.extend({
         if (t.queuedProposedIds === null) {
             t.getQueuedProposedIds().success(function () {
                 ExternalSuggests.success(function (result) {
+                    t.updateTotalCount();
                     externalItemsChecker(result);
-
-                    // обновим счётчик сверху
-                    var count = t.totalCount - t.queuedProposedIds.length;
-                    var text = '';
-                    if (count > 0) {
-                        text = count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей'])
-                    }
-                    $('.wall-title .count').text(text);
                 });
             });
         } else {
@@ -1391,6 +1384,16 @@ var LeftPanelWidget = Event.extend({
         }
 
         return Def;
+    },
+
+    updateTotalCount: function () {
+        var t = this;
+        var count = t.totalCount - t.queuedProposedIds.length;
+        var text = '';
+        if (count > 0) {
+            text = count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей'])
+        }
+        $('.wall-title .count').text(text);
     },
 
     getQueuedProposedIds: function () {
