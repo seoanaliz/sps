@@ -1422,11 +1422,8 @@ var LeftPanelWidget = Event.extend({
             if (resp && !resp.error) {
                 var result = resp.response;
                 if (result) {
-                    t.totalCount = result.shift();
-
-                    if (t.totalCount > itemsOffset + result.length) {
-                        t.hasMoreRemote = true;
-                    }
+                    t.totalCount = result.shift(); //result изменился!
+                    t.hasMoreRemote = (t.totalCount > itemsOffset + result.length);
                     Def.fireSuccess(result);
                 }
             }
