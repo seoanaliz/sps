@@ -288,7 +288,8 @@
             $article = new Article();
             $article->externalId = $post['id'];
             $article->targetFeedId = $target_feed_id;
-            $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->createdAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->sentAt = null;
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 3;
