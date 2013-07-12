@@ -1312,14 +1312,12 @@ var LeftPanelWidget = Event.extend({
         var ExternalSuggests = t.requestProposed(t.currentPageOffset); // запускаем асинхронное действие!
         t.currentPageOffset++;
 
-        var externalItemsChecker = function (externalData) {
-            t.hasMoreRemote = externalData.hasMore;
-
+        var externalItemsChecker = function (result) {
             var fromIdsUsers = [];
             var fromIdsPublics = [];
 
             // фильтруем скрытые элементы, собираем id авторов нескрытых
-            var nonhiddenPortion = jQuery.map(externalData.result, function (elem) {
+            var nonhiddenPortion = jQuery.map(result, function (elem) {
                 if (-1 === jQuery.inArray(elem.id, t.queuedProposedIds)) {
                     if (!(elem.from_id in t.cachedAuthorsInfo)) {
                         if (elem.from_id < 0) {
@@ -1415,18 +1413,12 @@ var LeftPanelWidget = Event.extend({
             if (resp && !resp.error) {
                 var result = resp.response;
                 if (result) {
-                    var totalCount = result.shift();
-                    $('.wall-title .count').text(totalCount + ' ' + Lang.declOfNum(totalCount, ['запись', 'записи', 'записей']));
+                    t.totalCount = result.shift();
 
-                    var data = {
-                        hasMore: false,
-                        result: result //shifted
-                    };
-
-                    if (totalCount > itemsOffset + result.length) {
-                        data.hasMore = true;
+                    if (t.totalCount > itemsOffset + result.length) {
+                        t.hasMoreRemote = true;
                     }
-                    Def.fireSuccess(data);
+                    Def.fireSuccess(result);
                 }
             }
         });
