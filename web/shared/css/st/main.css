@@ -589,11 +589,11 @@ td {
   white-space: nowrap;
   width: 150px;
 }
-.dropdown>.add-item {
+.dropdown .add-item {
   cursor: text;
   display: none;
 }
-.dropdown>.show-input {
+.dropdown .show-input {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -601,6 +601,11 @@ td {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  border-top: 1px solid #b8b8b8;
+  background: #f8f8f8;
+}
+.dropdown .show-input:nth-child(2) {
+  border: none;
 }
 .dropdown>.item>.icon {
   opacity: 0;
