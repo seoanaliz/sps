@@ -57,7 +57,7 @@ sql;
             }
 
             $result['success'] = true;
-            $result['result']  = $post_ids;
+            $result['result']  = array_values( array_unique( $post_ids ));
             echo ObjectHelper::ToJSON($result);
 
         }
