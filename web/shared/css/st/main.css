@@ -602,7 +602,7 @@ td {
   -o-user-select: none;
   user-select: none;
   border-top: 1px solid #b8b8b8;
-  background: #f1f1f1;
+  background: #f8f8f8;
 }
 .dropdown .show-input:nth-child(2) {
   border: none;
