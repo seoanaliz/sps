@@ -1379,7 +1379,11 @@ var LeftPanelWidget = Event.extend({
 
                     // обновим счётчик сверху
                     var count = t.totalCount - t.queuedProposedIds.length;
-                    $('.wall-title .count').text((count || 'нет') + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей']));
+                    var text = '';
+                    if (count !== 0) {
+                        text = count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей'])
+                    }
+                    $('.wall-title .count').text(text);
                 });
             });
         } else {
