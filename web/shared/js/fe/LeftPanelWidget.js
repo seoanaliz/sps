@@ -232,9 +232,9 @@ var LeftPanelWidget = Event.extend({
         var $wall = this.$wall;
 
         $wall.delegate('.post > .delete', 'click', function(){
-            var elem = $(this).closest('.post'),
-                pid = elem.data('id'),
-                gid = elem.data('group');
+            var $elem = $(this).closest('.post'),
+                pid = $elem.data('id'),
+                gid = $elem.data('group');
             Events.fire('leftcolumn_deletepost', pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
@@ -245,7 +245,7 @@ var LeftPanelWidget = Event.extend({
                         $deleteMessage.show();
                     } else {
                         // иначе добавляем
-                        elem.before($(
+                        $elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
@@ -253,7 +253,7 @@ var LeftPanelWidget = Event.extend({
                         ));
                     }
 
-                    elem.hide();
+                    $elem.hide();
                 }
             });
         });
