@@ -14,6 +14,7 @@ var Configs = {
 var cur = {
     dataUser: {
         isEditor: (window.rank > 2),
+        isAdmin: (window.rank > 3)
     }
 };
 

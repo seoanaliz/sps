@@ -719,11 +719,17 @@ table, tr, td {
 
     .actions {
         .inline-block;
+        .user-select(none);
         
         padding: 12px 8px 0;
 
         a {
-            margin: 0 0.7em;
+            padding: 0 1em 0 0.9em;
+
+            border-left: 1px solid #2b587a;
+            &:first-child {
+                border: none;
+            }
         }
     }
 }
