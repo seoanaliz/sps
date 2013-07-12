@@ -1384,12 +1384,17 @@ var LeftPanelWidget = Event.extend({
     },
 
     getQueuedProposedIds: function () {
+        var t = this;
         var Def = new Deferred();
         Control.fire('get-queued-suggests', {
             targetFeedId: Elements.rightdd()
         }).success(function (serviceResp) {
             if (serviceResp.success) {
                 Def.fireSuccess(serviceResp.result);
+
+                // обновим счётчик сверху
+                var count = t.totalCount - serviceResp.result.length;
+                $('.wall-title .count').text(count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей']));
             }
         });
 
