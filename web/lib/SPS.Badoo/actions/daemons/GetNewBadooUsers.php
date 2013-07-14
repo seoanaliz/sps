@@ -3,7 +3,7 @@ include_once('BadooParser.php');
 
 class GetNewBadooUsers extends BadooParser
 {
-    const START_USER_ID = 328209453;
+    const START_USER_ID = 330535850;
     const USERS_RANGE   = 1000;
 
     /** key is  a badooUser id, value - shortname */
@@ -15,13 +15,12 @@ class GetNewBadooUsers extends BadooParser
 
         $start = microtime(1);
         $this->getUsers( $usersIds );
-        echo round( microtime(1) - $start , 2 ) . '<br>';
-        if( !empty($this->falseArray)) {
-            print_r($this->falseArray);
 
+        if( !empty($this->falseArray)) {
             $userShortNames = array_values( $this->falseArray);
             $this->getUsers( $userShortNames, true );
         }
+        echo round( microtime(1) - $start , 2 ) . '<br>';
 
     }
 
@@ -60,7 +59,6 @@ class GetNewBadooUsers extends BadooParser
 
 
     public function getUsers( $usersIds, $shortname = false ) {
-        echo 1;
         $userProfiles = $this->multiget( $usersIds, $shortname );
 
         foreach( $userProfiles as $id => $profilePage ) {
@@ -79,17 +77,16 @@ class GetNewBadooUsers extends BadooParser
             try {
                 $BadooUser = $this->addUserFromProfile( $profilePage );
             } catch ( Exception $e ) {
-                print_r($e->getMessage());
+                print_r($e->getMessage() );
                 echo '<br><br><br>';
-                print_r($profilePage);
-                echo 'fuck';
+         ;
 
                 die();
                 continue;
             }
             if ( !$this->parseProfile( $BadooUser, $profilePage )) {
                 //todo log
-                echo 'fuck2';
+                echo 'не удалось спарсить профиль <br>';
                 die();
                 continue;
             }
