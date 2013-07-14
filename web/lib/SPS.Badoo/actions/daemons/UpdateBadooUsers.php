@@ -8,6 +8,7 @@ class UpdateBadooUsers extends BadooParser
 
     public function Execute() {
         $BadooUsers = $this->getUsersRange();
+
         $badooUsersIds = array_keys( $BadooUsers );
         $FailedUsers = array();
         $now = time();
@@ -35,11 +36,13 @@ class UpdateBadooUsers extends BadooParser
         BadooUserFactory::UpdateRange( $BadooUsers );
     }
 
+    /** @return BadooUser[]  */
     public function getUsersRange() {
         $search = array(
             'updated_atLE' => time() - self::PARSE_INTERVAL_SECONDS,
             'pageSize'     => 1000
         );
+
         return BadooUserFactory::Get( $search );
     }
 
