@@ -1,10 +1,4 @@
-*/3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/2     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
-#*/1     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
+*/6     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-sources/ > /dev/null
 
 0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
 0-59/2     *       *       *       *      sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/process-queue/ > /dev/null
@@ -50,6 +44,7 @@
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/delete-post/ > /dev/null
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/CheckPosts/ > /dev/null
 */3     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/CheckWalls/ > /dev/null
+*       *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/get-badoo/ > /dev/null
 
 */20     *       *       *       *       sudo -u www /usr/bin/php /home/sps/www/current/invoke.php socialboard.ru /int/daemons/sync-suggests/ > /dev/null
 
