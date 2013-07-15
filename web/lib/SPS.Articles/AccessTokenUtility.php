@@ -24,9 +24,10 @@
         /** @var $targetFeed TargetFeed*/
         public static function getPublisherTokenForTargetFeed($targetFeedId, $random = false )
         {
-            $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeedId ));
-            if (empty($publishers))
+            $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeedId));
+            if (empty($publishers)) {
                 return false;
+            }
             $index = $random ? array_rand( $publishers) : 0;
             $publisher = PublisherFactory::GetById( $publishers[$index]->publisherId);
 

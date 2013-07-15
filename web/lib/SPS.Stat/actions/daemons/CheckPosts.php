@@ -24,14 +24,11 @@ class CheckPosts
 
         foreach( $barters_for_search as $barter ) {
             if( $barter->status == 3 ) {
-                echo '213123';
                 continue;
             }
             self::count_users_from_barter( $barter );
-            StatPublics::update_population( $barters_for_search );
-
         }
-
+        StatPublics::update_population( $barters_for_search );
         BarterEventFactory::UpdateRange( $barters_for_search, null, 'tst' );
     }
 

@@ -169,7 +169,8 @@ class SaveTargetFeedAction extends BaseSaveAction  {
             }
         }
 
-        if (!empty($object->externalId)) {
+        if (!empty($object->externalId) && ( $object->type == TargetFeedUtility::VK || $object->type == TargetFeedUtility::FB )) {
+
             $duplicates = TargetFeedFactory::Count(
                 array('externalId' => $object->externalId),
                 array(BaseFactory::WithoutDisabled => false, BaseFactory::CustomSql => ' and "targetFeedId" != ' . PgSqlConvert::ToString((int)$object->targetFeedId))
@@ -199,9 +200,17 @@ class SaveTargetFeedAction extends BaseSaveAction  {
      */
     protected function add( $object ) {
         ConnectionFactory::BeginTransaction();
+        if ( $object->type = TargetFeedUtility::VK_ALBUM ) {
+            $res = VkHelper::api_request('groups.getById', array( 'gid' => $object->externalId ));
+            if( isset($res[0])) {
+                $object->title = $res[0]->name . ' : ' . $object->title;
+            }
+        }
         $result = parent::$factory->Add( $object );
 
         $this->objectId = $objectId = parent::$factory->GetCurrentId();
+
+
 
         if ($result && !empty($object->grids)) {
             foreach ($object->grids as $grid) {

@@ -1,12 +1,15 @@
 var LIST =
-'<div class="tab selected" data-id="null">Популярные</div>' +
-'<?if( cur.dataUser.isEditor ) { ?>'+
-    '<div class="actions">' +
-            '<a class="share">Поделиться</a> |' +
-            '<a class="edit">Редактировать</a> |' +
-            '<a class="delete">Удалить</a>' +
-    '</div> ' +
-' <? } ?> ';
+'<div class="tab-bar clear-fix">' +
+    '<div class="tab selected" data-id="null">Популярные</div>' +
+    '<?if( cur.dataUser.isEditor ) { ?>'+
+        '<div class="actions">' +
+                '<a class="share">Поделиться</a> |' +
+                '<a class="edit">Редактировать</a> |' +
+                '<a class="delete">Удалить</a>' +
+        '</div> ' +
+    ' <? } ?> ' +
+'</div>' ;
+
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
@@ -64,7 +67,7 @@ var TABLE_BODY =
 '<? each(TABLE_ROW, rows); ?>';
 
 var TABLE_ROW =
-'<div class="public row" data-id="<?=publicId?>">' +
+'<div class="public row" data-id="<?=intId?>">' +
     '<div class="column column3 public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
@@ -105,7 +108,8 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<?if( cur.dataUser.isEditor ) { ?>'+
+    '<? if( cur.dataUser.isEditor ) { ?>'+
+
         '<div class="column column1 public-actions">' +
             '<div class="cell">' +
                 '<span class="action add-to-list">' +
@@ -130,102 +134,6 @@ var OUR_TABLE =
     '<?=tmpl(OUR_TABLE_BODY, {rows: rows})?>' +
 '</div>';
 
-var OUR_TABLE_HEADER =
-'<div class="row">' +
-    '<div class="column column2 publics">' +
-        '<div class="cell">' +
-            '<div class="input-wrap">' +
-               '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" disabled="true" />' +
-            '</div>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1 posts" title="всего постов">' +
-        '<div class="cell">' +
-            'посты<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 posts-per-day" title="постов в день">' +
-        '<div class="cell">' +
-            'постов в день<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 authors-posts" title="авторские посты">' +
-        '<div class="cell">' +
-            'авт. посты<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 authors-likes" title="авторские лайки">' +
-        '<div class="cell">' +
-            'авт. лайки<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 authors-reposts" title="авторские репосты">' +
-        '<div class="cell">' +
-            'авт. репосты<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 growth-visitors" title="прирост посетителей">' +
-        '<div class="cell">' +
-            'рост посетит.<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5 sb-likes" title="SB лайки">' +
-        '<div class="cell">' +
-            'SB лайки<span class="icon arrow">' +
-        '</div>' +
-    '</div>' +
-'</div>';
-
-var OUR_TABLE_BODY =
-'<? each(OUR_TABLE_ROW, rows); ?>';
-
-var OUR_TABLE_ROW =
-'<div class="public row" data-id="<?=publicId?>">' +
-    '<div class="column column2 public-info" data-id="<?=publicId?>">' +
-        '<div class="photo">' +
-            '<img src="<?=publicImg?>" alt="" />' +
-        '</div>' +
-        '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
-    '</div>' +
-    '<div class="column column1 ">' +
-        '<div class="cell">' +
-            '<?=publicPosts ? numberWithSeparator(publicPosts) : "-"?>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<?=publicPostsPerDay ? numberWithSeparator(publicPostsPerDay) : "-"?>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<?=publicAuthorsPosts ? numberWithSeparator(publicAuthorsPosts) + "%" : "-"?>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<?=publicAuthorsLikes ? numberWithSeparator(publicAuthorsLikes) + "%" : "-"?>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<?=publicAuthorsReposts ? numberWithSeparator(publicAuthorsReposts) + "%" : "-"?>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<span class="<?=publicGrowthVisitors > 0 ? "plus" : "minus"?>">' +
-                '<?=publicGrowthVisitors?> <small><?=numberWithSeparator(publicGrowthVisitorsRelative)?>%</small>' +
-            '</span>' +
-        '</div>' +
-    '</div>' +
-    '<div class="column column1-5">' +
-        '<div class="cell">' +
-            '<?=publicSbLikes ? numberWithSeparator(publicSbLikes) : "-"?>' +
-        '</div>' +
-    '</div>' +
-'</div>';
-
 var CONTACT =
 '<div class="contact">' +
     '<div class="photo">' +
@@ -247,11 +155,10 @@ var DROPDOWN =
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
     '<div class="item show-input">Создать список</div>' +
-    '<div class="item hide-public">Скрыть паблик</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
+'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
 
 var CONTACT_DROPDOWN =
 '<div class="contact-dropdown">' +
@@ -274,11 +181,10 @@ var CONTACT_DROPDOWN_ITEM =
 '</div>';
 
 var FILTER_LIST =
-'<div class="item selected" data-id="null">Популярные</div>' +
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" data-id="<?=itemId?>">' +
+'<div class="item" title="<?=itemTitle?>" data-id="<?=itemId?>">' +
     '<span class="text"><?=itemTitle?></span>' +
     '<?if( cur.dataUser.isEditor ) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +

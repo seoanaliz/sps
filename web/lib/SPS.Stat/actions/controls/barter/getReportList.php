@@ -37,8 +37,7 @@ class getReportList
         if ( !$group_id ) {
             $group_id       = $default_group->group_id;
         }
-        if( !GroupsUtility::has_access_to_group( $group_id, $user_id ))
-            die( ObjectHelper::ToJSON( array( 'response' => 'access denied' )));
+
 
         if ( !$state) {
               $status_array = array( 1,2,3);
