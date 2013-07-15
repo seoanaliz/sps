@@ -35,7 +35,7 @@
                 )
                 ,'get_vip' => array(
                     'name'          => 'get_vip'
-                    , 'type'        => TYPE_INTEGER
+                    , 'type'        => TYPE_BOOLEAN
                 ))
             , 'lists'     => array()
             , 'search'    => array()
