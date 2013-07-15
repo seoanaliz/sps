@@ -4,9 +4,11 @@ include_once('BadooParser.php');
 
 class UpdateBadooUsers extends BadooParser
 {
-    const PARSE_INTERVAL_SECONDS = 8640;
+    const PARSE_INTERVAL_SECONDS = 86400;
+    const USERS_RANGE   = 1000;
 
     public function Execute() {
+        $start = microtime(1);
         $BadooUsers = $this->getUsersRange();
 
         $badooUsersIds = array_keys( $BadooUsers );
@@ -34,13 +36,14 @@ class UpdateBadooUsers extends BadooParser
         }
 
         BadooUserFactory::UpdateRange( $BadooUsers );
+        echo round( microtime(1) - $start , 2 ) . '<br>';
     }
 
     /** @return BadooUser[]  */
     public function getUsersRange() {
         $search = array(
             'updated_atLE' => time() - self::PARSE_INTERVAL_SECONDS,
-            'pageSize'     => 1000
+            'pageSize'     => self::USERS_RANGE
         );
 
         return BadooUserFactory::Get( $search );
