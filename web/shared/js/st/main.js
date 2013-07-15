@@ -103,15 +103,17 @@ var List = (function() {
     function init(callback) {
         $container = $('.header');
 
-        refresh(function() {
+        Events.fire('load_bookmarks', function(data) {
+            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
+            $actions = $('.actions', $container);
+            select('all', callback);
             _initEvents();
-            if ($.isFunction(callback)) callback();
         });
     }
     function _initEvents() {
         $container.delegate('.tab', 'click', function() {
             var $item = $(this);
-            select($item.data('id'));
+            select($item.data('id') || 'all');
         });
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
@@ -276,7 +278,7 @@ var List = (function() {
                 Events.fire('remove_list', listId, function() {
                     List.refresh(function() {
                         Filter.listRefresh(function() {
-                            $('.filter > .list > .item[data-id="null"]').click();
+                            $('.filter > .list > .item[data-id="all"]').click();
                         });
                     });
                 });
@@ -297,11 +299,10 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (!id) {
+        if (id === 'all' || id === 'all_not_listed') {
             id = null;
             $actions.hide();
-        }
-        else {
+        } else {
             $actions.show();
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
