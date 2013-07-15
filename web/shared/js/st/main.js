@@ -103,12 +103,9 @@ var List = (function() {
     function init(callback) {
         $container = $('.header');
 
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select('all');
-            callback();
+        refresh(function() {
             _initEvents();
+            if ($.isFunction(callback)) callback();
         });
     }
     function _initEvents() {
@@ -275,11 +272,11 @@ var List = (function() {
             }).show();
 
             function deleteList() {
-                box.hide();
+                this.hide();
                 Events.fire('remove_list', listId, function() {
                     List.refresh(function() {
                         Filter.listRefresh(function() {
-                            $('.filter .list .item[data-id="all"]').click();
+                            $('.filter > .list > .item[data-id="null"]').click();
                         });
                     });
                 });
@@ -300,19 +297,19 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (id === 'all' || id === 'all_not_listed') {
+        if (!id) {
             id = null;
             $actions.hide();
-        } else {
+        }
+        else {
             $actions.show();
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) {
-            callback();
-        } else {
+        if ($.isFunction(callback)) callback();
+        else {
             Filter.listSelect($item.data('id'));
         }
     }
@@ -487,7 +484,7 @@ var Filter = (function() {
                 Events.fire('add_to_general', listId, function() {
                     $icon.addClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'));
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             } else {
@@ -495,7 +492,7 @@ var Filter = (function() {
                 Events.fire('remove_from_general', listId, function() {
                     $icon.removeClass('selected');
                     List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'));
+                        List.select($list.find('.item.selected').data('id'), function() {});
                     });
                 });
             }
@@ -525,8 +522,9 @@ var Filter = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            List.select($item.data('id'));
-            Table.changeList($item.data('id'));
+            List.select($item.data('id'), function() {
+                Table.changeList($item.data('id'));
+            });
         }
     }
     function setSliderMin(min) {
