@@ -84,7 +84,6 @@
             $midnight->modify('midnight');
             //ограничение по количеству постов в ленте
             $search = array(
-                'createdAtNE'   =>  ParserVkontakte::false_created_time,
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $midnight,
                 'startDateTo'   =>  $midnightNextDay,
