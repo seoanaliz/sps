@@ -1265,6 +1265,7 @@ var LeftPanelWidget = Event.extend({
                 data['name'] = authorInfo.name;
                 data['photo'] = authorInfo.photo;
                 data['href'] = authorInfo.href;
+                data['loaderSrc'] = location.protocol + '//' + location.host + '/shared/images/fe/ajax-loader.gif';
             }
 
             var text = elem.text || '';

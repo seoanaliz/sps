@@ -127,7 +127,7 @@ var ARTICLE_ITEM =
         '<? if (isset("link")) { ?>' +
             '<div class="link-info-content">' +
                 '<div class="link-description-content">' +
-                    '<img src="/shared/images/fe/ajax-loader.gif" class="ajax-loader-ext" rel="<?=link?>" />' +
+                    '<img src="<?=loaderSrc?>" class="ajax-loader-ext" rel="<?=link?>" />' +
                 '</div>' +
             '</div>' +
         '<? } ?>' +
