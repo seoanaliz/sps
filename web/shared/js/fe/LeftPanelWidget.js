@@ -1273,15 +1273,15 @@ var LeftPanelWidget = Event.extend({
 
             var photos = [];
             for (var i in (elem.attachments || [])) {
-                var att = elem.attachments[i];
-                if (att.type === 'photo') {
+                var attachment = elem.attachments[i];
+                if (attachment.type === 'photo') {
                     photos.push({
                         parentId: elem.id,
-                        url: att.photo.src_big,
-                        title: att.photo.text
+                        url: attachment.photo.src_big,
+                        title: attachment.photo.text
                     });
-                } else if ((att.type === 'link') && !data.link) { // сохраняем первую найденную ссылку
-                    data['link'] = att.link.url;
+                } else if (attachment.type === 'link') {
+                    data['link'] = attachment.link;
                 }
             }
             data['photos'] = photos;

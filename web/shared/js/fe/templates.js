@@ -125,11 +125,20 @@ var ARTICLE_ITEM =
         '<? } ?>' +
 
         '<? if (isset("link")) { ?>' +
-            '<div class="link-info-content">' +
-                '<div class="link-description-content">' +
-                    '<img src="/shared/images/fe/ajax-loader.gif" class="ajax-loader-ext" rel="<?=link?>" />' +
+           '<div class="link">' +
+                'Ссылка: <a href="<?=link.url?>" target="_blank_link<?=id?>"><?=link.url?></a>' +
+                '<div class="wrap clear-fix">' +
+                    '<a href="<?=link.url?>" target="_blank_link<?=id?>">' +
+                        '<img class="image" src="<?=link.image_src?>" />' +
+                    '</a>' +
+
+                    '<h4 class="title">' +
+                        '<a href="<?=link.url?>" target="_blank_link<?=id?>"><?=link.title?></a>' +
+                    '</h4>' +
+
+                    '<div class="description"><?=link.description?></div>' +
                 '</div>' +
-            '</div>' +
+           '</div>' +
         '<? } ?>' +
 
         '<? if (photos.length) { ?>' +
