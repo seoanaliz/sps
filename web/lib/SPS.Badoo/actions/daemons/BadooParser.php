@@ -114,10 +114,11 @@ class BadooParser
             $BadooUserVisit = new BadooUsersVisit( $BadooUser->external_id, time());
             BadooUsersVisitFactory::Add($BadooUserVisit);
         }
+        $IsNowVip = $this->isVip( $page );
 
-        if ( $this->isVip( $page ) ^ $BadooUser->is_vip ) {
-            $BadooUser->is_vip = !$BadooUser->is_vip;
-            $BadooUserVip = new  BadooUsersVip( $BadooUser->external_id, $now, $BadooUser->is_vip);
+        if ( $IsNowVip ^ $BadooUser->is_vip ) {
+            $BadooUser->is_vip = $IsNowVip;
+            $BadooUserVip = new  BadooUsersVip( $BadooUser->external_id, $now, $IsNowVip);
             BadooUsersVipFactory::Add( $BadooUserVip );
         }
 
@@ -139,11 +140,7 @@ class BadooParser
     }
 
     public function getShortName( $page ) {
-        print_r('dsfsdf');
-        $log = file_get_contents('c:/wrk/3.txt');
-        file_get_contents('c:/wrk/3.txt', $log. $page . " \n\n\n");
         if( preg_match('/href="http:\/\/badoo.com\/(..{1,25})\/"/', $page, $matches)) {
-            print_r($matches);
             return $matches[1];
         }
         return false;
