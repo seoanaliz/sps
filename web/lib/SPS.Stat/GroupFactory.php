@@ -72,6 +72,7 @@ class GroupFactory
               'name'        => 'users_ids'
             , 'type'        => TYPE_INTEGER
             , 'searchType'  => SEARCHTYPE_INTARRAY_CONTAINS
+            , 'complexType' => 'int[]'
         )
         ,'_created_by' => array(
               'name'        => 'created_by'
