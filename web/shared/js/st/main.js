@@ -276,10 +276,8 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    List.refresh(function() {
-                        Filter.listRefresh(function() {
-                            $('.filter > .list > .item[data-id="all"]').click();
-                        });
+                    Filter.listRefresh(function() {
+                        $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
@@ -484,17 +482,11 @@ var Filter = (function() {
             if ($icon.hasClass('selected')) {
                 $icon.removeClass('selected');
                 Events.fire('remove_from_general', listId, function() {
-                    $icon.removeClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
+                    Filter.listRefresh();
                 });
             } else {
                 Events.fire('add_to_general', listId, function() {
-                    $icon.addClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
+                    Filter.listRefresh();
                 });
 
             }

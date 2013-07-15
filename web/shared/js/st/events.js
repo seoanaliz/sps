@@ -53,19 +53,17 @@ var Eventlist = {
     },
     load_list: function(callback) {
         simpleAjax('getGroupList', function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData.lists))
-                dirtyData.length;
-                $.each(dirtyData.lists, function(list, list_data) {
-                    clearData[list] = [];
-                    $.each(list_data, function(i, data) {
-                        clearData[list].push({
-                            itemId: data.group_id,
-                            itemTitle: data.name,
-                            itemFave: data.fave
-                        });
-                   });
-                });
+            var clearData = {};
+            $.each(dirtyData.lists, function(list, list_data) {
+                clearData[list] = [];
+                $.each(list_data, function(i, data) {
+                    clearData[list].push({
+                        itemId: data.group_id,
+                        itemTitle: data.name,
+                        itemFave: data.fave
+                    });
+               });
+            });
             cur.dataUser.listed = intval(dirtyData.listed_by);
             callback(clearData);
         });
