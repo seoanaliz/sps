@@ -22,10 +22,10 @@
         public $get_vip;
 
         public function __construct( $userId = null, $timestamp = null, $getVip = null) {
-            if( $userId && $timestamp && $getVip ) {
+            if( $userId && $timestamp ) {
                 $this->user_id      = $userId;
                 $this->timestamp    = $timestamp;
-                $this->get_vip      = $getVip;
+                $this->get_vip      = (boolean) $getVip;
             }
         }
     }
