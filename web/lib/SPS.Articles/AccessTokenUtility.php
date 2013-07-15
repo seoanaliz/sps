@@ -2,10 +2,10 @@
 
     class AccessTokenUtility {
         /** @var $targetFeed TargetFeed*/
-        public static function getTokenForTargetFeed( $targetFeed, $random = false ) {
+        public static function getTokenForTargetFeed( $targetFeedId, $random = false ) {
             $access_token = false;
             $search = array(
-                'targetFeedId'  =>  $targetFeed->targetFeedId,
+                'targetFeedId'  =>  $targetFeedId,
                 '_role'         =>  array(UserFeed::ROLE_ADMINISTRATOR, UserFeed::ROLE_OWNER, UserFeed::ROLE_EDITOR)
             );
             $userFeeds = UserFeedFactory::Get($search);
@@ -22,9 +22,9 @@
         }
 
         /** @var $targetFeed TargetFeed*/
-        public static function getPublisherTokenForTargetFeed($targetFeed, $random = false )
+        public static function getPublisherTokenForTargetFeed($targetFeedId, $random = false )
         {
-            $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeed->targetFeedId));
+            $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeedId));
             if( empty($publishers))
                 return false;
             $index = $random ? array_rand( $publishers) : 0;

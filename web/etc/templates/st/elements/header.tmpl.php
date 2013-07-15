@@ -93,6 +93,10 @@ if(!empty($jsFilesAdds)) {
     <?= JsHelper::Flush(); ?>
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+        <script type="text/javascript">
+            var rank = <?= ObjectHelper::ToJSON(StatAccessUtility::GetRankInSource(AuthVkontakte::IsAuth(), Group::STAT_GROUP))?>;
+        </script>
+
     <? } ?>
     <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>

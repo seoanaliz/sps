@@ -8,7 +8,6 @@ var Configs = {
     tableLoadOffset: 20,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
-
     etc: null
 };
 
@@ -31,7 +30,6 @@ $(document).ready(function() {
         });
     })(window);
 
-    cur.dataUser.isEditor = false;
     Filter.init(function() {
         List.init(function() {
             Table.init();
@@ -55,8 +53,8 @@ function checkVkStatus() {
 }
 
 // taken from http://www.quirksmode.org/js/cookies.html
-//function createCookie(name, value, days) {
-//    if (days) {
+//functioncreateCookie(name, value, days) {
+            //    if (days) {
 //        var date = new Date();
 //        date.setTime(date.getTime()+(days*24*60*60*1000));
 //        var expires = "; expires="+date.toGMTString();
@@ -67,9 +65,9 @@ function checkVkStatus() {
 //    document.cookie = name+"="+value+expires+"; path=/";
 //}
 //
-//function readCookie(name) {
+//functionreadCookie(name) {
 //    var nameEQ = name + "=";
-//    var ca = document.cookie.split(';');
+                //    var ca = document.cookie.split(';');
 //    for (var i=0; i < ca.length; i++) {
 //        var c = ca[i];
 //        while (c.charAt(0)==' ') {
@@ -96,8 +94,9 @@ function authInfo(response) {
         VK.Api.call('execute', {code: code}, function (answer) {
             if (answer && answer.response) {
                 cur.dataUser = answer.response.user;
+                cur.dataUser.isEditor = (window.rank > 2);
                 handleUserLoggedIn(answer.response.user);
-            }
+            };
         });
     }
 }
@@ -126,22 +125,6 @@ function handleUserLoggedIn(userData) {
         .text(name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
 }
-
-//function initVK(data) {
-//    if (data) {
-//        var r = data.response;
-//        cur.dataUser = r.me;
-//        Events.fire('get_user', cur.dataUser.uid, function(us) {
-//            cur.dataUser.isEditor = us.rank == 2 ;
-//            Filter.init(function() {
-//                List.init(function() {
-//                    Table.init();
-//                    Counter.init();
-//                });
-//            });
-//        });
-//    }
-//}
 
 var List = (function() {
     var $container;
@@ -548,8 +531,13 @@ var Filter = (function() {
     function listRefresh(callback) {
         var $selectedItem = $list.find('.item.selected');
         var id = $selectedItem.data('id');
+        var $list_global  =  $('> .list.global', $container);
+        var $list_private =  $('> .list.private', $container);
+        var $list_shared  =  $('> .list.shared', $container);
         Events.fire('load_list', function(data) {
-            $list.html(tmpl(FILTER_LIST, {items: data}));
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global_list}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private_list}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared_list}));
             if (id) {
                 listSelect(id, function() {
                     if ($.isFunction(callback)) callback();
@@ -880,10 +868,16 @@ var Table = (function() {
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
             var publicData;
+
             for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId == publicId) {
+                    publicData = dataTable[i];
+                    break; // ------------------- BREAK
+                }
             }
-            _createDropdownList(e, publicData);
+            if (publicData) {
+                _createDropdownList(e, publicData);
+            }
         });
 
         $container.delegate('.action.delete-public', 'click', function(e) {
@@ -980,8 +974,10 @@ var Table = (function() {
         if (!$dropdown) {
             Events.fire('load_list', function(dataList) {
                 if (!$el.hasClass('selected')) {
-                    var lists = dataList;
-                    $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
+                    var all_lists = dataList.private_list;
+                    all_lists.push.apply(all_lists,dataList.global_list);
+
+                    $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
                     var $input = $dropdown.find('input');
 
                     $.each(selectedLists, function(i, listId) {
@@ -991,21 +987,7 @@ var Table = (function() {
                     $dropdown.delegate('.show-input', 'click', function() {
                         $input.show().focus();
                     });
-                    $dropdown.delegate('.hide-public', 'click', function() {
-                        var $item = $(this);
-                        if ($item.hasClass('selected')) {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.removeClass('selected');
-                                $public.css('opacity', 1);
-                            });
-                        } else {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.addClass('selected');
-                                $public.css('opacity',.5);
-                            });
-                        }
-                    });
-                    $dropdown.delegate('.item:not(.show-input):not(.hide-public)', 'mousedown', function(e) {
+                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
                         var $item = $(this);
                         onChange($item);
                     });
@@ -1029,7 +1011,10 @@ var Table = (function() {
                         Events.fire('add_list', text, function() {
                             Events.fire('load_list', function(dataList) {
                                 $el.data('dropdown', false);
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
+                                var all_lists = dataList.private_list;
+                                all_lists.push.apply(all_lists,dataList.global_list);
+
+                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                                 $dropdown.html($tmpDropdown.html());
                                 $input = $dropdown.find('input');
                                 Filter.listRefresh();
@@ -1106,6 +1091,7 @@ var Table = (function() {
 
 var Counter = (function(){
     var $container;
+    var $editor_lists;
 
     function init( callback ){
         $container = $('#listed-counter');

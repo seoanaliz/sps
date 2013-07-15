@@ -18,6 +18,8 @@ class Group
      */
     const BARTER_GROUP      = 1;
     const MESSAGER_GROUP    = 2;
+    const STAT_GROUP        = 3;
+
 
     /** @var int*/
     public $group_id;
@@ -42,4 +44,5 @@ class Group
 
     /** @var int*/
     public $source;
+
 }

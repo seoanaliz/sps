@@ -55,6 +55,25 @@
                     }
                 }
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
+            } elseif ( $type == 'Stat' ) {
+                $res = false;
+                $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
+                if( empty( $group)) {
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
+                }
+
+                $is_global_can_delete = $group->type == GroupsUtility::Group_Global &&
+                    StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP );
+
+                $is_private_can_delete = $group->type == GroupsUtility::Group_Private &&
+                    StatAccessUtility::HasAccessToPrivateGroups( $user_id, Group::STAT_GROUP );
+
+                if ( $is_global_can_delete || $is_private_can_delete ) {
+                    $group->status = 2;
+                    $res = GroupFactory::Update( $group );
+                }
+
+                die(ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
             if ( statUsers::is_Sadmin( $user_id ) ) {

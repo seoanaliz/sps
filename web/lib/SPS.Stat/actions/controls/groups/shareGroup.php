@@ -42,18 +42,21 @@
                 GroupsUtility::share_groups( $groups, $recipients_ids );
                 GroupFactory::UpdateRange( $groups );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
+            } elseif ( $type == 'Stat') {
+                $group_user_array = array();
+                foreach( $recipients_ids as $recipients_id) {
+                    foreach( $group_ids as $group_id) {
+                        new GroupUser( $group_id, $recipients_id, Group::STAT_GROUP );
+                    }
+                }
+                GroupUserFactory::AddRange( $group_user_array );
+                die( ObjectHelper::ToJSON( array( 'response' => true )));
             }
 
-            if ( !StatUsers::is_Sadmin( $user_id )) {
-                die( ObjectHelper::ToJSON( array('response' => false )));
-            }
 	     
             $m_class::implement_group( $group_ids, $recipients_ids );
             die( ObjectHelper::ToJSON( array( 'response' => true )));
-
         }
-
-
     }
 
 ?>

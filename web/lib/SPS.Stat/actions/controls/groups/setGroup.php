@@ -36,37 +36,47 @@
             if ( !$groupName || !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
-
+            $users = array();
             if( $type == 'Barter' ) {
-                $group_source = 1;
-                if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
-                    die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
-                //если не задан id - создаем группу, задан - обновляем
-                if ( !$groupId ) {
-                    $users = GroupsUtility::$barter_watchers;
-                    $users[] = $user_id;
-                    $group = new Group;
-                    $group->created_by  =   $user_id;
-                    $group->name        =   $groupName;
-                    $group->source      =   $group_source;
-                    $group->status      =   1;
-                    $group->type        =   1;
-                    $group->users_ids   =   $users;
-                    GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
-
-                    if( !$group->group_id)
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
-                } else {
-                    $group = GroupFactory::GetOne( array( 'group_id' => $groupId, 'created_by' => $user_id ));
-                    $default_group = GroupsUtility::get_default_group( $user_id, $group_source );
-                    if ( empty( $group ) || $group->group_id === $default_group->group_id )
-                        die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
-                    $group->name = $groupName;
-                    if ( !GroupFactory::Update( $group, array()))
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
-                }
-                die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
+                $users = GroupsUtility::$barter_watchers;
+                $users[] = $user_id;
+                $group_source = Group::BARTER_GROUP;
+            } elseif ( $type == 'Stat' ) {
+                $group_source = Group::STAT_GROUP;
             }
+            if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
+                die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
+            //если не задан id - создаем группу, задан - обновляем
+            if ( !$groupId ) {
+
+                $group = new Group;
+                $group->created_by  =   $user_id;
+                $group->name        =   $groupName;
+                $group->source      =   $group_source;
+                $group->status      =   1;
+                $group->type        =   GroupsUtility::Group_Private;
+                $group->users_ids   =   $users;
+
+                GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
+                if( !$group->group_id)
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
+                if ( $type == 'Stat'  ) {
+                    //прикрепляем группу к юзеру
+                    $groupUser = new GroupUser($group->group_id, $user_id, Group::STAT_GROUP);
+                    GroupUserFactory::Add($groupUser);
+                }
+            } else {
+                $group = GroupFactory::GetOne( array( 'group_id' => $groupId, 'created_by' => $user_id ));
+                $default_group = GroupsUtility::get_default_group( $user_id, $group_source );
+                if ( empty( $group ) || $group->group_id === $default_group->group_id )
+                    die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
+                $group->name = $groupName;
+                if ( !GroupFactory::Update( $group, array()))
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
+            }
+            GroupFactory::Update($group);
+            die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
+
 
             if( !StatUsers::is_Sadmin( $user_id )) {
                  die( ObjectHelper::ToJSON(array('response' => false)));

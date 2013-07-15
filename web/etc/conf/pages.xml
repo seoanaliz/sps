@@ -170,9 +170,6 @@
                 <page uri="controls://exPublic/">
                     <actions>SPS.Stat.exEntryFromGroup</actions>
                 </page>
-                <page uri="controls://togglePublVisibil/">
-                    <actions>SPS.Stat.togglePublVisibil</actions>
-                </page>
                 <page uri="controls://toggleGroupGeneral/">
                     <actions>SPS.Stat.toggleGroupGeneral</actions>
                 </page>
@@ -766,6 +763,7 @@
 
             <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
                 <page uri="stat://">
+                    <actions>SPS.Stat.GetStatData</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">

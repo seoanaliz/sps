@@ -6,8 +6,19 @@
     {
 
         const Group_Type_Default = 1;
-        const Group_Shared = 2;
+        const Group_Shared  = 2;
         const Group_Shared_Special = 3;
+        const Group_Private = 4;
+        const Group_Global  = 5;
+
+        const Group_Id_Special_All = 'all';
+        const Group_Id_Special_All_Not = 'all_not_listed';
+
+
+        public static $special_group_ids = array(
+            self::Group_Id_Special_All      => 'Все',
+            self::Group_Id_Special_All_Not  => 'Не в группе',
+        );
 
         public static  $barter_watchers = array(
             '670456',
@@ -133,6 +144,7 @@
         public static function form_response(  $groups, $user_id, $group_source )
         {
         //todo place
+            $user_shared_groups = array();
             if( !is_array( $groups ))
                 $groups = array( $groups );
             $res = array();
