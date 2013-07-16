@@ -96,7 +96,7 @@
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
-                <page uri="controls://get-suggests-post-ids/">
+                <page uri="controls://get-queued-suggests/">
                     <actions>SPS.Site.GetQueuedSuggestsControl</actions>
                 </page>
                 <page uri="controls://authors-list/">
