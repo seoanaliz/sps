@@ -603,8 +603,23 @@ table, tr, td {
     box-shadow: 0 2px 4px rgba(0,0,0,.25);
     z-index: 10;
 
-    &>.add-item,
-    &>.item {
+    .search-clear {
+        position: absolute;
+        top: 0;
+        right: 3px;
+        z-index: 11;
+        cursor: pointer;
+        padding: 4px;
+        opacity: 0.4;
+        
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .item,
+    .show-input,
+    &>input {
         color: #45688E;
         padding: .4em 1.6em .4em .6em;
         cursor: pointer;
@@ -615,9 +630,17 @@ table, tr, td {
         white-space: nowrap;
         width: 150px;
     }
-    .add-item {
+    &>input {
         cursor: text;
+        color: #383838;
+    }
+    .add-item {
         display: none;
+    }
+    .highlight {
+        background: #ffffdd;
+        border-radius: 2px;
+        border: 1px solid #d8d8d8;
     }
     .show-input {
         .user-select(none);
@@ -628,7 +651,7 @@ table, tr, td {
             border: none;
         }
     }
-    &>.item {
+    .item {
         &>.icon {
             opacity: 0;
             position: absolute;
@@ -649,10 +672,14 @@ table, tr, td {
             color: #fff;
             background-color: #597DA3;
             font-weight: bold;
+            
+            .highlight {
+                color: #777;
+                font-weight: normal;
+            }
 
             &>.icon {
-                opacity: 1;
-                background-image: url('../../images/common/select-white.png');
+                display: none;
             }
         }
     }

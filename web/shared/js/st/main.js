@@ -480,6 +480,14 @@ var Filter = (function() {
                 Filter.listRefresh();
             });
         });
+        // сортировка списков
+        $list.filter('.private, .global').sortable({
+            axis: 'y',
+            update: function (_, ui) {
+                var id = ui.item.data('id');
+                var place = $(this).find('.item').index(ui.item);
+            }
+        });
     }
     function listRefresh(callback) {
         var $selectedItem = $list.find('.item.selected');
@@ -931,7 +939,32 @@ var Table = (function() {
                     all_lists.push.apply(all_lists,dataList.global_list);
 
                     $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
-                    var $input = $dropdown.find('input');
+
+                    var displayBefore = $dropdown.find('.item')[0].style.display;
+                    var $search = $dropdown.find('.search');
+                    $dropdown.find('.search-clear').click(function () {
+                        $search.val('');
+                    });
+                    var prevVal = '';
+                    $search.bind('keyup drop paste change', function () {
+                        var val = $(this).val();
+                        if (val !== prevVal) {
+                            var regexp = new RegExp(val, 'gim');
+                            $dropdown.find('.item').each(function () {
+                                var text = this.getAttribute('title');
+                                if (!val || regexp.test(text)) {
+                                    var div = this.childNodes[0];
+                                    div.innerHTML = text.replace(regexp, val ? "<span class=\"highlight\">$&</span>" : '$&');
+                                    this.style.display = displayBefore;
+                                } else {
+                                    this.style.display = 'none';
+                                }
+                            });
+                            prevVal = val;
+                        }
+                    });
+                    
+                    var $input = $dropdown.find('.add-item');
 
                     $.each(selectedLists, function(i, listId) {
                         $dropdown.find('[data-id=' + listId + ']').addClass('selected');
@@ -944,7 +977,7 @@ var Table = (function() {
                         var $item = $(this);
                         onChange($item);
                     });
-                    $dropdown.delegate('input', 'keyup blur', function(e) {
+                    $dropdown.delegate('.add-item', 'keyup blur', function(e) {
                         var text = $.trim($input.val());
                         if (e.keyCode && e.keyCode != KEY.ENTER) return false;
                         if (!text) return false;
@@ -969,7 +1002,7 @@ var Table = (function() {
 
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                                 $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('input');
+                                $input = $dropdown.find('.add-item');
                                 Filter.listRefresh();
                             });
                         });

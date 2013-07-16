@@ -291,6 +291,9 @@ var Eventlist = {
         }, function() {
             callback(true);
         });
+    },
+    sort_list: function() {
+        
     }
 };
 $.extend(Events.eventList, Eventlist);

@@ -141,13 +141,19 @@ var CONTACT =
 
 var DROPDOWN =
 '<div class="dropdown">' +
+    '<span class="icon delete search-clear"></span>' +
+    '<input type="text" class="search" placeholder="Поиск" />' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
-    '<div class="item show-input">Создать список</div>' +
+    '<div class="show-input">Создать список</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
+'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item">' +
+    '<div>' +
+        '<?=itemTitle?>' +
+    '</div>' +
+'<div class="icon plus"></div></div>';
 
 var CONTACT_DROPDOWN =
 '<div class="contact-dropdown">' +
