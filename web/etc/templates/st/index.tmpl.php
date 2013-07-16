@@ -55,13 +55,13 @@
                                 <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
                             </div>
                         </div>
-                        <? if ( $canEditGlobalGroups ) {?>
-                            <div class="list buttons">
-                                <div class="item selected" data-id="all">Все паблики</div>    
+                        <div class="list buttons">
+                            <div class="item selected" data-id="all">Все паблики</div>    
+                            <? if ($canEditGlobalGroups) {?>
                                 <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
-                            </div>
-                        <? } ?>
-                        <? if ( $hasAccessToPrivateGroups ) {?>
+                            <? } ?>
+                        </div>
+                        <? if ($hasAccessToPrivateGroups) {?>
                             <div class="title">Личные</div>
                             <div class="list private editor_lists">
                             </div>
