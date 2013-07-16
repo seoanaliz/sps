@@ -1056,7 +1056,7 @@ var Table = (function() {
 var Counter = (function(){
     var $container;
 
-    function init( callback ){
+    function init() {
         $container = $('#listed-counter');
         if( cur.dataUser.isEditor ) {
             $container.show();
@@ -1065,7 +1065,7 @@ var Counter = (function(){
     }
 
     function refresh(){
-       $container.find('span').text( cur.dataUser.listed );
+       $container.find('span').text(cur.dataUser.listed);
     }
 
     return {
