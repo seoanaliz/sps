@@ -472,6 +472,9 @@ td {
   border-top: 1px solid #D8DFEA;
   margin: 0 8px 12px;
 }
+.right-column .ui-sortable-helper {
+  cursor: move;
+}
 #global-loader {
   position: fixed;
   top: 0;
