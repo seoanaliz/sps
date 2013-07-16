@@ -26,8 +26,7 @@
                 if( !empty( $group )) {
                     if( $group->type == GroupsUtility::Group_Global) {
                         $group->type = GroupsUtility::Group_Private;
-                        new GroupUser($group_id, $user_id, Group::STAT_GROUP);
-                        GroupUserFactory::Add($group);
+                        GroupUserFactory::Add( new GroupUser($group_id, $user_id, Group::STAT_GROUP));
                     } else {
                         $group->type = GroupsUtility::Group_Global;
                         GroupUserFactory::DeleteByMask( array(
