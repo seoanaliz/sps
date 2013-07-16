@@ -111,10 +111,6 @@ var List = (function() {
         });
     }
     function _initEvents() {
-        $container.delegate('.tab', 'click', function() {
-            var $item = $(this);
-            select($item.data('id') || 'all');
-        });
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
@@ -282,6 +278,9 @@ var List = (function() {
                 });
             }
         });
+        $container.delegate('.tab', 'click', function() {
+            Filter.listSelect($(this).data('id'));
+        });
     }
 
     function refresh(callback) {
@@ -298,7 +297,6 @@ var List = (function() {
 
     function select(id, callback) {
         if (id === 'all' || id === 'all_not_listed') {
-            id = null;
             $actions.hide();
         } else {
             $actions.show();
@@ -471,8 +469,7 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            var $item = $(this);
-            listSelect($item.data('id'));
+            listSelect($(this).data('id'));
         });
         $list.delegate('.item > .bookmark', 'click', function(e) {
             e.stopPropagation();

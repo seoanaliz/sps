@@ -1,4 +1,4 @@
-var LIST = '<div class="tab selected" data-id="null">Популярные</div>' +
+var LIST = '<div class="tab selected" data-id="all">Популярные</div>' +
 '<?if (cur.dataUser.isAdmin) { ?>'+
     '<div class="actions">' +
         '<a class="share">Поделиться</a>' +
