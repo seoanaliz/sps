@@ -1271,11 +1271,11 @@ var LeftPanelWidget = Event.extend({
             data['content1'] = text.substring(0, 300);
             data['content2'] = text.substring(300);
 
-            var photos = [];
+            data['photos'] = [];
             for (var i in (elem.attachments || [])) {
                 var attachment = elem.attachments[i];
                 if (attachment.type === 'photo') {
-                    photos.push({
+                    data['photos'].push({
                         parentId: elem.id,
                         url: attachment.photo.src_big,
                         title: attachment.photo.text
@@ -1284,7 +1284,6 @@ var LeftPanelWidget = Event.extend({
                     data['link'] = attachment.link;
                 }
             }
-            data['photos'] = photos;
 
             if (elem.date) {
                 data['date'] = t.timestampToHumanReadable(elem.date);
@@ -1297,7 +1296,7 @@ var LeftPanelWidget = Event.extend({
         if (t.cachedProposed.length || t.hasMoreRemote) {
             // ничего не делаем, можно подгружать дальше
         } else {
-            $(window).data('disable-load-more', false);
+            $(window).data('disable-load-more', true);
         }
     },
 
