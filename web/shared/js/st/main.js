@@ -33,6 +33,11 @@ $(document).ready(function() {
         });
     })(window);
 
+    Configs.activeElement = document.body;
+    document.body.addEventListener && document.body.addEventListener('focus', function () {
+        Configs.activeElement = document.activeElement;
+    }, true);
+
     Filter.init(function() {
         List.init(function() {
             Table.init();
@@ -995,9 +1000,16 @@ var Table = (function() {
                         e.stopPropagation();
                     });
                     $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) return;
+                        if ($dropdown.is(':hidden')) {
+                            return;
+                        }
                         $dropdown.hide();
                         $el.removeClass('selected');
+                        setTimeout(function () {
+                            if (document.activeElement === document.body) {
+                                $(Configs.activeBeforeDropdown).focus();
+                            } 
+                        }, 50);
                     });
 
                     function onSave(text) {
@@ -1032,20 +1044,23 @@ var Table = (function() {
                             Events.fire('remove_from_list', publicId, listId, callback);
                         }
                     }
-                    $el.addClass('selected');
+
                     $el.data('dropdown', $dropdown);
-                    $dropdown.show().css({
-                        top: offset.top + $el.outerHeight(),
-                        left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
-                    });
+                    showDropdown();
                 }
             });
         } else {
+            showDropdown();
+        }
+
+        function showDropdown() {
+            Configs.activeBeforeDropdown = Configs.activeElement;
             $el.addClass('selected');
             $dropdown.show().css({
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
+            $dropdown.find('.search').focus();
         }
     }
 
