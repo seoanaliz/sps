@@ -297,9 +297,9 @@ var List = (function() {
 
     function select(id, callback) {
         if (id === 'all' || id === 'all_not_listed') {
-            $actions.hide();
+            $actions.fadeOut(140);
         } else {
-            $actions.show();
+            $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
