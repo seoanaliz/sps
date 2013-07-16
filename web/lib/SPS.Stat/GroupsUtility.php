@@ -119,7 +119,11 @@
         //проверяет уникальность предлагаемого имени группы для данного типа групп данного пользователя
         public static function check_name( $user_id, $group_source, $group_name )
         {
-            $check = GroupFactory::GetOne( array( 'name' => $group_name, 'created_by' => $user_id, 'source' => $group_source ));
+            $check = GroupFactory::Get( array(
+                    'name'       =>     $group_name
+                ,   'created_by' =>     $user_id
+                ,   'source'     =>     $group_source
+                ,   '_statusNE'  =>     2 ));
             if ( !$check )
                 return true;
             return false;
