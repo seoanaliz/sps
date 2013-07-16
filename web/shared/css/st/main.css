@@ -684,6 +684,11 @@ td {
   float: right;
   margin-top: 7px;
 }
+.header .under {
+  height: 9px;
+  width: 100%;
+  clear: both;
+}
 .header .actions {
   display: inline-block;
   zoom: 1;
@@ -695,11 +700,13 @@ td {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
-  padding: 12px 8px 0;
+  float: right;
+  margin-right: -1px;
+  margin-bottom: 5px;
 }
 .header .actions a {
   padding: 0 1em 0 0.9em;
-  border-left: 1px solid #2b587a;
+  border-left: 1px solid #d8dfea;
 }
 .header .actions a:first-child {
   border: none;
@@ -746,6 +753,7 @@ td {
   zoom: 1;
   *display: inline;
   width: 590px;
+  padding-bottom: 0 !important;
 }
 #vk-button {
   position: absolute;

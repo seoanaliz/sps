@@ -9,13 +9,20 @@
 {increal:tmpl://st/elements/header.tmpl.php}
 <div id="global-loader"></div>
 <div id="main" class="main">
-    <div class="header">
+    <div class="header clear-fix">
         <div class="tab-bar"></div>
         <div class="login-info"></div>
         <div class="button-wrap">
             <script type="text/javascript"><!--
                 document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
             --></script>
+        </div>
+        <div class="under">
+            <div class="actions">
+                <a class="share">Поделиться</a>
+                <a class="edit">Редактировать</a>
+                <a class="delete">Удалить</a>
+            </div>
         </div>
     </div>
     <table>

@@ -717,16 +717,23 @@ table, tr, td {
         margin-top: 7px;
     }
 
+    .under {
+        height: 9px;
+        width: 100%;
+        clear: both;
+    }
+
     .actions {
         .inline-block;
         .user-select(none);
-
-        padding: 12px 8px 0;
+        float: right;
+        margin-right: -1px;
+        margin-bottom: 5px;
 
         a {
             padding: 0 1em 0 0.9em;
+            border-left: 1px solid #d8dfea;
 
-            border-left: 1px solid #2b587a;
             &:first-child {
                 border: none;
             }
@@ -777,6 +784,7 @@ table, tr, td {
 .tab-bar {
     .inline-block;
     width: 590px;
+    padding-bottom: 0 !important;
 }
 
 #vk-button {

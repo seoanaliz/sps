@@ -1,11 +1,4 @@
-var LIST = '<div class="tab selected" data-id="all">Популярные</div>' +
-'<?if (cur.dataUser.isAdmin) { ?>'+
-    '<div class="actions">' +
-        '<a class="share">Поделиться</a>' +
-        '<a class="edit">Редактировать</a>' +
-        '<a class="delete">Удалить</a>' +
-    '</div> ' +
-'<? } ?>';
+var LIST = '<div class="tab selected" data-id="all">Популярные</div>';
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
