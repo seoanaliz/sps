@@ -1,17 +1,13 @@
-var LIST =
-'<div class="tab-bar clear-fix">' +
-    '<div class="tab selected" data-id="null">Популярные</div>' +
-    '<?if (cur.dataUser.isEditor) { ?>'+
-        '<div class="actions">' +
-            '<a class="share">Поделиться</a>' +
-            '<a class="edit">Редактировать</a>' +
-            '<?if (cur.dataUser.isAdmin) { ?>'+
-                '<a class="delete">Удалить</a>' +
-            '<? } ?> ' +
-        '</div> ' +
-    '<? } ?> ' +
-'</div>' ;
-
+var LIST = '<div class="tab selected" data-id="null">Популярные</div>' +
+'<?if (cur.dataUser.isEditor) { ?>'+
+    '<div class="actions">' +
+        '<a class="share">Поделиться</a>' +
+        '<a class="edit">Редактировать</a>' +
+        '<?if (cur.dataUser.isAdmin) { ?>'+
+            '<a class="delete">Удалить</a>' +
+        '<? } ?> ' +
+    '</div> ' +
+'<? } ?>';
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
