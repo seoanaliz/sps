@@ -940,33 +940,39 @@ var Table = (function() {
 
                     $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
 
-                    var displayBefore = $dropdown.find('.item')[0].style.display;
+                    // поиск по категориям
+                    var previousDisplay = $dropdown.find('.item')[0].style.display;
                     var $search = $dropdown.find('.search');
-                    $dropdown.find('.search-clear').click(function () {
+                    function clearSearch() {
                         $search.attr('value', '');
                         $search.change();
+                    }
+                    $dropdown.find('.search-clear').click(function () {
+                        clearSearch();
                     });
-                    var prevVal = '';
-                    $search.bind('keyup drop paste change', function () {
+                    var previousValue = '';
+                    $search.bind('keyup drop paste change', function (e) {
                         var val = $(this).val();
-                        if (val !== prevVal) {
+                        if (e.keyCode && e.keyCode === KEY.ESC) {
+                            return clearSearch(); // ---- RETURN
+                        }
+                        if (val !== previousValue) {
                             var regexp = new RegExp(val, 'gim');
                             $dropdown.find('.item').each(function () {
                                 var text = this.getAttribute('title');
                                 if (regexp.test(text)) {
                                     var div = this.childNodes[0];
-                                    div.innerHTML = text.replace(regexp, val ? "<span class=\"highlight\">$&</span>" : '$&');
-                                    this.style.display = displayBefore;
+                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                    this.style.display = previousDisplay;
                                 } else {
                                     this.style.display = 'none';
                                 }
                             });
-                            prevVal = val;
+                            previousValue = val;
                         }
                     });
-                    
-                    var $input = $dropdown.find('.add-item');
 
+                    var $input = $dropdown.find('.add-item');
                     $.each(selectedLists, function(i, listId) {
                         $dropdown.find('[data-id=' + listId + ']').addClass('selected');
                     });
