@@ -476,17 +476,9 @@ var Filter = (function() {
             var $icon = $(this);
             var $item = $icon.closest('.item');
             var listId = $item.data('id');
-            if ($icon.hasClass('selected')) {
-                $icon.removeClass('selected');
-                Events.fire('remove_from_general', listId, function() {
-                    Filter.listRefresh();
-                });
-            } else {
-                Events.fire('add_to_general', listId, function() {
-                    Filter.listRefresh();
-                });
-
-            }
+            Events.fire('toggle_group_general', listId, function() {
+                Filter.listRefresh();
+            });
         });
     }
     function listRefresh(callback) {

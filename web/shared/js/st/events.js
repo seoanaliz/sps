@@ -277,14 +277,7 @@ var Eventlist = {
             callback(true);
         });
     },
-    add_to_general: function(listId, callback) {
-        simpleAjax('toggleGroupGeneral', {
-            groupId: listId
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    remove_from_general: function(listId, callback) {
+    toggle_group_general: function(listId, callback) {
         simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
