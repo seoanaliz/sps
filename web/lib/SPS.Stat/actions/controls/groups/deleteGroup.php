@@ -71,6 +71,11 @@
                 if ( $is_global_can_delete || $is_private_can_delete ) {
                     $group->status = 2;
                     $res = GroupFactory::Update( $group );
+
+                    GroupEntryFactory::DeleteByMask( array(
+                        'group_id'      =>  $group->group_id,
+                        'sourceType'    =>  Group::STAT_GROUP
+                    ));
                 }
 
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
