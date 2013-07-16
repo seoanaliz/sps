@@ -13,18 +13,16 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
-
             $group_id  =  Request::getInteger( 'groupId' );
             $user_id   =  AuthVkontakte::IsAuth();
-            if( !$group_id ) {
+            if (!$group_id) {
                 die( ObjectHelper::ToJSON(array( 'response' => false )));
             }
 
             if( StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP)) {
                 $group = GroupFactory::GetById($group_id);
-                if( !empty( $group )) {
-                    if( $group->type == GroupsUtility::Group_Global) {
+                if (!empty( $group )) {
+                    if ($group->type == GroupsUtility::Group_Global) {
                         $group->type = GroupsUtility::Group_Private;
                         GroupUserFactory::Add( new GroupUser($group_id, $user_id, Group::STAT_GROUP));
                     } else {
@@ -36,11 +34,10 @@
                         ));
                     }
                     GroupFactory::Update($group);
-                    die( ObjectHelper::ToJSON(array( 'response' => true )));
+                    die(ObjectHelper::ToJSON(array( 'response' => true )));
                 }
             };
-            die( ObjectHelper::ToJSON(array( 'response' => false )));
-
+            die(ObjectHelper::ToJSON(array( 'response' => false )));
         }
     }
 ?>
