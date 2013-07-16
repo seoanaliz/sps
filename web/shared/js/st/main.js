@@ -943,7 +943,8 @@ var Table = (function() {
                     var displayBefore = $dropdown.find('.item')[0].style.display;
                     var $search = $dropdown.find('.search');
                     $dropdown.find('.search-clear').click(function () {
-                        $search.val('');
+                        $search.attr('value', '');
+                        $search.change();
                     });
                     var prevVal = '';
                     $search.bind('keyup drop paste change', function () {
@@ -952,7 +953,7 @@ var Table = (function() {
                             var regexp = new RegExp(val, 'gim');
                             $dropdown.find('.item').each(function () {
                                 var text = this.getAttribute('title');
-                                if (!val || regexp.test(text)) {
+                                if (regexp.test(text)) {
                                     var div = this.childNodes[0];
                                     div.innerHTML = text.replace(regexp, val ? "<span class=\"highlight\">$&</span>" : '$&');
                                     this.style.display = displayBefore;
