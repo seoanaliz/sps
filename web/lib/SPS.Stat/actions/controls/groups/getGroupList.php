@@ -22,8 +22,14 @@
                 $type    = 'Stat';
             }
             if ( $type == 'Stat') {
-                $global_groups = $this->get_global_list( Group::STAT_GROUP );
+                $global_groups = GroupFactory::Get(
+                    array(
+                        'type'  =>  GroupsUtility::Group_Global,
+                        'source'=>  Group::STAT_GROUP
+                    ));
                 GroupsUtility::set_default_order($global_groups);
+                $global_groups = $this->get_global_list( $global_groups, Group::STAT_GROUP );
+
                 $user_groups = array();
                 $shared_groups = array();
                 if( $user_id ) {
@@ -93,14 +99,9 @@
             return $res;
         }
 
-        private function get_global_list( $source )
+        private function get_global_list( $global_groups, $source )
         {
-            $global_groups = GroupFactory::Get(
-                array(
-                    'type'  =>  GroupsUtility::Group_Global,
-                    'source'=>  $source
-                )
-            );
+
 
             $global_groupUser = GroupUserFactory::Get( array(
                 'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
