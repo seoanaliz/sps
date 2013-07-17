@@ -65,7 +65,7 @@
                     ));
                     GroupUserFactory::AddRange($groupUserArray);
 
-                    die( ObjectHelper::ToJSON( array( 'response' => true )));
+                    die( ObjectHelper::ToJSON( array( 'success' => true )));
                 }
             }
             $m_class  = $type . 'Groups';
@@ -74,7 +74,7 @@
             }
 
 
-            die( ObjectHelper::ToJSON( array( 'response' => 'true' )));
+            die( ObjectHelper::ToJSON( array( 'success' => 'true' )));
         }
 
         private function replace( $group_id, $new_place, $groupUserArray ) {

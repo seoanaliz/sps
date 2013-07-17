@@ -17,7 +17,7 @@
 
             $user_id    =   AuthVkontakte::IsAuth();
             $groupId    =   Request::getInteger( 'groupId' );
-            $groupName  =   Request::getString ( 'groupName' );
+            $groupName  =   trim(Request::getString ( 'groupName' ));
             $ava        =   Request::getString ( 'ava' );
             $comments   =   Request::getString ( 'comments' );
             $general    =   Request::getInteger( 'general' );
@@ -69,9 +69,10 @@
                 if ( !GroupFactory::Update( $group, array()))
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
             }
-            die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
-
-
+            die(ObjectHelper::ToJSON(array(
+                'success' => true,
+                'data' => array('groupId' => $group->group_id, 'groupName' => $group->name),
+            )));
         }
 
 

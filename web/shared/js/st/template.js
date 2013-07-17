@@ -179,11 +179,11 @@ var FILTER_LIST =
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" title="<?=itemTitle?>" data-id="<?=itemId?>">' +
+'<div class="item" title="<?=name?>" data-id="<?=id?>">' +
     '<span class="edit icon"></span>' +
-    '<span class="text"><?=itemTitle?></span>' +
+    '<span class="text"><?=name?></span>' +
     '<?if (cur.dataUser.isEditor) { ?>'+
-        '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
+        '<div class="icon bookmark"></div>' +
     '<? } ?>'+
 '</div>';
 

@@ -107,13 +107,10 @@ var List = (function() {
 
     function init(callback) {
         $container = $('.header');
-
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select('all', callback);
-            _initEvents();
-        });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select('all', callback);
+        _initEvents();
     }
     function _initEvents() {
         $container.delegate('.actions .share', 'click', function() {
@@ -288,12 +285,10 @@ var List = (function() {
     function refresh(callback) {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select(id, function() {
-                if ($.isFunction(callback)) callback();
-            });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select(id, function() {
+            if ($.isFunction(callback)) callback();
         });
     }
 
@@ -482,33 +477,38 @@ var Filter = (function() {
         });
         $list.delegate('.edit', 'click', function(e) {
             e.stopPropagation();
-            var stillShowing = true;
             var $item = $(this).closest('.item');
-            var $editField = $('<textarea class="edit-field">'+ $item.attr('title') +'</textarea>');
+            var $editField = $('<textarea class="edit-field"></textarea>');
             var $saver = $('<span class="saver">Save</span>');
             $item.append($editField);
             $editField.focus();
-            setTimeout(function () {
-                if (stillShowing) {
-                    $item.append($saver);
-                    $saver.animate({'margin-right': 0});
-                }
-            }, 500);
+            $editField.val($item.attr('title'));
+            var saverAppendTimeout = setTimeout(function () {
+                $item.append($saver);
+                $saver.animate({'margin-right': 0});
+            }, 150);
             $editField.click(function (e) {
                 e.stopPropagation();
             });
-            $saver.click(function () {
+            $saver.click(function (e) {
                 e.stopPropagation();
-                destroyEditor();
+                saveEditor();
             });
             $editField.bind('blur keyup', function (e) {
                 if (!e.keyCode || e.keyCode === KEY.ESC) {
                     destroyEditor();
                 }
             });
-            
+
+            function saveEditor() {
+                Events.fire('rename_list', $item.data('id'), $editField.val(), function (data) {
+                    $item.attr('title', data.groupName);
+                    $item.find('.text').text(data.groupName);
+                    destroyEditor();
+                });
+            }
             function destroyEditor() {
-                stillShowing = false;
+                clearTimeout(saverAppendTimeout);
                 $editField.remove();
                 $saver.remove();
             }
@@ -517,8 +517,9 @@ var Filter = (function() {
         $list.filter('.private, .global').sortable({
             axis: 'y',
             update: function (_, ui) {
-                var id = ui.item.data('id');
+                var listId = ui.item.data('id');
                 var place = $(this).find('.item').index(ui.item);
+                Events.fire('sort_list', listId, place, function () {});
             }
         });
     }
@@ -529,9 +530,9 @@ var Filter = (function() {
         var $list_private =  $('> .list.private', $container);
         var $list_shared  =  $('> .list.shared', $container);
         Events.fire('load_list', function(data) {
-            $list_global.html(tmpl(FILTER_LIST, {items: data.global_list}));
-            $list_private.html(tmpl(FILTER_LIST, {items: data.private_list}));
-            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared_list}));
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
             if (id) {
                 listSelect(id, function() {
                     if ($.isFunction(callback)) callback();

@@ -52,38 +52,14 @@ var Eventlist = {
     });
     },
     load_list: function(callback) {
-        simpleAjax('getGroupList', function(dirtyData) {
-            var clearData = {};
-            $.each(dirtyData.lists, function(list, list_data) {
-                clearData[list] = [];
-                $.each(list_data, function(i, data) {
-                    clearData[list].push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.fave
-                    });
-               });
-            });
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            callback(clearData);
-        });
-    },
-    load_bookmarks: function(callback) {
-        simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData)) {
-                $.each(dirtyData.lists, function(list, list_data) {
-                    clearData[list] = [];
-                        $.each(dirtyData.list, function(i, data) {
-                            clearData.push({
-                                itemId: data.group_id,
-                                itemTitle: data.name,
-                                itemFave: data.general
-                            });
-                        });
-                });
+        $.ajax({
+            url: controlsRoot + 'getGroupList/',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
             }
-            callback(clearData);
         });
     },
     load_table: function(options, callback) {
@@ -292,8 +268,35 @@ var Eventlist = {
             callback(true);
         });
     },
-    sort_list: function() {
-        
+    sort_list: function(listId, index, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroupOrder/',
+            data: {
+                groupId: listId,
+                index: index
+            },
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback();
+                }
+            }
+        });
+    },
+    rename_list: function(listId, listName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            data: {
+                groupId: listId,
+                groupName: listName
+            },
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
+            }
+        });
     }
 };
 $.extend(Events.eventList, Eventlist);
