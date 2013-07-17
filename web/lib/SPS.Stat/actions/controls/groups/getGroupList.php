@@ -15,6 +15,7 @@
     */
         public function Execute()
         {
+            $res = array( 'success' => false );
             $user_id    =   AuthVkontakte::IsAuth();
             $type       =   ucfirst( Request::getString( 'type' ));
             $type_array = array( 'Stat', 'Mes', 'Barter' );
@@ -42,28 +43,24 @@
                     );
                     $groups_ids = array();
                     foreach( $groupsUsers as $GroupUser ) {
-                        $groups_ids[$GroupUser->groupId] = $GroupUser->place;
+                        $groups_ids[] = $GroupUser->groupId;
                     }
 
                     if( !empty($groups_ids) ) {
                         $user_groups_uns = GroupFactory::Get(array(
-                            '_group_id' =>  array_keys( $groups_ids )
+                            '_group_id' =>  $groups_ids
                         ));
-                        foreach( $groups_ids as $group_id => $place ) {
-                            if( isset($user_groups_uns[$group_id])) {
-                                $tmp = $user_groups_uns[$group_id];
-                                $tmp->place = $place;
-                                $user_groups[$group_id] = $tmp;
-                            }
-                        }
+
                     }
                 }
 
-                $res['lists'] = array(
-                    'global_list' => $global_groups,
-                    'private_list'=> $user_groups,
-                    'shared_list' => $shared_groups,
+                $res['data'] = array(
+                    'global' => $global_groups,
+                    'private'=> $user_groups,
+                    'shared' => $shared_groups,
                 );
+                $res['success'] = true;
+                die( ObjectHelper::ToJSON( $res ));
             }
 
             if ( $type == 'Barter' ) {
@@ -102,22 +99,20 @@
         private function get_global_list( $global_groups, $source )
         {
 
-
             $global_groupUser = GroupUserFactory::Get( array(
                 'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
                 'sourceType'    =>  $source
                 )
-            , array(
-                    'orderBy'   =>  'place'
-                )
+                , array( 'orderBy'   =>  'place')
             );
 
             $result = array();
             foreach( $global_groupUser as $ggu ) {
-                if( isset ( $global_groups[$ggu->groupId] )) {
-                    $tmp = $global_groups[$ggu->groupId];
-                    $tmp->place = $ggu->place;
-                    $result[$ggu->groupId] = $tmp;
+                if( isset( $global_groups[$ggu->groupId])) {
+                    $result[] = array(
+                        'id'    =>  $global_groups[$ggu->groupId]->group_id,
+                        'name'  =>  $global_groups[$ggu->groupId]->name
+                    );
                 }
             }
             return $result;
