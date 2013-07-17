@@ -35,15 +35,17 @@
                     );
                     $groups_ids = array();
                     foreach( $groupsUsers as $GroupUser ) {
-                        $groups_ids[] = $GroupUser->groupId;
+                        $groups_ids[$GroupUser->groupId] = $GroupUser->place;
                     }
 
                     if( !empty($groups_ids) ) {
                         $user_groups_uns = GroupFactory::Get(array(
-                            '_group_id' =>  $groups_ids
+                            '_group_id' =>  array_keys( $groups_ids )
                         ));
-                        foreach( $groups_ids as $gi ) {
-                            $user_groups[$gi] = $user_groups_uns[$gi];
+                        foreach( $groups_ids as $group_id => $place ) {
+                            $tmp = $user_groups_uns[$group_id];
+                            $tmp->place = $place;
+                            $user_groups[$group_id] = $tmp;
                         }
                     }
                 }
@@ -107,7 +109,9 @@
 
             $result = array();
             foreach( $global_groupUser as $ggu ) {
-                $result[$ggu->groupId] = $global_groups[$ggu->groupId];
+                $tmp = $global_groups[$ggu->groupId];
+                $tmp->place = $ggu->place;
+                $result[$ggu->groupId] = $tmp;
             }
             return $result;
         }
