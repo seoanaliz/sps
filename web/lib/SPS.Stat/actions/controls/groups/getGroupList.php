@@ -52,6 +52,14 @@
                         ));
 
                     }
+                    foreach( $groups_ids as $group_id ) {
+                        if( isset( $user_groups_uns[$group_id])) {
+                            $user_groups[] = array(
+                                'id'    =>  $user_groups_uns[$group_id]->group_id,
+                                'name'  =>  $user_groups_uns[$group_id]->name
+                            );
+                        }
+                    }
                 }
 
                 $res['data'] = array(
