@@ -365,45 +365,6 @@ td {
 #main .left-column > .content .list-body .column .stat-link-icon:hover .icon {
   opacity: 1;
 }
-#main .left-column > .content .list-body.edit-mode .public {
-  padding: 0;
-}
-#main .left-column > .content .list-body.edit-mode .public-info .photo {
-  width: 22px;
-  height: 22px;
-  overflow: hidden;
-  margin: 8px 10px;
-}
-#main .left-column > .content .list-body.edit-mode .public-actions .action.add-to-list {
-  display: none;
-}
-#main .left-column > .content .list-body.edit-mode .public-actions .action.delete-public {
-  display: block;
-}
-#main .left-column > .content .list-body.edit-mode .public-contacts {
-  margin: 5px 0;
-}
-#main .left-column > .content .list-body.edit-mode .public-contacts .contact .content {
-  height: 22px;
-  min-height: 22px;
-  line-height: 22px;
-  padding: 3px 25px 3px 30px;
-}
-#main .left-column > .content .list-body.edit-mode .public-contacts .contact .photo {
-  max-width: 22px;
-}
-#main .left-column > .content .list-body.edit-mode .public-contacts .contact .description {
-  display: none;
-}
-#main .left-column > .content .list-body.edit-mode .public.not-editable {
-  display: block;
-}
-#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions .action.delete-public {
-  display: none;
-}
-#main .left-column > .content .list-body.edit-mode .public.not-editable .public-actions .action.restore-public {
-  display: block;
-}
 #main .left-column > .content .table.no-list-id .public-actions .action .icon {
   opacity: 0.3;
 }
@@ -447,6 +408,14 @@ td {
 }
 .right-column .item.selected .icon {
   background-image: url('../../images/st/star-white.png');
+}
+.right-column .edit {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: red;
+  top: 0;
+  left: 2px;
 }
 .right-column .title {
   color: #555;

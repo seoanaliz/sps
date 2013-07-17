@@ -180,8 +180,9 @@ var FILTER_LIST =
 
 var FILTER_LIST_ITEM =
 '<div class="item" title="<?=itemTitle?>" data-id="<?=itemId?>">' +
+    '<span class="edit"></span>' +
     '<span class="text"><?=itemTitle?></span>' +
-    '<?if( cur.dataUser.isEditor ) { ?>'+
+    '<?if (cur.dataUser.isEditor) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
     '<? } ?>'+
 '</div>';

@@ -342,66 +342,6 @@ table, tr, td {
                     }
                 }
             }
-
-            &.edit-mode {
-                .public {
-                    padding: 0;
-                }
-
-                .public-info {
-                    .photo {
-                        width: 22px;
-                        height: 22px;
-                        overflow: hidden;
-                        margin: 8px 10px;
-                    }
-                }
-
-                .public-actions {
-                    .action {
-                        &.add-to-list {
-                            display: none;
-                        }
-                        &.delete-public {
-                            display: block;
-                        }
-                    }
-                }
-
-                .public-contacts {
-                    margin: 5px 0;
-
-                    .contact {
-                        .content {
-                            height: 22px;
-                            min-height: 22px;
-                            line-height: 22px;
-                            padding: 3px 25px 3px 30px;
-                        }
-                        .photo {
-                            max-width: 22px;
-                        }
-                        .description {
-                            display: none;
-                        }
-                    }
-                }
-
-                .public.not-editable {
-                    display: block;
-
-                    .public-actions {
-                        .action {
-                            &.delete-public {
-                                display: none;
-                            }
-                            &.restore-public {
-                                display: block;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         .table.no-list-id {
@@ -463,6 +403,15 @@ table, tr, td {
                 background-image: url('../../images/st/star-white.png');
             }
         }
+    }
+
+    .edit {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: red;
+        top: 0;
+        left: 2px;
     }
 
     .title {

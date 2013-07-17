@@ -259,9 +259,6 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .edit', 'click', function() {
-            Table.toggleEditMode();
-        });
         $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
@@ -559,7 +556,6 @@ var Filter = (function() {
 
 var Table = (function() {
     var $container;
-    var idEditMode = false;
     var dataTable = {};
     var pagesLoaded = 0;
     var currentListId = 0;
@@ -1065,20 +1061,6 @@ var Table = (function() {
         }
     }
 
-    function toggleEditMode() {
-        editMode(!idEditMode);
-    }
-
-    function editMode(on) {
-        idEditMode = on;
-        var $list = $container.find('.list-body');
-        if (on) {
-            $list.addClass('edit-mode');
-        } else {
-            $list.removeClass('edit-mode');
-        }
-    }
-
     function setCurrentInterval(interval) {
         currentInterval = interval;
     }
@@ -1091,8 +1073,6 @@ var Table = (function() {
         search: search,
         setPeriod: setPeriod,
         setAudience: setAudience,
-        editMode: editMode,
-        toggleEditMode: toggleEditMode,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval
     };
