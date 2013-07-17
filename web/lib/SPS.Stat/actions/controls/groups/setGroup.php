@@ -72,33 +72,6 @@
             die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
 
 
-            if( !StatUsers::is_Sadmin( $user_id )) {
-                 die( ObjectHelper::ToJSON(array('response' => false)));
-            }
-
-            if ( $m_class::check_group_name_used( $user_id, $groupName ))  {
-                die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
-            }
-
-            if ( $general && !StatUsers::is_Sadmin( $user_id ) ) {
-                die( ObjectHelper::ToJSON(array('response' => false)));
-            }
-
-            //если мы создаем general группу, ее надо применить ко всем юзерам, посему
-            //вместо id текущего юзера мы посылаем массив всех
-//            elseif ( $general && !$groupId )
-//                $user_id = StatUsers::get_users();
-
-            $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
-
-            if ( !$newGroupId ) {
-                die( ObjectHelper::ToJSON(array( 'response' => false )));
-            }
-
-            if ( !$groupId )
-                $m_class::implement_group( $newGroupId, $user_id );
-
-            die( ObjectHelper::ToJSON( array( 'response' => $newGroupId )));
         }
 
 
