@@ -90,13 +90,14 @@ if(!empty($jsFilesAdds)) {
     <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
     <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
+
+    <script type="text/javascript">
+        var rank = <?= ObjectHelper::ToJSON(StatAccessUtility::GetRankInSource(AuthVkontakte::IsAuth(), Group::STAT_GROUP))?>;
+    </script>
+ 
     <?= JsHelper::Flush(); ?>
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
-        <script type="text/javascript">
-            var rank = <?= ObjectHelper::ToJSON(StatAccessUtility::GetRankInSource(AuthVkontakte::IsAuth(), Group::STAT_GROUP))?>;
-        </script>
-
     <? } ?>
     <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>

@@ -589,11 +589,11 @@ td {
   white-space: nowrap;
   width: 150px;
 }
-.dropdown>.add-item {
+.dropdown .add-item {
   cursor: text;
   display: none;
 }
-.dropdown>.show-input {
+.dropdown .show-input {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -601,6 +601,11 @@ td {
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  border-top: 1px solid #b8b8b8;
+  background: #f8f8f8;
+}
+.dropdown .show-input:nth-child(2) {
+  border: none;
 }
 .dropdown>.item>.icon {
   opacity: 0;
@@ -679,13 +684,25 @@ td {
   float: right;
   margin-top: 7px;
 }
-.header>.actions {
-  float: right;
+.header .actions {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
   padding: 12px 8px 0;
-  color: #999;
 }
-.header>.actions>a {
-  margin: 0 0.7em;
+.header .actions a {
+  padding: 0 1em 0 0.9em;
+  border-left: 1px solid #2b587a;
+}
+.header .actions a:first-child {
+  border: none;
 }
 .login-info {
   margin: 3px 7px 0 24px;
