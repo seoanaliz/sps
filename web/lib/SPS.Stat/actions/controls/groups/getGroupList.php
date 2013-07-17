@@ -43,9 +43,11 @@
                             '_group_id' =>  array_keys( $groups_ids )
                         ));
                         foreach( $groups_ids as $group_id => $place ) {
-                            $tmp = $user_groups_uns[$group_id];
-                            $tmp->place = $place;
-                            $user_groups[$group_id] = $tmp;
+                            if( isset($user_groups_uns[$group_id])) {
+                                $tmp = $user_groups_uns[$group_id];
+                                $tmp->place = $place;
+                                $user_groups[$group_id] = $tmp;
+                            }
                         }
                     }
                 }
@@ -76,6 +78,7 @@
 
         /** @var $groups Group[]*/
         public function form_stat_lists( $groups ) {
+            $res = array();
             foreach($groups as $group ) {
                 $res[] = array(
                     'group_id'  =>  $group->group_id ,
@@ -109,9 +112,11 @@
 
             $result = array();
             foreach( $global_groupUser as $ggu ) {
-                $tmp = $global_groups[$ggu->groupId];
-                $tmp->place = $ggu->place;
-                $result[$ggu->groupId] = $tmp;
+                if( isset ( $global_groups[$ggu->groupId] )) {
+                    $tmp = $global_groups[$ggu->groupId];
+                    $tmp->place = $ggu->place;
+                    $result[$ggu->groupId] = $tmp;
+                }
             }
             return $result;
         }
