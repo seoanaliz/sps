@@ -40,7 +40,7 @@
                     if( $list_type == GroupsUtility::Group_Global ) {
                         if( !StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP))
                             die( ObjectHelper::ToJSON( array( 'response' => false )));
-                        $this->set_default_order();
+                        GroupsUtility::set_default_order();
                         $user_id = GroupsUtility::Fake_User_ID_Global;
                     } else {
                         if( !StatAccessUtility::CanEditGlobalGroups( $user_id, Group::STAT_GROUP)) {
@@ -114,26 +114,5 @@
             return $groupUserArray;
         }
 
-        private function set_default_order(  ) {
-            $i = 0;
-            $global_groups = GroupFactory::Get( array(
-                'type'      =>  GroupsUtility::Group_Global,
-                'source'    =>  Group::STAT_GROUP
-            ));
-            $check = GroupUserFactory::Get( array(
-                'groupId'   =>  current($global_groups)->group_id,
-                'vkId'    =>  GroupsUtility::Fake_User_ID_Global
-            ));
-            if ( !empty($check)) {
-                return;
-            }
-            $global_groupUser = array();
-            foreach( $global_groups as $global_group ) {
-                $tmp = new GroupUser($global_group->group_id, GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
-                $tmp->place = ++$i;
-                $global_groupUser[] = $tmp;
-            }
 
-            GroupUserFactory::AddRange( $global_groupUser);
-        }
     }

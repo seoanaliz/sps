@@ -23,6 +23,7 @@
             }
             if ( $type == 'Stat') {
                 $global_groups = $this->get_global_list( Group::STAT_GROUP );
+                GroupsUtility::set_default_order($global_groups);
                 $user_groups = array();
                 $shared_groups = array();
                 if( $user_id ) {

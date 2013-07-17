@@ -225,5 +225,31 @@
             ));
             return $count + 1;
         }
+
+        //проверяетзадан ли порядкок для общих категорий. нет - делает его
+        public static function set_default_order( $global_groups = false ) {
+            $i = 0;
+            if( !$global_groups) {
+                $global_groups = GroupFactory::Get( array(
+                    'type'      =>  GroupsUtility::Group_Global,
+                    'source'    =>  Group::STAT_GROUP
+                ));
+            }
+            $check = GroupUserFactory::Get( array(
+                'groupId'   =>  current($global_groups)->group_id,
+                'vkId'    =>  GroupsUtility::Fake_User_ID_Global
+            ));
+            if ( !empty($check)) {
+                return;
+            }
+            $global_groupUser = array();
+            foreach( $global_groups as $global_group ) {
+                $tmp = new GroupUser($global_group->group_id, GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                $tmp->place = ++$i;
+                $global_groupUser[] = $tmp;
+            }
+
+            GroupUserFactory::AddRange( $global_groupUser);
+        }
     }
 ?>
