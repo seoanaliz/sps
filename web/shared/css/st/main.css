@@ -385,20 +385,9 @@ td {
 }
 .right-column .item:hover .icon {
   display: block;
-  opacity: 0.5;
+  opacity: 0.4;
 }
-.right-column .item .icon {
-  position: absolute;
-  margin-top: -0.66em;
-  top: 50%;
-  right: 4px;
-  display: none;
-  padding: 1px;
-  background-image: url('../../images/st/star.png');
-}
-.right-column .item .icon:hover,
-.right-column .item .icon.selected {
-  display: block;
+.right-column .item:hover .icon:hover {
   opacity: 1;
 }
 .right-column .item.selected {
@@ -406,16 +395,27 @@ td {
   color: #fff;
   box-shadow: 0 0 1px rgba(0,0,0,0.6) inset;
 }
-.right-column .item.selected .icon {
+.right-column .item.selected .edit {
+  background-image: url('../../images/common/edit-white.png');
+}
+.right-column .item.selected .bookmark {
   background-image: url('../../images/st/star-white.png');
 }
-.right-column .edit {
+.right-column .icon {
   position: absolute;
-  width: 12px;
-  height: 12px;
-  background: red;
-  top: 0;
-  left: 2px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  display: none;
+}
+.right-column .edit {
+  right: 21px;
+  background: url('../../images/common/edit.png') 50% 50% no-repeat;
+}
+.right-column .bookmark {
+  right: 1px;
+  background: url('../../images/st/star.png') 2px 2px no-repeat;
 }
 .right-column .title {
   color: #555;

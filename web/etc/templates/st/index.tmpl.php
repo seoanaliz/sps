@@ -20,7 +20,6 @@
         <div class="under">
             <div class="actions">
                 <a class="share">Поделиться</a>
-                <a class="edit">Редактировать</a>
                 <a class="delete">Удалить</a>
             </div>
         </div>

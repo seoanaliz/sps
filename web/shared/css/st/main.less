@@ -374,23 +374,11 @@ table, tr, td {
 
             .icon {
                 display: block;
-                .opacity(0.5);
-            }
-        }
-
-        .icon {
-            position: absolute;
-            margin-top: -.66em;
-            top: 50%;
-            right: 4px;
-            display: none;
-            padding: 1px;
-            background-image: url('../../images/st/star.png');
-
-            &:hover,
-            &.selected {
-                display: block;
-                opacity: 1;
+                opacity: 0.4;
+                
+                &:hover {
+                    opacity: 1;
+                }
             }
         }
 
@@ -399,21 +387,35 @@ table, tr, td {
             color: #fff;
             box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
 
-            .icon {
+            .edit {
+                background-image: url('../../images/common/edit-white.png');
+            }
+
+            .bookmark {
                 background-image: url('../../images/st/star-white.png');
             }
         }
     }
 
-    .edit {
+    .icon {
         position: absolute;
-        width: 12px;
-        height: 12px;
-        background: red;
-        top: 0;
-        left: 2px;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        margin-top: -9px;
+        display: none;
     }
 
+    .edit {
+        right: 21px;
+        background: url('../../images/common/edit.png') 50% 50% no-repeat;
+    }
+
+    .bookmark {
+        right: 1px;
+        background: url('../../images/st/star.png') 2px 2px no-repeat;
+    }
+    
     .title {
         color: #555;
         font-weight: bold;
