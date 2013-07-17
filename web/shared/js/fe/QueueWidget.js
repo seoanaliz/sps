@@ -462,7 +462,7 @@ var QueueWidget = Event.extend({
             }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-                    Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
+                    Events.fire('post_moved', postId, $slot.data('id'), null, null, function(isOk, data) {
                         if (isOk && data && data.html) {
                             t.setSlotArticleHtml($slot, data.html);
                         }

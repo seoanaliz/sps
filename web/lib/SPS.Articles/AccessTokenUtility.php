@@ -15,8 +15,8 @@
 
             $index = $random ? array_rand($userFeeds) : 0;
 
-            $access_token =  AccessTokenFactory::GetOne( array( 'vkId' => $userFeeds[$index]->vkId ));
-            if( !empty( $access_token ))
+            $access_token = AccessTokenFactory::GetOne( array( 'vkId' => $userFeeds[$index]->vkId ));
+            if (!empty( $access_token ))
                 return $access_token->accessToken;
             return $access_token;
         }
@@ -25,12 +25,13 @@
         public static function getPublisherTokenForTargetFeed($targetFeedId, $random = false )
         {
             $publishers = TargetFeedPublisherFactory::Get(array('targetFeedId' => $targetFeedId));
-            if( empty($publishers))
+            if (empty($publishers)) {
                 return false;
+            }
             $index = $random ? array_rand( $publishers) : 0;
             $publisher = PublisherFactory::GetById( $publishers[$index]->publisherId);
 
-            if( !empty( $publisher->vk_token ))
+            if (!empty( $publisher->vk_token ))
                 return $publisher->vk_token;
             return false;
         }
