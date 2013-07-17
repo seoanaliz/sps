@@ -15,7 +15,6 @@
     */
         public function Execute()
         {
-            error_reporting( 0 );
             $user_id    =   AuthVkontakte::IsAuth();
             $type       =   ucfirst( Request::getString( 'type' ));
             $type_array = array( 'Stat', 'Mes', 'Barter' );
@@ -23,13 +22,16 @@
                 $type    = 'Stat';
             }
             if ( $type == 'Stat') {
-                $global_groups = GroupFactory::Get(array( 'type' => GroupsUtility::Group_Global, 'source'=>Group::STAT_GROUP));
+                $global_groups = $this->get_global_list( Group::STAT_GROUP );
                 $user_groups = array();
                 $shared_groups = array();
                 if( $user_id ) {
                     $groupsUsers = GroupUserFactory::Get(array(
                         'vkId'          => $user_id,
                         'sourceType'    => Group::STAT_GROUP)
+                    ,array(
+                            'orderBy'   => 'place'
+                        )
                     );
                     $groups_ids = array();
                     foreach( $groupsUsers as $GroupUser ) {
@@ -37,9 +39,12 @@
                     }
 
                     if( !empty($groups_ids) ) {
-                        $user_groups = GroupFactory::Get(array(
+                        $user_groups_uns = GroupFactory::Get(array(
                             '_group_id' =>  $groups_ids
                         ));
+                        foreach( $groups_ids as $gi ) {
+                            $user_groups[$gi] = $user_groups_uns[$gi];
+                        }
                     }
                 }
 
@@ -51,7 +56,6 @@
             }
 
             if ( $type == 'Barter' ) {
-                $source = 1;
                 GroupsUtility::get_default_group( $user_id, Group::BARTER_GROUP );
                 $search = array(
                     'status' => 1,
@@ -81,5 +85,30 @@
                 );
             }
             return $res;
+        }
+
+        private function get_global_list( $source )
+        {
+            $global_groups = GroupFactory::Get(
+                array(
+                    'type'  =>  GroupsUtility::Group_Global,
+                    'source'=>  $source
+                )
+            );
+
+            $global_groupUser = GroupUserFactory::Get( array(
+                'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
+                'sourceType'    =>  $source
+                )
+            , array(
+                    'orderBy'   =>  'place'
+                )
+            );
+
+            $result = array();
+            foreach( $global_groupUser as $ggu ) {
+                $result[$ggu->groupId] = $global_groups[$ggu->groupId];
+            }
+            return $result;
         }
     }

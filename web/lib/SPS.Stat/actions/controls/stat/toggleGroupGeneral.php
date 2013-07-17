@@ -13,7 +13,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
 
             $group_id  =  Request::getInteger( 'groupId' );
             $user_id   =  AuthVkontakte::IsAuth();
@@ -26,8 +25,20 @@
                 if( !empty( $group )) {
                     if( $group->type == GroupsUtility::Group_Global) {
                         $group->type = GroupsUtility::Group_Private;
-                        GroupUserFactory::Add( new GroupUser($group_id, $user_id, Group::STAT_GROUP));
+                        GroupUserFactory::DeleteByMask( array(
+                            'groupId'       =>  $group_id,
+                            'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
+                            'sourceType'    =>  Group::STAT_GROUP
+                        ));
+                        $tmp = new GroupUser($group_id, $user_id, Group::STAT_GROUP);
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP);
+                        GroupUserFactory::Add( $tmp);
                     } else {
+                        //нумерация
+                        $tmp = new GroupUser($group_id, GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                        GroupUserFactory::Add($tmp);
+
                         $group->type = GroupsUtility::Group_Global;
                         GroupUserFactory::DeleteByMask( array(
                             'groupId'       =>  $group_id,

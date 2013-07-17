@@ -14,6 +14,7 @@
         const Group_Id_Special_All = 'all';
         const Group_Id_Special_All_Not = 'all_not_listed';
 
+        const Fake_User_ID_Global = -1;
 
         public static $special_group_ids = array(
             self::Group_Id_Special_All      => 'Все',
@@ -215,6 +216,14 @@
 //                    continue;
                 $group->users_ids = array_unique( array_merge( $group->users_ids, $rec_ids ));
             }
+        }
+
+        public static function get_next_index_groupUser( $user_id, $source ) {
+            $count = GroupUserFactory::Count( array(
+                'vkId'      =>  $user_id,
+                'sourceType'=>  $source
+            ));
+            return $count + 1;
         }
     }
 ?>
