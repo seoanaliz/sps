@@ -57,6 +57,7 @@
                 if ( $type == 'Stat'  ) {
                     //прикрепляем группу к юзеру
                     $groupUser = new GroupUser($group->group_id, $user_id, Group::STAT_GROUP);
+                    $groupUser->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP );
                     GroupUserFactory::Add($groupUser);
                 }
             } else {
@@ -99,6 +100,7 @@
 
             die( ObjectHelper::ToJSON( array( 'response' => $newGroupId )));
         }
+
 
     }
 
