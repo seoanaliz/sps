@@ -950,7 +950,8 @@ var Table = (function() {
                     var $search = $dropdown.find('.search');
                     function clearSearch() {
                         $search.attr('value', '');
-                        $search.change();
+                        $search.trigger('change');
+                        $search.focus();
                     }
                     $dropdown.find('.clear-search').click(function () {
                         clearSearch();
