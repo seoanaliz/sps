@@ -141,7 +141,7 @@ var CONTACT =
 
 var DROPDOWN =
 '<div class="dropdown">' +
-    '<span class="icon delete search-clear"></span>' +
+    '<span class="icon delete clear-search"></span>' +
     '<input type="text" class="search" placeholder="Поиск" />' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +

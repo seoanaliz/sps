@@ -580,7 +580,7 @@ td {
   box-shadow: 0 2px 4px rgba(0,0,0,0.25);
   z-index: 10;
 }
-.dropdown .search-clear {
+.dropdown .clear-search {
   position: absolute;
   top: 0;
   right: 2px;
@@ -589,7 +589,7 @@ td {
   padding: 4px;
   opacity: 0.4;
 }
-.dropdown .search-clear:hover {
+.dropdown .clear-search:hover {
   opacity: 1;
 }
 .dropdown .item,

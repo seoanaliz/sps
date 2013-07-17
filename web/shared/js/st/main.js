@@ -952,7 +952,7 @@ var Table = (function() {
                         $search.attr('value', '');
                         $search.change();
                     }
-                    $dropdown.find('.search-clear').click(function () {
+                    $dropdown.find('.clear-search').click(function () {
                         clearSearch();
                     });
                     var previousValue = '';
