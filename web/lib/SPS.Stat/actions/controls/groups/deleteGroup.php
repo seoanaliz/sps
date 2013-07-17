@@ -16,7 +16,6 @@
 
         public function Execute() {
 
-            error_reporting( 0 );
             $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
@@ -58,7 +57,7 @@
             } elseif ( $type == 'Stat' ) {
                 $res = false;
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if( empty( $group)) {
+                if( empty( $group )) {
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
                 }
 
@@ -81,7 +80,7 @@
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
-            if ( statUsers::is_Sadmin( $user_id ) ) {
+            if ( statUsers::is_Sadmin( $user_id )) {
                 $res = $m_class::delete_group( $group_id );
             }
 //            elseif ( !$general ) {
@@ -98,6 +97,9 @@
             }
 
             die( ObjectHelper::ToJSON(array('response' => false)));
+        }
+
+        private function remove_inLists_state( $group_id ) {
         }
     }
 ?>

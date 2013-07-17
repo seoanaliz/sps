@@ -14,7 +14,6 @@ class getEntries {
      */
     public function Execute()
     {
-        error_reporting( 0 );
         $this->conn =   ConnectionFactory::Get('tst');
         $user_id    =   AuthVkontakte::IsAuth();
         $group_id   =   Request::getString( 'groupId' );
