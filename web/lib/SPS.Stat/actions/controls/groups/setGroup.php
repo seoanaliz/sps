@@ -14,7 +14,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
 
             $user_id    =   AuthVkontakte::IsAuth();
             $groupId    =   Request::getInteger( 'groupId' );
@@ -26,12 +25,7 @@
             $type_array = array( 'Stat', 'Mes', 'Barter' );
             if ( !$type || !in_array( $type, $type_array ))
                 $type    = 'Stat';
-
-            $m_class    = $type . 'Groups';
-            $general    = $general  ? $general : 0;
             $groupId    = $groupId  ? $groupId : 0;
-            $ava        = $ava      ? $ava     : NULL;
-            $comments   = $comments ? $comments : NULL;
 
             if ( !$groupName || !$user_id ) {
                 die(ERR_MISSING_PARAMS);
@@ -66,7 +60,7 @@
                     GroupUserFactory::Add($groupUser);
                 }
             } else {
-                $group = GroupFactory::GetOne( array( 'group_id' => $groupId, 'created_by' => $user_id ));
+                $group = GroupFactory::GetOne( array( 'group_id' => $groupId ));
                 $default_group = GroupsUtility::get_default_group( $user_id, $group_source );
                 if ( empty( $group ) || $group->group_id === $default_group->group_id )
                     die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
@@ -74,7 +68,6 @@
                 if ( !GroupFactory::Update( $group, array()))
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
             }
-            GroupFactory::Update($group);
             die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
 
 
