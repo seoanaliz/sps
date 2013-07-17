@@ -417,6 +417,30 @@ td {
   right: 1px;
   background: url('../../images/st/star.png') 2px 2px no-repeat;
 }
+.right-column .edit-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 128px;
+  border: none;
+  padding-right: 37px;
+}
+.right-column .saver {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  margin-right: -40px;
+  background: #f1f1f1;
+  border: 1px solid #d8dfea;
+  width: 32px;
+  height: 15px;
+  padding-top: 1px;
+  border-radius: 3px;
+  text-align: center;
+}
 .right-column .title {
   color: #555;
   font-weight: bold;

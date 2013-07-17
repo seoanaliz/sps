@@ -473,14 +473,45 @@ var Filter = (function() {
         $list.delegate('.item', 'click', function() {
             listSelect($(this).data('id'));
         });
-        $list.delegate('.item > .bookmark', 'click', function(e) {
+        $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
-            var $icon = $(this);
-            var $item = $icon.closest('.item');
-            var listId = $item.data('id');
+            var listId = $(this).closest('.item').data('id');
             Events.fire('toggle_group_general', listId, function() {
                 Filter.listRefresh();
             });
+        });
+        $list.delegate('.edit', 'click', function(e) {
+            e.stopPropagation();
+            var stillShowing = true;
+            var $item = $(this).closest('.item');
+            var $editField = $('<textarea class="edit-field">'+ $item.attr('title') +'</textarea>');
+            var $saver = $('<span class="saver">Save</span>');
+            $item.append($editField);
+            $editField.focus();
+            setTimeout(function () {
+                if (stillShowing) {
+                    $item.append($saver);
+                    $saver.animate({'margin-right': 0});
+                }
+            }, 500);
+            $editField.click(function (e) {
+                e.stopPropagation();
+            });
+            $saver.click(function () {
+                e.stopPropagation();
+                destroyEditor();
+            });
+            $editField.bind('blur keyup', function (e) {
+                if (!e.keyCode || e.keyCode === KEY.ESC) {
+                    destroyEditor();
+                }
+            });
+            
+            function destroyEditor() {
+                stillShowing = false;
+                $editField.remove();
+                $saver.remove();
+            }
         });
         // сортировка списков
         $list.filter('.private, .global').sortable({
