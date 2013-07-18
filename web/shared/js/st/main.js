@@ -520,7 +520,11 @@ var Filter = (function() {
                 $(this).find('.item').each(function () {
                     sortedIds.push(this.getAttribute('data-id'));
                 });
-                Events.fire('sort_list', sortedIds, function () {});
+                Events.fire('sort_list', sortedIds, function (success) {
+                    if (!success) {
+                        Filter.listRefresh();
+                    }
+                });
             }
         });
     }

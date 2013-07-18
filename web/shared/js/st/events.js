@@ -276,7 +276,9 @@ var Eventlist = {
             dataType: 'json',
             success: function (resp) {
                 if (resp.success) {
-                    callback();
+                    callback(true);
+                } else {
+                    callback(false);
                 }
             }
         });
