@@ -231,8 +231,6 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            Counter.refresh();
             callback(true);
         });
     },

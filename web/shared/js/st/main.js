@@ -41,7 +41,6 @@ $(document).ready(function() {
     Filter.init(function() {
         List.init(function() {
             Table.init();
-            Counter.init();
         });
     });
     checkVkStatus();
@@ -1107,26 +1106,5 @@ var Table = (function() {
         setAudience: setAudience,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval
-    };
-})();
-
-var Counter = (function(){
-    var $container;
-
-    function init() {
-        $container = $('#listed-counter');
-        if( cur.dataUser.isEditor ) {
-            $container.show();
-        }
-        refresh();
-    }
-
-    function refresh(){
-       $container.find('span').text(cur.dataUser.listed);
-    }
-
-    return {
-        init: init,
-        refresh: refresh
     };
 })();
