@@ -879,7 +879,7 @@ var Table = (function() {
                 }
             }
             if (publicData) {
-                _createDropdownList(e, publicData);
+                _createDropdown(e, publicData);
             }
         });
 
@@ -963,7 +963,7 @@ var Table = (function() {
         })();
     }
 
-    function _createDropdownList(e, publicData) {
+    function _createDropdown(e, publicData) {
         var $el = $(e.currentTarget);
         var offset = $el.offset();
         var $dropdown = $el.data('dropdown');
@@ -1028,9 +1028,9 @@ var Table = (function() {
                 });
                 $dropdown.delegate('.add-item', 'keyup blur', function(e) {
                     var text = $.trim($input.val());
-                    if (e.keyCode && e.keyCode != KEY.ENTER) return false;
+                    if (e.keyCode && e.keyCode !== KEY.ENTER) return false;
                     if (!text) return false;
-                    if (e.keyCode == KEY.ENTER) return $input.blur();
+                    if (e.keyCode === KEY.ENTER) return $input.blur();
                     return onSave(text);
                 });
                 $dropdown.bind('mousedown', function(e) {
@@ -1049,10 +1049,9 @@ var Table = (function() {
                     }, 50);
                 });
 
-                function onSave(text) {
-                    Events.fire('add_list', text, function() {
+                function onSave(groupName) {
+                    Events.fire('add_list', groupName, function() {
                         Events.fire('load_list', function(dataList) {
-                            $el.data('dropdown', false);
                             var all_lists = dataList.private;
                             all_lists.push.apply(all_lists,dataList.global);
 

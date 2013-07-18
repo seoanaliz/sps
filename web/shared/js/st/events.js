@@ -203,11 +203,18 @@ var Eventlist = {
             callback(clearList, clearPeriod, clearListType);
         });
     },
-    add_list: function(title, callback) {
-        simpleAjax('setGroup', {
-            groupName: title
-        }, function(dirtyData) {
-            callback(true);
+    add_list: function(groupName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            dataType: 'json',
+            data: {
+                groupName: groupName
+            },
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
+            }
         });
     },
     update_list: function(public_id, list_id, title, callback) {
