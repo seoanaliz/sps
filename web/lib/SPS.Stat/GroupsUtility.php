@@ -118,14 +118,14 @@
         }
 
         //проверяет уникальность предлагаемого имени группы для данного типа групп данного пользователя
-        public static function check_name( $user_id, $group_source, $group_name )
+        public static function check_name( $user_id, $group_source, $group_name, $groupId = false )
         {
             $check = GroupFactory::Get( array(
                     'name'       =>     $group_name
                 ,   'created_by' =>     $user_id
                 ,   'source'     =>     $group_source
                 ,   '_statusNE'  =>     2 ));
-            if ( !$check )
+            if ( !$check  || ( isset( current( $check )->group_id) && current( $check )->group_id == $groupId ))
                 return true;
             return false;
         }
