@@ -142,7 +142,6 @@
             $group->users_ids   =   array(0);
             $group->status      =   7;
             GroupFactory::Update( $group );
-
         }
 
         //формирует отчет для групп. Если указан user_id, разделяет созданные им группы и нет
@@ -223,10 +222,10 @@
                 'vkId'      =>  $user_id,
                 'sourceType'=>  $source
             ));
-            return $count + 1;
+            return $count ;
         }
 
-        //проверяетзадан ли порядкок для общих категорий. нет - делает его
+        //проверяет, задан ли порядок для общих категорий. нет - делает его
         public static function set_default_order( $global_groups = false ) {
             $i = 0;
             if( !$global_groups) {
@@ -250,6 +249,47 @@
             }
 
             GroupUserFactory::AddRange( $global_groupUser);
+        }
+
+        public static function sort_groups_users( $user_id, $source, $groupId = null, $place = null ) {
+            $GroupUsers = GroupUserFactory::Get(
+                array(
+                    'vkId'          =>  $user_id,
+                    'sourceType'    =>  $source
+                ),
+                array( 'orderBy' => 'place' ));
+
+            if ( $groupId ) {
+
+                $GroupUsers = ArrayHelper::Collapse($GroupUsers, 'groupId', false);
+                if( !isset( $GroupUsers[ $groupId])) {
+                    return false;
+                }
+
+                $moved = $GroupUsers[ $groupId ];
+                unset( $GroupUsers[$groupId]);
+                $GroupUsers =  array_values( $GroupUsers);
+                $length = count( $GroupUsers);
+                if( $place < 0 || !$place ) {
+                    $place = 0;
+                }
+                if( $place > $length) {
+                    $place = $length;
+                }
+                $GroupUsers = array_merge(
+                    array_slice( $GroupUsers, 0, $place ),
+                    array( $moved),
+                    array_slice( $GroupUsers, $place, $length )
+                );
+            }
+
+            $i = 0;
+            foreach ( $GroupUsers as $GroupUser ) {
+                $GroupUser->place = $i++;
+            }
+
+            return $GroupUsers;
+
         }
     }
 ?>

@@ -69,12 +69,24 @@
 
                 if ( $is_global_can_delete || $is_private_can_delete ) {
                     $group->status = 2;
-                    $res = GroupFactory::Update( $group );
 
                     GroupEntryFactory::DeleteByMask( array(
-                        'group_id'      =>  $group->group_id,
+                        'groupId'       =>  $group->group_id,
                         'sourceType'    =>  Group::STAT_GROUP
                     ));
+
+                    GroupUserFactory::DeleteByMask( array(
+                        'groupId'       =>  $group->group_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    $NewGroupUsers = GroupsUtility::sort_groups_users( $user_id, Group::STAT_GROUP );
+                    GroupUserFactory::DeleteByMask( array(
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    GroupUserFactory::AddRange($NewGroupUsers);
+                    $res = true;
                 }
 
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
