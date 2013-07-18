@@ -429,21 +429,28 @@ i {font-style: italic;}
     }
 }
 
-.delete {
+.delete, .edit-trigger {
     position: absolute;
     top: 10px;
-    right: 10px;
     cursor: pointer;
-    background: url('../../images/common/delete.png') center no-repeat;
+    background: center no-repeat;
     width: 20px;
     height: 20px;
-    .opacity(0);
+    opacity: 0;
     .transition(0.2s opacity);
     z-index: 1;
 
     &:hover {
-        .opacity(1) !important;
+        opacity: 1 !important;
     }
+}
+.delete {
+    right: 10px;
+    background-image: url('../../images/common/delete.png');
+}
+.edit-trigger {
+    right: 30px;
+    background-image: url('../../images/common/edit.png');
 }
 
 .controls {
@@ -657,8 +664,8 @@ i {font-style: italic;}
             }
 
             &:hover {
-                .delete {
-                    .opacity(0.5);
+                .delete, .edit-trigger {
+                    opacity: 0.5;
                 }
             }
         }

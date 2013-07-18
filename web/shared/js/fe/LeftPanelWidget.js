@@ -47,7 +47,7 @@ var LeftPanelWidget = Event.extend({
         });
 
         $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if (e.ctrlKey && e.keyCode === KEY.ENTER) {
                 var $newComment = $(this).closest('.new-comment');
                 var $sendBtn = $newComment.find('.send');
                 $sendBtn.click();
@@ -828,12 +828,15 @@ var LeftPanelWidget = Event.extend({
 
         // Редактирование поста в левом меню
         $('#left-panel').delegate('.post .edit, .post.editable .content .shortcut', 'click', t.editPostInline);
-        $('#right-panel').delegate('.post .text', 'click', t.editPostInline);
+        $('#right-panel').delegate('.post .text, .edit-trigger', 'click', t.editPostInline);
     },
 
     editPostInline: function(){
-        var $post = $(this).closest('.post'),
-        $el = $post.find('.content'),
+        var $post = $(this).closest('.post');
+        if (!$post.length) {
+            $post = $(this).closest('.slot').find('.post');
+        }
+        var $el = $post.find('.content'),
         $buttonPanel = $post.find('.bottom.d-hide'),
         postId = $post.data('id'),
         queueId = $post.data('queue-id'),
