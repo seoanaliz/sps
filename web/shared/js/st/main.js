@@ -522,11 +522,9 @@ var Filter = (function() {
                 axis: 'y',
                 tolerance: 'pointer',
                 update: function (_, ui) {
-                    var sortedIds = [];
-                    $(this).find('.item').each(function () {
-                        sortedIds.push(this.getAttribute('data-id'));
-                    });
-                    Events.fire('sort_list', sortedIds, function (success) {
+                    var listId = ui.item.data('id');
+                    var index = $(this).find('.item').index(ui.item);
+                    Events.fire('sort_list', listId, index, function (success) {
                         if (!success) {
                             Filter.refreshList();
                         }
