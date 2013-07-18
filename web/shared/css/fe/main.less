@@ -409,7 +409,10 @@ i {font-style: italic;}
 
 .locked {
     .opacity(0.6);
-    .pointer-events(none);
+    
+    .slot-header {
+        .pointer-events(none);
+    }
 }
 
 .wall .post.removed {height:0;margin-bottom: 100px;overflow:hidden;padding:0;}
@@ -530,7 +533,7 @@ i {font-style: italic;}
             min-height: 114px;
 
             .delete {
-                .opacity(0);
+                opacity: 0;
             }
 
             .slot-header {
@@ -568,15 +571,15 @@ i {font-style: italic;}
                 cursor: pointer;
                 margin-top: 2px;
                 margin-left: 4px;
-                .opacity(0);
+                opacity: 0;
                 .transition(0.2s all);
 
                 &.active,
                 &:hover {
-                    .opacity(1);
+                    opacity: 1;
                 }
             }
-
+            
             input.hasDatepick {
                 width: 15px;
                 height: 10px;
@@ -645,10 +648,17 @@ i {font-style: italic;}
             &.new, &:hover {
                 .time-of-removal,
                 .datepicker {
-                    .opacity(0.5);
+                    opacity: 0.5;
                 }
             }
 
+            &.locked:hover {
+                .time-of-removal,
+                .datepicker {
+                    opacity: 0;
+                }
+            }
+            
             &.empty {
                 cursor: pointer;
 
@@ -669,7 +679,7 @@ i {font-style: italic;}
                 }
             }
         }
-        
+
         .slot.repeat {
             .repeater {
                 opacity: 1;

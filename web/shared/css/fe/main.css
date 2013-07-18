@@ -399,6 +399,8 @@ i {
 }
 .locked {
   opacity: 0.6;
+}
+.locked .slot-header {
   -webkit-pointer-events: none;
   -moz-pointer-events: none;
   pointer-events: none;
@@ -647,6 +649,10 @@ i {
 .right-panel .items .slot:hover .time-of-removal,
 .right-panel .items .slot:hover .datepicker {
   opacity: 0.5;
+}
+.right-panel .items .slot.locked:hover .time-of-removal,
+.right-panel .items .slot.locked:hover .datepicker {
+  opacity: 0;
 }
 .right-panel .items .slot.empty {
   cursor: pointer;

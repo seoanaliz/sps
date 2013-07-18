@@ -828,7 +828,7 @@ var LeftPanelWidget = Event.extend({
 
         // Редактирование поста в левом меню
         $('#left-panel').delegate('.post .edit, .post.editable .content .shortcut', 'click', t.editPostInline);
-        $('#right-panel').delegate('.post .text, .edit-trigger', 'click', t.editPostInline);
+        $('#right-panel').delegate('.slot:not(.locked) .text, .edit-trigger', 'click', t.editPostInline);
     },
 
     editPostInline: function(){
