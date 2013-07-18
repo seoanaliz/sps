@@ -144,8 +144,10 @@ var DROPDOWN =
     '<span class="icon delete clear-search"></span>' +
     '<input type="text" class="search" placeholder="Поиск" />' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
-    '<input type="text" class="add-item" placeholder="Название списка" />' +
-    '<div class="show-input">Создать список</div>' +
+    '<? if (cur.dataUser.isAdmin) { ?>'+
+        '<input type="text" class="add-item" placeholder="Название списка" />' +
+        '<div class="show-input">Создать список</div>' +
+    '<? } ?>'+
 '</div>';
 
 var DROPDOWN_ITEM =
