@@ -270,14 +270,14 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    Filter.listRefresh(function() {
+                    Filter.refreshList(function() {
                         $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
         });
         $container.delegate('.tab', 'click', function() {
-            Filter.listSelect($(this).data('id'));
+            Filter.selectList($(this).data('id'));
         });
     }
 
@@ -303,7 +303,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.listSelect($item.data('id'));
+            Filter.selectList($item.data('id'));
         }
     }
 
@@ -335,7 +335,7 @@ var Filter = (function() {
         $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
-        listRefresh(callback);
+        refreshList(callback);
     }
 
     function _initEvents() {
@@ -465,13 +465,13 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            listSelect($(this).data('id'));
+            selectList($(this).data('id'));
         });
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
             var listId = $(this).closest('.item').data('id');
             Events.fire('toggle_group_general', listId, function() {
-                Filter.listRefresh();
+                Filter.refreshList();
             });
         });
         $list.delegate('.edit', 'click', function(e) {
@@ -500,9 +500,13 @@ var Filter = (function() {
             });
 
             function saveEditor() {
-                Events.fire('rename_list', $item.data('id'), $editField.val(), function (data) {
-                    $item.attr('title', data.groupName);
-                    $item.find('.text').text(data.groupName);
+                Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
+                    if (success) {
+                        $item.attr('title', data.groupName);
+                        $item.find('.text').text(data.groupName);
+                    } else {
+                        Filter.refreshList();
+                    }
                     destroyEditor();
                 });
             }
@@ -522,13 +526,13 @@ var Filter = (function() {
                 });
                 Events.fire('sort_list', sortedIds, function (success) {
                     if (!success) {
-                        Filter.listRefresh();
+                        Filter.refreshList();
                     }
                 });
             }
         });
     }
-    function listRefresh(callback) {
+    function refreshList(callback) {
         var $selectedItem = $list.find('.item.selected');
         var id = $selectedItem.data('id');
         var $list_global  =  $('> .list.global', $container);
@@ -539,13 +543,13 @@ var Filter = (function() {
             $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
             $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
             if (id) {
-                listSelect(id, function() {
+                selectList(id, function() {
                     if ($.isFunction(callback)) callback();
                 });
             } else if ($.isFunction(callback)) callback();
         });
     }
-    function listSelect(id, callback) {
+    function selectList(id, callback) {
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
@@ -582,8 +586,8 @@ var Filter = (function() {
 
     return {
         init: init,
-        listRefresh: listRefresh,
-        listSelect: listSelect,
+        refreshList: refreshList,
+        selectList: selectList,
         setSliderMin: setSliderMin,
         setSliderMax: setSliderMax,
         showInterval: showInterval,
@@ -1055,7 +1059,7 @@ var Table = (function() {
                             var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                             $dropdown.html($tmpDropdown.html());
                             $input = $dropdown.find('.add-item');
-                            Filter.listRefresh();
+                            Filter.refreshList();
                         });
                     });
                 }
