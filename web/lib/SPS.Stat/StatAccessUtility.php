@@ -42,7 +42,7 @@ class StatAccessUtility
     protected function GetRules( $vk_id )
     {
 
-        $suaf = StatAuthorityFactory::Get( array( 'user_id' => $vk_id ));
+        $suaf = StatAuthorityFactory::Get( array( 'vkId' => $vk_id ));
 
         foreach( $suaf as $access_rule ) {
             self::$_instance->rules_array[$access_rule->source] = $access_rule->rank;
@@ -73,7 +73,6 @@ class StatAccessUtility
                 array(
                     StatAuthority::STAT_ROLE_ADMIN,
                     StatAuthority::STAT_ROLE_EDITOR
-
                 )
             );
         }
