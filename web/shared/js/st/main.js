@@ -41,7 +41,6 @@ $(document).ready(function() {
     Filter.init(function() {
         List.init(function() {
             Table.init();
-            Counter.init();
         });
     });
     checkVkStatus();
@@ -107,13 +106,10 @@ var List = (function() {
 
     function init(callback) {
         $container = $('.header');
-
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select('all', callback);
-            _initEvents();
-        });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select('all', callback);
+        _initEvents();
     }
     function _initEvents() {
         $container.delegate('.actions .share', 'click', function() {
@@ -274,26 +270,24 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    Filter.listRefresh(function() {
+                    Filter.refreshList(function() {
                         $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
         });
         $container.delegate('.tab', 'click', function() {
-            Filter.listSelect($(this).data('id'));
+            Filter.selectList($(this).data('id'));
         });
     }
 
     function refresh(callback) {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select(id, function() {
-                if ($.isFunction(callback)) callback();
-            });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select(id, function() {
+            if ($.isFunction(callback)) callback();
         });
     }
 
@@ -309,7 +303,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.listSelect($item.data('id'));
+            Filter.selectList($item.data('id'));
         }
     }
 
@@ -341,7 +335,7 @@ var Filter = (function() {
         $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
-        listRefresh(callback);
+        refreshList(callback);
     }
 
     function _initEvents() {
@@ -471,75 +465,95 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            listSelect($(this).data('id'));
+            selectList($(this).data('id'));
         });
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
             var listId = $(this).closest('.item').data('id');
             Events.fire('toggle_group_general', listId, function() {
-                Filter.listRefresh();
+                Filter.refreshList();
             });
         });
         $list.delegate('.edit', 'click', function(e) {
             e.stopPropagation();
-            var stillShowing = true;
             var $item = $(this).closest('.item');
-            var $editField = $('<textarea class="edit-field">'+ $item.attr('title') +'</textarea>');
+            var $editField = $('<textarea class="edit-field"></textarea>');
             var $saver = $('<span class="saver">Save</span>');
             $item.append($editField);
             $editField.focus();
-            setTimeout(function () {
-                if (stillShowing) {
-                    $item.append($saver);
-                    $saver.animate({'margin-right': 0});
-                }
-            }, 500);
+            $editField.val($item.attr('title'));
+            var saverAppendTimeout = setTimeout(function () {
+                $item.append($saver);
+                $saver.animate({'margin-right': 0});
+            }, 150);
             $editField.click(function (e) {
                 e.stopPropagation();
             });
-            $saver.click(function () {
+            $saver.click(function (e) {
                 e.stopPropagation();
-                destroyEditor();
+                saveEditor();
             });
             $editField.bind('blur keyup', function (e) {
                 if (!e.keyCode || e.keyCode === KEY.ESC) {
                     destroyEditor();
                 }
             });
-            
+
+            function saveEditor() {
+                Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
+                    if (success) {
+                        $item.attr('title', data.groupName);
+                        $item.find('.text').text(data.groupName);
+                    } else {
+                        Filter.refreshList();
+                    }
+                    destroyEditor();
+                });
+            }
             function destroyEditor() {
-                stillShowing = false;
+                clearTimeout(saverAppendTimeout);
                 $editField.remove();
                 $saver.remove();
             }
         });
         // сортировка списков
-        $list.filter('.private, .global').sortable({
-            axis: 'y',
-            update: function (_, ui) {
-                var id = ui.item.data('id');
-                var place = $(this).find('.item').index(ui.item);
-            }
-        });
+        if (cur.dataUser.isAdmin) {
+            $list.filter('.private, .global').sortable({
+                axis: 'y',
+                tolerance: 'pointer',
+                update: function (_, ui) {
+                    var sortedIds = [];
+                    $(this).find('.item').each(function () {
+                        sortedIds.push(this.getAttribute('data-id'));
+                    });
+                    Events.fire('sort_list', sortedIds, function (success) {
+                        if (!success) {
+                            Filter.refreshList();
+                        }
+                    });
+                }
+            });
+        }
     }
-    function listRefresh(callback) {
+
+    function refreshList(callback) {
         var $selectedItem = $list.find('.item.selected');
         var id = $selectedItem.data('id');
         var $list_global  =  $('> .list.global', $container);
         var $list_private =  $('> .list.private', $container);
         var $list_shared  =  $('> .list.shared', $container);
         Events.fire('load_list', function(data) {
-            $list_global.html(tmpl(FILTER_LIST, {items: data.global_list}));
-            $list_private.html(tmpl(FILTER_LIST, {items: data.private_list}));
-            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared_list}));
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
             if (id) {
-                listSelect(id, function() {
+                selectList(id, function() {
                     if ($.isFunction(callback)) callback();
                 });
             } else if ($.isFunction(callback)) callback();
         });
     }
-    function listSelect(id, callback) {
+    function selectList(id, callback) {
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
@@ -576,8 +590,8 @@ var Filter = (function() {
 
     return {
         init: init,
-        listRefresh: listRefresh,
-        listSelect: listSelect,
+        refreshList: refreshList,
+        selectList: selectList,
         setSliderMin: setSliderMin,
         setSliderMax: setSliderMax,
         showInterval: showInterval,
@@ -869,7 +883,7 @@ var Table = (function() {
                 }
             }
             if (publicData) {
-                _createDropdownList(e, publicData);
+                _createDropdown(e, publicData);
             }
         });
 
@@ -953,10 +967,10 @@ var Table = (function() {
         })();
     }
 
-    function _createDropdownList(e, publicData) {
+    function _createDropdown(e, publicData) {
         var $el = $(e.currentTarget);
         var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
+        var $dropdown;
         var $public = $el.closest('.public');
         var publicId = $public.data('id');
         var selectedLists = publicData.lists;
@@ -964,121 +978,121 @@ var Table = (function() {
 
         e.stopPropagation();
 
-        if (!$dropdown) {
-            Events.fire('load_list', function(dataList) {
-                if (!$el.hasClass('selected')) {
-                    var all_lists = dataList.private_list;
-                    all_lists.push.apply(all_lists,dataList.global_list);
+        Events.fire('load_list', function(dataList) {
+            if (!$el.hasClass('selected')) {
+                var all_lists = dataList.private;
+                all_lists.push.apply(all_lists,dataList.global);
 
-                    $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
+                $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
 
-                    // поиск по категориям
-                    var previousDisplay = $dropdown.find('.item')[0].style.display;
-                    var $search = $dropdown.find('.search');
-                    function clearSearch() {
-                        $search.attr('value', '');
-                        $search.trigger('change');
-                        $search.focus();
+                // поиск по категориям
+                initListSearch();
+
+                var $input = $dropdown.find('.add-item');
+                $.each(selectedLists, function(i, listId) {
+                    $dropdown.find('[data-id=' + listId + ']').addClass('selected');
+                });
+
+                $dropdown.delegate('.show-input', 'click', function() {
+                    $input.show().focus();
+                });
+                $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
+                    var $item = $(this);
+                    onChange($item);
+                });
+                $dropdown.delegate('.add-item', 'keyup blur', function(e) {
+                    var text = $.trim($input.val());
+                    if (e.keyCode && e.keyCode !== KEY.ENTER) return false;
+                    if (!text) return false;
+                    if (e.keyCode === KEY.ENTER) return $input.blur();
+                    return onSave(text);
+                });
+                $dropdown.bind('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+                $(document).mousedown(function() {
+                    if ($dropdown.is(':hidden')) {
+                        return;
                     }
-                    $dropdown.find('.clear-search').click(function () {
-                        clearSearch();
-                    });
-                    var previousValue = '';
-                    $search.bind('keyup drop paste change', function (e) {
-                        var val = $(this).val();
-                        if (e.keyCode && e.keyCode === KEY.ESC) {
-                            return clearSearch(); // ---- RETURN
-                        }
-                        if (val !== previousValue) {
-                            var regexp = new RegExp(val, 'gim');
-                            $dropdown.find('.item').each(function () {
-                                var text = this.getAttribute('title');
-                                if (regexp.test(text)) {
-                                    var div = this.childNodes[0];
-                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                                    this.style.display = previousDisplay;
-                                } else {
-                                    this.style.display = 'none';
-                                }
-                            });
-                            previousValue = val;
-                        }
-                    });
+                    $dropdown.hide();
+                    $el.removeClass('selected');
+                    setTimeout(function () {
+                        if (document.activeElement === document.body) {
+                            $(Configs.activeBeforeDropdown).focus();
+                        } 
+                    }, 50);
+                });
 
-                    var $input = $dropdown.find('.add-item');
-                    $.each(selectedLists, function(i, listId) {
-                        $dropdown.find('[data-id=' + listId + ']').addClass('selected');
-                    });
+                function onSave(groupName) {
+                    Events.fire('add_list', groupName, function() {
+                        Events.fire('load_list', function(dataList) {
+                            var all_lists = dataList.private;
+                            all_lists.push.apply(all_lists,dataList.global);
 
-                    $dropdown.delegate('.show-input', 'click', function() {
-                        $input.show().focus();
-                    });
-                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
-                        var $item = $(this);
-                        onChange($item);
-                    });
-                    $dropdown.delegate('.add-item', 'keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
-                        if (!text) return false;
-                        if (e.keyCode == KEY.ENTER) return $input.blur();
-                        return onSave(text);
-                    });
-                    $dropdown.bind('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
-                    $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) {
-                            return;
-                        }
-                        $dropdown.hide();
-                        $el.removeClass('selected');
-                        setTimeout(function () {
-                            if (document.activeElement === document.body) {
-                                $(Configs.activeBeforeDropdown).focus();
-                            } 
-                        }, 50);
-                    });
-
-                    function onSave(text) {
-                        Events.fire('add_list', text, function() {
-                            Events.fire('load_list', function(dataList) {
-                                $el.data('dropdown', false);
-                                var all_lists = dataList.private_list;
-                                all_lists.push.apply(all_lists,dataList.global_list);
-
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
-                                $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('.add-item');
-                                Filter.listRefresh();
-                            });
+                            var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
+                            $dropdown.html($tmpDropdown.html());
+                            $input = $dropdown.find('.add-item');
+                            initListSearch();
+                            Filter.refreshList();
                         });
-                    }
-                    function onChange($item) {
-                        listId = $item.data('id');
-                        var isSelected = !$item.hasClass('selected');
-                        var callback = function(data) {
-                            if (!data) return;
-                            $item.toggleClass('selected');
-                            if ($dropdown.find('.item.selected').length) {
-                                $el.find('.icon').removeClass('plus').addClass('select');
-                            } else {
-                                $el.find('.icon').removeClass('select').addClass('plus');
-                            }
-                        };
-                        if (isSelected) {
-                            Events.fire('add_to_list', publicId, listId, callback);
+                    });
+                }
+                function onChange($item) {
+                    listId = $item.data('id');
+                    var isSelected = !$item.hasClass('selected');
+                    var callback = function(data) {
+                        if (!data) return;
+                        $item.toggleClass('selected');
+                        if ($dropdown.find('.item.selected').length) {
+                            $el.find('.icon').removeClass('plus').addClass('select');
                         } else {
-                            Events.fire('remove_from_list', publicId, listId, callback);
+                            $el.find('.icon').removeClass('select').addClass('plus');
                         }
+                    };
+                    if (isSelected) {
+                        Events.fire('add_to_list', publicId, listId, callback);
+                    } else {
+                        Events.fire('remove_from_list', publicId, listId, callback);
                     }
+                }
 
-                    $el.data('dropdown', $dropdown);
-                    showDropdown();
+                showDropdown();
+            }
+        });
+
+        function initListSearch() {
+            var previousDisplay = $dropdown.find('.item')[0].style.display;
+            var $search = $dropdown.find('.search');
+            function clearSearch() {
+                $search.attr('value', '');
+                $search.trigger('change');
+                $search.focus();
+            }
+            $dropdown.find('.clear-search').click(function () {
+                clearSearch();
+            });
+            var previousValue = '';
+            $search.bind('keyup drop paste change', function (e) {
+                var val = $(this).val();
+                if (e.keyCode && e.keyCode === KEY.ESC) {
+                    return clearSearch(); // ---- RETURN
+                }
+                if (val !== previousValue) {
+                    var regexp = new RegExp(val, 'gim');
+                    $dropdown.find('.item').each(function () {
+                        var text = this.getAttribute('title');
+                        if (regexp.test(text)) {
+                            var div = this.childNodes[0];
+                            div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                            this.style.display = previousDisplay;
+                        } else {
+                            this.style.display = 'none';
+                        }
+                    });
+                    previousValue = val;
                 }
             });
-        } else {
-            showDropdown();
+            $search.focus();
         }
 
         function showDropdown() {
@@ -1088,7 +1102,6 @@ var Table = (function() {
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
-            $dropdown.find('.search').focus();
         }
     }
 
@@ -1106,26 +1119,5 @@ var Table = (function() {
         setAudience: setAudience,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval
-    };
-})();
-
-var Counter = (function(){
-    var $container;
-
-    function init() {
-        $container = $('#listed-counter');
-        if( cur.dataUser.isEditor ) {
-            $container.show();
-        }
-        refresh();
-    }
-
-    function refresh(){
-       $container.find('span').text(cur.dataUser.listed);
-    }
-
-    return {
-        init: init,
-        refresh: refresh
     };
 })();

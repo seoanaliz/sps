@@ -7,45 +7,41 @@
     * @subpackage Stat
     */
 
-    class setGroupOrder
-    {
+    class setGroupOrder {
 
     /**
     * Entry Point
     */
-        public function Execute()
-        {
-            $user_id    =   AuthVkontakte::IsAuth();
-            $group_ids  =   Request::getString( 'groupIds' );
-            $type       =   Request::getString ( 'type' );
-            $type_array         = array( 'Stat', 'Mes', 'stat', 'mes');
+        public function Execute() {
+            $user_id = AuthVkontakte::IsAuth();
+            $groupIdsString = Request::getString('groupIds');
+            $type = Request::getString('type');
+            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
 
-            if( !$group_ids ) {
-                die( ObjectHelper::ToJSON( array( 'response' => false )));
+            if (!$groupIdsString) {
+                die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-            if( !is_array( $group_ids )) {
-                $group_ids = explode( ',', $group_ids);
-            }
+            $group_ids = explode(',', $groupIdsString);
 
-            if ( !$type || !in_array( $type, $type_array, 1 ) )
+            if (!$type || !in_array( $type, $type_array, 1 )) {
                 $type = 'Stat';
-
+            }
 
             $group = GroupFactory::GetById( current( $group_ids ));
             if ( empty( $group )) {
-                die( ObjectHelper::ToJSON( array( 'response' => false )));
+                die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-            if( $type == "Stat") {
+            if ($type == "Stat") {
                 $list_type = $group->type;
                 //проверяем права, подменяем юзера на фейкового для эдита глобальных категорий
                 if( $list_type == GroupsUtility::Group_Global ) {
                     if( !StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP))
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
+                        die( ObjectHelper::ToJSON( array( 'success' => false )));
                     GroupsUtility::set_default_order();
                     $user_id = GroupsUtility::Fake_User_ID_Global;
                 } else {
                     if( !StatAccessUtility::CanEditGlobalGroups( $user_id, Group::STAT_GROUP)) {
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
+                        die( ObjectHelper::ToJSON( array( 'success' => false )));
                     }
                 }
 
@@ -56,7 +52,7 @@
 
                 //если количество не совпадает
                 if( count( $GroupUsers ) != count( $group_ids )) {
-                    die( ObjectHelper::ToJSON( array( 'response' => false )));
+                    die( ObjectHelper::ToJSON( array( 'success' => false )));
                 }
                 $GroupUsers = ArrayHelper::Collapse( $GroupUsers, 'groupId', false );
 
@@ -67,7 +63,7 @@
                         $GroupUsers[$group_id]->place = ++$i;
                         $NewGroupUsers[] = $GroupUsers[$group_id];
                     } else {
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
+                        die( ObjectHelper::ToJSON( array( 'success' => false )));
                     }
                 }
 
@@ -77,17 +73,13 @@
                 ));
 
                 $res = GroupUserFactory::AddRange( $NewGroupUsers );
-                die( ObjectHelper::ToJSON( array( 'response' => $res )));
-
+                die( ObjectHelper::ToJSON( array( 'success' => $res )));
             }
             $m_class  = $type . 'Groups';
             if ( !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
 
-            die( ObjectHelper::ToJSON( array( 'response' => 'true' )));
+            die( ObjectHelper::ToJSON( array( 'success' => 'true' )));
         }
-
-
-
     }
