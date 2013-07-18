@@ -16,103 +16,78 @@
         public function Execute()
         {
             $user_id    =   AuthVkontakte::IsAuth();
-            $group_id   =   Request::getInteger ( 'groupId' );
-            $new_place  =   Request::getInteger ( 'index' );
+            $group_ids  =   Request::getString( 'groupIds' );
             $type       =   Request::getString ( 'type' );
             $type_array         = array( 'Stat', 'Mes', 'stat', 'mes');
 
-            if( !$group_id ) {
+            if( !$group_ids ) {
                 die( ObjectHelper::ToJSON( array( 'response' => false )));
             }
+            if( !is_array( $group_ids )) {
+                $group_ids = explode( ',', $group_ids);
+            }
+
             if ( !$type || !in_array( $type, $type_array, 1 ) )
                 $type = 'Stat';
 
-            $group = GroupFactory::GetById( $group_id );
+
+            $group = GroupFactory::GetById( current( $group_ids ));
             if ( empty( $group )) {
                 die( ObjectHelper::ToJSON( array( 'response' => false )));
             }
-
-            $list_type = $group->type;
             if( $type == "Stat") {
-                {
-
-                    //проверяем права, подменяем юзера на фейкового для эдита глобальных категорий
-                    if( $list_type == GroupsUtility::Group_Global ) {
-                        if( !StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP))
-                            die( ObjectHelper::ToJSON( array( 'response' => false )));
-                        GroupsUtility::set_default_order();
-                        $user_id = GroupsUtility::Fake_User_ID_Global;
-                    } else {
-                        if( !StatAccessUtility::CanEditGlobalGroups( $user_id, Group::STAT_GROUP)) {
-                            die( ObjectHelper::ToJSON( array( 'response' => false )));
-                        }
+                $list_type = $group->type;
+                //проверяем права, подменяем юзера на фейкового для эдита глобальных категорий
+                if( $list_type == GroupsUtility::Group_Global ) {
+                    if( !StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP))
+                        die( ObjectHelper::ToJSON( array( 'response' => false )));
+                    GroupsUtility::set_default_order();
+                    $user_id = GroupsUtility::Fake_User_ID_Global;
+                } else {
+                    if( !StatAccessUtility::CanEditGlobalGroups( $user_id, Group::STAT_GROUP)) {
+                        die( ObjectHelper::ToJSON( array( 'response' => false )));
                     }
+                }
 
-                    $groupUsersForUpdate = GroupUserFactory::Get( array(
-                       'vkId'       =>  $user_id,
-                       'sourceType' =>  Group::STAT_GROUP
-                    ));
+                $GroupUsers = GroupUserFactory::Get( array(
+                    'vkId'          =>  $user_id,
+                    'sourceType'    =>  Group::STAT_GROUP
+                ));
 
-                    if ( !empty( $groupUsersForUpdate )) {
-                        $groupUserArray = $this->replace( $group_id, $new_place, $groupUsersForUpdate);
+                //если количество не совпадает
+                if( count( $GroupUsers ) != count( $group_ids )) {
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
+                }
+                $GroupUsers = ArrayHelper::Collapse( $GroupUsers, 'groupId', false );
+
+                $i = 0;
+                $NewGroupUsers = array();
+                foreach( $group_ids as $group_id ) {
+                    if( isset( $GroupUsers[$group_id])) {
+                        $GroupUsers[$group_id]->place = ++$i;
+                        $NewGroupUsers[] = $GroupUsers[$group_id];
                     } else {
                         die( ObjectHelper::ToJSON( array( 'response' => false )));
                     }
-
-                    GroupUserFactory::DeleteByMask( array(
-                        'vkId'          =>  $user_id,
-                        'sourceType'    =>  Group::STAT_GROUP
-                    ));
-                    GroupUserFactory::AddRange($groupUserArray);
-
-                    die( ObjectHelper::ToJSON( array( 'response' => true )));
                 }
+
+                GroupUserFactory::DeleteByMask( array(
+                    'vkId'          =>  $user_id,
+                    'sourceType'    =>  Group::STAT_GROUP
+                ));
+
+                $res = GroupUserFactory::AddRange( $NewGroupUsers );
+                die( ObjectHelper::ToJSON( array( 'response' => $res )));
+
             }
             $m_class  = $type . 'Groups';
             if ( !$user_id ) {
                 die(ERR_MISSING_PARAMS);
             }
 
-
             die( ObjectHelper::ToJSON( array( 'response' => 'true' )));
         }
 
-        private function replace( $group_id, $new_place, $groupUserArray ) {
-            $i = 0;
-            //если сортировки не было - добавляем, попутно находим старое положение категории
-            foreach($groupUserArray as $gu) {
-                ++$i;
-                if(!$gu->place)
-                    $gu->place = $i;
-
-                if( $gu->groupId == $group_id) {
-                    $old_place = $gu->place;
-                    $moved = $gu;
-                }
-            }
-            if( $new_place > count($groupUserArray ) || !isset( $moved )) {
-                return array();
-            }
-
-            $groupUserArray = ArrayHelper::Collapse( $groupUserArray, 'place', false );
-            if ( $old_place - $new_place > 0 ) {
-
-                for ( $i = $new_place; $i <= $old_place; $i++ ) {
-                    $moved_tmp = $groupUserArray[$i];
-                    $groupUserArray[$i] = $moved;
-                    $groupUserArray[$i]->place = $i;
-                    $moved = $moved_tmp;
-                }
-            } else {
-                for ( $i = $old_place; $i < $new_place; $i++ ) {
-                    $groupUserArray[$i] = $groupUserArray[$i + 1];
-                    $groupUserArray[$i]->place = $i;
-                }
-                $groupUserArray[$new_place] = $moved;
-                $groupUserArray[$i]->place = $new_place;
-            }
-            return $groupUserArray;
-        }
 
 
     }
