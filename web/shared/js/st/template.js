@@ -180,10 +180,10 @@ var FILTER_LIST =
 
 var FILTER_LIST_ITEM =
 '<div class="item" title="<?=name?>" data-id="<?=id?>">' +
-    '<span class="edit icon"></span>' +
     '<span class="text"><?=name?></span>' +
     '<?if (cur.dataUser.isEditor) { ?>'+
-        '<div class="icon bookmark"></div>' +
+        '<span class="icon edit"></span>' +
+        '<span class="icon bookmark"></span>' +
     '<? } ?>'+
 '</div>';
 
