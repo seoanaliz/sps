@@ -182,12 +182,12 @@
 
         public function get_suggested_posts($last_post_id, $access_token )
         {
-            sleep(rand( 1,12 ));
+            sleep(rand( 1,5 ));
             $params = array(
                 'access_token'  =>   $access_token,
-                'count'         =>   30,
+                'count'         =>   100,
                 'filter'        =>  'suggests',
-                'owner_id'      =>  '-' . $this->page_id
+                'owner_id'      =>  '-' . $this->page_id,
             );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
             sleep(self::PAUSE);
@@ -207,7 +207,6 @@
         public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
-
             foreach( $posts as $post ) {
 
                 if( $stop_post_id && $post->id <= $stop_post_id){
@@ -289,13 +288,14 @@
             $article = new Article();
             $article->externalId = $post['id'];
             $article->targetFeedId = $target_feed_id;
-            $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->createdAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->sentAt = null;
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 3;
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
-            $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
             $article->isSuggested = false;
 
             return $article;
@@ -677,14 +677,15 @@
             return $res;
         }
 
-        public static function get_posts_by_vk_id( $ids )
+        public static function get_posts_by_vk_id( $ids, $access_token = false )
         {
             $replace_array = array( 'wall', 'post' );
             if( is_array( $ids ))
                 $ids = implode( ',', $ids );
-
             $ids = str_replace( $replace_array, '', $ids );
-            $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
+            $params['posts'] = $ids;
+            if( $access_token ) $params['access_token'] = $access_token;
+            $res = VkHelper::api_request( 'wall.getById', $params);
             $posts = self::post_conv( $res );
             return $posts;
         }

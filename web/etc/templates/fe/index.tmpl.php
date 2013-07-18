@@ -131,6 +131,7 @@
                                     'title' => $targetFeed->title,
                                     'icon' => $targetInfo[$targetFeed->targetFeedId]['img'],
                                     'isActive' => ($targetFeed->targetFeedId == $currentTargetFeedId),
+                                    'externalId' => $targetFeed->externalId,
                                 ));
                             }
                             echo 'var rightPanelData = '.json_encode($json);

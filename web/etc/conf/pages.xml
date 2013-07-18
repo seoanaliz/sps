@@ -96,6 +96,9 @@
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
                 </page>
+                <page uri="controls://get-queued-suggests/">
+                    <actions>SPS.Site.GetQueuedSuggestsControl</actions>
+                </page>
                 <page uri="controls://authors-list/">
                     <actions>SPS.Site.GetAuthorsListControl</actions>
                     <template>tmpl://fe/elements/authors-list.tmpl.php</template>
@@ -166,9 +169,6 @@
                 </page>
                 <page uri="controls://exPublic/">
                     <actions>SPS.Stat.exEntryFromGroup</actions>
-                </page>
-                <page uri="controls://togglePublVisibil/">
-                    <actions>SPS.Stat.togglePublVisibil</actions>
                 </page>
                 <page uri="controls://toggleGroupGeneral/">
                     <actions>SPS.Stat.toggleGroupGeneral</actions>
@@ -594,6 +594,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-fb-sources/">
+                    <actions>SPS.Site.SyncFbSources</actions>
+                </page>
                 <page uri="daemons://sync-suggests/">
                     <actions>SPS.Site.SyncSuggestedPosts</actions>
                 </page>
@@ -633,7 +636,7 @@
                 <page uri="daemons://PublicsParser/">
                     <actions>SPS.Stat.PublicsParser</actions>
                 </page>
-                 <page uri="daemons://SyncLikes/">
+                <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
                  </page>
                 <page uri="daemons://CheckWalls/">
@@ -645,6 +648,12 @@
                 <page uri="daemons://PublicsGrowFixer/">
                      <actions>SPS.Stat.PublicsGrowFixer</actions>
                  </page>
+                <page uri="daemons://get-badoo/">
+                    <actions>SPS.Badoo.GetNewBadooUsers</actions>
+                </page>
+                <page uri="daemons://update-badoo/">
+                     <actions>SPS.Badoo.UpdateBadooUsers</actions>
+                </page>
 
             </pageGroup>
             <pageGroup name="vtControls" boot="">
@@ -754,6 +763,7 @@
 
             <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
                 <page uri="stat://">
+                    <actions>SPS.Stat.GetStatData</actions>
                     <template>tmpl://st/index.tmpl.php</template>
                 </page>
                 <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">

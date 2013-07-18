@@ -17,8 +17,9 @@ var Lang = {
             'Январь','Февраль','Март','Апрель','Май','Июнь', 'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'
         ]
     }
-    , declOfNum: function (number, titles) {
-        cases = [2, 0, 1, 1, 1, 2];
+    , declOfNum: function (num, titles) {
+        var number = Math.abs(num);
+        var cases = [2, 0, 1, 1, 1, 2];
         return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];
     }
     , parseTime: function ( string ) {
@@ -30,8 +31,8 @@ var Lang = {
         timeArr[0] = parseFloat( timeArr[0] );
         timeArr[1] = parseFloat( timeArr[1] );
 
-        hours = Lang.declOfNum( timeArr[0], ['час', 'часа', 'часов'] );
-        minutes = Lang.declOfNum( timeArr[1], ['минута', 'минуты', 'минут'] );
+        var hours = Lang.declOfNum( timeArr[0], ['час', 'часа', 'часов'] );
+        var minutes = Lang.declOfNum( timeArr[1], ['минута', 'минуты', 'минут'] );
 
         if( timeArr[0] == 0 && timeArr[1] == 0 ) {
             return 'не указано';
