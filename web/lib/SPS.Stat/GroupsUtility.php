@@ -270,7 +270,7 @@
                 unset( $GroupUsers[$groupId]);
                 $GroupUsers =  array_values( $GroupUsers);
                 $length = count( $GroupUsers);
-                if( $place < 0 ) {
+                if( $place < 0 || !$place ) {
                     $place = 0;
                 }
                 if( $place > $length) {
