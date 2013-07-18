@@ -966,7 +966,7 @@ var Table = (function() {
     function _createDropdown(e, publicData) {
         var $el = $(e.currentTarget);
         var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
+        var $dropdown;
         var $public = $el.closest('.public');
         var publicId = $public.data('id');
         var selectedLists = publicData.lists;
@@ -982,37 +982,7 @@ var Table = (function() {
                 $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
 
                 // поиск по категориям
-                var previousDisplay = $dropdown.find('.item')[0].style.display;
-                var $search = $dropdown.find('.search');
-                function clearSearch() {
-                    $search.attr('value', '');
-                    $search.trigger('change');
-                    $search.focus();
-                }
-                $dropdown.find('.clear-search').click(function () {
-                    clearSearch();
-                });
-                var previousValue = '';
-                $search.bind('keyup drop paste change', function (e) {
-                    var val = $(this).val();
-                    if (e.keyCode && e.keyCode === KEY.ESC) {
-                        return clearSearch(); // ---- RETURN
-                    }
-                    if (val !== previousValue) {
-                        var regexp = new RegExp(val, 'gim');
-                        $dropdown.find('.item').each(function () {
-                            var text = this.getAttribute('title');
-                            if (regexp.test(text)) {
-                                var div = this.childNodes[0];
-                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                                this.style.display = previousDisplay;
-                            } else {
-                                this.style.display = 'none';
-                            }
-                        });
-                        previousValue = val;
-                    }
-                });
+                initListSearch();
 
                 var $input = $dropdown.find('.add-item');
                 $.each(selectedLists, function(i, listId) {
@@ -1058,6 +1028,7 @@ var Table = (function() {
                             var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                             $dropdown.html($tmpDropdown.html());
                             $input = $dropdown.find('.add-item');
+                            initListSearch();
                             Filter.refreshList();
                         });
                     });
@@ -1081,10 +1052,44 @@ var Table = (function() {
                     }
                 }
 
-                $el.data('dropdown', $dropdown);
                 showDropdown();
             }
         });
+
+        function initListSearch() {
+            var previousDisplay = $dropdown.find('.item')[0].style.display;
+            var $search = $dropdown.find('.search');
+            function clearSearch() {
+                $search.attr('value', '');
+                $search.trigger('change');
+                $search.focus();
+            }
+            $dropdown.find('.clear-search').click(function () {
+                clearSearch();
+            });
+            var previousValue = '';
+            $search.bind('keyup drop paste change', function (e) {
+                var val = $(this).val();
+                if (e.keyCode && e.keyCode === KEY.ESC) {
+                    return clearSearch(); // ---- RETURN
+                }
+                if (val !== previousValue) {
+                    var regexp = new RegExp(val, 'gim');
+                    $dropdown.find('.item').each(function () {
+                        var text = this.getAttribute('title');
+                        if (regexp.test(text)) {
+                            var div = this.childNodes[0];
+                            div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                            this.style.display = previousDisplay;
+                        } else {
+                            this.style.display = 'none';
+                        }
+                    });
+                    previousValue = val;
+                }
+            });
+            $search.focus();
+        }
 
         function showDropdown() {
             Configs.activeBeforeDropdown = Configs.activeElement;
@@ -1093,7 +1098,6 @@ var Table = (function() {
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
-            $dropdown.find('.search').focus();
         }
     }
 
