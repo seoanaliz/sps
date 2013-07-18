@@ -517,21 +517,24 @@ var Filter = (function() {
             }
         });
         // сортировка списков
-        $list.filter('.private, .global').sortable({
-            axis: 'y',
-            update: function (_, ui) {
-                var sortedIds = [];
-                $(this).find('.item').each(function () {
-                    sortedIds.push(this.getAttribute('data-id'));
-                });
-                Events.fire('sort_list', sortedIds, function (success) {
-                    if (!success) {
-                        Filter.refreshList();
-                    }
-                });
-            }
-        });
+        if (cur.dataUser.isAdmin) {
+            $list.filter('.private, .global').sortable({
+                axis: 'y',
+                update: function (_, ui) {
+                    var sortedIds = [];
+                    $(this).find('.item').each(function () {
+                        sortedIds.push(this.getAttribute('data-id'));
+                    });
+                    Events.fire('sort_list', sortedIds, function (success) {
+                        if (!success) {
+                            Filter.refreshList();
+                        }
+                    });
+                }
+            });
+        }
     }
+
     function refreshList(callback) {
         var $selectedItem = $list.find('.item.selected');
         var id = $selectedItem.data('id');
