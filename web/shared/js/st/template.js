@@ -149,9 +149,9 @@ var DROPDOWN =
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item">' +
+'<div data-id="<?=id?>" title="<?=name?>" class="item">' +
     '<div>' +
-        '<?=itemTitle?>' +
+        '<?=name?>' +
     '</div>' +
 '<div class="icon plus"></div></div>';
 

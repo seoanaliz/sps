@@ -266,13 +266,13 @@ var Eventlist = {
             callback(true);
         });
     },
-    sort_list: function(listId, index, callback) {
+    sort_list: function(sortedIds, callback) {
         $.ajax({
             url: controlsRoot + 'setGroupOrder/',
             data: {
-                groupId: listId,
-                index: index
+                groupIds: sortedIds.join(',')
             },
+            type: 'POST',
             dataType: 'json',
             success: function (resp) {
                 if (resp.success) {
@@ -288,6 +288,7 @@ var Eventlist = {
                 groupId: listId,
                 groupName: listName
             },
+            type: 'POST',
             dataType: 'json',
             success: function (resp) {
                 if (resp.success) {

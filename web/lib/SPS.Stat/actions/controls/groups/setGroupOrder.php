@@ -13,21 +13,19 @@
     * Entry Point
     */
         public function Execute() {
-            $user_id    =   AuthVkontakte::IsAuth();
-            $group_ids  =   Request::getString( 'groupIds' );
-            $type       =   Request::getString ( 'type' );
-            $type_array         = array( 'Stat', 'Mes', 'stat', 'mes');
+            $user_id = AuthVkontakte::IsAuth();
+            $groupIdsString = Request::getString('groupIds');
+            $type = Request::getString('type');
+            $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
 
-            if (!$group_ids) {
+            if (!$groupIdsString) {
                 die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-            if (!is_array( $group_ids )) {
-                $group_ids = explode( ',', $group_ids);
-            }
+            $group_ids = explode(',', $groupIdsString);
 
-            if (!$type || !in_array( $type, $type_array, 1 ))
+            if (!$type || !in_array( $type, $type_array, 1 )) {
                 $type = 'Stat';
-
+            }
 
             $group = GroupFactory::GetById( current( $group_ids ));
             if ( empty( $group )) {

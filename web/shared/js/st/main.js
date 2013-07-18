@@ -516,9 +516,11 @@ var Filter = (function() {
         $list.filter('.private, .global').sortable({
             axis: 'y',
             update: function (_, ui) {
-                var listId = ui.item.data('id');
-                var place = $(this).find('.item').index(ui.item);
-                Events.fire('sort_list', listId, place, function () {});
+                var sortedIds = [];
+                $(this).find('.item').each(function () {
+                    sortedIds.push(this.getAttribute('data-id'));
+                });
+                Events.fire('sort_list', sortedIds, function () {});
             }
         });
     }
@@ -964,122 +966,118 @@ var Table = (function() {
 
         e.stopPropagation();
 
-        if (!$dropdown) {
-            Events.fire('load_list', function(dataList) {
-                if (!$el.hasClass('selected')) {
-                    var all_lists = dataList.private_list;
-                    all_lists.push.apply(all_lists,dataList.global_list);
+        Events.fire('load_list', function(dataList) {
+            if (!$el.hasClass('selected')) {
+                var all_lists = dataList.private;
+                all_lists.push.apply(all_lists,dataList.global);
 
-                    $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
+                $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
 
-                    // поиск по категориям
-                    var previousDisplay = $dropdown.find('.item')[0].style.display;
-                    var $search = $dropdown.find('.search');
-                    function clearSearch() {
-                        $search.attr('value', '');
-                        $search.trigger('change');
-                        $search.focus();
-                    }
-                    $dropdown.find('.clear-search').click(function () {
-                        clearSearch();
-                    });
-                    var previousValue = '';
-                    $search.bind('keyup drop paste change', function (e) {
-                        var val = $(this).val();
-                        if (e.keyCode && e.keyCode === KEY.ESC) {
-                            return clearSearch(); // ---- RETURN
-                        }
-                        if (val !== previousValue) {
-                            var regexp = new RegExp(val, 'gim');
-                            $dropdown.find('.item').each(function () {
-                                var text = this.getAttribute('title');
-                                if (regexp.test(text)) {
-                                    var div = this.childNodes[0];
-                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                                    this.style.display = previousDisplay;
-                                } else {
-                                    this.style.display = 'none';
-                                }
-                            });
-                            previousValue = val;
-                        }
-                    });
-
-                    var $input = $dropdown.find('.add-item');
-                    $.each(selectedLists, function(i, listId) {
-                        $dropdown.find('[data-id=' + listId + ']').addClass('selected');
-                    });
-
-                    $dropdown.delegate('.show-input', 'click', function() {
-                        $input.show().focus();
-                    });
-                    $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
-                        var $item = $(this);
-                        onChange($item);
-                    });
-                    $dropdown.delegate('.add-item', 'keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
-                        if (!text) return false;
-                        if (e.keyCode == KEY.ENTER) return $input.blur();
-                        return onSave(text);
-                    });
-                    $dropdown.bind('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
-                    $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) {
-                            return;
-                        }
-                        $dropdown.hide();
-                        $el.removeClass('selected');
-                        setTimeout(function () {
-                            if (document.activeElement === document.body) {
-                                $(Configs.activeBeforeDropdown).focus();
-                            } 
-                        }, 50);
-                    });
-
-                    function onSave(text) {
-                        Events.fire('add_list', text, function() {
-                            Events.fire('load_list', function(dataList) {
-                                $el.data('dropdown', false);
-                                var all_lists = dataList.private_list;
-                                all_lists.push.apply(all_lists,dataList.global_list);
-
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
-                                $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('.add-item');
-                                Filter.listRefresh();
-                            });
-                        });
-                    }
-                    function onChange($item) {
-                        listId = $item.data('id');
-                        var isSelected = !$item.hasClass('selected');
-                        var callback = function(data) {
-                            if (!data) return;
-                            $item.toggleClass('selected');
-                            if ($dropdown.find('.item.selected').length) {
-                                $el.find('.icon').removeClass('plus').addClass('select');
-                            } else {
-                                $el.find('.icon').removeClass('select').addClass('plus');
-                            }
-                        };
-                        if (isSelected) {
-                            Events.fire('add_to_list', publicId, listId, callback);
-                        } else {
-                            Events.fire('remove_from_list', publicId, listId, callback);
-                        }
-                    }
-
-                    $el.data('dropdown', $dropdown);
-                    showDropdown();
+                // поиск по категориям
+                var previousDisplay = $dropdown.find('.item')[0].style.display;
+                var $search = $dropdown.find('.search');
+                function clearSearch() {
+                    $search.attr('value', '');
+                    $search.trigger('change');
+                    $search.focus();
                 }
-            });
-        } else {
-            showDropdown();
-        }
+                $dropdown.find('.clear-search').click(function () {
+                    clearSearch();
+                });
+                var previousValue = '';
+                $search.bind('keyup drop paste change', function (e) {
+                    var val = $(this).val();
+                    if (e.keyCode && e.keyCode === KEY.ESC) {
+                        return clearSearch(); // ---- RETURN
+                    }
+                    if (val !== previousValue) {
+                        var regexp = new RegExp(val, 'gim');
+                        $dropdown.find('.item').each(function () {
+                            var text = this.getAttribute('title');
+                            if (regexp.test(text)) {
+                                var div = this.childNodes[0];
+                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                this.style.display = previousDisplay;
+                            } else {
+                                this.style.display = 'none';
+                            }
+                        });
+                        previousValue = val;
+                    }
+                });
+
+                var $input = $dropdown.find('.add-item');
+                $.each(selectedLists, function(i, listId) {
+                    $dropdown.find('[data-id=' + listId + ']').addClass('selected');
+                });
+
+                $dropdown.delegate('.show-input', 'click', function() {
+                    $input.show().focus();
+                });
+                $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
+                    var $item = $(this);
+                    onChange($item);
+                });
+                $dropdown.delegate('.add-item', 'keyup blur', function(e) {
+                    var text = $.trim($input.val());
+                    if (e.keyCode && e.keyCode != KEY.ENTER) return false;
+                    if (!text) return false;
+                    if (e.keyCode == KEY.ENTER) return $input.blur();
+                    return onSave(text);
+                });
+                $dropdown.bind('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+                $(document).mousedown(function() {
+                    if ($dropdown.is(':hidden')) {
+                        return;
+                    }
+                    $dropdown.hide();
+                    $el.removeClass('selected');
+                    setTimeout(function () {
+                        if (document.activeElement === document.body) {
+                            $(Configs.activeBeforeDropdown).focus();
+                        } 
+                    }, 50);
+                });
+
+                function onSave(text) {
+                    Events.fire('add_list', text, function() {
+                        Events.fire('load_list', function(dataList) {
+                            $el.data('dropdown', false);
+                            var all_lists = dataList.private;
+                            all_lists.push.apply(all_lists,dataList.global);
+
+                            var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
+                            $dropdown.html($tmpDropdown.html());
+                            $input = $dropdown.find('.add-item');
+                            Filter.listRefresh();
+                        });
+                    });
+                }
+                function onChange($item) {
+                    listId = $item.data('id');
+                    var isSelected = !$item.hasClass('selected');
+                    var callback = function(data) {
+                        if (!data) return;
+                        $item.toggleClass('selected');
+                        if ($dropdown.find('.item.selected').length) {
+                            $el.find('.icon').removeClass('plus').addClass('select');
+                        } else {
+                            $el.find('.icon').removeClass('select').addClass('plus');
+                        }
+                    };
+                    if (isSelected) {
+                        Events.fire('add_to_list', publicId, listId, callback);
+                    } else {
+                        Events.fire('remove_from_list', publicId, listId, callback);
+                    }
+                }
+
+                $el.data('dropdown', $dropdown);
+                showDropdown();
+            }
+        });
 
         function showDropdown() {
             Configs.activeBeforeDropdown = Configs.activeElement;
