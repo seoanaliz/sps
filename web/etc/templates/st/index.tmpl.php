@@ -9,13 +9,19 @@
 {increal:tmpl://st/elements/header.tmpl.php}
 <div id="global-loader"></div>
 <div id="main" class="main">
-    <div class="header">
+    <div class="header clear-fix">
         <div class="tab-bar"></div>
         <div class="login-info"></div>
         <div class="button-wrap">
             <script type="text/javascript"><!--
                 document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
             --></script>
+        </div>
+        <div class="under">
+            <div class="actions">
+                <a class="share">Поделиться</a>
+                <a class="delete">Удалить</a>
+            </div>
         </div>
     </div>
     <table>
@@ -55,13 +61,13 @@
                                 <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
                             </div>
                         </div>
-                        <? if ( $canEditGlobalGroups ) {?>
-                            <div class="list buttons">
-                                <div class="item selected" data-id="all">Все паблики</div>    
+                        <div class="list buttons">
+                            <div class="item selected" data-id="all">Все паблики</div>    
+                            <? if ($canEditGlobalGroups) {?>
                                 <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
-                            </div>
-                        <? } ?>
-                        <? if ( $hasAccessToPrivateGroups ) {?>
+                            <? } ?>
+                        </div>
+                        <? if ($hasAccessToPrivateGroups) {?>
                             <div class="title">Личные</div>
                             <div class="list private editor_lists">
                             </div>

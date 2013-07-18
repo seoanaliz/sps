@@ -342,66 +342,6 @@ table, tr, td {
                     }
                 }
             }
-
-            &.edit-mode {
-                .public {
-                    padding: 0;
-                }
-
-                .public-info {
-                    .photo {
-                        width: 22px;
-                        height: 22px;
-                        overflow: hidden;
-                        margin: 8px 10px;
-                    }
-                }
-
-                .public-actions {
-                    .action {
-                        &.add-to-list {
-                            display: none;
-                        }
-                        &.delete-public {
-                            display: block;
-                        }
-                    }
-                }
-
-                .public-contacts {
-                    margin: 5px 0;
-
-                    .contact {
-                        .content {
-                            height: 22px;
-                            min-height: 22px;
-                            line-height: 22px;
-                            padding: 3px 25px 3px 30px;
-                        }
-                        .photo {
-                            max-width: 22px;
-                        }
-                        .description {
-                            display: none;
-                        }
-                    }
-                }
-
-                .public.not-editable {
-                    display: block;
-
-                    .public-actions {
-                        .action {
-                            &.delete-public {
-                                display: none;
-                            }
-                            &.restore-public {
-                                display: block;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         .table.no-list-id {
@@ -434,23 +374,11 @@ table, tr, td {
 
             .icon {
                 display: block;
-                .opacity(0.5);
-            }
-        }
-
-        .icon {
-            position: absolute;
-            margin-top: -.66em;
-            top: 50%;
-            right: 4px;
-            display: none;
-            padding: 1px;
-            background-image: url('../../images/st/star.png');
-
-            &:hover,
-            &.selected {
-                display: block;
-                opacity: 1;
+                opacity: 0.4;
+                
+                &:hover {
+                    opacity: 1;
+                }
             }
         }
 
@@ -459,12 +387,59 @@ table, tr, td {
             color: #fff;
             box-shadow: 0 0 1px rgba(0,0,0,.6) inset;
 
-            .icon {
+            .edit {
+                background-image: url('../../images/common/edit-white.png');
+            }
+
+            .bookmark {
                 background-image: url('../../images/st/star-white.png');
             }
         }
     }
 
+    .icon {
+        position: absolute;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        margin-top: -9px;
+        display: none;
+    }
+
+    .edit {
+        right: 21px;
+        background: url('../../images/common/edit.png') 50% 50% no-repeat;
+    }
+
+    .bookmark {
+        right: 1px;
+        background: url('../../images/st/star.png') 2px 2px no-repeat;
+    }
+
+    .edit-field {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 128px;
+        border: none;
+        padding-right: 37px;
+    }
+
+    .saver {
+        .inline-block;
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        margin-right: -40px;
+        background: #f1f1f1;
+        border: 1px solid #d8dfea;
+        width: 32px;
+        height: 15px;
+        padding-top: 1px;
+        border-radius: 3px;
+        text-align: center;
+    }
+    
     .title {
         color: #555;
         font-weight: bold;
@@ -492,6 +467,10 @@ table, tr, td {
             border-top: 1px solid #D8DFEA;
             margin: 0 8px 12px;
         }
+    }
+    
+    .ui-sortable-helper {
+        cursor: move;
     }
 }
 
@@ -603,8 +582,23 @@ table, tr, td {
     box-shadow: 0 2px 4px rgba(0,0,0,.25);
     z-index: 10;
 
-    &>.add-item,
-    &>.item {
+    .clear-search {
+        position: absolute;
+        top: 0;
+        right: 2px;
+        z-index: 11;
+        cursor: pointer;
+        padding: 4px;
+        opacity: 0.4;
+        
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .item,
+    .show-input,
+    &>input {
         color: #45688E;
         padding: .4em 1.6em .4em .6em;
         cursor: pointer;
@@ -615,9 +609,17 @@ table, tr, td {
         white-space: nowrap;
         width: 150px;
     }
-    .add-item {
+    &>input {
         cursor: text;
+        color: #383838;
+    }
+    .add-item {
         display: none;
+    }
+    .highlight {
+        background: #ffc;
+        border-radius: 2px;
+        border: 1px solid #d8d8d8;
     }
     .show-input {
         .user-select(none);
@@ -628,7 +630,7 @@ table, tr, td {
             border: none;
         }
     }
-    &>.item {
+    .item {
         &>.icon {
             opacity: 0;
             position: absolute;
@@ -649,10 +651,14 @@ table, tr, td {
             color: #fff;
             background-color: #597DA3;
             font-weight: bold;
+            
+            .highlight {
+                color: #777;
+                font-weight: normal;
+            }
 
             &>.icon {
-                opacity: 1;
-                background-image: url('../../images/common/select-white.png');
+                display: none;
             }
         }
     }
@@ -717,16 +723,23 @@ table, tr, td {
         margin-top: 7px;
     }
 
+    .under {
+        height: 5px;
+        width: 100%;
+        clear: both;
+    }
+
     .actions {
         .inline-block;
         .user-select(none);
-
-        padding: 12px 8px 0;
+        float: right;
+        margin-right: -1px;
+        margin-bottom: 5px;
 
         a {
             padding: 0 1em 0 0.9em;
+            border-left: 1px solid #d8dfea;
 
-            border-left: 1px solid #2b587a;
             &:first-child {
                 border: none;
             }
@@ -777,6 +790,7 @@ table, tr, td {
 .tab-bar {
     .inline-block;
     width: 590px;
+    padding-bottom: 0 !important;
 }
 
 #vk-button {

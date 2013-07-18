@@ -33,6 +33,11 @@ $(document).ready(function() {
         });
     })(window);
 
+    Configs.activeElement = document.body;
+    document.body.addEventListener && document.body.addEventListener('focus', function () {
+        Configs.activeElement = document.activeElement;
+    }, true);
+
     Filter.init(function() {
         List.init(function() {
             Table.init();
@@ -103,16 +108,14 @@ var List = (function() {
     function init(callback) {
         $container = $('.header');
 
-        refresh(function() {
+        Events.fire('load_bookmarks', function(data) {
+            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
+            $actions = $('.actions', $container);
+            select('all', callback);
             _initEvents();
-            if ($.isFunction(callback)) callback();
         });
     }
     function _initEvents() {
-        $container.delegate('.tab', 'click', function() {
-            var $item = $(this);
-            select($item.data('id'));
-        });
         $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
@@ -256,9 +259,6 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .edit', 'click', function() {
-            Table.toggleEditMode();
-        });
         $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
@@ -274,13 +274,14 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    List.refresh(function() {
-                        Filter.listRefresh(function() {
-                            $('.filter > .list > .item[data-id="null"]').click();
-                        });
+                    Filter.listRefresh(function() {
+                        $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
+        });
+        $container.delegate('.tab', 'click', function() {
+            Filter.listSelect($(this).data('id'));
         });
     }
 
@@ -297,12 +298,10 @@ var List = (function() {
     }
 
     function select(id, callback) {
-        if (!id) {
-            id = null;
-            $actions.hide();
-        }
-        else {
-            $actions.show();
+        if (id === 'all' || id === 'all_not_listed') {
+            $actions.fadeOut(140);
+        } else {
+            $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
@@ -472,29 +471,54 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            var $item = $(this);
-            listSelect($item.data('id'));
+            listSelect($(this).data('id'));
         });
-        $list.delegate('.item > .bookmark', 'click', function(e) {
+        $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
-            var $icon = $(this);
-            var $item = $icon.closest('.item');
-            var listId = $item.data('id');
-            if (!$icon.hasClass('selected')) {
-                Events.fire('add_to_general', listId, function() {
-                    $icon.addClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
-                });
-            } else {
-                $icon.removeClass('selected');
-                Events.fire('remove_from_general', listId, function() {
-                    $icon.removeClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
-                });
+            var listId = $(this).closest('.item').data('id');
+            Events.fire('toggle_group_general', listId, function() {
+                Filter.listRefresh();
+            });
+        });
+        $list.delegate('.edit', 'click', function(e) {
+            e.stopPropagation();
+            var stillShowing = true;
+            var $item = $(this).closest('.item');
+            var $editField = $('<textarea class="edit-field">'+ $item.attr('title') +'</textarea>');
+            var $saver = $('<span class="saver">Save</span>');
+            $item.append($editField);
+            $editField.focus();
+            setTimeout(function () {
+                if (stillShowing) {
+                    $item.append($saver);
+                    $saver.animate({'margin-right': 0});
+                }
+            }, 500);
+            $editField.click(function (e) {
+                e.stopPropagation();
+            });
+            $saver.click(function () {
+                e.stopPropagation();
+                destroyEditor();
+            });
+            $editField.bind('blur keyup', function (e) {
+                if (!e.keyCode || e.keyCode === KEY.ESC) {
+                    destroyEditor();
+                }
+            });
+            
+            function destroyEditor() {
+                stillShowing = false;
+                $editField.remove();
+                $saver.remove();
+            }
+        });
+        // сортировка списков
+        $list.filter('.private, .global').sortable({
+            axis: 'y',
+            update: function (_, ui) {
+                var id = ui.item.data('id');
+                var place = $(this).find('.item').index(ui.item);
             }
         });
     }
@@ -563,7 +587,6 @@ var Filter = (function() {
 
 var Table = (function() {
     var $container;
-    var idEditMode = false;
     var dataTable = {};
     var pagesLoaded = 0;
     var currentListId = 0;
@@ -948,8 +971,41 @@ var Table = (function() {
                     all_lists.push.apply(all_lists,dataList.global_list);
 
                     $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
-                    var $input = $dropdown.find('input');
 
+                    // поиск по категориям
+                    var previousDisplay = $dropdown.find('.item')[0].style.display;
+                    var $search = $dropdown.find('.search');
+                    function clearSearch() {
+                        $search.attr('value', '');
+                        $search.trigger('change');
+                        $search.focus();
+                    }
+                    $dropdown.find('.clear-search').click(function () {
+                        clearSearch();
+                    });
+                    var previousValue = '';
+                    $search.bind('keyup drop paste change', function (e) {
+                        var val = $(this).val();
+                        if (e.keyCode && e.keyCode === KEY.ESC) {
+                            return clearSearch(); // ---- RETURN
+                        }
+                        if (val !== previousValue) {
+                            var regexp = new RegExp(val, 'gim');
+                            $dropdown.find('.item').each(function () {
+                                var text = this.getAttribute('title');
+                                if (regexp.test(text)) {
+                                    var div = this.childNodes[0];
+                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                    this.style.display = previousDisplay;
+                                } else {
+                                    this.style.display = 'none';
+                                }
+                            });
+                            previousValue = val;
+                        }
+                    });
+
+                    var $input = $dropdown.find('.add-item');
                     $.each(selectedLists, function(i, listId) {
                         $dropdown.find('[data-id=' + listId + ']').addClass('selected');
                     });
@@ -961,7 +1017,7 @@ var Table = (function() {
                         var $item = $(this);
                         onChange($item);
                     });
-                    $dropdown.delegate('input', 'keyup blur', function(e) {
+                    $dropdown.delegate('.add-item', 'keyup blur', function(e) {
                         var text = $.trim($input.val());
                         if (e.keyCode && e.keyCode != KEY.ENTER) return false;
                         if (!text) return false;
@@ -972,9 +1028,16 @@ var Table = (function() {
                         e.stopPropagation();
                     });
                     $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) return;
+                        if ($dropdown.is(':hidden')) {
+                            return;
+                        }
                         $dropdown.hide();
                         $el.removeClass('selected');
+                        setTimeout(function () {
+                            if (document.activeElement === document.body) {
+                                $(Configs.activeBeforeDropdown).focus();
+                            } 
+                        }, 50);
                     });
 
                     function onSave(text) {
@@ -986,7 +1049,7 @@ var Table = (function() {
 
                                 var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                                 $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('input');
+                                $input = $dropdown.find('.add-item');
                                 Filter.listRefresh();
                             });
                         });
@@ -1009,34 +1072,23 @@ var Table = (function() {
                             Events.fire('remove_from_list', publicId, listId, callback);
                         }
                     }
-                    $el.addClass('selected');
+
                     $el.data('dropdown', $dropdown);
-                    $dropdown.show().css({
-                        top: offset.top + $el.outerHeight(),
-                        left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
-                    });
+                    showDropdown();
                 }
             });
         } else {
+            showDropdown();
+        }
+
+        function showDropdown() {
+            Configs.activeBeforeDropdown = Configs.activeElement;
             $el.addClass('selected');
             $dropdown.show().css({
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
-        }
-    }
-
-    function toggleEditMode() {
-        editMode(!idEditMode);
-    }
-
-    function editMode(on) {
-        idEditMode = on;
-        var $list = $container.find('.list-body');
-        if (on) {
-            $list.addClass('edit-mode');
-        } else {
-            $list.removeClass('edit-mode');
+            $dropdown.find('.search').focus();
         }
     }
 
@@ -1052,8 +1104,6 @@ var Table = (function() {
         search: search,
         setPeriod: setPeriod,
         setAudience: setAudience,
-        editMode: editMode,
-        toggleEditMode: toggleEditMode,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval
     };
@@ -1062,7 +1112,7 @@ var Table = (function() {
 var Counter = (function(){
     var $container;
 
-    function init( callback ){
+    function init() {
         $container = $('#listed-counter');
         if( cur.dataUser.isEditor ) {
             $container.show();
@@ -1071,7 +1121,7 @@ var Counter = (function(){
     }
 
     function refresh(){
-       $container.find('span').text( cur.dataUser.listed );
+       $container.find('span').text(cur.dataUser.listed);
     }
 
     return {

@@ -77,17 +77,14 @@ class GetNewBadooUsers extends BadooParser
             try {
                 $BadooUser = $this->addUserFromProfile( $profilePage );
             } catch ( Exception $e ) {
-                print_r($e->getMessage() );
+                print_r($e->getMessage(). ' ' . $id );
                 echo '<br><br><br>';
-         ;
-
-                die();
                 continue;
+
             }
             if ( !$this->parseProfile( $BadooUser, $profilePage )) {
                 //todo log
-                echo 'не удалось спарсить профиль <br>';
-                die();
+                echo 'не удалось спарсить профиль ', $BadooUser->external_id, '<bd>';
                 continue;
             }
             BadooUserFactory::Add($BadooUser);

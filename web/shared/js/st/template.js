@@ -1,17 +1,4 @@
-var LIST =
-'<div class="tab-bar clear-fix">' +
-    '<div class="tab selected" data-id="null">Популярные</div>' +
-    '<?if (cur.dataUser.isEditor) { ?>'+
-        '<div class="actions">' +
-            '<a class="share">Поделиться</a>' +
-            '<a class="edit">Редактировать</a>' +
-            '<?if (cur.dataUser.isAdmin) { ?>'+
-                '<a class="delete">Удалить</a>' +
-            '<? } ?> ' +
-        '</div> ' +
-    '<? } ?> ' +
-'</div>' ;
-
+var LIST = '<div class="tab selected" data-id="all">Популярные</div>';
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
@@ -154,13 +141,19 @@ var CONTACT =
 
 var DROPDOWN =
 '<div class="dropdown">' +
+    '<span class="icon delete clear-search"></span>' +
+    '<input type="text" class="search" placeholder="Поиск" />' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
     '<input type="text" class="add-item" placeholder="Название списка" />' +
-    '<div class="item show-input">Создать список</div>' +
+    '<div class="show-input">Создать список</div>' +
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
+'<div data-id="<?=itemId?>" title="<?=itemTitle?>" class="item">' +
+    '<div>' +
+        '<?=itemTitle?>' +
+    '</div>' +
+'<div class="icon plus"></div></div>';
 
 var CONTACT_DROPDOWN =
 '<div class="contact-dropdown">' +
@@ -187,8 +180,9 @@ var FILTER_LIST =
 
 var FILTER_LIST_ITEM =
 '<div class="item" title="<?=itemTitle?>" data-id="<?=itemId?>">' +
+    '<span class="edit icon"></span>' +
     '<span class="text"><?=itemTitle?></span>' +
-    '<?if( cur.dataUser.isEditor ) { ?>'+
+    '<?if (cur.dataUser.isEditor) { ?>'+
         '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
     '<? } ?>'+
 '</div>';

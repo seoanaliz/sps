@@ -40,9 +40,9 @@ class SyncSuggestedPosts extends AbstractPostLoadDaemon {
                 if(!isset( $targetFeed->params['lastSuggestedPost']))
                     $targetFeed->params['lastSuggestedPost'] = 0;
                 //времянка, пока не перейдем на новую систему токенов
-                $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed, true );
+                $token = AccessTokenUtility::getPublisherTokenForTargetFeed($targetFeed->targetFeedId, true );
                 if( !$token ) {
-                    $token = AccessTokenUtility::getTokenForTargetFeed($targetFeed, true);
+                    $token = AccessTokenUtility::getTokenForTargetFeed($targetFeed->targetFeedId, true);
                 }
                 //мы упрямые!
                 if( !$token) {
