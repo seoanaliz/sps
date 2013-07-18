@@ -520,6 +520,7 @@ var Filter = (function() {
         if (cur.dataUser.isAdmin) {
             $list.filter('.private, .global').sortable({
                 axis: 'y',
+                tolerance: 'pointer',
                 update: function (_, ui) {
                     var sortedIds = [];
                     $(this).find('.item').each(function () {
