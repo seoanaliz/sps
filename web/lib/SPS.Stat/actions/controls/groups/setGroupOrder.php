@@ -14,25 +14,24 @@
     */
         public function Execute() {
             $user_id = AuthVkontakte::IsAuth();
-            $groupIdsString = Request::getString('groupIds');
+            $groupId = Request::getInteger('groupId');
+            $index   = Request::getInteger('index');
             $type = Request::getString('type');
             $type_array = array( 'Stat', 'Mes', 'stat', 'mes');
-
-            if (!$groupIdsString) {
+            if (!$groupId || $index === false ) {
                 die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-            $group_ids = explode(',', $groupIdsString);
 
             if (!$type || !in_array( $type, $type_array, 1 )) {
                 $type = 'Stat';
             }
-
-            $group = GroupFactory::GetById( current( $group_ids ));
+            $group = GroupFactory::GetById( $groupId );
             if ( empty( $group )) {
                 die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
             if ($type == "Stat") {
                 $list_type = $group->type;
+
                 //проверяем права, подменяем юзера на фейкового для эдита глобальных категорий
                 if( $list_type == GroupsUtility::Group_Global ) {
                     if( !StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP))
@@ -50,22 +49,7 @@
                     'sourceType'    =>  Group::STAT_GROUP
                 ));
 
-                //если количество не совпадает
-                if( count( $GroupUsers ) != count( $group_ids )) {
-                    die( ObjectHelper::ToJSON( array( 'success' => false )));
-                }
-                $GroupUsers = ArrayHelper::Collapse( $GroupUsers, 'groupId', false );
-
-                $i = 0;
-                $NewGroupUsers = array();
-                foreach( $group_ids as $group_id ) {
-                    if( isset( $GroupUsers[$group_id])) {
-                        $GroupUsers[$group_id]->place = ++$i;
-                        $NewGroupUsers[] = $GroupUsers[$group_id];
-                    } else {
-                        die( ObjectHelper::ToJSON( array( 'success' => false )));
-                    }
-                }
+                $NewGroupUsers = GroupsUtility::sort_groups_users( $user_id, Group::STAT_GROUP, $groupId, $index );
 
                 GroupUserFactory::DeleteByMask( array(
                     'vkId'          =>  $user_id,

@@ -52,6 +52,8 @@
                         ));
 
                     }
+
+
                     foreach( $groups_ids as $group_id ) {
                         if( isset( $user_groups_uns[$group_id])) {
                             $user_groups[] = array(
@@ -60,6 +62,7 @@
                             );
                         }
                     }
+                    $this->check_groups_const($groupsUsers, $user_groups_uns, $user_id, Group::STAT_GROUP );
                 }
 
                 $res['data'] = array(
@@ -124,5 +127,17 @@
                 }
             }
             return $result;
+        }
+
+        private function check_groups_const( $groupUsers, $groups, $user_id, $source ) {
+            foreach( $groupUsers as $gu ) {
+                if( !isset( $groups[$gu->groupId])) {
+                    GroupUserFactory::DeleteByMask( array(
+                        'vkId'          =>  $user_id,
+                        'groupId'       =>  $gu->groupId,
+                        'sourceType'    =>  $source
+                    ));
+                }
+            }
         }
     }
