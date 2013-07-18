@@ -650,7 +650,8 @@ td {
   font-weight: normal;
 }
 .dropdown .item.selected>.icon {
-  display: none;
+  opacity: 1;
+  background-image: url('../../images/common/select-white.png');
 }
 .contact-dropdown {
   position: absolute;
