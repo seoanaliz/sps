@@ -28,7 +28,7 @@
             $groupId    = $groupId  ? $groupId : 0;
 
             if ( !$groupName || !$user_id ) {
-                die(ERR_MISSING_PARAMS);
+                die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
             $users = array();
             if( $type == 'Barter' ) {
