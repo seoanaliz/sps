@@ -21,6 +21,9 @@
         /** @var int */
         public $sourceType;
 
+        /** @var int */
+        public $place;
+
         public function __construct( $groupId = null, $vkId = null, $sourceType = null) {
             if( $groupId && $vkId && $sourceType) {
                 $this->groupId      = $groupId;

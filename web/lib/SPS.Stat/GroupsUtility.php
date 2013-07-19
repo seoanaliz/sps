@@ -14,6 +14,7 @@
         const Group_Id_Special_All = 'all';
         const Group_Id_Special_All_Not = 'all_not_listed';
 
+        const Fake_User_ID_Global = -1;
 
         public static $special_group_ids = array(
             self::Group_Id_Special_All      => 'Все',
@@ -117,10 +118,14 @@
         }
 
         //проверяет уникальность предлагаемого имени группы для данного типа групп данного пользователя
-        public static function check_name( $user_id, $group_source, $group_name )
+        public static function check_name( $user_id, $group_source, $group_name, $groupId = false )
         {
-            $check = GroupFactory::GetOne( array( 'name' => $group_name, 'created_by' => $user_id, 'source' => $group_source ));
-            if ( !$check )
+            $check = GroupFactory::Get( array(
+                    'name'       =>     $group_name
+                ,   'created_by' =>     $user_id
+                ,   'source'     =>     $group_source
+                ,   '_statusNE'  =>     2 ));
+            if ( !$check  || ( isset( current( $check )->group_id) && current( $check )->group_id == $groupId ))
                 return true;
             return false;
         }
@@ -137,7 +142,6 @@
             $group->users_ids   =   array(0);
             $group->status      =   7;
             GroupFactory::Update( $group );
-
         }
 
         //формирует отчет для групп. Если указан user_id, разделяет созданные им группы и нет
@@ -211,6 +215,85 @@
 //                    continue;
                 $group->users_ids = array_unique( array_merge( $group->users_ids, $rec_ids ));
             }
+        }
+
+        public static function get_next_index_groupUser( $user_id, $source ) {
+            $count = GroupUserFactory::Count( array(
+                'vkId'      =>  $user_id,
+                'sourceType'=>  $source
+            ));
+            return $count ;
+        }
+
+        //проверяет, задан ли порядок для общих категорий. нет - делает его
+        public static function set_default_order( $global_groups = false ) {
+            $i = 0;
+            if( !$global_groups) {
+                $global_groups = GroupFactory::Get( array(
+                    'type'      =>  GroupsUtility::Group_Global,
+                    'source'    =>  Group::STAT_GROUP
+                ));
+            }
+            $check = GroupUserFactory::Get( array(
+                'groupId'   =>  current($global_groups)->group_id,
+                'vkId'    =>  GroupsUtility::Fake_User_ID_Global
+            ));
+
+            if ( !empty($check)) {
+                return;
+            }
+            $global_groupUser = array();
+            foreach( $global_groups as $global_group ) {
+                $tmp = new GroupUser($global_group->group_id, GroupsUtility::Fake_User_ID_Global, Group::STAT_GROUP);
+                $tmp->place = ++$i;
+                $global_groupUser[] = $tmp;
+            }
+            GroupUserFactory::DeleteByMask( array(
+                'vkId'      =>  GroupsUtility::Fake_User_ID_Global,
+                'sourceType'=>  Group::STAT_GROUP
+            ));
+            GroupUserFactory::AddRange( $global_groupUser);
+        }
+
+        public static function sort_groups_users( $user_id, $source, $groupId = null, $place = null ) {
+            $GroupUsers = GroupUserFactory::Get(
+                array(
+                    'vkId'          =>  $user_id,
+                    'sourceType'    =>  $source
+                ),
+                array( 'orderBy' => 'place' ));
+
+            if ( $groupId ) {
+
+                $GroupUsers = ArrayHelper::Collapse($GroupUsers, 'groupId', false);
+                if( !isset( $GroupUsers[ $groupId])) {
+                    return false;
+                }
+
+                $moved = $GroupUsers[ $groupId ];
+                unset( $GroupUsers[$groupId]);
+                $GroupUsers =  array_values( $GroupUsers);
+                $length = count( $GroupUsers);
+                if( $place < 0 || !$place ) {
+                    $place = 0;
+                }
+                if( $place > $length) {
+                    $place = $length;
+                }
+                $GroupUsers = array_merge(
+                    array_slice( $GroupUsers, 0, $place ),
+                    array( $moved),
+                    array_slice( $GroupUsers, $place, $length )
+                );
+            }
+
+            $i = 0;
+            foreach ( $GroupUsers as $GroupUser ) {
+                $GroupUser->place = $i++;
+            }
+
+            return $GroupUsers;
+
         }
     }
 ?>
