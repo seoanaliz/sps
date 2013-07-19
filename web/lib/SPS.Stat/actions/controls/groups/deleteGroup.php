@@ -16,7 +16,6 @@
 
         public function Execute() {
 
-            error_reporting( 0 );
             $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
@@ -58,7 +57,7 @@
             } elseif ( $type == 'Stat' ) {
                 $res = false;
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if( empty( $group)) {
+                if( empty( $group )) {
                     die( ObjectHelper::ToJSON( array( 'response' => false )));
                 }
 
@@ -68,20 +67,36 @@
                 $is_private_can_delete = $group->type == GroupsUtility::Group_Private &&
                     StatAccessUtility::HasAccessToPrivateGroups( $user_id, Group::STAT_GROUP );
 
+                if( $is_global_can_delete) {
+                    $user_id = GroupsUtility::Fake_User_ID_Global;
+                }
+
                 if ( $is_global_can_delete || $is_private_can_delete ) {
                     $group->status = 2;
-                    $res = GroupFactory::Update( $group );
 
                     GroupEntryFactory::DeleteByMask( array(
-                        'group_id'      =>  $group->group_id,
+                        'groupId'       =>  $group->group_id,
                         'sourceType'    =>  Group::STAT_GROUP
                     ));
+
+                    GroupUserFactory::DeleteByMask( array(
+                        'groupId'       =>  $group->group_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    $NewGroupUsers = GroupsUtility::sort_groups_users( $user_id, Group::STAT_GROUP );
+                    GroupUserFactory::DeleteByMask( array(
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    GroupUserFactory::AddRange($NewGroupUsers);
+                    $res = true;
                 }
 
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
-            if ( statUsers::is_Sadmin( $user_id ) ) {
+            if ( statUsers::is_Sadmin( $user_id )) {
                 $res = $m_class::delete_group( $group_id );
             }
 //            elseif ( !$general ) {
@@ -98,6 +113,9 @@
             }
 
             die( ObjectHelper::ToJSON(array('response' => false)));
+        }
+
+        private function remove_inLists_state( $group_id ) {
         }
     }
 ?>

@@ -38,6 +38,9 @@
             ,'sourceType' => array(
                     'name'          => 'sourceType'
                     , 'type'        => TYPE_INTEGER
+                ) ,'place' => array(
+                    'name'          => 'place'
+                    , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
             , 'search'    => array(

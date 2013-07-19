@@ -25,7 +25,7 @@ class StatAccessUtility
     {
         if ( self::$_instance === null )
             self::$_instance = new self;
-        self::$_instance->SetUser( $vk_id );
+       // self::$_instance->SetUser( $vk_id );
         self::$_instance->GetRules( $vk_id );
 
         return self::$_instance;
@@ -39,21 +39,22 @@ class StatAccessUtility
         }
     }
 
-    protected function GetRules(  )
+    protected function GetRules( $vk_id )
     {
-        if ( $this->user ) {
-            $suaf = StatAuthorityFactory::Get( array( 'user_id' => $this->user->vkId ));
-            foreach( $suaf as $access_rule ) {
-                self::$_instance->rules_array[$access_rule->source] = $access_rule->rank;
-            }
+
+        $suaf = StatAuthorityFactory::Get( array( 'vkId' => $vk_id ));
+
+        foreach( $suaf as $access_rule ) {
+            self::$_instance->rules_array[$access_rule->source] = $access_rule->rank;
         }
+
     }
 
     public static function HasAccessToPrivateGroups( $vk_id, $source )
     {
         $acessUtility = self::GetInstance($vk_id);
         $res = false;
-        if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
+        if( isset( $acessUtility->rules_array[ $source ])) {
             $res = in_array($acessUtility->rules_array[ $source ],
                         array(
                             StatAuthority::STAT_ROLE_ADMIN,
@@ -67,12 +68,11 @@ class StatAccessUtility
     public static function  CanEditGlobalGroups($vk_id, $source) {
         $acessUtility = self::GetInstance($vk_id);
         $res = false;
-        if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
+        if(  isset( $acessUtility->rules_array[ $source ])) {
             $res = in_array($acessUtility->rules_array[ $source ],
                 array(
                     StatAuthority::STAT_ROLE_ADMIN,
                     StatAuthority::STAT_ROLE_EDITOR
-
                 )
             );
         }
@@ -82,7 +82,7 @@ class StatAccessUtility
     public static function  CanManageGlobalGroups($vk_id, $source) {
         $acessUtility = self::GetInstance($vk_id);
         $res = false;
-        if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ])) {
+        if( isset( $acessUtility->rules_array[ $source ])) {
             $res = in_array($acessUtility->rules_array[ $source ],
                 array(
                     StatAuthority::STAT_ROLE_ADMIN
@@ -99,7 +99,7 @@ class StatAccessUtility
         }
 
         $acessUtility = self::GetInstance($vk_id);
-        if( $acessUtility->user && isset( $acessUtility->rules_array[ $source ]))
+        if( isset( $acessUtility->rules_array[ $source ]))
             return $acessUtility->rules_array[ $source ];
 
         return StatAuthority::STAT_ROLE_USER;

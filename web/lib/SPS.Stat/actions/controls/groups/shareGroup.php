@@ -14,7 +14,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
             $user_id        =   AuthVkontakte::IsAuth();
             $group_ids      =   Request::getString(  'groupId' );
             $recipients_ids =   Request::getString(  'recId' );
@@ -46,7 +45,9 @@
                 $group_user_array = array();
                 foreach( $recipients_ids as $recipients_id) {
                     foreach( $group_ids as $group_id) {
-                        new GroupUser( $group_id, $recipients_id, Group::STAT_GROUP );
+                        $tmp = new GroupUser( $group_id, $recipients_id, Group::STAT_GROUP );
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP );
+                        $group_user_array[] = $tmp;
                     }
                 }
                 GroupUserFactory::AddRange( $group_user_array );

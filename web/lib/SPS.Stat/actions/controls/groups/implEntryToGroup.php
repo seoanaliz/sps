@@ -14,7 +14,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
             $response  = array('success' => false);
             $user_id  = AuthVkontakte::IsAuth();
             $group_id  = Request::getInteger ( 'groupId' );
