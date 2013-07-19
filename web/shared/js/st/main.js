@@ -112,7 +112,7 @@ var List = (function() {
         _initEvents();
     }
     function _initEvents() {
-        $container.delegate('.actions .share', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
@@ -255,7 +255,7 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .delete', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
                 id: 'deleteList' + listId,
@@ -295,7 +295,7 @@ var List = (function() {
         if (id === 'all' || id === 'all_not_listed') {
             $actions.fadeOut(140);
         } else {
-            $actions.fadeIn(300);
+            cur.dataUser.isAdmin && $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');

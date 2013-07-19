@@ -18,10 +18,12 @@
             --></script>
         </div>
         <div class="under">
-            <div class="actions">
-                <a class="share">Поделиться</a>
-                <a class="delete">Удалить</a>
-            </div>
+            <? if ($canEditGlobalGroups) {?>
+                <div class="actions">
+                    <a class="share">Поделиться</a>
+                    <a class="delete">Удалить</a>
+                </div>
+            <? } ?>
         </div>
     </div>
     <table>
