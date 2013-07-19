@@ -843,7 +843,7 @@ var LeftPanelWidget = Event.extend({
         $slot = $post.closest('.slot'),
         timestamp = $slot.data('id');
 
-        if ($post.editing) return;
+        if ($post.data('editing')) return;
 
         Events.fire('load_post_edit', postId, queueId, function(state, data){
             if (state && data) {
@@ -994,7 +994,7 @@ var LeftPanelWidget = Event.extend({
                     scroll: $(window).scrollTop()
                 };
                 $post.find('> .content').draggable('disable');
-                $post.editing = true;
+                $post.data('editing', true);
                 $buttonPanel.hide();
                 $el.html('');
 
@@ -1041,7 +1041,7 @@ var LeftPanelWidget = Event.extend({
                 };
                 var onCancel = function() {
                     $post.find('> .content').draggable('enable');
-                    $post.editing = false;
+                    $post.data('editing', false);
                     $buttonPanel.show();
                     $el.html(cache.html);
                     $edit.remove();
