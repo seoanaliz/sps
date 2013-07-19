@@ -34,7 +34,6 @@ $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.less',
         'css://st/main.less',
-        'css://fe/jquery-ui.css',
         'css://fe/custom.css',
    ),
     AssetHelper::IE7 => array(),
