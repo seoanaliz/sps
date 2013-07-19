@@ -409,7 +409,10 @@ i {font-style: italic;}
 
 .locked {
     .opacity(0.6);
-    .pointer-events(none);
+    
+    .slot-header {
+        .pointer-events(none);
+    }
 }
 
 .wall .post.removed {height:0;margin-bottom: 100px;overflow:hidden;padding:0;}
@@ -429,21 +432,28 @@ i {font-style: italic;}
     }
 }
 
-.delete {
+.delete, .edit-trigger {
     position: absolute;
     top: 10px;
-    right: 10px;
     cursor: pointer;
-    background: url('../../images/common/delete.png') center no-repeat;
+    background: center no-repeat;
     width: 20px;
     height: 20px;
-    .opacity(0);
+    opacity: 0;
     .transition(0.2s opacity);
     z-index: 1;
 
     &:hover {
-        .opacity(1) !important;
+        opacity: 1 !important;
     }
+}
+.delete {
+    right: 10px;
+    background-image: url('../../images/common/delete.png');
+}
+.edit-trigger {
+    right: 30px;
+    background-image: url('../../images/common/edit.png');
 }
 
 .controls {
@@ -523,7 +533,7 @@ i {font-style: italic;}
             min-height: 114px;
 
             .delete {
-                .opacity(0);
+                opacity: 0;
             }
 
             .slot-header {
@@ -561,15 +571,15 @@ i {font-style: italic;}
                 cursor: pointer;
                 margin-top: 2px;
                 margin-left: 4px;
-                .opacity(0);
+                opacity: 0;
                 .transition(0.2s all);
 
                 &.active,
                 &:hover {
-                    .opacity(1);
+                    opacity: 1;
                 }
             }
-
+            
             input.hasDatepick {
                 width: 15px;
                 height: 10px;
@@ -642,6 +652,13 @@ i {font-style: italic;}
                 }
             }
 
+            &.locked:hover {
+                .time-of-removal,
+                .datepicker {
+                    opacity: 0;
+                }
+            }
+            
             &.empty {
                 cursor: pointer;
 
@@ -657,12 +674,12 @@ i {font-style: italic;}
             }
 
             &:hover {
-                .delete {
+                .delete, .edit-trigger {
                     opacity: 0.5;
                 }
             }
         }
-        
+
         .slot.repeat {
             .repeater {
                 opacity: 1;
@@ -1380,7 +1397,6 @@ i {font-style: italic;}
     padding-left: 50px;
     line-height: 160%;
     .box-shadow(0px 1px 4px 0px rgba(0, 0, 0, 0.1));
-    .user-select(none);
 
     .userpic {
         top: 10px;
