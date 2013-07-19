@@ -60,6 +60,7 @@
                             );
                         }
                     }
+
                     $this->check_groups_const($groupsUsers, $user_groups_uns, $user_id, Group::STAT_GROUP );
                 }
 
@@ -122,6 +123,12 @@
                         'id'    =>  $global_groups[$ggu->groupId]->group_id,
                         'name'  =>  $global_groups[$ggu->groupId]->name
                     );
+                } else {
+                    GroupUserFactory::DeleteByMask( array(
+                        'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
+                        'groupId'       =>  $ggu->groupId,
+                        'sourceType'    =>  $source
+                    ));
                 }
             }
             return $result;
