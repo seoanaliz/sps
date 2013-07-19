@@ -163,19 +163,6 @@ td {
   width: 169px;
   padding-bottom: 10px;
 }
-#main .right-column > div>.interval-wrapper {
-  display: none;
-}
-#main .right-column > div>div > .interval,
-#main .right-column > div>.interval {
-  padding: 10px 10px 0;
-}
-#main .right-column > div>div > .interval>.timeFrom,
-#main .right-column > div>div > .interval>.timeTo,
-#main .right-column > div>.interval>.timeFrom,
-#main .right-column > div>.interval>.timeTo {
-  width: 63px;
-}
 #main .right-column > div>div > .audience,
 #main .right-column > div>.audience {
   padding: 10px 10px 0;
