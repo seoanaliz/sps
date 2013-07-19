@@ -447,18 +447,20 @@ var Filter = (function() {
                 $item.append($saver);
                 $saver.animate({'margin-right': 0});
             }, 150);
-            $editField.click(function (e) {
-                e.stopPropagation();
-            });
             $saver.click(function (e) {
                 e.stopPropagation();
                 saveEditor();
             });
-            $editField.bind('blur keyup', function (e) {
-                if (!e.keyCode || e.keyCode === KEY.ESC) {
-                    destroyEditor();
-                }
-            });
+            $editField
+                .on('click', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', function (e) {
+                    if (e.keyCode === KEY.ESC) {
+                        destroyEditor();
+                    }
+                })
+                .on('blur', destroyEditor);
 
             function saveEditor() {
                 Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
@@ -955,13 +957,15 @@ var Table = (function() {
                     var $item = $(this);
                     onChange($item);
                 });
-                $dropdown.delegate('.add-item', 'keyup blur', function(e) {
-                    var text = $.trim($input.val());
-                    if (e.keyCode && e.keyCode !== KEY.ENTER) return false;
-                    if (!text) return false;
-                    if (e.keyCode === KEY.ENTER) return $input.blur();
-                    return onSave(text);
-                });
+                $dropdown
+                    .delegate('.add-item', 'keyup', function(e) {
+                        if (e.keyCode === KEY.ENTER) {
+                            onSave($.trim($input.val()));
+                        }
+                    })
+                    .delegate('.add-item', 'blur', function () {
+                        onSave($.trim($input.val()));
+                    })
                 $dropdown.bind('mousedown', function(e) {
                     e.stopPropagation();
                 });
@@ -987,7 +991,7 @@ var Table = (function() {
                             var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                             $dropdown.html($tmpDropdown.html());
                             $input = $dropdown.find('.add-item');
-                            initListSearch();
+                            $dropdown.find('.search').focus();
                             Filter.refreshList();
                         });
                     });
@@ -1012,42 +1016,41 @@ var Table = (function() {
                 }
 
                 showDropdown();
+                $dropdown.find('.search').focus();
             }
         });
 
         function initListSearch() {
             var previousDisplay = $dropdown.find('.item')[0].style.display;
-            var $search = $dropdown.find('.search');
             function clearSearch() {
+                var $search = $dropdown.find('.search');
                 $search.attr('value', '');
                 $search.trigger('change');
                 $search.focus();
             }
-            $dropdown.find('.clear-search').click(function () {
-                clearSearch();
-            });
             var previousValue = '';
-            $search.bind('keyup drop paste change', function (e) {
-                var val = $(this).val();
-                if (e.keyCode && e.keyCode === KEY.ESC) {
-                    return clearSearch(); // ---- RETURN
-                }
-                if (val !== previousValue) {
-                    var regexp = new RegExp(val, 'gim');
-                    $dropdown.find('.item').each(function () {
-                        var text = this.getAttribute('title');
-                        if (regexp.test(text)) {
-                            var div = this.childNodes[0];
-                            div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                            this.style.display = previousDisplay;
-                        } else {
-                            this.style.display = 'none';
-                        }
-                    });
-                    previousValue = val;
-                }
-            });
-            $search.focus();
+            $dropdown
+                .delegate('.search', 'keyup drop paste change', function (e) {
+                    var val = $(this).val();
+                    if (('keyCode' in e) && e.keyCode === KEY.ESC) {
+                        return clearSearch(); // ---- RETURN
+                    }
+                    if (val !== previousValue) {
+                        var regexp = new RegExp(val, 'gim');
+                        $dropdown.find('.item').each(function () {
+                            var text = this.getAttribute('title');
+                            if (regexp.test(text)) {
+                                var div = this.childNodes[0];
+                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                this.style.display = previousDisplay;
+                            } else {
+                                this.style.display = 'none';
+                            }
+                        });
+                        previousValue = val;
+                    }
+                })
+                .delegate('.search', 'click', clearSearch);
         }
 
         function showDropdown() {
