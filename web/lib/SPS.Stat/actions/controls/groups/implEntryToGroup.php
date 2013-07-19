@@ -54,9 +54,12 @@
                     $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP, $user_id );
 
                     if( GroupEntryFactory::Add($groupEntry)) {
-                        $public = new VkPublic();
-                        $public->inLists = true;
-                        VkPublicFactory::UpdateByMask($public, array('inLists'), array('vk_public_id' => $entry_id));
+                        $group  = GroupFactory::GetById( $group_id );
+                        if( $group->type ==  GroupsUtility::Group_Global ) {
+                            $public = new VkPublic();
+                            $public->inLists = true;
+                            VkPublicFactory::UpdateByMask( $public, array('inLists'), array('vk_public_id' => $entry_id));
+                        }
                         $response['success'] = true;
                         die( ObjectHelper::ToJSON(array( 'response' => true )));
                     }

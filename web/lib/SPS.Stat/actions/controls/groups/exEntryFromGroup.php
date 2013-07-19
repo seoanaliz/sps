@@ -50,9 +50,10 @@
                         'entryId'       =>  $entry_id,
                         'sourceType'    =>  Group::STAT_GROUP,
                     ));
-                    $inLists = GroupEntryFactory::Count(array(
+                    $inLists = GroupEntryFactory::Count( array(
                         'entryId'       =>  $entry_id,
                         'sourceType'    =>  Group::STAT_GROUP,
+                        'userId'        =>  GroupsUtility::Fake_User_ID_Global
                     ));
                     if( !$inLists) {
                         $public = new VkPublic();
