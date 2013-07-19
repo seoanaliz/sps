@@ -238,6 +238,7 @@
                 'groupId'   =>  current($global_groups)->group_id,
                 'vkId'    =>  GroupsUtility::Fake_User_ID_Global
             ));
+
             if ( !empty($check)) {
                 return;
             }
@@ -247,7 +248,10 @@
                 $tmp->place = ++$i;
                 $global_groupUser[] = $tmp;
             }
-
+            GroupUserFactory::DeleteByMask( array(
+                'vkId'      =>  GroupsUtility::Fake_User_ID_Global,
+                'sourceType'=>  Group::STAT_GROUP
+            ));
             GroupUserFactory::AddRange( $global_groupUser);
         }
 
