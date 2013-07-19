@@ -34,13 +34,13 @@
                 $user_groups = array();
                 $shared_groups = array();
                 if( $user_id ) {
+                    $user_groups_uns  = array();
                     $groupsUsers = GroupUserFactory::Get(array(
                         'vkId'          => $user_id,
                         'sourceType'    => Group::STAT_GROUP)
                     ,array(
-                            'orderBy'   => 'place'
-                        )
-                    );
+                        'orderBy'   => 'place'
+                    ));
                     $groups_ids = array();
                     foreach( $groupsUsers as $GroupUser ) {
                         $groups_ids[] = $GroupUser->groupId;
@@ -50,9 +50,7 @@
                         $user_groups_uns = GroupFactory::Get(array(
                             '_group_id' =>  $groups_ids
                         ));
-
                     }
-
 
                     foreach( $groups_ids as $group_id ) {
                         if( isset( $user_groups_uns[$group_id])) {
@@ -62,6 +60,7 @@
                             );
                         }
                     }
+
                     $this->check_groups_const($groupsUsers, $user_groups_uns, $user_id, Group::STAT_GROUP );
                 }
 
@@ -124,6 +123,12 @@
                         'id'    =>  $global_groups[$ggu->groupId]->group_id,
                         'name'  =>  $global_groups[$ggu->groupId]->name
                     );
+                } else {
+                    GroupUserFactory::DeleteByMask( array(
+                        'vkId'          =>  GroupsUtility::Fake_User_ID_Global,
+                        'groupId'       =>  $ggu->groupId,
+                        'sourceType'    =>  $source
+                    ));
                 }
             }
             return $result;

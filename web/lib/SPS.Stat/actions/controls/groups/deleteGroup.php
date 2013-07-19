@@ -67,6 +67,10 @@
                 $is_private_can_delete = $group->type == GroupsUtility::Group_Private &&
                     StatAccessUtility::HasAccessToPrivateGroups( $user_id, Group::STAT_GROUP );
 
+                if( $is_global_can_delete) {
+                    $user_id = GroupsUtility::Fake_User_ID_Global;
+                }
+
                 if ( $is_global_can_delete || $is_private_can_delete ) {
                     $group->status = 2;
 
