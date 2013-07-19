@@ -49,8 +49,8 @@ $jsFiles = array(
     'js://st/template.js',
 );
 
-CssHelper::Init(true);
-JsHelper::Init(true);
+CssHelper::Init(false);
+JsHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {
