@@ -676,3 +676,6 @@ input[disabled] {
   z-index: 1;
   visibility: visible !important;
 }
+.ui-sortable {
+  position: relative;
+}

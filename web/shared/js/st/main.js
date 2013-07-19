@@ -518,6 +518,9 @@ var Filter = (function() {
         });
         // сортировка списков
         if (cur.dataUser.isAdmin) {
+            var preventEvent = function () {
+                return false;
+            };
             $list.filter('.private, .global').sortable({
                 axis: 'y',
                 tolerance: 'pointer',
@@ -529,6 +532,14 @@ var Filter = (function() {
                             Filter.refreshList();
                         }
                     });
+                },
+                start: function (_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
+                    ui.item.on('click', preventEvent);
+                },
+                stop: function (_, ui) {
+                    setInterval(function () { // отменяет хак для FF
+                        ui.item.off('click', preventEvent);
+                    }, 10);
                 }
             });
         }
