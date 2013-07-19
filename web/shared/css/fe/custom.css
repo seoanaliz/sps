@@ -117,7 +117,7 @@
     background: url('../../images/fe/select-clear.png') center no-repeat !important;
 }
 
-.link-info-content .link-description-content { overflow: hidden; margin-top: 5px; padding: 10px; border-left: #ссс solid 3px; }
+.link-info-content .link-description-content { overflow: hidden; margin-top: 5px; padding: 10px; border-left: #ccc solid 3px; }
 .link-info-content .link-description-content img { float: left; margin-right: 10px; }
 .link-info-content .link-description-content a { float: none; margin: 0; display: block;}
 .link-info-content .link-description-content p { float: left; }
