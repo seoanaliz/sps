@@ -321,8 +321,6 @@ var Filter = (function() {
     var $periodWrapper;
     var $period;
     var $list;
-    var $intervalWrapper;
-    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
@@ -331,8 +329,6 @@ var Filter = (function() {
         $audience = $('> .audience', $audienceWrapper);
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
-        $intervalWrapper = $('> .interval-wrapper', $container);
-        $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
         refreshList(callback);
@@ -410,41 +406,6 @@ var Filter = (function() {
                     Table.setAudience(audience);
                 }
             }
-        })();
-        (function() {
-            var $timeFrom = $interval.find('.timeFrom');
-            var $timeTo = $interval.find('.timeTo');
-            $($timeFrom).add($timeTo).datepicker({
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: 'd MM yy'
-            }).change(function(e) {
-                var $timeFrom = $interval.find('.timeFrom');
-                var $timeTo = $interval.find('.timeTo');
-                var dateFrom = $timeFrom.datepicker('getDate');
-                var dateTo = $timeTo.datepicker('getDate');
-                $timeTo.datepicker('option', 'minDate', dateFrom);
-                $timeFrom.datepicker('option', 'maxDate', dateTo);
-                Table.setInterval([
-                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
-                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
-                ]);
-            });
-            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
-            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
-            var dateFrom = $timeFrom.datepicker('getDate');
-            var dateTo = $timeTo.datepicker('getDate');
-            $timeTo.datepicker('option', 'minDate', dateFrom);
-            $timeFrom.datepicker('option', 'maxDate', dateTo);
-            Table.setCurrentInterval([
-                intval($timeFrom.datepicker('getDate').getTime() / 1000),
-                intval($timeTo.datepicker('getDate') / 1000)
-            ]);
         })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
@@ -586,25 +547,12 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
-    function showInterval() {
-        $audienceWrapper.slideUp(400);
-        $periodWrapper.slideUp(400);
-        $intervalWrapper.slideDown(200);
-    }
-    function hideInterval() {
-        $audienceWrapper.slideDown(200);
-        $periodWrapper.slideDown(200);
-        $intervalWrapper.slideUp(400);
-    }
-
     return {
         init: init,
         refreshList: refreshList,
         selectList: selectList,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax,
-        showInterval: showInterval,
-        hideInterval: hideInterval
+        setSliderMax: setSliderMax
     };
 })();
 
@@ -855,10 +803,8 @@ var Table = (function() {
                 dataTable = data;
                 if (!listType) {
                     $container.html(tmpl(TABLE, {rows: data}));
-                    Filter.hideInterval();
                 } else {
                     $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.showInterval();
                 }
                 $container.find('.' + currentSortBy).addClass('active');
                 if (!currentListId) {
