@@ -48,8 +48,7 @@
             $SourceFeed->targetFeedIds = implode(',', $targetFeedIds);
 
             if (   $SourceFeed->type == SourceFeedUtility::Source
-                || $SourceFeed->type == SourceFeedUtility::Topface
-                || $SourceFeed->type == SourceFeedUtility::FbFeed ) {
+                || $SourceFeed->type == SourceFeedUtility::Topface) {
                 // do nothing
             } elseif ($SourceFeed->type == SourceFeedUtility::Albums)   {
                 preg_match('/(\d+)_(\d+)$/', $SourceFeed->externalId, $matches);
