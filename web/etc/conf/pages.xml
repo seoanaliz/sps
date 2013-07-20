@@ -418,6 +418,7 @@
                             <template>tmpl://vt/navigations/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
+
                 </pageGroup>
 
                 <pageGroup name="SPS.Articles">
@@ -523,8 +524,96 @@
                             <template>tmpl://vt/editors/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
-
                 </pageGroup>
+
+                <pageGroup name="SPS.Mobile">
+                    <pageGroup name="andSettings">
+                        <page uri="vt://androidSettings/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetAndroidSettingList</actions>
+                            <template>tmpl://vt/androidSettings/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://androidSettings/add">
+                            <actions>SPS.Mobile.SaveAndroidSetting</actions>
+                            <template>tmpl://vt/androidSettings/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://androidSettings/delete/([0-9]+)">
+                            <actions>SPS.Mobile.DeleteAndroidSetting</actions>
+                        </page>
+                        <page uri="vt://androidSettings/edit/([0-9]+)">
+                            <actions>SPS.Mobile.SaveAndroidSetting</actions>
+                            <template>tmpl://vt/androidSettings/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="iosSettings">
+                        <page uri="vt://iOSsetting/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetIOSsettingList</actions>
+                            <template>tmpl://vt/iOSsettings/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://iOSsetting/add">
+                            <actions>SPS.Mobile.SaveIOSsetting</actions>
+                            <template>tmpl://vt/iOSsettings/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://iOSsetting/delete/([0-9]+)">
+                            <actions>SPS.Mobile.DeleteIOSsetting</actions>
+                        </page>
+                        <page uri="vt://iOSsetting/edit/([0-9]+)">
+                            <actions>SPS.Mobile.SaveIOSsetting</actions>
+                            <template>tmpl://vt/iOSsettings/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="banners">
+                        <page uri="vt://banners/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetBannerList</actions>
+                            <template>tmpl://vt/banners/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://banners/add">
+                            <actions>SPS.Mobile.SaveBanner</actions>
+                            <template>tmpl://vt/banners/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://banners/delete/([0-9]+)">
+                            <actions>SPS.Mobile.DeleteBanner</actions>
+                        </page>
+                        <page uri="vt://banners/edit/([0-9]+)">
+                            <actions>SPS.Mobile.SaveBanner</actions>
+                            <template>tmpl://vt/banners/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="categories">
+                        <page uri="vt://categories/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetCategoryList</actions>
+                            <template>tmpl://vt/categories/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://categories/add">
+                            <actions>SPS.Mobile.SaveCategory</actions>
+                            <template>tmpl://vt/categories/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://categories/delete/([0-9]+)">
+                            <actions>SPS.Mobile.DeleteCategory</actions>
+                        </page>
+                        <page uri="vt://categories/edit/([0-9]+)">
+                            <actions>SPS.Mobile.SaveCategory</actions>
+                            <template>tmpl://vt/categories/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                    <pageGroup name="promPosts">
+                        <page uri="vt://promotionPost/">
+                            <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetPromotionPostList</actions>
+                            <template>tmpl://vt/promotionPost/index.tmpl.php</template>
+                        </page>
+                        <page uri="vt://promotionPost/add">
+                            <actions>SPS.Mobile.SavePromotionPost</actions>
+                            <template>tmpl://vt/promotionPost/add.tmpl.php</template>
+                        </page>
+                        <page uri="vt://promotionPost/delete/([0-9]+)">
+                            <actions>SPS.Mobile.DeletePromotionPost</actions>
+                        </page>
+                        <page uri="vt://promotionPost/edit/([0-9]+)">
+                            <actions>SPS.Mobile.SavePromotionPost</actions>
+                            <template>tmpl://vt/promotionPost/edit.tmpl.php</template>
+                        </page>
+                    </pageGroup>
+                </pageGroup>
+
 
                 <pageGroup name="SPS.App">
                     <pageGroup name="author">
@@ -545,6 +634,7 @@
                         </page>
                     </pageGroup>
                 </pageGroup>
+
                 <pageGroup name="daemonLocks">
                     <page uri="vt://daemons/">
                         <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Common.GetDaemonLockList</actions>
