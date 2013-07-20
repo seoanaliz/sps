@@ -163,7 +163,13 @@ sql;
                 $this->finishArticleQueue($articleQueue);
 
                 if( $article->isSuggested ) {
-                    $sender->delete_post( $article->externalId );
+                    try {
+                        $sender->delete_post( $article->externalId );
+                    } catch( Exception $e ) {
+                        AuditUtility::CreateEvent('exportErrors', 'articleQueue', $articleQueue->articleQueueId,
+                            'cant delete post (' . $article->externalId . ' ) ' .  $e->getMessage() );
+
+                    }
                 }
 
                 if ($article->sourceFeedId == SourceFeedUtility::FakeSourceTopface) {

@@ -1050,7 +1050,7 @@ var Table = (function() {
                         previousValue = val;
                     }
                 })
-                .delegate('.search', 'click', clearSearch);
+                .delegate('.clear-search', 'click', clearSearch);
         }
 
         function showDropdown() {
