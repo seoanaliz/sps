@@ -74,11 +74,11 @@
             , "menu" => array(
                 array(
                     "title"  => "vt.menu.andSettings"
-                    , "link" => "vt://and-settings/"
+                    , "link" => "vt://androidSettings/"
                 ),
                 array(
                     "title"  => "vt.menu.iosSettings"
-                    , "link" => "vt://ios-settings/"
+                    , "link" => "vt://iOSsetting/"
                 ),
                 array(
                     "title"  => "vt.menu.banners"

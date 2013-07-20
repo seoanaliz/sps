@@ -17,22 +17,23 @@
     </ul>
 
     <div id="page-0" class="tab-page rows">
+        <div data-row="publicId" class="row">
+            <label>{lang:vt.mobile.publicId}</label>
+            <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="minVersion" class="row">
-            <label>{lang:vt.iOSsetting.minVersion}</label>
+            <label>{lang:vt.mobile.minVersion}</label>
             <?= FormHelper::FormInput( $prefix . '[minVersion]', $object->minVersion, 'minVersion', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="curVersion" class="row">
-            <label>{lang:vt.iOSsetting.curVersion}</label>
+            <label>{lang:vt.mobile.curVersion}</label>
             <?= FormHelper::FormInput( $prefix . '[curVersion]', $object->curVersion, 'curVersion', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="shareText" class="row">
-            <label>{lang:vt.iOSsetting.shareText}</label>
+            <label>{lang:vt.mobile.shareText}</label>
             <?= FormHelper::FormInput( $prefix . '[shareText]', $object->shareText, 'shareText', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
-        <div data-row="publicId" class="row">
-            <label>{lang:vt.iOSsetting.publicId}</label>
-            <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
-        </div>
+
 	</div>
 </div>
 <script type="text/javascript">

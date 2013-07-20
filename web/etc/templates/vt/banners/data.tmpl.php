@@ -17,32 +17,32 @@
     </ul>
 
     <div id="page-0" class="tab-page rows">
+        <div data-row="bannerId" class="row">
+            <label>{lang:vt.mobile.bannerId}</label>
+            <?= FormHelper::FormInput( $prefix . '[bannerId]', $object->bannerId, 'bannerId', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
+        </div>
         <div data-row="publicId" class="row">
-            <label>{lang:vt.banner.publicId}</label>
+            <label>{lang:vt.mobile.publicId}</label>
             <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="platform" class="row">
-            <label>{lang:vt.banner.platform}</label>
+            <label>{lang:vt.mobile.platform}</label>
             <?= FormHelper::FormInput( $prefix . '[platform]', $object->platform, 'platform', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
-        <div data-row="bannerId" class="row">
-            <label>{lang:vt.banner.bannerId}</label>
-            <?= FormHelper::FormInput( $prefix . '[bannerId]', $object->bannerId, 'bannerId', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
-        </div>
         <div data-row="prob" class="row">
-            <label>{lang:vt.banner.prob}</label>
+            <label>{lang:vt.mobile.prob}</label>
             <?= FormHelper::FormInput( $prefix . '[prob]', $object->prob, 'prob', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="imgUrl" class="row">
-            <label>{lang:vt.banner.imgUrl}</label>
+            <label>{lang:vt.mobile.imgUrl}</label>
             <?= FormHelper::FormInput( $prefix . '[imgUrl]', $object->imgUrl, 'imgUrl', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="actionUrl" class="row">
-            <label>{lang:vt.banner.actionUrl}</label>
+            <label>{lang:vt.mobile.actionUrl}</label>
             <?= FormHelper::FormInput( $prefix . '[actionUrl]', $object->actionUrl, 'actionUrl', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="active" class="row">
-            <label>{lang:vt.banner.active}</label>
+            <label>{lang:vt.mobile.active}</label>
             <?= FormHelper::FormInput( $prefix . '[active]', $object->active, 'active', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
 	</div>

@@ -528,35 +528,35 @@
 
                 <pageGroup name="SPS.Mobile">
                     <pageGroup name="andSettings">
-                        <page uri="vt://and-settings/">
+                        <page uri="vt://androidSettings/">
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetAndroidSettingList</actions>
                             <template>tmpl://vt/androidSettings/index.tmpl.php</template>
                         </page>
-                        <page uri="vt://and-settings/add">
+                        <page uri="vt://androidSettings/add">
                             <actions>SPS.Mobile.SaveAndroidSetting</actions>
                             <template>tmpl://vt/androidSettings/add.tmpl.php</template>
                         </page>
-                        <page uri="vt://and-settings/delete/([0-9]+)">
+                        <page uri="vt://androidSettings/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeleteAndroidSetting</actions>
                         </page>
-                        <page uri="vt://and-settings/edit/([0-9]+)">
+                        <page uri="vt://androidSettings/edit/([0-9]+)">
                             <actions>SPS.Mobile.SaveAndroidSetting</actions>
                             <template>tmpl://vt/androidSettings/edit.tmpl.php</template>
                         </page>
                     </pageGroup>
                     <pageGroup name="iosSettings">
-                        <page uri="vt://ios-settings/">
+                        <page uri="vt://iOSsetting/">
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetIOSsettingList</actions>
                             <template>tmpl://vt/iOSsettings/index.tmpl.php</template>
                         </page>
-                        <page uri="vt://iOSsetings/add">
+                        <page uri="vt://iOSsetting/add">
                             <actions>SPS.Mobile.SaveIOSsetting</actions>
                             <template>tmpl://vt/iOSsettings/add.tmpl.php</template>
                         </page>
-                        <page uri="vt://iOSsetings/delete/([0-9]+)">
+                        <page uri="vt://iOSsetting/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeleteIOSsetting</actions>
                         </page>
-                        <page uri="vt://iOSsetings/edit/([0-9]+)">
+                        <page uri="vt://iOSsetting/edit/([0-9]+)">
                             <actions>SPS.Mobile.SaveIOSsetting</actions>
                             <template>tmpl://vt/iOSsettings/edit.tmpl.php</template>
                         </page>
@@ -566,14 +566,14 @@
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetBannerList</actions>
                             <template>tmpl://vt/banners/index.tmpl.php</template>
                         </page>
-                        <page uri="vt://Mobile/add">
+                        <page uri="vt://banners/add">
                             <actions>SPS.Mobile.SaveBanner</actions>
                             <template>tmpl://vt/banners/add.tmpl.php</template>
                         </page>
-                        <page uri="vt://Mobile/delete/([0-9]+)">
+                        <page uri="vt://banners/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeleteBanner</actions>
                         </page>
-                        <page uri="vt://Mobile/edit/([0-9]+)">
+                        <page uri="vt://banners/edit/([0-9]+)">
                             <actions>SPS.Mobile.SaveBanner</actions>
                             <template>tmpl://vt/banners/edit.tmpl.php</template>
                         </page>
@@ -596,18 +596,18 @@
                         </page>
                     </pageGroup>
                     <pageGroup name="promPosts">
-                        <page uri="vt://promotion-posts/">
+                        <page uri="vt://promotionPost/">
                             <actions>Eaze.Helpers.ProcessSearchFilter, SPS.Mobile.GetPromotionPostList</actions>
                             <template>tmpl://vt/promotionPost/index.tmpl.php</template>
                         </page>
-                        <page uri="vt://publishers/add">
+                        <page uri="vt://promotionPost/add">
                             <actions>SPS.Mobile.SavePromotionPost</actions>
                             <template>tmpl://vt/promotionPost/add.tmpl.php</template>
                         </page>
-                        <page uri="vt://publishers/delete/([0-9]+)">
+                        <page uri="vt://promotionPost/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeletePromotionPost</actions>
                         </page>
-                        <page uri="vt://publishers/edit/([0-9]+)">
+                        <page uri="vt://promotionPost/edit/([0-9]+)">
                             <actions>SPS.Mobile.SavePromotionPost</actions>
                             <template>tmpl://vt/promotionPost/edit.tmpl.php</template>
                         </page>

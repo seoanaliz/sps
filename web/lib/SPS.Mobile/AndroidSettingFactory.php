@@ -95,7 +95,6 @@
 
         /** @return AndroidSetting[] */
         public static function Get( $searchArray = null, $options = null, $connectionName = self::DefaultConnection ) {
-            print_r($connectionName);
             return BaseFactory::Get( $searchArray, self::$mapping, $options, $connectionName );
         }
 

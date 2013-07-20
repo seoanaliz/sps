@@ -17,22 +17,23 @@
     </ul>
 
     <div id="page-0" class="tab-page rows">
+        <div data-row="index" class="row">
+            <label>{lang:vt.mobile.index}</label>
+            <?= FormHelper::FormInput( $prefix . '[index]', $object->index, 'index', null, array( 'size' => 80 ) ); ?>
+        </div>
         <div data-row="publicId" class="row">
-            <label>{lang:vt.category.publicId}</label>
+            <label>{lang:vt.mobile.publicId}</label>
             <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="name" class="row">
-            <label>{lang:vt.category.name}</label>
+            <label>{lang:vt.mobile.name}</label>
             <?= FormHelper::FormInput( $prefix . '[name]', $object->name, 'name', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
         <div data-row="mask" class="row">
-            <label>{lang:vt.category.mask}</label>
+            <label>{lang:vt.mobile.mask}</label>
             <?= FormHelper::FormInput( $prefix . '[mask]', $object->mask, 'mask', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
-        <div data-row="index" class="row">
-            <label>{lang:vt.category.index}</label>
-            <?= FormHelper::FormInput( $prefix . '[index]', $object->index, 'index', null, array( 'size' => 80 ) ); ?>
-        </div>
+
 	</div>
 </div>
 <script type="text/javascript">

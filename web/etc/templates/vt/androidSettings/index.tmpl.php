@@ -1,11 +1,14 @@
 <?php
     /** @var AndroidSetting[] $list */
 
-    $__pageTitle = LocaleLoader::Translate( "vt.screens.androidSetting.list");
+    $__pageTitle = LocaleLoader::Translate( "vt.menu.andSettings");
 
     $grid = array(
         "columns" => array(
-           
+              LocaleLoader::Translate( "vt.mobile.publicId" )
+            , LocaleLoader::Translate( "vt.mobile.minVersion" )
+            , LocaleLoader::Translate( "vt.mobile.curVersion" )
+            , LocaleLoader::Translate( "vt.mobile.shareText" )
         )
         , "colspans"	=> array()
         , "sorts"		=> array()
@@ -43,21 +46,22 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.androidSetting.minVersion}</label>
+                    <label>{lang:vt.mobile.publicId}</label>
+                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.minVersion}</label>
                     <?= FormHelper::FormInput( "search[minVersion]", $search['minVersion'], 'minVersion', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.androidSetting.curVersion}</label>
+                    <label>{lang:vt.mobile.curVersion}</label>
                     <?= FormHelper::FormInput( "search[curVersion]", $search['curVersion'], 'curVersion', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.androidSetting.shareText}</label>
+                    <label>{lang:vt.mobile.shareText}</label>
                     <?= FormHelper::FormInput( "search[shareText]", $search['shareText'], 'shareText', null, array( 'size' => 80 ) ); ?>
                 </div>
-                <div class="row">
-                    <label>{lang:vt.androidSetting.publicId}</label>
-                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
-                </div>
+
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
 		</div>

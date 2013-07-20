@@ -1,12 +1,17 @@
 <?php
     /** @var Banner[] $list */
 
-    $__pageTitle = LocaleLoader::Translate( "vt.screens.banner.list");
+    $__pageTitle = LocaleLoader::Translate( "vt.menu.banners");
 
     $grid = array(
         "columns" => array(
-           LocaleLoader::Translate( "vt.banner.publicId" )
-            , LocaleLoader::Translate( "vt.banner.prob" )
+              LocaleLoader::Translate( "vt.mobile.bannerId" )
+            , LocaleLoader::Translate( "vt.mobile.publicId" )
+            , LocaleLoader::Translate( "vt.mobile.platform" )
+            , LocaleLoader::Translate( "vt.mobile.prob" )
+            , LocaleLoader::Translate( "vt.mobile.imgUrl" )
+            , LocaleLoader::Translate( "vt.mobile.actionUrl" )
+            , LocaleLoader::Translate( "vt.mobile.active" )
         )
         , "colspans"	=> array()
         , "sorts"		=> array(0 => "publicId", 1 => "prob")
@@ -44,31 +49,32 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.banner.publicId}</label>
-                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.banner.platform}</label>
-                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.banner.bannerId}</label>
+                    <label>{lang:vt.mobile.bannerId}</label>
                     <?= FormHelper::FormInput( "search[bannerId]", $search['bannerId'], 'bannerId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.banner.prob}</label>
+                    <label>{lang:vt.mobile.publicId}</label>
+                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.platform}</label>
+                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
+                </div>
+
+                <div class="row">
+                    <label>{lang:vt.mobile.prob}</label>
                     <?= FormHelper::FormInput( "search[prob]", $search['prob'], 'prob', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.banner.imgUrl}</label>
+                    <label>{lang:vt.mobile.imgUrl}</label>
                     <?= FormHelper::FormInput( "search[imgUrl]", $search['imgUrl'], 'imgUrl', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.banner.actionUrl}</label>
+                    <label>{lang:vt.mobile.actionUrl}</label>
                     <?= FormHelper::FormInput( "search[actionUrl]", $search['actionUrl'], 'actionUrl', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.banner.active}</label>
+                    <label>{lang:vt.mobile.active}</label>
                     <?= FormHelper::FormInput( "search[active]", $search['active'], 'active', null, array( 'size' => 80 ) ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />

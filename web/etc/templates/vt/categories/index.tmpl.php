@@ -1,11 +1,14 @@
 <?php
     /** @var Category[] $list */
 
-    $__pageTitle = LocaleLoader::Translate( "vt.screens.category.list");
+    $__pageTitle = LocaleLoader::Translate( "vt.menu.categories");
 
     $grid = array(
         "columns" => array(
-           LocaleLoader::Translate( "vt.category.publicId" )
+            LocaleLoader::Translate( "vt.mobile.index" )
+           ,LocaleLoader::Translate( "vt.mobile.publicId" )
+           ,LocaleLoader::Translate( "vt.mobile.name" )
+           ,LocaleLoader::Translate( "vt.mobile.mask" )
         )
         , "colspans"	=> array()
         , "sorts"		=> array(0 => "publicId")
@@ -43,20 +46,20 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.category.publicId}</label>
+                    <label>{lang:vt.mobile.index}</label>
+                    <?= FormHelper::FormInput( "search[index]", $search['index'], 'index', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.publicId}</label>
                     <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.category.name}</label>
+                    <label>{lang:vt.mobile.name}</label>
                     <?= FormHelper::FormInput( "search[name]", $search['name'], 'name', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.category.mask}</label>
+                    <label>{lang:vt.mobile.mask}</label>
                     <?= FormHelper::FormInput( "search[mask]", $search['mask'], 'mask', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.category.index}</label>
-                    <?= FormHelper::FormInput( "search[index]", $search['index'], 'index', null, array( 'size' => 80 ) ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
@@ -73,10 +76,11 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
+                <td>{$object.index}</td>
                 <td>{$object.publicId}</td>
                 <td>{$object.name}</td>
                 <td>{$object.mask}</td>
-                <td>{$object.index}</td>
+
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>

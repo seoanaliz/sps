@@ -1,11 +1,20 @@
 <?php
     /** @var PromotionPost[] $list */
 
-    $__pageTitle = LocaleLoader::Translate( "vt.screens.promotionPost.list");
+    $__pageTitle = LocaleLoader::Translate( "vt.menu.promPosts");
 
     $grid = array(
         "columns" => array(
-           
+             LocaleLoader::Translate( "vt.mobile.indexPP" )
+            ,LocaleLoader::Translate( "vt.mobile.publicId" )
+            ,LocaleLoader::Translate( "vt.mobile.platform" )
+            ,LocaleLoader::Translate( "vt.mobile.headerText" )
+            ,LocaleLoader::Translate( "vt.mobile.imgUrl" )
+            ,LocaleLoader::Translate( "vt.mobile.shareText" )
+            ,LocaleLoader::Translate( "vt.mobile.actionText" )
+            ,LocaleLoader::Translate( "vt.mobile.actionUrl" )
+            ,LocaleLoader::Translate( "vt.mobile.active" )
+            ,LocaleLoader::Translate( "vt.mobile.showsCount" )
         )
         , "colspans"	=> array()
         , "sorts"		=> array()
@@ -43,43 +52,44 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.promotionPost.publicId}</label>
-                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.platform}</label>
-                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.headerText}</label>
-                    <?= FormHelper::FormInput( "search[headerText]", $search['headerText'], 'headerText', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.imgUrl}</label>
-                    <?= FormHelper::FormInput( "search[imgUrl]", $search['imgUrl'], 'imgUrl', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.text}</label>
-                    <?= FormHelper::FormInput( "search[text]", $search['text'], 'text', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.actionText}</label>
-                    <?= FormHelper::FormInput( "search[actionText]", $search['actionText'], 'actionText', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.actionUrl}</label>
-                    <?= FormHelper::FormInput( "search[actionUrl]", $search['actionUrl'], 'actionUrl', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
-                    <label>{lang:vt.promotionPost.index}</label>
+                    <label>{lang:vt.mobile.indexPP}</label>
                     <?= FormHelper::FormInput( "search[index]", $search['index'], 'index', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.promotionPost.active}</label>
+                    <label>{lang:vt.mobile.publicId}</label>
+                    <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.platform}</label>
+                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.headerText}</label>
+                    <?= FormHelper::FormInput( "search[headerText]", $search['headerText'], 'headerText', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.imgUrl}</label>
+                    <?= FormHelper::FormInput( "search[imgUrl]", $search['imgUrl'], 'imgUrl', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.shareText}</label>
+                    <?= FormHelper::FormInput( "search[text]", $search['text'], 'text', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.actionText}</label>
+                    <?= FormHelper::FormInput( "search[actionText]", $search['actionText'], 'actionText', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.actionUrl}</label>
+                    <?= FormHelper::FormInput( "search[actionUrl]", $search['actionUrl'], 'actionUrl', null, array( 'size' => 80 ) ); ?>
+                </div>
+
+                <div class="row">
+                    <label>{lang:vt.mobile.active}</label>
                     <?= FormHelper::FormInput( "search[active]", $search['active'], 'active', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.promotionPost.showsCount}</label>
+                    <label>{lang:vt.mobile.showsCount}</label>
                     <?= FormHelper::FormInput( "search[showsCount]", $search['showsCount'], 'showsCount', null, array( 'size' => 80 ) ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
@@ -97,6 +107,7 @@
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
+                <td>{$object.index}</td>
                 <td>{$object.publicId}</td>
                 <td>{$object.platform}</td>
                 <td>{$object.headerText}</td>
@@ -104,7 +115,6 @@
                 <td>{$object.text}</td>
                 <td>{$object.actionText}</td>
                 <td>{$object.actionUrl}</td>
-                <td>{$object.index}</td>
                 <td>{$object.active}</td>
                 <td>{$object.showsCount}</td>
 				<td width="10%">
