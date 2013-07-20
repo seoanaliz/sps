@@ -1,15 +1,4 @@
-var LIST =
-'<div class="tab-bar clear-fix">' +
-    '<div class="tab selected" data-id="null">Популярные</div>' +
-    '<?if( cur.dataUser.rank > 7 ) { ?>'+
-        '<div class="actions">' +
-                '<a class="share">Поделиться</a> |' +
-                '<a class="edit">Редактировать</a> |' +
-                '<a class="delete">Удалить</a>' +
-        '</div> ' +
-    ' <? } ?> ' +
-'</div>' ;
-
+var LIST = '<div class="tab selected" data-id="all">Популярные</div>';
 
 var LIST_ITEM =
 '<? if (isset("itemFave")) { ?>' +
@@ -108,7 +97,8 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<? if( cur.dataUser.rank > 2 ) { ?>'+
+    '<? if( cur.dataUser.isEditor ) { ?>'+
+
         '<div class="column column1 public-actions">' +
             '<div class="cell">' +
                 '<span class="action add-to-list">' +
@@ -151,14 +141,21 @@ var CONTACT =
 
 var DROPDOWN =
 '<div class="dropdown">' +
+    '<span class="icon delete clear-search"></span>' +
+    '<input type="text" class="search" placeholder="Поиск" />' +
     '<? each(DROPDOWN_ITEM, items); ?>' +
-    '<input type="text" class="add-item" placeholder="Название списка" />' +
-    '<div class="item show-input">Создать список</div>' +
-    '<div class="item hide-public">Скрыть паблик</div>' +
+    '<? if (cur.dataUser.isAdmin) { ?>'+
+        '<input type="text" class="add-item" placeholder="Название списка" />' +
+        '<div class="show-input">Создать список</div>' +
+    '<? } ?>'+
 '</div>';
 
 var DROPDOWN_ITEM =
-'<div data-id="<?=itemId?>" class="item"><?=itemTitle?><div class="icon plus"></div></div>';
+'<div data-id="<?=id?>" title="<?=name?>" class="item">' +
+    '<div>' +
+        '<?=name?>' +
+    '</div>' +
+'<div class="icon plus"></div></div>';
 
 var CONTACT_DROPDOWN =
 '<div class="contact-dropdown">' +
@@ -184,10 +181,11 @@ var FILTER_LIST =
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" data-id="<?=itemId?>">' +
-    '<span class="text"><?=itemTitle?></span>' +
-    '<?if( cur.dataUser.rank == 4 ) { ?>'+
-        '<div class="icon bookmark<?=(isset("itemFave")) ? " selected" : ""?>"></div>' +
+'<div class="item" title="<?=name?>" data-id="<?=id?>">' +
+    '<span class="text"><?=name?></span>' +
+    '<?if (cur.dataUser.isAdmin) { ?>'+
+        '<span class="icon edit"></span>' +
+        '<span class="icon bookmark"></span>' +
     '<? } ?>'+
 '</div>';
 

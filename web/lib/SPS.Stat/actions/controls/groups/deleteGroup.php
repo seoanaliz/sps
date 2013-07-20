@@ -16,7 +16,6 @@
 
         public function Execute() {
 
-            error_reporting( 0 );
             $user_id  = AuthVkontakte::IsAuth();
             $group_id = Request::getString ( 'groupId' );
             $general  = Request::getInteger ( 'general' );
@@ -56,22 +55,48 @@
                 }
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
             } elseif ( $type == 'Stat' ) {
+                $res = false;
                 $group = GroupFactory::GetOne( array( 'group_id' => $group_id));
-                if ( $group && $group->type != GroupsUtility::Group_Global  ) {
-                    if( $group->created_by == $user_id ) {
-                        $group->status = 2;
-                        $res = GroupFactory::Update($group);
-                    } else {
-                        $statUser = StatUserFactory::GetOne( array( 'user_id' => $user_id ));
-                        $k = array_search($group->group_id, $statUser->groups_ids);
-                        unset( $statUser->groups_ids[$k]);
-                        $res = StatUserFactory::Update($statUser);
-                    }
+                if( empty( $group )) {
+                    die( ObjectHelper::ToJSON( array( 'response' => false )));
                 }
+
+                $is_global_can_delete = $group->type == GroupsUtility::Group_Global &&
+                    StatAccessUtility::CanManageGlobalGroups( $user_id, Group::STAT_GROUP );
+
+                $is_private_can_delete = $group->type == GroupsUtility::Group_Private &&
+                    StatAccessUtility::HasAccessToPrivateGroups( $user_id, Group::STAT_GROUP );
+
+                if( $is_global_can_delete) {
+                    $user_id = GroupsUtility::Fake_User_ID_Global;
+                }
+
+                if ( $is_global_can_delete || $is_private_can_delete ) {
+                    $group->status = 2;
+
+                    GroupEntryFactory::DeleteByMask( array(
+                        'groupId'       =>  $group->group_id,
+                        'sourceType'    =>  Group::STAT_GROUP
+                    ));
+
+                    GroupUserFactory::DeleteByMask( array(
+                        'groupId'       =>  $group->group_id,
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    $NewGroupUsers = GroupsUtility::sort_groups_users( $user_id, Group::STAT_GROUP );
+                    GroupUserFactory::DeleteByMask( array(
+                        'sourceType'    =>  Group::STAT_GROUP,
+                        'vkId'          =>  $user_id
+                    ));
+                    GroupUserFactory::AddRange($NewGroupUsers);
+                    $res = true;
+                }
+
                 die(ObjectHelper::ToJSON( array( 'response' => $res )));
             }
 
-            if ( statUsers::is_Sadmin( $user_id ) ) {
+            if ( statUsers::is_Sadmin( $user_id )) {
                 $res = $m_class::delete_group( $group_id );
             }
 //            elseif ( !$general ) {
@@ -88,6 +113,9 @@
             }
 
             die( ObjectHelper::ToJSON(array('response' => false)));
+        }
+
+        private function remove_inLists_state( $group_id ) {
         }
     }
 ?>

@@ -18,11 +18,12 @@ class DeletePost
                 WHERE
                 "articleQueues"."isDeleted" = FALSE
                 AND @now >= "articleQueues"."deleteAt"
+                AND now() - interval '1 day' <= "articleQueues"."deleteAt"
                 AND "articleQueues"."deleteAt" IS NOT NULL
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
-                ORDER BY "articleQueues"."deleteAt" DESC
-                LIMIT 20 FOR UPDATE;
+                AND "articleQueues"."externalId" IS NOT NULL
+                ORDER BY "articleQueues"."deleteAt" DESC;
 sql;
         $sender = new SenderVkontakte();
 
@@ -55,6 +56,7 @@ sql;
                         break;
                     } catch(Exception $exception) {
                         Logger::Warning('Exception on delete post over VK:API :' . $exception->getMessage());
+                        AuditUtility::CreateEvent('deleteErrors', 'articleQueue', $articleQueue->articleQueueId, $exception->getMessage());
                         continue;
                     }
                 }

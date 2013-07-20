@@ -11,7 +11,7 @@ class TokenChecker
         $errors = 0;
 
         //токены издателей
-        $publishers = PublisherFactory::Get(array('status_id' => 1));
+        $publishers = PublisherFactory::Get(array('statusId' => 1));
         foreach( $publishers as $publisher ) {
             $errors += $this->check_token( $publisher->vk_token, $publisher->vk_id, 'sb');
             sleep(1);

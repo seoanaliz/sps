@@ -21,11 +21,15 @@
         /** @var int */
         public $sourceType;
 
-        public function __construct( $groupId = null, $entryId = null, $sourceType = null) {
-            if( $groupId && $entryId && $sourceType) {
+        /** @var int */
+        public $addedBy;
+
+        public function __construct( $groupId = null, $entryId = null, $sourceType = null, $addedBy = null) {
+            if( $groupId && $entryId && $sourceType ) {
                 $this->groupId      = $groupId;
                 $this->entryId      = $entryId;
                 $this->sourceType   = $sourceType;
+                $this->addedBy      = $addedBy;
             }
         }
     }

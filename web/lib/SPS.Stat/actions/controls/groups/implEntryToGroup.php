@@ -14,7 +14,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
             $response  = array('success' => false);
             $user_id  = AuthVkontakte::IsAuth();
             $group_id  = Request::getInteger ( 'groupId' );
@@ -47,14 +46,20 @@
 
             } elseif( $type == 'Stat' ) {
                 if( StatAccessUtility::CanEditGlobalGroups($user_id, Group::STAT_GROUP)) {
-                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'sourceType' => Group::STAT_GROUP));
+                    $check = GroupEntryFactory::GetOne( array( 'entryId' => $entry_id, 'groupId' => $group_id, 'sourceType' => Group::STAT_GROUP));
                     if( !empty( $check)) {
-                        $response['message'] = 'В этом списке уже есть данная запись';
+                        $response['message'] = 'it\'s already there';
                         die(ObjectHelper::ToJSON($response));
                     }
-                    $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP);
+                    $groupEntry = new GroupEntry( $group_id, $entry_id, Group::STAT_GROUP, $user_id );
 
                     if( GroupEntryFactory::Add($groupEntry)) {
+                        $group  = GroupFactory::GetById( $group_id );
+                        if( $group->type ==  GroupsUtility::Group_Global ) {
+                            $public = new VkPublic();
+                            $public->inLists = true;
+                            VkPublicFactory::UpdateByMask( $public, array('inLists'), array('vk_public_id' => $entry_id));
+                        }
                         $response['success'] = true;
                         die( ObjectHelper::ToJSON(array( 'response' => true )));
                     }

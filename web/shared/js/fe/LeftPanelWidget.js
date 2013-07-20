@@ -47,7 +47,7 @@ var LeftPanelWidget = Event.extend({
         });
 
         $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if (e.ctrlKey && e.keyCode === KEY.ENTER) {
                 var $newComment = $(this).closest('.new-comment');
                 var $sendBtn = $newComment.find('.send');
                 $sendBtn.click();
@@ -232,9 +232,9 @@ var LeftPanelWidget = Event.extend({
         var $wall = this.$wall;
 
         $wall.delegate('.post > .delete', 'click', function(){
-            var elem = $(this).closest('.post'),
-                pid = elem.data('id'),
-                gid = elem.data('group');
+            var $elem = $(this).closest('.post'),
+                pid = $elem.data('id'),
+                gid = $elem.data('group');
             Events.fire('leftcolumn_deletepost', pid, function(state){
                 if (state) {
                     var deleteMessageId = 'deleted-post-' + pid;
@@ -245,7 +245,7 @@ var LeftPanelWidget = Event.extend({
                         $deleteMessage.show();
                     } else {
                         // иначе добавляем
-                        elem.before($(
+                        $elem.before($(
                             '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
@@ -253,7 +253,7 @@ var LeftPanelWidget = Event.extend({
                         ));
                     }
 
-                    elem.hide();
+                    $elem.hide();
                 }
             });
         });
@@ -419,7 +419,6 @@ var LeftPanelWidget = Event.extend({
 
     loadArticles: function(clean) {
         var t = this;
-        var filterAuthorId = t.filterAuthorId;
 
         if (articlesLoading) {
             return;
@@ -431,16 +430,23 @@ var LeftPanelWidget = Event.extend({
             $(window).data('disable-load-more', false);
         }
 
+        var $newPost = $('.newpost');
+        $newPost.hide();
+        t.wallPage++;
+
         var sourceType = Elements.leftType();
+
+        // костыль
+        if ((sourceType === App.FEED_TYPE_AUTHORS) && $('.user-groups-tabs .selected').hasClass('proposed')) {
+            return t.showMoreProposed();
+        }
+
+        var $wallLoader = Elements.getWallLoader();
+        $wallLoader.show();
         var targetFeedId = Elements.rightdd();
         var switcherType = Elements.getSwitcherType();
-        var $newPost = $('.newpost');
-        var $wallLoader = Elements.getWallLoader();
-        t.wallPage++;
-        articlesLoading = true;
 
-        $wallLoader.show();
-        $newPost.hide();
+        articlesLoading = true;
 
         var requestData = {
             sortType: Elements.getSortType(),
@@ -495,9 +501,9 @@ var LeftPanelWidget = Event.extend({
                 break;
         }
 
-        if (filterAuthorId) {
+        if (t.filterAuthorId) {
             requestData.mode = 'posted';
-            requestData.authorId = filterAuthorId;
+            requestData.authorId = t.filterAuthorId;
         }
 
         if (!clean) {
@@ -513,23 +519,29 @@ var LeftPanelWidget = Event.extend({
         }).success(function(html) {
             if (!html) {
                 $(window).data('disable-load-more', true);
-                $('.wall-title span.count').text('нет записей');
+                $('.wall-title .count').text('нет записей');
             } else {
-                var tmpEl = document.createElement('div');
-                var $block = $(tmpEl).html(html);
-                t.$wall.append($block);
-                Elements.initDraggable($block);
-                Elements.initDroppable();
-                Elements.initImages($block);
-                Elements.initLinks($block);
-                if (!$block.find('.post').length) {
-                    $(window).data('disable-load-more', true);
-                }
+                t.appendWallContent(html);
             }
             t.trigger('loadArticles', html);
         }).error(function() {
             t.trigger('loadArticles', false);
         });
+    },
+
+    appendWallContent: function(html) {
+        var t = this;
+
+        var tmpEl = document.createElement('div');
+        var $block = $(tmpEl).html(html);
+        t.$wall.append($block);
+        Elements.initDraggable($block);
+        Elements.initDroppable();
+        Elements.initImages($block);
+        Elements.initLinks($block);
+        if (!$block.find('.post').length) {
+            $(window).data('disable-load-more', true);
+        }
     },
 
     initAddPost: function() {
@@ -816,19 +828,22 @@ var LeftPanelWidget = Event.extend({
 
         // Редактирование поста в левом меню
         $('#left-panel').delegate('.post .edit, .post.editable .content .shortcut', 'click', t.editPostInline);
-        $('#right-panel').delegate('.post .text', 'click', t.editPostInline);
+        $('#right-panel').delegate('.slot:not(.locked) .text, .edit-trigger', 'click', t.editPostInline);
     },
 
     editPostInline: function(){
-        var $post = $(this).closest('.post'),
-        $el = $post.find('.content'),
+        var $post = $(this).closest('.post');
+        if (!$post.length) {
+            $post = $(this).closest('.slot').find('.post');
+        }
+        var $el = $post.find('.content'),
         $buttonPanel = $post.find('.bottom.d-hide'),
         postId = $post.data('id'),
         queueId = $post.data('queue-id'),
         $slot = $post.closest('.slot'),
         timestamp = $slot.data('id');
 
-        if ($post.editing) return;
+        if ($post.data('editing')) return;
 
         Events.fire('load_post_edit', postId, queueId, function(state, data){
             if (state && data) {
@@ -979,7 +994,7 @@ var LeftPanelWidget = Event.extend({
                     scroll: $(window).scrollTop()
                 };
                 $post.find('> .content').draggable('disable');
-                $post.editing = true;
+                $post.data('editing', true);
                 $buttonPanel.hide();
                 $el.html('');
 
@@ -1026,7 +1041,7 @@ var LeftPanelWidget = Event.extend({
                 };
                 var onCancel = function() {
                     $post.find('> .content').draggable('enable');
-                    $post.editing = false;
+                    $post.data('editing', false);
                     $buttonPanel.show();
                     $el.html(cache.html);
                     $edit.remove();
@@ -1082,7 +1097,7 @@ var LeftPanelWidget = Event.extend({
                 if (!$window.data('disable-load-more') && $window.scrollTop() > ($(document).height() - $window.height() * 2)) {
                     t.loadArticles(false);
                 }
-            }, 200);
+            }, 50);
         });
     },
 
@@ -1182,16 +1197,247 @@ var LeftPanelWidget = Event.extend({
 
         // Кастомные подвкладки
         $leftPanel.find('.user-groups-tabs').delegate('.tab', 'click', function() {
-            if (articlesLoading) {
-                return;
-            }
-
             var $tab = $(this);
-            $leftPanel.find('.user-groups-tabs .tab').removeClass('selected');
+            $leftPanel.find('.user-groups-tabs .tab.selected').removeClass('selected');
             $tab.addClass('selected');
+
+            if ($tab.hasClass('proposed')) {
+                t.initProposed();
+                $('#wall-switcher').hide();
+                t.$wall.empty();
+            } else {
+                $('#wall-switcher').show();
+                if (articlesLoading) {
+                    return; // ------------------ RETURN
+                }
+            }
 
             t.loadArticles(true);
         });
+    },
+
+    // всяческие кеши и глобальное состояние для "Предложенных"
+    initProposed: function () {
+        var t = this;
+        t.itemsPerRequest = 80; // сколько брать с удалённого сервера (ВКонтакте) за раз
+        t.cachedProposed = []; // взятые с удалённого сервера, но пока не отрисованные
+        t.itemsPerShow = 20; // сколько отрисовать за раз
+        t.hasMoreRemote = true; // остались ли ещё на удалённом сервере
+        t.loadingMore = null; // когда нужно, хранит Deferred уже запущенного запроса на удалённый сервер, используется в префетчинге
+        t.currentPageOffset = 0; // какую по счёту порцию взять с удалённого сервера, начиная с 0
+        t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении
+        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообщества) и т.п.)
+        t.totalCount = 0; // общее число предложенных на удалённом сервере
+    },
+
+    showMoreProposed: function () {
+        var t = this;
+        if (t.cachedProposed.length) {
+            t.renderProposed();
+            if ((t.cachedProposed.length <= (t.itemsPerShow + 10)) && !t.loadingMore) {
+                t.loadingMore = t.loadProposed();
+            }
+        } else {
+            (t.loadingMore ? t.loadingMore : t.loadProposed()).success(function () {
+                t.showMoreProposed();
+            });
+        }
+    },
+
+    timestampToHumanReadable: function(timestamp) {
+        var date = new Date(timestamp*1000);
+        var months = ['Янв','Фев','Мар','Апр','Мая','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+        var month = months[date.getMonth()];
+        var hour = ('0' + date.getHours()).slice(-2);
+        var min = ('0' + date.getMinutes()).slice(-2);
+        return date.getDate() +' '+ month +' '+ date.getFullYear() +'&nbsp; '+ hour +':'+ min;
+    },
+
+    renderProposed: function() {
+        var t = this;
+        var portion = t.cachedProposed.splice(0, t.itemsPerShow);
+
+        var html = '';
+        jQuery.map(portion, function (elem) {
+            var data = {
+                id: elem.id
+            };
+
+            var authorInfo = t.cachedAuthorsInfo[elem.from_id];
+            if (authorInfo) {
+                data['name'] = authorInfo.name;
+                data['photo'] = authorInfo.photo;
+                data['href'] = authorInfo.href;
+            }
+
+            var text = elem.text || '';
+            data['content1'] = text.substring(0, 300);
+            data['content2'] = text.substring(300);
+
+            data['photos'] = [];
+            for (var i in (elem.attachments || [])) {
+                var attachment = elem.attachments[i];
+                if (attachment.type === 'photo') {
+                    data['photos'].push({
+                        parentId: elem.id,
+                        url: attachment.photo.src_big,
+                        title: attachment.photo.text
+                    });
+                } else if (attachment.type === 'link') {
+                    data['link'] = attachment.link;
+                }
+            }
+
+            if (elem.date) {
+                data['date'] = t.timestampToHumanReadable(elem.date);
+            }
+
+            html += tmpl(ARTICLE_ITEM, data);
+        })
+
+        t.appendWallContent(html);
+        if (t.cachedProposed.length || t.hasMoreRemote) {
+            // ничего не делаем, можно подгружать дальше
+        } else {
+            $(window).data('disable-load-more', true);
+        }
+    },
+
+    loadProposed: function () {
+        var t = this;
+
+        var Def = new Deferred();
+
+        if (!t.hasMoreRemote) {
+            return Def; // RETURN
+        }
+
+        var ExternalSuggests = t.requestProposed(t.currentPageOffset); // запускаем асинхронное действие!
+        t.currentPageOffset++;
+
+        var externalItemsChecker = function (result) {
+            var fromIdsUsers = [];
+            var fromIdsPublics = [];
+
+            // фильтруем скрытые элементы, собираем id авторов нескрытых
+            var nonhiddenPortion = jQuery.map(result, function (elem) {
+                if (-1 === jQuery.inArray(String(elem.id), t.queuedProposedIds)) {
+                    if (!(elem.from_id in t.cachedAuthorsInfo)) {
+                        if (elem.from_id < 0) {
+                            fromIdsPublics.push(-elem.from_id);
+                        } else {
+                            fromIdsUsers.push(elem.from_id);
+                        }
+                    }
+
+                    return elem;
+                }
+            });
+
+            // получаем данные авторов
+            if (fromIdsUsers.length || fromIdsPublics.length) {
+                var codeParts = [];
+                if (fromIdsUsers.length) {
+                    codeParts.push('users: API.users.get({uids:['+ fromIdsUsers.join(',') +'], fields:"photo_50"})');
+                }
+                if (fromIdsPublics.length) {
+                    codeParts.push('groups: API.groups.getById({gids:['+ fromIdsPublics.join(',') +']})');
+                }
+                var code = 'return {'+ codeParts.join(',') +'};';
+                VK.Api.call('execute', {code: code}, function (resp) {
+                    if (!resp.execute_errors && resp.response) {
+                        jQuery.map(resp.response.users || [], function (elem) {
+                            t.cachedAuthorsInfo[elem.uid] = {
+                                name: elem.first_name + ' ' + elem.last_name,
+                                photo: elem.photo_50,
+                                href: 'http://vk.com/id' + elem.uid
+                            };
+                        });
+ 
+                        jQuery.map(resp.response.groups || [], function (elem) {
+                            t.cachedAuthorsInfo[-elem.gid] = {
+                                name: elem.name,
+                                photo: elem.photo,
+                                href: 'http://vk.com/public' + elem.gid
+                            };
+                        });
+
+                        t.cachedProposed.push.apply(t.cachedProposed, nonhiddenPortion);
+                        t.loadingMore = null;
+                        Def.fireSuccess();
+                    }
+                });
+            } else {
+                t.cachedProposed.push.apply(t.cachedProposed, nonhiddenPortion);
+                t.loadingMore = null;
+                Def.fireSuccess();
+            }
+        };
+
+        if (t.queuedProposedIds === null) {
+            t.getQueuedProposedIds().success(function () {
+                ExternalSuggests.success(function (result) {
+                    t.updateTotalCount();
+                    externalItemsChecker(result);
+                });
+            });
+        } else {
+            ExternalSuggests.success(externalItemsChecker);
+        }
+
+        return Def;
+    },
+
+    updateTotalCount: function () {
+        var t = this;
+        var count = t.totalCount - t.queuedProposedIds.length;
+        var text = '';
+        if (count > 0) {
+            text = count + ' ' + Lang.declOfNum(count, ['запись', 'записи', 'записей'])
+        }
+        $('.wall-title .count').text(text);
+    },
+
+    getQueuedProposedIds: function () {
+        var t = this;
+
+        var Def = new Deferred();
+        Control.fire('get-queued-suggests', {
+            targetFeedId: Elements.rightdd()
+        }).success(function (serviceResp) {
+            if (serviceResp.success) {
+                t.queuedProposedIds = serviceResp.result;
+                Def.fireSuccess();
+            }
+        });
+
+        return Def;
+    },
+
+    /**
+     * @param {Int} pageOffset Номер страницы, начиная с нуля 
+     */
+    requestProposed: function (pageOffset) {
+        var t = this;
+
+        var Def = new Deferred();
+        var itemsOffset = t.itemsPerRequest * pageOffset;
+        VK && VK.Api.call('wall.get', {
+            filter: 'suggests',
+            owner_id: -Elements.currentExternalId(),
+            count: t.itemsPerRequest,
+            offset: itemsOffset
+        }, function (resp) {
+            if (resp && !resp.error) {
+                var result = resp.response;
+                if (result) {
+                    t.totalCount = result.shift(); //result изменился!
+                    t.hasMoreRemote = (t.totalCount > itemsOffset + result.length);
+                    Def.fireSuccess(result);
+                }
+            }
+        });
+        return Def;
     },
 
     // Список авторов
@@ -1573,6 +1819,7 @@ var LeftPanelWidget = Event.extend({
                     $userGroupTabs.append('<div class="tab" data-user-group-id="' + userGroups[i]['id'] + '">' + userGroups[i]['name'] + '</div>');
                 }
             }
+            $userGroupTabs.append('<div class="tab proposed">Предложенные</div>');
         } else {
             $userGroupTabs.addClass('hidden');
         }

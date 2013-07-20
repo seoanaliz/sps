@@ -103,3 +103,69 @@ var ATTACHMENT_PREVIEW_LINK =
         '</span>' +
     '</div>' +
 '</div>';
+
+var ARTICLE_ITEM =
+'<div class="post bb movable relocatable external"' +
+    'data-id="<?=id?>">' +
+
+    '<div class="l d-hide">' +
+        '<div class="userpic">' + 
+            '<img src="<?=photo?>" />' +
+        '</div>' +
+    '</div>' +
+
+    '<div class="name d-hide"><a href="<?=href?>" target="_blank<?=id?>"><?=name?></a></div>' +
+
+    '<div class="content">' +
+        '<div class="shortcut"><?=content1?></div>' +
+
+        '<? if (content2) { ?>' +
+            '<a class="show-cut">Показать полностью...</a>' +
+            '<div class="cut"><?=content2?></div>' +
+        '<? } ?>' +
+
+        '<? if (isset("link")) { ?>' +
+           '<div class="link">' +
+                'Ссылка: <a href="<?=link.url?>" target="_blank_link<?=id?>"><?=link.url?></a>' +
+                '<div class="wrap clear-fix">' +
+                    '<a href="<?=link.url?>" target="_blank_link<?=id?>">' +
+                        '<img class="image" src="<?=link.image_src?>" />' +
+                    '</a>' +
+
+                    '<h4 class="title">' +
+                        '<a href="<?=link.url?>" target="_blank_link<?=id?>"><?=link.title?></a>' +
+                    '</h4>' +
+
+                    '<div class="description"><?=link.description?></div>' +
+                '</div>' +
+           '</div>' +
+        '<? } ?>' +
+
+        '<? if (photos.length) { ?>' +
+            '<div class="images-ready">' +
+                '<? each(ARTICLE_PHOTO, photos); ?>' +
+            '</div>' +
+        '<? } ?>' +
+    '</div>' +
+
+    '<div class="bottom d-hide">' +
+        '<div class="l">' +
+            '<span class="timestamp"><?=date?></span>' +
+        '</div>' +
+
+        '<div class="r">' +
+            '<? if (isset("link")) { ?>' +
+                '<span class="attach-icon attach-icon-link-red" title="Пост со ссылкой"><!-- --></span>' +
+            '<? } ?>' +
+        '</div>' +
+    '</div>' +
+
+    '<div class="clear"></div>' +
+'</div>';
+
+var ARTICLE_PHOTO =
+'<a class="fancybox-thumb" rel="fancybox-thumb-<?=parentId?>" href="<?=url?>" title="<?=title?>">' +
+    '<div class="post-image">' +
+        '<img src="<?=url?>" alt="" />' +
+    '</div>' +
+'</a>';
