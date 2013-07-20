@@ -573,7 +573,7 @@
                         <page uri="vt://banners/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeleteBanner</actions>
                         </page>
-                        <page uri="vt://banners/edit/([0-9]+)">
+                        <page uri="vt://banners/edit/([a-zA-Z0-9]+)">
                             <actions>SPS.Mobile.SaveBanner</actions>
                             <template>tmpl://vt/banners/edit.tmpl.php</template>
                         </page>
@@ -590,7 +590,7 @@
                         <page uri="vt://categories/delete/([0-9]+)">
                             <actions>SPS.Mobile.DeleteCategory</actions>
                         </page>
-                        <page uri="vt://categories/edit/([0-9]+)">
+                        <page uri="vt://categories/edit/([a-zA-Z0-9]+)">
                             <actions>SPS.Mobile.SaveCategory</actions>
                             <template>tmpl://vt/categories/edit.tmpl.php</template>
                         </page>
