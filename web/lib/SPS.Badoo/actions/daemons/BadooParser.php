@@ -10,7 +10,7 @@ class BadooParser
 {
     const BADOO_USER_URL    = 'http://badoo.com/';
     const MG_CONNECT_TIME   = 3;
-    const MG_MAX_THREADS    = 100;
+    const MG_MAX_THREADS    = 200;
 
     public $weekAgoTS;
 
