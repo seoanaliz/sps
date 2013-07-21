@@ -30,7 +30,7 @@
         private $post_try_counter = 0;
 
         const METH                  =   'https://api.vk.com/method/';
-        const ANTIGATE_KEY          =   'cae95d19a0b446cafc82e21f5248c945';
+        const ANTIGATE_KEY          =   '20f6dc1d30ea218fe78f1c58131c9dda';
         const TESTING               =    false;
         const FALSE_COUNTER         =    3; //количество попыток совершить какое-либо действие
         const ALBUM_NAME            =    'wall photo';
@@ -146,7 +146,7 @@
         public function repost($captcha = array())
         {
             $this->post_try_counter ++;
-            if($this->post_try_counter > 3) {
+            if( $this->post_try_counter > 3 ) {
                 throw new Exception('too many tries');
             }
 
@@ -295,12 +295,12 @@
                     'post_id'       =>  $post_id,
                     'access_token'  =>  $this->vk_access_token
                 );
-                VkHelper::api_request( 'wall.delete', $params );
+                $res = VkHelper::api_request( 'wall.delete', $params );
 
                 $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
                 if( empty( $check ))
                     return true;
-                throw new Exception('Failed on deleting ' . $post_id);
+                throw new Exception('Failed on deleting ' . $post_id . ', ' . $res );
             }
             return false;
         }
