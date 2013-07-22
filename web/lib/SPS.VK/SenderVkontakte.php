@@ -12,7 +12,7 @@
 
     class SenderVkontakte {
 
-        private $change_admin_errors = array( 5, 7, 14, 15, 214 );
+        private $change_admin_errors = array( 5, 7, 15, 214 );
         private $post_photo_array;    //массив адресов фоток
         private $post_text;                     //текст поста
         private $attachments = '';              //аттачи
@@ -27,13 +27,14 @@
         private $video_id = array();            //заголовок ссылки
         private $repost_post;
 
-        const METH          =   'https://api.vk.com/method/';
-        const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
-    //    const TEMP_PATH     =   'c:\\wrk\\'; //обязательно полный путь, иначе curl теряется\
-        const TESTING       =   false;
-        const FALSE_COUNTER =   3; //количество попыток совершить какое-либо действие
-        const ALBUM_NAME    =   'wall photo';
-        const ALBUM_MAX_SIZE=   489;
+        private $post_try_counter = 0;
+
+        const METH                  =   'https://api.vk.com/method/';
+        const ANTIGATE_KEY          =   '20f6dc1d30ea218fe78f1c58131c9dda';
+        const TESTING               =    false;
+        const FALSE_COUNTER         =    3; //количество попыток совершить какое-либо действие
+        const ALBUM_NAME            =    'wall photo';
+        const CAPTCHA_ERROR_CODE    =    14;
 
         //(например, получение разгаданной капчи)
 
@@ -95,21 +96,6 @@
             return $result;
         }
 
-        public function send_photo_in_album( $album_title )
-        {
-            $album_title = explode(' : ', $album_title );
-            $album_title = end( $album_title );
-            $album = $this->get_album( $album_title );
-            if ( !$album['id'] || $album['size'] > self::ALBUM_MAX_SIZE) {
-                $album_id = $this->create_album( $album['counter'], 0, $album_title );
-            } else {
-                $album_id = $album['id'];
-            }
-
-            return $this->load_photo( $this->post_photo_array[0], 'album', $album_id, $this->post_text );
-
-        }
-
         //возвращаемые значения
         //Удачная отсылка
         //      -ХХХ_УУУ - id поста (ХХХ - id паблика, УУУ - поста в этом паблике)
@@ -131,9 +117,11 @@
             foreach( $this->post_photo_array as $photo_adr ) {
                 $photo_array[] = $this->load_photo( $photo_adr, $meth );
             }
-
+            echo 1;
             $attachments = array_merge( $photo_array, $this->audio_id, $this->video_id );
-
+            if (  $this->post_text =='©' || ( $this->post_text == '' && count( $attachments ) == 1 )) {
+//            $this->post_text = "&#01;";
+            }
             if( count( $photo_array ) == 0 && $this->link ) {
                 $attachments[] = $this->link;
 
@@ -155,22 +143,36 @@
                 return '-' . $this->vk_group_id . '_' . $check_id;
         }
 
-        public function repost()
+        public function repost($captcha = array())
         {
+            $this->post_try_counter ++;
+            if( $this->post_try_counter > 3 ) {
+                throw new Exception('too many tries');
+            }
+
             $params = array(
                 'object'    =>  'wall' . $this->repost_post,
                 'message'   =>  '',
                 'gid'       =>  $this->vk_group_id,
                 'access_token' => $this->vk_access_token
             );
+            if(!empty($captcha )) {
+                $params = array_merge($params, $captcha);
+            }
+
             $res = VkHelper::api_request( 'wall.repost', $params );
             if (isset ($res->error )) {
-                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                if ( $res->error->error_code == self::CAPTCHA_ERROR_CODE ) {
+                    return $this->repost( array(
+                        'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
+                        'captcha_sid'   =>  $res->error->captcha_sid
+                    ));
+                } elseif ( in_array( $res->error->error_code, $this->change_admin_errors )) {
                     throw new ChangeSenderException(  $res->error->error_msg );
-
-                else
+                } else {
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_code
                         . ', public: '. $this->vk_group_id );
+                }
             }
 
             if ( isset( $res->success) && $res->success && isset( $res->post_id ))
@@ -181,12 +183,12 @@
             }
         }
 
-        public function text_corrector( $text = '' )
+        public function text_corrector( $text )
         {
             $text = strip_tags( $text );
             //cURL пытается найти файл по любой строке, начинающейся с @
 //            preg_replace( '/^@/', '^ @', $text );
-            if ( $text && $text[0] == '@')
+            if ( $text[0] == '@')
                 $text = ' ' . $text;
             return $text;
         }
@@ -203,7 +205,7 @@
         // нужно учитывать это время
         //если повезет, возвращает  текст капчи,
         // false в случае неправильной разгадки/недоступности работников распознавания
-        private function captcha( $url, $vk_sid )
+        private function captcha( $url )
         {
             //не требующие пока изменений настройки
             $domain="antigate.com";
@@ -219,77 +221,67 @@
             $try_counter = 0;
             while (true) {
                 $try_counter ++;
-                if ($try_counter > self::FALSE_COUNTER)
+                if ($try_counter > 3)
                     return false;
-                $jp = file_get_contents($url );
-                file_put_contents('capcha.jpg', $jp);
+                $tmpCaptcha  = Site::GetRealPath('temp://upl_' . md5($url) . '.jpg');
+                $jp = file_get_contents($url);
+                file_put_contents($tmpCaptcha, $jp);
 
-                $filename = realpath('capcha.jpg');
-
-                if (!file_exists($filename))
-                {
-                    if (self::TESTING) echo "file $filename not found\n";
+                if (!file_exists($tmpCaptcha)) {
                     return false;
                 }
                 $postdata = array(
                     'method'        => 'post',
                     'key'           => self::ANTIGATE_KEY,
-                    'file'          => '@' . $filename,
+                    'file'          => '@' . $tmpCaptcha,
                     'phrase'        => $is_phrase,
                     'regsense'      => $is_regsense,
                     'numeric'       => $is_numeric,
                     'min_len'       => $min_len,
                     'max_len'       => $max_len,
-
                 );
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,             "http://$domain/in.php");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER,     1);
-                curl_setopt($ch, CURLOPT_TIMEOUT,             60);
-                curl_setopt($ch, CURLOPT_POST,                 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS,         $postdata);
+                curl_setopt($ch, CURLOPT_URL,             "http://$domain/in.php" );
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,  1 );
+                curl_setopt($ch, CURLOPT_TIMEOUT,         60 );
+                curl_setopt($ch, CURLOPT_POST,            1 );
+                curl_setopt($ch, CURLOPT_POSTFIELDS,      $postdata );
                 $result = curl_exec($ch);
-                if (curl_errno($ch))
-                {
-                    if (self::TESTING) echo "CURL returned error: ".curl_error($ch)."\n";
-                    return false;
+                unlink( $tmpCaptcha);
+                if (curl_errno($ch)) {
+                    throw new Exception('Error in captcha recoginition, ' . curl_error($ch));
                 }
                 curl_close($ch);
+
                 if (strpos($result, "ERROR")!==false) {
-                    if (self::TESTING) echo "server returned error: $result\n";
-                    return false;
+                    throw new Exception('Error in captcha recoginition, ' . $result );
                 } else {
                     $ex = explode("|", $result);
                     $captcha_id = $ex[1];
-                    if (self::TESTING) echo "captcha sent, got captcha ID $captcha_id\n";
                     $waittime = 0;
-                    if (self::TESTING) echo "waiting for $rtimeout seconds\n";
                     sleep($rtimeout);
                     while(true) {
-                        $result = file_get_contents("http://$domain/res.php?key=".self::ANTIGATE_KEY.'&action=get&id='.$captcha_id);
+                        $result = file_get_contents("http://$domain/res.php?key=" . self::ANTIGATE_KEY . '&action=get&id=' . $captcha_id);
                         if (strpos($result, 'ERROR') !== false) {
-                            if (self::TESTING) echo "server returned error: $result\n";
                             continue(2);
                         }
                         if ($result=="CAPCHA_NOT_READY") {
-                            if (self::TESTING) echo "captcha is not ready yet\n";
                             $waittime += $rtimeout;
-                            if ($waittime>$mtimeout) {
-                                if (self::TESTING) echo "timelimit ($mtimeout) hit\n";
-                                continue(2);
+                            if ($waittime > $mtimeout) {
+                                throw new Exception('Error in captcha recoginition, too long'  );
                             }
-                            if ( self::TESTING ) echo "waiting for $rtimeout seconds\n";
                             sleep($rtimeout);
                         } else {
                             $ex = explode( '|', $result );
-                            if ( trim( $ex[ 0 ] )=='OK' ) return trim($ex[1]);
+                            if ( trim( $ex[ 0 ] )=='OK' )
+                                return trim($ex[1]);
                         }
                     }
-                    return false;
+
                 }
             }
-            return false;
+            throw new Exception('Error in captcha recoginition, too long' );
         }
 
         //$post_id  = idпаблика_idпоста
@@ -303,12 +295,12 @@
                     'post_id'       =>  $post_id,
                     'access_token'  =>  $this->vk_access_token
                 );
-                VkHelper::api_request( 'wall.delete', $params );
+                $res = VkHelper::api_request( 'wall.delete', $params );
 
                 $check = ParserVkontakte::get_posts_by_vk_id( $full_post_id );
                 if( empty( $check ))
                     return true;
-                throw new Exception('Failed on deleting ' . $post_id);
+                throw new Exception('Failed on deleting ' . $post_id . ', ' . $res );
             }
             return false;
         }
@@ -331,7 +323,7 @@
 
         //нужно для однотипных названий (альбом 1, альбом 2)
         //возвращает массив о последнем таком альбоме:
-        // id,size - количество фото в нем, counter - сколько всего альбомов c таким названием
+        // id, количество фото в нем, сколько всего c таким названием
         private function get_album( $title_search = '' )
         {
             $title_search = $title_search ? $title_search : self::ALBUM_NAME;
@@ -341,21 +333,24 @@
             );
 
             $res = VkHelper::api_request( 'photos.getAlbums', $params );
+
             $i = 1;
-            $album_id = 0;
-            $album_size = 0;
+            $album_id = '';
             foreach ( $res as $album ) {
                 if ( substr_count( mb_convert_case( $album->title, MB_CASE_LOWER, "UTF-8" ), $title_search ) > 0 ) {
                     $i++;
-                    if( $album->aid > $album_id ) {
-                        $album_id   =  $album->aid ;
-                        $album_size =  $album->size;
-                    }
+                    $album_id   = $album->aid;
+                    $album_size = $album->size;
                 }
             }
 
             $res = array( 'id' => $album_id, 'counter' =>   $i, 'size'  => $album_size );
-            return( $res );
+
+            if ( $i > 1 )
+                return( $res );
+
+            return false;
+
         }
 
         public function get_album_size( $full_album_id )
@@ -374,23 +369,25 @@
             return false;
         }
 
-        private function create_album( $counter_value = 1, $privacy = 1, $title = '' )
+        private function create_album( $counter = 1, $privacy = 1, $title = '' )
         {
-            $counter = $counter_value ? $counter_value : 1;
-            $title = $title . ' ' . $counter;
+            $counter = $counter ? $counter : 1;
+            $title = $title ? $title : self::ALBUM_NAME . ' ' . $counter;
 
             $params = array(
-                'gid'           =>  $this->vk_group_id,
-                'title'         =>  $title,
-                'privacy'       =>  $privacy,
-                'access_token'  =>  $this->vk_access_token,
+                'gid'       =>  $this->vk_group_id,
+                'title'     =>  $title,
+                'privacy'   =>  $privacy,
             );
             $res = VkHelper::api_request( 'photos.createAlbum', $params );
-            return  $res->aid;
+            return  $res->aid  ;
         }
 
-        private function post( $attaches )
-        {
+        private function post( $attaches, $captcha = array()) {
+            $this->post_try_counter ++;
+            if($this->post_try_counter > 3) {
+                throw new Exception('too many tries');
+            }
             $attaches = implode( ',', $attaches );
             $params = array(
                 'owner_id'      =>  '-' . $this->vk_group_id,
@@ -400,6 +397,9 @@
                 'from_group'    =>  1
             );
 
+            if(!empty($captcha )) {
+                $params = array_merge($params, $captcha);
+            }
             $res = VkHelper::api_request( 'wall.post', $params, false );
             if ( isset( $res->post_id ))
                 return $res->post_id;
@@ -408,13 +408,18 @@
                 return true;
 
             elseif ( isset( $res->error ))
-
-                if ( in_array( $res->error->error_code, $this->change_admin_errors ))
+                if( $res->error->error_code  == self::CAPTCHA_ERROR_CODE && isset( $res->error->captcha_img)) {
+                    return $this->post($attaches, array(
+                        'captcha_key'   =>  $this->captcha( $res->error->captcha_img ),
+                        'captcha_sid'   =>  $res->error->captcha_sid
+                    ));
+                } elseif ( in_array( $res->error->error_code, $this->change_admin_errors )) {
                     throw new ChangeSenderException($res->error->error_msg);
 
-                else
+                } else {
                     throw new Exception( 'Error in wall.post: ' . $res->error->error_msg
                         . ', public: '. $this->vk_group_id );
+                }
         }
 
         private function delivery_check( $attacments_count )
@@ -465,7 +470,7 @@
         }
 
         //todo описания фоток матьматьмать
-        public function load_photo( $path, $destination = 'wall', $album_id = '', $caption = '' )
+        public function load_photo( $path, $destination = 'wall', $caption = '' )
         {
             if ( !file_exists( $path ))
                 throw new exception( " Can't find file : $path for vk.com/public" . $this->vk_group_id);
@@ -474,14 +479,21 @@
             $aid = '';
             switch ( $destination ) {
                 case 'wall':
-                    $method_get_server  =   'photos.getWallUploadServer';
-                    $method_save_photo  =   'photos.saveWallPhoto';
-                    $photo_list         =   'photo';
+                    $method_get_server = 'photos.getWallUploadServer';
+                    $method_save_photo = 'photos.saveWallPhoto';
+                    $photo_list        = 'photo' ;
                     break;
                 case 'album':
+                    $album = $this->get_album();
+
+                    if ( !$album || $album['size'] > 470 )
+                        $aid = $this->create_album( $album[ 'counter' ] );
+                    else
+                        $aid = $album['id'];
+
                     $method_get_server  =   'photos.getUploadServer';
                     $method_save_photo  =   'photos.save';
-                    $photo_list         =   'photos_list';
+                    $photo_list         =   'photos_list' ;
                     break;
                 default:
                     return false;
@@ -490,7 +502,7 @@
             $params = array(
                 'gid'           =>  $this->vk_group_id,
                 'access_token'  =>  $this->vk_access_token,
-                'aid'           =>  $album_id
+                'aid'           =>  $aid
             );
 
             //первый запрос, получение адреса для заливки фото
@@ -530,11 +542,13 @@
                 'photo'         =>  $content->$photo_list,
                 'photos_list'   =>  $content->$photo_list,
                 'access_token'  =>  $this->vk_access_token,
-                'aid'           =>  $album_id,
+                'aid'           =>  $aid,
                 'caption'       =>  $caption
             );
 
             $res = VkHelper::api_request( $method_save_photo, $params );
+            if( isset( $res->error ))
+                ;
             $res = $res[0];
 
             if( $destination == 'wall' )
