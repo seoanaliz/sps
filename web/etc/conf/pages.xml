@@ -744,6 +744,12 @@
                 <page uri="daemons://update-badoo/">
                      <actions>SPS.Badoo.UpdateBadooUsers</actions>
                 </page>
+                <page uri="daemons://inst-wallchecker/">
+                     <actions>SPS.Instagram.instWallChecker</actions>
+                </page>
+                <page uri="daemons://inst-postchecker/">
+                     <actions>SPS.Instagram.instPostChecker</actions>
+                </page>
 
             </pageGroup>
             <pageGroup name="vtControls" boot="">
