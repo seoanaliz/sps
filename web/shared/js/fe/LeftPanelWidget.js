@@ -1320,9 +1320,7 @@ var LeftPanelWidget = Event.extend({
             var fromIdsPublics = [];
 
             // фильтруем скрытые элементы, собираем id авторов нескрытых
-            log('-----');
             var nonhiddenPortion = jQuery.map(result, function (elem) {
-                log(elem.id);
                 if (-1 === jQuery.inArray(String(elem.id), t.queuedProposedIds)) {
                     if (!(elem.from_id in t.cachedAuthorsInfo)) {
                         if (elem.from_id < 0) {
@@ -1335,7 +1333,6 @@ var LeftPanelWidget = Event.extend({
                     return elem;
                 }
             });
-            log(fromIdsUsers, fromIdsPublics);
 
             // получаем данные авторов
             if (fromIdsUsers.length || fromIdsPublics.length) {
