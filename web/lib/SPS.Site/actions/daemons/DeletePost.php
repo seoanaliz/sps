@@ -8,7 +8,7 @@ class DeletePost
 {
     public function Execute()
     {
-        set_time_limit(0);
+        set_time_limit(1000);
         Logger::LogLevel(ELOG_DEBUG);
         ConnectionFactory::BeginTransaction();
 
@@ -19,6 +19,7 @@ class DeletePost
                 "articleQueues"."isDeleted" = FALSE
                 AND @now >= "articleQueues"."deleteAt"
                 AND now() - interval '1 day' <= "articleQueues"."deleteAt"
+                AND @now  - interval '1 day' <= "articleQueues"."deleteAt"
                 AND "articleQueues"."deleteAt" IS NOT NULL
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
@@ -36,9 +37,7 @@ sql;
         while ($ds->next()) {
             /** @var $articleQueue ArticleQueue */
             $articleQueue = BaseFactory::GetObject($ds, ArticleQueueFactory::$mapping, $structure);
-
             $targetFeed = TargetFeedFactory::GetById($articleQueue->targetFeedId, array(), array(BaseFactory::WithLists => true));
-
             if ($targetFeed->type == TargetFeedUtility::VK) {
 
                 if (empty($targetFeed) || empty($targetFeed->publishers) || empty($articleQueue)) {
@@ -49,7 +48,7 @@ sql;
                     try {
                         $sender->vk_app_seckey = $publisher->publisher->vk_seckey;
                         $sender->vk_access_token = $publisher->publisher->vk_token;
-                        if( $sender->delete_post($articleQueue->externalId)) {
+                        if ( $sender->delete_post($articleQueue->externalId)) {
                             $articleQueue->isDeleted = true;
                             ArticleQueueFactory::UpdateByMask($articleQueue, array('isDeleted'), array('articleQueueId' => $articleQueue->articleQueueId));
                         }
