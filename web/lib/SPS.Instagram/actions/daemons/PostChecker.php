@@ -21,9 +21,12 @@ class PostChecker
 
         $posts = $this->get_posts_for_update();
         foreach( $posts as $post ) {
+            $post_upd = $this->get_media( $post->id );
             $end_subs = $this->get_ref_user_subs( $post->reference_id);
-            if( $end_subs) {
-                $post->ref_end_subs = $end_subs;
+            if( $end_subs && $post_upd ) {
+                $post->ref_end_subs =   $end_subs;
+                $post->likes        =   $post_upd->likes->count;
+                $post->comments     =   $post_upd->comments->count;
                 $post->updated_at = DateTimeWrapper::Now();
             }  else {
                 //todo errorlog
@@ -50,7 +53,8 @@ class PostChecker
         return $posts;
     }
 
-    public function get_ref_user_subs( $ref_id) {
+    public function get_ref_user_subs( $ref_id)
+    {
         try {
             $user = InstagramHelper::api_request( 'users/' . $ref_id, array());
             if( isset ($user->id )) {
@@ -60,6 +64,19 @@ class PostChecker
             //todo errorlog
         }
 
+        return false;
+    }
+
+    public function get_media( $media_id )
+    {
+        try {
+            $post_upd = InstagramHelper::api_request( '/media/' . $media_id.'/', array());
+            if( isset ($post_upd->id )) {
+                return $post_upd;
+            }
+        } catch (Exception $e ) {
+            //todo errorlog
+        }
         return false;
     }
 }
