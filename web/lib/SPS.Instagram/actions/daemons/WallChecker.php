@@ -19,7 +19,7 @@ class WallChecker
             $last_base_post = InstObservedPostFactory::GetOne(
                 array( 'author_id' => $acc->id ),
                 array(
-                    BaseFactory::CustomSql => 'ORDER BY created_at DESC LIMIT 1')
+                    BaseFactory::CustomSql => 'ORDER BY posted_at DESC LIMIT 1')
             );
             $id_for_check = ( empty( $last_base_post )) ? 0 : $last_base_post->id;
             try {
