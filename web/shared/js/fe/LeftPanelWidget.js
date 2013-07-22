@@ -1226,7 +1226,6 @@ var LeftPanelWidget = Event.extend({
         t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении
         t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообществ) и т.п.)
         t.totalCount = 0; // общее число предложенных на удалённом сервере
-        t.isAdmin = true; // является ли пользователь администратором паблика, для которого запрашиваем "предложенные". Ставим false, только если получаем соответствующие данные от Vk во избежание
     },
 
     showMoreProposed: function () {
@@ -1298,8 +1297,14 @@ var LeftPanelWidget = Event.extend({
         if (t.cachedProposed.length || t.hasMoreRemote) {
             // ничего не делаем, можно подгружать дальше
         } else {
-            $(window).data('disable-load-more', true);
+            t.disableProposed();
         }
+    },
+
+    disableProposed: function () {
+        var t = this;
+        t.initProposed(); // почистим кеши
+        $(window).data('disable-load-more', true);
     },
 
     loadProposed: function () {
@@ -1315,7 +1320,6 @@ var LeftPanelWidget = Event.extend({
         t.currentPageOffset++;
 
         var externalItemsChecker = function (result) {
-            log('isAdmin', t.isAdmin);
             var fromIdsUsers = [];
             var fromIdsPublics = [];
 
@@ -1375,6 +1379,13 @@ var LeftPanelWidget = Event.extend({
         };
 
         if (t.queuedProposedIds === null) {
+            ExternalSuggests.error(function (Error) {
+                if (Error.message === 'isAdmin') {
+                    t.disableProposed();
+                    t.$wall.html('<div class="notice">Вы не являетесь администратором или владельцем сообщества, и поэтому не можете работать с предложенными новостями.</div>');
+                }
+            });
+
             t.getQueuedProposedIds().success(function () {
                 ExternalSuggests.success(function (result) {
                     t.updateTotalCount();
@@ -1432,7 +1443,10 @@ var LeftPanelWidget = Event.extend({
             if (resp && !resp.error && resp.response) {
                 var groupsInfo = resp.response.groups && resp.response.groups[0];
                 if (groupsInfo && ('is_admin' in groupsInfo)) {
-                    t.isAdmin = groupsInfo.is_admin;
+                    if (!groupsInfo.is_admin) {
+                        Def.fireError('isAdmin');
+                        return; // -------- RETURN
+                    }
                 }
 
                 var result = resp.response.wall;
