@@ -42,6 +42,7 @@
             const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
             const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
             const FALSE_COUNTER = 3;
+            const TESTING = false;
 
             /**
              *id аппа обмена
@@ -75,6 +76,9 @@
 
             public static function api_request( $method, $request_params, $throw_exc_on_errors = 1, $app = '' )
             {
+                if(isset($request_params['captcha_key'])) {
+                    echo $request_params['captcha_key'], '<br>';
+                }
                 $app_id = $app == 'barter' ? self::APP_ID_BARTER : self::APP_ID_STATISTICS;
                 if ( !isset( $request_params['access_token']) && !isset( self::$open_methods[ $method ]))
                     $request_params['access_token']  =  self::get_service_access_token( $app_id );
