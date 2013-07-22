@@ -1047,29 +1047,27 @@ var LeftPanelWidget = Event.extend({
                     $edit.remove();
                 };
 
-                if (true || data.text) {
-                    var text = data.text;
-                    $text
-                    .val(text.split('<br />').join(''))
-                    .appendTo($content)
-                    .bind('paste', function(e) {
-                        setTimeout(function() {
-                            parseUrl($text.val(), function(link, domain) {
-                                if ($text.link && $links.html() || $text.link == link) return;
-                                $text.link = link;
-                                addLink(link, domain, $links);
-                            });
-                        }, 0);
-                    })
-                    .bind('keyup', function(e) {
-                        if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                            onSave();
-                        }
-                    })
-                    .autoResize()
-                    .keyup().focus();
-                    setCaretToPos($text.get(0), text.length);
-                }
+                var text = data.text;
+                $text
+                .val(text.split('<br />').join(''))
+                .appendTo($content)
+                .bind('paste', function(e) {
+                    setTimeout(function() {
+                        parseUrl($text.val(), function(link, domain) {
+                            if ($text.link && $links.html() || $text.link == link) return;
+                            $text.link = link;
+                            addLink(link, domain, $links);
+                        });
+                    }, 0);
+                })
+                .bind('keyup', function(e) {
+                    if (e.ctrlKey && e.keyCode === KEY.ENTER) {
+                        onSave();
+                    }
+                })
+                .autoResize()
+                .keyup().focus();
+                setCaretToPos($text.get(0), text.length);
 
                 if (data.link) {
                     parseUrl(data.link, function(link, domain) {

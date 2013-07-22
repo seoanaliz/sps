@@ -403,7 +403,7 @@ var QueueWidget = Event.extend({
         var t = this;
         var $queue = this.$queue;
 
-        $queue.delegate('.slot.empty:not(.new):not(.edit)', 'click', function(e) {
+        $queue.delegate('.slot.empty:not(.new):not(.edit):not(.locked)', 'click', function(e) {
             if (e.target != e.currentTarget) {
                 return;
             }
