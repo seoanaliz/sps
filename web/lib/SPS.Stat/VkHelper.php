@@ -40,13 +40,16 @@
              */
             const APP_ID_STATISTICS = 2642172;
             const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
-
+            const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
+            const FALSE_COUNTER = 3;
 
             /**
              *id аппа обмена
              */
             const APP_ID_BARTER = 3391730;
             const PAUSE   = 0.5;
+
+            public static $tries = 0;
             public static  $serv_bots = array(
                 array(
                     'login'     =>  '79531648056',
@@ -77,14 +80,21 @@
                     $request_params['access_token']  =  self::get_service_access_token( $app_id );
                 $url = VK_API_URL . $method;
                 $a = VkHelper::qurl_request( $url, $request_params );
-//                if ( $method == 'stats.get') {
-//                    $start = strpos( $a, ',"sex"');
-//                    $a = substr_replace( $a, '}]}', $start );
-//                }
                 $res = json_decode(  $a );
                 if( !$res )
                     return array();
-                if ( isset( $res->error ) )
+                if ( isset( $res->error ) ) {
+                    if( $res->error->error_code == 14 ) {
+                        self::$tries++;
+                        if( self::$tries > 3 ) {
+                            self::$tries = 0;
+                            echo self::$tries, '<br>';
+                            throw new Exception('Error : cant get through captcha. ' . $res->error->error_msg . ' on params ' . json_encode( $request_params ));
+                        }
+                        $request_params['captcha_key'] =  self::captcha( $res->error->captcha_img );
+                        $request_params['captcha_sid'] =  $res->error->captcha_sid;
+                        $res = self::api_request( $method, $request_params, $throw_exc_on_errors, $app );
+                    }
                     if ( $throw_exc_on_errors ) {
                         if( $res->error->error_code == 5 )
                             throw new AccessTokenIsDead();
@@ -93,6 +103,7 @@
                     } else {
                         return $res;
                     }
+                }
                 return $res->response;
             }
 
@@ -273,7 +284,8 @@
                 $cmd->Execute();
             }
 
-            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true) {
+            public static function connect( $link, $cookie=null, $post=null, $includeHeader = true)
+            {
                 $ch = curl_init();
 
                 curl_setopt( $ch, CURLOPT_URL, $link );
@@ -314,7 +326,8 @@
                 return false;
             }
 
-            public static function send_alert( $message, $reciever_vk_ids ) {
+            public static function send_alert( $message, $reciever_vk_ids )
+            {
                 if( !is_array( $reciever_vk_ids )) {
                     $reciever_vk_ids = array( $reciever_vk_ids );
                 }
@@ -328,5 +341,96 @@
                     sleep( self::PAUSE );
                 }
             }
+
+            public static function captcha( $url )
+            {
+                //не требующие пока изменений настройки
+                $domain="antigate.com";
+                $rtimeout = 5;
+                $mtimeout = 120;
+                $is_phrase = 0;
+                $is_regsense = 0;
+                $is_numeric = 0;
+                $min_len = 0;
+                $max_len = 0;
+                $is_russian = 1;
+
+                $try_counter = 0;
+                while (true) {
+                    $try_counter ++;
+                    if ($try_counter > self::FALSE_COUNTER)
+                        return false;
+                    $jp = file_get_contents( $url );
+                    file_put_contents('capcha.jpg', $jp);
+
+                    $filename = realpath('capcha.jpg');
+
+                    if (!file_exists($filename))
+                    {
+                        if (self::TESTING) echo "file $filename not found\n";
+                        return false;
+                    }
+                    $postdata = array(
+                        'method'        => 'post',
+                        'key'           => self::ANTIGATE_KEY,
+                        'file'          => '@' . $filename,
+                        'phrase'        => $is_phrase,
+                        'regsense'      => $is_regsense,
+                        'numeric'       => $is_numeric,
+                        'min_len'       => $min_len,
+                        'max_len'       => $max_len,
+
+                    );
+
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL,             "http://$domain/in.php");
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER,     1);
+                    curl_setopt($ch, CURLOPT_TIMEOUT,             60);
+                    curl_setopt($ch, CURLOPT_POST,                 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS,         $postdata);
+                    $result = curl_exec($ch);
+                    if (curl_errno($ch))
+                    {
+                        if (self::TESTING) echo "CURL returned error: ".curl_error($ch)."\n";
+                        return false;
+                    }
+                    curl_close($ch);
+                    if (strpos($result, "ERROR")!==false) {
+                        if (self::TESTING) echo "server returned error: $result\n";
+                        return false;
+                    } else {
+                        $ex = explode("|", $result);
+                        $captcha_id = $ex[1];
+                        if (self::TESTING) echo "captcha sent, got captcha ID $captcha_id\n";
+                        $waittime = 0;
+                        if (self::TESTING) echo "waiting for $rtimeout seconds\n";
+                        sleep($rtimeout);
+                        while(true) {
+                            $result = file_get_contents("http://$domain/res.php?key=".self::ANTIGATE_KEY.'&action=get&id='.$captcha_id);
+                            if (strpos($result, 'ERROR') !== false) {
+                                if (self::TESTING) echo "server returned error: $result\n";
+                                continue(2);
+                            }
+                            if ($result=="CAPCHA_NOT_READY") {
+                                if (self::TESTING) echo "captcha is not ready yet\n";
+                                $waittime += $rtimeout;
+                                if ($waittime>$mtimeout) {
+                                    if (self::TESTING) echo "timelimit ($mtimeout) hit\n";
+                                    continue(2);
+                                }
+                                if ( self::TESTING ) echo "waiting for $rtimeout seconds\n";
+                                sleep($rtimeout);
+                            } else {
+                                $ex = explode( '|', $result );
+                                if ( trim( $ex[ 0 ] )=='OK' ) return trim($ex[1]);
+                            }
+                        }
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+
         }
     ?>
