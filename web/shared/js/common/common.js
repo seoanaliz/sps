@@ -1537,7 +1537,19 @@ var BOX_CLOSE =
 
 if (typeof console !== 'undefined' && console.log) {
     log = function () {
-        console.log.apply(console, arguments);
+        if (jQuery) {
+            var argsCopy = Array.prototype.slice.call(arguments, 0);
+            var argsWithClonedObjects = jQuery.map(argsCopy, function (elem) {
+                if (jQuery.isPlainObject(elem)) { // заменим "простые" объекты их клонами, чтобы выводить актуальное состояние на момент вызова log()
+                    return jQuery.extend(true, {}, elem);
+                } else {
+                    return elem;
+                }
+            });
+            console.log.apply(console, argsWithClonedObjects);
+        } else {
+            console.log.apply(console, arguments);
+        }
     }
 } else {
     log = function () {}
