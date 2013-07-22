@@ -1226,6 +1226,7 @@ var LeftPanelWidget = Event.extend({
         t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении
         t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообществ) и т.п.)
         t.totalCount = 0; // общее число предложенных на удалённом сервере
+        t.isAdmin = true; // является ли пользователь администратором паблика, для которого запрашиваем "предложенные". Ставим false, только если получаем соответствующие данные от Vk во избежание
     },
 
     showMoreProposed: function () {
@@ -1314,6 +1315,7 @@ var LeftPanelWidget = Event.extend({
         t.currentPageOffset++;
 
         var externalItemsChecker = function (result) {
+            log('isAdmin', t.isAdmin);
             var fromIdsUsers = [];
             var fromIdsPublics = [];
 
@@ -1424,10 +1426,16 @@ var LeftPanelWidget = Event.extend({
             filter: 'suggests',
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
-            offset: itemsOffset
+            offset: itemsOffset,
+            extended: 1
         }, function (resp) {
-            if (resp && !resp.error) {
-                var result = resp.response;
+            if (resp && !resp.error && resp.response) {
+                var groupsInfo = resp.response.groups && resp.response.groups[0];
+                if (groupsInfo && ('is_admin' in groupsInfo)) {
+                    t.isAdmin = groupsInfo.is_admin;
+                }
+
+                var result = resp.response.wall;
                 if (result) {
                     t.totalCount = result.shift(); //result изменился!
                     t.hasMoreRemote = (t.totalCount > itemsOffset + result.length);
