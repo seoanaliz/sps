@@ -27,11 +27,11 @@ class WallChecker
             } catch ( Exception $e ) {
                 continue;
             }
-
+            print_r(count($posts));
             foreach( $posts as $post ) {
                 if ( strpos( $post->id, $id_for_check)) {
                     //todo errorlog
-                    continue(2);
+                    continue;
                 }
 
                 $post_id                = explode('_',$post->id);
@@ -39,13 +39,12 @@ class WallChecker
 
                 if ( !$reference_id || count($post_id) != 2) {
                     //todo errorlog
-                    continue(2);
+                    continue;
                 }
                 $ref_subscribers_count  = $this->get_ref_user_subs( $reference_id );
 
                 $a = new InstObservedPost();
-
-                $a->id              = $post_id[1];
+                $a->id              = $post_id[0];
                 $a->reference_id    = $reference_id;
                 $a->comments        = $post->comments->count;
                 $a->likes           = $post->likes->count;
