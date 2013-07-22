@@ -90,7 +90,7 @@
                 ),
                 array(
                     "title"  => "vt.menu.promPosts"
-                    , "link" => "vt://promotion-posts/"
+                    , "link" => "vt://promotionPost/"
                 ),
             )
         )
