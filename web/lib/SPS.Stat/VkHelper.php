@@ -42,7 +42,7 @@
             const ALERT_TOKEN = "9a52c2c5ad3c3a0dba10d682cd5e70e99aea7ca665701c2f754fb94e33775cf842485db7b5ec5fb49b2d5";
             const ANTIGATE_KEY  =   'cae95d19a0b446cafc82e21f5248c945';
             const FALSE_COUNTER = 3;
-            const TESTING = false;
+            const TESTING = true;
 
             /**
              *id аппа обмена
@@ -98,6 +98,7 @@
                         $request_params['captcha_key'] =  self::captcha( $res->error->captcha_img );
                         $request_params['captcha_sid'] =  $res->error->captcha_sid;
                         $res = self::api_request( $method, $request_params, $throw_exc_on_errors, $app );
+                        return $res;
                     }
                     if ( $throw_exc_on_errors ) {
                         if( $res->error->error_code == 5 )
