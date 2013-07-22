@@ -288,7 +288,8 @@ i {
   border-radius: 0 0 2px 2px;
 }
 .left-panel .wall .wall-empty,
-.left-panel .wall:empty {
+.left-panel .wall:empty,
+.left-panel .wall .notice {
   color: #aaa;
   font-size: 14px;
   padding: 100px;

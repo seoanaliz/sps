@@ -1217,14 +1217,14 @@ var LeftPanelWidget = Event.extend({
     // всяческие кеши и глобальное состояние для "Предложенных"
     initProposed: function () {
         var t = this;
-        t.itemsPerRequest = 80; // сколько брать с удалённого сервера (ВКонтакте) за раз
+        t.itemsPerRequest = 80; // сколько "предложенных" брать с удалённого сервера (ВКонтакте) за раз
         t.cachedProposed = []; // взятые с удалённого сервера, но пока не отрисованные
         t.itemsPerShow = 20; // сколько отрисовать за раз
         t.hasMoreRemote = true; // остались ли ещё на удалённом сервере
         t.loadingMore = null; // когда нужно, хранит Deferred уже запущенного запроса на удалённый сервер, используется в префетчинге
         t.currentPageOffset = 0; // какую по счёту порцию взять с удалённого сервера, начиная с 0
         t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении
-        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообщества) и т.п.)
+        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообществ) и т.п.)
         t.totalCount = 0; // общее число предложенных на удалённом сервере
     },
 
@@ -1297,8 +1297,14 @@ var LeftPanelWidget = Event.extend({
         if (t.cachedProposed.length || t.hasMoreRemote) {
             // ничего не делаем, можно подгружать дальше
         } else {
-            $(window).data('disable-load-more', true);
+            t.disableProposed();
         }
+    },
+
+    disableProposed: function () {
+        var t = this;
+        t.initProposed(); // почистим кеши
+        $(window).data('disable-load-more', true);
     },
 
     loadProposed: function () {
@@ -1373,6 +1379,13 @@ var LeftPanelWidget = Event.extend({
         };
 
         if (t.queuedProposedIds === null) {
+            ExternalSuggests.error(function (Error) {
+                if (Error.message === 'isAdmin') {
+                    t.disableProposed();
+                    t.$wall.html('<div class="notice">Вы не являетесь администратором или владельцем сообщества, и поэтому не можете работать с предложенными новостями.</div>');
+                }
+            });
+
             t.getQueuedProposedIds().success(function () {
                 ExternalSuggests.success(function (result) {
                     t.updateTotalCount();
@@ -1424,10 +1437,19 @@ var LeftPanelWidget = Event.extend({
             filter: 'suggests',
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
-            offset: itemsOffset
+            offset: itemsOffset,
+            extended: 1
         }, function (resp) {
-            if (resp && !resp.error) {
-                var result = resp.response;
+            if (resp && !resp.error && resp.response) {
+                var groupsInfo = resp.response.groups && resp.response.groups[0];
+                if (groupsInfo && ('is_admin' in groupsInfo)) {
+                    if (!groupsInfo.is_admin) {
+                        Def.fireError('isAdmin');
+                        return; // -------- RETURN
+                    }
+                }
+
+                var result = resp.response.wall;
                 if (result) {
                     t.totalCount = result.shift(); //result изменился!
                     t.hasMoreRemote = (t.totalCount > itemsOffset + result.length);
