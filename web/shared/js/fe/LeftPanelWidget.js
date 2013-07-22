@@ -1440,7 +1440,6 @@ var LeftPanelWidget = Event.extend({
             offset: itemsOffset,
             extended: 1
         }, function (resp) {
-            log('resp:', resp);
             if (resp && !resp.error && resp.response) {
                 var groupsInfo = resp.response.groups && resp.response.groups[0];
                 if (groupsInfo && ('is_admin' in groupsInfo)) {
