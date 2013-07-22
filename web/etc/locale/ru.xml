@@ -340,6 +340,7 @@
       <statusId><![CDATA[Статус]]></statusId>
       <externalId><![CDATA[externalId]]></externalId>
       <useFullExport><![CDATA[Экспорт описаний фото]]></useFullExport>
+      <onlyOurs><![CDATA[Только наши ленты]]></onlyOurs>
       <processed><![CDATA[processed]]></processed>
       <targetFeedIds><![CDATA[Ленты отправки]]></targetFeedIds>
       <type><![CDATA[Тип]]></type>

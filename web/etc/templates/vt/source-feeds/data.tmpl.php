@@ -34,7 +34,7 @@
             <?= FormHelper::FormCheckBox( $prefix . '[useFullExport]', null, 'useFullExport', null, $SourceFeed->useFullExport ); ?>
         </div>
         <div data-row="onlyOurs" class="row required">
-            <label>{lang:vt.sourceFeed.useFullExport}</label>
+            <label>{lang:vt.sourceFeed.onlyOurs}</label>
             <?= FormHelper::FormCheckBox(  'onlyOurs', null, 'onlyOurs', null, $onlyOuers ); ?>
         </div>
         <div data-row="targetFeedIds" class="row">
