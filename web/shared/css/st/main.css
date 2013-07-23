@@ -103,9 +103,13 @@ td {
   zoom: 1;
   *display: inline;
 }
-.table>.body>.row>.column>.cell,
-.table>.header>.row>.column>.cell {
+.table>.body>.row>.column .cell,
+.table>.header>.row>.column .cell {
   padding: 10px 0;
+}
+.table>.body>.row>.column.publics .cell,
+.table>.header>.row>.column.publics .cell {
+  padding: 10px;
 }
 .table>.body>.row>.column.left,
 .table>.header>.row>.column.left {
