@@ -10,9 +10,11 @@ class GetInstPostInfo
 {
     public function Execute()
     {
+        header('Access-Control-Allow-Origin:*');
         $response   = array( 'success' => false );
         $link       = Request::getString('post_shortlink');
-        if( $link ) {
+        $callback   = Request::getString('jsonp_callback');
+        if( $link && $callback ) {
 
             $post = InstObservedPostFactory::GetOne( array( 'link' => $link ));
             if( $post ) {
@@ -28,6 +30,6 @@ class GetInstPostInfo
             }
         }
 
-        die( ObjectHelper::ToJSON($response));
+        die( $callback . '(' . ObjectHelper::ToJSON($response) . ')');
     }
 }
