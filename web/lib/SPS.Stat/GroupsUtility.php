@@ -166,7 +166,7 @@
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
                     if( $group->type == 2 ) {
-                        if( !is_array( $res['user_lists']))
+                        if( !isset( $res['user_lists']))
                             $res['user_lists'] = array();
                         array_unshift( $res['user_lists'], $tmp );
                     } else {
