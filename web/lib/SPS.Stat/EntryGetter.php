@@ -71,14 +71,8 @@ class EntryGetter {
             if( !empty( $group_entries_by_group )) {
                 $search['_vk_public_id'] = $entry_ids;
             } else {
-                 die( ObjectHelper::ToJSON(array(
-                         'response' => array(
-                             'list'              =>  array(),
-                             'min_max'           =>  $this->get_min_max(),
-                             'group_type'        =>  empty($group) ? null : $group->type
-                         )
-                     )
-                 ));
+                 $result = array ();
+                 goto end;
             }
         }
 
@@ -121,6 +115,8 @@ class EntryGetter {
                 'active'    =>  $vkPublic->active== 't' ? true : false
             );
         }
+
+        end:
         $group = isset($group_id) ? GroupFactory::GetById($group_id) : null;
 
         return array($result, $group);

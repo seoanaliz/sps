@@ -888,12 +888,12 @@ var Table = (function() {
             slug: slug
         };
 
-        if (typeof slug !== 'undefined') {
-            var pushedURI = '/stat'; // по умолчанию
-            if (slug) {
-                pushedURI = '/stat/' + slug;
-            }
+        if (typeof slug === 'undefined' || !slug) {
+            var pushedURI = '/stat/';
+        } else {
+            pushedURI = '/stat/' + slug;
         }
+
         if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
             if (typeof history === 'object' && 'replaceState' in history) {
                 history.replaceState({listId: entriesPrecache.groupId, slug: ''}, '');
@@ -946,8 +946,6 @@ var Table = (function() {
             Filter.setSliderMax(maxPeriod[1]);
             $('#global-loader').fadeOut(200);
         }
-
-        Events.fire('load_table', params, loadTableCallback);
     }
 
     function _initEvents() {
