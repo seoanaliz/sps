@@ -298,6 +298,7 @@ td {
 #main .left-column > .content .list-body .column .cell {
   padding: 0;
   display: table;
+  width: 100%;
 }
 #main .left-column > .content .list-body .column.public-info {
   text-align: left;
