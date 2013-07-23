@@ -4,10 +4,13 @@
         <action name="instWallChecker">
             <path>daemons/WallChecker</path>
         </action>
-    </group>
-    <group name="Daemons">
         <action name="instPostChecker">
             <path>daemons/PostChecker</path>
+        </action>
+    </group>
+    <group name = "Controls">
+        <action name="getInstPostInfo">
+            <path>controls/getInstPostInfo</path>
         </action>
     </group>
 </actions>
