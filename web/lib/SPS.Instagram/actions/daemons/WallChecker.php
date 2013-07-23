@@ -21,7 +21,7 @@ class WallChecker
                 array(
                     BaseFactory::CustomSql => 'ORDER BY posted_at DESC LIMIT 1')
             );
-            $id_for_check = ( empty( $last_base_post )) ? 0 : $last_base_post->id;
+//            $id_for_check = ( empty( $last_base_post )) ? 0 : $last_base_post->id;
             try {
                 $posts = InstagramHelper::api_request( $method, $params );
             } catch ( Exception $e ) {
@@ -29,10 +29,10 @@ class WallChecker
             }
             print_r(count($posts));
             foreach( $posts as $post ) {
-                if ( strpos( $post->id, $id_for_check)) {
-                    //todo errorlog
-                    continue;
-                }
+//                if ( strpos( $post->id, $id_for_check)) {
+//                    //todo errorlog
+//                    continue;
+//                }
 
                 $post_id                = explode('_',$post->id);
                 $reference_id           = $this->get_reference_from_text($post->caption->text);
@@ -41,6 +41,11 @@ class WallChecker
                     //todo errorlog
                     continue;
                 }
+
+                $check = InstObservedPostFactory::GetById( $post_id );
+                if( $check )
+                    continue;
+
                 $ref_subscribers_count  = $this->get_ref_user_subs( $reference_id );
                 $link = false;
                 if( preg_match('/p\/(.+?)\/?$/', $post->link, $matches )) {

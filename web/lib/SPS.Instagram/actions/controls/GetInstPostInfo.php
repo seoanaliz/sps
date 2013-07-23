@@ -17,14 +17,14 @@ class GetInstPostInfo
             $post = InstObservedPostFactory::GetOne( array( 'link' => $link ));
             if( $post ) {
                 $response['success']    = true;
-                $response['likes']      = $post->likes;
-                $response['comments']   = $post->comments;
+                $response['data']['likes']      = $post->likes;
+                $response['data']['comments']   = $post->comments;
 
                 $subs = '-';
                 if( $post->ref_start_subs && $post->ref_end_subs ) {
                     $subs = $post->ref_end_subs - $post->ref_start_subs;
                 }
-                $response['subscribers']= $subs;
+                $response['data']['subscribers']= $subs;
             }
         }
 
