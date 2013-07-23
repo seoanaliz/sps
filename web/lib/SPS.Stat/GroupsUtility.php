@@ -151,7 +151,7 @@
             $user_shared_groups = array();
             if( !is_array( $groups ))
                 $groups = array( $groups );
-            $res = array();
+            $res = array( 'users_lists' => array());
             $i = 1;
 
             foreach( $groups as $group ) {
@@ -166,7 +166,7 @@
                         'place'     =>  $group->type == 2 ? 0 : $i++
                     );
                     if( $group->type == 2 ) {
-                        if( !isset( $res['user_lists']))
+                        if( !is_array( $res['user_lists']))
                             $res['user_lists'] = array();
                         array_unshift( $res['user_lists'], $tmp );
                     } else {
