@@ -32,5 +32,9 @@
 
         /** @var TargetFeed */
         public $targetFeed;
+
+        /** @var boolean */
+        public $repeat;
+
     }
 ?>

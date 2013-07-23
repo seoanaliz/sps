@@ -10,10 +10,7 @@ class getEntries {
     /**
      * Entry Point
      */
-    public function Execute()
-    {
-        error_reporting( 0 );
-
+    public function Execute() {
         $EntryGetter = new EntryGetter();
         echo ObjectHelper::ToJSON( array('response' => $EntryGetter->getEntriesData()) );
     }

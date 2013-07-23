@@ -348,14 +348,12 @@ class CheckWalls
         if ( $outer_link ) {
             $articleQueue = ArticleQueueFactory::GetOne( array('externalId' => '-' . $public_id . '_' . $post_id ));
             if( !empty( $articleQueue ) && in_array( $articleQueue->author, StatUsers::$editors_black_list )) {
-                $outer_link = false;
-            } else {
-                $link = $outer_link;
+                    $outer_link = false;
             }
             if( !empty( $articleQueue ) && $articleQueue->author ) {
                 $author = AuthorFactory::GetOne( array( 'vkId' => $articleQueue->author ));
-                $author = ' ' . $author->FullName() . '( vk.com/id' . $author->vkId. ') ';
-        }
+                $author = ' ' . $author->FullName() . '(vk.com/id)' . $author->vkId. ' ';
+            }
             $link = $outer_link;
         }
         if( $link && $type == self::MONITORING_TYPE_WALL )
@@ -372,7 +370,8 @@ class CheckWalls
             $cmd->SetString ( '@type',     $type );
             $cmd->Execute();
             if( $outer_link ) {
-                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id . '    ' . $author;
+                $message = 'У нас внешние ссылки(' . $outer_link . '): http://vk.com/wall-' . $public_id . '_' . $post_id . '    ' . $author ;
+
                 VkHelper::send_alert( $message, array( 670456, 106175502 ));
             }
         }
@@ -507,6 +506,7 @@ sql;
         $grid_line->endDate = $date;
         $grid_line->targetFeedId = $target_feed_id;
         $grid_line->time = $sent_at->format('H:i:s');
+        $grid_line->repeat = false;
         $grid_line->type = GridLineUtility::TYPE_CONTENT;
         $result = GridLineFactory::Add( $grid_line, array(BaseFactory::WithReturningKeys => true));
 

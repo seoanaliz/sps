@@ -51,35 +51,14 @@ var Eventlist = {
         });
     },
     load_list: function(callback) {
-        simpleAjax('getGroupList', function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData.list)) {
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.fave,
-                        slug: data.slug
-                    });
-                });
+        $.ajax({
+            url: controlsRoot + 'getGroupList/',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
             }
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            callback(clearData);
-        });
-    },
-    load_bookmarks: function(callback) {
-        simpleAjax('getGroupList', {filter: 'bookmark'}, function(dirtyData) {
-            var clearData = [];
-            if ($.isArray(dirtyData)) {
-                $.each(dirtyData.list, function(i, data) {
-                    clearData.push({
-                        itemId: data.group_id,
-                        itemTitle: data.name,
-                        itemFave: data.general
-                    });
-                });
-            }
-            callback(clearData);
         });
     },
     load_table: function(options, callback) {
@@ -143,11 +122,18 @@ var Eventlist = {
             callback(data.clearList, data.clearPeriod, data.clearListType);
         });
     },
-    add_list: function(title, callback) {
-        simpleAjax('setGroup', {
-            groupName: title
-        }, function(dirtyData) {
-            callback(true);
+    add_list: function(groupName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            dataType: 'json',
+            data: {
+                groupName: groupName
+            },
+            success: function (resp) {
+                if (resp.success) {
+                    callback(resp.data);
+                }
+            }
         });
     },
     update_list: function(public_id, list_id, title, callback) {
@@ -171,8 +157,6 @@ var Eventlist = {
             groupId: list_id,
             publId: public_id
         }, function(dirtyData) {
-            cur.dataUser.listed = intval(dirtyData.listed_by);
-            Counter.refresh();
             callback(true);
         });
     },
@@ -193,21 +177,7 @@ var Eventlist = {
             callback(true);
         });
     },
-    hide_public: function(public_id, callback) {
-        simpleAjax('togglePublVisibil', {
-            publId: public_id
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    add_to_general: function(listId, callback) {
-        simpleAjax('toggleGroupGeneral', {
-            groupId: listId
-        }, function(dirtyData) {
-            callback(true);
-        });
-    },
-    remove_from_general: function(listId, callback) {
+    toggle_group_general: function(listId, callback) {
         simpleAjax('toggleGroupGeneral', {
             groupId: listId
         }, function(dirtyData) {
@@ -220,6 +190,42 @@ var Eventlist = {
             recId: userId
         }, function() {
             callback(true);
+        });
+    },
+    sort_list: function(groupId, index, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroupOrder/',
+            data: {
+                groupId: groupId,
+                index: index
+            },
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            }
+        });
+    },
+    rename_list: function(listId, listName, callback) {
+        $.ajax({
+            url: controlsRoot + 'setGroup/',
+            data: {
+                groupId: listId,
+                groupName: listName
+            },
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    callback(true, resp.data);
+                } else {
+                    callback(false);
+                }
+            }
         });
     }
 };

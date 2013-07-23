@@ -87,7 +87,7 @@
                 'targetFeedId'  =>  $targetFeedId,
                 'startDateFrom' =>  $midnight,
                 'startDateTo'   =>  $midnightNextDay,
-                BaseFactoryPrepare::PageSize => 1
+                 BaseFactoryPrepare::PageSize => 1
             );
 
             $articlesCount = ArticleQueueFactory::Count( $search);

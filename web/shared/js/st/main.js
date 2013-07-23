@@ -8,12 +8,14 @@ var Configs = {
     tableLoadOffset: 20,
     controlsRoot: controlsRoot,
     eventsDelay: 0,
-
     etc: null
 };
 
 var cur = {
-    dataUser: {}
+    dataUser: {
+        isEditor: (window.rank > 2),
+        isAdmin: (window.rank > 3)
+    }
 };
 
 $(document).ready(function() {
@@ -31,11 +33,14 @@ $(document).ready(function() {
         });
     })(window);
 
-    cur.dataUser.isEditor = false;
+    Configs.activeElement = document.body;
+    document.body.addEventListener && document.body.addEventListener('focus', function () {
+        Configs.activeElement = document.activeElement;
+    }, true);
+
     Filter.init(function() {
         List.init(function() {
             Table.init();
-            Counter.init();
         });
     });
     checkVkStatus();
@@ -54,38 +59,6 @@ function checkVkStatus() {
     }
 }
 
-// taken from http://www.quirksmode.org/js/cookies.html
-//function createCookie(name, value, days) {
-//    if (days) {
-//        var date = new Date();
-//        date.setTime(date.getTime()+(days*24*60*60*1000));
-//        var expires = "; expires="+date.toGMTString();
-//    }
-//    else {
-//        expires = "";
-//    }
-//    document.cookie = name+"="+value+expires+"; path=/";
-//}
-//
-//function readCookie(name) {
-//    var nameEQ = name + "=";
-//    var ca = document.cookie.split(';');
-//    for (var i=0; i < ca.length; i++) {
-//        var c = ca[i];
-//        while (c.charAt(0)==' ') {
-//            c = c.substring(1,c.length);
-//        }
-//        if (c.indexOf(nameEQ) == 0) {
-//            return c.substring(nameEQ.length,c.length);
-//        }
-//    }
-//    return null;
-//}
-//
-//function removeCookie(name) {
-//    createCookie(name, "", -1);
-//}
-
 function authInfo(response) {
     if (!response.session) {
         makeVkButton();
@@ -95,9 +68,9 @@ function authInfo(response) {
         '};';
         VK.Api.call('execute', {code: code}, function (answer) {
             if (answer && answer.response) {
-                cur.dataUser = answer.response.user;
+                jQuery.extend(cur.dataUser, answer.response.user);
                 handleUserLoggedIn(answer.response.user);
-            }
+            };
         });
     }
 }
@@ -127,40 +100,19 @@ function handleUserLoggedIn(userData) {
     $('.userpic', $loginInfo).attr('src', userData.photo);
 }
 
-//function initVK(data) {
-//    if (data) {
-//        var r = data.response;
-//        cur.dataUser = r.me;
-//        Events.fire('get_user', cur.dataUser.uid, function(us) {
-//            cur.dataUser.isEditor = us.rank == 2 ;
-//            Filter.init(function() {
-//                List.init(function() {
-//                    Table.init();
-//                    Counter.init();
-//                });
-//            });
-//        });
-//    }
-//}
-
 var List = (function() {
     var $container;
     var $actions;
 
     function init(callback) {
         $container = $('.header');
-
-        refresh(function() {
-            _initEvents();
-            if ($.isFunction(callback)) callback();
-        });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select('all', callback);
+        _initEvents();
     }
     function _initEvents() {
-        $container.delegate('.tab', 'click', function() {
-            var $item = $(this);
-            select($item.data('id'));
-        });
-        $container.delegate('.actions .share', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
@@ -303,10 +255,7 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .edit', 'click', function() {
-            Table.toggleEditMode();
-        });
-        $container.delegate('.actions .delete', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
                 id: 'deleteList' + listId,
@@ -321,35 +270,32 @@ var List = (function() {
             function deleteList() {
                 this.hide();
                 Events.fire('remove_list', listId, function() {
-                    List.refresh(function() {
-                        Filter.listRefresh(function() {
-                            $('.filter > .list > .item[data-id="null"]').click();
-                        });
+                    Filter.refreshList(function() {
+                        $('.filter > .list > .item[data-id="all"]').click();
                     });
                 });
             }
+        });
+        $container.delegate('.tab', 'click', function() {
+            Filter.selectList($(this).data('id'));
         });
     }
 
     function refresh(callback) {
         var $selectedItem = $container.find('.tab.selected');
         var id = $selectedItem.data('id');
-        Events.fire('load_bookmarks', function(data) {
-            $container.find('.tab-bar').html(tmpl(LIST, {items: data}));
-            $actions = $('.actions', $container);
-            select(id, function() {
-                if ($.isFunction(callback)) callback();
-            });
+        $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
+        $actions = $('.actions', $container);
+        select(id, function() {
+            if ($.isFunction(callback)) callback();
         });
     }
 
     function select(id, callback) {
-        if (!id) {
-            id = null;
-            $actions.hide();
-        }
-        else {
-            $actions.show();
+        if (id === 'all' || id === 'all_not_listed') {
+            $actions.fadeOut(140);
+        } else {
+            cur.dataUser.isAdmin && $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
@@ -357,7 +303,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.listSelect($item.data('id'));
+            Filter.selectList($item.data('id'));
         }
     }
 
@@ -375,8 +321,6 @@ var Filter = (function() {
     var $periodWrapper;
     var $period;
     var $list;
-    var $intervalWrapper;
-    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
@@ -385,11 +329,9 @@ var Filter = (function() {
         $audience = $('> .audience', $audienceWrapper);
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
-        $intervalWrapper = $('> .interval-wrapper', $container);
-        $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
-        listRefresh(callback);
+        refreshList(callback);
     }
 
     function _initEvents() {
@@ -465,41 +407,6 @@ var Filter = (function() {
                 }
             }
         })();
-        (function() {
-            var $timeFrom = $interval.find('.timeFrom');
-            var $timeTo = $interval.find('.timeTo');
-            $($timeFrom).add($timeTo).datepicker({
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: 'd MM yy'
-            }).change(function(e) {
-                var $timeFrom = $interval.find('.timeFrom');
-                var $timeTo = $interval.find('.timeTo');
-                var dateFrom = $timeFrom.datepicker('getDate');
-                var dateTo = $timeTo.datepicker('getDate');
-                $timeTo.datepicker('option', 'minDate', dateFrom);
-                $timeFrom.datepicker('option', 'maxDate', dateTo);
-                Table.setInterval([
-                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
-                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
-                ]);
-            });
-            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
-            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
-            var dateFrom = $timeFrom.datepicker('getDate');
-            var dateTo = $timeTo.datepicker('getDate');
-            $timeTo.datepicker('option', 'minDate', dateFrom);
-            $timeFrom.datepicker('option', 'maxDate', dateTo);
-            Table.setCurrentInterval([
-                intval($timeFrom.datepicker('getDate').getTime() / 1000),
-                intval($timeTo.datepicker('getDate') / 1000)
-            ]);
-        })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
             var period;
@@ -519,41 +426,107 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            listSelect($(this));
+            selectList($(this).data('id'));
         });
-        $list.delegate('.item > .bookmark', 'click', function(e) {
+        $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
-            var $icon = $(this);
-            var $item = $icon.closest('.item');
-            var listId = $item.data('id');
-            if (!$icon.hasClass('selected')) {
-                Events.fire('add_to_general', listId, function() {
-                    $icon.addClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
-                });
-            } else {
-                $icon.removeClass('selected');
-                Events.fire('remove_from_general', listId, function() {
-                    $icon.removeClass('selected');
-                    List.refresh(function() {
-                        List.select($list.find('.item.selected').data('id'), function() {});
-                    });
-                });
-            }
-        });
-    }
-    function listRefresh(callback) {
-        Events.fire('load_list', function(data) {
-            $list.html(tmpl(FILTER_LIST, {items: data}));
-            var $selectedItem = $list.find('.item.selected');
-            listSelect($selectedItem, function() {
-                if ($.isFunction(callback)) callback();
+            var listId = $(this).closest('.item').data('id');
+            Events.fire('toggle_group_general', listId, function() {
+                Filter.refreshList();
             });
         });
+        $list.delegate('.edit', 'click', function(e) {
+            e.stopPropagation();
+            var $item = $(this).closest('.item');
+            var $editField = $('<textarea class="edit-field"></textarea>');
+            var $saver = $('<span class="saver">Save</span>');
+            $item.append($editField);
+            $editField.focus();
+            $editField.val($item.attr('title'));
+            var saverAppendTimeout = setTimeout(function () {
+                $item.append($saver);
+                $saver.animate({'margin-right': 0});
+            }, 150);
+            $saver.click(function (e) {
+                e.stopPropagation();
+                saveEditor();
+            });
+            $editField
+                .on('click', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', function (e) {
+                    if (e.keyCode === KEY.ESC) {
+                        destroyEditor();
+                    }
+                })
+                .on('blur', destroyEditor);
+
+            function saveEditor() {
+                Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
+                    if (success) {
+                        $item.attr('title', data.groupName);
+                        $item.find('.text').text(data.groupName);
+                    } else {
+                        Filter.refreshList();
+                    }
+                    destroyEditor();
+                });
+            }
+            function destroyEditor() {
+                clearTimeout(saverAppendTimeout);
+                $editField.remove();
+                $saver.remove();
+            }
+        });
+        // сортировка списков
+        if (cur.dataUser.isAdmin) {
+            var preventEvent = function () {
+                return false;
+            };
+            $list.filter('.private, .global').sortable({
+                axis: 'y',
+                tolerance: 'pointer',
+                update: function (_, ui) {
+                    var listId = ui.item.data('id');
+                    var index = $(this).find('.item').index(ui.item);
+                    Events.fire('sort_list', listId, index, function (success) {
+                        if (!success) {
+                            Filter.refreshList();
+                        }
+                    });
+                },
+                start: function (_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
+                    ui.item.on('click', preventEvent);
+                },
+                stop: function (_, ui) {
+                    setInterval(function () { // отменяет хак для FF
+                        ui.item.off('click', preventEvent);
+                    }, 10);
+                }
+            });
+        }
     }
-    function listSelect($item, callback) {
+
+    function refreshList(callback) {
+        var $selectedItem = $list.find('.item.selected');
+        var id = $selectedItem.data('id');
+        var $list_global  =  $('> .list.global', $container);
+        var $list_private =  $('> .list.private', $container);
+        var $list_shared  =  $('> .list.shared', $container);
+        Events.fire('load_list', function(data) {
+            $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
+            $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
+            $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
+            if (id) {
+                selectList(id, function() {
+                    if ($.isFunction(callback)) callback();
+                });
+            } else if ($.isFunction(callback)) callback();
+        });
+    }
+    function selectList(id, callback) {
+        var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
 
@@ -578,31 +551,17 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
-    function showInterval() {
-        $audienceWrapper.slideUp(400);
-        $periodWrapper.slideUp(400);
-        $intervalWrapper.slideDown(200);
-    }
-    function hideInterval() {
-        $audienceWrapper.slideDown(200);
-        $periodWrapper.slideDown(200);
-        $intervalWrapper.slideUp(400);
-    }
-
     return {
         init: init,
-        listRefresh: listRefresh,
-        listSelect: listSelect,
+        refreshList: refreshList,
+        selectList: selectList,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax,
-        showInterval: showInterval,
-        hideInterval: hideInterval
+        setSliderMax: setSliderMax
     };
 })();
 
 var Table = (function() {
     var $container;
-    var idEditMode = false;
     var dataTable = {};
     var pagesLoaded = 0;
     var currentListId = 0;
@@ -642,12 +601,13 @@ var Table = (function() {
                         users.push({
                             userId: data.vk_id,
                             userName: data.name,
-                            userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                            userPhoto: data.ava === 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
                             userDescription: data.role || '&nbsp;'
                         });
                     });
                     clearList.push({
-                        publicId: publicItem.id,
+                        intId: publicItem.id,
+                        publicId: publicItem.vk_id,
                         publicImg: publicItem.ava,
                         publicName: publicItem.name,
                         publicFollowers: publicItem.quantity,
@@ -664,21 +624,21 @@ var Table = (function() {
             }
         } else {
             /*
-             id - id
-             name - name
-             ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
-             auth_likes_eff: 0 - Авторское/спарсенное: лайки
-             auth_posts: 0 - авторских постов
-             auth_reposts_eff: 0 - Авторское/спарсенное: репосты
-             avg_vie_grouth: null - средний суточный прирост просмотров
-             avg_vis_grouth: null - средний суточный прирост уников
-             overall_posts: 68 - общее количество постов за период
-             posts_days_rel: 0 - в среднем постов за сутки
-             sb_posts_count: 56 - постов из источников
-             sb_posts_rate: 0 - средний рейтинг постов из источников
-             views: null - просмотры
-             visitors: null - посетители
-             */
+            id - id
+            name - name
+            ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+            auth_likes_eff: 0 - Авторское/спарсенное: лайки
+            auth_posts: 0 - авторских постов
+            auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+            avg_vie_grouth: null - средний суточный прирост просмотров
+            avg_vis_grouth: null - средний суточный прирост уников
+            overall_posts: 68 - общее количество постов за период
+            posts_days_rel: 0 - в среднем постов за сутки
+            sb_posts_count: 56 - постов из источников
+            sb_posts_rate: 0 - средний рейтинг постов из источников
+            views: null - просмотры
+            visitors: null - посетители
+            */
             if ($.isArray(dirtyData.list)) {
                 $.each(dirtyData.list, function(i, publicItem) {
                     clearList.push({
@@ -934,7 +894,6 @@ var Table = (function() {
                 pushedURI = '/stat/' + slug;
             }
         }
-
         if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
             if (typeof history === 'object' && 'replaceState' in history) {
                 history.replaceState({listId: entriesPrecache.groupId, slug: ''}, '');
@@ -949,6 +908,7 @@ var Table = (function() {
                 location.href = pushedURI;
             }
         }
+
         function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
             if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
                 listId = explicitGroupId;
@@ -959,10 +919,6 @@ var Table = (function() {
                 }
             }
 
-            var $filterContainer = $('.filter');
-            $filterContainer.find('.selected').removeClass('selected');
-            $filterContainer.find('.item').filter('[data-id=' + listId + ']').addClass('selected');
-
             pagesLoaded = 1;
             currentListType = listType;
             currentListId = listId;
@@ -972,10 +928,8 @@ var Table = (function() {
             dataTable = data;
             if (!listType) {
                 $container.html(tmpl(TABLE, {rows: data}));
-                Filter.hideInterval();
             } else {
                 $container.html(tmpl(OUR_TABLE, {rows: data}));
-                Filter.showInterval();
             }
             $container.find('.' + currentSortBy).addClass('active');
             if (!currentListId) {
@@ -992,6 +946,8 @@ var Table = (function() {
             Filter.setSliderMax(maxPeriod[1]);
             $('#global-loader').fadeOut(200);
         }
+
+        Events.fire('load_table', params, loadTableCallback);
     }
 
     function _initEvents() {
@@ -1010,10 +966,16 @@ var Table = (function() {
             var $public = $el.closest('.public');
             var publicId = $public.data('id');
             var publicData;
+
             for (var i in dataTable) {
-                if (dataTable[i].publicId == publicId) { publicData = dataTable[i]; break; }
+                if (dataTable[i].intId == publicId) {
+                    publicData = dataTable[i];
+                    break; // ------------------- BREAK
+                }
             }
-            _createDropdownList(e, publicData);
+            if (publicData) {
+                _createDropdown(e, publicData);
+            }
         });
 
         $container.delegate('.action.delete-public', 'click', function(e) {
@@ -1096,10 +1058,10 @@ var Table = (function() {
         })();
     }
 
-    function _createDropdownList(e, publicData) {
+    function _createDropdown(e, publicData) {
         var $el = $(e.currentTarget);
         var offset = $el.offset();
-        var $dropdown = $el.data('dropdown');
+        var $dropdown;
         var $public = $el.closest('.public');
         var publicId = $public.data('id');
         var selectedLists = publicData.lists;
@@ -1107,111 +1069,131 @@ var Table = (function() {
 
         e.stopPropagation();
 
-        if (!$dropdown) {
-            Events.fire('load_list', function(dataList) {
-                if (!$el.hasClass('selected')) {
-                    var lists = dataList;
-                    $dropdown = $(tmpl(DROPDOWN, {items: lists})).appendTo('body');
-                    var $input = $dropdown.find('input');
+        Events.fire('load_list', function(dataList) {
+            if (!$el.hasClass('selected')) {
+                var all_lists = dataList.private;
+                all_lists.push.apply(all_lists,dataList.global);
 
-                    $.each(selectedLists, function(i, listId) {
-                        $dropdown.find('[data-id=' + listId + ']').addClass('selected');
-                    });
+                $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
 
-                    $dropdown.delegate('.show-input', 'click', function() {
-                        $input.show().focus();
-                    });
-                    $dropdown.delegate('.hide-public', 'click', function() {
-                        var $item = $(this);
-                        if ($item.hasClass('selected')) {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.removeClass('selected');
-                                $public.css('opacity', 1);
-                            });
-                        } else {
-                            Events.fire('hide_public', publicId, function() {
-                                $item.addClass('selected');
-                                $public.css('opacity',.5);
-                            });
+                // поиск по категориям
+                initListSearch();
+
+                var $input = $dropdown.find('.add-item');
+                $.each(selectedLists, function(i, listId) {
+                    $dropdown.find('[data-id=' + listId + ']').addClass('selected');
+                });
+
+                $dropdown.delegate('.show-input', 'click', function() {
+                    $input.show().focus();
+                });
+                $dropdown.delegate('.item:not(.show-input)', 'mousedown', function(e) {
+                    var $item = $(this);
+                    onChange($item);
+                });
+                $dropdown
+                    .delegate('.add-item', 'keyup', function(e) {
+                        if (e.keyCode === KEY.ENTER) {
+                            onSave($.trim($input.val()));
                         }
-                    });
-                    $dropdown.delegate('.item:not(.show-input):not(.hide-public)', 'mousedown', function(e) {
-                        var $item = $(this);
-                        onChange($item);
-                    });
-                    $dropdown.delegate('input', 'keyup blur', function(e) {
-                        var text = $.trim($input.val());
-                        if (e.keyCode && e.keyCode != KEY.ENTER) return false;
-                        if (!text) return false;
-                        if (e.keyCode == KEY.ENTER) return $input.blur();
-                        return onSave(text);
-                    });
-                    $dropdown.bind('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
-                    $(document).mousedown(function() {
-                        if ($dropdown.is(':hidden')) return;
-                        $dropdown.hide();
-                        $el.removeClass('selected');
-                    });
+                    })
+                    .delegate('.add-item', 'blur', function () {
+                        onSave($.trim($input.val()));
+                    })
+                $dropdown.bind('mousedown', function(e) {
+                    e.stopPropagation();
+                });
+                $(document).mousedown(function() {
+                    if ($dropdown.is(':hidden')) {
+                        return;
+                    }
+                    $dropdown.hide();
+                    $el.removeClass('selected');
+                    setTimeout(function () {
+                        if (document.activeElement === document.body) {
+                            $(Configs.activeBeforeDropdown).focus();
+                        } 
+                    }, 50);
+                });
 
-                    function onSave(text) {
-                        Events.fire('add_list', text, function() {
-                            Events.fire('load_list', function(dataList) {
-                                $el.data('dropdown', false);
-                                var $tmpDropdown = $(tmpl(DROPDOWN, {items: dataList}));
-                                $dropdown.html($tmpDropdown.html());
-                                $input = $dropdown.find('input');
-                                Filter.listRefresh();
-                            });
+                function onSave(groupName) {
+                    Events.fire('add_list', groupName, function() {
+                        Events.fire('load_list', function(dataList) {
+                            var all_lists = dataList.private;
+                            all_lists.push.apply(all_lists,dataList.global);
+
+                            var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
+                            $dropdown.html($tmpDropdown.html());
+                            $input = $dropdown.find('.add-item');
+                            $dropdown.find('.search').focus();
+                            Filter.refreshList();
                         });
-                    }
-                    function onChange($item) {
-                        listId = $item.data('id');
-                        var isSelected = !$item.hasClass('selected');
-                        var callback = function(data) {
-                            if (!data) return;
-                            $item.toggleClass('selected');
-                            if ($dropdown.find('.item.selected').length) {
-                                $el.find('.icon').removeClass('plus').addClass('select');
-                            } else {
-                                $el.find('.icon').removeClass('select').addClass('plus');
-                            }
-                        };
-                        if (isSelected) {
-                            Events.fire('add_to_list', publicId, listId, callback);
-                        } else {
-                            Events.fire('remove_from_list', publicId, listId, callback);
-                        }
-                    }
-                    $el.addClass('selected');
-                    $el.data('dropdown', $dropdown);
-                    $dropdown.show().css({
-                        top: offset.top + $el.outerHeight(),
-                        left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
                     });
                 }
-            });
-        } else {
+                function onChange($item) {
+                    listId = $item.data('id');
+                    var isSelected = !$item.hasClass('selected');
+                    var callback = function(data) {
+                        if (!data) return;
+                        $item.toggleClass('selected');
+                        if ($dropdown.find('.item.selected').length) {
+                            $el.find('.icon').removeClass('plus').addClass('select');
+                        } else {
+                            $el.find('.icon').removeClass('select').addClass('plus');
+                        }
+                    };
+                    if (isSelected) {
+                        Events.fire('add_to_list', publicId, listId, callback);
+                    } else {
+                        Events.fire('remove_from_list', publicId, listId, callback);
+                    }
+                }
+
+                showDropdown();
+                $dropdown.find('.search').focus();
+            }
+        });
+
+        function initListSearch() {
+            var previousDisplay = $dropdown.find('.item')[0].style.display;
+            function clearSearch() {
+                var $search = $dropdown.find('.search');
+                $search.attr('value', '');
+                $search.trigger('change');
+                $search.focus();
+            }
+            var previousValue = '';
+            $dropdown
+                .delegate('.search', 'keyup drop paste change', function (e) {
+                    var val = $(this).val();
+                    if (('keyCode' in e) && e.keyCode === KEY.ESC) {
+                        return clearSearch(); // ---- RETURN
+                    }
+                    if (val !== previousValue) {
+                        var regexp = new RegExp(val, 'gim');
+                        $dropdown.find('.item').each(function () {
+                            var text = this.getAttribute('title');
+                            if (regexp.test(text)) {
+                                var div = this.childNodes[0];
+                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                this.style.display = previousDisplay;
+                            } else {
+                                this.style.display = 'none';
+                            }
+                        });
+                        previousValue = val;
+                    }
+                })
+                .delegate('.clear-search', 'click', clearSearch);
+        }
+
+        function showDropdown() {
+            Configs.activeBeforeDropdown = Configs.activeElement;
             $el.addClass('selected');
             $dropdown.show().css({
                 top: offset.top + $el.outerHeight(),
                 left: offset.left - $dropdown.outerWidth() + $el.outerWidth()
             });
-        }
-    }
-
-    function toggleEditMode() {
-        editMode(!idEditMode);
-    }
-
-    function editMode(on) {
-        idEditMode = on;
-        var $list = $container.find('.list-body');
-        if (on) {
-            $list.addClass('edit-mode');
-        } else {
-            $list.removeClass('edit-mode');
         }
     }
 
@@ -1227,31 +1209,8 @@ var Table = (function() {
         search: search,
         setPeriod: setPeriod,
         setAudience: setAudience,
-        editMode: editMode,
-        toggleEditMode: toggleEditMode,
         setInterval: setInterval,
         setCurrentInterval: setCurrentInterval,
         prepareServerData: prepareServerData
-    };
-})();
-
-var Counter = (function(){
-    var $container;
-
-    function init( callback ){
-        $container = $('#listed-counter');
-        if( cur.dataUser.isEditor ) {
-            $container.show();
-        }
-        refresh();
-    }
-
-    function refresh(){
-       $container.find('span').text( cur.dataUser.listed );
-    }
-
-    return {
-        init: init,
-        refresh: refresh
     };
 })();

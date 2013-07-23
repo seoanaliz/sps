@@ -8,6 +8,7 @@
         private $page_short_name;
         private $count;
 
+        const false_created_time = '1970-01-01 00:00:00';
         const PAUSE = 1;
         const MAP_SIZE = 'size=180x70';//контактовское значение для размера карт
         const MAP_NEW_SIZE = 'size=360x140';//то значение, на которое ^ надо заменить
@@ -18,7 +19,7 @@
         const GET_PHOTO_DESC = true; // собирать ли внутреннее описание фото (очень нестабильно и долго)
         const TESTING = false;
         const ALBUM_MIN_LIKES_LIMIT = 10;
-        const WALL_MIN_LIKES_LIMIT = 30;
+        const WALL_MIN_LIKES_LIMIT  = 30;
         /**
          * Максимальное количество постов, для которых можно запросить лайки
          */
@@ -181,12 +182,12 @@
 
         public function get_suggested_posts($last_post_id, $access_token )
         {
-            sleep(rand( 1,12 ));
+            sleep(rand( 1,5 ));
             $params = array(
                 'access_token'  =>   $access_token,
-                'count'         =>   30,
+                'count'         =>   100,
                 'filter'        =>  'suggests',
-                'owner_id'      =>  '-' . $this->page_id
+                'owner_id'      =>  '-' . $this->page_id,
             );
             $res = VkHelper::api_request( 'wall.get', $params, 0 );
             sleep(self::PAUSE);
@@ -206,7 +207,6 @@
         public static function post_conv( $posts, $stop_post_id = false )
         {
             $result_posts_array = array();
-
             foreach( $posts as $post ) {
 
                 if( $stop_post_id && $post->id <= $stop_post_id){
@@ -288,13 +288,14 @@
             $article = new Article();
             $article->externalId = $post['id'];
             $article->targetFeedId = $target_feed_id;
-            $article->createdAt = $article->sentAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->createdAt = new DateTimeWrapper( date('r', $post['time'] ));
+            $article->sentAt = null;
             $article->importedAt = DateTimeWrapper::Now();
             $article->isCleaned = false;
             $article->statusId = 3;
             $article->articleStatus = Article::STATUS_APPROVED;
             $article->rate = 0;
-            $article->sourceFeedId = SourceFeedUtility::FakeSourceNotSbPosts;
+            $article->sourceFeedId = SourceFeedUtility::FakeSourceAuthors;
             $article->isSuggested = false;
 
             return $article;
@@ -321,23 +322,25 @@
         }
 
         /** @return ArticleQueue */
-        public static function get_articleQueue_from_article( $post ,$sent_at, $target_feed_id )
+        public static function get_articleQueue_from_article( $post, $sent_at, $target_feed_id )
         {
             $articleQueue = new ArticleQueue();
             $articleQueue->collectLikes = true;
-            $articleQueue->sentAt = $sent_at;
-            $articleQueue->externalId = $post['id'];
+            $articleQueue->sentAt       = $sent_at;
+            $articleQueue->externalId   = $post['id'];
             $articleQueue->externalLikes = (int)$post['likes_tr'];
             $articleQueue->externalRetweets = (int)$post['retweet'];
-            $articleQueue->startDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->startDate    = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->startDate->modify( '-5 minutes');
-            $articleQueue->endDate = new DateTimeWrapper($sent_at->Default24hFormat());
+            $articleQueue->endDate      = new DateTimeWrapper($sent_at->Default24hFormat());
             $articleQueue->endDate->modify( '+5 minutes');
             $articleQueue->targetFeedId = $target_feed_id;
-            $articleQueue->statusId = StatusUtility::Finished;
-            $articleQueue->createdAt = $sent_at;
-            $articleQueue->isDeleted = false;
-            $articleQueue->type = 'content'; //неспортивно
+            $articleQueue->statusId     = StatusUtility::Finished;
+            $articleQueue->createdAt    = new DateTimeWrapper(self::false_created_time);
+            $articleQueue->isDeleted    = false;
+            $articleQueue->author       = $author = isset($post->from_id) ? $post->from_id : false;
+            $articleQueue->type         = 'content'; //неспортивно
+
             return $articleQueue;
         }
 
@@ -674,14 +677,15 @@
             return $res;
         }
 
-        public static function get_posts_by_vk_id( $ids )
+        public static function get_posts_by_vk_id( $ids, $access_token = false )
         {
             $replace_array = array( 'wall', 'post' );
             if( is_array( $ids ))
                 $ids = implode( ',', $ids );
-
             $ids = str_replace( $replace_array, '', $ids );
-            $res = VkHelper::api_request( 'wall.getById', array( 'posts' => $ids ));
+            $params['posts'] = $ids;
+            if( $access_token ) $params['access_token'] = $access_token;
+            $res = VkHelper::api_request( 'wall.getById', $params);
             $posts = self::post_conv( $res );
             return $posts;
         }

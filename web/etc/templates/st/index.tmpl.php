@@ -1,13 +1,29 @@
+<?php
+/**
+*@var $canSuggestGlobalGroups boolean
+*@var $hasAccessToPrivateGroups boolean
+*@var $canEditGlobalGroups boolean
+*/
+?>
+
 {increal:tmpl://st/elements/header.tmpl.php}
 <div id="global-loader"></div>
 <div id="main" class="main">
-    <div class="header">
+    <div class="header clear-fix">
         <div class="tab-bar"></div>
         <div class="login-info"></div>
         <div class="button-wrap">
             <script type="text/javascript"><!--
                 document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
             --></script>
+        </div>
+        <div class="under">
+            <? if ($canEditGlobalGroups) {?>
+                <div class="actions">
+                    <a class="share">Поделиться</a>
+                    <a class="delete">Удалить</a>
+                </div>
+            <? } ?>
         </div>
     </div>
     <table>
@@ -21,13 +37,6 @@
                 </td>
                 <td class="right-column">
                     <div class="filter">
-                        <div class="interval-wrapper">
-                            <div class="title">Интервал</div>
-                            <div class="interval">
-                                <input placeholder="В период с" class="timeFrom" type="text" />
-                                <input placeholder="по" class="timeTo" type="text" />
-                            </div>
-                        </div>
                         <div class="audience-wrapper">
                             <div class="title">Аудитория</div>
                             <div class="audience">
@@ -47,9 +56,19 @@
                                 <label><input name="period" type="radio" value="month"><span>Месяц</span></label>
                             </div>
                         </div>
-                        <div class="list">
-                            <div class="item selected">List1</div>
-                            <div class="item">List1</div>
+                        <div class="list buttons">
+                            <div class="item selected" data-id="all">Все паблики</div>    
+                            <? if ($canEditGlobalGroups) {?>
+                                <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
+                            <? } ?>
+                        </div>
+                        <? if ($hasAccessToPrivateGroups) {?>
+                            <div class="title">Личные</div>
+                            <div class="list private editor_lists">
+                            </div>
+                        <? } ?>
+                        <div class="title">Категории</div>
+                        <div class="list global">
                         </div>
                     </div>
                 </td>
@@ -58,9 +77,6 @@
     </table>
 </div>
 <div id="go-to-top">Наверх</div>
-<div id="listed-counter"> вы накликали:
-    <span class="value-max"></span>
-</div>
 </div>
 
 {increal:tmpl://st/elements/footer.tmpl.php}

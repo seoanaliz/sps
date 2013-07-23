@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<actions>
+    <group name="Daemons">
+        <action name="UpdateBadooUsers">
+            <path>daemons/UpdateBadooUsers</path>
+        </action>
+        <action name="GetNewBadooUsers">
+            <path>daemons/GetNewBadooUsers</path>
+        </action>
+    </group>
+</actions>

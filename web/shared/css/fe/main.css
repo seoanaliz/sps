@@ -288,7 +288,8 @@ i {
   border-radius: 0 0 2px 2px;
 }
 .left-panel .wall .wall-empty,
-.left-panel .wall:empty {
+.left-panel .wall:empty,
+.left-panel .wall .notice {
   color: #aaa;
   font-size: 14px;
   padding: 100px;
@@ -399,6 +400,8 @@ i {
 }
 .locked {
   opacity: 0.6;
+}
+.locked .slot-header {
   -webkit-pointer-events: none;
   -moz-pointer-events: none;
   pointer-events: none;
@@ -435,12 +438,12 @@ i {
   height: 14px;
   background-position: -56px 0;
 }
-.delete {
+.delete,
+.edit-trigger {
   position: absolute;
   top: 10px;
-  right: 10px;
   cursor: pointer;
-  background: url('../../images/common/delete.png') center no-repeat;
+  background: center no-repeat;
   width: 20px;
   height: 20px;
   opacity: 0;
@@ -450,8 +453,17 @@ i {
   transition: 0.2s opacity;
   z-index: 1;
 }
-.delete:hover {
+.delete:hover,
+.edit-trigger:hover {
   opacity: 1 !important;
+}
+.delete {
+  right: 10px;
+  background-image: url('../../images/common/delete.png');
+}
+.edit-trigger {
+  right: 30px;
+  background-image: url('../../images/common/edit.png');
 }
 .controls {
   display: inline-block;
@@ -639,6 +651,10 @@ i {
 .right-panel .items .slot:hover .datepicker {
   opacity: 0.5;
 }
+.right-panel .items .slot.locked:hover .time-of-removal,
+.right-panel .items .slot.locked:hover .datepicker {
+  opacity: 0;
+}
 .right-panel .items .slot.empty {
   cursor: pointer;
 }
@@ -648,7 +664,8 @@ i {
 .right-panel .items .slot.edit .editing-post {
   display: block;
 }
-.right-panel .items .slot:hover .delete {
+.right-panel .items .slot:hover .delete,
+.right-panel .items .slot:hover .edit-trigger {
   opacity: 0.5;
 }
 .right-panel .items .slot.repeat .repeater {
@@ -705,7 +722,7 @@ i {
   cursor: pointer;
   position: absolute;
   right: 0;
-  bottom: 1px;
+  top: -1px;
   color: #205f82;
   font-weight: bold;
   font-size: 14px;
@@ -1301,13 +1318,6 @@ i {
   -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
   -moz-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
   box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
 }
 .post .userpic {
   top: 10px;
@@ -1351,7 +1361,7 @@ i {
   margin-left: 5px;
 }
 .post .editing textarea {
-  width: 516px;
+  width: 93%;
 }
 .post .actions {
   margin-top: 10px;
@@ -1739,4 +1749,22 @@ body.editor-mode .left-panel > .block>.wall {
   margin-top: 15px;
   margin-right: 10px;
   margin-bottom: 8px;
+}
+.link {
+  margin-top: 0.6em;
+}
+.link .wrap {
+  border-left: 2px solid #C3D1E0;
+  padding-left: 3px;
+  margin-top: 6px;
+}
+.link .title {
+  position: relative;
+  top: -0.3em;
+  margin: 0 0 0.4em;
+}
+.link .image {
+  float: left;
+  border: none;
+  margin-right: 8px;
 }

@@ -34,7 +34,6 @@ $cssFiles = array(
     AssetHelper::AnyBrowser => array(
         'css://common/common.less',
         'css://st/main.less',
-        'css://fe/jquery-ui.css',
         'css://fe/custom.css',
    ),
     AssetHelper::IE7 => array(),
@@ -44,9 +43,7 @@ $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
-    'js://fe/jquery.maskedinput-1.3.js',
     'js://fe/jquery.ui.slider.js',
-    'js://fe/jquery.ui.datepicker.js',
     'js://st/main.js',
     'js://st/events.js',
     'js://st/template.js',
@@ -90,13 +87,16 @@ if(!empty($jsFilesAdds)) {
     <link rel="shortcut icon" href="{web:/shared/images/st/favicon.ico}" type="image/x-icon" />
     <link rel="image_src" href="{web:/shared/images/st/stat.png}">
     <?= CssHelper::Flush(); ?>
+
+    <script type="text/javascript">
+        rank = <?= $rank ?>;
+        entriesPrecache = <?= $entriesPrecache ?>;
+    </script>
+ 
     <?= JsHelper::Flush(); ?>
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
     <? } ?>
     <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
-    <script type="text/javascript">
-        entriesPrecache = <?=$entriesPrecache?>;
-    </script>
 </head>
 <body>

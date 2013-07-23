@@ -20,7 +20,12 @@
                 'success' => false
             );
 
-            if (empty($time) || empty($timestamp) || !is_numeric($timestamp) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
+            if (!preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9]$/', $time)) {
+                echo ObjectHelper::ToJSON($result);
+                return false;
+            }
+
+            if (empty($timestamp) || !is_numeric($timestamp) || empty($targetFeedId) || !isset(GridLineUtility::$Types[$type])) {
                 echo ObjectHelper::ToJSON($result);
                 return false;
             }

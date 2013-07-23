@@ -265,6 +265,12 @@
       <navigations><![CDATA[Элементы навигации]]></navigations>
       <navigationTypes><![CDATA[Типы навигации]]></navigationTypes>
       <siteParams><![CDATA[Параметры]]></siteParams>
+      <mobParams><![CDATA[Моби]]></mobParams>
+      <andSettings><![CDATA[Андроид]]></andSettings>
+      <iosSettings><![CDATA[IOS]]></iosSettings>
+      <banners><![CDATA[Баннеры]]></banners>
+      <categories><![CDATA[Категории]]></categories>
+      <promPosts><![CDATA[Промо посты]]></promPosts>
       <exit><![CDATA[Выход]]></exit>
       <articles><![CDATA[Статьи]]></articles>
       <sourceFeeds><![CDATA[Источники]]></sourceFeeds>
@@ -334,6 +340,7 @@
       <statusId><![CDATA[Статус]]></statusId>
       <externalId><![CDATA[externalId]]></externalId>
       <useFullExport><![CDATA[Экспорт описаний фото]]></useFullExport>
+      <onlyOurs><![CDATA[Только наши ленты]]></onlyOurs>
       <processed><![CDATA[processed]]></processed>
       <targetFeedIds><![CDATA[Ленты отправки]]></targetFeedIds>
       <type><![CDATA[Тип]]></type>
@@ -457,6 +464,25 @@
       <targetFeedIds><![CDATA[Паблики]]></targetFeedIds>
       <statusId><![CDATA[Статус]]></statusId>
     </editor>
+    <mobile>
+        <minVersion><![CDATA[Мин. версия]]></minVersion>
+        <curVersion><![CDATA[Текущая версия]]></curVersion>
+        <shareText><![CDATA[Текст]]></shareText>
+        <headerText><![CDATA[Текст заголовка]]></headerText>
+        <actionText><![CDATA[Текст экшена]]></actionText>
+        <bannerId><![CDATA[ID баннера]]></bannerId>
+        <publicId><![CDATA[ID паблика]]></publicId>
+        <platform><![CDATA[Платформа]]></platform>
+        <prob><![CDATA[prob]]></prob>
+        <imgUrl><![CDATA[Url фото]]></imgUrl>
+        <actionUrl><![CDATA[Url экшена]]></actionUrl>
+        <active><![CDATA[Активность]]></active>
+        <name><![CDATA[Название]]></name>
+        <mask><![CDATA[Маска]]></mask>
+        <index><![CDATA[ID категории]]></index>
+        <indexPP><![CDATA[ID промопоста]]></indexPP>
+        <showsCount><![CDATA[Cчетчик просмотров]]></showsCount>
+    </mobile>
   </vt>
   <objects>
     <siteParam>
