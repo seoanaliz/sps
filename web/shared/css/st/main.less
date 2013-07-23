@@ -238,24 +238,22 @@ table, tr, td {
             }
 
             .column {
-                white-space: nowrap;
-                overflow: hidden;
                 vertical-align: middle;
                 text-align: center;
 
                 .cell {
                     padding: 0;
+                    display: table;
                 }
 
                 &.public-info {
                     text-align: left;
 
-                    a, .photo {
-                        vertical-align: middle;
-                        display: inline-block;
-                    }
                     a {
+                        vertical-align: middle;
                         line-height: 1.5em;
+                        display: table-cell;
+                        width: 100%;
                     }
                     .photo {
                         width: 32px;
