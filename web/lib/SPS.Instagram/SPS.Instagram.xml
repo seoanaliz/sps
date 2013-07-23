@@ -10,7 +10,7 @@
     </group>
     <group name = "Controls">
         <action name="getInstPostInfo">
-            <path>controls/getInstPostInfo</path>
+            <path>controls/GetInstPostInfo</path>
         </action>
     </group>
 </actions>
