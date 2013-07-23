@@ -42,7 +42,7 @@ var TABLE_HEADER =
             'прирост<span class="icon arrow"></span>' +
         '</div>' +
     '</div>' +
-    '<div class="column column1-5 in-search">' +
+    '<div class="column column1 in-search">' +
         '<div class="cell">' +
             'в поиске<span class="icon arrow">' +
         '</div>' +
@@ -94,7 +94,7 @@ var TABLE_ROW =
             '</span>' +
         '</div>' +
     '</div>' +
-    '<div class="column column1-5">' +
+    '<div class="column column1">' +
         '<div class="cell">' +
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
