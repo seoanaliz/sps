@@ -13,7 +13,7 @@ class GetInstPostInfo
         header('Access-Control-Allow-Origin:*');
         $response   = array( 'success' => false );
         $link       = Request::getString('post_shortlink');
-        $callback   = Request::getString('jsonp_callback');
+        $callback   = Request::getString('callback');
         if( $link && $callback ) {
 
             $post = InstObservedPostFactory::GetOne( array( 'link' => $link ));
