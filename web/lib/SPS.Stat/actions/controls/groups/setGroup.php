@@ -14,11 +14,10 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
 
             $user_id    =   AuthVkontakte::IsAuth();
             $groupId    =   Request::getInteger( 'groupId' );
-            $groupName  =   Request::getString ( 'groupName' );
+            $groupName  =   trim(Request::getString ( 'groupName' ));
             $ava        =   Request::getString ( 'ava' );
             $comments   =   Request::getString ( 'comments' );
             $general    =   Request::getInteger( 'general' );
@@ -26,76 +25,56 @@
             $type_array = array( 'Stat', 'Mes', 'Barter' );
             if ( !$type || !in_array( $type, $type_array ))
                 $type    = 'Stat';
-
-            $m_class    = $type . 'Groups';
-            $general    = $general  ? $general : 0;
             $groupId    = $groupId  ? $groupId : 0;
-            $ava        = $ava      ? $ava     : NULL;
-            $comments   = $comments ? $comments : NULL;
 
             if ( !$groupName || !$user_id ) {
-                die(ERR_MISSING_PARAMS);
+                die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-
+            $users = array();
             if( $type == 'Barter' ) {
-                $group_source = 1;
-                if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
-                    die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
-                //если не задан id - создаем группу, задан - обновляем
-                if ( !$groupId ) {
-                    $users = GroupsUtility::$barter_watchers;
-                    $users[] = $user_id;
-                    $group = new Group;
-                    $group->created_by  =   $user_id;
-                    $group->name        =   $groupName;
-                    $group->source      =   $group_source;
-                    $group->status      =   1;
-                    $group->type        =   1;
-                    $group->users_ids   =   $users;
-                    GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
+                $users = GroupsUtility::$barter_watchers;
+                $users[] = $user_id;
+                $group_source = Group::BARTER_GROUP;
+            } elseif ( $type == 'Stat' ) {
+                $group_source = Group::STAT_GROUP;
+            }
+            if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
+                die( ObjectHelper::ToJSON(array('success' => false, 'err_mess' =>  'already exist')));
+            //если не задан id - создаем группу, задан - обновляем
+            if ( !$groupId ) {
 
-                    if( !$group->group_id)
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
-                } else {
-                    $group = GroupFactory::GetOne( array( 'group_id' => $groupId, 'created_by' => $user_id ));
-                    $default_group = GroupsUtility::get_default_group( $user_id, $group_source );
-                    if ( empty( $group ) || $group->group_id === $default_group->group_id )
-                        die( ObjectHelper::ToJSON( array( 'response' => false, 'err_mes' => 'access denied' )));
-                    $group->name = $groupName;
-                    if ( !GroupFactory::Update( $group, array()))
-                        die( ObjectHelper::ToJSON( array( 'response' => false )));
+                $group = new Group;
+                $group->created_by  =   $user_id;
+                $group->name        =   $groupName;
+                $group->source      =   $group_source;
+                $group->status      =   1;
+                $group->type        =   GroupsUtility::Group_Private;
+                $group->users_ids   =   $users;
+
+                GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
+                if( !$group->group_id)
+                    die( ObjectHelper::ToJSON( array( 'success' => false )));
+                if ( $type == 'Stat'  ) {
+                    //прикрепляем группу к юзеру
+                    $groupUser = new GroupUser($group->group_id, $user_id, Group::STAT_GROUP);
+                    $groupUser->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP );
+                    GroupUserFactory::Add($groupUser);
                 }
-                die( ObjectHelper::ToJSON( array( 'response' => $group->group_id )));
+            } else {
+                $group = GroupFactory::GetOne( array( 'group_id' => $groupId ));
+                $default_group = GroupsUtility::get_default_group( $user_id, $group_source );
+                if ( empty( $group ) || $group->group_id === $default_group->group_id )
+                    die( ObjectHelper::ToJSON( array( 'success' => false, 'err_mes' => 'access denied' )));
+                $group->name = $groupName;
+                if ( !GroupFactory::Update( $group, array()))
+                    die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
-
-            if( !StatUsers::is_Sadmin( $user_id )) {
-                 die( ObjectHelper::ToJSON(array('response' => false)));
-            }
-
-            if ( $m_class::check_group_name_used( $user_id, $groupName ))  {
-                die( ObjectHelper::ToJSON(array('response' => false, 'err_mess' =>  'already exist')));
-            }
-
-            if ( $general && !StatUsers::is_Sadmin( $user_id ) ) {
-                die( ObjectHelper::ToJSON(array('response' => false)));
-            }
-
-            //если мы создаем general группу, ее надо применить ко всем юзерам, посему
-            //вместо id текущего юзера мы посылаем массив всех
-//            elseif ( $general && !$groupId )
-//                $user_id = StatUsers::get_users();
-
-            $newGroupId = $m_class::setGroup( $ava, $groupName, $comments, $groupId );
-
-            if ( !$newGroupId ) {
-                die( ObjectHelper::ToJSON(array( 'response' => false )));
-            }
-
-            if ( !$groupId )
-                $m_class::implement_group( $newGroupId, $user_id );
-
-            die( ObjectHelper::ToJSON( array( 'response' => $newGroupId )));
+            die(ObjectHelper::ToJSON(array(
+                'success' => true,
+                'data' => array('groupId' => $group->group_id, 'groupName' => $group->name),
+            )));
         }
+
 
     }
 

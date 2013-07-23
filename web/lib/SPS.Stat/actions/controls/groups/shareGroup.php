@@ -14,7 +14,6 @@
          * Entry Point
          */
         public function Execute() {
-            error_reporting( 0 );
             $user_id        =   AuthVkontakte::IsAuth();
             $group_ids      =   Request::getString(  'groupId' );
             $recipients_ids =   Request::getString(  'recId' );
@@ -42,18 +41,23 @@
                 GroupsUtility::share_groups( $groups, $recipients_ids );
                 GroupFactory::UpdateRange( $groups );
                 die( ObjectHelper::ToJSON( array( 'response' => true )));
+            } elseif ( $type == 'Stat') {
+                $group_user_array = array();
+                foreach( $recipients_ids as $recipients_id) {
+                    foreach( $group_ids as $group_id) {
+                        $tmp = new GroupUser( $group_id, $recipients_id, Group::STAT_GROUP );
+                        $tmp->place = GroupsUtility::get_next_index_groupUser( $user_id, Group::STAT_GROUP );
+                        $group_user_array[] = $tmp;
+                    }
+                }
+                GroupUserFactory::AddRange( $group_user_array );
+                die( ObjectHelper::ToJSON( array( 'response' => true )));
             }
 
-            if ( !StatUsers::is_Sadmin( $user_id )) {
-                die( ObjectHelper::ToJSON( array('response' => false )));
-            }
 	     
             $m_class::implement_group( $group_ids, $recipients_ids );
             die( ObjectHelper::ToJSON( array( 'response' => true )));
-
         }
-
-
     }
 
 ?>

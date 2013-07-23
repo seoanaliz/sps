@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+    <action name="VKLogout">
+        <path>VKLogout</path>
+        <redirects>
+            <redirect name="success" path="/" />
+        </redirects>
+    </action>
 
     <action name="AdminsWork" />
         <path>AdminsWork</path>
+
+    <action name="GetStatData" />
+        <path>GetStatData</path>
 
     <group name="Daemons">
         <action name="WrTopics">

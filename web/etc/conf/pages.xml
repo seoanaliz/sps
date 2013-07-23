@@ -22,19 +22,12 @@
                 <page uri="/landing/" boot="SPS.Site.GetSiteParams">
                     <template>tmpl://fe/landing.tmpl.php</template>
                 </page>
-                <page uri="/logout/" boot="SPS.Site.GetSiteParams">
-                    <actions>SPS.VK.VKLogout</actions>
-                    <template>tmpl://fe/login.tmpl.php</template>
-                </page>
                 <page uri="/oadmins">
                     <actions>SPS.Stat.AdminsWork</actions>
                     <template>tmpl://vt/stat_admins/index.tmpl.php</template>
                 </page>
                 <page uri="/oadmins/cof12">
                     <template>tmpl://vt/stat_admins/conf.tmpl.php</template>
-                </page>
-                <page uri="/test/" boot="SPS.VK.VKCheckAuth">
-                    <actions>SPS.Site.RunTest</actions>
                 </page>
             </pageGroup>
 
@@ -102,6 +95,9 @@
                 </page>
                 <page uri="controls://grid-line-item-save/">
                     <actions>SPS.Site.SaveGridLineItemControl</actions>
+                </page>
+                <page uri="controls://get-queued-suggests/">
+                    <actions>SPS.Site.GetQueuedSuggestsControl</actions>
                 </page>
                 <page uri="controls://authors-list/">
                     <actions>SPS.Site.GetAuthorsListControl</actions>
@@ -174,9 +170,7 @@
                 <page uri="controls://exPublic/">
                     <actions>SPS.Stat.exEntryFromGroup</actions>
                 </page>
-                <page uri="controls://togglePublVisibil/">
-                    <actions>SPS.Stat.togglePublVisibil</actions>
-                </page>
+                
                 <page uri="controls://toggleGroupGeneral/">
                     <actions>SPS.Stat.toggleGroupGeneral</actions>
                 </page>
@@ -601,6 +595,9 @@
                 <page uri="daemons://sync-sources/">
                     <actions>SPS.Site.SyncSources</actions>
                 </page>
+                <page uri="daemons://sync-fb-sources/">
+                    <actions>SPS.Site.SyncFbSources</actions>
+                </page>
                 <page uri="daemons://sync-suggests/">
                     <actions>SPS.Site.SyncSuggestedPosts</actions>
                 </page>
@@ -640,7 +637,7 @@
                 <page uri="daemons://PublicsParser/">
                     <actions>SPS.Stat.PublicsParser</actions>
                 </page>
-                 <page uri="daemons://SyncLikes/">
+                <page uri="daemons://SyncLikes/">
                      <actions>SPS.Site.SyncLikes</actions>
                  </page>
                 <page uri="daemons://CheckWalls/">
@@ -652,6 +649,12 @@
                 <page uri="daemons://PublicsGrowFixer/">
                      <actions>SPS.Stat.PublicsGrowFixer</actions>
                  </page>
+                <page uri="daemons://get-badoo/">
+                    <actions>SPS.Badoo.GetNewBadooUsers</actions>
+                </page>
+                <page uri="daemons://update-badoo/">
+                     <actions>SPS.Badoo.UpdateBadooUsers</actions>
+                </page>
 
             </pageGroup>
             <pageGroup name="vtControls" boot="">

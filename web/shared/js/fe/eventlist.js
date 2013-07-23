@@ -63,6 +63,10 @@ Control = $.extend(Control, {
             name: 'article-save',
             dataType: 'json',
             type: 'POST'
+        },
+        'get-queued-suggests': {
+            name: 'get-queued-suggests',
+            dataType: 'json'
         }
     }
 });
@@ -242,7 +246,7 @@ var Eventlist = {
         });
     },
 
-    post_moved: function(article_id, slot_id, queueId, callback){
+    post_moved: function(article_id, slot_id, queueId, externalId, callback){
         $.ajax({
             url: controlsRoot + 'article-add-to-queue/',
             dataType : "json",
@@ -251,7 +255,8 @@ var Eventlist = {
                 timestamp: slot_id,
                 targetFeedId: Elements.rightdd(),
                 queueId: queueId,
-                type: Elements.rightType()
+                type: Elements.rightType(),
+                vkPostId: externalId
             },
             success: function (data) {
                 if(data.success) {
@@ -266,12 +271,13 @@ var Eventlist = {
         });
     },
 
-    load_post_edit: function(id, callback){
+    load_post_edit: function(articleId, queueId, callback){
         $.ajax({
             url: controlsRoot + 'article-get/',
             dataType : "json",
             data: {
-                articleId: id
+                articleId: articleId,
+                queueId: queueId
             },
             success: function (data) {
                 if(data && data.id) {

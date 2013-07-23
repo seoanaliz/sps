@@ -106,11 +106,10 @@ class RoleAccessUtility
 
     /**
      * Созвращает массив источников, доступных для ленты (с учетом настроек ленты)
-     * @param $targetFeedId
+     * @param $targetFeed TargetFeed
      * @return array
      */
-    public function getAccessibleSourceTypes($targetFeedId) {
-        $targetFeed = TargetFeedFactory::GetById( $targetFeedId );
+    public function getAccessibleSourceTypes($targetFeed) {
         $accessibleSourceTypes = array();
         foreach (SourceFeedUtility::$Types as $sourceType => $sourceTypeTitle) {
             if (    $this->hasAccessToSourceType($targetFeed->targetFeedId, $sourceType)

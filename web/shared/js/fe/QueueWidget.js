@@ -167,6 +167,7 @@ var QueueWidget = Event.extend({
             var $post = $time.closest('.slot');
             t.scrollAtEditBegin = $post.closest('.queue-page').position().top + $post.position().top;
 
+            $time.data('time-before', $time.text());
             $input.focus().select();
         });
 
@@ -239,6 +240,11 @@ var QueueWidget = Event.extend({
                                     }
                                 }
                             });
+                        } else {
+                            var savedTime = $time.data('time-before');
+                            if (savedTime) {
+                                $time.text(savedTime);
+                            }
                         }
                     });
                 }
@@ -340,6 +346,7 @@ var QueueWidget = Event.extend({
         // Показать полностью в правом меню
         $queue.delegate('.toggle-text', 'click', function() {
             $(this).parent().toggleClass('collapsed');
+            return false;
         });
 
         // Показать полностью в раскрытом правом меню
@@ -433,13 +440,6 @@ var QueueWidget = Event.extend({
             var $slot = $(this).closest('.slot');
             t.saveArticle($slot);
         });
-
-        $('.queue-footer .add-button').click(function() {
-            $queue.scrollTo(0);
-            var $newPost = $(QUEUE_SLOT_ADD);
-            $newPost.prependTo($queue).animate({height: 110}, 200);
-            $newPost.find('.time').click();
-        });
     },
 
     /**
@@ -462,7 +462,7 @@ var QueueWidget = Event.extend({
             }).success(function(data) {
                 if (data && data.articleId) {
                     var postId = data.articleId;
-                    Events.fire('post_moved', postId, $slot.data('id'), null, function(isOk, data) {
+                    Events.fire('post_moved', postId, $slot.data('id'), null, null, function(isOk, data) {
                         if (isOk && data && data.html) {
                             t.setSlotArticleHtml($slot, data.html);
                         }

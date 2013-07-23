@@ -638,7 +638,7 @@ i {font-style: italic;}
             &.new, &:hover {
                 .time-of-removal,
                 .datepicker {
-                    .opacity(0.5);
+                    opacity: 0.5;
                 }
             }
 
@@ -658,7 +658,7 @@ i {font-style: italic;}
 
             &:hover {
                 .delete {
-                    .opacity(0.5);
+                    opacity: 0.5;
                 }
             }
         }
@@ -732,7 +732,7 @@ i {font-style: italic;}
                     cursor: pointer;
                     position: absolute;
                     right: 0;
-                    bottom: 1px;
+                    top: -1px;
                     color: #205f82;
                     font-weight: bold;
                     font-size: 14px;
@@ -1431,7 +1431,7 @@ i {font-style: italic;}
 
     .editing {
         textarea {
-            width: 516px;
+            width: 93%;
         }
     }
 
@@ -1896,4 +1896,24 @@ body.editor-mode {
     margin-top: 15px;
     margin-right: 10px;
     margin-bottom: 8px;
+}
+
+.link {
+    margin-top: 0.6em;
+
+    .wrap {
+        border-left: 2px solid #C3D1E0;
+        padding-left: 3px;
+        margin-top: 6px;
+    }
+    .title {
+        position: relative;
+        top: -0.3em;
+        margin: 0 0 0.4em;
+    }
+    .image {
+        float: left;
+        border: none;
+        margin-right: 8px;
+    }
 }

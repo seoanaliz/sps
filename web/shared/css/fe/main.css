@@ -705,7 +705,7 @@ i {
   cursor: pointer;
   position: absolute;
   right: 0;
-  bottom: 1px;
+  top: -1px;
   color: #205f82;
   font-weight: bold;
   font-size: 14px;
@@ -1351,7 +1351,7 @@ i {
   margin-left: 5px;
 }
 .post .editing textarea {
-  width: 516px;
+  width: 93%;
 }
 .post .actions {
   margin-top: 10px;
@@ -1739,4 +1739,22 @@ body.editor-mode .left-panel > .block>.wall {
   margin-top: 15px;
   margin-right: 10px;
   margin-bottom: 8px;
+}
+.link {
+  margin-top: 0.6em;
+}
+.link .wrap {
+  border-left: 2px solid #C3D1E0;
+  padding-left: 3px;
+  margin-top: 6px;
+}
+.link .title {
+  position: relative;
+  top: -0.3em;
+  margin: 0 0 0.4em;
+}
+.link .image {
+  float: left;
+  border: none;
+  margin-right: 8px;
 }
