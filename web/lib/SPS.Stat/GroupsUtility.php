@@ -151,7 +151,7 @@
             $user_shared_groups = array();
             if( !is_array( $groups ))
                 $groups = array( $groups );
-            $res = array();
+            $res = array( 'users_lists' => array());
             $i = 1;
 
             foreach( $groups as $group ) {

@@ -19,7 +19,6 @@ class DeletePost
                 "articleQueues"."isDeleted" = FALSE
                 AND @now >= "articleQueues"."deleteAt"
                 AND now() - interval '1 day' <= "articleQueues"."deleteAt"
-                AND @now  - interval '1 day' <= "articleQueues"."deleteAt"
                 AND "articleQueues"."deleteAt" IS NOT NULL
                 AND "articleQueues"."statusId" = @status
                 AND "articleQueues"."sentAt" IS NOT NULL
