@@ -42,7 +42,10 @@ class WallChecker
                     continue;
                 }
                 $ref_subscribers_count  = $this->get_ref_user_subs( $reference_id );
-
+                $link = false;
+                if( preg_match('/p\/(.+?)\/?$/', $post->link, $matches )) {
+                    $link = $matches[1];
+                }
                 $a = new InstObservedPost();
                 $a->id              = $post_id[0];
                 $a->reference_id    = $reference_id;
@@ -51,8 +54,9 @@ class WallChecker
                 $a->posted_at       = DateTimeWrapper::Now();
                 $a->updated_at      = DateTimeWrapper::Now();
                 $a->ref_start_subs  = $ref_subscribers_count;
-                $a->status = StatusUtility::Enabled;
+                $a->status          = StatusUtility::Enabled;
                 $a->author_id       = $post->user->id;
+                $a->link            = $link;
 
                 InstObservedPostFactory::Add($a);
                 sleep( self::PAUSE );

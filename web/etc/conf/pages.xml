@@ -752,6 +752,7 @@
                 </page>
 
             </pageGroup>
+
             <pageGroup name="vtControls" boot="">
                 <page uri="controls://generate-grid-sql/">
                     <actions>SPS.Articles.GenerateGridSQL</actions>
@@ -850,7 +851,6 @@
                 </page>
             </pageGroup>
 
-
             <pageGroup name="editors" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                 <page uri="editors_login://" >
                     <template>tmpl://editors_login/login.tmpl.php</template>
@@ -882,6 +882,12 @@
             <pageGroup name="reports" boot="">
                 <page uri="reports://topface-user-posts/">
                     <actions>SPS.Reports.TopfaceUserPosts</actions>
+                </page>
+            </pageGroup>
+
+            <pageGroup name="Instagram" boot="">
+                <page uri="controls://inst-post-info/">
+                    <actions>SPS.Instagram.getInstPostInfo</actions>
                 </page>
             </pageGroup>
 

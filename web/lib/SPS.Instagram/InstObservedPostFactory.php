@@ -65,6 +65,10 @@
                 ,'author_id' => array(
                       'name'          => 'author_id'
                     , 'type'        => TYPE_INTEGER
+                )
+                ,'link' => array(
+                      'name'        => 'link'
+                    , 'type'        => TYPE_STRING
                 ))
             , 'lists'     => array()
             , 'search'    => array(

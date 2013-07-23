@@ -41,5 +41,8 @@
 
         /** @var int */
         public $author_id;
+
+        /** @var string */
+        public $link;
     }
 ?>
