@@ -153,7 +153,7 @@ td {
   font-weight: bold;
 }
 #main {
-  width: 1070px;
+  width: 980px;
   margin: 10px auto;
   border: 1px solid #C4CDE0;
   border-radius: 3px;
@@ -219,7 +219,7 @@ td {
   float: right;
 }
 #main .left-column > .content {
-  width: 900px;
+  width: 810px;
 }
 #main .left-column > .content .list-head {
   background-color: #DEE5EB;
@@ -773,7 +773,7 @@ td {
   display: inline-block;
   zoom: 1;
   *display: inline;
-  width: 590px;
+  width: 450px;
   padding-bottom: 0 !important;
 }
 #vk-button {
