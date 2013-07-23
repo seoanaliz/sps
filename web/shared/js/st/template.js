@@ -15,7 +15,7 @@ var TABLE =
 
 var TABLE_HEADER =
 '<div class="row">' +
-    '<div class="column column4-5 publics">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> publics">' +
         '<div class="cell">' +
             '<div class="input-wrap">' +
                '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
@@ -47,11 +47,11 @@ var TABLE_HEADER =
             'в поиске<span class="icon arrow">' +
         '</div>' +
     '</div>' +
-    '<?if( cur.dataUser.isEditor ) { ?>'+
+    '<? if (cur.dataUser.isEditor) { ?>' +
         '<div class="column column1" title="Действия">' +
             '<div class="cell"></div>' +
         '</div>' +
-    '<? } ?> ' +
+    '<? } ?>' +
 '</div>';
 
 var TABLE_BODY =
@@ -59,7 +59,7 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public row" data-id="<?=intId?>">' +
-    '<div class="column column3 public-info" data-id="<?=publicId?>">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
                 '<img src="<?=publicImg?>" alt="" />' +
@@ -99,7 +99,7 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<? if( cur.dataUser.isEditor ) { ?>'+
+    '<? if (cur.dataUser.isEditor) { ?>'+
         '<div class="column column1 public-actions">' +
             '<div class="cell">' +
                 '<span class="action add-to-list">' +
