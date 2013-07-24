@@ -16,7 +16,7 @@ class EntryGetter {
     }
 
     protected function getEntries()
-    {$this->conn =   ConnectionFactory::Get('tst');
+    {
         $user_id    =   AuthVkontakte::IsAuth();
         $group_id   =   Request::getString( 'groupId' );
         $offset     =   Request::getInteger( 'offset' );
@@ -27,25 +27,32 @@ class EntryGetter {
         $search_name=   trim(pg_escape_string( Request::getString( 'search' )));
         $sort_by    =   pg_escape_string( Request::getString( 'sortBy' ));
         $sort_reverse    =   Request::getInteger( 'sortReverse' );
-
         $mode = null;
         if( !isset( GroupsUtility::$special_group_ids[$group_id] ) && !is_numeric($group_id)) {
             $group_id = null;
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All ) {
             $group_id = null;
         }
+
         $period_suffixes = array(
             '1'     =>  '',
             '7'     =>  '_week',
             '30'    =>  '_month'
         );
+
+        if( !$sort_by ) {
+            $sort_by = 'diff_abs';
+        }
+        if ( !$period || !in_array( $period, array_keys( $period_suffixes ))) {
+            $period = '1';
+        }
         $without_suffixes  = array( 'quantity' => true, 'in_search' => true );
 
         $search     =   array(
              '_quantityLE'  =>  $quant_max ? $quant_max : 100000000
             ,'_quantityGE'  =>  $quant_min ? $quant_min : 30000
             ,'page'         =>  round( $offset/( $limit ? $limit : 25))
-            ,'pageSize'     =>  $limit
+            ,'pageSize'     =>  $limit ? $limit : 25
             ,'sh_in_main'   =>  true
             ,'is_page'      =>  true
         );
@@ -76,7 +83,6 @@ class EntryGetter {
             }
         }
 
-        $sort_by = $sort_by ? $sort_by : 'quantity';
         if( !isset( $without_suffixes[$sort_by]))
             $sort_by .= $period_suffixes[$period];
         $sort_direction   = $sort_reverse ? ' ASC ': ' DESC ';
@@ -118,7 +124,6 @@ class EntryGetter {
 
         end:
         $group = isset($group_id) ? GroupFactory::GetById($group_id) : null;
-
         return array($result, $group);
     }
 
