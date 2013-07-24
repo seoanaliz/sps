@@ -233,6 +233,31 @@
         <addTitle><![CDATA[Добавление админа]]></addTitle>
         <editTitle><![CDATA[Редактирование админа]]></editTitle>
       </editor>
+      <category>
+        <list><![CDATA[Список категорий]]></list>
+        <addTitle><![CDATA[Добавление категории]]></addTitle>
+        <editTitle><![CDATA[Редактирование категории]]></editTitle>
+      </category>
+      <androidSetting>
+        <list><![CDATA[Настройки для андроида]]></list>
+        <addTitle><![CDATA[Добавление настроек паблика(андроид)]]></addTitle>
+        <editTitle><![CDATA[Редактирование настроек паблика(андроид)]]></editTitle>
+      </androidSetting>
+      <iOSsetting>
+        <list><![CDATA[Настройки для iOS]]></list>
+        <addTitle><![CDATA[Добавление настроек паблика(iOS)]]></addTitle>
+        <editTitle><![CDATA[Редактирование настроек паблика(iOS)]]></editTitle>
+      </iOSsetting>
+      <banner>
+        <list><![CDATA[Список баннеров]]></list>
+        <addTitle><![CDATA[Добавление баннера]]></addTitle>
+        <editTitle><![CDATA[Редактирование баннера]]></editTitle>
+      </banner>
+      <promotionPost>
+        <list><![CDATA[Список постов]]></list>
+        <addTitle><![CDATA[Добавление поста]]></addTitle>
+        <editTitle><![CDATA[Редактирование поста]]></editTitle>
+      </promotionPost>
     </screens>
     <vfs>
       <queue>
@@ -478,9 +503,11 @@
         <active><![CDATA[Активность]]></active>
         <name><![CDATA[Название]]></name>
         <mask><![CDATA[Маска]]></mask>
-        <index><![CDATA[ID категории]]></index>
-        <indexPP><![CDATA[ID промопоста]]></indexPP>
+        <index><![CDATA[Порядковый номер]]></index>
+        <indexPP><![CDATA[Порядковый номер]]></indexPP>
         <showsCount><![CDATA[Cчетчик просмотров]]></showsCount>
+        <imageHeight><![CDATA[Высота изображения]]></imageHeight>
+        <imageWidth><![CDATA[Ширина изображения]]></imageWidth>
     </mobile>
   </vt>
   <objects>

@@ -15,6 +15,8 @@
             ,LocaleLoader::Translate( "vt.mobile.actionUrl" )
             ,LocaleLoader::Translate( "vt.mobile.active" )
             ,LocaleLoader::Translate( "vt.mobile.showsCount" )
+            ,LocaleLoader::Translate( "vt.mobile.imageHeight" )
+            ,LocaleLoader::Translate( "vt.mobile.imageWidth" )
         )
         , "colspans"	=> array()
         , "sorts"		=> array()
@@ -52,10 +54,6 @@
 				<input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
 				<input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.mobile.indexPP}</label>
-                    <?= FormHelper::FormInput( "search[index]", $search['index'], 'index', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
                     <label>{lang:vt.mobile.publicId}</label>
                     <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
                 </div>
@@ -68,10 +66,6 @@
                     <?= FormHelper::FormInput( "search[headerText]", $search['headerText'], 'headerText', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.mobile.imgUrl}</label>
-                    <?= FormHelper::FormInput( "search[imgUrl]", $search['imgUrl'], 'imgUrl', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
                     <label>{lang:vt.mobile.shareText}</label>
                     <?= FormHelper::FormInput( "search[text]", $search['text'], 'text', null, array( 'size' => 80 ) ); ?>
                 </div>
@@ -79,11 +73,6 @@
                     <label>{lang:vt.mobile.actionText}</label>
                     <?= FormHelper::FormInput( "search[actionText]", $search['actionText'], 'actionText', null, array( 'size' => 80 ) ); ?>
                 </div>
-                <div class="row">
-                    <label>{lang:vt.mobile.actionUrl}</label>
-                    <?= FormHelper::FormInput( "search[actionUrl]", $search['actionUrl'], 'actionUrl', null, array( 'size' => 80 ) ); ?>
-                </div>
-
                 <div class="row">
                     <label>{lang:vt.mobile.active}</label>
                     <?= FormHelper::FormInput( "search[active]", $search['active'], 'active', null, array( 'size' => 80 ) ); ?>
@@ -103,7 +92,7 @@
     $langDelete = LocaleLoader::Translate( "vt.common.delete" );
 
     foreach ( $list as $object )  {
-        $id         = $object->index;
+        $id         = $object->id;
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">
@@ -117,6 +106,8 @@
                 <td>{$object.actionUrl}</td>
                 <td>{$object.active}</td>
                 <td>{$object.showsCount}</td>
+                <td>{$object.image_height}</td>
+                <td>{$object.image_width}</td>
 				<td width="10%">
 					<ul class="actions">
 						<li class="edit"><a href="{$editpath}" title="{$langEdit}">{$langEdit}</a></li><li class="delete"><a href="#" class="delete-object" title="{$langDelete}">{$langDelete}</a></li>

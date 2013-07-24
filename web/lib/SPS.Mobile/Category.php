@@ -23,5 +23,8 @@
 
         /** @var int */
         public $index;
+
+        /** @var int */
+        public $id;
     }
 ?>

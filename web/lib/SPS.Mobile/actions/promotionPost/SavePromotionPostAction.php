@@ -19,6 +19,7 @@
             );
 
             parent::$factory = new PromotionPostFactory();
+
         }
 
                
@@ -35,7 +36,7 @@
             $object = parent::$factory->GetFromRequest();
             
             if ( $originalObject != null ) {
-                $object->index = $originalObject->index;
+                $object->id = $originalObject->id;
             }
             
             return $object;
