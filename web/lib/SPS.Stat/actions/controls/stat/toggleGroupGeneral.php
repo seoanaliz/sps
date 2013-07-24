@@ -46,6 +46,7 @@
                         ));
                     }
                     GroupFactory::Update($group);
+                    EntryGetter::updateSlugs(false);
                     die(ObjectHelper::ToJSON(array('response' => true)));
                 }
             };
