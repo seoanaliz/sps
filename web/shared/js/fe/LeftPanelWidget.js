@@ -47,7 +47,7 @@ var LeftPanelWidget = Event.extend({
         });
 
         $leftPanel.delegate('.post > .comments .new-comment textarea', 'keyup', function(e) {
-            if (e.ctrlKey && e.keyCode == KEY.ENTER) {
+            if (e.ctrlKey && e.keyCode === KEY.ENTER) {
                 var $newComment = $(this).closest('.new-comment');
                 var $sendBtn = $newComment.find('.send');
                 $sendBtn.click();
@@ -828,19 +828,22 @@ var LeftPanelWidget = Event.extend({
 
         // Редактирование поста в левом меню
         $('#left-panel').delegate('.post .edit, .post.editable .content .shortcut', 'click', t.editPostInline);
-        $('#right-panel').delegate('.post .text', 'click', t.editPostInline);
+        $('#right-panel').delegate('.slot:not(.locked) .text, .edit-trigger', 'click', t.editPostInline);
     },
 
     editPostInline: function(){
-        var $post = $(this).closest('.post'),
-        $el = $post.find('.content'),
+        var $post = $(this).closest('.post');
+        if (!$post.length) {
+            $post = $(this).closest('.slot').find('.post');
+        }
+        var $el = $post.find('.content'),
         $buttonPanel = $post.find('.bottom.d-hide'),
         postId = $post.data('id'),
         queueId = $post.data('queue-id'),
         $slot = $post.closest('.slot'),
         timestamp = $slot.data('id');
 
-        if ($post.editing) return;
+        if ($post.data('editing')) return;
 
         Events.fire('load_post_edit', postId, queueId, function(state, data){
             if (state && data) {
@@ -991,7 +994,7 @@ var LeftPanelWidget = Event.extend({
                     scroll: $(window).scrollTop()
                 };
                 $post.find('> .content').draggable('disable');
-                $post.editing = true;
+                $post.data('editing', true);
                 $buttonPanel.hide();
                 $el.html('');
 
@@ -1038,35 +1041,33 @@ var LeftPanelWidget = Event.extend({
                 };
                 var onCancel = function() {
                     $post.find('> .content').draggable('enable');
-                    $post.editing = false;
+                    $post.data('editing', false);
                     $buttonPanel.show();
                     $el.html(cache.html);
                     $edit.remove();
                 };
 
-                if (true || data.text) {
-                    var text = data.text;
-                    $text
-                    .val(text.split('<br />').join(''))
-                    .appendTo($content)
-                    .bind('paste', function(e) {
-                        setTimeout(function() {
-                            parseUrl($text.val(), function(link, domain) {
-                                if ($text.link && $links.html() || $text.link == link) return;
-                                $text.link = link;
-                                addLink(link, domain, $links);
-                            });
-                        }, 0);
-                    })
-                    .bind('keyup', function(e) {
-                        if (e.ctrlKey && e.keyCode == KEY.ENTER) {
-                            onSave();
-                        }
-                    })
-                    .autoResize()
-                    .keyup().focus();
-                    setCaretToPos($text.get(0), text.length);
-                }
+                var text = data.text;
+                $text
+                .val(text.split('<br />').join(''))
+                .appendTo($content)
+                .bind('paste', function(e) {
+                    setTimeout(function() {
+                        parseUrl($text.val(), function(link, domain) {
+                            if ($text.link && $links.html() || $text.link == link) return;
+                            $text.link = link;
+                            addLink(link, domain, $links);
+                        });
+                    }, 0);
+                })
+                .bind('keyup', function(e) {
+                    if (e.ctrlKey && e.keyCode === KEY.ENTER) {
+                        onSave();
+                    }
+                })
+                .autoResize()
+                .keyup().focus();
+                setCaretToPos($text.get(0), text.length);
 
                 if (data.link) {
                     parseUrl(data.link, function(link, domain) {
@@ -1216,14 +1217,14 @@ var LeftPanelWidget = Event.extend({
     // всяческие кеши и глобальное состояние для "Предложенных"
     initProposed: function () {
         var t = this;
-        t.itemsPerRequest = 80; // сколько брать с удалённого сервера (ВКонтакте) за раз
+        t.itemsPerRequest = 80; // сколько "предложенных" брать с удалённого сервера (ВКонтакте) за раз
         t.cachedProposed = []; // взятые с удалённого сервера, но пока не отрисованные
         t.itemsPerShow = 20; // сколько отрисовать за раз
         t.hasMoreRemote = true; // остались ли ещё на удалённом сервере
         t.loadingMore = null; // когда нужно, хранит Deferred уже запущенного запроса на удалённый сервер, используется в префетчинге
         t.currentPageOffset = 0; // какую по счёту порцию взять с удалённого сервера, начиная с 0
         t.queuedProposedIds = null; // уже помеченные у нас для отправки посты. Cкрываются при повторном получении
-        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообщества) и т.п.)
+        t.cachedAuthorsInfo = {}; // данные об авторах, берутся отдельным запросом (использовать execute не получается из-за ошибок с парсом отрицательных айдишников (сообществ) и т.п.)
         t.totalCount = 0; // общее число предложенных на удалённом сервере
     },
 
@@ -1296,8 +1297,14 @@ var LeftPanelWidget = Event.extend({
         if (t.cachedProposed.length || t.hasMoreRemote) {
             // ничего не делаем, можно подгружать дальше
         } else {
-            $(window).data('disable-load-more', true);
+            t.disableProposed();
         }
+    },
+
+    disableProposed: function () {
+        var t = this;
+        t.initProposed(); // почистим кеши
+        $(window).data('disable-load-more', true);
     },
 
     loadProposed: function () {
@@ -1372,6 +1379,13 @@ var LeftPanelWidget = Event.extend({
         };
 
         if (t.queuedProposedIds === null) {
+            ExternalSuggests.error(function (Error) {
+                if (Error.message === 'isAdmin') {
+                    t.disableProposed();
+                    t.$wall.html('<div class="notice">Вы не являетесь администратором или владельцем сообщества, и поэтому не можете работать с предложенными новостями.</div>');
+                }
+            });
+
             t.getQueuedProposedIds().success(function () {
                 ExternalSuggests.success(function (result) {
                     t.updateTotalCount();
@@ -1423,10 +1437,19 @@ var LeftPanelWidget = Event.extend({
             filter: 'suggests',
             owner_id: -Elements.currentExternalId(),
             count: t.itemsPerRequest,
-            offset: itemsOffset
+            offset: itemsOffset,
+            extended: 1
         }, function (resp) {
-            if (resp && !resp.error) {
-                var result = resp.response;
+            if (resp && !resp.error && resp.response) {
+                var groupsInfo = resp.response.groups && resp.response.groups[0];
+                if (groupsInfo && ('is_admin' in groupsInfo)) {
+                    if (!groupsInfo.is_admin) {
+                        Def.fireError('isAdmin');
+                        return; // -------- RETURN
+                    }
+                }
+
+                var result = resp.response.wall;
                 if (result) {
                     t.totalCount = result.shift(); //result изменился!
                     t.hasMoreRemote = (t.totalCount > itemsOffset + result.length);

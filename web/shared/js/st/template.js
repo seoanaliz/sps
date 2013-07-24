@@ -15,29 +15,29 @@ var TABLE =
 
 var TABLE_HEADER =
 '<div class="row">' +
-    '<div class="column column3 publics">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> publics">' +
         '<div class="cell">' +
             '<div class="input-wrap">' +
                '<input class="filter" id="filter" type="text" placeholder="Поиск по названию" />' +
             '</div>' +
         '</div>' +
     '</div>' +
-    '<div class="column column2 followers">' +
+    '<div class="column column1-5 followers">' +
         '<div class="cell">' +
             'подписчики<span class="icon arrow"></span>' +
         '</div>' +
     '</div>' +
-    '<div class="column column1 audience">' +
+    '<div class="column column1-5 audience">' +
         '<div class="cell">' +
             'охват<span class="icon arrow">' +
         '</div>' +
     '</div>' +
-    '<div class="column column2 visitors">' +
+    '<div class="column column1-5 visitors">' +
         '<div class="cell">' +
             'посетители<span class="icon arrow">' +
         '</div>' +
     '</div>' +
-    '<div class="column column2 growth">' +
+    '<div class="column column1-5 growth">' +
         '<div class="cell">' +
             'прирост<span class="icon arrow"></span>' +
         '</div>' +
@@ -47,9 +47,11 @@ var TABLE_HEADER =
             'в поиске<span class="icon arrow">' +
         '</div>' +
     '</div>' +
+    '<? if (cur.dataUser.isEditor) { ?>' +
         '<div class="column column1" title="Действия">' +
             '<div class="cell"></div>' +
         '</div>' +
+    '<? } ?>' +
 '</div>';
 
 var TABLE_BODY =
@@ -57,7 +59,7 @@ var TABLE_BODY =
 
 var TABLE_ROW =
 '<div class="public row" data-id="<?=intId?>">' +
-    '<div class="column column3 public-info" data-id="<?=publicId?>">' +
+    '<div class="column <?= cur.dataUser.isEditor ? "column4" : "column5" ?> public-info" data-id="<?=publicId?>">' +
         '<div class="cell">' +
             '<div class="photo">' +
                 '<img src="<?=publicImg?>" alt="" />' +
@@ -65,26 +67,26 @@ var TABLE_ROW =
             '<a target="_blank" href="http://vk.com/public<?=publicId?>"><?=publicName?></a>' +
         '</div>' +
     '</div>' +
-    '<div class="column column2">' +
+    '<div class="column column1-5">' +
         '<div class="cell">' +
             '<?=publicFollowers ? numberWithSeparator(publicFollowers) : "-"?>' +
         '</div>' +
     '</div>' +
-    '<div class="column column1">' +
+    '<div class="column column1-5">' +
         '<div class="cell">' +
             '<a class="stat-link-icon" href="http://vk.com/stats?act=reach&gid=<?=publicId?>" target="_blank">' +
                 '<?=publicAudience ? numberWithSeparator(publicAudience) : "<div class=\'icon locked\'></div>"?>' +
             '</a>' +
         '</div>' +
     '</div>' +
-    '<div class="column column2">' +
+    '<div class="column column1-5">' +
         '<div class="cell">' +
             '<a class="stat-link-icon" href="http://vk.com/stats?gid=<?=publicId?>" target="_blank">' +
                 '<?=publicVisitors ? numberWithSeparator(publicVisitors) : "<div class=\'icon locked\'></div>"?>' +
             '</a>' +
         '</div>' +
     '</div>' +
-    '<div class="column column2">' +
+    '<div class="column column1-5">' +
         '<div class="cell">' +
             '<span class="<?=publicGrowthNum > 0 ? "plus" : "minus"?>">' +
                 '<?=numberWithSeparator(publicGrowthNum)?> ' +
@@ -97,8 +99,7 @@ var TABLE_ROW =
             '<span class="<?=publicInSearch ? "true" : "false"?>">●</span>' +
         '</div>' +
     '</div>' +
-    '<? if( cur.dataUser.isEditor ) { ?>'+
-
+    '<? if (cur.dataUser.isEditor) { ?>'+
         '<div class="column column1 public-actions">' +
             '<div class="cell">' +
                 '<span class="action add-to-list">' +
@@ -181,7 +182,7 @@ var FILTER_LIST =
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" title="<?=name?>" data-id="<?=id?>">' +
+'<div class="item" title="<?=name?>" data-id="<?=id?>" data-slug="<?=slug?>">' +
     '<span class="text"><?=name?></span>' +
     '<?if (cur.dataUser.isAdmin) { ?>'+
         '<span class="icon edit"></span>' +

@@ -112,7 +112,7 @@ var List = (function() {
         _initEvents();
     }
     function _initEvents() {
-        $container.delegate('.actions .share', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .share', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var listTitle = $('.filter > .list > .item.selected').text();
             var isFirstShow = true;
@@ -255,7 +255,7 @@ var List = (function() {
                 }
             }
         });
-        $container.delegate('.actions .delete', 'click', function() {
+        cur.dataUser.isAdmin && $container.delegate('.actions .delete', 'click', function() {
             var listId = $('.filter > .list > .item.selected').data('id');
             var box = new Box({
                 id: 'deleteList' + listId,
@@ -295,7 +295,7 @@ var List = (function() {
         if (id === 'all' || id === 'all_not_listed') {
             $actions.fadeOut(140);
         } else {
-            $actions.fadeIn(300);
+            cur.dataUser.isAdmin && $actions.fadeIn(300);
         }
         var $item = $container.find('.tab[data-id=' + id + ']');
         $container.find('.tab.selected').removeClass('selected');
@@ -321,8 +321,6 @@ var Filter = (function() {
     var $periodWrapper;
     var $period;
     var $list;
-    var $intervalWrapper;
-    var $interval;
 
     function init(callback) {
         $container = $('td > .filter');
@@ -331,8 +329,6 @@ var Filter = (function() {
         $audience = $('> .audience', $audienceWrapper);
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
-        $intervalWrapper = $('> .interval-wrapper', $container);
-        $interval = $('> .interval', $intervalWrapper);
 
         _initEvents();
         refreshList(callback);
@@ -411,41 +407,6 @@ var Filter = (function() {
                 }
             }
         })();
-        (function() {
-            var $timeFrom = $interval.find('.timeFrom');
-            var $timeTo = $interval.find('.timeTo');
-            $($timeFrom).add($timeTo).datepicker({
-                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                monthNames: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                firstDay: 1,
-                showAnim: '',
-                dateFormat: 'd MM yy'
-            }).change(function(e) {
-                var $timeFrom = $interval.find('.timeFrom');
-                var $timeTo = $interval.find('.timeTo');
-                var dateFrom = $timeFrom.datepicker('getDate');
-                var dateTo = $timeTo.datepicker('getDate');
-                $timeTo.datepicker('option', 'minDate', dateFrom);
-                $timeFrom.datepicker('option', 'maxDate', dateTo);
-                Table.setInterval([
-                    Math.round(dateFrom ? (dateFrom.getTime() / 1000) : null),
-                    Math.round(dateTo ? (dateTo.getTime() / 1000) : null)
-                ]);
-            });
-            $timeTo.datepicker('setDate', new Date((new Date).getTime() - TIME.DAY));
-            $timeFrom.datepicker('setDate', new Date($timeTo.datepicker('getDate').getTime() - TIME.DAY));
-            var dateFrom = $timeFrom.datepicker('getDate');
-            var dateTo = $timeTo.datepicker('getDate');
-            $timeTo.datepicker('option', 'minDate', dateFrom);
-            $timeFrom.datepicker('option', 'maxDate', dateTo);
-            Table.setCurrentInterval([
-                intval($timeFrom.datepicker('getDate').getTime() / 1000),
-                intval($timeTo.datepicker('getDate') / 1000)
-            ]);
-        })();
         $period.delegate('input', 'change', function() {
             var $input = $(this);
             var period;
@@ -486,18 +447,20 @@ var Filter = (function() {
                 $item.append($saver);
                 $saver.animate({'margin-right': 0});
             }, 150);
-            $editField.click(function (e) {
-                e.stopPropagation();
-            });
             $saver.click(function (e) {
                 e.stopPropagation();
                 saveEditor();
             });
-            $editField.bind('blur keyup', function (e) {
-                if (!e.keyCode || e.keyCode === KEY.ESC) {
-                    destroyEditor();
-                }
-            });
+            $editField
+                .on('click', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', function (e) {
+                    if (e.keyCode === KEY.ESC) {
+                        destroyEditor();
+                    }
+                })
+                .on('blur', destroyEditor);
 
             function saveEditor() {
                 Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
@@ -518,6 +481,9 @@ var Filter = (function() {
         });
         // сортировка списков
         if (cur.dataUser.isAdmin) {
+            var preventEvent = function () {
+                return false;
+            };
             $list.filter('.private, .global').sortable({
                 axis: 'y',
                 tolerance: 'pointer',
@@ -529,6 +495,14 @@ var Filter = (function() {
                             Filter.refreshList();
                         }
                     });
+                },
+                start: function (_, ui) { // нужно в FireFox (версия 22) для превента выбора списка при окончании драг-н-дропа
+                    ui.item.on('click', preventEvent);
+                },
+                stop: function (_, ui) {
+                    setInterval(function () { // отменяет хак для FF
+                        ui.item.off('click', preventEvent);
+                    }, 10);
                 }
             });
         }
@@ -556,10 +530,12 @@ var Filter = (function() {
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) callback();
-        else {
-            List.select($item.data('id'), function() {
-                Table.changeList($item.data('id'));
+        if ($.isFunction(callback)) {
+            callback();
+        } else {
+            var id = $item.data('id');
+            List.select(id, function() {
+                Table.changeList(id, $item.data('slug'));
             });
         }
     }
@@ -575,25 +551,12 @@ var Filter = (function() {
         $slider.slider('value', $slider.slider('value'));
     }
 
-    function showInterval() {
-        $audienceWrapper.slideUp(400);
-        $periodWrapper.slideUp(400);
-        $intervalWrapper.slideDown(200);
-    }
-    function hideInterval() {
-        $audienceWrapper.slideDown(200);
-        $periodWrapper.slideDown(200);
-        $intervalWrapper.slideUp(400);
-    }
-
     return {
         init: init,
         refreshList: refreshList,
         selectList: selectList,
         setSliderMin: setSliderMin,
-        setSliderMax: setSliderMax,
-        showInterval: showInterval,
-        hideInterval: hideInterval
+        setSliderMax: setSliderMax
     };
 })();
 
@@ -615,6 +578,97 @@ var Table = (function() {
         _initEvents();
         changeList();
         if ($.isFunction(callback)) callback();
+    }
+    function prepareServerData(dirtyData) {
+        var clearList = [];
+        var clearPeriod = [];
+        var clearListType = 0;
+
+        if (dirtyData.min_max) {
+            clearPeriod = [
+                dirtyData.min_max.min,
+                dirtyData.min_max.max
+            ];
+        }
+        if (dirtyData.group_type == 2) {
+            clearListType = 1;
+        }
+        if (!clearListType) {
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    var users = [];
+                    $.each(publicItem.admins, function(i, data) {
+                        users.push({
+                            userId: data.vk_id,
+                            userName: data.name,
+                            userPhoto: data.ava === 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                            userDescription: data.role || '&nbsp;'
+                        });
+                    });
+                    clearList.push({
+                        intId: publicItem.id,
+                        publicId: publicItem.vk_id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        publicIsActive: !!publicItem.active,
+                        publicInSearch: !!publicItem.in_search,
+                        publicVisitors: publicItem.visitors,
+                        publicAudience: publicItem.viewers,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                        users: users
+                    });
+                });
+            }
+        } else {
+            /*
+            id - id
+            name - name
+            ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+            auth_likes_eff: 0 - Авторское/спарсенное: лайки
+            auth_posts: 0 - авторских постов
+            auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+            avg_vie_grouth: null - средний суточный прирост просмотров
+            avg_vis_grouth: null - средний суточный прирост уников
+            overall_posts: 68 - общее количество постов за период
+            posts_days_rel: 0 - в среднем постов за сутки
+            sb_posts_count: 56 - постов из источников
+            sb_posts_rate: 0 - средний рейтинг постов из источников
+            views: null - просмотры
+            visitors: null - посетители
+            */
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicPosts: publicItem.overall_posts,
+                        publicViews: publicItem.views,
+                        publicVisitors: publicItem.visitors,
+                        publicPostsPerDay: publicItem.posts_days_rel,
+                        publicSbPosts: publicItem.sb_posts_count,
+                        publicSbLikes: publicItem.sb_posts_rate,
+                        publicAuthorsPosts: publicItem.auth_posts,
+                        publicAuthorsLikes: publicItem.auth_likes_eff,
+                        publicAuthorsReposts: publicItem.auth_reposts_eff,
+                        publicGrowthViews: publicItem.avg_vie_grouth,
+                        publicGrowthVisitors: intval(publicItem.abs_vis_grow),
+                        publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
+                    });
+                });
+            }
+        }
+
+        var data = {
+            clearList: clearList,
+            clearPeriod: clearPeriod,
+            clearListType: clearListType
+        };
+
+        return data;
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -816,7 +870,7 @@ var Table = (function() {
             }
         );
     }
-    function changeList(listId) {
+    function changeList(listId, slug) {
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
@@ -830,44 +884,81 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1],
             timeFrom: currentInterval[0],
-            timeTo: currentInterval[1]
+            timeTo: currentInterval[1],
+            slug: slug
         };
 
-        Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentListId = listId;
-                currentSearch = defSearch;
-                currentSortBy = defSortBy;
-                currentSortReverse = defSortReverse;
-                dataTable = data;
-                if (!listType) {
-                    $container.html(tmpl(TABLE, {rows: data}));
-                    Filter.hideInterval();
-                } else {
-                    $container.html(tmpl(OUR_TABLE, {rows: data}));
-                    Filter.showInterval();
-                }
-                $container.find('.' + currentSortBy).addClass('active');
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
-                } else {
-                    $container.addClass('no-list-id');
-                }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(maxPeriod[0]);
-                Filter.setSliderMax(maxPeriod[1]);
-                $('#global-loader').fadeOut(200);
+        if (typeof slug === 'undefined' || !slug) {
+            var pushedURI = '/stat/';
+        } else {
+            pushedURI = '/stat/' + slug;
+        }
+
+        if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+            if (typeof history === 'object' && 'replaceState' in history) {
+                history.replaceState({listId: entriesPrecache.groupId, slug: ''}, '');
             }
-        );
+            var data = prepareServerData(entriesPrecache);
+            loadTableCallback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
+            entriesPrecache = false;
+        } else {
+            if (typeof history === 'object' && 'pushState' in history) {
+                Events.fire('load_table', params, loadTableCallback);
+            } else if (pushedURI) { // для старых браузеров — перезагружаем страницу
+                location.href = pushedURI;
+            }
+        }
+
+        function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
+            if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
+                listId = explicitGroupId;
+            } else {
+                // смена URI
+                if (pushedURI) {
+                    history.pushState({listId: listId, slug: slug}, '', pushedURI);
+                }
+            }
+
+            pagesLoaded = 1;
+            currentListType = listType;
+            currentListId = listId;
+            currentSearch = defSearch;
+            currentSortBy = defSortBy;
+            currentSortReverse = defSortReverse;
+            dataTable = data;
+            if (!listType) {
+                $container.html(tmpl(TABLE, {rows: data}));
+            } else {
+                $container.html(tmpl(OUR_TABLE, {rows: data}));
+            }
+            $container.find('.' + currentSortBy).addClass('active');
+            if (!currentListId) {
+                $container.removeClass('no-list-id');
+            } else {
+                $container.addClass('no-list-id');
+            }
+            if (dataTable.length < Configs.tableLoadOffset) {
+                $('#load-more-table').hide();
+            } else {
+                $('#load-more-table').show();
+            }
+            Filter.setSliderMin(maxPeriod[0]);
+            Filter.setSliderMax(maxPeriod[1]);
+            $('#global-loader').fadeOut(200);
+        }
     }
 
     function _initEvents() {
+       window.onpopstate = function(E) {
+            if (typeof E.state === 'object') {
+                if (E.state !== null && ('listId' in E.state)) {
+                    Table.changeList(E.state.listId);
+                } else {
+                    Table.changeList(null);
+                }
+            }
+        };
+
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
@@ -998,13 +1089,15 @@ var Table = (function() {
                     var $item = $(this);
                     onChange($item);
                 });
-                $dropdown.delegate('.add-item', 'keyup blur', function(e) {
-                    var text = $.trim($input.val());
-                    if (e.keyCode && e.keyCode !== KEY.ENTER) return false;
-                    if (!text) return false;
-                    if (e.keyCode === KEY.ENTER) return $input.blur();
-                    return onSave(text);
-                });
+                $dropdown
+                    .delegate('.add-item', 'keyup', function(e) {
+                        if (e.keyCode === KEY.ENTER) {
+                            onSave($.trim($input.val()));
+                        }
+                    })
+                    .delegate('.add-item', 'blur', function () {
+                        onSave($.trim($input.val()));
+                    })
                 $dropdown.bind('mousedown', function(e) {
                     e.stopPropagation();
                 });
@@ -1030,7 +1123,7 @@ var Table = (function() {
                             var $tmpDropdown = $(tmpl(DROPDOWN, {items: all_lists}));
                             $dropdown.html($tmpDropdown.html());
                             $input = $dropdown.find('.add-item');
-                            initListSearch();
+                            $dropdown.find('.search').focus();
                             Filter.refreshList();
                         });
                     });
@@ -1055,42 +1148,41 @@ var Table = (function() {
                 }
 
                 showDropdown();
+                $dropdown.find('.search').focus();
             }
         });
 
         function initListSearch() {
             var previousDisplay = $dropdown.find('.item')[0].style.display;
-            var $search = $dropdown.find('.search');
             function clearSearch() {
+                var $search = $dropdown.find('.search');
                 $search.attr('value', '');
                 $search.trigger('change');
                 $search.focus();
             }
-            $dropdown.find('.clear-search').click(function () {
-                clearSearch();
-            });
             var previousValue = '';
-            $search.bind('keyup drop paste change', function (e) {
-                var val = $(this).val();
-                if (e.keyCode && e.keyCode === KEY.ESC) {
-                    return clearSearch(); // ---- RETURN
-                }
-                if (val !== previousValue) {
-                    var regexp = new RegExp(val, 'gim');
-                    $dropdown.find('.item').each(function () {
-                        var text = this.getAttribute('title');
-                        if (regexp.test(text)) {
-                            var div = this.childNodes[0];
-                            div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                            this.style.display = previousDisplay;
-                        } else {
-                            this.style.display = 'none';
-                        }
-                    });
-                    previousValue = val;
-                }
-            });
-            $search.focus();
+            $dropdown
+                .delegate('.search', 'keyup drop paste change', function (e) {
+                    var val = $(this).val();
+                    if (('keyCode' in e) && e.keyCode === KEY.ESC) {
+                        return clearSearch(); // ---- RETURN
+                    }
+                    if (val !== previousValue) {
+                        var regexp = new RegExp(val, 'gim');
+                        $dropdown.find('.item').each(function () {
+                            var text = this.getAttribute('title');
+                            if (regexp.test(text)) {
+                                var div = this.childNodes[0];
+                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                this.style.display = previousDisplay;
+                            } else {
+                                this.style.display = 'none';
+                            }
+                        });
+                        previousValue = val;
+                    }
+                })
+                .delegate('.clear-search', 'click', clearSearch);
         }
 
         function showDropdown() {
@@ -1116,6 +1208,7 @@ var Table = (function() {
         setPeriod: setPeriod,
         setAudience: setAudience,
         setInterval: setInterval,
-        setCurrentInterval: setCurrentInterval
+        setCurrentInterval: setCurrentInterval,
+        prepareServerData: prepareServerData
     };
 })();

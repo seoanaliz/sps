@@ -20,9 +20,9 @@ $collapsed = (strlen($content) > 50) ? 'collapsed' : false;
 <? if (!empty($articleRecord->photos)) { ?>
     <div class="images">
         <? foreach($articleRecord->photos as $photoItem) { ?>
-            <div class="img">
+            <a class="img fancybox-thumb" rel="fancybox-thumb-<?=$articleRecord->articleRecordId?>" href="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
                 <img src="<?= MediaUtility::GetArticlePhoto($photoItem); ?>">
-            </div>
+            </a>
         <? } ?>
     </div>
 <? } ?>

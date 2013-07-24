@@ -8,7 +8,8 @@
      * @property SourceFeed currentObject
      */
     class SaveSourceFeedAction extends BaseSaveAction  {
-        
+
+        public $onlyOursTargetFeeds ;
         /**
          * Constructor
          */
@@ -19,6 +20,7 @@
             );
 
             parent::$factory = new SourceFeedFactory();
+            $this->onlyOursTargetFeeds = Request::getString('onlyOurs');
         }
 
                
@@ -45,7 +47,8 @@
             $targetFeedIds = !empty($targetFeedIds) ? $targetFeedIds : array();
             $SourceFeed->targetFeedIds = implode(',', $targetFeedIds);
 
-            if ($SourceFeed->type == SourceFeedUtility::Source || $SourceFeed->type == SourceFeedUtility::Topface ) {
+            if (   $SourceFeed->type == SourceFeedUtility::Source
+                || $SourceFeed->type == SourceFeedUtility::Topface) {
                 // do nothing
             } elseif ($SourceFeed->type == SourceFeedUtility::Albums)   {
                 preg_match('/(\d+)_(\d+)$/', $SourceFeed->externalId, $matches);
@@ -124,7 +127,13 @@
          * Set Foreign Lists
          */
         protected function setForeignLists() {
-            $targetFeeds = TargetFeedFactory::Get( null, array( BaseFactory::WithoutDisabled => false ) );
+            Response::setBoolean( 'onlyOuers', $this->onlyOursTargetFeeds );
+            $search = array();
+            if( $this->onlyOursTargetFeeds ) {
+                $search['isOur'] = true;
+            }
+
+            $targetFeeds = TargetFeedFactory::Get( $search, array( BaseFactory::WithoutDisabled => false ) );
             Response::setArray( 'targetFeeds', $targetFeeds );
         }
 
