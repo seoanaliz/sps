@@ -22,7 +22,7 @@
             'class'       => 'Category'
             , 'table'     => 'categories'
             , 'view'      => 'getCategories'
-            , 'flags'     => array( 'AddablePK' => 'AddablePK' )
+            , 'flags'     => array( )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'publicId' => array(
@@ -39,6 +39,10 @@
                 )
                 ,'index' => array(
                     'name'          => 'index'
+                    , 'type'        => TYPE_INTEGER
+                )
+                ,'id' => array(
+                    'name'          => 'id'
                     , 'type'        => TYPE_INTEGER
                     , 'key'         => true
                 ))

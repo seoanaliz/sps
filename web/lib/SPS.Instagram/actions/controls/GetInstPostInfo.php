@@ -10,15 +10,19 @@ class GetInstPostInfo
 {
     public function Execute()
     {
+        header('Access-Control-Allow-Origin:*');
         $response   = array( 'success' => false );
         $link       = Request::getString('post_shortlink');
-        if( $link ) {
+        $callback   = Request::getString('callback');
+        $id         = Request::getString('id');
+        if( $link && $callback && $id ) {
 
             $post = InstObservedPostFactory::GetOne( array( 'link' => $link ));
             if( $post ) {
                 $response['success']    = true;
                 $response['data']['likes']      = $post->likes;
                 $response['data']['comments']   = $post->comments;
+                $response['data']['id']         = $id;
 
                 $subs = '-';
                 if( $post->ref_start_subs && $post->ref_end_subs ) {
@@ -28,6 +32,6 @@ class GetInstPostInfo
             }
         }
 
-        die( ObjectHelper::ToJSON($response));
+        die( $callback . '(' . ObjectHelper::ToJSON($response) . ')');
     }
 }

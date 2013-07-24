@@ -72,7 +72,7 @@
     $langDelete = LocaleLoader::Translate( "vt.common.delete" );
 
     foreach ( $list as $object )  {
-        $id         = $object->index;
+        $id         = $object->id;
         $editpath   = $grid['basepath'] . "edit/" . $id;
 ?>
 			<tr data-object-id="{$id}">

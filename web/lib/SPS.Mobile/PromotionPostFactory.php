@@ -22,15 +22,15 @@
             'class'       => 'PromotionPost'
             , 'table'     => 'promotionPost'
             , 'view'      => 'getPromotionPost'
-            , 'flags'     => array( 'AddablePK' => 'AddablePK' )
+            , 'flags'     => array( )
             , 'cacheDeps' => array()
             , 'fields'    => array(
                 'publicId' => array(
-                    'name'          => 'publicId'
+                      'name'          => 'publicId'
                     , 'type'        => TYPE_INTEGER
                 )
                 ,'platform' => array(
-                    'name'          => 'platform'
+                      'name'          => 'platform'
                     , 'type'        => TYPE_STRING
                 )
                 ,'headerText' => array(
@@ -54,9 +54,8 @@
                     , 'type'        => TYPE_STRING
                 )
                 ,'index' => array(
-                    'name'          => 'index'
+                      'name'          => 'index'
                     , 'type'        => TYPE_INTEGER
-                    , 'key'         => true
                 )
                 ,'active' => array(
                     'name'          => 'active'
@@ -65,7 +64,21 @@
                 ,'showsCount' => array(
                     'name'          => 'showsCount'
                     , 'type'        => TYPE_INTEGER
-                ))
+                )
+                ,'image_width'  => array(
+                      'name'  =>  'image_width'
+                     ,'type'  =>  TYPE_INTEGER
+                )
+                ,'image_height'  => array(
+                      'name'  =>  'image_height'
+                     ,'type'  =>  TYPE_INTEGER
+                )
+                ,'id'  => array(
+                      'name'  =>  'id'
+                     ,'type'  =>  TYPE_INTEGER
+                     ,'key'   =>  true
+                )
+            )
             , 'lists'     => array()
             , 'search'    => array()
         );
