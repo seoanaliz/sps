@@ -464,7 +464,7 @@ var Filter = (function() {
 
             if (typeof history === 'object' && ('pushState' in history)) {
                 // ничего не делаем, всё ок
-            } else { // для старых браузеров — перезагружаем страницу
+            } else if (location.pathname !== pushedURI) { // для старых браузеров — перезагружаем страницу, если URI должен поменяться
                 location.href = pushedURI; // REDIRECT, перезагрузка страницы
                 return;
             }
