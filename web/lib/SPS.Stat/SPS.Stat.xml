@@ -10,8 +10,12 @@
     <action name="AdminsWork" />
         <path>AdminsWork</path>
 
-    <action name="GetStatData" />
+    <action name="GetStatData">
         <path>GetStatData</path>
+        <redirects>
+            <redirect name="default" path="/stat/" />
+        </redirects>
+    </action>
 
     <group name="Daemons">
         <action name="WrTopics">

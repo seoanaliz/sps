@@ -36,7 +36,11 @@ class GetStatData extends BaseControl
                 die('done');
             }
             $id = $EntryGetter->getGroupIdBySlug($slug);
+            if (!$id) { // несуществующий URI
+                return 'default'; // редирект
+            }
         }
+
         Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
         Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
     }
