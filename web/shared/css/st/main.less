@@ -629,20 +629,22 @@ table, tr, td {
         }
     }
     .item {
-        &>.icon {
+        .icon {
             opacity: 0;
             position: absolute;
-            right: .4em;
-            top: 50%;
-            margin-top: -6px;
-            width: 12px;
-            height: 12px;
+            top: 0;
+            right: 0;
+            width: 18px;
+            height: 22px;
+            background-color: inherit;
+            background-position: 2px 50%;
+            .border-radius(18px 0 0 18px);
         }
         &:hover {
             background-color: #EDF1F5;
 
-            &>.icon {
-                opacity: .3;
+            .icon {
+                opacity: .6;
             }
         }
         &.selected {
@@ -655,7 +657,7 @@ table, tr, td {
                 font-weight: normal;
             }
 
-            &>.icon {
+            .icon {
                 opacity: 1;
                 background-image: url('../../images/common/select-white.png');
             }
