@@ -42,6 +42,8 @@ $cssFiles = array(
 $jsFiles = array(
     'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
+    'js://common/class.js',
+    'js://common/deferred.js',
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
