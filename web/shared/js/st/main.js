@@ -476,9 +476,22 @@ var Filter = (function() {
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
             var listId = $(this).closest('.item').data('id');
-            Events.fire('toggle_group_general', listId, function() {
-                Filter.refreshList();
-            });
+
+            var box = new Box({
+                title: 'Перемещение списка',
+                html: '',
+                buttons: [
+                    {label: 'Переместить', onclick: moveList},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function moveList() {
+                this.hide();
+                Events.fire('toggle_group_general', listId, function() {
+                    Filter.refreshList();
+                });
+            }
         });
         $list.delegate('.edit', 'click', function(e) {
             e.stopPropagation();
