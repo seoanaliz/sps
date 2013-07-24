@@ -40,11 +40,32 @@ $(document).ready(function() {
 
     Filter.init(function() {
         List.init(function() {
+            initHistory();
             Table.init();
         });
     });
+
     checkVkStatus();
 });
+
+function initHistory() {
+    window.onpopstate = function(e) {
+        if (typeof e.state === 'object' && e.state) {
+            if ('listId' in e.state) {
+                Filter.selectList(e.state.listId);
+            } else {
+                Filter.selectList('all');
+            }
+        }
+    };
+
+    // в переменную entriesPrecache передавались данные с сервера
+    if (entriesPrecache &&
+        typeof history === 'object' && ('replaceState' in history)) {
+        // запишем в history состояние, взятое из прекеша
+        history.replaceState({listId: entriesPrecache.groupId || 'all', slug: ''}, '');
+    }
+}
 
 function checkVkStatus() {
     if (typeof VK !== 'undefined' && VK.Api) {
@@ -108,7 +129,12 @@ var List = (function() {
         $container = $('.header');
         $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
         $actions = $('.actions', $container);
-        select('all', callback);
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
+        select(listId, callback);
         _initEvents();
     }
     function _initEvents() {
@@ -303,7 +329,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.selectList($item.data('id'));
+            Filter.selectList(id);
         }
     }
 
@@ -330,8 +356,14 @@ var Filter = (function() {
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
 
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
+
         _initEvents();
-        refreshList(callback);
+        refreshList(callback, listId);
     }
 
     function _initEvents() {
@@ -426,7 +458,20 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            selectList($(this).data('id'));
+            var listId = this.getAttribute('data-id');
+            var slug = this.getAttribute('data-slug');
+            var pushedURI = '/stat/' + (slug || '');
+
+            if (typeof history === 'object' && ('pushState' in history)) {
+                // ничего не делаем, всё ок
+            } else { // для старых браузеров — перезагружаем страницу
+                location.href = pushedURI; // REDIRECT, перезагрузка страницы
+                return;
+            }
+
+            selectList(listId).success(function () {
+                history.pushState({listId: listId, slug: slug}, '', pushedURI);
+            });
         });
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
@@ -508,9 +553,9 @@ var Filter = (function() {
         }
     }
 
-    function refreshList(callback) {
+    function refreshList(callback, maybeListId) {
         var $selectedItem = $list.find('.item.selected');
-        var id = $selectedItem.data('id');
+        var id = maybeListId || $selectedItem.data('id');
         var $list_global  =  $('> .list.global', $container);
         var $list_private =  $('> .list.private', $container);
         var $list_shared  =  $('> .list.shared', $container);
@@ -526,6 +571,7 @@ var Filter = (function() {
         });
     }
     function selectList(id, callback) {
+        var Def = new Deferred();
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
@@ -535,9 +581,12 @@ var Filter = (function() {
         } else {
             var id = $item.data('id');
             List.select(id, function() {
-                Table.changeList(id, $item.data('slug'));
+                Table.changeList(id, $item.data('slug')).success(function () {
+                    Def.fireSuccess();
+                });
             });
         }
+        return Def;
     }
     function setSliderMin(min) {
         var $slider = $audience.find('> .slider-wrap');
@@ -871,6 +920,8 @@ var Table = (function() {
         );
     }
     function changeList(listId, slug) {
+        var Def = new Deferred();
+
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
@@ -888,37 +939,19 @@ var Table = (function() {
             slug: slug
         };
 
-        if (typeof slug === 'undefined' || !slug) {
-            var pushedURI = '/stat/';
-        } else {
-            pushedURI = '/stat/' + slug;
-        }
+        getTable(params, loadTableCallback);
 
-        if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
-            if (typeof history === 'object' && 'replaceState' in history) {
-                history.replaceState({listId: entriesPrecache.groupId, slug: ''}, '');
-            }
-            var data = prepareServerData(entriesPrecache);
-            loadTableCallback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
-            entriesPrecache = false;
-        } else {
-            if (typeof history === 'object' && 'pushState' in history) {
-                Events.fire('load_table', params, loadTableCallback);
-            } else if (pushedURI) { // для старых браузеров — перезагружаем страницу
-                location.href = pushedURI;
-            }
-        }
-
-        function loadTableCallback(data, maxPeriod, listType, explicitGroupId) {
-            if (typeof explicitGroupId !== 'undefined') { // При инициализации, groupId передан явно
-                listId = explicitGroupId;
+        function getTable(params, callback) {
+            if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+                var data = prepareServerData(entriesPrecache);
+                callback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
+                entriesPrecache = false;
             } else {
-                // смена URI
-                if (pushedURI) {
-                    history.pushState({listId: listId, slug: slug}, '', pushedURI);
-                }
+                Events.fire('load_table', params, callback);
             }
+        }
 
+        function loadTableCallback(data, maxPeriod, listType) {
             pagesLoaded = 1;
             currentListType = listType;
             currentListId = listId;
@@ -945,20 +978,13 @@ var Table = (function() {
             Filter.setSliderMin(maxPeriod[0]);
             Filter.setSliderMax(maxPeriod[1]);
             $('#global-loader').fadeOut(200);
+            Def.fireSuccess();
         }
+
+        return Def;
     }
 
     function _initEvents() {
-       window.onpopstate = function(E) {
-            if (typeof E.state === 'object') {
-                if (E.state !== null && ('listId' in E.state)) {
-                    Table.changeList(E.state.listId);
-                } else {
-                    Table.changeList(null);
-                }
-            }
-        };
-
         $container.delegate('.action.add-to-list', 'click', function(e) {
             var $el = $(this);
             var $public = $el.closest('.public');
