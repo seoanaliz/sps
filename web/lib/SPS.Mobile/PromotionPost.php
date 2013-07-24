@@ -41,5 +41,14 @@
 
         /** @var int */
         public $showsCount;
+
+        /** @var int */
+        public $image_height;
+
+        /** @var int */
+        public $image_width;
+
+        /** @var int */
+        public $id;
     }
 ?>
