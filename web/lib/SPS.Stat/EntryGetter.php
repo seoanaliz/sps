@@ -67,6 +67,7 @@ class EntryGetter {
         } elseif( $group_id == GroupsUtility::Group_Id_Special_All_Not ) {
             $search['inLists'] = false;
         } elseif( $group_id ) {
+
             $group_entries_by_group = GroupEntryFactory::Get(array(
                 'groupId'   =>  $group_id,
                 'sourceType'=>  Group::STAT_GROUP,
@@ -276,9 +277,14 @@ class EntryGetter {
         return $result->GetInteger('group_id');
     }
 
-    public function updateSlugs()
+    public static  function updateSlugs()
     {
-        $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .' ORDER BY group_id DESC';
+        $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .'  WHERE
+            type = ' .GroupsUtility::Group_Global . '
+            AND status != 2
+            AND source = ' . Group::STAT_GROUP .'
+            ORDER BY group_id DESC';
+
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $found = array(
             '' => 1 // для переименования пустого слага в '1' в цикле ниже
@@ -298,8 +304,7 @@ class EntryGetter {
             }
 
             $id = $result->GetInteger('group_id');
-            $updateResult = $this->saveSlugForId($id, $slug);
-            echo "$id - $name - $slug  [$updateResult]<br />";
+            $updateResult = self::saveSlugForId($id, $slug);
         }
     }
 
@@ -350,7 +355,7 @@ class EntryGetter {
         return str_replace('yy', 'iy', strtolower(preg_replace("/[_]{2,}/", '_', $result)));
     }
 
-    public function saveSlugForId($id, $slug) {
+    public static function saveSlugForId($id, $slug) {
         $sql = 'UPDATE '. TABLE_STAT_GROUPS .'
             SET slug = @slug
             WHERE group_id = @group_id';
@@ -358,11 +363,12 @@ class EntryGetter {
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
         $updateResult = $cmd->ExecuteNonQuery();
-        if (!$updateResult) {
-            Logger::Error('Failed to update slugs!');
-        }
+//        if (!$updateResult) {
+//            Logger::Error('Failed to update slugs!');
+//        }
         return $updateResult;
     }
+
 }
 
 ?>
