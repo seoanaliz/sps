@@ -131,10 +131,13 @@ function changeState(listId, slug, doReplace) {
         return;
     }
 
-    var method = doReplace ? 'replaceState' : 'pushState';
-    Filter.selectList(listId).success(function () {
-        history[method]({listId: listId, slug: slug}, '', pushedURI);
-    });
+    if (doReplace) {
+        history.replaceState({listId: listId, slug: slug}, '', pushedURI);
+    } else {
+        Filter.selectList(listId).success(function () {
+            history.pushState({listId: listId, slug: slug}, '', pushedURI);
+        });
+    }
 }
 
 var List = (function() {
