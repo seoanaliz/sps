@@ -305,6 +305,7 @@ class EntryGetter {
 
             $id = $result->GetInteger('group_id');
             $updateResult = self::saveSlugForId($id, $slug);
+//            echo "$id - $name - $slug  [$updateResult]<br />";
         }
     }
 
@@ -363,9 +364,9 @@ class EntryGetter {
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
         $updateResult = $cmd->ExecuteNonQuery();
-//        if (!$updateResult) {
-//            Logger::Error('Failed to update slugs!');
-//        }
+        if (!$updateResult) {
+            Logger::Error('Failed to update slugs!');
+        }
         return $updateResult;
     }
 
