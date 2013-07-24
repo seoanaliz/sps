@@ -479,7 +479,7 @@ var Filter = (function() {
 
             var box = new Box({
                 title: 'Перемещение списка',
-                html: '',
+                html: 'Вы уверены, что хотите перенести список?',
                 buttons: [
                     {label: 'Переместить', onclick: moveList},
                     {label: 'Отмена', isWhite: true}
