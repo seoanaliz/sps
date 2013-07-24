@@ -1025,6 +1025,7 @@ var Table = (function() {
 
         function initListSearch() {
             var previousDisplay = $dropdown.find('.item')[0].style.display;
+            var previousCategoryDisplay = $dropdown.find('.category')[0].style.display;
             function clearSearch() {
                 var $search = $dropdown.find('.search');
                 $search.attr('value', '');
@@ -1056,9 +1057,9 @@ var Table = (function() {
                                 }
                             });
                             if (i === 0) {
-                                $category.hide();
+                                this.style.display = 'none';
                             } else {
-                                $category.show();
+                                this.style.display = previousCategoryDisplay;
                             }
                         });
                         previousValue = val;
