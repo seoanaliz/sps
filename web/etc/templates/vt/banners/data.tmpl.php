@@ -25,10 +25,6 @@
             <label>{lang:vt.mobile.publicId}</label>
             <?= FormHelper::FormInput( $prefix . '[publicId]', $object->publicId, 'publicId', null, array( 'size' => 80 ) ); ?>
         </div>
-        <div data-row="platform" class="row">
-            <label>{lang:vt.mobile.platform}</label>
-            <?= FormHelper::FormInput( $prefix . '[platform]', $object->platform, 'platform', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
-        </div>
         <div data-row="prob" class="row">
             <label>{lang:vt.mobile.prob}</label>
             <?= FormHelper::FormInput( $prefix . '[prob]', $object->prob, 'prob', null, array( 'size' => 80 ) ); ?>
@@ -41,9 +37,13 @@
             <label>{lang:vt.mobile.actionUrl}</label>
             <?= FormHelper::FormInput( $prefix . '[actionUrl]', $object->actionUrl, 'actionUrl', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
         </div>
+        <div data-row="platform" class="row">
+            <label>{lang:vt.mobile.platform}</label>
+            <?= FormHelper::FormSelect( $prefix . '[platform]',array('ios' => 'ios', 'android' => 'android'),null, null, $object->platform, null, null, true ); ?>
+        </div>
         <div data-row="active" class="row">
             <label>{lang:vt.mobile.active}</label>
-            <?= FormHelper::FormInput( $prefix . '[active]', $object->active, 'active', null, array( 'rows' => 5, 'cols' => 80 ) ); ?>
+            <?= FormHelper::FormSelect( $prefix . "[active]", array('on' => 'on', 'off' => 'off'),null, null, $object->active, null, null, true ); ?>
         </div>
 	</div>
 </div>
