@@ -277,7 +277,7 @@ class EntryGetter {
         return $result->GetInteger('group_id');
     }
 
-    public static  function updateSlugs()
+    public static  function updateSlugs( $show_results = true)
     {
         $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .'  WHERE
             type = ' .GroupsUtility::Group_Global . '
@@ -305,7 +305,12 @@ class EntryGetter {
 
             $id = $result->GetInteger('group_id');
             $updateResult = self::saveSlugForId($id, $slug);
-//            echo "$id - $name - $slug  [$updateResult]<br />";
+            if( $show_results ) {
+                echo "$id - $name - $slug  [$updateResult]<br />";
+                if (!$updateResult) {
+                    Logger::Error('Failed to update slugs!');
+                }
+            }
         }
     }
 
@@ -364,9 +369,6 @@ class EntryGetter {
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
         $updateResult = $cmd->ExecuteNonQuery();
-        if (!$updateResult) {
-            Logger::Error('Failed to update slugs!');
-        }
         return $updateResult;
     }
 
