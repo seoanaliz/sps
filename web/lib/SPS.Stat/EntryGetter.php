@@ -275,19 +275,21 @@ class EntryGetter {
     {
         $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .' ORDER BY group_id DESC';
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
-        $found = array();
+        $found = array(
+            '' => 1 // для переименования пустого слага в '1' в цикле ниже
+        );
         $result = $cmd->Execute();
         while ( $result->next()) {
             $name = $result->GetString('name');
-            if (!isset($found[$name])) {
-                $found[$name] = 1;
+            $slug = self::transliterate($name);
+            if (!isset($found[$slug])) {
+                $found[$slug] = 1;
             } else {
-                $found[$name] += 1;
+                $found[$slug] += 1;
             }
 
-            $slug = self::transliterate($name);
-            if ($found[$name] > 1) {
-                $slug .= $found[$name] - 1;
+            if ($found[$slug] > 1) {
+                $slug .= $found[$slug] - 1;
             }
 
             $id = $result->GetInteger('group_id');
@@ -297,17 +299,17 @@ class EntryGetter {
     }
 
     static public function transliterate($rawText) {
-        $text = iconv('windows-1251', 'UTF-8',
-            iconv('UTF-8', 'windows-1251//TRANSLIT', $rawText)
-        );
+        $text = trim(iconv('windows-1251', 'UTF-8',
+            iconv('UTF-8', 'windows-1251//TRANSLIT//IGNORE', $rawText)
+        ));
 
-        $specialSpecial = array('ье' => 'ie', 'ЬЕ' => 'IE', 'Топфейс' => 'Topface'); // символы, которые заменяются группами
+        $specialSpecial = array('ье' => 'ie', 'ЬЕ' => 'IE', 'Топфейс' => 'Topface', ' ' => '_'); // символы, которые заменяются группами
         foreach ($specialSpecial as $from => $to) {
             $text = str_replace($from, $to, $text);
         }
 
         $matches = array();
-        preg_match_all('/./u', $text, $matches);
+        preg_match_all('/[\-\w]/u', $text, $matches);
         $chars = $matches[0];
         $simplePairs = array('а' => 'a', 'л' => 'l', 'у' => 'u', 'б' => 'b', 'м' => 'm', 'т' => 't', 'в' => 'v', 'н' => 'n', 'ы' => 'y', 'г' => 'g', 'о' => 'o', 'ф' => 'f', 'д' => 'd', 'п' => 'p', 'и' => 'i', 'р' => 'r', 'А' => 'A', 'Л' => 'L', 'У' => 'U', 'Б' => 'B', 'М' => 'M', 'Т' => 'T', 'В' => 'V', 'Н' => 'N', 'Ы' => 'Y', 'Г' => 'G', 'О' => 'O', 'Ф' => 'F', 'Д' => 'D', 'П' => 'P', 'И' => 'I', 'Р' => 'R',);
         $complexPairs = array('з' => 'z', 'ц' => 'c', 'к' => 'k', 'ж' => 'zh', 'ч' => 'ch', 'х' => 'h', 'е' => 'e', 'с' => 's', 'ё' => 'yo', 'э' => 'e', 'ш' => 'sh', 'й' => 'y', 'щ' => 'sh', 'ю' => 'yu', 'я' => 'ya', 'З' => 'Z', 'Ц' => 'C', 'К' => 'K', 'Ж' => 'ZH', 'Ч' => 'CH', 'Х' => 'H', 'Е' => 'E', 'С' => 'S', 'Ё' => 'YO', 'Э' => 'E', 'Ш' => 'SH', 'Й' => 'Y', 'Щ' => 'SH', 'Ю' => 'YU', 'Я' => 'YA', 'Ь' => "", 'Ъ' => "", 'ъ' => "", 'ь' => "");
