@@ -60,9 +60,10 @@
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
                         ($apiAnswer->permissions & VkHelper::PERM_WALL)  
                     ) {
-                        $existingToken = AccessTokenFactory::GetOne(
-                            array('vkId' => $vkId)
-                        );
+                        $existingToken = AccessTokenFactory::GetOne( array(
+                            'vkId' => $vkId,
+                            'version' => AuthVkontakte::$Version
+                        ));
                         if (!$existingToken) {
                             self::addAccessToken($vkId, $accessToken);
                         } else {
