@@ -51,11 +51,11 @@
         </div>
         <div data-row="imageHeight" class="row">
             <label>{lang:vt.mobile.imageHeight}</label>
-            <?= FormHelper::FormInput( $prefix . '[image_height]', $object->showsCount, 'imageHeight', null, array( 'size' => 80 ) ); ?>
+            <?= FormHelper::FormInput( $prefix . '[image_height]', $object->image_height, 'imageHeight', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="imageWidth" class="row">
             <label>{lang:vt.mobile.imageWidth}</label>
-            <?= FormHelper::FormInput( $prefix . '[image_width]', $object->showsCount, 'imageWidth', null, array( 'size' => 80 ) ); ?>
+            <?= FormHelper::FormInput( $prefix . '[image_width]', $object->image_width, 'imageWidth', null, array( 'size' => 80 ) ); ?>
         </div>
         <div data-row="platform" class="row">
             <label>{lang:vt.mobile.platform}</label>
