@@ -865,7 +865,7 @@
             </pageGroup>
 
             <pageGroup name="stat" boot="SPS.Site.GetSiteParams, SPS.Site.GetMetaDetails">
-                <page uri="stat://reports/" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
+                <page uri="stat-reports://" boot="SPS.Site.GetSiteParams, SPS.VK.VKCheckAuth">
                     <template>tmpl://reports/index.tmpl.php</template>
                 </page>
                 <page uri="stat://">
