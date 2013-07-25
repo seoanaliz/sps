@@ -1,5 +1,6 @@
 alter table "accessTokens" add column version integer;
 
+drop view "getAccessTokens";
 CREATE OR REPLACE VIEW "getAccessTokens" AS
 SELECT
       "accessTokens"."vkId"
