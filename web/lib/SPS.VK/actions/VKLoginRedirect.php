@@ -58,16 +58,18 @@
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
-                        ($apiAnswer->permissions & VkHelper::PERM_WALL)  
+                        ($apiAnswer->permissions & VkHelper::PERM_WALL)
                     ) {
-                        $existingToken = AccessTokenFactory::GetOne(
-                            array('vkId' => $vkId)
-                        );
+                        $existingToken = AccessTokenFactory::GetOne( array(
+                            'vkId' => $vkId,
+                        ));
+
                         if (!$existingToken) {
                             self::addAccessToken($vkId, $accessToken);
                         } else {
-                            $existingToken->createdAt = DateTimeWrapper::Now();
+                            $existingToken->createdAt   = DateTimeWrapper::Now();
                             $existingToken->accessToken = $accessToken;
+                            $existingToken->version     = AuthVkontakte::$Version;
                             AccessTokenFactory::Update($existingToken);
                         }
                         EditorsUtility::SetTargetFeeds($vkId, $apiAnswer->publics);
