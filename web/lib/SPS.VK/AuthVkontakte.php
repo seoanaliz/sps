@@ -43,15 +43,18 @@
 
         protected static function GetUserByCookie($cookieString) {
             $keys = array('version', 'expire', 'encodedVkId', 'checksum');
-            $data = explode('.', $cookieString);
-            if (count($data) === count($keys)) {
-                $cookieData = array_combine($keys, $data);
-                $vkId = base64_decode($cookieData['encodedVkId']);
-                if (
-                    (time() < (int) $cookieData['expire']) &&
-                    (self::GenerateCookieContentString($vkId, $cookieData['expire']) === $cookieString)
-                ) {
-                    return $vkId;
+            $values = explode('.', $cookieString);
+            if (count($values) === count($keys)) {
+                $data = array_combine($keys, $values);
+
+                if ($data['version'] === 2) {
+                    $vkId = base64_decode($data['encodedVkId']);
+                    if (
+                        (time() < (int) $data['expire']) &&
+                        (self::GenerateCookieContentString($vkId, $data['expire']) === $cookieString)
+                    ) {
+                        return $vkId;
+                    }
                 }
             }
             return false;
@@ -61,7 +64,7 @@
             $checkSum  = base64_encode(
                 hash('sha256', $vkId . '_' . $expire . '_' . self::$CookieSecret, $raw=true)
             );
-            $version = 1;
+            $version = 2;
             $encodedId = base64_encode($vkId);
             return "$version.$expire.$encodedId.$checkSum";
         }
