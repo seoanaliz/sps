@@ -1,0 +1,1 @@
+ALTER TABLE "public"."groups" ADD COLUMN "slug" character varying;

@@ -45,11 +45,10 @@ var simpleAjax = function(method, data, callback) {
 };
 
 var Eventlist = {
-
     get_user: function(userId, callback) {
-    simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
-        callback(dirtyData);
-    });
+        simpleAjax('addUser',{type: 'stat'}, function(dirtyData) {
+            callback(dirtyData);
+        });
     },
     load_list: function(callback) {
         $.ajax({
@@ -119,88 +118,8 @@ var Eventlist = {
             timeTo: params.timeTo,
             show: 1
         }, function(dirtyData) {
-            var clearList = [];
-            var clearPeriod = [];
-            var clearListType = 0;
-
-            if (dirtyData.min_max) {
-                clearPeriod = [
-                    dirtyData.min_max.min,
-                    dirtyData.min_max.max
-                ];
-            }
-            if (dirtyData.group_type == 2) {
-                clearListType = 1;
-            }
-            if (!clearListType) {
-                if ($.isArray(dirtyData.list)) {
-                    $.each(dirtyData.list, function(i, publicItem) {
-                        var users = [];
-                        $.each(publicItem.admins, function(i, data) {
-                            users.push({
-                                userId: data.vk_id,
-                                userName: data.name,
-                                userPhoto: data.ava == 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
-                                userDescription: data.role || '&nbsp;'
-                            });
-                        });
-                        clearList.push({
-                            intId: publicItem.id,
-                            publicId: publicItem.vk_id,
-                            publicImg: publicItem.ava,
-                            publicName: publicItem.name,
-                            publicFollowers: publicItem.quantity,
-                            publicGrowthNum: publicItem.diff_abs,
-                            publicGrowthPer: publicItem.diff_rel,
-                            publicIsActive: !!publicItem.active,
-                            publicInSearch: !!publicItem.in_search,
-                            publicVisitors: publicItem.visitors,
-                            publicAudience: publicItem.viewers,
-                            lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
-                            users: users
-                        });
-                    });
-                }
-            } else {
-                /*
-                id - id
-                name - name
-                ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
-                auth_likes_eff: 0 - Авторское/спарсенное: лайки
-                auth_posts: 0 - авторских постов
-                auth_reposts_eff: 0 - Авторское/спарсенное: репосты
-                avg_vie_grouth: null - средний суточный прирост просмотров
-                avg_vis_grouth: null - средний суточный прирост уников
-                overall_posts: 68 - общее количество постов за период
-                posts_days_rel: 0 - в среднем постов за сутки
-                sb_posts_count: 56 - постов из источников
-                sb_posts_rate: 0 - средний рейтинг постов из источников
-                views: null - просмотры
-                visitors: null - посетители
-                */
-                if ($.isArray(dirtyData.list)) {
-                    $.each(dirtyData.list, function(i, publicItem) {
-                        clearList.push({
-                            publicId: publicItem.id,
-                            publicImg: publicItem.ava,
-                            publicName: publicItem.name,
-                            publicPosts: publicItem.overall_posts,
-                            publicViews: publicItem.views,
-                            publicVisitors: publicItem.visitors,
-                            publicPostsPerDay: publicItem.posts_days_rel,
-                            publicSbPosts: publicItem.sb_posts_count,
-                            publicSbLikes: publicItem.sb_posts_rate,
-                            publicAuthorsPosts: publicItem.auth_posts,
-                            publicAuthorsLikes: publicItem.auth_likes_eff,
-                            publicAuthorsReposts: publicItem.auth_reposts_eff,
-                            publicGrowthViews: publicItem.avg_vie_grouth,
-                            publicGrowthVisitors: intval(publicItem.abs_vis_grow),
-                            publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
-                        });
-                    });
-                }
-            }
-            callback(clearList, clearPeriod, clearListType);
+            var data = Table.prepareServerData(dirtyData);
+            callback(data.clearList, data.clearPeriod, data.clearListType);
         });
     },
     add_list: function(groupName, callback) {

@@ -45,4 +45,6 @@ class Group
     /** @var int*/
     public $source;
 
+    /** @var string*/
+    public $slug;
 }

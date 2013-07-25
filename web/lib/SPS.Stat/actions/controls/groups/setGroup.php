@@ -38,9 +38,12 @@
             } elseif ( $type == 'Stat' ) {
                 $group_source = Group::STAT_GROUP;
             }
+
             if ( !GroupsUtility::check_name( $user_id, $group_source, $groupName ))
                 die( ObjectHelper::ToJSON(array('success' => false, 'err_mess' =>  'already exist')));
+
             //если не задан id - создаем группу, задан - обновляем
+
             if ( !$groupId ) {
 
                 $group = new Group;
@@ -50,6 +53,7 @@
                 $group->status      =   1;
                 $group->type        =   GroupsUtility::Group_Private;
                 $group->users_ids   =   $users;
+
 
                 GroupFactory::Add( $group, array( BaseFactory::WithReturningKeys => true ));
                 if( !$group->group_id)
@@ -69,9 +73,12 @@
                 if ( !GroupFactory::Update( $group, array()))
                     die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
+
+            EntryGetter::updateSlugs(false);
+            $group_new = GroupFactory::GetById($groupId);
             die(ObjectHelper::ToJSON(array(
                 'success' => true,
-                'data' => array('groupId' => $group->group_id, 'groupName' => $group->name),
+                'data' => array('groupId' => $group_new->group_id, 'groupName' => $group_new->name, 'slug' => $group_new->slug),
             )));
         }
 

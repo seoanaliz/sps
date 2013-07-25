@@ -21,7 +21,7 @@
 
         public static function get_group( $groupId )
         {
-            $sql = 'SELECT group_id, name, general, name, comments,type, group_admin FROM ' . TABLE_STAT_GROUPS
+            $sql = 'SELECT group_id, name, general, name, comments, type FROM ' . TABLE_STAT_GROUPS
                  . ' WHERE group_id=@group_id';
             $cmd = new SqlCommand( $sql, ConnectionFactory::Get( 'tst' ));
             $cmd->SetInteger('@group_id', $groupId);
@@ -39,7 +39,7 @@
 
         public static function get_groups( $userId = NULL )
         {
-            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, b.fave
+            $sql = 'SELECT DISTINCT( c.group_id), c.type, c.name, c.comments, c.general, c.group_admin, c.slug, b.fave
                     FROM
                         ' . TABLE_STAT_USERS . ' as a,
                         ' . TABLE_STAT_GROUP_USER_REL . ' as b,
@@ -64,6 +64,7 @@
                     'comments'  =>  $ds->getValue( 'comments' ),
                     'fave'      =>  $ds->GetBoolean( 'general' ),
                     'group_type'=>  $ds->GetInteger( 'type' ),
+                    'slug'      =>  $ds->GetString( 'slug' ),
                 );
             }
             $res['list']        =   array_values( $res );
@@ -209,20 +210,24 @@
                 return $group_id;
             //create new
             } elseif( $groupName ) {
+                $slug = EntryGetter::transliterate($groupName);
+                $safeSlug = self::getSafeSlug($slug);
+
                 $sql = 'INSERT INTO
                         ' . TABLE_STAT_GROUPS . '
-                            ("name", comments, ava,general)
+                            ("name", comments, ava,general,slug)
                         VALUES
-                            (@name, @comments, @ava,false)
+                            (@name, @comments, @ava,false,@slug)
                         RETURNING
                             group_id';
                 $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
                 $cmd->SetString('@name',        $groupName);
                 $cmd->SetString('@comments',    $comments);
                 $cmd->SetString('@ava',         $ava);
+                $cmd->SetString('@slug',        $safeSlug);
 
                 $ds = $cmd->Execute();
-                $ds->next();
+                $ds->Next();
                 $group_id = $ds->getValue('group_id', TYPE_INTEGER);
                 if ( !$group_id ) {
                     return false;
@@ -282,7 +287,6 @@
             $cmd->SetInteger( '@group_id', $group_id );
             $cmd->SetInteger( '@limit', $limit );
             $cmd->SetInteger( '@offset', $offset );
-//            $cmd->SetInteger( '@user_id', $user_id );
             $ds = $cmd->Execute();
 
             $res = array();
@@ -329,6 +333,54 @@
             $cmd->SetInteger( '@groupId',  $groupId );
             $cmd->SetInteger( '@publicId', $publicId );
             $cmd->Execute();
+        }
+
+        public static function getSimilarSlugs($slug)
+        {
+            $sqlSelect = 'SELECT slug FROM '. TABLE_STAT_GROUPS .'
+                    WHERE slug LIKE @slug';
+            $cmdSelect = new SqlCommand( $sqlSelect, ConnectionFactory::Get('tst') );
+            $cmdSelect->SetString('@slug', $slug . '%'); // добавляем знак процента
+            $result = $cmdSelect->Execute();
+            $slugs = array ();
+            while ( $result->Next() ) {
+                $similarSlug = $result->GetString('slug');
+                $slugs []= $similarSlug;
+            }
+            return $slugs;
+        }
+
+        /**
+         * @param array[int]string $slugs
+         * @param string $slug
+         * @return false|int
+         */
+        public static function getLargestSuffixNumber($slugs, $slug)
+        {
+            $pattern = '/^' . preg_quote($slug) . '([0-9]*)$/';
+            $numbers = array_map(function ($elem) use ($pattern) {
+                $isMatched = preg_match($pattern, $elem, $matches);
+                $parenMatch = $matches[1];
+                if (!$isMatched) {
+                    return false;
+                } else {
+                    return (int) $parenMatch;
+                }
+            }, $slugs);
+            return max($numbers);
+        }
+
+        public static function getSafeSlug($slug)
+        {
+            $similarSlugs = self::getSimilarSlugs($slug);
+            $largestNumber = self::getLargestSuffixNumber($similarSlugs, $slug);
+            if ($largestNumber === false) {
+                $safeSlug = $slug;
+            } else {
+                $nextNumber = $largestNumber + 1;
+                $safeSlug = $slug . $nextNumber;
+            }
+            return $safeSlug;
         }
 
         public static function get_listed_by_user( $user_id )
