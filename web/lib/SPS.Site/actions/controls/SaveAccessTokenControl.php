@@ -19,6 +19,8 @@ class SaveAccessTokenControl extends BaseControl
         $token   =   Request::getString('accessToken');
         $vk_id   =   Request::getString('vkId');
         $app_id  =   Request::getInteger('appId');
+        $version =   Request::getInteger('version');
+
         if( !$token || !$vk_id || !$app_id ) {
             die( ObjectHelper::ToJSON( $result));
         }
@@ -34,6 +36,7 @@ class SaveAccessTokenControl extends BaseControl
             $accessToken->appId = $app_id;
             $accessToken->createdAt = DateTimeWrapper::Now();
             $accessToken->statusId  = StatusUtility::Enabled;
+            $accessToken->version   = $version ? $version : 1;
             $result['success'] = AccessTokenFactory::Add( $accessToken);
         }
 

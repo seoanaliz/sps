@@ -53,6 +53,10 @@
                     , 'type'        => TYPE_INTEGER
                     , 'nullable'    => 'CheckEmpty'
                     , 'foreignKey'  => 'Status'
+                )
+                ,'version' => array(
+                      'name'        => 'version'
+                    , 'type'        => TYPE_INTEGER
                 ))
             , 'lists'     => array()
             , 'search'    => array()

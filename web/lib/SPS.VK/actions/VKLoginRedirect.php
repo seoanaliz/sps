@@ -85,6 +85,7 @@
             $accessTokenData->appId = AuthVkontakte::$AppId;
             $accessTokenData->createdAt = DateTimeWrapper::Now();
             $accessTokenData->statusId  = StatusUtility::Enabled;
+            $accessTokenData->version   = AuthVkontakte::$Version;
             return AccessTokenFactory::Add($accessTokenData);
         }
     }
