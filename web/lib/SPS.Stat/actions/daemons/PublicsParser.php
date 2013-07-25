@@ -11,7 +11,7 @@ class PublicsParser
 
     const LIMIT = 30000;
     const REQUESTS_PER_LAUNCH = 70;
-    const PUBLICS_PER_REQUEST  = 700;
+    const PUBLICS_PER_REQUEST  = 500;
     const PAUSE = 0.4;
     private $current_public;
 
@@ -22,7 +22,7 @@ class PublicsParser
         while( $i++ < self::REQUESTS_PER_LAUNCH) {
             $this->get_state();
             $ms = microtime(1);
-            $take_counter = rand(600, self::PUBLICS_PER_REQUEST);
+            $take_counter = rand(450, self::PUBLICS_PER_REQUEST);
             $params = array(
                 'gids'      =>  implode( ',', range( $this->current_public, $this->current_public + $take_counter )),
                 'fields'    =>  'members_count'
@@ -35,7 +35,7 @@ class PublicsParser
             foreach( $res as $public ) {
                 if( !isset( $public->type) || $public->type != 'page' && $public->type != 'group' && $public->type != 'club' )
                     continue;
-                if( $public->name == 'DELETED' && $this->current_public > 52000000 && $public->members_count == 0) {
+                if( $public->name == 'DELETED' && $this->current_public > 53000000 && $public->members_count == 0) {
                     $this->set_state( 0, $this->current_public );
                     die();
                 }
@@ -75,8 +75,10 @@ class PublicsParser
             if( $tries > 3 ) {
                 $this->current_public += 1000;
                 $tries = 0;
+                $this->set_state($this->current_public);
+            } else{
+                $this->set_tries( ++$tries );
             }
-            $this->set_tries( ++$tries );
         }
     }
 
