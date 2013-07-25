@@ -233,7 +233,7 @@ var LeftPanelWidget = Event.extend({
 
         function manageExternalPost(method, postId, ownerId) {
             var Def = new Deferred();
-            VK.Api.call('wall' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
+            VK.Api.call('wall.' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
                 if (resp.response) {
                     Def.fireSuccess();
                 }
