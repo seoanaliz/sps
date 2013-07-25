@@ -231,16 +231,21 @@ var LeftPanelWidget = Event.extend({
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
 
-        function deleteExternalPost(postId, ownerId) {
-            VK.Api.call('wall.delete', {owner_id: ownerId, post_id: postId}, function (resp) {
-                log('wall.delete resp:', resp);
+        function manageExternalPost(method, postId, ownerId) {
+            var Def = new Deferred();
+            VK.Api.call('wall' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
+                if (resp.response) {
+                    Def.fireSuccess();
+                }
             });
+            return Def;
         }
 
         $wall.delegate('.post > .delete', 'click', function() {
             var $post = $(this).closest('.post');
             var postId = $post.data('id');
             var groupId = $post.data('group');
+            var isExternal = $post.hasClass('external');
             
             var handleDelete = function(state){
                 if (state) {
@@ -253,7 +258,7 @@ var LeftPanelWidget = Event.extend({
                     } else {
                         // иначе добавляем
                         $post.before($(
-                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + groupId + '" data-id="' + postId + '">' +
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post '+ (isExternal ? 'external' : 'internal') +'" data-group="' + groupId + '" data-id="' + postId + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
@@ -264,9 +269,9 @@ var LeftPanelWidget = Event.extend({
                 }
             };
 
-            if ($post.hasClass('external')) {
+            if (isExternal) {
                 // Удаление поста на сервере Вконтакте
-                deleteExternalPost(postId, -Elements.currentExternalId()).success(function () {handleDelete(true);});
+                manageExternalPost('delete', postId, -Elements.currentExternalId()).success(function () {handleDelete(true);});
             } else {
                 // Обычное наше удаление
                 Events.fire('leftcolumn_deletepost', postId, handleDelete);
@@ -282,13 +287,19 @@ var LeftPanelWidget = Event.extend({
             });
         });
 
-        $wall.delegate('.post .recover', 'click', function() {
-            var elem = $(this).closest(".post"),
-                pid = elem.data("id");
-            Events.fire('leftcolumn_recoverpost', pid, function(state){
+        $wall.delegate('.post.internal .recover', 'click', function() {
+            var $elem = $(this).closest('.post');
+            Events.fire('leftcolumn_recoverpost', $elem.data('id'), function(state){
                 if (state) {
-                    elem.hide().next().show();
+                    $elem.hide().next().show();
                 }
+            });
+        });
+
+        $wall.delegate('.post.external .recover', 'click', function() {
+            var $elem = $(this).closest('.post');
+            manageExternalPost('delete', $elem.data('id'), -Elements.currentExternalId()).success(function () {
+                $elem.hide().next().show();
             });
         });
 
