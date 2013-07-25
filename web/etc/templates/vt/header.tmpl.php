@@ -47,10 +47,7 @@
             "title"  => "vt.menu.editors"
             , "link" => "vt://editors/"
         )
-        , "meta-details" => array(
-            "title"  => "vt.menu.metaDetails"
-            , "link" => "vt://meta-details/"
-        )
+
         , "site-params" => array(
             "title"  => "vt.menu.siteParams"
             , "link" => "vt://site-params/"
@@ -66,9 +63,13 @@
                 array(
                     "title"  => "vt.screens.daemonLock.list"
                     , "link" => "vt://daemons/"
-                ),
+                ), array(
+                     "title"  => "vt.menu.metaDetails"
+                    , "link" => "vt://meta-details/"
+                )
             )            
-        ) , "mobile-params" => array(
+        )
+        ,"mobile-params" => array(
             "title"  => "vt.menu.mobParams"
             , "link" => "vt://moby-params/"
             , "menu" => array(
@@ -94,6 +95,16 @@
                 ),
             )
         )
+        ,"stat" => array(
+              "title"  => "vt.menu.stat"
+            , "link"   => null
+            , "menu"   => array(
+                    array(
+                        "title"  => "vt.menu.statGroups"
+                      , "link" => "vt://stat-groups/"
+                    )
+                )
+            )
         , "exit" => array (
             "title"  => "vt.menu.exit"
             , "link" => "vt://login"

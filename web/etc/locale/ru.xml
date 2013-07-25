@@ -258,6 +258,11 @@
         <addTitle><![CDATA[Добавление поста]]></addTitle>
         <editTitle><![CDATA[Редактирование поста]]></editTitle>
       </promotionPost>
+        <stat>
+            <list><![CDATA[Список групп]]></list>
+            <addTitle><![CDATA[Добавление группы]]></addTitle>
+            <editTitle><![CDATA[Редактирование группы]]></editTitle>
+        </stat>
     </screens>
     <vfs>
       <queue>
@@ -304,6 +309,8 @@
       <publishers><![CDATA[Издатели]]></publishers>
       <authors><![CDATA[Авторы]]></authors>
       <editors><![CDATA[Админы]]></editors>
+      <stat><![CDATA[Stat]]></stat>
+      <statGroups><![CDATA[Слаги]]></statGroups>
     </menu>
     <metaDetail>
       <deleteString><![CDATA[Вы действительно хотите удалить параметр ссылки?]]></deleteString>
@@ -459,6 +466,10 @@
       <vk_seckey><![CDATA[vk_seckey]]></vk_seckey>
       <statusId><![CDATA[Статус]]></statusId>
     </publisher>
+    <stat>
+          <name><![CDATA[Название группы]]></name>
+          <slug><![CDATA[Линк]]></slug>
+    </stat>
     <auditEvent>
       <deleteString><![CDATA[Вы действительно хотите удалить событие?]]></deleteString>
       <header><![CDATA[события]]></header>
