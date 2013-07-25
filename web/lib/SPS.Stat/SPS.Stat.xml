@@ -42,7 +42,6 @@
         <action name="PublicsParser">
             <path>daemons/PublicsParser</path>
         </action>
-
     </group>
 
     <group name="Controls">
@@ -197,6 +196,26 @@
                 <path>controls/messager/manageFriend</path>
             </action>
         </group>
+    </group>
+
+    <group name="group">
+        <action name="GetGroupList">
+            <path>groups/GetGroupListAction</path>
+        </action>
+        <action name="SaveGroup">
+            <path>groups/SaveGroupAction</path>
+            <redirects>
+                <redirect name="success" path="vt://stat-groups/" />
+            </redirects>
+        </action>
+        <action name="DeleteGroup">
+            <path>groups/SaveGroupAction</path>
+            <parameters>
+                <request>
+                    <param name="action">'delete'</param>
+                </request>
+            </parameters>
+        </action>
     </group>
 
 </actions>
