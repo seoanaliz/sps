@@ -42,7 +42,6 @@ class GetStatData extends BaseControl
         }
 
         Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
-        Request::setString('sortBy', 'diff_abs');
         Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
     }
 }
