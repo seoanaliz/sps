@@ -84,7 +84,7 @@ class SaveGroupAction extends BaseSaveAction  {
         $new_object->group_id  = $object->group_id;
 
         $result = parent::$factory->Update( $new_object );
-
+        EntryGetter::updateSlugs($id, $onLogging = false, $setNewSlug = false);
         return $result;
     }
 

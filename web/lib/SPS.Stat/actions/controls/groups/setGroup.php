@@ -74,7 +74,6 @@
                     die( ObjectHelper::ToJSON( array( 'success' => false )));
             }
 
-            EntryGetter::updateSlugs(false);
             $group_new = GroupFactory::GetById($groupId);
             die(ObjectHelper::ToJSON(array(
                 'success' => true,

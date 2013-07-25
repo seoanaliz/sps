@@ -277,9 +277,9 @@ class EntryGetter {
         return $result->GetInteger('group_id');
     }
 
-    public static  function updateSlugs( $show_results = true)
+    public static  function updateSlugs( $check_for_id = null, $show_results = true, $rename = false )
     {
-        $sql = 'SELECT group_id, name FROM '. TABLE_STAT_GROUPS .'  WHERE
+        $sql = 'SELECT group_id, name, slug FROM '. TABLE_STAT_GROUPS .'  WHERE
             type = ' .GroupsUtility::Group_Global . '
             AND status != 2
             AND source = ' . Group::STAT_GROUP .'
@@ -292,7 +292,11 @@ class EntryGetter {
         $result = $cmd->Execute();
         while ( $result->next()) {
             $name = $result->GetString('name');
-            $slug = self::transliterate($name);
+            if( $rename ) {
+                $slug = self::transliterate($name);
+            } else  {
+                $slug = $result->GetString('slug');
+            }
             if (!isset($found[$slug])) {
                 $found[$slug] = 1;
             } else {
@@ -304,6 +308,10 @@ class EntryGetter {
             }
 
             $id = $result->GetInteger('group_id');
+            if( $check_for_id && $check_for_id != $id ) {
+                continue;
+            }
+
             $updateResult = self::saveSlugForId($id, $slug);
             if( $show_results ) {
                 echo "$id - $name - $slug  [$updateResult]<br />";
@@ -365,9 +373,11 @@ class EntryGetter {
         $sql = 'UPDATE '. TABLE_STAT_GROUPS .'
             SET slug = @slug
             WHERE group_id = @group_id';
+
         $cmd = new SqlCommand( $sql, ConnectionFactory::Get('tst') );
         $cmd->SetString('@slug', $slug);
         $cmd->SetInteger('@group_id', $id);
+
         $updateResult = $cmd->ExecuteNonQuery();
         return $updateResult;
     }
