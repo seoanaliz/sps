@@ -8,6 +8,8 @@
         public static $Password;
 
         public static $AuthSecret;
+        
+        public static $Vesion = 2;
 
         protected static $CookieSecret = 't2MJebh87ZmYdN2i2btAXGLv+Z1NxrYcA4AgHNQMYvM=';
 
@@ -47,14 +49,12 @@
             if (count($values) === count($keys)) {
                 $data = array_combine($keys, $values);
 
-                if ($data['version'] === 2) {
-                    $vkId = base64_decode($data['encodedVkId']);
-                    if (
-                        (time() < (int) $data['expire']) &&
-                        (self::GenerateCookieContentString($vkId, $data['expire']) === $cookieString)
-                    ) {
-                        return $vkId;
-                    }
+                $vkId = base64_decode($data['encodedVkId']);
+                if (
+                    (time() < (int) $data['expire']) &&
+                    (self::GenerateCookieContentString($vkId, $data['expire']) === $cookieString)
+                ) {
+                    return $vkId;
                 }
             }
             return false;
@@ -62,11 +62,10 @@
 
         protected static function GenerateCookieContentString($vkId, $expire) {
             $checkSum  = base64_encode(
-                hash('sha256', $vkId . '_' . $expire . '_' . self::$CookieSecret, $raw=true)
+                hash('sha256', self::$Version . '_' . $vkId . '_' . $expire . '_' . self::$CookieSecret, $raw=true)
             );
-            $version = 2;
             $encodedId = base64_encode($vkId);
-            return "$version.$expire.$encodedId.$checkSum";
+            return self::$Version . ".$expire.$encodedId.$checkSum";
         }
 
         public static function PopulateSession($editor) {
