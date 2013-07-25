@@ -233,7 +233,7 @@ var LeftPanelWidget = Event.extend({
 
         function manageExternalPost(method, postId, ownerId) {
             var Def = new Deferred();
-            VK.Api.call('wall.' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
+            (method in {'delete': 1, 'restore': 1}) && VK.Api.call('wall.' + method, {owner_id: ownerId, post_id: postId}, function (resp) {
                 if (resp.response) {
                     Def.fireSuccess();
                 }
@@ -298,7 +298,7 @@ var LeftPanelWidget = Event.extend({
 
         $wall.delegate('.post.external .recover', 'click', function() {
             var $elem = $(this).closest('.post');
-            manageExternalPost('delete', $elem.data('id'), -Elements.currentExternalId()).success(function () {
+            manageExternalPost('restore', $elem.data('id'), -Elements.currentExternalId()).success(function () {
                 $elem.hide().next().show();
             });
         });
