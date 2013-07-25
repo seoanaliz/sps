@@ -101,7 +101,7 @@ function makeVkButton() {
     if ($loginInfo.length) {
         var vkHref = 'https://oauth.vk.com/authorize?' +
                     'client_id='+ Configs.appId +
-                    '&scope=stats,groups,offline' +
+                    '&scope=stats,groups,offline,wall' +
                     '&redirect_uri='+ encodeURIComponent(location.protocol + '//' + location.host + '/vk-login/?to=' + location.pathname) +
                     '&display=page' +
                     '&response_type=code';
@@ -119,6 +119,25 @@ function handleUserLoggedIn(userData) {
     .find('span')
         .text(name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
+}
+
+function changeState(listId, slug, doReplace) {
+    var pushedURI = '/stat/' + (slug || '');
+
+    if ('pushState' in history) {
+        // ничего не делаем, всё ок
+    } else if (location.pathname !== pushedURI) { // для старых браузеров — перезагружаем страницу, если URI должен поменяться
+        location.href = pushedURI; // REDIRECT, перезагрузка страницы
+        return;
+    }
+
+    if (doReplace) {
+        history.replaceState({listId: listId, slug: slug}, '', pushedURI);
+    } else {
+        Filter.selectList(listId).success(function () {
+            history.pushState({listId: listId, slug: slug}, '', pushedURI);
+        });
+    }
 }
 
 var List = (function() {
@@ -458,20 +477,7 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            var listId = this.getAttribute('data-id');
-            var slug = this.getAttribute('data-slug');
-            var pushedURI = '/stat/' + (slug || '');
-
-            if (typeof history === 'object' && ('pushState' in history)) {
-                // ничего не делаем, всё ок
-            } else if (location.pathname !== pushedURI) { // для старых браузеров — перезагружаем страницу, если URI должен поменяться
-                location.href = pushedURI; // REDIRECT, перезагрузка страницы
-                return;
-            }
-
-            selectList(listId).success(function () {
-                history.pushState({listId: listId, slug: slug}, '', pushedURI);
-            });
+            changeState(this.getAttribute('data-id'), this.getAttribute('data-slug'));
         });
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
@@ -521,10 +527,13 @@ var Filter = (function() {
                 .on('blur', destroyEditor);
 
             function saveEditor() {
-                Events.fire('rename_list', $item.data('id'), $editField.val(), function (success, data) {
+                var id = $item.data('id');
+                Events.fire('rename_list', id, $editField.val(), function (success, data) {
                     if (success) {
                         $item.attr('title', data.groupName);
+                        $item.attr('data-slug', data.slug);
                         $item.find('.text').text(data.groupName);
+                        changeState(id, data.slug, true/*doReplace*/);
                     } else {
                         Filter.refreshList();
                     }

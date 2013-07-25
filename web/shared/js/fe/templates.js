@@ -160,6 +160,7 @@ var ARTICLE_ITEM =
         '</div>' +
     '</div>' +
 
+    '<div class="delete" title="Удаление поста из Вконтакте"></div>' +
     '<div class="clear"></div>' +
 '</div>';
 
