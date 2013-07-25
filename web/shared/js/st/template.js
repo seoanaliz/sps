@@ -144,12 +144,20 @@ var DROPDOWN =
 '<div class="dropdown">' +
     '<span class="icon delete clear-search"></span>' +
     '<input type="text" class="search" placeholder="Поиск" />' +
-    '<? each(DROPDOWN_ITEM, items); ?>' +
+    '<? each(DROPDOWN_CATEGORY, categories); ?>' +
     '<? if (cur.dataUser.isAdmin) { ?>'+
         '<input type="text" class="add-item" placeholder="Название списка" />' +
         '<div class="show-input">Создать список</div>' +
     '<? } ?>'+
 '</div>';
+
+var DROPDOWN_CATEGORY =
+'<? if (items.length) { ?>'+
+    '<div class="category" data-number="<?=items.length?>">' +
+        '<h4 class="title"><?=title?></h4>' +
+        '<? each(DROPDOWN_ITEM, items); ?>' +
+    '</div>' +
+'<? } ?>';
 
 var DROPDOWN_ITEM =
 '<div data-id="<?=id?>" title="<?=name?>" class="item">' +

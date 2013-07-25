@@ -834,13 +834,14 @@ var Table = (function() {
             var publicData;
 
             for (var i in dataTable) {
-                if (dataTable[i].intId == publicId) {
+                if (dataTable[i].intId === publicId) {
                     publicData = dataTable[i];
                     break; // ------------------- BREAK
                 }
             }
             if (publicData) {
-                _createDropdown(e, publicData);
+                e.stopPropagation();
+                _createDropdown($(e.currentTarget), publicData);
             }
         });
 
@@ -924,8 +925,7 @@ var Table = (function() {
         })();
     }
 
-    function _createDropdown(e, publicData) {
-        var $el = $(e.currentTarget);
+    function _createDropdown($el, publicData) {
         var offset = $el.offset();
         var $dropdown;
         var $public = $el.closest('.public');
@@ -933,14 +933,17 @@ var Table = (function() {
         var selectedLists = publicData.lists;
         var listId = null;
 
-        e.stopPropagation();
-
         Events.fire('load_list', function(dataList) {
             if (!$el.hasClass('selected')) {
-                var all_lists = dataList.private;
-                all_lists.push.apply(all_lists,dataList.global);
-
-                $dropdown = $(tmpl(DROPDOWN, {items: all_lists})).appendTo('body');
+                var categories = [{
+                    title: 'Личные',
+                    items: dataList.private
+                }, {
+                    title: 'Категории',
+                    items: dataList.global
+                }];
+                
+                $dropdown = $(tmpl(DROPDOWN, {categories: categories})).appendTo('body');
 
                 // поиск по категориям
                 initListSearch();
@@ -1022,6 +1025,7 @@ var Table = (function() {
 
         function initListSearch() {
             var previousDisplay = $dropdown.find('.item')[0].style.display;
+            var previousCategoryDisplay = $dropdown.find('.category')[0].style.display;
             function clearSearch() {
                 var $search = $dropdown.find('.search');
                 $search.attr('value', '');
@@ -1037,14 +1041,25 @@ var Table = (function() {
                     }
                     if (val !== previousValue) {
                         var regexp = new RegExp(val, 'gim');
-                        $dropdown.find('.item').each(function () {
-                            var text = this.getAttribute('title');
-                            if (regexp.test(text)) {
-                                var div = this.childNodes[0];
-                                div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
-                                this.style.display = previousDisplay;
-                            } else {
+                        
+                        $dropdown.find('.category').each(function() {
+                            var $category = $(this);
+                            var i = Number(this.getAttribute('data-number'));
+                            $category.find('.item').each(function () {
+                                var text = this.getAttribute('title');
+                                if (regexp.test(text)) {
+                                    var div = this.childNodes[0];
+                                    div.innerHTML = val ? text.replace(regexp, "<span class=\"highlight\">$&</span>") : text;
+                                    this.style.display = previousDisplay;
+                                } else {
+                                    i--;
+                                    this.style.display = 'none';
+                                }
+                            });
+                            if (i === 0) {
                                 this.style.display = 'none';
+                            } else {
+                                this.style.display = previousCategoryDisplay;
                             }
                         });
                         previousValue = val;
