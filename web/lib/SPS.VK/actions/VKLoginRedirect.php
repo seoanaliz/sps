@@ -57,7 +57,8 @@
                 if (property_exists($apiAnswer, 'permissions') && property_exists($apiAnswer, 'publics')) {
                     if (($apiAnswer->permissions & VkHelper::PERM_GROUPS) &&
                         ($apiAnswer->permissions & VkHelper::PERM_GROUP_STATS) &&
-                        ($apiAnswer->permissions & VkHelper::PERM_OFFLINE)
+                        ($apiAnswer->permissions & VkHelper::PERM_OFFLINE) &&
+                        ($apiAnswer->permissions & VkHelper::PERM_WALL)  
                     ) {
                         $existingToken = AccessTokenFactory::GetOne(
                             array('vkId' => $vkId)
