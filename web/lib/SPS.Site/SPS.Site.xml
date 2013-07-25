@@ -27,6 +27,9 @@
                 </request>
             </parameters>
         </action>
+        <action name="RunTest">
+            <path>RunTest</path>
+        </action>
     </group>
 
     <group name="Daemons">

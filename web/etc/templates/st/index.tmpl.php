@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div class="list buttons">
-                            <div class="item selected" data-id="all">Все паблики</div>    
+                            <div class="item" data-id="all">Все паблики</div>    
                             <? if ($canEditGlobalGroups) {?>
                                 <div class="item editor_lists" data-id="all_not_listed">Не в группе</div>
                             <? } ?>

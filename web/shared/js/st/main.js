@@ -40,11 +40,32 @@ $(document).ready(function() {
 
     Filter.init(function() {
         List.init(function() {
+            initHistory();
             Table.init();
         });
     });
+
     checkVkStatus();
 });
+
+function initHistory() {
+    window.onpopstate = function(e) {
+        if (typeof e.state === 'object' && e.state) {
+            if ('listId' in e.state) {
+                Filter.selectList(e.state.listId);
+            } else {
+                Filter.selectList('all');
+            }
+        }
+    };
+
+    // в переменную entriesPrecache передавались данные с сервера
+    if (entriesPrecache &&
+        typeof history === 'object' && ('replaceState' in history)) {
+        // запишем в history состояние, взятое из прекеша
+        history.replaceState({listId: entriesPrecache.groupId || 'all', slug: ''}, '');
+    }
+}
 
 function checkVkStatus() {
     if (typeof VK !== 'undefined' && VK.Api) {
@@ -108,7 +129,12 @@ var List = (function() {
         $container = $('.header');
         $container.find('.tab-bar').html(tmpl(LIST, {items: []}));
         $actions = $('.actions', $container);
-        select('all', callback);
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
+        select(listId, callback);
         _initEvents();
     }
     function _initEvents() {
@@ -303,7 +329,7 @@ var List = (function() {
 
         if ($.isFunction(callback)) callback();
         else {
-            Filter.selectList($item.data('id'));
+            Filter.selectList(id);
         }
     }
 
@@ -330,8 +356,14 @@ var Filter = (function() {
         $periodWrapper = $('> .period-wrapper', $container);
         $period = $('> .period', $periodWrapper);
 
+        if (entriesPrecache && entriesPrecache.groupId) {
+            var listId = entriesPrecache.groupId;
+        } else {
+            listId = 'all';
+        }
+
         _initEvents();
-        refreshList(callback);
+        refreshList(callback, listId);
     }
 
     function _initEvents() {
@@ -426,14 +458,40 @@ var Filter = (function() {
             Table.setPeriod(period);
         });
         $list.delegate('.item', 'click', function() {
-            selectList($(this).data('id'));
+            var listId = this.getAttribute('data-id');
+            var slug = this.getAttribute('data-slug');
+            var pushedURI = '/stat/' + (slug || '');
+
+            if (typeof history === 'object' && ('pushState' in history)) {
+                // ничего не делаем, всё ок
+            } else if (location.pathname !== pushedURI) { // для старых браузеров — перезагружаем страницу, если URI должен поменяться
+                location.href = pushedURI; // REDIRECT, перезагрузка страницы
+                return;
+            }
+
+            selectList(listId).success(function () {
+                history.pushState({listId: listId, slug: slug}, '', pushedURI);
+            });
         });
         $list.delegate('.bookmark', 'click', function(e) {
             e.stopPropagation();
             var listId = $(this).closest('.item').data('id');
-            Events.fire('toggle_group_general', listId, function() {
-                Filter.refreshList();
-            });
+
+            var box = new Box({
+                title: 'Перемещение списка',
+                html: 'Вы уверены, что хотите перенести список?',
+                buttons: [
+                    {label: 'Переместить', onclick: moveList},
+                    {label: 'Отмена', isWhite: true}
+                ]
+            }).show();
+
+            function moveList() {
+                this.hide();
+                Events.fire('toggle_group_general', listId, function() {
+                    Filter.refreshList();
+                });
+            }
         });
         $list.delegate('.edit', 'click', function(e) {
             e.stopPropagation();
@@ -508,9 +566,9 @@ var Filter = (function() {
         }
     }
 
-    function refreshList(callback) {
+    function refreshList(callback, maybeListId) {
         var $selectedItem = $list.find('.item.selected');
-        var id = $selectedItem.data('id');
+        var id = maybeListId || $selectedItem.data('id');
         var $list_global  =  $('> .list.global', $container);
         var $list_private =  $('> .list.private', $container);
         var $list_shared  =  $('> .list.shared', $container);
@@ -526,16 +584,22 @@ var Filter = (function() {
         });
     }
     function selectList(id, callback) {
+        var Def = new Deferred();
         var $item = $list.find('.item[data-id=' + id + ']');
         $list.find('.item.selected').removeClass('selected');
         $item.addClass('selected');
 
-        if ($.isFunction(callback)) callback();
-        else {
-            List.select($item.data('id'), function() {
-                Table.changeList($item.data('id'));
+        if ($.isFunction(callback)) {
+            callback();
+        } else {
+            var id = $item.data('id');
+            List.select(id, function() {
+                Table.changeList(id, $item.data('slug')).success(function () {
+                    Def.fireSuccess();
+                });
             });
         }
+        return Def;
     }
     function setSliderMin(min) {
         var $slider = $audience.find('> .slider-wrap');
@@ -576,6 +640,97 @@ var Table = (function() {
         _initEvents();
         changeList();
         if ($.isFunction(callback)) callback();
+    }
+    function prepareServerData(dirtyData) {
+        var clearList = [];
+        var clearPeriod = [];
+        var clearListType = 0;
+
+        if (dirtyData.min_max) {
+            clearPeriod = [
+                dirtyData.min_max.min,
+                dirtyData.min_max.max
+            ];
+        }
+        if (dirtyData.group_type == 2) {
+            clearListType = 1;
+        }
+        if (!clearListType) {
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    var users = [];
+                    $.each(publicItem.admins, function(i, data) {
+                        users.push({
+                            userId: data.vk_id,
+                            userName: data.name,
+                            userPhoto: data.ava === 'standard' ? 'http://vk.com/images/camera_c.gif' : data.ava,
+                            userDescription: data.role || '&nbsp;'
+                        });
+                    });
+                    clearList.push({
+                        intId: publicItem.id,
+                        publicId: publicItem.vk_id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicFollowers: publicItem.quantity,
+                        publicGrowthNum: publicItem.diff_abs,
+                        publicGrowthPer: publicItem.diff_rel,
+                        publicIsActive: !!publicItem.active,
+                        publicInSearch: !!publicItem.in_search,
+                        publicVisitors: publicItem.visitors,
+                        publicAudience: publicItem.viewers,
+                        lists: ($.isArray(publicItem.group_id) && publicItem.group_id.length) ? publicItem.group_id : [],
+                        users: users
+                    });
+                });
+            }
+        } else {
+            /*
+            id - id
+            name - name
+            ava: "http://cs302214.userapi.com/g37140977/e_9e81c016.jpg
+            auth_likes_eff: 0 - Авторское/спарсенное: лайки
+            auth_posts: 0 - авторских постов
+            auth_reposts_eff: 0 - Авторское/спарсенное: репосты
+            avg_vie_grouth: null - средний суточный прирост просмотров
+            avg_vis_grouth: null - средний суточный прирост уников
+            overall_posts: 68 - общее количество постов за период
+            posts_days_rel: 0 - в среднем постов за сутки
+            sb_posts_count: 56 - постов из источников
+            sb_posts_rate: 0 - средний рейтинг постов из источников
+            views: null - просмотры
+            visitors: null - посетители
+            */
+            if ($.isArray(dirtyData.list)) {
+                $.each(dirtyData.list, function(i, publicItem) {
+                    clearList.push({
+                        publicId: publicItem.id,
+                        publicImg: publicItem.ava,
+                        publicName: publicItem.name,
+                        publicPosts: publicItem.overall_posts,
+                        publicViews: publicItem.views,
+                        publicVisitors: publicItem.visitors,
+                        publicPostsPerDay: publicItem.posts_days_rel,
+                        publicSbPosts: publicItem.sb_posts_count,
+                        publicSbLikes: publicItem.sb_posts_rate,
+                        publicAuthorsPosts: publicItem.auth_posts,
+                        publicAuthorsLikes: publicItem.auth_likes_eff,
+                        publicAuthorsReposts: publicItem.auth_reposts_eff,
+                        publicGrowthViews: publicItem.avg_vie_grouth,
+                        publicGrowthVisitors: intval(publicItem.abs_vis_grow),
+                        publicGrowthVisitorsRelative: intval(publicItem.rel_vis_grow)
+                    });
+                });
+            }
+        }
+
+        var data = {
+            clearList: clearList,
+            clearPeriod: clearPeriod,
+            clearListType: clearListType
+        };
+
+        return data;
     }
     function loadMore() {
         var $el = $("#load-more-table");
@@ -777,7 +932,9 @@ var Table = (function() {
             }
         );
     }
-    function changeList(listId) {
+    function changeList(listId, slug) {
+        var Def = new Deferred();
+
         var defSearch = '';
         var defSortBy = 'growth';
         var defSortReverse = false;
@@ -791,39 +948,53 @@ var Table = (function() {
             audienceMin: currentAudience[0],
             audienceMax: currentAudience[1],
             timeFrom: currentInterval[0],
-            timeTo: currentInterval[1]
+            timeTo: currentInterval[1],
+            slug: slug
         };
 
-        Events.fire('load_table', params,
-            function(data, maxPeriod, listType) {
-                pagesLoaded = 1;
-                currentListType = listType;
-                currentListId = listId;
-                currentSearch = defSearch;
-                currentSortBy = defSortBy;
-                currentSortReverse = defSortReverse;
-                dataTable = data;
-                if (!listType) {
-                    $container.html(tmpl(TABLE, {rows: data}));
-                } else {
-                    $container.html(tmpl(OUR_TABLE, {rows: data}));
-                }
-                $container.find('.' + currentSortBy).addClass('active');
-                if (!currentListId) {
-                    $container.removeClass('no-list-id');
-                } else {
-                    $container.addClass('no-list-id');
-                }
-                if (dataTable.length < Configs.tableLoadOffset) {
-                    $('#load-more-table').hide();
-                } else {
-                    $('#load-more-table').show();
-                }
-                Filter.setSliderMin(maxPeriod[0]);
-                Filter.setSliderMax(maxPeriod[1]);
-                $('#global-loader').fadeOut(200);
+        getTable(params, loadTableCallback);
+
+        function getTable(params, callback) {
+            if (typeof entriesPrecache === 'object') { // в переменную entriesPrecache передавались данные с сервера
+                var data = prepareServerData(entriesPrecache);
+                callback(data.clearList, data.clearPeriod, data.clearListType, entriesPrecache.groupId);
+                entriesPrecache = false;
+            } else {
+                Events.fire('load_table', params, callback);
             }
-        );
+        }
+
+        function loadTableCallback(data, maxPeriod, listType) {
+            pagesLoaded = 1;
+            currentListType = listType;
+            currentListId = listId;
+            currentSearch = defSearch;
+            currentSortBy = defSortBy;
+            currentSortReverse = defSortReverse;
+            dataTable = data;
+            if (!listType) {
+                $container.html(tmpl(TABLE, {rows: data}));
+            } else {
+                $container.html(tmpl(OUR_TABLE, {rows: data}));
+            }
+            $container.find('.' + currentSortBy).addClass('active');
+            if (!currentListId) {
+                $container.removeClass('no-list-id');
+            } else {
+                $container.addClass('no-list-id');
+            }
+            if (dataTable.length < Configs.tableLoadOffset) {
+                $('#load-more-table').hide();
+            } else {
+                $('#load-more-table').show();
+            }
+            Filter.setSliderMin(maxPeriod[0]);
+            Filter.setSliderMax(maxPeriod[1]);
+            $('#global-loader').fadeOut(200);
+            Def.fireSuccess();
+        }
+
+        return Def;
     }
 
     function _initEvents() {
@@ -1091,6 +1262,7 @@ var Table = (function() {
         setPeriod: setPeriod,
         setAudience: setAudience,
         setInterval: setInterval,
-        setCurrentInterval: setCurrentInterval
+        setCurrentInterval: setCurrentInterval,
+        prepareServerData: prepareServerData
     };
 })();

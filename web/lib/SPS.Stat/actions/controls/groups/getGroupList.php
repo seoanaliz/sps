@@ -56,7 +56,8 @@
                         if( isset( $user_groups_uns[$group_id])) {
                             $user_groups[] = array(
                                 'id'    =>  $user_groups_uns[$group_id]->group_id,
-                                'name'  =>  $user_groups_uns[$group_id]->name
+                                'name'  =>  $user_groups_uns[$group_id]->name,
+                                'slug'  =>  $user_groups_uns[$group_id]->slug
                             );
                         }
                     }
@@ -121,7 +122,8 @@
                 if( isset( $global_groups[$ggu->groupId])) {
                     $result[] = array(
                         'id'    =>  $global_groups[$ggu->groupId]->group_id,
-                        'name'  =>  $global_groups[$ggu->groupId]->name
+                        'name'  =>  $global_groups[$ggu->groupId]->name,
+                        'slug'  =>  $global_groups[$ggu->groupId]->slug
                     );
                 } else {
                     GroupUserFactory::DeleteByMask( array(

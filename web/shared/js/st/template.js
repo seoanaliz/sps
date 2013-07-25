@@ -190,7 +190,7 @@ var FILTER_LIST =
 '<? each(FILTER_LIST_ITEM, items); ?>';
 
 var FILTER_LIST_ITEM =
-'<div class="item" title="<?=name?>" data-id="<?=id?>">' +
+'<div class="item" title="<?=name?>" data-id="<?=id?>" data-slug="<?=slug?>">' +
     '<span class="text"><?=name?></span>' +
     '<?if (cur.dataUser.isAdmin) { ?>'+
         '<span class="icon edit"></span>' +

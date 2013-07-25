@@ -12,7 +12,6 @@ class GetStatData extends BaseControl
     {
         $hasAccessToPrivateGroups   =   false;
         $canEditGlobalGroups        =   false;
-        $canSuggestGlobalGroups     =   false;
         $rank = StatAuthority::STAT_ROLE_GUEST;
 
         if( $this->vkId ) {
@@ -23,7 +22,27 @@ class GetStatData extends BaseControl
 
         Response::setParameter('hasAccessToPrivateGroups', $hasAccessToPrivateGroups);
         Response::setParameter('canEditGlobalGroups', $canEditGlobalGroups);
-        Response::setParameter('canSuggestGlobalGroups', $canSuggestGlobalGroups);
-        Response::setParameter('rank', $rank);
+        Response::setParameter('rank', ObjectHelper::ToJSON($rank));
+
+
+        $requestData = Page::$RequestData;
+        $slug = isset($requestData[1]) ? $requestData[1] : null;
+
+        $EntryGetter = new EntryGetter();
+        $id = null;
+        if ($slug) {
+            if ($slug === "~update-sAPDixIx6SNVl4~gX0QM307hADw--cxpuO3rYwnKeyB") {
+                $EntryGetter->updateSlugs();
+                die('done');
+            }
+            $id = $EntryGetter->getGroupIdBySlug($slug);
+            if (!$id) { // несуществующий URI
+                return 'default'; // редирект
+            }
+        }
+
+        Request::setInteger('groupId', $id); // Нужно, т.к. EntryGetter зависит от глобального состояния (Request)
+        Request::setString('sortBy', 'diff_abs');
+        Response::setString('entriesPrecache', ObjectHelper::ToJSON($EntryGetter->getEntriesData()));
     }
 }

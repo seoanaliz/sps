@@ -55,7 +55,10 @@ class GroupFactory
               'name'        => 'source'
             , 'type'        => TYPE_INTEGER
         )
-
+        ,'slug' => array(
+              'name'        => 'slug'
+            , 'type'        => TYPE_STRING
+        )
     )
     , 'search'    => array(
         '_group_id' => array(
