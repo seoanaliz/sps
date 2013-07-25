@@ -231,13 +231,20 @@ var LeftPanelWidget = Event.extend({
         var $multiSelect = this.$multiSelect;
         var $wall = this.$wall;
 
-        $wall.delegate('.post > .delete', 'click', function(){
-            var $elem = $(this).closest('.post'),
-                pid = $elem.data('id'),
-                gid = $elem.data('group');
-            Events.fire('leftcolumn_deletepost', pid, function(state){
+        function deleteExternalPost(postId, ownerId) {
+            VK.Api.call('wall.delete', {owner_id: ownerId, post_id: postId}, function (resp) {
+                log('wall.delete resp:', resp);
+            });
+        }
+
+        $wall.delegate('.post > .delete', 'click', function() {
+            var $post = $(this).closest('.post');
+            var postId = $post.data('id');
+            var groupId = $post.data('group');
+            
+            var handleDelete = function(state){
                 if (state) {
-                    var deleteMessageId = 'deleted-post-' + pid;
+                    var deleteMessageId = 'deleted-post-' + postId;
                     var $deleteMessage = $('#' + deleteMessageId);
                     var isShowIgnoreAllBtn = !/^(authors|my)$/.test(Elements.leftType());
                     if ($deleteMessage.length) {
@@ -245,17 +252,25 @@ var LeftPanelWidget = Event.extend({
                         $deleteMessage.show();
                     } else {
                         // иначе добавляем
-                        $elem.before($(
-                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + gid + '" data-id="' + pid + '">' +
+                        $post.before($(
+                            '<div id="' + deleteMessageId + '" class="bb post deleted-post" data-group="' + groupId + '" data-id="' + postId + '">' +
                                 'Пост удален. <a class="recover">Восстановить</a><br/>' +
                                 (isShowIgnoreAllBtn ? '<span class="button ignore">Не показывать новости сообщества</span>' : '') +
                             '</div>'
                         ));
                     }
 
-                    $elem.hide();
+                    $post.hide();
                 }
-            });
+            };
+
+            if ($post.hasClass('external')) {
+                // Удаление поста на сервере Вконтакте
+                deleteExternalPost(postId, -Elements.currentExternalId()).success(function () {handleDelete(true);});
+            } else {
+                // Обычное наше удаление
+                Events.fire('leftcolumn_deletepost', postId, handleDelete);
+            }
         });
 
         $wall.delegate('.post .ignore', 'click', function() {
