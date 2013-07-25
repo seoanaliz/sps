@@ -44,11 +44,11 @@ $__breadcrumbs = array( array( 'link' => $grid['basepath'], 'title' => $__pageTi
                 <input type="hidden" value="{form:$sortField}" id="sortField" name="sortField" />
                 <input type="hidden" value="{form:$sortType}" id="sortType" name="sortType" />
                 <div class="row">
-                    <label>{lang:vt.group.name}</label>
+                    <label>{lang:vt.stat.name}</label>
                     <?= FormHelper::FormInput( "search[name]", $search['name'], 'name', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.group.slug}</label>
+                    <label>{lang:vt.stat.slug}</label>
                     <?= FormHelper::FormInput( "search[slug]", $search['slug'], 'slug', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <input type="submit" value="{lang:vt.common.find}" />
