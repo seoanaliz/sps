@@ -35,7 +35,7 @@
             $object = parent::$factory->GetFromRequest();
             
             if ( $originalObject != null ) {
-                $object->bannerId = $originalObject->bannerId;
+                $object->id = $originalObject->id;
             }
             
             return $object;

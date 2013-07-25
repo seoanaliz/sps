@@ -58,10 +58,6 @@
                     <?= FormHelper::FormInput( "search[publicId]", $search['publicId'], 'publicId', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.mobile.platform}</label>
-                    <?= FormHelper::FormInput( "search[platform]", $search['platform'], 'platform', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
                     <label>{lang:vt.mobile.headerText}</label>
                     <?= FormHelper::FormInput( "search[headerText]", $search['headerText'], 'headerText', null, array( 'size' => 80 ) ); ?>
                 </div>
@@ -74,12 +70,16 @@
                     <?= FormHelper::FormInput( "search[actionText]", $search['actionText'], 'actionText', null, array( 'size' => 80 ) ); ?>
                 </div>
                 <div class="row">
-                    <label>{lang:vt.mobile.active}</label>
-                    <?= FormHelper::FormInput( "search[active]", $search['active'], 'active', null, array( 'size' => 80 ) ); ?>
-                </div>
-                <div class="row">
                     <label>{lang:vt.mobile.showsCount}</label>
                     <?= FormHelper::FormInput( "search[showsCount]", $search['showsCount'], 'showsCount', null, array( 'size' => 80 ) ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.platform}</label>
+                    <?= FormHelper::FormSelect( "search[platform]", array('ios' => 'ios', 'android' => 'android'),null, null, $search['platform'], null, null, true ); ?>
+                </div>
+                <div class="row">
+                    <label>{lang:vt.mobile.active}</label>
+                    <?= FormHelper::FormSelect( "search[active]", array('on' => 'on', 'off' => 'off'),null, null, $search['active'], null, null, true ); ?>
                 </div>
 				<input type="submit" value="{lang:vt.common.find}" />
 			</form>
