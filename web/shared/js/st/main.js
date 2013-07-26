@@ -1008,7 +1008,6 @@ var Table = (function() {
             }
             Filter.setSliderMin(maxPeriod[0]);
             Filter.setSliderMax(maxPeriod[1]);
-            $('#global-loader').fadeOut(200);
             Def.fireSuccess();
         }
 
