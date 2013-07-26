@@ -182,18 +182,18 @@
 
         public static function includeCombinedFiles($files) {
             $revision = AssetHelper::GetRevision();
-            $cacheFile = __ROOT__ . '/cache/js_' . md5(join('_', $files) . $revision) . '.js';
-            if (!file_exists($cacheFile)) {
-                $jsDir = __ROOT__ . '/shared/js/';
+            $jsDir = __ROOT__ . '/shared/js/';
+            $cacheDir = $jsDir . 'cache/';
+            $cacheFilename = 'js_' . md5(join('_', $files) . $revision) . '.js';
+            if (!file_exists($cacheDir . $cacheFilename)) {
                 $combined = array ();
                 foreach ($files as $file) {
                     $combined []= '//# ' . $file;
                     $combined []= file_get_contents($jsDir . ltrim($file, '/')) . "\n";
                 }
-                $content = join("\n", $combined);
-                echo "<script type=\"text/javascript\">\n" . $content . "\n</script>";
-                //file_put_contents($cacheFile, $content);
+                file_put_contents($cacheDir . $cacheFilename, join("\n", $combined));
             }
+            echo '<script type="text/javascript" src="' . Site::GetWebPath('/shared/js/cache/' . $cacheFilename . "?$revision") . '"></script>';
         }
     }
 ?>
