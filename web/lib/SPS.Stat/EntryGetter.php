@@ -88,9 +88,8 @@ class EntryGetter {
             $sort_by .= $period_suffixes[$period];
         $sort_direction   = $sort_reverse ? ' ASC ': ' DESC ';
         $options    =   array(
-            BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST ' ))
+            BaseFactory::OrderBy => array( array( 'name' => $sort_by, 'sort' => $sort_direction . ' NULLS LAST,vk_public_id ' ))
         );
-
         $vkPublics = VkPublicFactory::Get( $search, $options );
         $diff_abs = 'diff_abs' .  $period_suffixes[$period];
         $diff_rel = 'diff_rel' .  $period_suffixes[$period];
