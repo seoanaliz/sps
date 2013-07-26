@@ -86,8 +86,9 @@ if(!empty($cssFilesAdds)) {
     <script type="text/javascript">
         rank = <?= $rank ?>;
         entriesPrecache = <?= $entriesPrecache ?>;
+        groupsPrecache = <?= $groupsPrecache ?>;
     </script>
- 
+
     <script type="text/javascript" src="{web:/shared/js/common/jquery-1.7.2.min.js?v1}"></script>
     <script type="text/javascript" src="{web:/shared/js/fe/jquery-ui-1.8.18.custom.min.js?v1}"></script>
     <?= JsHelper::includeCombinedFiles($jsFiles); ?>
@@ -95,6 +96,5 @@ if(!empty($cssFilesAdds)) {
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
     <? } ?>
-    <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
 </head>
 <body>
