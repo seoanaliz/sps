@@ -422,6 +422,7 @@ td {
   top: 0;
   left: 0;
   width: 128px;
+  height: 100%;
   border: none;
   padding-right: 37px;
   padding-left: 4px;
@@ -721,9 +722,7 @@ td {
   clear: both;
 }
 .header .actions {
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
+  display: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
