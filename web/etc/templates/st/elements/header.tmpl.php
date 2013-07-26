@@ -39,16 +39,6 @@ $cssFiles = array(
     AssetHelper::IE7 => array(),
 );
 
-$jsFiles = array(
-    'common/common.js',
-    'common/class.js',
-    'common/deferred.js',
-    'fe/jquery.ui.slider.js',
-    'st/main.js',
-    'st/events.js',
-    'st/template.js',
-);
-
 CssHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);
@@ -89,9 +79,20 @@ if(!empty($cssFilesAdds)) {
         groupsPrecache = <?= $groupsPrecache ?>;
     </script>
 
-    <script type="text/javascript" src="{web:/shared/js/common/jquery-1.7.2.min.js?v1}"></script>
-    <script type="text/javascript" src="{web:/shared/js/fe/jquery-ui-1.8.18.custom.min.js?v1}"></script>
-    <?= JsHelper::includeCombinedFiles($jsFiles); ?>
+    <?= JsHelper::includeCombined(array(
+        'common/jquery-1.7.2.min.js',
+        'fe/jquery-ui-1.8.18.custom.min.js',
+    )); ?>
+
+    <?= JsHelper::includeCombined(array(
+        'common/common.js',
+        'common/class.js',
+        'common/deferred.js',
+        'fe/jquery.ui.slider.js',
+        'st/main.js',
+        'st/events.js',
+        'st/template.js',
+    )); ?>
 
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>

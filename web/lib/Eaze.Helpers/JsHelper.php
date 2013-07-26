@@ -180,7 +180,7 @@
             self::$Hostname  = $hostname;
         }
 
-        public static function includeCombinedFiles($files) {
+        public static function includeCombined($files) {
             $revision = AssetHelper::GetRevision();
             $jsDir = __ROOT__ . '/shared/js/';
             $cacheDir = $jsDir . 'cache/';
