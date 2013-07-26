@@ -575,13 +575,22 @@ var Filter = (function() {
         }
     }
 
+    function getList(callback) {
+        if (groupsPrecache && groupsPrecache.success) {
+            callback(groupsPrecache.data);
+            groupsPrecache = false;
+        } else {
+            Events.fire('load_list', callback);
+        }
+    }
+
     function refreshList(callback, maybeListId) {
         var $selectedItem = $list.find('.item.selected');
         var id = maybeListId || $selectedItem.data('id');
         var $list_global  =  $('> .list.global', $container);
         var $list_private =  $('> .list.private', $container);
         var $list_shared  =  $('> .list.shared', $container);
-        Events.fire('load_list', function(data) {
+        getList(function(data) {
             $list_global.html(tmpl(FILTER_LIST, {items: data.global}));
             $list_private.html(tmpl(FILTER_LIST, {items: data.private}));
             $list_shared.html(tmpl(FILTER_LIST, {items: data.shared}));
@@ -1122,7 +1131,7 @@ var Table = (function() {
                     title: 'Категории',
                     items: dataList.global
                 }];
-                
+
                 $dropdown = $(tmpl(DROPDOWN, {categories: categories})).appendTo('body');
 
                 // поиск по категориям
