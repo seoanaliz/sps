@@ -471,6 +471,18 @@ td {
 .right-column .ui-sortable-helper {
   cursor: move;
 }
+#global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff url(http://st0.userapi.com/images/progress7.gif) no-repeat center;
+  z-index: 999;
+  text-align: center;
+  line-height: 300px;
+  font-size: 14px;
+}
 #go-to-top {
   display: none;
   position: fixed;
