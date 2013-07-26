@@ -193,7 +193,7 @@
                 }
                 file_put_contents($cacheDir . $cacheFilename, join("\n", $combined));
             }
-            echo '<script type="text/javascript" src="' . Site::GetWebPath('/shared/js/cache/' . $cacheFilename . "?$revision") . '"></script>';
+            echo '<script type="text/javascript" src="' . Site::GetWebPath('/shared/js/cache/' . $cacheFilename) . '"></script>';
         }
     }
 ?>
