@@ -47,8 +47,8 @@ $jsFiles = array(
     'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
-    'js://st/events.js',
     'js://st/template.js',
+    'js://st/events.js',
 );
 
 CssHelper::Init(false);
