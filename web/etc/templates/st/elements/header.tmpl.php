@@ -40,11 +40,9 @@ $cssFiles = array(
 );
 
 $jsFiles = array(
-    'js://common/jquery-1.7.2.min.js',
     'js://common/common.js',
     'js://common/class.js',
     'js://common/deferred.js',
-    'js://fe/jquery-ui-1.8.18.custom.min.js',
     'js://fe/jquery.ui.slider.js',
     'js://st/main.js',
     'js://st/template.js',
@@ -52,7 +50,7 @@ $jsFiles = array(
 );
 
 CssHelper::Init(false);
-JsHelper::Init(false);
+JsHelper::Init(true);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {
@@ -96,6 +94,8 @@ if(!empty($jsFilesAdds)) {
         groupsPrecache = <?= $groupsPrecache ?>;
     </script>
  
+    <script type="text/javascript" src="{web:/shared/js/common/jquery-1.7.2.min.js?v1}"></script>
+    <script type="text/javascript" src="{web:/shared/js/fe/jquery-ui-1.8.18.custom.min.js?v1}"></script>
     <?= JsHelper::Flush(); ?>
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
