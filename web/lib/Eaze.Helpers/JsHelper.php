@@ -179,5 +179,21 @@
             self::$MaxGroups = $maxGroups;
             self::$Hostname  = $hostname;
         }
+
+        public static function includeCombinedFiles($files) {
+            $revision = AssetHelper::GetRevision();
+            $cacheFile = __ROOT__ . '/cache/js_' . md5(join('_', $files) . $revision) . '.js';
+            if (!file_exists($cacheFile)) {
+                $jsDir = __ROOT__ . '/shared/js/';
+                $combined = array ();
+                foreach ($files as $file) {
+                    $combined []= '//# ' . $file;
+                    $combined []= file_get_contents($jsDir . ltrim($file, '/')) . "\n";
+                }
+                $content = join("\n", $combined);
+                echo "<script type=\"text/javascript\">\n" . $content . "\n</script>";
+                //file_put_contents($cacheFile, $content);
+            }
+        }
     }
 ?>

@@ -40,29 +40,22 @@ $cssFiles = array(
 );
 
 $jsFiles = array(
-    'js://common/jquery-1.7.2.min.js',
-    'js://common/common.js',
-    'js://common/class.js',
-    'js://common/deferred.js',
-    'js://fe/jquery-ui-1.8.18.custom.min.js',
-    'js://fe/jquery.ui.slider.js',
-    'js://st/main.js',
-    'js://st/events.js',
-    'js://st/template.js',
+    'common/common.js',
+    'common/class.js',
+    'common/deferred.js',
+    'fe/jquery.ui.slider.js',
+    'st/main.js',
+    'st/events.js',
+    'st/template.js',
 );
 
 CssHelper::Init(false);
-JsHelper::Init(false);
 
 CssHelper::PushGroups($cssFiles);
 if(!empty($cssFilesAdds)) {
     CssHelper::PushGroups($cssFilesAdds);
 }
 
-JsHelper::PushFiles($jsFiles);
-if(!empty($jsFilesAdds)) {
-    JsHelper::PushFiles($jsFilesAdds);
-}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -95,7 +88,10 @@ if(!empty($jsFilesAdds)) {
         entriesPrecache = <?= $entriesPrecache ?>;
     </script>
  
-    <?= JsHelper::Flush(); ?>
+    <script type="text/javascript" src="{web:/shared/js/common/jquery-1.7.2.min.js?v1}"></script>
+    <script type="text/javascript" src="{web:/shared/js/fe/jquery-ui-1.8.18.custom.min.js?v1}"></script>
+    <?= JsHelper::includeCombinedFiles($jsFiles); ?>
+
     <? if (AuthVkontakte::IsAuth()) { ?>
         <script src="http://vk.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
     <? } ?>
