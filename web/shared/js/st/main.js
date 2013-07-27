@@ -47,7 +47,7 @@ $(document).ready(function() {
 
     setTimeout(function () {
         $('.header .button-wrap').css({opacity: 1});
-    }, 2000);
+    }, 1800);
 
     checkVkStatus();
 });
