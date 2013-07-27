@@ -504,10 +504,10 @@ input[disabled] {
   transition: .2s opacity;
 }
 .icon.plus {
-  background-image: url('../../images/common/add.png');
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAABlBMVEUAAABrjbHTrvgSAAAAAXRSTlMAQObYZgAAACBJREFUeNqdzbENAAAAAUH2XxqdUlwjX0HQsmuwjPH8CBj8AFHnZyj6AAAAAElFTkSuQmCC);
 }
 .icon.select {
-  background-image: url('../../images/common/select.png');
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAADFBMVEUrWHorWHoAAABrjbHH6lvlAAAAA3RSTlMQCAAuie2mAAAANElEQVR42k3NyQkAMAwDQUfbf88hgiXWSwM+JisfLAAj4CkHeyZA+9vB9Jq9cKao1tN2YS5lkAFOvGpwkwAAAABJRU5ErkJggg==);
 }
 .icon.arrow {
   background-image: url('../../images/common/arrow.png');
@@ -525,7 +525,7 @@ input[disabled] {
   background-image: url('../../images/common/edit.png');
 }
 .icon.locked {
-  background-image: url('../../images/common/locked.png');
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAACVBMVEVylbIAAABylbLzkPZOAAAAAnRSTlOAAE0QVXMAAAApSURBVHjarc4xCgAACMPAmv8/WsRBBBEHAx1uq6w1UYCKxI4ke+b+2QFhoAD2V6UPfQAAAABJRU5ErkJggg==);
 }
 .placeholder {
   color: #999;
