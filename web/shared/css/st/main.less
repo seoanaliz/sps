@@ -711,12 +711,6 @@ table, tr, td {
         height: 39px;
     }
 
-    .button-wrap {
-        .inline-block;
-        float: right;
-        margin-top: 7px;
-    }
-
     .under {
         height: 5px;
         width: 100%;
@@ -738,6 +732,17 @@ table, tr, td {
             }
         }
     }
+}
+
+.login-info, .button-wrap {
+    opacity: 0;
+    .transition(opacity 1s ease-out);
+}
+
+.button-wrap {
+    .inline-block;
+    float: right;
+    margin-top: 7px;
 }
 
 .login-info {

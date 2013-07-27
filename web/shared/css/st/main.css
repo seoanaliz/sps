@@ -677,13 +677,6 @@ td {
   right: 0;
   height: 39px;
 }
-.header .button-wrap {
-  display: inline-block;
-  zoom: 1;
-  *display: inline;
-  float: right;
-  margin-top: 7px;
-}
 .header .under {
   height: 5px;
   width: 100%;
@@ -707,6 +700,21 @@ td {
 }
 .header .actions a:first-child {
   border: none;
+}
+.login-info,
+.button-wrap {
+  opacity: 0;
+  -webkit-transition: opacity 1s ease-out;
+  -moz-transition: opacity 1s ease-out;
+  -o-transition: opacity 1s ease-out;
+  transition: opacity 1s ease-out;
+}
+.button-wrap {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  float: right;
+  margin-top: 7px;
 }
 .login-info {
   margin: 3px 7px 0 24px;

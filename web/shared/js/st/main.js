@@ -45,6 +45,10 @@ $(document).ready(function() {
         });
     });
 
+    setTimeout(function () {
+        $('.header .button-wrap').css({opacity: 1});
+    }, 2000);
+
     checkVkStatus();
 });
 
@@ -108,6 +112,7 @@ function makeVkButton() {
                 '&response_type=code';
         $('.login-info').html($('<a />', {'class': 'login', href: vkHref}).text('Войти'));
     }
+    $loginInfo.css({opacity: 1});
 }
 
 function handleUserLoggedIn(userData) {
@@ -120,6 +125,7 @@ function handleUserLoggedIn(userData) {
             .find('span')
             .text(name);
     $('.userpic', $loginInfo).attr('src', userData.photo);
+    $loginInfo.css({opacity: 1});
 }
 
 function changeState(listId, slug, doReplace) {
