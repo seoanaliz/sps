@@ -10,12 +10,14 @@
 <div id="main" class="main">
     <div class="header clear-fix">
         <div class="tab-bar"></div>
-        <div class="login-info"></div>
-        <div class="button-wrap">
-            <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
-            <script type="text/javascript">
-                document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
-            </script>
+        <div class="controls">
+            <div class="login-info"></div>
+            <div class="button-wrap">
+                <script type="text/javascript" src="http://vk.com/js/api/share.js?85" charset="windows-1251"></script>
+                <script type="text/javascript">
+                    document.write(VK.Share.button('http://socialboard.ru/stat/?from=share', {type: "button", text: "Поделиться ссылкой"}));
+                </script>
+            </div>
         </div>
         <div class="under">
             <? if ($canEditGlobalGroups) {?>

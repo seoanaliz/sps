@@ -16,98 +16,95 @@ table, tr, td {
 }
 
 .table {
-    &>.body>.row>.column {
+    .column12 { width: 100%  }
+    .column11 { width: 91.6% }
+    .column10 { width: 83.3% }
+    .column9  { width: 75%   }
+    .column8  { width: 66.6% }
+    .column7  { width: 58.3% }
+    .column6  { width: 50%   }
+    .column5-5{ width: 45.8% }
+    .column5  { width: 41.6% }
+    .column4-5{ width: 37.5% }
+    .column4  { width: 33.3% }
+    .column3-5{ width: 29.2% }
+    .column3  { width: 25%   }
+    .column2  { width: 16.6% }
+    .column1-5{ width: 12.5% }
+    .column1  { width: 8.3%  }
+
+    .body .column {
         vertical-align: top;
     }
 
-    &>.header>.row>.column {
-        vertical-align: middle;
+    .list-head {
+        color: @color_link;
+        background-color: #DEE5EB;
+        .user-select(none);
+
+        .column {
+            vertical-align: middle;
+        }
+        
+        .row .column {
+            font-weight: bold;
+        }
     }
 
-    &>.body,
-    &>.header {
+    .body,
+    .list-head {
         font-size: 0;
 
-        .row + .row {
-            border-top: 1px solid @border_inside;
-        }
-
-        &>.row {
-            &>.column12 { width: 100%  }
-            &>.column11 { width: 91.6% }
-            &>.column10 { width: 83.3% }
-            &>.column9  { width: 75%   }
-            &>.column8  { width: 66.6% }
-            &>.column7  { width: 58.3% }
-            &>.column6  { width: 50%   }
-            &>.column5-5{ width: 45.8% }
-            &>.column5  { width: 41.6% }
-            &>.column4-5{ width: 37.5% }
-            &>.column4  { width: 33.3% }
-            &>.column3-5{ width: 29.2% }
-            &>.column3  { width: 25%   }
-            &>.column2  { width: 16.6% }
-            &>.column1-5{ width: 12.5% }
-            &>.column1  { width: 8.3%  }
-
-            &>.column {
-                font-size: 12px;
-                .inline-block;
-
-                .cell {
-                    padding: 10px 0;
-                }
-                
-                &.publics .cell {
-                    padding: 10px;
-                }
-
-                &.left {
-                    text-align: left;
-                }
-
-                &.center {
-                    text-align: center;
-                }
-
-                &.right {
-                    text-align: right;
-                }
-
-                &.top {
-                    vertical-align: top;
-                }
-
-                &.middle {
-                    vertical-align: middle;
-                }
-
-                &.bottom {
-                    vertical-align: bottom;
-                }
-            }
-        }
-
-        &>.empty {
+        .empty {
             padding: 100px 0;
             text-align: center;
             color: #777;
             font-size: 14px;
         }
     }
+ 
+    .row + .row {
+        border-top: 1px solid @border_inside;
+    }
 
-    &>.header {
-        color: @color_link;
-        background-color: #DEE5EB;
-        .user-select(none);
+    .row {
+        .column {
+            font-size: 12px;
+            .inline-block;
 
-        &>.row {
-            &>.column {
-                font-weight: bold;
+            .cell {
+                padding: 10px 0;
+            }
+
+            &.publics .cell {
+                padding: 10px;
+            }
+
+            &.left {
+                text-align: left;
+            }
+
+            &.center {
+                text-align: center;
+            }
+
+            &.right {
+                text-align: right;
+            }
+
+            &.top {
+                vertical-align: top;
+            }
+
+            &.middle {
+                vertical-align: middle;
+            }
+
+            &.bottom {
+                vertical-align: bottom;
             }
         }
     }
-
 }
 
 #main {
@@ -704,6 +701,16 @@ table, tr, td {
 }
 
 .header {
+    position: relative;
+
+    .controls {
+        width: 500px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 39px;
+    }
+
     .button-wrap {
         .inline-block;
         float: right;
@@ -713,7 +720,6 @@ table, tr, td {
     .under {
         height: 5px;
         width: 100%;
-        clear: both;
     }
 
     .actions {
@@ -777,6 +783,7 @@ table, tr, td {
 .tab-bar {
     .inline-block;
     width: 460px;
+    height: 34px;
     padding-bottom: 0 !important;
 }
 
