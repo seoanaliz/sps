@@ -185,7 +185,7 @@
             $jsDir = __ROOT__ . '/shared/js/';
             $cacheDir = $jsDir . 'cache/';
             $cacheFilename = 'js_' . md5(join('_', $files) . $revision) . '.js';
-            if (!file_exists($cacheDir . $cacheFilename)) {
+            if (Site::IsDevel() || !file_exists($cacheDir . $cacheFilename)) {
                 $combined = array ();
                 foreach ($files as $file) {
                     $combined []= '//# ' . $file;
