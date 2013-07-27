@@ -7,7 +7,6 @@
 ?>
 
 {increal:tmpl://st/elements/header.tmpl.php}
-<div id="global-loader"></div>
 <div id="main" class="main">
     <div class="header clear-fix">
         <div class="tab-bar"></div>
